@@ -36,7 +36,7 @@ function NetworkSelection() {
                   fill
                   className="object-contain"
                   alt="logo"
-                  src={networkLogos[selected.id]}
+                  src={(networkLogos as any)[selected.id]}
                 />
               </figure>
             )}

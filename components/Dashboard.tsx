@@ -34,15 +34,14 @@ function Dashboard() {
       (fee) => Number(formatUnits(fee)) < 1
     );
   const validAdapter = !!adapter;
+
+  const initParams = adapter?.initParams || [];
   const validAdapterConfig =
-    typeof adapter.initParams === "undefined" ||
-    (!!adapter.initParams &&
-      adapter.initParams.length > 0 &&
-      adapterConfig.length === adapter.initParams.length &&
-      // @ts-ignore
-      adapterConfig.every((config, i) =>
-        checkInitParamValidity(config, adapter.initParams[i])
-      ));
+    initParams.length > 0 &&
+    initParams.length === adapterConfig.length &&
+    adapterConfig.every((config, i) =>
+      checkInitParamValidity(config, adapter?.initParams![i])
+    );
 
   return (
     <section>

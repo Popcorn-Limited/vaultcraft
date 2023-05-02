@@ -50,7 +50,7 @@ function FeeConfiguration() {
                   spellCheck="false"
                   // @ts-ignore
                   className={
-                    Number(formatUnits(fees[input.key])) >= 1
+                    Number(formatUnits((fees as any)[input.key] || 0)) >= 1
                       ? "border border-red-500"
                       : ""
                   }
@@ -78,7 +78,7 @@ function FeeConfiguration() {
                 !utils.isAddress(fees.recipient) ||
                 // @ts-ignore
                 (Object.keys(fees).some(
-                  (key) => Number(formatUnits(fees[key])) > 0
+                  (key) => Number(formatUnits((fees as any)[key])) > 0
                 ) &&
                   fees.recipient === constants.AddressZero)
                   ? "border border-red-500"
