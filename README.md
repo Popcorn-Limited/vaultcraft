@@ -1,12 +1,14 @@
-<p align="center">
+<p>
   <h1 align="center">VaultCraft by Popcorn</h1>
-  <picture>
-    <img src="./assets/vc-intro.gif"/>
-  </picture>
+  <p align="center">
+    <img alt="Loading..." src="./assets/vc-intro.gif">
+  </p>
   <p align="center">
     A no-code DeFi protocol for customizing vault strategies.
   </p>
 </p>
+
+<br>
 
 ## Introducing VaultCraft
 
