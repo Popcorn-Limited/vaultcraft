@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { networkAtom } from "@/lib/networks";
 
 function ProtocolSelection() {
-  const [network,] = useAtom(networkAtom);
+  const [network] = useAtom(networkAtom);
   const [protocol, setProtocol] = useAtom(protocolAtom);
   const protocols = useProtocols();
   const [options, setOptions] = useState<Protocol[]>(protocols);
@@ -19,8 +19,7 @@ function ProtocolSelection() {
       setOptions(filtered);
       setProtocol(filtered[0]);
     }
-  }, [network])
-
+  }, [network]);
 
   return (
     <Section title="Protocol Selection">
@@ -31,7 +30,12 @@ function ProtocolSelection() {
           <Fragment>
             {selected?.logoURI && (
               <figure className="relative w-6 h-6">
-                <Image className="object-contain" alt="logo" src={selected?.logoURI} />
+                <Image
+                  fill
+                  className="object-contain"
+                  alt="logo"
+                  src={selected?.logoURI}
+                />
               </figure>
             )}
             <span>{selected?.name || "Click to select"}</span>
@@ -41,7 +45,12 @@ function ProtocolSelection() {
         {protocols.map((protocol) => (
           <Option value={protocol} key={`asset-selc-${protocol.name}`}>
             <figure className="relative w-6 h-6">
-              <Image alt="" className="object-contain" src={protocol.logoURI} />
+              <Image
+                fill
+                alt=""
+                className="object-contain"
+                src={protocol.logoURI}
+              />
             </figure>
             <span>{protocol.name}</span>
           </Option>

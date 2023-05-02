@@ -8,7 +8,11 @@ import StrategySelection from "./sections/StrategySelection";
 import FeeConfiguration from "./sections/FeeConfiguration";
 import { useRouter } from "next/router";
 import { useAtom } from "jotai";
-import { adapterAtom, adapterConfigAtom, checkInitParamValidity } from "@/lib/adapter";
+import {
+  adapterAtom,
+  adapterConfigAtom,
+  checkInitParamValidity,
+} from "@/lib/adapter";
 import { feeAtom } from "@/lib/fees";
 import { constants, utils } from "ethers";
 import { formatUnits } from "ethers/lib/utils.js";
@@ -16,19 +20,29 @@ import NetworkSelection from "./sections/NetworkSelection";
 
 function Dashboard() {
   const router = useRouter();
-  const [adapter,] = useAtom(adapterAtom);
-  const [adapterConfig,] = useAtom(adapterConfigAtom);
-  const [fees,] = useAtom(feeAtom)
+  const [adapter] = useAtom(adapterAtom);
+  const [adapterConfig] = useAtom(adapterConfigAtom);
+  const [fees] = useAtom(feeAtom);
 
-  const validFees = ([fees.deposit, fees.withdrawal, fees.management, fees.performance].some(fee => Number(formatUnits(fee)) > 0) && fees.recipient != constants.AddressZero)
-    && utils.isAddress(fees.recipient)
-    && [fees.deposit, fees.withdrawal, fees.management, fees.performance].every(fee => Number(formatUnits(fee)) < 1)
-  const validAdapter = !!adapter
-  const validAdapterConfig = typeof adapter.initParams === "undefined"
-    || (!!adapter.initParams && adapter.initParams.length > 0 && adapterConfig.length === adapter.initParams.length &&
+  const validFees =
+    [fees.deposit, fees.withdrawal, fees.management, fees.performance].some(
+      (fee) => Number(formatUnits(fee)) > 0
+    ) &&
+    fees.recipient != constants.AddressZero &&
+    utils.isAddress(fees.recipient) &&
+    [fees.deposit, fees.withdrawal, fees.management, fees.performance].every(
+      (fee) => Number(formatUnits(fee)) < 1
+    );
+  const validAdapter = !!adapter;
+  const validAdapterConfig =
+    typeof adapter.initParams === "undefined" ||
+    (!!adapter.initParams &&
+      adapter.initParams.length > 0 &&
+      adapterConfig.length === adapter.initParams.length &&
       // @ts-ignore
-      (adapterConfig.every((config, i) => checkInitParamValidity(config, adapter.initParams[i])))
-    )
+      adapterConfig.every((config, i) =>
+        checkInitParamValidity(config, adapter.initParams[i])
+      ));
 
   return (
     <section>

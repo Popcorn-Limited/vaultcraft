@@ -9,19 +9,20 @@ import { useAtom } from "jotai";
 import { RESET } from "jotai/utils";
 
 function AdapterSelection() {
-  const [protocol,] = useAtom(protocolAtom);
+  const [protocol] = useAtom(protocolAtom);
   const [adapter, setAdapter] = useAtom(adapterAtom);
   const adapters = useAdapters();
   const [options, setOptions] = useState<Adapter[]>(adapters);
 
   useEffect(() => {
     if (protocol) {
-      const filtered = adapters.filter((adapter) => adapter.protocol === protocol.name);
+      const filtered = adapters.filter(
+        (adapter) => adapter.protocol === protocol.name
+      );
       setOptions(filtered);
       setAdapter(filtered[0]);
     }
-  }, [protocol])
-
+  }, [protocol]);
 
   return (
     <Section title="Adapter Selection">
@@ -33,7 +34,12 @@ function AdapterSelection() {
           <Fragment>
             {selected?.logoURI && (
               <figure className="relative w-6 h-6">
-                <Image className="object-contain" alt="logo" src={selected?.logoURI} />
+                <Image
+                  fill
+                  className="object-contain"
+                  alt="logo"
+                  src={selected?.logoURI}
+                />
               </figure>
             )}
             <span>{selected?.name || "Click to select"}</span>
@@ -41,9 +47,17 @@ function AdapterSelection() {
         )}
       >
         {options.map((adapter) => (
-          <Option value={adapter} key={`asset-selc-${adapter.key}-${adapter.name}`}>
+          <Option
+            value={adapter}
+            key={`asset-selc-${adapter.key}-${adapter.name}`}
+          >
             <figure className="relative w-6 h-6">
-              <Image alt="" className="object-contain" src={adapter.logoURI} />
+              <Image
+                fill
+                alt=""
+                className="object-contain"
+                src={adapter.logoURI}
+              />
             </figure>
             <span>{adapter.name}</span>
           </Option>
@@ -54,5 +68,3 @@ function AdapterSelection() {
 }
 
 export default AdapterSelection;
-
-

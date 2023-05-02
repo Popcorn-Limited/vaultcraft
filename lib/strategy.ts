@@ -7,7 +7,7 @@ const STRATEGY = {
   key: "strategy",
   description: "Strategy",
   compatibleAdapters: [],
-}
+};
 
 export type Strategy = {
   name: string;
@@ -15,10 +15,13 @@ export type Strategy = {
   description: string;
   compatibleAdapters: string[];
   initParams?: InitParam[];
-}
+};
 
 export const useStrategies = () => {
   return strategies as any as Array<Strategy>;
 };
 
-export const strategyAtom = atomWithStorage<Strategy>("select.strategy", STRATEGY);
+export const strategyAtom = atomWithStorage<Strategy>(
+  "select.strategy",
+  STRATEGY
+);

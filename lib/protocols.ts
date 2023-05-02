@@ -11,4 +11,7 @@ export const useProtocols = () => {
   return protocols as any as Array<Protocol>;
 };
 
-export const protocolAtom = atomWithStorage<Protocol>("select.protocol", protocols[0] as unknown as Protocol);
+export const protocolAtom = atomWithStorage<Protocol>(
+  "select.protocol",
+  protocols[0] as unknown as Protocol
+);

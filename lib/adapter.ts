@@ -11,11 +11,11 @@ export type Adapter = {
 };
 
 export type InitParam = {
-  name: string,
-  type: string,
-  requirements?: InitParamRequirement[],
-  description?: string,
-}
+  name: string;
+  type: string;
+  requirements?: InitParamRequirement[];
+  description?: string;
+};
 
 export enum InitParamRequirement {
   "Required",
@@ -28,17 +28,27 @@ export interface AdapterConfig {
   data: string;
 }
 
-
 export const useAdapters = () => {
   return adapters as any as Array<Adapter>;
 };
 
-export const adapterAtom = atomWithStorage<Adapter>("select.adapter", adapters[0] as unknown as Adapter);
-export const adapterConfigAtom = atomWithStorage<Array<string>>("config.adapter", []);
-export const adapterDeploymentAtom = atomWithStorage<AdapterConfig>("deploy.adapter", { id: ethers.utils.formatBytes32String(""), data: "0x" });
+export const adapterAtom = atomWithStorage<Adapter>(
+  "select.adapter",
+  adapters[0] as unknown as Adapter
+);
+export const adapterConfigAtom = atomWithStorage<Array<string>>(
+  "config.adapter",
+  []
+);
+export const adapterDeploymentAtom = atomWithStorage<AdapterConfig>(
+  "deploy.adapter",
+  { id: ethers.utils.formatBytes32String(""), data: "0x" }
+);
 
-
-export function checkInitParamValidity(value: any, inputParam: InitParam): boolean {
+export function checkInitParamValidity(
+  value: any,
+  inputParam: InitParam
+): boolean {
   if (!value) return false;
   if (!inputParam?.requirements) {
     switch (inputParam.type) {

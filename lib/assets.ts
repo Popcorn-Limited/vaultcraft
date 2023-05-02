@@ -15,4 +15,3 @@ export const useAssets = () => {
 };
 
 export const assetAtom = atomWithStorage<Asset>("select.asset", assets[0]);
-

@@ -7,7 +7,6 @@ import { Chain, goerli } from "wagmi";
 import { networkAtom } from "@/lib/networks";
 import { localhost } from "wagmi/chains";
 
-
 const networkLogos = {
   1: "/images/icons/ethereum.svg",
   5: "/images/icons/testNetLogo.png",
@@ -17,7 +16,7 @@ const networkLogos = {
   31338: "/images/icons/testNetLogo.png",
   10: "/images/icons/optimism-op-logo.svg",
   56: "/images/icons/bsc-logo.png",
-  250: "/images/icons/fantom.png"
+  250: "/images/icons/fantom.png",
 };
 
 function NetworkSelection() {
@@ -33,7 +32,12 @@ function NetworkSelection() {
           <Fragment>
             {selected && (
               <figure className="relative w-6 h-6">
-                <Image className="object-contain" alt="logo" src={networkLogos[selected.id]} />
+                <Image
+                  fill
+                  className="object-contain"
+                  alt="logo"
+                  src={networkLogos[selected.id]}
+                />
               </figure>
             )}
             <span>{selected?.name || "Click to select"}</span>
@@ -43,7 +47,12 @@ function NetworkSelection() {
         {chains.map((c) => (
           <Option value={c} key={`asset-selc-${c.network}`}>
             <figure className="relative w-6 h-6">
-              <Image alt="" className="object-contain" src={networkLogos[c.id]} />
+              <Image
+                fill
+                alt=""
+                className="object-contain"
+                src={networkLogos[c.id]}
+              />
             </figure>
             <span>{c.name}</span>
           </Option>
@@ -54,5 +63,3 @@ function NetworkSelection() {
 }
 
 export default NetworkSelection;
-
-

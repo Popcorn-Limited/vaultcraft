@@ -5,7 +5,6 @@ import asset_logo from "@/assets/logo.png";
 import { useAccount } from "wagmi";
 import { beautifyAddress } from "@/lib/helpers";
 
-
 export default function Navbar(): JSX.Element {
   const { address: account } = useAccount();
   return (
@@ -18,5 +17,5 @@ export default function Navbar(): JSX.Element {
         {account ? <p>{beautifyAddress(account)}</p> : <ConnectButton />}
       </nav>
     </section>
-  )
+  );
 }

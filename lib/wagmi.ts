@@ -1,4 +1,8 @@
-import { useContractRead, useContractWrite, usePrepareContractWrite } from "wagmi";
+import {
+  useContractRead,
+  useContractWrite,
+  usePrepareContractWrite,
+} from "wagmi";
 
 export type ContractWriteArgs = Partial<Parameters<typeof useContractWrite>[0]>;
 

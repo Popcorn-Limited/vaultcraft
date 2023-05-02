@@ -1,7 +1,11 @@
 import Section from "@/components/content/Section";
 import { constants, ethers } from "ethers";
 import { useAccount } from "wagmi";
-import { adapterAtom, adapterConfigAtom, adapterDeploymentAtom } from "@/lib/adapter";
+import {
+  adapterAtom,
+  adapterConfigAtom,
+  adapterDeploymentAtom,
+} from "@/lib/adapter";
 import { useAtom } from "jotai";
 import { assetAtom } from "@/lib/assets";
 import { feeAtom } from "@/lib/fees";
@@ -12,26 +16,27 @@ import { IoMdArrowBack, IoMdArrowForward } from "react-icons/io";
 import { useRouter } from "next/router";
 import { formatUnits } from "ethers/lib/utils.js";
 
-
 export default function Preview(): JSX.Element {
   const { address: account } = useAccount();
   const router = useRouter();
-  const [asset,] = useAtom(assetAtom);
-  const [adapter,] = useAtom(adapterAtom);
-  const [adapterConfig,] = useAtom(adapterConfigAtom);
+  const [asset] = useAtom(assetAtom);
+  const [adapter] = useAtom(adapterAtom);
+  const [adapterConfig] = useAtom(adapterConfigAtom);
   const [adapterData, setAdapterData] = useAtom(adapterDeploymentAtom);
-  const [fees,] = useAtom(feeAtom);
+  const [fees] = useAtom(feeAtom);
 
   const { write: deployVault = noOp } = useDeployVault();
-
 
   useEffect(() => {
     setAdapterData({
       id: ethers.utils.formatBytes32String(adapter.key ? adapter.key : ""),
-      data: !!adapter.initParams ?
-        ethers.utils.defaultAbiCoder.encode(adapter.initParams?.map(param => param.type), adapterConfig)
-        : "0x"
-    })
+      data: !!adapter.initParams
+        ? ethers.utils.defaultAbiCoder.encode(
+            adapter.initParams?.map((param) => param.type),
+            adapterConfig
+          )
+        : "0x",
+    });
   }, [adapterConfig]);
 
   return (
@@ -48,10 +53,22 @@ export default function Preview(): JSX.Element {
           <div>
             <p>Fees: </p>
             <div>
-              <p>Deposit: {Number(fees.deposit._hex)} ({formatUnits(fees.deposit)})</p>
-              <p>Withdrawal: {Number(fees.withdrawal._hex)} ({formatUnits(fees.withdrawal)})</p>
-              <p>Management: {Number(fees.management._hex)} ({formatUnits(fees.management)})</p>
-              <p>Performance: {Number(fees.performance._hex)} ({formatUnits(fees.performance)})</p>
+              <p>
+                Deposit: {Number(fees.deposit._hex)} (
+                {formatUnits(fees.deposit)})
+              </p>
+              <p>
+                Withdrawal: {Number(fees.withdrawal._hex)} (
+                {formatUnits(fees.withdrawal)})
+              </p>
+              <p>
+                Management: {Number(fees.management._hex)} (
+                {formatUnits(fees.management)})
+              </p>
+              <p>
+                Performance: {Number(fees.performance._hex)} (
+                {formatUnits(fees.performance)})
+              </p>
               <p>Recipient: {fees.recipient}</p>
             </div>
           </div>
@@ -63,7 +80,11 @@ export default function Preview(): JSX.Element {
           <div>
             <p>Params: </p>
             <div>
-              {adapterConfig?.map((param, i) => <p key={i}>{i}: {param}</p>)}
+              {adapterConfig?.map((param, i) => (
+                <p key={i}>
+                  {i}: {param}
+                </p>
+              ))}
             </div>
           </div>
         </Section>
@@ -113,7 +134,10 @@ export default function Preview(): JSX.Element {
             </button>
             <button
               className="flex group gap-2 items-center bg-blue-600 text-white font-bold px-6 py-4 rounded-xl shadow"
-              onClick={() => { console.log("done"); deployVault() }}
+              onClick={() => {
+                console.log("done");
+                deployVault();
+              }}
             >
               <span>Deploy Vault</span>
               <IoMdArrowForward className="text-[150%] group-hover:translate-x-px" />
@@ -122,5 +146,5 @@ export default function Preview(): JSX.Element {
         </div>
       </div>
     </section>
-  )
+  );
 }

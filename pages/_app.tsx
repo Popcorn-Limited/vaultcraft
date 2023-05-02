@@ -13,7 +13,10 @@ import Page from "@/components/content/Page";
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 
-const { provider, chains } = configureChains([goerli, localhost], [publicProvider()]);
+const { provider, chains } = configureChains(
+  [goerli, localhost],
+  [publicProvider()]
+);
 
 const { connectors } = getDefaultWallets({
   appName: "app.pop.network",

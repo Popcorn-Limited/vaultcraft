@@ -18,7 +18,12 @@ function AssetSelection() {
           <Fragment>
             {selected?.logoURI && (
               <figure className="relative w-6 h-6">
-                <Image className="object-contain" alt="logo" src={selected?.logoURI} />
+                <Image
+                  fill
+                  className="object-contain"
+                  alt="logo"
+                  src={selected?.logoURI}
+                />
               </figure>
             )}
             <span>{selected?.name || "Click to select"}</span>
@@ -28,7 +33,12 @@ function AssetSelection() {
         {assets.map((asset) => (
           <Option value={asset} key={`asset-selc-${asset.address}`}>
             <figure className="relative w-6 h-6">
-              <Image alt="" className="object-contain" src={asset.logoURI} />
+              <Image
+                fill
+                alt=""
+                className="object-contain"
+                src={asset.logoURI}
+              />
             </figure>
             <span>{asset.name}</span>
           </Option>
