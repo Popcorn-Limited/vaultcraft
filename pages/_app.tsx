@@ -10,13 +10,11 @@ import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { Toaster } from "react-hot-toast";
 import Head from "next/head";
 import Page from "@/components/content/Page";
-import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
-import { alchemyProvider } from "wagmi/providers/alchemy";
 
-const { provider, chains } = configureChains(
-  [goerli, localhost],
-  [publicProvider()]
-);
+export const SUPPORTED_NETWORKS = [goerli, localhost];
+const { provider, chains } = configureChains(SUPPORTED_NETWORKS, [
+  publicProvider(),
+]);
 
 const { connectors } = getDefaultWallets({
   appName: "app.pop.network",
