@@ -1,11 +1,13 @@
-import Section from "@/components/content/Section";
-import { Fragment } from "react";
-import Image from "next/image";
-import Selector, { Option } from "../Selector";
-import { useAtom } from "jotai";
-import { Chain, goerli } from "wagmi";
+import { Fragment, useEffect } from "react";
 import { networkAtom } from "@/lib/networks";
-import { localhost } from "wagmi/chains";
+import { useAtom } from "jotai";
+import { Chain, useNetwork } from "wagmi";
+import { useChainModal } from "@rainbow-me/rainbowkit";
+
+import Section from "@/components/content/Section";
+import Image from "next/image";
+import Selector, { Option } from "@/components/Selector";
+import { SUPPORTED_NETWORKS } from "pages/_app";
 
 const networkLogos = {
   1: "/images/icons/ethereum.svg",
@@ -20,8 +22,21 @@ const networkLogos = {
 };
 
 function NetworkSelection() {
+  const { chain } = useNetwork();
+  const { openChainModal } = useChainModal();
   const [network, setNetwork] = useAtom(networkAtom);
-  const chains = [goerli, localhost];
+
+  useEffect(() => {
+    if (chain?.unsupported) {
+      // Suggest to change network when not in `SUPPORTED_NETWORKS`
+      return openChainModal?.();
+    }
+
+    if (network?.id !== chain?.id) {
+      // Propt to change network when user changes from Selection Dropdown
+      openChainModal?.();
+    }
+  }, [chain?.unsupported, network]);
 
   return (
     <Section title="Network Selection">
@@ -44,17 +59,17 @@ function NetworkSelection() {
           </Fragment>
         )}
       >
-        {chains.map((c) => (
-          <Option value={c} key={`asset-selc-${c.network}`}>
+        {SUPPORTED_NETWORKS.map((chain) => (
+          <Option value={chain} key={`asset-selc-${chain.network}`}>
             <figure className="relative w-6 h-6">
               <Image
                 fill
                 alt=""
                 className="object-contain"
-                src={networkLogos[c.id]}
+                src={networkLogos[chain.id]}
               />
             </figure>
-            <span>{c.name}</span>
+            <span>{chain.name}</span>
           </Option>
         ))}
       </Selector>
