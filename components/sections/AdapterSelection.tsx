@@ -1,4 +1,4 @@
-import { Adapter, adapterAtom, useAdapters } from "@/lib/adapter";
+import { Adapter, adapterAtom, adapterConfigAtom, useAdapters } from "@/lib/adapter";
 import Section from "@/components/content/Section";
 import { Fragment } from "react";
 import Image from "next/image";
@@ -7,12 +7,17 @@ import { protocolAtom } from "@/lib/protocols";
 import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import { RESET } from "jotai/utils";
+import { strategyAtom } from "@/lib/strategy";
 
 function AdapterSelection() {
   const [protocol] = useAtom(protocolAtom);
   const [adapter, setAdapter] = useAtom(adapterAtom);
   const adapters = useAdapters();
   const [options, setOptions] = useState<Adapter[]>(adapters);
+
+  // Only for reset
+  const [, setAdapterConfig] = useAtom(adapterConfigAtom);
+  const [, setStrategy] = useAtom(strategyAtom);
 
   useEffect(() => {
     if (protocol) {
@@ -24,12 +29,20 @@ function AdapterSelection() {
     }
   }, [protocol]);
 
+  function selectAdapter(newAdapter: any) {
+    if (adapter !== newAdapter) {
+      setAdapterConfig(RESET)
+      setStrategy(RESET)
+    }
+    setAdapter(newAdapter)
+  }
+
   return (
     <Section title="Adapter Selection">
       <p>Options: {options.length}</p>
       <Selector
         selected={adapter}
-        onSelect={setAdapter}
+        onSelect={(newAdapter) => selectAdapter(newAdapter)}
         actionContent={(selected) => (
           <Fragment>
             {selected?.logoURI && (

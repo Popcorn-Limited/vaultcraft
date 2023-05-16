@@ -6,26 +6,35 @@ import Selector, { Option } from "../Selector";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { networkAtom } from "@/lib/networks";
+import { adapterConfigAtom } from "@/lib/adapter";
+import { RESET } from "jotai/utils";
 
 function ProtocolSelection() {
   const [network] = useAtom(networkAtom);
   const [protocol, setProtocol] = useAtom(protocolAtom);
   const protocols = useProtocols();
   const [options, setOptions] = useState<Protocol[]>(protocols);
+  const [adapterConfig, setAdapterConfig] = useAtom(adapterConfigAtom);
 
   useEffect(() => {
     if (network) {
       const filtered = protocols.filter((p) => p.chains.includes(network.id));
       setOptions(filtered);
-      setProtocol(filtered[0]);
     }
   }, [network]);
+
+  function selectProtocol(newProtocol: any) {
+    if (protocol !== newProtocol) {
+      setAdapterConfig(RESET)
+    }
+    setProtocol(newProtocol)
+  }
 
   return (
     <Section title="Protocol Selection">
       <Selector
         selected={protocol}
-        onSelect={setProtocol}
+        onSelect={(newProtocol) => selectProtocol(newProtocol)}
         actionContent={(selected) => (
           <Fragment>
             {selected?.logoURI && (

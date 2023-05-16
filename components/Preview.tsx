@@ -15,10 +15,13 @@ import { noOp } from "@/lib/helpers";
 import { IoMdArrowBack, IoMdArrowForward } from "react-icons/io";
 import { useRouter } from "next/router";
 import { formatUnits } from "ethers/lib/utils.js";
+import { networkAtom } from "@/lib/networks";
 
 export default function Preview(): JSX.Element {
   const { address: account } = useAccount();
   const router = useRouter();
+  const [network] = useAtom(networkAtom);
+  const chainId = network.id === 1337 ? 1 : network.id;
   const [asset] = useAtom(assetAtom);
   const [adapter] = useAtom(adapterAtom);
   const [adapterConfig] = useAtom(adapterConfigAtom);
@@ -46,7 +49,7 @@ export default function Preview(): JSX.Element {
           Review Vault
         </h1>
         <Section title="Vault Configuration">
-          <p>Asset: {asset?.address || constants.AddressZero}</p>
+          <p>Asset: {asset?.address[chainId] || constants.AddressZero}</p>
           <p>Adapter: {constants.AddressZero}</p>
           <p>Owner: {account}</p>
           <p>Deposit Limit: {constants.MaxUint256.toString()}</p>

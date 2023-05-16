@@ -4,16 +4,19 @@ import Image from "next/image";
 import Selector, { Option } from "../Selector";
 import { useAtom } from "jotai";
 import { assetAtom, useAssets } from "@/lib/assets";
+import { networkAtom } from "@/lib/networks";
 
 function AssetSelection() {
-  const [adapter, setAdapter] = useAtom(assetAtom);
+  const [network] = useAtom(networkAtom);
+  const chainId = network.id === 1337 ? 1 : network.id;
+  const [asset, setAsset] = useAtom(assetAtom);
   const assets = useAssets();
 
   return (
     <Section title="Asset Selection">
       <Selector
-        selected={adapter}
-        onSelect={setAdapter}
+        selected={asset}
+        onSelect={setAsset}
         actionContent={(selected) => (
           <Fragment>
             {selected?.logoURI && (
@@ -30,8 +33,9 @@ function AssetSelection() {
           </Fragment>
         )}
       >
-        {assets.map((asset) => (
-          <Option value={asset} key={`asset-selc-${asset.address}`}>
+        {assets.filter(a => a.chains?.includes(chainId)).map((asset) => (
+          // @ts-ignore
+          <Option value={asset} key={`asset-selc-${asset.address[String(chainId)]}`}>
             <figure className="relative w-6 h-6">
               <Image
                 fill

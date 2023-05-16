@@ -24,15 +24,15 @@ function Dashboard() {
   const [adapterConfig] = useAtom(adapterConfigAtom);
   const [fees] = useAtom(feeAtom);
 
-  const validFees =
-    [fees.deposit, fees.withdrawal, fees.management, fees.performance].some(
-      (fee) => Number(formatUnits(fee)) > 0
-    ) &&
-    fees.recipient != constants.AddressZero &&
-    utils.isAddress(fees.recipient) &&
-    [fees.deposit, fees.withdrawal, fees.management, fees.performance].every(
-      (fee) => Number(formatUnits(fee)) < 1
-    );
+  const feesLargerZero =
+    [fees.deposit, fees.withdrawal, fees.management, fees.performance].reduce((acc, val) => acc.add(val), constants.Zero).gt(constants.Zero);
+  const nonZeroFeeRecipient = fees.recipient != constants.AddressZero;
+  const validFeeRecipient = utils.isAddress(fees.recipient);
+  const feesLess1 = [fees.deposit, fees.withdrawal, fees.management, fees.performance].every(
+    (fee) => Number(formatUnits(fee)) < 1
+  )
+  const baseValidFees = validFeeRecipient && feesLess1;
+  const validFees = feesLargerZero ? (baseValidFees && nonZeroFeeRecipient) : baseValidFees
   const validAdapter = !!adapter;
 
   const initParams = adapter?.initParams || [];
@@ -51,8 +51,8 @@ function Dashboard() {
       </h1>
       <div className="mb-12">
         <NetworkSelection />
-        <ProtocolSelection />
         <AssetSelection />
+        <ProtocolSelection />
         <AdapterSelection />
         <AdapterConfiguration />
         <StrategySelection />
@@ -68,7 +68,10 @@ function Dashboard() {
           <IoMdArrowForward className="text-[150%] group-hover:translate-x-px" />
         </button>
         <div>
-          <p>ValidFees: {String(validFees)}</p>
+          <p>FeesLess1: {String(feesLess1)}</p>
+          <p>ValidFeeRecipient: {String(validFeeRecipient)}</p>
+          <p>nonZeroFeeRecipient: {String(nonZeroFeeRecipient)}</p>
+          <p>feesLargerZero: {String(feesLargerZero)}</p>
           <p>ValidAdapter: {String(validAdapter)}</p>
           <p>ValidAdapterConfig: {String(validAdapterConfig)}</p>
         </div>

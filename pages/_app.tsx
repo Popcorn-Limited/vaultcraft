@@ -11,7 +11,7 @@ import { Toaster } from "react-hot-toast";
 import Head from "next/head";
 import Page from "@/components/content/Page";
 
-export const SUPPORTED_NETWORKS = [goerli, localhost];
+export const SUPPORTED_NETWORKS = [localhost];
 const { provider, chains } = configureChains(SUPPORTED_NETWORKS, [
   publicProvider(),
 ]);

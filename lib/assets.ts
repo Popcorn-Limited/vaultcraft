@@ -14,4 +14,5 @@ export const useAssets = () => {
   return assets;
 };
 
-export const assetAtom = atomWithStorage<Asset>("select.asset", assets[0]);
+// @ts-ignore
+export const assetAtom = atomWithStorage<Asset>("select.asset", null);

@@ -8,6 +8,11 @@ import Section from "@/components/content/Section";
 import Image from "next/image";
 import Selector, { Option } from "@/components/Selector";
 import { SUPPORTED_NETWORKS } from "pages/_app";
+import { assetAtom } from "@/lib/assets";
+import { RESET } from "jotai/utils";
+import { protocolAtom } from "@/lib/protocols";
+import { adapterAtom, adapterConfigAtom } from "@/lib/adapter";
+import { strategyAtom } from "@/lib/strategy";
 
 const networkLogos = {
   1: "/images/icons/ethereum.svg",
@@ -26,6 +31,14 @@ function NetworkSelection() {
   const { openChainModal } = useChainModal();
   const [network, setNetwork] = useAtom(networkAtom);
 
+  // Used only to reset
+  const [, setAsset] = useAtom(assetAtom);
+  const [, setProtocol] = useAtom(protocolAtom);
+  const [, setAdapter] = useAtom(adapterAtom);
+  const [, setAdapterConfig] = useAtom(adapterConfigAtom);
+  const [, setStrategy] = useAtom(strategyAtom);
+
+
   useEffect(() => {
     if (chain?.unsupported) {
       // Suggest to change network when not in `SUPPORTED_NETWORKS`
@@ -38,11 +51,22 @@ function NetworkSelection() {
     }
   }, [chain?.unsupported, network]);
 
+  function selectNetwork(newNetwork: any) {
+    if (newNetwork !== network) {
+      setAsset(RESET);
+      setProtocol(RESET);
+      setAdapter(RESET);
+      setAdapterConfig(RESET);
+      setStrategy(RESET)
+    }
+    setNetwork(newNetwork)
+  }
+
   return (
     <Section title="Network Selection">
       <Selector
         selected={network}
-        onSelect={setNetwork}
+        onSelect={selectNetwork}
         actionContent={(selected: Chain) => (
           <Fragment>
             {selected && (
