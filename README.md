@@ -19,3 +19,12 @@ Two years ago, Popcorn embarked on a journey to reinvent yield-generating financ
 While we were building products like Butter, 3x, and POP staking vaults, we came across an earth-shaking discovery — one that could forever change the way that projects manage digital assets. The time has come to take the lid off.
 
 [Read more in Twitter](https://twitter.com/Popcorn_DAO/status/1647952149043638274)
+
+
+## Run
+
+1. Install dependencies
+1. Clone [Popcorn-Limited/contracts](https://github.com/Popcorn-Limited/contracts) 
+2. Install dependencies and add env variables
+3. Run `yarn anvil` using and ethereum RPC for `$FORKING_RPC_URL` to fork the ethereum main network
+4. Run `yarn dev` in this repo and connect your Wallet to `localhost:8545` with chainId `1337`
