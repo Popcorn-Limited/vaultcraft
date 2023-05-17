@@ -8,6 +8,7 @@ export type Adapter = {
   logoURI: string;
   protocol: string;
   initParams?: InitParam[];
+  assets: string[]
 };
 
 export type InitParam = {

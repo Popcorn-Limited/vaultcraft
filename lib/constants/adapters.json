@@ -10,7 +10,8 @@
         "type": "uint256",
         "description": "Max Loss for the yVault"
       }
-    ]
+    ],
+    "assets": ["USDC"]
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
@@ -29,19 +30,22 @@
         "type": "address",
         "description": "Address of the BeefyBooster to use if the BeefyVault has any."
       }
-    ]
+    ],
+    "assets": ["USDC"]
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
     "name": "AaveV2 Adapter",
     "key": "AaveV2Adapter",
-    "protocol": "Aave"
+    "protocol": "Aave",
+    "assets": ["USDC"]
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
     "name": "AaveV3 Adapter",
     "key": "AaveV3Adapter",
-    "protocol": "Aave"
+    "protocol": "Aave",
+    "assets": ["USDC"]
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
@@ -55,7 +59,8 @@
         "requirements": ["Required", "NotAddressZero"],
         "description": "Address of the fitting CToken for the asset"
       }
-    ]
+    ],
+    "assets": ["USDC"]
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
@@ -69,7 +74,8 @@
         "requirements": ["Required", "NotAddressZero"],
         "description": "Address of the fitting CToken for the asset"
       }
-    ]
+    ],
+    "assets": ["USDC"]
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
@@ -83,7 +89,8 @@
         "requirements": ["Required"],
         "description": "Pid of the Convex Pool"
       }
-    ]
+    ],
+    "assets": ["USDC"]
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
@@ -103,6 +110,7 @@
         "requirements": ["Required", "NotAddressZero"],
         "description": "RewardToken of the MasterChef contract"
       }
-    ]
+    ],
+    "assets": ["USDC"]
   }
 ]

@@ -33,7 +33,7 @@
   },
   {
     "chains": [1],
-    "address": { "1": "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0" },
+    "address": { "1": "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0"},
     "name": "Matic Token",
     "symbol": "MATIC",
     "decimals": 18,
