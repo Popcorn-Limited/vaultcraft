@@ -1,12 +1,19 @@
 import { SUPPORTED_NETWORKS } from "pages/_app";
 
-interface BeefyVault {
-  tokenAddress: string;
-  chain: string;
+interface Asset {
+  type: string;
+  id: string;
+  symbol: string;
+  name: string;
+  chainId: string;
+  oracle: string;
+  oracleId: string;
+  address: string;
+  decimals: number;
 }
 
 export async function beefy({ chainId }: { chainId: number }): Promise<string[]> {
   const network = SUPPORTED_NETWORKS.find(chain => chain.id === chainId)?.network
-  const result = await (await fetch("https://api.beefy.finance/vaults")).json() as BeefyVault[];
-  return result.filter(vault => vault.chain === network?.toLowerCase()).map(vault => vault.tokenAddress)
+  const result = await (await fetch(`https://api.beefy.finance/tokens/${network}`)).json() as Asset[];
+  return result.map(token => token.address)
 }
