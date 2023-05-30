@@ -1,5 +1,6 @@
 import { Fragment } from "react";
 import { Listbox } from "@headlessui/react";
+import Image from "next/image";
 
 function Selector({
   selected,
@@ -14,32 +15,38 @@ function Selector({
 }) {
   return (
     <Listbox
-      className="relative self-start"
+      className="self-start w-full border-none"
       as="div"
       value={selected}
       onChange={onSelect}
     >
-      <Listbox.Button className="border rounded-lg flex gap-2 p-2">
+      <Listbox.Button className="border-1 border border-[#353945] rounded-lg flex gap-2 w-full px-2">
         {actionContent(selected)}
       </Listbox.Button>
-      <Listbox.Options className="z-[1] absolute flex flex-col min-w-[12rem] rounded-lg ml-[100%] top-0 left-0 p-2 bg-white shadow-xl max-h-[80vh] overflow-auto">
+      <Listbox.Options className="z-[1] absolute flex flex-col min-w-[12rem] rounded-lg top-0 left-0 p-2 bg-white md:max-h-[80vh] w-full h-full overflow-auto">
         {children}
       </Listbox.Options>
-    </Listbox>
+    </Listbox >
   );
 }
 
-export function Option({ value, children }: { value: any; children: any }) {
+export function Option({ value, children, selected }: { value: any; children: any, selected: boolean }) {
   return (
     <Listbox.Option value={value} as={Fragment}>
       {({ active }) => {
         return (
           <button
-            className={`p-2 flex gap-2 border border-transparent rounded-lg whitespace-nowrap text-left hover:bg-zinc-400/5 ${
-              active && "bg-zinc-400/5 border-zinc-400/5"
-            }`}
+            className={`p-2 w-full flex gap-2 flex-row h-14 relative border border-transparent rounded-lg whitespace-nowrap text-left ${selected ? '' : 'hover:bg-[gray]'} ${selected ? "bg-[white]" : ""} `}
           >
-            {children}
+            <img
+              alt=""
+              className="object-contain relative h-full w-fit z-10"
+              src={value.logoURI}
+            />
+            <div className="flex flex-col self-center">
+              <p className={`${selected ? "text-[black]" : "text-[white]"}`}>{value.symbol}</p>
+              <p className={`text-[#ffffff99] ${selected ? "text-[black] text-[black]" : ""}`}>{value.name}</p>
+            </div>
           </button>
         );
       }}

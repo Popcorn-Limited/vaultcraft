@@ -14,7 +14,7 @@ function assetSupported(protocol: any, asset: any) {
   const adapters = useAdapters();
   const adapterSupportingAsset = adapters.filter(
     (adapter) => adapter.protocol === protocol.name
-  ).filter(a => a.assets.includes(asset.symbol))
+  ).filter(a => a.assets.includes(asset?.symbol))
   return adapterSupportingAsset.length > 0;
 }
 
@@ -42,41 +42,37 @@ function ProtocolSelection() {
   }
 
   return (
-    <Section title="Protocol Selection">
+    <section className="mt-4 mb-4">
       <Selector
         selected={protocol}
         onSelect={(newProtocol) => selectProtocol(newProtocol)}
         actionContent={(selected) => (
           <Fragment>
             {selected?.logoURI && (
-              <figure className="relative w-6 h-6">
-                <Image
-                  fill
-                  className="object-contain"
+              <figure className="h-12 py-2 flex-row items-center flex relative">
+                <img
+                  className="object-contain h-full w-fit"
                   alt="logo"
                   src={selected?.logoURI}
                 />
               </figure>
             )}
-            <span>{selected?.name || "Click to select"}</span>
+            <span className="text-[white] w-full flex self-center flex-row justify-start">{selected?.name || "Protocol selection"}</span><span className="self-center text-[white] mr-2">{`>`}</span>
           </Fragment>
         )}
       >
-        {protocols.map((protocol) => (
-          <Option value={protocol} key={`asset-selc-${protocol.name}`}>
-            <figure className="relative w-6 h-6">
-              <Image
-                fill
-                alt=""
-                className="object-contain"
-                src={protocol.logoURI}
-              />
-            </figure>
-            <span>{protocol.name}</span>
-          </Option>
-        ))}
+        <div className="w-full h-full bg-black flex flex-col items-start gap-y-1 px-8 py-9">
+          <p className="text-[white] text-2xl mb-9">Select Protocol</p>
+          <p className="text-[white] mb-8">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna ut labore et dolore magna.</p>
+          <div className="flex flex-col overflow-y-scroll w-full">
+            {protocols.map((protocolIter) => (
+              <Option selected={protocolIter?.name === protocol?.name} value={protocolIter} key={`asset-selc-${protocolIter.name}`}>
+              </Option>
+            ))}
+          </div>
+        </div>
       </Selector>
-    </Section>
+    </section>
   );
 }
 

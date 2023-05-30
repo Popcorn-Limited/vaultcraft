@@ -38,45 +38,41 @@ function AdapterSelection() {
   }
 
   return (
-    <Section title="Adapter Selection">
-      <p>Options: {options.length}</p>
+    <section className="mb-4">
       <Selector
         selected={adapter}
         onSelect={(newAdapter) => selectAdapter(newAdapter)}
         actionContent={(selected) => (
           <Fragment>
             {selected?.logoURI && (
-              <figure className="relative w-6 h-6">
-                <Image
-                  fill
-                  className="object-contain"
+              <figure className="h-12 py-2 flex-row items-center flex relative">
+                <img
+                  className="object-contain h-full w-fit"
                   alt="logo"
                   src={selected?.logoURI}
                 />
               </figure>
             )}
-            <span>{selected?.name || "Click to select"}</span>
+            <span className="text-[white] w-full flex self-center flex-row justify-start">{selected?.name || "Protocol selection"}</span><span className="self-center text-[white] mr-2">{`>`}</span>
           </Fragment>
         )}
       >
-        {options.map((adapter) => (
-          <Option
-            value={adapter}
-            key={`asset-selc-${adapter.key}-${adapter.name}`}
-          >
-            <figure className="relative w-6 h-6">
-              <Image
-                fill
-                alt=""
-                className="object-contain"
-                src={adapter.logoURI}
-              />
-            </figure>
-            <span>{adapter.name}</span>
-          </Option>
-        ))}
+        <div className="w-full h-full bg-black flex flex-col items-start gap-y-1 px-8 py-9">
+          <p className="text-[white] text-2xl mb-9">Select Adapter</p>
+          <p className="text-[white] mb-8">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna ut labore et dolore magna.</p>
+          <div className="flex flex-col overflow-y-scroll w-full">
+            {options.map((adapterIter) => (
+              <Option
+                value={adapterIter}
+                selected={adapterIter.name === adapter?.name}
+                key={`asset-selc-${adapterIter.key}-${adapterIter.name}`}
+              >
+              </Option>
+            ))}
+          </div>
+        </div>
       </Selector>
-    </Section>
+    </section>
   );
 }
 
