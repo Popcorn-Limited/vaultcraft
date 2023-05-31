@@ -25,7 +25,7 @@ export default function Fees() {
 
         <FeeConfiguration />
 
-        <div className="flex flex-row space-x-8">
+        <div className="flex flex-row space-x-8 mt-16">
           <SecondaryActionButton label="Back" handleClick={() => router.push('/create/basics')} />
           <MainActionButton label="Next" handleClick={() => router.push('/create/limits')} />
         </div>
