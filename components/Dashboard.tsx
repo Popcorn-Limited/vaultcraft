@@ -17,6 +17,8 @@ import { feeAtom } from "@/lib/fees";
 import { constants, utils } from "ethers";
 import { formatUnits } from "ethers/lib/utils.js";
 import NetworkSelection from "./sections/NetworkSelection";
+import ProgressBar from "./ProgressBar";
+import { stages } from "@/lib/stage";
 
 function Dashboard() {
   const router = useRouter();

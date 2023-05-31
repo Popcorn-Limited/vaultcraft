@@ -4,7 +4,6 @@ import { useAtom } from "jotai";
 import { Chain, useNetwork } from "wagmi";
 import { useChainModal } from "@rainbow-me/rainbowkit";
 
-import Section from "@/components/content/Section";
 import Image from "next/image";
 import Selector, { Option } from "@/components/Selector";
 import { SUPPORTED_NETWORKS } from "pages/_app";
@@ -63,7 +62,7 @@ function NetworkSelection() {
   }
 
   return (
-    <Section title="Network Selection">
+    <section>
       <Selector
         selected={network}
         onSelect={selectNetwork}
@@ -83,21 +82,21 @@ function NetworkSelection() {
           </Fragment>
         )}
       >
-        {SUPPORTED_NETWORKS.map((chain) => (
-          <Option value={chain} key={`asset-selc-${chain.network}`}>
+        {SUPPORTED_NETWORKS.map((c) => (
+          <Option key={`asset-selc-${c.network}`} value={c} selected={c.id === chain?.id} >
             <figure className="relative w-6 h-6">
               <Image
                 fill
                 alt=""
                 className="object-contain"
-                src={networkLogos[chain.id]}
+                src={networkLogos[c.id]}
               />
             </figure>
-            <span>{chain.name}</span>
+            <span>{c.name}</span>
           </Option>
         ))}
       </Selector>
-    </Section>
+    </section>
   );
 }
 
