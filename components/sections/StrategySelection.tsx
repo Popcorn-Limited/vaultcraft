@@ -1,4 +1,3 @@
-import Section from "@/components/content/Section";
 import { adapterAtom } from "@/lib/adapter";
 import { strategyAtom, useStrategies } from "@/lib/strategy";
 import { useAtom } from "jotai";
@@ -10,6 +9,13 @@ function StrategySelection() {
 
   return (
     <section>
+      <div className="border-1 border border-[#353945] rounded-lg flex flex-row justify-between gap-2 w-full px-2 h-full">
+        <span className="my-auto py-3 flex flex-row space-x-4">
+          <p className="text-white">Select Strategy</p>
+          <p className="text-gray-500">Coming Soon</p>
+        </span>
+        <span className="self-center text-[white] mr-2">&gt;</span>
+      </div>
       {strategies
         .filter((strategy) => strategy.compatibleAdapters.includes(adapter.key))
         .map((strategy) => {

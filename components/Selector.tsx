@@ -45,7 +45,7 @@ export function Option({ value, children, selected }: { value: any; children: an
             />
             <div className="flex flex-col self-center">
               <p className={`${selected ? "text-[black]" : "text-[white]"}`}>{value.symbol}</p>
-              <p className={`text-[#ffffff99] ${selected ? "text-[black] text-[black]" : ""}`}>{value.name}</p>
+              <p className={`text-[#ffffff99] ${selected ? "text-[black]" : ""}`}>{value.name}</p>
             </div>
           </button>
         );

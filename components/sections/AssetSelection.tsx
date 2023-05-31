@@ -31,7 +31,8 @@ function AssetSelection() {
               />
             </figure>
           )}
-          <span className="text-[white] w-full flex self-center flex-row justify-start">{selected?.name || "Select Asset"}</span><span className="self-center text-[white] mr-2">{`>`}</span>
+          <span className="text-[white] w-full flex self-center flex-row justify-start">{selected?.name || "Select Asset"}</span>
+          <span className="self-center text-[white] mr-2">{`>`}</span>
         </div>
       )}
     >

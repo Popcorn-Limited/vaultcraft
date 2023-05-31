@@ -53,7 +53,8 @@ function AdapterSelection() {
                 />
               </figure>
             )}
-            <span className="text-[white] w-full flex self-center flex-row justify-start">{selected?.name || "Protocol selection"}</span><span className="self-center text-[white] mr-2">{`>`}</span>
+            <span className="text-[white] w-full flex self-center flex-row justify-start">{selected?.name || "Protocol selection"}</span>
+            <span className="self-center text-[white] mr-2">{`>`}</span>
           </Fragment>
         )}
       >
