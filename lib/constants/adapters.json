@@ -11,7 +11,8 @@
         "description": "Max Loss for the yVault"
       }
     ],
-    "assets": ["USDC"]
+    "assets": ["USDC"],
+    "resolver": "default"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
@@ -31,21 +32,24 @@
         "description": "Address of the BeefyBooster to use if the BeefyVault has any."
       }
     ],
-    "assets": ["USDC"]
+    "assets": ["USDC"],
+    "resolver": "beefy"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
     "name": "AaveV2 Adapter",
     "key": "AaveV2Adapter",
     "protocol": "Aave",
-    "assets": ["USDC"]
+    "assets": ["USDC"],
+    "resolver": "default"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
     "name": "AaveV3 Adapter",
     "key": "AaveV3Adapter",
     "protocol": "Aave",
-    "assets": ["USDC"]
+    "assets": ["USDC"],
+    "resolver": "default"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
@@ -60,7 +64,8 @@
         "description": "Address of the fitting CToken for the asset"
       }
     ],
-    "assets": ["USDC"]
+    "assets": ["USDC"],
+    "resolver": "default"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
@@ -75,7 +80,8 @@
         "description": "Address of the fitting CToken for the asset"
       }
     ],
-    "assets": ["USDC"]
+    "assets": ["USDC"],
+    "resolver": "default"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
@@ -90,7 +96,8 @@
         "description": "Pid of the Convex Pool"
       }
     ],
-    "assets": ["USDC"]
+    "assets": ["USDC"],
+    "resolver": "default"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
@@ -111,6 +118,7 @@
         "description": "RewardToken of the MasterChef contract"
       }
     ],
-    "assets": ["USDC"]
+    "assets": ["USDC"],
+    "resolver": "default"
   }
 ]

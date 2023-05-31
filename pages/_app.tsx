@@ -3,8 +3,8 @@ import "@rainbow-me/rainbowkit/styles.css";
 import type { AppProps } from "next/app";
 
 import { Roboto } from "@next/font/google";
-import { WagmiConfig, createClient, configureChains } from "wagmi";
-import { localhost } from "wagmi/chains";
+import { WagmiConfig, createClient, configureChains, mainnet } from "wagmi";
+import { arbitrum, bsc, localhost, polygon } from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
 import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { Toaster } from "react-hot-toast";
@@ -14,7 +14,7 @@ import NoSSR from 'react-no-ssr';
 import Head from "next/head";
 import Page from "@/components/Page";
 
-export const SUPPORTED_NETWORKS = [localhost];
+export const SUPPORTED_NETWORKS = [localhost, mainnet, polygon, bsc, arbitrum];
 const { provider, chains } = configureChains(SUPPORTED_NETWORKS, [
   publicProvider(),
 ]);

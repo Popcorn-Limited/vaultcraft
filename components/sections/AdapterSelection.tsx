@@ -1,17 +1,41 @@
 import { Adapter, adapterAtom, adapterConfigAtom, useAdapters } from "@/lib/adapter";
 import { Fragment } from "react";
 import Selector, { Option } from "../Selector";
-import { protocolAtom } from "@/lib/protocols";
+import { Protocol, protocolAtom } from "@/lib/protocols";
 import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import { RESET } from "jotai/utils";
 import { strategyAtom } from "@/lib/strategy";
+import { resolveProtocolAssets } from "@/lib/resolver/protocolAssets/protocolAssets";
+import { networkAtom } from "@/lib/networks";
+import { assetAtom } from "@/lib/assets";
+
+interface AdapterOption extends Adapter {
+  disabled: boolean;
+}
+
+async function assetSupported(adapter: Adapter, chainId: number, asset: string): Promise<boolean> {
+  const availableAssets = await resolveProtocolAssets({ chainId: chainId, resolver: adapter.resolver })
+
+  return availableAssets.flat().map(a => a.toLowerCase()).filter((availableAsset) => availableAsset === asset).length > 0
+}
+
+async function getAdapterOptions(adapters: Adapter[], chainId: number, asset: string): Promise<AdapterOption[]> {
+  return Promise.all(
+    adapters.map(async (adapter) => {
+      return { ...adapter, disabled: !(await assetSupported(adapter, chainId, asset)) }
+    })
+  )
+}
 
 function AdapterSelection() {
+  const [network] = useAtom(networkAtom);
   const [protocol] = useAtom(protocolAtom);
+  const [asset] = useAtom(assetAtom);
+
   const [adapter, setAdapter] = useAtom(adapterAtom);
   const adapters = useAdapters();
-  const [options, setOptions] = useState<Adapter[]>(adapters);
+  const [options, setOptions] = useState<AdapterOption[]>([]);
 
   // Only for reset
   const [, setAdapterConfig] = useAtom(adapterConfigAtom);
@@ -19,11 +43,12 @@ function AdapterSelection() {
 
   useEffect(() => {
     if (protocol) {
-      const filtered = adapters.filter(
-        (adapter) => adapter.protocol === protocol.name
-      );
-      setOptions(filtered);
-      setAdapter(filtered[0]);
+      getAdapterOptions(adapters.filter(
+        (adapter) => adapter.protocol === protocol.name), network.id, asset.address["1"].toLowerCase())
+        .then(res => {
+          setOptions(res);
+          if (res.length > 0) setAdapter(res[0]);
+        });
     }
   }, [protocol]);
 

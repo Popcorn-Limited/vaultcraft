@@ -6,19 +6,19 @@ import {
 import { useAtom } from "jotai";
 import { useEffect } from "react";
 import { RESET } from "jotai/utils";
+import { constants } from "ethers";
 import Fieldset from "../Fieldset";
 import Input from "../Input";
-import { resolveAdapterDefaults } from "@/lib/resolver/adapterDefaults/adapterDefaults";
-import { assetAtom } from "@/lib/assets";
-import { networkAtom } from "@/lib/networks";
 
-function AdapterConfiguration() {
+
+const DEFAULT_VALUE = {
+  address: constants.AddressZero,
+  uint256: 0,
+};
+
+function StrategyConfiguration() {
   const [adapter] = useAtom(adapterAtom);
   const [adapterConfig, setAdapterConfig] = useAtom(adapterConfigAtom);
-
-  const [network,] = useAtom(networkAtom);
-  const [asset,] = useAtom(assetAtom);
-
 
   function handleChange(value: string, index: number, paramType: string) {
     const newConfig = [...adapterConfig];
@@ -31,12 +31,13 @@ function AdapterConfiguration() {
   }
 
   useEffect(
-    () => {
-      !!adapter?.initParams && adapter?.initParams.length > 0 ?
-        // TODO - remove hardcoded network id
-        resolveAdapterDefaults({ chainId: network.id, address: asset.address["1"], resolver: "beefy" }).then(res => setAdapterConfig(res)) :
-        setAdapterConfig(RESET)
-    },
+    () =>
+      setAdapterConfig(
+        !!adapter?.initParams && adapter?.initParams.length > 0
+          ? // @ts-ignore
+          adapter?.initParams.map((param) => DEFAULT_VALUE[param.type])
+          : RESET
+      ),
     [adapter]
   );
 
@@ -46,7 +47,7 @@ function AdapterConfiguration() {
         adapter?.initParams.map((initParam, i) => {
           return (
             <div key={`fee-element-${initParam.name}`} className="flex gap-4">
-              <Fieldset className="flex-grow" label={initParam.name} description={initParam.description || ""}>
+              <Fieldset className="flex-grow" label={initParam.name} description="Test">
                 <Input
                   onChange={(e) =>
                     handleChange(
@@ -77,10 +78,10 @@ function AdapterConfiguration() {
           );
         })
       ) : (
-        <p className="text-white">No configuration required</p>
+        <p>No configuration required</p>
       )}
     </section>
   );
 }
 
-export default AdapterConfiguration;
+export default StrategyConfiguration;

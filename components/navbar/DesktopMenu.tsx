@@ -3,7 +3,7 @@ import MainActionButton from "../buttons/MainActionButton";
 import Link from "next/link";
 import { useNetwork, useAccount } from "wagmi";
 import { useChainModal, useConnectModal } from "@rainbow-me/rainbowkit";
-import { networkLogos } from "../../utils/connectors";
+import { networkLogos } from "../../lib/connectors";
 import { useMemo } from "react";
 
 export default function DesktopMenu(): JSX.Element {

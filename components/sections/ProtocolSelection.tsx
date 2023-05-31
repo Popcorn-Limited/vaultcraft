@@ -7,30 +7,46 @@ import { networkAtom } from "@/lib/networks";
 import { Adapter, adapterConfigAtom, useAdapters } from "@/lib/adapter";
 import { RESET } from "jotai/utils";
 import { assetAtom } from "@/lib/assets";
+import { resolveProtocolAssets } from "@/lib/resolver/protocolAssets/protocolAssets";
 
-function supportedAssets(protocol: any, asset: any, adapters: Adapter[]) {
-  const adapterSupportingAsset = adapters.filter(
+interface ProtocolOption extends Protocol {
+  disabled: boolean;
+}
+
+async function assetSupported(protocol: Protocol, adapters: Adapter[], chainId: number, asset: string): Promise<boolean> {
+  const availableAssets = await Promise.all(adapters.filter(
     (adapter) => adapter.protocol === protocol.name
-  ).filter(a => a.assets.includes(asset?.symbol))
-  return adapterSupportingAsset.length > 0;
+  ).map(adapter => resolveProtocolAssets({ chainId: chainId, resolver: adapter.resolver })
+  ))
+
+  return availableAssets.flat().map(a => a.toLowerCase()).filter((availableAsset) => availableAsset === asset).length > 0
+}
+
+async function getProtocolOptions(protocols: Protocol[], adapters: Adapter[], chainId: number, asset: string): Promise<ProtocolOption[]> {
+  return Promise.all(protocols.filter(
+    (p) => p.chains.includes(chainId)).map(
+      async (p) => {
+        return { ...p, disabled: !(await assetSupported(p, adapters, chainId, asset)) }
+      })
+  )
 }
 
 function ProtocolSelection() {
   const [network] = useAtom(networkAtom);
   const [protocol, setProtocol] = useAtom(protocolAtom);
   const protocols = useProtocols();
-  const [options, setOptions] = useState<Protocol[]>(protocols);
+  const [options, setOptions] = useState<ProtocolOption[]>([]);
 
   const adapters = useAdapters();
   const [, setAdapterConfig] = useAtom(adapterConfigAtom);
   const [asset] = useAtom(assetAtom);
 
   useEffect(() => {
-    if (network) {
-      const filtered = protocols.filter((p) => p.chains.includes(network.id)).filter(p => supportedAssets(p, asset, adapters))
-      setOptions(filtered);
+    if (network && asset) {
+      // TODO - remove hardcoded network id
+      getProtocolOptions(protocols, adapters, network.id, asset.address["1"].toLowerCase()).then(res => setOptions(res));
     }
-  }, [network]);
+  }, [network, asset]);
 
   function selectProtocol(newProtocol: any) {
     if (protocol !== newProtocol) {
@@ -62,9 +78,14 @@ function ProtocolSelection() {
         <div className="w-full h-full bg-black flex flex-col items-start gap-y-1 px-8 py-9">
           <p className="text-[white] text-2xl mb-9">Select Protocol</p>
           <p className="text-[white] mb-8">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna ut labore et dolore magna.</p>
-          <div className="flex flex-col overflow-y-scroll w-full">
-            {protocols.map((protocolIter) => (
-              <Option selected={protocolIter?.name === protocol?.name} value={protocolIter} key={`asset-selc-${protocolIter.name}`}>
+          <div className="flex flex-col overflow-y-scroll w-full space-y-2">
+            {options.map((protocolIter) => (
+              <Option
+                key={`asset-selc-${protocolIter.name}`}
+                value={protocolIter}
+                selected={protocolIter?.name === protocol?.name}
+                disabled={protocolIter.disabled}
+              >
               </Option>
             ))}
           </div>

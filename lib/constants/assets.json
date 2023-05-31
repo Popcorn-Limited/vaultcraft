@@ -94,5 +94,13 @@
     "symbol": "WETH",
     "decimals": 18,
     "logoURI": "https://cdn.furucombo.app/assets/img/token/WETH.svg"
+  },
+  {
+    "chains": [1],
+    "address": { "1": "0xd0cd466b34a24fcb2f87676278af2005ca8a78c4" },
+    "name": "Popcorn",
+    "symbol": "POP",
+    "decimals": 18,
+    "logoURI": "https://cdn.furucombo.app/assets/img/token/WETH.svg"
   }
 ]

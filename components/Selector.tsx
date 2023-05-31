@@ -30,13 +30,15 @@ function Selector({
   );
 }
 
-export function Option({ value, children, selected }: { value: any; children: any, selected: boolean }) {
+export function Option({ value, children, selected, disabled }: { value: any; children: any, selected: boolean, disabled?: boolean }) {
   return (
-    <Listbox.Option value={value} as={Fragment}>
+    <Listbox.Option value={value} as={Fragment} disabled={disabled}>
       {({ active }) => {
         return (
           <button
-            className={`p-2 w-full flex gap-2 flex-row h-14 relative border border-transparent rounded-lg whitespace-nowrap text-left ${selected ? '' : 'hover:bg-[gray]'} ${selected ? "bg-[white]" : ""} `}
+            className={`p-2 w-full flex gap-2 flex-row h-14 relative border border-transparent rounded-lg whitespace-nowrap text-left ${disabled ? "hover:bg-red-600 cursor-not-allowed" : "hover:bg-[gray]"} 
+            ${selected ? 'bg-[white]' : ''}`}
+            disabled={disabled}
           >
             <img
               alt=""
@@ -45,7 +47,10 @@ export function Option({ value, children, selected }: { value: any; children: an
             />
             <div className="flex flex-col self-center">
               <p className={`${selected ? "text-[black]" : "text-[white]"}`}>{value.symbol}</p>
-              <p className={`text-[#ffffff99] ${selected ? "text-[black]" : ""}`}>{value.name}</p>
+              <span className="flex flex-row">
+                <p className={`${selected ? "text-[black]" : "text-[#ffffff99]"}`}>{value.name}</p>
+                {disabled && <p className={`ml-1 ${selected ? "text-[black]" : "text-[#ffffff99]"}`}>- Asset not supported</p>}
+              </span>
             </div>
           </button>
         );

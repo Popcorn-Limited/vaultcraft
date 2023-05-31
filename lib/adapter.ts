@@ -7,8 +7,9 @@ export type Adapter = {
   key: string;
   logoURI: string;
   protocol: string;
+  assets: string[];
   initParams?: InitParam[];
-  assets: string[]
+  resolver?: string;
 };
 
 export type InitParam = {
@@ -33,10 +34,9 @@ export const useAdapters = () => {
   return adapters as any as Array<Adapter>;
 };
 
-export const adapterAtom = atomWithStorage<Adapter>(
-  "select.adapter",
-  adapters[0] as unknown as Adapter
-);
+// @ts-ignore
+export const adapterAtom = atomWithStorage<Adapter>("select.adapter", null);
+
 export const adapterConfigAtom = atomWithStorage<Array<string>>(
   "config.adapter",
   []

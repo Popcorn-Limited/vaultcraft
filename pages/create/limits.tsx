@@ -5,7 +5,7 @@ import AdapterSelection from "@/components/sections/AdapterSelection";
 import AssetSelection from "@/components/sections/AssetSelection";
 import ProtocolSelection from "@/components/sections/ProtocolSelection";
 import StrategySelection from "@/components/sections/StrategySelection";
-import { stages } from "@/lib/stage";
+import { CREATION_STAGES } from "@/lib/stages";
 import { useRouter } from "next/router";
 
 export default function Limits() {
@@ -13,7 +13,7 @@ export default function Limits() {
 
   return (
     <div className="bg-[#141416] md:max-w-[800px] w-full h-full flex flex-col justify-center mx-auto md:px-8 px-6">
-      <ProgressBar stages={stages} activeStage={2} />
+      <ProgressBar stages={CREATION_STAGES} activeStage={3} />
       <div className="md:bg-[#23262F] self-center min-h-[500px] bg-transparent h-fit rounded-[20px] border-[#23262F] border-2 md:border border-none md:w-[600px] md:p-6 px-0 flex flex-col justify-between mt-10 md:relative w-full">
         <h1 className="text-[white] text-2xl mb-2">Set up a new vault</h1>
 
@@ -39,8 +39,8 @@ export default function Limits() {
         <StrategySelection />
 
         <div className="flex flex-row space-x-8">
-          <SecondaryActionButton label="Back" handleClick={() => router.push('/create/fees')} />
-          <MainActionButton label="Next" handleClick={() => router.push('/create/review')} />
+          <SecondaryActionButton label="Back" handleClick={() => router.push('/create/strategy')} />
+          <MainActionButton label="Next" handleClick={() => router.push('/create/fees')} />
         </div>
 
       </div>
