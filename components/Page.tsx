@@ -1,5 +1,4 @@
-import DesktopMenu from "../navbar/DesktopMenu";
-import Navbar from "./Navbar";
+import DesktopMenu from "./navbar/DesktopMenu";
 
 export default function Page({
   children,

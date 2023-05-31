@@ -1,12 +1,10 @@
-import MainActionButton from "@/components/Buttons/MainActionButton";
+import MainActionButton from "@/components/buttons/MainActionButton";
 import ProgressBar from "@/components/ProgressBar";
 import AdapterSelection from "@/components/sections/AdapterSelection";
 import AssetSelection from "@/components/sections/AssetSelection";
 import ProtocolSelection from "@/components/sections/ProtocolSelection";
 import StrategySelection from "@/components/sections/StrategySelection";
-import { basicAtom } from "@/lib/basic";
 import { stages } from "@/lib/stage";
-import { useAtom } from "jotai";
 import { useRouter } from "next/router";
 
 export default function Basics() {

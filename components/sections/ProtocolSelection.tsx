@@ -1,17 +1,14 @@
 import { Protocol, protocolAtom, useProtocols } from "@/lib/protocols";
-import Section from "@/components/content/Section";
 import { Fragment } from "react";
-import Image from "next/image";
 import Selector, { Option } from "../Selector";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { networkAtom } from "@/lib/networks";
-import { adapterConfigAtom, useAdapters } from "@/lib/adapter";
+import { Adapter, adapterConfigAtom, useAdapters } from "@/lib/adapter";
 import { RESET } from "jotai/utils";
 import { assetAtom } from "@/lib/assets";
 
-function assetSupported(protocol: any, asset: any) {
-  const adapters = useAdapters();
+function supportedAssets(protocol: any, asset: any, adapters: Adapter[]) {
   const adapterSupportingAsset = adapters.filter(
     (adapter) => adapter.protocol === protocol.name
   ).filter(a => a.assets.includes(asset?.symbol))
@@ -24,12 +21,13 @@ function ProtocolSelection() {
   const protocols = useProtocols();
   const [options, setOptions] = useState<Protocol[]>(protocols);
 
+  const adapters = useAdapters();
   const [, setAdapterConfig] = useAtom(adapterConfigAtom);
   const [asset] = useAtom(assetAtom);
 
   useEffect(() => {
     if (network) {
-      const filtered = protocols.filter((p) => p.chains.includes(network.id)).filter(p => assetSupported(p, asset))
+      const filtered = protocols.filter((p) => p.chains.includes(network.id)).filter(p => supportedAssets(p, asset, adapters))
       setOptions(filtered);
     }
   }, [network]);

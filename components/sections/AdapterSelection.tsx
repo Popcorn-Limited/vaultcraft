@@ -1,7 +1,5 @@
 import { Adapter, adapterAtom, adapterConfigAtom, useAdapters } from "@/lib/adapter";
-import Section from "@/components/content/Section";
 import { Fragment } from "react";
-import Image from "next/image";
 import Selector, { Option } from "../Selector";
 import { protocolAtom } from "@/lib/protocols";
 import { useEffect, useState } from "react";

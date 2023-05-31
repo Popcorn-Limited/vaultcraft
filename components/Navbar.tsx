@@ -1,4 +1,4 @@
-import DesktopMenu from "../navbar/DesktopMenu";
+import DesktopMenu from "./navbar/DesktopMenu";
 
 function Navbar() {
   return (

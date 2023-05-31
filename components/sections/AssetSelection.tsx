@@ -1,9 +1,5 @@
-import Section from "@/components/content/Section";
-import { Fragment, useEffect } from "react";
-import Image from "next/image";
 import Selector, { Option } from "../Selector";
 import { useAtom } from "jotai";
-import { RESET } from "jotai/utils";
 import { assetAtom, useAssets } from "@/lib/assets";
 import { networkAtom } from "@/lib/networks";
 

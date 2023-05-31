@@ -1,10 +1,10 @@
-import Section from "@/components/content/Section";
-import Fieldset from "@/components/content/Fieldset";
-import Input from "@/components/content/Input";
 import { useAtom } from "jotai";
 import { feeAtom, validateBigNumberInput } from "@/lib/fees";
 import { formatUnits, parseUnits } from "ethers/lib/utils.js";
 import { constants, utils } from "ethers";
+import Fieldset from "../Fieldset";
+import Input from "../Input";
+
 
 const FEE_INPUTS = [
   { name: "Deposit Fee", key: "deposit", description: "Deposit fees are charged with every new deposit." },

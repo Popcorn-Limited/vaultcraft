@@ -47,7 +47,6 @@ function Dashboard() {
 
   return (
     <section>
-      <ProgressBar stages={stages} />
       <h1 className="text-2xl flex items-center gap-2 font-bold mt-6 mb-8">
         <GrDocumentConfig />
         <span>Setup New Vault</span>

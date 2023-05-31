@@ -1,14 +1,8 @@
-import MainActionButton from "@/components/Buttons/MainActionButton";
-import SecondaryActionButton from "@/components/Buttons/SecondaryActionButton";
+import MainActionButton from "@/components/buttons/MainActionButton";
+import SecondaryActionButton from "@/components/buttons/SecondaryActionButton";
 import ProgressBar from "@/components/ProgressBar";
-import AdapterSelection from "@/components/sections/AdapterSelection";
-import AssetSelection from "@/components/sections/AssetSelection";
 import FeeConfiguration from "@/components/sections/FeeConfiguration";
-import ProtocolSelection from "@/components/sections/ProtocolSelection";
-import StrategySelection from "@/components/sections/StrategySelection";
-import { basicAtom } from "@/lib/basic";
 import { stages } from "@/lib/stage";
-import { useAtom } from "jotai";
 import { useRouter } from "next/router";
 
 export default function Fees() {

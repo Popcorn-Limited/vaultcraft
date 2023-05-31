@@ -4,12 +4,15 @@ import type { AppProps } from "next/app";
 
 import { Roboto } from "@next/font/google";
 import { WagmiConfig, createClient, configureChains } from "wagmi";
-import { goerli, localhost } from "wagmi/chains";
+import { localhost } from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
 import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { Toaster } from "react-hot-toast";
+// @ts-ignore
+import NoSSR from 'react-no-ssr';
+
 import Head from "next/head";
-import Page from "@/components/content/Page";
+import Page from "@/components/Page";
 
 export const SUPPORTED_NETWORKS = [localhost];
 const { provider, chains } = configureChains(SUPPORTED_NETWORKS, [
@@ -57,9 +60,11 @@ export default function App({ Component, pageProps }: AppProps) {
         <Toaster />
         <WagmiConfig client={client}>
           <RainbowKitProvider chains={chains} modalSize="compact">
-            <Page>
-              <Component {...pageProps} />
-            </Page>
+            <NoSSR>
+              <Page>
+                <Component {...pageProps} />
+              </Page>
+            </NoSSR>
           </RainbowKitProvider>
         </WagmiConfig>
       </main>

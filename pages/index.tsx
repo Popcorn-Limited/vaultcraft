@@ -1,4 +1,4 @@
-import MainActionButton from "@/components/Buttons/MainActionButton";
+import MainActionButton from "@/components/buttons/MainActionButton";
 import { useRouter } from "next/router";
 
 export default function Home() {

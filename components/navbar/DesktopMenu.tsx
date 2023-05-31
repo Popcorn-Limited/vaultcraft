@@ -1,22 +1,17 @@
-import { Menu } from "@headlessui/react";
-import { Dialog, Transition } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
-import MainActionButton from "../Buttons/MainActionButton";
+import MainActionButton from "../buttons/MainActionButton";
 import Link from "next/link";
-import { useRouter } from "next/router";
-import DropDownComponent from "../DropDownComponent";
 import { useNetwork, useAccount } from "wagmi";
 import { useChainModal, useConnectModal } from "@rainbow-me/rainbowkit";
 import { networkLogos } from "../../utils/connectors";
-import { useMemo, useRef, useState, Fragment, useCallback } from "react";
-// import { useProductLinks } from "@popcorn/app/hooks/useProductLinks";
+import { useMemo } from "react";
 
 export default function DesktopMenu(): JSX.Element {
     const { openConnectModal } = useConnectModal();
     const { openChainModal } = useChainModal();
     const { address } = useAccount();
-    // const router = useRouter();
     const { chain, chains } = useNetwork();
+    // @ts-ignore
     const logo = useMemo(() => (address && chain?.id ? networkLogos[chain.id] : networkLogos["1"]), [chain?.id, address]);
     const chainName = useMemo(() => (address && chain?.name ? chain.name : "Ethereum"), [chain?.id, address]);
 

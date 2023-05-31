@@ -5,7 +5,7 @@ export default function ProgressBar({ stages, activeStage }: { stages: string[],
             <div className="flex flex-row items-center justify-center w-full py-4 h-fit bg-transparent relative">
                 {stages.map((stage, index) => {
                     return (
-                        <div className="flex flex-row justify-start items-center h-12 w-full">
+                        <div key={stage} className="flex flex-row justify-start items-center h-12 w-full">
                             <div className={`flex grow w-full border-1 border h-0 ${borderColor(index, stages.length, activeStage, "left")}`} />
                             <div className="flex flex-col items-center gap-y-2 relative">
                                 <div className={`flex flex-row border-1 border justify-center h-6 w-6 items-center rounded-full 
