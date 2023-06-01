@@ -16,7 +16,7 @@ export async function yearn({ chainId }: { chainId: number }): Promise<string[]>
     }) as BigNumber[]
 
     const registryTokens = await readContracts({
-        contracts: Array(numTokens.toNumber()).map((item, idx) => {
+        contracts: Array(numTokens.toNumber()).fill(undefined).map((item, idx) => {
             return {
                 address: VAULT_REGISTRY_ADDRESS,
                 abi: abiRegistry,
@@ -26,6 +26,8 @@ export async function yearn({ chainId }: { chainId: number }): Promise<string[]>
             }
         })
     }) as string[]
+
+    console.log(registryTokens)
 
     const [ allDeployedVaults ] = await readContracts({
         contracts: [{

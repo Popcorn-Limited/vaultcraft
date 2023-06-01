@@ -6,11 +6,15 @@ import { useAtom } from "jotai";
 import { assetAtom } from "../assets";
 import { feeAtom } from "../fees";
 
+import {yearn} from "@/lib/resolver/protocolAssets/resolver";
+
 export const useDeployVault = () => {
   const { address: account } = useAccount();
   const [asset] = useAtom(assetAtom);
   const [adapterData] = useAtom(adapterDeploymentAtom);
   const [fees] = useAtom(feeAtom);
+
+  yearn({chainId: 1337})
 
   const { config, error: configError } = usePrepareContractWrite({
     address: "0xee1eb820beeced56657ba74fa8d70748d7a6756c",
