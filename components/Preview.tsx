@@ -1,4 +1,3 @@
-import Section from "@/components/content/Section";
 import { constants, ethers } from "ethers";
 import { useAccount } from "wagmi";
 import {
@@ -35,9 +34,9 @@ export default function Preview(): JSX.Element {
       id: ethers.utils.formatBytes32String(adapter.key ? adapter.key : ""),
       data: !!adapter.initParams
         ? ethers.utils.defaultAbiCoder.encode(
-            adapter.initParams?.map((param) => param.type),
-            adapterConfig
-          )
+          adapter.initParams?.map((param) => param.type),
+          adapterConfig
+        )
         : "0x",
     });
   }, [adapterConfig]);
@@ -48,7 +47,7 @@ export default function Preview(): JSX.Element {
         <h1 className="text-2xl flex items-center gap-2 font-bold mt-6 mb-8">
           Review Vault
         </h1>
-        <Section title="Vault Configuration">
+        <div>
           <p>Asset: {asset?.address[chainId] || constants.AddressZero}</p>
           <p>Adapter: {constants.AddressZero}</p>
           <p>Owner: {account}</p>
@@ -75,8 +74,8 @@ export default function Preview(): JSX.Element {
               <p>Recipient: {fees.recipient}</p>
             </div>
           </div>
-        </Section>
-        <Section title="Adapter Configuration">
+        </div>
+        <div>
           <p>Name: {adapter.name}</p>
           <p>Id: {adapterData.id}</p>
           <p>Data: {adapterData.data}</p>
@@ -90,19 +89,19 @@ export default function Preview(): JSX.Element {
               ))}
             </div>
           </div>
-        </Section>
-        <Section title="Strategy Configuration">
+        </div>
+        <div>
           <p>Id: {ethers.utils.formatBytes32String("")}</p>
           <p>Data: 0x</p>
           <div>
             <p>Params: </p>
           </div>
-        </Section>
-        <Section title="Staking Configuration">
+        </div>
+        <div>
           <p>Deploy Staking: false </p>
           <p>RewardsData: 0x</p>
-        </Section>
-        <Section title="Vault Metadata">
+        </div>
+        <div>
           <p>Vault: {constants.AddressZero}</p>
           <p>Adapter: {constants.AddressZero}</p>
           <p>Creator: {account}</p>
@@ -122,10 +121,10 @@ export default function Preview(): JSX.Element {
               <p>7: {constants.AddressZero}</p>
             </div>
           </div>
-        </Section>
-        <Section title="InitialDeposit">
+        </div>
+        <div>
           <p>InitialDeposit: 0</p>
-        </Section>
+        </div>
         <div className="flex justify-center mt-8">
           <div className="flex flex-row items-center space-x-4">
             <button

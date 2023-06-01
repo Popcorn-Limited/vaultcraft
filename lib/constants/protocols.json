@@ -1,18 +1,28 @@
 [
   {
     "chains": [1, 5, 1337],
-    "name": "Yearn",
-    "logoURI": "https://cryptologos.cc/logos/yearn-finance-yfi-logo.png?v=024"
+    "name": "Aave",
+    "logoURI": "https://cryptologos.cc/logos/aave-aave-logo.png?v=024"
+  },
+  {
+    "chains": [1, 5, 1337],
+    "name": "Alpaca",
+    "logoURI": "https://cryptologos.cc/logos/aave-aave-logo.png?v=024"
+  },
+  {
+    "chains": [1, 5, 1337],
+    "name": "Aura",
+    "logoURI": "https://cryptologos.cc/logos/aave-aave-logo.png?v=024"
+  },
+  {
+    "chains": [1, 5, 1337],
+    "name": "Balancer",
+    "logoURI": "https://cryptologos.cc/logos/aave-aave-logo.png?v=024"
   },
   {
     "chains": [1, 5, 1337],
     "name": "Beefy",
     "logoURI": "https://cryptologos.cc/logos/beefy-finance-bifi-logo.png?v=024"
-  },
-  {
-    "chains": [1, 5, 1337],
-    "name": "Aave",
-    "logoURI": "https://cryptologos.cc/logos/aave-aave-logo.png?v=024"
   },
   {
     "chains": [1, 5, 1337],
@@ -26,7 +36,62 @@
   },
   {
     "chains": [1, 5, 1337],
+    "name": "Curve",
+    "logoURI": "https://cdn.furucombo.app/assets/img/token/CVX.png"
+  },
+  {
+    "chains": [1, 5, 1337],
+    "name": "DotDot",
+    "logoURI": "https://cdn.furucombo.app/assets/img/token/CVX.png"
+  },
+  {
+    "chains": [1, 5, 1337],
+    "name": "Ellipsis",
+    "logoURI": "https://cdn.furucombo.app/assets/img/token/CVX.png"
+  },
+  {
+    "chains": [1, 5, 1337],
+    "name": "Gearbox",
+    "logoURI": "https://cdn.furucombo.app/assets/img/token/CVX.png"
+  },
+  {
+    "chains": [1, 5, 1337],
+    "name": "Idle",
+    "logoURI": "https://cdn.furucombo.app/assets/img/token/CVX.png"
+  },
+  {
+    "chains": [1, 5, 1337],
+    "name": "Origin",
+    "logoURI": "https://cdn.furucombo.app/assets/img/token/CVX.png"
+  },
+  {
+    "chains": [1, 5, 1337],
+    "name": "Radiant",
+    "logoURI": "https://cdn.furucombo.app/assets/img/token/CVX.png"
+  },
+  {
+    "chains": [1, 5, 1337],
+    "name": "Solidly",
+    "logoURI": "https://cdn.furucombo.app/assets/img/token/CVX.png"
+  },
+  {
+    "chains": [1, 5, 1337],
+    "name": "Stargate",
+    "logoURI": "https://cdn.furucombo.app/assets/img/token/CVX.png"
+  },
+  {
+    "chains": [1, 5, 1337],
     "name": "Sushi",
     "logoURI": "https://cdn.furucombo.app/assets/img/token/SUSHI.png"
+  },
+  {
+    "chains": [1, 5, 1337],
+    "name": "Velodrome",
+    "logoURI": "https://cdn.furucombo.app/assets/img/token/CVX.png"
+  },
+  {
+    "chains": [1, 5, 1337],
+    "name": "Yearn",
+    "logoURI": "https://cryptologos.cc/logos/yearn-finance-yfi-logo.png?v=024"
   }
 ]

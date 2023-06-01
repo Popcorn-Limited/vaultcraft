@@ -1,33 +1,56 @@
 import { Adapter, adapterAtom, adapterConfigAtom, useAdapters } from "@/lib/adapter";
-import Section from "@/components/content/Section";
 import { Fragment } from "react";
-import Image from "next/image";
 import Selector, { Option } from "../Selector";
-import { protocolAtom } from "@/lib/protocols";
+import { Protocol, protocolAtom } from "@/lib/protocols";
 import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import { RESET } from "jotai/utils";
 import { strategyAtom } from "@/lib/strategy";
+import { resolveProtocolAssets } from "@/lib/resolver/protocolAssets/protocolAssets";
+import { networkAtom } from "@/lib/networks";
+import { assetAtom } from "@/lib/assets";
+
+interface AdapterOption extends Adapter {
+  disabled: boolean;
+}
+
+async function assetSupported(adapter: Adapter, chainId: number, asset: string): Promise<boolean> {
+  const availableAssets = await resolveProtocolAssets({ chainId: chainId, resolver: adapter.resolver })
+
+  return availableAssets.flat().map(a => a.toLowerCase()).filter((availableAsset) => availableAsset === asset).length > 0
+}
+
+async function getAdapterOptions(adapters: Adapter[], chainId: number, asset: string): Promise<AdapterOption[]> {
+  return Promise.all(
+    adapters.map(async (adapter) => {
+      return { ...adapter, disabled: !(await assetSupported(adapter, chainId, asset)) }
+    })
+  )
+}
 
 function AdapterSelection() {
+  const [network] = useAtom(networkAtom);
   const [protocol] = useAtom(protocolAtom);
+  const [asset] = useAtom(assetAtom);
+
   const [adapter, setAdapter] = useAtom(adapterAtom);
   const adapters = useAdapters();
-  const [options, setOptions] = useState<Adapter[]>(adapters);
+  const [options, setOptions] = useState<AdapterOption[]>([]);
 
   // Only for reset
   const [, setAdapterConfig] = useAtom(adapterConfigAtom);
   const [, setStrategy] = useAtom(strategyAtom);
 
   useEffect(() => {
-    if (protocol) {
-      const filtered = adapters.filter(
-        (adapter) => adapter.protocol === protocol.name
-      );
-      setOptions(filtered);
-      setAdapter(filtered[0]);
+    if (protocol && asset && network) {
+      getAdapterOptions(adapters.filter(
+        (adapter) => adapter.protocol === protocol.name), network.id, asset.address["1"].toLowerCase())
+        .then(res => {
+          setOptions(res);
+          if (res.length > 0) setAdapter(res[0]);
+        });
     }
-  }, [protocol]);
+  }, [protocol, asset, network]);
 
   function selectAdapter(newAdapter: any) {
     if (adapter !== newAdapter) {
@@ -38,45 +61,42 @@ function AdapterSelection() {
   }
 
   return (
-    <Section title="Adapter Selection">
-      <p>Options: {options.length}</p>
+    <section className="mb-4">
       <Selector
         selected={adapter}
         onSelect={(newAdapter) => selectAdapter(newAdapter)}
         actionContent={(selected) => (
           <Fragment>
             {selected?.logoURI && (
-              <figure className="relative w-6 h-6">
-                <Image
-                  fill
-                  className="object-contain"
+              <figure className="h-12 py-2 flex-row items-center flex relative">
+                <img
+                  className="object-contain h-full w-fit"
                   alt="logo"
                   src={selected?.logoURI}
                 />
               </figure>
             )}
-            <span>{selected?.name || "Click to select"}</span>
+            <span className="text-[white] w-full flex self-center flex-row justify-start">{selected?.name || "Protocol selection"}</span>
+            <span className="self-center text-[white] mr-2">{`>`}</span>
           </Fragment>
         )}
       >
-        {options.map((adapter) => (
-          <Option
-            value={adapter}
-            key={`asset-selc-${adapter.key}-${adapter.name}`}
-          >
-            <figure className="relative w-6 h-6">
-              <Image
-                fill
-                alt=""
-                className="object-contain"
-                src={adapter.logoURI}
-              />
-            </figure>
-            <span>{adapter.name}</span>
-          </Option>
-        ))}
+        <div className="w-full h-full bg-black flex flex-col items-start gap-y-1 px-8 py-9">
+          <p className="text-[white] text-2xl mb-9">Select Adapter</p>
+          <p className="text-[white] mb-8">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna ut labore et dolore magna.</p>
+          <div className="flex flex-col overflow-y-scroll w-full">
+            {options.map((adapterIter) => (
+              <Option
+                value={adapterIter}
+                selected={adapterIter.name === adapter?.name}
+                key={`asset-selc-${adapterIter.key}-${adapterIter.name}`}
+              >
+              </Option>
+            ))}
+          </div>
+        </div>
       </Selector>
-    </Section>
+    </section>
   );
 }
 
