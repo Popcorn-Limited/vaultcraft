@@ -1,3 +1,4 @@
+import { readContract } from "@wagmi/core";
 import { readContracts } from "wagmi";
 import { BigNumber } from "ethers";
 
@@ -5,15 +6,13 @@ const VAULT_REGISTRY_ADDRESS = "0x50c1a2eA0a861A967D9d0FFE2AE4012c2E053804";
 const VAULT_FACTORY_ADDRESS = "0x21b1FC8A52f179757bf555346130bF27c0C2A17A";
 
 export async function yearn({ chainId }: { chainId: number }): Promise<string[]> {
-    const [ numTokens ] = await readContracts({
-        contracts: [{
-            address: VAULT_REGISTRY_ADDRESS,
-            abi: abiRegistry,
-            functionName: "numTokens",
-            chainId: 1337,
-            args: []
-        }]
-    }) as BigNumber[]
+    const numTokens = await readContract({
+        address: VAULT_REGISTRY_ADDRESS,
+        abi: abiRegistry,
+        functionName: "numTokens",
+        chainId: 1337,
+        args: []
+    }) as BigNumber
 
     const registryTokens = await readContracts({
         contracts: Array(numTokens.toNumber()).fill(undefined).map((item, idx) => {
@@ -27,17 +26,13 @@ export async function yearn({ chainId }: { chainId: number }): Promise<string[]>
         })
     }) as string[]
 
-    console.log(registryTokens)
-
-    const [ allDeployedVaults ] = await readContracts({
-        contracts: [{
-            address: VAULT_FACTORY_ADDRESS,
-            abi: abiFactory,
-            functionName: "allDeployedVaults",
-            chainId: 1337,
-            args: []
-        }]
-    }) as `0x${string}`[][]
+    const allDeployedVaults = await readContract({
+        address: VAULT_FACTORY_ADDRESS,
+        abi: abiFactory,
+        functionName: "allDeployedVaults",
+        chainId: 1337,
+        args: []
+    }) as `0x${string}`[]
 
     const factoryTokens = await readContracts({
         contracts: allDeployedVaults.map(item => {
