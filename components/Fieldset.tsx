@@ -12,7 +12,7 @@ function Fieldset({
   return (
     <fieldset className={`${className} flex flex-col mt-4`}>
       <div>
-        <p className="text-white text-lg">{label}</p>
+        <h2 className="text-white text-lg">{label}</h2>
         <p className="text-gray-500 text-sm">{description}</p>
       </div>
 
