@@ -1,10 +1,13 @@
 import { readContracts } from "wagmi";
 import { BigNumber } from "ethers";
 
+const VAULT_REGISTRY_ADDRESS = "0x50c1a2eA0a861A967D9d0FFE2AE4012c2E053804";
+const VAULT_FACTORY_ADDRESS = "0x21b1FC8A52f179757bf555346130bF27c0C2A17A";
+
 export async function yearn({ chainId }: { chainId: number }): Promise<string[]> {
     const [ numTokens ] = await readContracts({
         contracts: [{
-            address: "0x50c1a2eA0a861A967D9d0FFE2AE4012c2E053804",
+            address: VAULT_REGISTRY_ADDRESS,
             abi: abiRegistry,
             functionName: "numTokens",
             chainId: 1337,
@@ -15,7 +18,7 @@ export async function yearn({ chainId }: { chainId: number }): Promise<string[]>
     const registryTokens = await readContracts({
         contracts: Array(numTokens.toNumber()).map((item, idx) => {
             return {
-                address: "0x50c1a2eA0a861A967D9d0FFE2AE4012c2E053804",
+                address: VAULT_REGISTRY_ADDRESS,
                 abi: abiRegistry,
                 functionName: "tokens",
                 chainId: 1337,
@@ -26,7 +29,7 @@ export async function yearn({ chainId }: { chainId: number }): Promise<string[]>
 
     const [ allDeployedVaults ] = await readContracts({
         contracts: [{
-            address: "0x21b1FC8A52f179757bf555346130bF27c0C2A17A",
+            address: VAULT_FACTORY_ADDRESS,
             abi: abiFactory,
             functionName: "allDeployedVaults",
             chainId: 1337,
