@@ -42,7 +42,7 @@ function AdapterSelection() {
   const [, setStrategy] = useAtom(strategyAtom);
 
   useEffect(() => {
-    if (protocol) {
+    if (protocol && asset && network) {
       getAdapterOptions(adapters.filter(
         (adapter) => adapter.protocol === protocol.name), network.id, asset.address["1"].toLowerCase())
         .then(res => {
@@ -50,7 +50,7 @@ function AdapterSelection() {
           if (res.length > 0) setAdapter(res[0]);
         });
     }
-  }, [protocol]);
+  }, [protocol, asset, network]);
 
   function selectAdapter(newAdapter: any) {
     if (adapter !== newAdapter) {

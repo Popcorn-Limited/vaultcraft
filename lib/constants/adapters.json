@@ -1,14 +1,79 @@
 [
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
-    "name": "Yearn Adapter",
-    "key": "YearnAdapter",
-    "protocol": "Yearn",
+    "name": "AaveV2 Adapter",
+    "key": "AaveV2Adapter",
+    "protocol": "Aave",
+    "assets": ["USDC"],
+    "resolver": "default"
+  },
+  {
+    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "name": "AaveV3 Adapter",
+    "key": "AaveV3Adapter",
+    "protocol": "Aave",
+    "assets": ["USDC"],
+    "resolver": "default"
+  },
+  {
+    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "name": "Alpaca LendV1 Adapter",
+    "key": "AlpacaLendV1Adapter",
+    "protocol": "Alpaca",
     "initParams": [
       {
-        "name": "MaxLoss",
+        "name": "AlpacaVault",
+        "type": "address",
+        "requirements": ["Required", "NotAddressZero"],
+        "description": "Address of the Alpaca Vault to use"
+      }
+    ],
+    "assets": ["USDC"],
+    "resolver": "default"
+  },
+  {
+    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "name": "Alpaca LendV2 Adapter",
+    "key": "AlpacaLendV2Adapter",
+    "protocol": "Alpaca",
+    "initParams": [
+      {
+        "name": "Pid",
         "type": "uint256",
-        "description": "Max Loss for the yVault"
+        "requirements": ["Required"],
+        "description": "Pid of the AlpacaV2 Pool"
+      }
+    ],
+    "assets": ["USDC"],
+    "resolver": "default"
+  },
+  {
+    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "name": "Aura Adapter",
+    "key": "AuraAdapter",
+    "protocol": "Aura",
+    "initParams": [
+      {
+        "name": "Pid",
+        "type": "uint256",
+        "requirements": ["Required"],
+        "description": "Pid of the Aura Pool"
+      }
+    ],
+    "assets": ["USDC"],
+    "resolver": "default"
+  },
+  {
+    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "name": "Balancer Gauge Adapter",
+    "key": "BalancerGaugeAdapter",
+    "protocol": "Balancer",
+    "initParams": [
+      {
+        "name": "BalancerGauge",
+        "type": "address",
+        "requirements": ["Required", "NotAddressZero"],
+        "description": "Address of the Balancer Gauge to use"
       }
     ],
     "assets": ["USDC"],
@@ -37,24 +102,24 @@
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
-    "name": "AaveV2 Adapter",
-    "key": "AaveV2Adapter",
-    "protocol": "Aave",
-    "assets": ["USDC"],
-    "resolver": "default"
-  },
-  {
-    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
-    "name": "AaveV3 Adapter",
-    "key": "AaveV3Adapter",
-    "protocol": "Aave",
-    "assets": ["USDC"],
-    "resolver": "default"
-  },
-  {
-    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
     "name": "CompoundV2 Adapter",
     "key": "CompoundV2Adapter",
+    "protocol": "Compound",
+    "initParams": [
+      {
+        "name": "CToken",
+        "type": "address",
+        "requirements": ["Required", "NotAddressZero"],
+        "description": "Address of the fitting CToken for the asset"
+      }
+    ],
+    "assets": ["USDC"],
+    "resolver": "default"
+  },
+  {
+    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "name": "CompoundV3 Adapter",
+    "key": "CompoundV3Adapter",
     "protocol": "Compound",
     "initParams": [
       {
@@ -101,8 +166,168 @@
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
-    "name": "Sushi Adapter",
-    "key": "MasterChefAdapter",
+    "name": "Curve Gauge Adapter",
+    "key": "CurveGaugeAdapter",
+    "protocol": "Curve",
+    "initParams": [
+      {
+        "name": "GaugeId",
+        "type": "uint256",
+        "requirements": ["Required"],
+        "description": "Id of the Gauge to use"
+      }
+    ],
+    "assets": ["USDC"],
+    "resolver": "default"
+  },
+  {
+    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "name": "Curve Child Gauge Adapter",
+    "key": "CurveChildGaugeAdapter",
+    "protocol": "Curve",
+    "initParams": [
+      {
+        "name": "CRV",
+        "type": "address",
+        "requirements": ["Required", "NotAddressZero"],
+        "description": "Address of the CRV-Token on the specific network"
+      }
+    ],
+    "assets": ["USDC"],
+    "resolver": "default"
+  },
+  {
+    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "name": "DotDot Gauge Adapter",
+    "key": "DotDotGaugeAdapter",
+    "protocol": "DotDot",
+    "assets": ["USDC"],
+    "resolver": "default"
+  },
+  {
+    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "name": "Ellipsis Gauge Adapter",
+    "key": "EllipsisGaugeAdapter",
+    "protocol": "Ellipsis",
+    "initParams": [
+      {
+        "name": "Pid",
+        "type": "uint256",
+        "requirements": ["Required"],
+        "description": "Pid of the Ellipsis Pool"
+      }
+    ],
+    "assets": ["USDC"],
+    "resolver": "default"
+  },
+  {
+    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "name": "Gearbox Passive Adapter",
+    "key": "GearboxPassiveAdapter",
+    "protocol": "Gearbox",
+    "initParams": [
+      {
+        "name": "Pid",
+        "type": "uint256",
+        "requirements": ["Required"],
+        "description": "Pid of the Gearbox Pool"
+      }
+    ],
+    "assets": ["USDC"],
+    "resolver": "default"
+  },
+  {
+    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "name": "Idle Junior Adapter",
+    "key": "IdleJuniorAdapter",
+    "protocol": "Idle",
+    "initParams": [
+      {
+        "name": "CDO",
+        "type": "address",
+        "requirements": ["Required", "NotAddressZero"],
+        "description": "Address of the CDO Contract"
+      }
+    ],
+    "assets": ["USDC"],
+    "resolver": "default"
+  },
+  {
+    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "name": "Idle Senior Adapter",
+    "key": "IdleSeniorAdapter",
+    "protocol": "Idle",
+    "initParams": [
+      {
+        "name": "CDO",
+        "type": "address",
+        "requirements": ["Required", "NotAddressZero"],
+        "description": "Address of the CDO Contract"
+      }
+    ],
+    "assets": ["USDC"],
+    "resolver": "default"
+  },
+  {
+    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "name": "Origin Adapter",
+    "key": "OriginAdapter",
+    "protocol": "Origin",
+    "initParams": [
+      {
+        "name": "Wrapped Asset",
+        "type": "address",
+        "requirements": ["Required", "NotAddressZero"],
+        "description": "Address of the wrapped version of the asset"
+      }
+    ],
+    "assets": ["USDC"],
+    "resolver": "default"
+  },
+  {
+    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "name": "Radiant Adapter",
+    "key": "RadiantAdapter",
+    "protocol": "Radiant",
+    "assets": ["USDC"],
+    "resolver": "default"
+  },
+  {
+    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "name": "Solidly Adapter",
+    "key": "SolidlyAdapter",
+    "protocol": "Solidly",
+    "initParams": [
+      {
+        "name": "Gauge",
+        "type": "address",
+        "requirements": ["Required", "NotAddressZero"],
+        "description": "Address of the Solidly Gauge"
+      }
+    ],
+    "assets": ["USDC"],
+    "resolver": "default"
+  },
+  {
+    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "name": "Stargate Adapter",
+    "key": "StargateAdapter",
+    "protocol": "Stargate",
+    "initParams": [
+      {
+        "name": "Staking Id",
+        "type": "uint256",
+        "requirements": ["Required"],
+        "description": "Pid used for stargate staking"
+      }
+    ],
+    "assets": ["USDC"],
+    "resolver": "default"
+  },
+  {
+    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "name": "MasterChefV1 Adapter",
+    "key": "MasterChefV1Adapter",
     "protocol": "Sushi",
     "initParams": [
       {
@@ -116,6 +341,59 @@
         "type": "address",
         "requirements": ["Required", "NotAddressZero"],
         "description": "RewardToken of the MasterChef contract"
+      }
+    ],
+    "assets": ["USDC"],
+    "resolver": "default"
+  },
+  {
+    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "name": "MasterChefV2 Adapter",
+    "key": "MasterChefV2Adapter",
+    "protocol": "Sushi",
+    "initParams": [
+      {
+        "name": "Pid",
+        "type": "uint256",
+        "requirements": ["Required"],
+        "description": "Pid of the Convex Pool"
+      },
+      {
+        "name": "RewardsToken",
+        "type": "address",
+        "requirements": ["Required", "NotAddressZero"],
+        "description": "RewardToken of the MasterChef contract"
+      }
+    ],
+    "assets": ["USDC"],
+    "resolver": "default"
+  },
+  {
+    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "name": "Velodrome Adapter",
+    "key": "VelodromeAdapter",
+    "protocol": "Velodrome",
+    "initParams": [
+      {
+        "name": "Gauge",
+        "type": "address",
+        "requirements": ["Required", "NotAddressZero"],
+        "description": "Address of the Velodrome Gauge"
+      }
+    ],
+    "assets": ["USDC"],
+    "resolver": "default"
+  },
+  {
+    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "name": "Yearn Adapter",
+    "key": "YearnAdapter",
+    "protocol": "Yearn",
+    "initParams": [
+      {
+        "name": "MaxLoss",
+        "type": "uint256",
+        "description": "Max Loss for the yVault"
       }
     ],
     "assets": ["USDC"],
