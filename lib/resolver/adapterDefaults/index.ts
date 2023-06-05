@@ -1,4 +1,4 @@
-import { beefy } from "./resolver";
+import { beefy, convex } from "./resolver";
 
 export type AdapterDefaultResolver = (
   chainId: number,
@@ -9,6 +9,7 @@ export type AdapterDefaultResolvers = typeof AdapterDefaultResolvers;
 
 export const AdapterDefaultResolvers = {
   beefy,
+  convex,
   default: beefy
 };
 
