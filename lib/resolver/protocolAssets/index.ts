@@ -1,4 +1,4 @@
-import { beefy, velodrome, assetDefault } from "./resolver";
+import { beefy, assetDefault, yearn, velodrome } from "./resolver";
 
 export type ProtocolAssetResolver = (
   chainId: number,
@@ -9,6 +9,7 @@ export type ProtocolAssetResolvers = typeof ProtocolAssetResolvers;
 export const ProtocolAssetResolvers = {
   beefy,
   velodrome,
+  yearn,
   default: assetDefault
 };
 
