@@ -5,6 +5,7 @@
     "key": "AaveV2Adapter",
     "protocol": "Aave",
     "assets": ["USDC"],
+    "chains": [1, 5, 1337],
     "resolver": "default"
   },
   {
@@ -13,6 +14,7 @@
     "key": "AaveV3Adapter",
     "protocol": "Aave",
     "assets": ["USDC"],
+    "chains": [1, 5, 1337],
     "resolver": "default"
   },
   {
@@ -29,6 +31,7 @@
       }
     ],
     "assets": ["USDC"],
+    "chains": [1, 5, 1337],
     "resolver": "default"
   },
   {
@@ -45,6 +48,7 @@
       }
     ],
     "assets": ["USDC"],
+    "chains": [1, 5, 1337],
     "resolver": "default"
   },
   {
@@ -61,6 +65,7 @@
       }
     ],
     "assets": ["USDC"],
+    "chains": [1, 5, 1337],
     "resolver": "default"
   },
   {
@@ -77,6 +82,7 @@
       }
     ],
     "assets": ["USDC"],
+    "chains": [1, 5, 1337],
     "resolver": "default"
   },
   {
@@ -98,6 +104,7 @@
       }
     ],
     "assets": ["USDC"],
+    "chains": [1, 5, 1337],
     "resolver": "beefy"
   },
   {
@@ -114,6 +121,7 @@
       }
     ],
     "assets": ["USDC"],
+    "chains": [1, 5, 1337],
     "resolver": "default"
   },
   {
@@ -130,6 +138,7 @@
       }
     ],
     "assets": ["USDC"],
+    "chains": [1, 5, 1337],
     "resolver": "default"
   },
   {
@@ -146,6 +155,7 @@
       }
     ],
     "assets": ["USDC"],
+    "chains": [1, 5, 1337],
     "resolver": "default"
   },
   {
@@ -162,6 +172,7 @@
       }
     ],
     "assets": ["USDC"],
+    "chains": [1, 5, 1337],
     "resolver": "default"
   },
   {
@@ -178,6 +189,7 @@
       }
     ],
     "assets": ["USDC"],
+    "chains": [1, 5, 1337],
     "resolver": "default"
   },
   {
@@ -194,6 +206,7 @@
       }
     ],
     "assets": ["USDC"],
+    "chains": [1, 5, 1337],
     "resolver": "default"
   },
   {
@@ -202,6 +215,7 @@
     "key": "DotDotGaugeAdapter",
     "protocol": "DotDot",
     "assets": ["USDC"],
+    "chains": [1, 5, 1337],
     "resolver": "default"
   },
   {
@@ -218,6 +232,7 @@
       }
     ],
     "assets": ["USDC"],
+    "chains": [1, 5, 1337],
     "resolver": "default"
   },
   {
@@ -234,6 +249,7 @@
       }
     ],
     "assets": ["USDC"],
+    "chains": [1, 5, 1337],
     "resolver": "default"
   },
   {
@@ -250,6 +266,7 @@
       }
     ],
     "assets": ["USDC"],
+    "chains": [1, 5, 1337],
     "resolver": "default"
   },
   {
@@ -266,6 +283,7 @@
       }
     ],
     "assets": ["USDC"],
+    "chains": [1, 5, 1337],
     "resolver": "default"
   },
   {
@@ -282,6 +300,7 @@
       }
     ],
     "assets": ["USDC"],
+    "chains": [1, 5, 1337],
     "resolver": "default"
   },
   {
@@ -290,6 +309,7 @@
     "key": "RadiantAdapter",
     "protocol": "Radiant",
     "assets": ["USDC"],
+    "chains": [1, 5, 1337],
     "resolver": "default"
   },
   {
@@ -306,6 +326,7 @@
       }
     ],
     "assets": ["USDC"],
+    "chains": [1, 5, 1337],
     "resolver": "default"
   },
   {
@@ -322,6 +343,7 @@
       }
     ],
     "assets": ["USDC"],
+    "chains": [1, 5, 1337],
     "resolver": "default"
   },
   {
@@ -344,6 +366,7 @@
       }
     ],
     "assets": ["USDC"],
+    "chains": [1, 5, 1337],
     "resolver": "default"
   },
   {
@@ -366,6 +389,7 @@
       }
     ],
     "assets": ["USDC"],
+    "chains": [1, 5, 1337],
     "resolver": "default"
   },
   {
@@ -382,6 +406,7 @@
       }
     ],
     "assets": ["USDC"],
+    "chains": [1, 5, 1337],
     "resolver": "default"
   },
   {
@@ -397,6 +422,7 @@
       }
     ],
     "assets": ["USDC"],
+    "chains": [1, 5, 1337],
     "resolver": "default"
   }
 ]

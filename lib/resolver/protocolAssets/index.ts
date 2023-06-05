@@ -1,4 +1,4 @@
-import { beefy, stargate, assetDefault } from "./resolver";
+import { beefy, assetDefault, yearn, stargate } from "./resolver";
 
 export type ProtocolAssetResolver = (
   chainId: number,
@@ -9,6 +9,7 @@ export type ProtocolAssetResolvers = typeof ProtocolAssetResolvers;
 export const ProtocolAssetResolvers = {
   beefy,
   stargate,
+  yearn,
   default: assetDefault
 };
 
