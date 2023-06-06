@@ -27,8 +27,6 @@ export async function convex({ chainId, address }: { chainId: number, address: s
 
     const lpTokens = poolInfo.map(item => item[0])
 
-    console.log(lpTokens)
-
     return lpTokens.indexOf(address)
 }
 

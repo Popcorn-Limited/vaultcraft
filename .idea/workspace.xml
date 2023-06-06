@@ -5,10 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a6d9d225-4d05-4bc6-b6af-87650f300a66" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/lib/resolver/adapterDefaults/resolver/convex.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/resolver/adapterDefaults/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/resolver/adapterDefaults/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/resolver/adapterDefaults/resolver/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/resolver/adapterDefaults/resolver/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/vaults/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/vaults/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/resolver/adapterDefaults/resolver/convex.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/resolver/adapterDefaults/resolver/convex.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,23 +26,23 @@
                 <list>
                   <RecentBranch>
                     <option name="branchName" value="feature/init-resolver-convex" />
-                    <option name="lastUsedInstant" value="1685958807" />
+                    <option name="lastUsedInstant" value="1686054603" />
+                  </RecentBranch>
+                  <RecentBranch>
+                    <option name="branchName" value="feature/init-resolver-velodrome" />
+                    <option name="lastUsedInstant" value="1685994244" />
                   </RecentBranch>
                   <RecentBranch>
                     <option name="branchName" value="main" />
-                    <option name="lastUsedInstant" value="1685958134" />
+                    <option name="lastUsedInstant" value="1685994023" />
+                  </RecentBranch>
+                  <RecentBranch>
+                    <option name="branchName" value="feature/asset-resolver-velodrome" />
+                    <option name="lastUsedInstant" value="1685993870" />
                   </RecentBranch>
                   <RecentBranch>
                     <option name="branchName" value="feature/asset-resolver-convex" />
                     <option name="lastUsedInstant" value="1685958089" />
-                  </RecentBranch>
-                  <RecentBranch>
-                    <option name="branchName" value="feature/asset-resolver-stargate" />
-                    <option name="lastUsedInstant" value="1685958031" />
-                  </RecentBranch>
-                  <RecentBranch>
-                    <option name="branchName" value="feature/asset-resolver-compound" />
-                    <option name="lastUsedInstant" value="1685957262" />
                   </RecentBranch>
                 </list>
               </option>
@@ -63,22 +61,27 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.standard": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.standard": "",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "yarn",
-    "settings.editor.selected.configurable": "preferences.keymap",
-    "ts.external.directory.path": "/Users/revomrevom/work/POPCORN/vaultcraft/node_modules/typescript/lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.standard&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.standard&quot;: &quot;&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;yarn&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/Users/revomrevom/work/POPCORN/vaultcraft/node_modules/typescript/lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/lib/resolver/adapterDefaults/resolver" />
+    </key>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -89,7 +92,8 @@
       <updated>1685436628523</updated>
       <workItem from="1685436630413" duration="43005000" />
       <workItem from="1685603582798" duration="973000" />
-      <workItem from="1685604569558" duration="33483000" />
+      <workItem from="1685604569558" duration="38336000" />
+      <workItem from="1686050650532" duration="3954000" />
     </task>
     <servers />
   </component>
