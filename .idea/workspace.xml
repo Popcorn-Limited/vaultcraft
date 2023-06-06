@@ -5,9 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a6d9d225-4d05-4bc6-b6af-87650f300a66" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/lib/resolver/protocolAssets/resolver/aave-v3.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/resolver/protocolAssets/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/resolver/protocolAssets/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/resolver/protocolAssets/resolver/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/resolver/protocolAssets/resolver/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/resolver/protocolAssets/resolver/aave-v3.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/resolver/protocolAssets/resolver/aave-v3.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

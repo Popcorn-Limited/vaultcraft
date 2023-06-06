@@ -9,7 +9,7 @@ export async function aaveV3({ chainId }: { chainId: number }) {
         functionName: "getReservesList",
         chainId: 1337,
         args: []
-    })
+    }) as string[]
 
     return reservesList
 }
