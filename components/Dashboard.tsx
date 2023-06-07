@@ -1,22 +1,22 @@
-import AssetSelection from "./sections/AssetSelection";
-import ProtocolSelection from "./sections/ProtocolSelection";
+import { constants, utils } from "ethers";
+import { formatUnits } from "ethers/lib/utils.js";
 import { GrDocumentConfig } from "react-icons/gr";
 import { IoMdArrowForward } from "react-icons/io";
-import AdapterSelection from "./sections/AdapterSelection";
-import AdapterConfiguration from "./sections/AdapterConfiguration";
-import StrategySelection from "./sections/StrategySelection";
-import FeeConfiguration from "./sections/FeeConfiguration";
 import { useRouter } from "next/router";
 import { useAtom } from "jotai";
 import {
   adapterAtom,
   adapterConfigAtom,
-  checkInitParamValidity,
-} from "@/lib/adapter";
-import { feeAtom } from "@/lib/fees";
-import { constants, utils } from "ethers";
-import { formatUnits } from "ethers/lib/utils.js";
-import NetworkSelection from "./sections/NetworkSelection";
+  feeAtom,
+} from "@/lib/atoms";
+import { checkInitParamValidity } from "@/lib/helpers";
+import AssetSelection from "@/components/sections/AssetSelection";
+import ProtocolSelection from "@/components/sections/ProtocolSelection";
+import AdapterSelection from "@/components/sections/AdapterSelection";
+import AdapterConfiguration from "@/components/sections/AdapterConfiguration";
+import StrategySelection from "@/components/sections/StrategySelection";
+import FeeConfiguration from "@/components/sections/FeeConfiguration";
+import NetworkSelection from "@/components/sections/NetworkSelection";
 
 function Dashboard() {
   const router = useRouter();

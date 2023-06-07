@@ -1,6 +1,6 @@
+import { ethers } from "ethers";
 import { atomWithStorage } from "jotai/utils";
-import adapters from "./constants/adapters.json";
-import { constants, ethers, utils } from "ethers";
+import adapters from "@/lib/constants/adapters.json";
 
 export type Adapter = {
   name: string;
@@ -46,27 +46,3 @@ export const adapterDeploymentAtom = atomWithStorage<AdapterConfig>(
   "deploy.adapter",
   { id: ethers.utils.formatBytes32String(""), data: "0x" }
 );
-
-export function checkInitParamValidity(
-  value: any,
-  inputParam: InitParam
-): boolean {
-  if (!value) return false;
-  if (!inputParam?.requirements) {
-    switch (inputParam.type) {
-      case "address":
-        return utils.isAddress(value);
-      case "uint256":
-      default:
-        return true;
-    }
-  }
-  if (inputParam.requirements.includes(InitParamRequirement.NotAddressZero)) {
-    return utils.isAddress(value) && value !== constants.AddressZero;
-  }
-  if (inputParam.requirements.includes(InitParamRequirement.NotZero)) {
-    return value > 0;
-  }
-
-  return true;
-}

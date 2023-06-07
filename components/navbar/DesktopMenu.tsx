@@ -1,10 +1,10 @@
-import { ChevronDownIcon } from "@heroicons/react/24/solid";
-import MainActionButton from "../buttons/MainActionButton";
+import { useMemo } from "react";
 import Link from "next/link";
 import { useNetwork, useAccount } from "wagmi";
 import { useChainModal, useConnectModal } from "@rainbow-me/rainbowkit";
-import { networkLogos } from "../../lib/connectors";
-import { useMemo } from "react";
+import { ChevronDownIcon } from "@heroicons/react/24/solid";
+import { networkLogos } from "@/lib/connectors";
+import MainActionButton from "@/components/buttons/MainActionButton";
 
 export default function DesktopMenu(): JSX.Element {
     const { openConnectModal } = useConnectModal();
@@ -12,7 +12,7 @@ export default function DesktopMenu(): JSX.Element {
     const { address } = useAccount();
     const { chain, chains } = useNetwork();
     // @ts-ignore
-    const logo = useMemo(() => (address && chain?.id ? networkLogos[chain.id] : networkLogos["1"]), [chain?.id, address]);
+    const logo = useMemo(() => (address && chain?.id ? networkLogos[chain.id] : networkLogos["42161"]), [chain?.id, address]);
     const chainName = useMemo(() => (address && chain?.name ? chain.name : "Ethereum"), [chain?.id, address]);
 
 
