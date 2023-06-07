@@ -1,14 +1,9 @@
-import { Adapter, adapterAtom, adapterConfigAtom, useAdapters } from "@/lib/adapter";
-import { Fragment } from "react";
-import Selector, { Option } from "../Selector";
-import { Protocol, protocolAtom } from "@/lib/protocols";
 import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import { RESET } from "jotai/utils";
-import { strategyAtom } from "@/lib/strategy";
+import { Adapter, adapterAtom, adapterConfigAtom, useAdapters, protocolAtom, networkAtom, assetAtom, strategyAtom } from "@/lib/atoms";
 import { resolveProtocolAssets } from "@/lib/resolver/protocolAssets/protocolAssets";
-import { networkAtom } from "@/lib/networks";
-import { assetAtom } from "@/lib/assets";
+import Selector, { Option } from "@/components/inputs/Selector";
 
 interface AdapterOption extends Adapter {
   disabled: boolean;
@@ -43,8 +38,9 @@ function AdapterSelection() {
 
   useEffect(() => {
     if (protocol && asset && network) {
+      // TODO - remove hardcoded network id
       getAdapterOptions(adapters.filter(
-        (adapter) => adapter.protocol === protocol.name), network.id, asset.address["1"].toLowerCase())
+        (adapter) => adapter.protocol === protocol.name), 42161, asset.address["42161"].toLowerCase())
         .then(res => {
           setOptions(res);
           if (res.length > 0) setAdapter(res[0]);
@@ -66,7 +62,7 @@ function AdapterSelection() {
         selected={adapter}
         onSelect={(newAdapter) => selectAdapter(newAdapter)}
         actionContent={(selected) => (
-          <Fragment>
+          <div className="h-12 flex flex-row items-center w-full gap-x-2">
             {selected?.logoURI && (
               <figure className="h-12 py-2 flex-row items-center flex relative">
                 <img
@@ -76,9 +72,9 @@ function AdapterSelection() {
                 />
               </figure>
             )}
-            <span className="text-[white] w-full flex self-center flex-row justify-start">{selected?.name || "Protocol selection"}</span>
+            <span className="text-[white] w-full flex self-center flex-row justify-start">{selected?.name || "Adapter selection"}</span>
             <span className="self-center text-[white] mr-2">{`>`}</span>
-          </Fragment>
+          </div>
         )}
       >
         <div className="w-full h-full bg-black flex flex-col items-start gap-y-1 px-8 py-9">

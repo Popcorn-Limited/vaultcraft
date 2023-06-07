@@ -1,11 +1,11 @@
-import ProgressBar from "@/components/ProgressBar";
-import Review from "@/components/Review";
-import MainActionButton from "@/components/buttons/MainActionButton";
-import SecondaryActionButton from "@/components/buttons/SecondaryActionButton";
+import { useRouter } from "next/router";
 import { noOp } from "@/lib/helpers";
 import { CREATION_STAGES } from "@/lib/stages";
 import { useDeployVault } from "@/lib/vaults";
-import { useRouter } from "next/router";
+import ProgressBar from "@/components/ProgressBar";
+import Review from "@/components/review/Review";
+import MainActionButton from "@/components/buttons/MainActionButton";
+import SecondaryActionButton from "@/components/buttons/SecondaryActionButton";
 
 
 export default function ReviewPage(): JSX.Element {

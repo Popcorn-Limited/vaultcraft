@@ -1,13 +1,10 @@
-import { Protocol, protocolAtom, useProtocols } from "@/lib/protocols";
-import { Fragment } from "react";
-import Selector, { Option } from "../Selector";
+import { Fragment, useEffect, useState } from "react";
 import { useAtom } from "jotai";
-import { useEffect, useState } from "react";
-import { networkAtom } from "@/lib/networks";
-import { Adapter, adapterConfigAtom, useAdapters } from "@/lib/adapter";
 import { RESET } from "jotai/utils";
-import { assetAtom } from "@/lib/assets";
+import { Adapter, adapterConfigAtom, useAdapters, assetAtom, networkAtom, Protocol, protocolAtom, useProtocols } from "@/lib/atoms";
 import { resolveProtocolAssets } from "@/lib/resolver/protocolAssets/protocolAssets";
+import Selector, { Option } from "@/components/inputs/Selector";
+
 
 interface ProtocolOption extends Protocol {
   disabled: boolean;
@@ -44,7 +41,7 @@ function ProtocolSelection() {
   useEffect(() => {
     if (network && asset) {
       // TODO - remove hardcoded network id
-      getProtocolOptions(protocols, adapters, network.id, asset.address["1"].toLowerCase()).then(res => setOptions(res));
+      getProtocolOptions(protocols, adapters, 42161, asset.address["42161"].toLowerCase()).then(res => setOptions(res));
     }
   }, [network, asset]);
 

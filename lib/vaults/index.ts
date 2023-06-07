@@ -1,10 +1,8 @@
 import { constants, ethers } from "ethers";
-import { useTypedWriteCall } from "@/lib/wagmi";
 import { useAccount, useContractWrite, usePrepareContractWrite } from "wagmi";
-import { adapterAtom, adapterDeploymentAtom } from "../adapter";
 import { useAtom } from "jotai";
-import { assetAtom } from "../assets";
-import { feeAtom } from "../fees";
+import { adapterDeploymentAtom, assetAtom, feeAtom } from "@/lib/atoms"
+
 
 export const useDeployVault = () => {
   const { address: account } = useAccount();

@@ -1,29 +1,26 @@
+import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import { constants, ethers } from "ethers";
+import { formatUnits } from "ethers/lib/utils.js";
 import { useAccount } from "wagmi";
+import { useAtom } from "jotai";
+import { Switch } from '@headlessui/react'
 import {
   adapterAtom,
   adapterConfigAtom,
   adapterDeploymentAtom,
-} from "@/lib/adapter";
-import { useAtom } from "jotai";
-import { protocolAtom } from "@/lib/protocols";
-import { assetAtom } from "@/lib/assets";
-import { feeAtom } from "@/lib/fees";
-import { limitAtom } from "@/lib/limits";
-import { useEffect, useState } from "react";
-import { useDeployVault } from "@/lib/vaults";
-import { noOp } from "@/lib/helpers";
-import { IoMdArrowBack, IoMdArrowForward } from "react-icons/io";
-import { useRouter } from "next/router";
-import { formatUnits } from "ethers/lib/utils.js";
-import { networkAtom } from "@/lib/networks";
+  protocolAtom,
+  assetAtom,
+  feeAtom,
+  limitAtom,
+  networkAtom,
+  metadataAtom
+} from "@/lib/atoms";
 import ReviewSection from "./ReviewSection";
 import ReviewParam from "./ReviewParam";
-import { Switch } from '@headlessui/react'
 
 export default function Review(): JSX.Element {
   const { address: account } = useAccount();
-  const router = useRouter();
   const [network] = useAtom(networkAtom);
   const chainId = network.id === 1337 ? 1 : network.id;
   const [asset] = useAtom(assetAtom);
@@ -33,6 +30,7 @@ export default function Review(): JSX.Element {
   const [limit] = useAtom(limitAtom);
   const [adapterData, setAdapterData] = useAtom(adapterDeploymentAtom);
   const [fees] = useAtom(feeAtom);
+  const [metadata] = useAtom(metadataAtom);
 
   const [devMode, setDevMode] = useState(false);
 
@@ -65,6 +63,8 @@ export default function Review(): JSX.Element {
         </Switch>
       </span>
       <ReviewSection title="Basics">
+        <ReviewParam title="Name" value={metadata?.name} />
+        <ReviewParam title="Categories" value={String(metadata?.tags)} />
         <ReviewParam title="Asset" value={asset?.name} img={asset?.logoURI} />
         {devMode && <ReviewParam title="Asset Address" value={asset?.address[chainId] || constants.AddressZero} />}
         <ReviewParam title="Protocol" value={protocol?.name} img={protocol?.logoURI} />

@@ -1,5 +1,5 @@
 import { atomWithStorage } from "jotai/utils";
-import protocols from "./constants/protocols.json";
+import protocols from "@/lib/constants/protocols.json";
 
 export type Protocol = {
   chains: number[];
