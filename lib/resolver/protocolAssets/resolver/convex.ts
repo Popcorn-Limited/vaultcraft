@@ -25,9 +25,7 @@ export async function convex({ chainId }: { chainId: number }) {
         })
     }) as string[][]
 
-    const lpTokens = poolInfo.map(item => item[0])
-
-    return lpTokens
+    return poolInfo.map(item => item[0]);
 }
 
 const abi = [

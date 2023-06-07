@@ -3,15 +3,13 @@ import { readContract } from "@wagmi/core";
 const POOL_ADDRESS = "0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9";
 
 export async function aaveV2 ({ chainId }: { chainId: number }) {
-    const reservesList = await readContract({
+    return await readContract({
         address: POOL_ADDRESS,
         abi,
         functionName: "getReservesList",
         chainId: 1337,
         args: []
-    }) as string[]
-
-    return reservesList
+    }) as string[];
 }
 
 const abi= [

@@ -13,7 +13,7 @@ export async function velodrome({ chainId }: { chainId: number }) {
         args: []
     }) as BigNumber
 
-    const pairs = await readContracts({
+    return await readContracts({
         contracts: Array(allPairLength.toNumber()).fill(undefined).map((item, idx) => {
             return {
                 address: PAIR_FACTORY_ADDRESS,
@@ -23,9 +23,7 @@ export async function velodrome({ chainId }: { chainId: number }) {
                 args: [idx]
             }
         })
-    }) as string[]
-
-    return pairs
+    }) as string[];
 }
 
 const abiFactory = [

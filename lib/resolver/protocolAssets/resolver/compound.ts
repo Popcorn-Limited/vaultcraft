@@ -12,7 +12,7 @@ export async function compound({ chainId }: { chainId: number }): Promise<string
         args: []
     }) as `0x${string}`[]
 
-    const assets = await readContracts({
+    return await readContracts({
         contracts: allMarkets.map(item => {
             return {
                 address: item,
@@ -23,8 +23,6 @@ export async function compound({ chainId }: { chainId: number }): Promise<string
             }
         })
     }) as string[]
-
-    return assets
 }
 
 const abiProxy = [
