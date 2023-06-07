@@ -1,9 +1,8 @@
+import { useRouter } from "next/router";
+import { CREATION_STAGES } from "@/lib/stages";
 import MainActionButton from "@/components/buttons/MainActionButton";
 import SecondaryActionButton from "@/components/buttons/SecondaryActionButton";
 import ProgressBar from "@/components/ProgressBar";
-import StrategyConfiguration from "@/components/sections/StrategyConfiguration";
-import { CREATION_STAGES } from "@/lib/stages";
-import { useRouter } from "next/router";
 
 export default function Strategy() {
   const router = useRouter();

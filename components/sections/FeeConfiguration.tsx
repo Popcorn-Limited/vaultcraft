@@ -1,9 +1,10 @@
 import { useAtom } from "jotai";
-import { feeAtom, validateBigNumberInput } from "@/lib/fees";
-import { formatUnits, parseUnits } from "ethers/lib/utils.js";
 import { constants, utils } from "ethers";
-import Fieldset from "../Fieldset";
-import Input from "../Input";
+import { formatUnits, parseUnits } from "ethers/lib/utils.js";
+import { feeAtom } from "@/lib/atoms/fees";
+import { validateBigNumberInput } from "@/lib/helpers";
+import Fieldset from "@/components/inputs/Fieldset";
+import Input from "@/components/inputs/Input";
 
 
 const FEE_INPUTS = [

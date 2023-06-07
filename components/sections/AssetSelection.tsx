@@ -1,11 +1,11 @@
-import Selector, { Option } from "../Selector";
 import { useAtom } from "jotai";
-import { assetAtom, useAssets } from "@/lib/assets";
-import { networkAtom } from "@/lib/networks";
+import { arbitrum, localhost } from "wagmi/chains";
+import { assetAtom, useAssets, networkAtom } from "@/lib/atoms";
+import Selector, { Option } from "@/components/inputs/Selector";
 
 function AssetSelection() {
   const [network] = useAtom(networkAtom);
-  const chainId = network.id === 1337 ? 1 : network.id;
+  const chainId = network.id === localhost.id ? arbitrum.id : network.id;
   const [asset, setAsset] = useAtom(assetAtom);
   const assets = useAssets();
 
@@ -20,7 +20,6 @@ function AssetSelection() {
           {selected?.logoURI && (
             <figure className="h-12 py-2 flex-row items-center flex relative">
               <img
-                // fill
                 className="object-contain h-full w-fit"
                 alt="logo"
                 src={selected?.logoURI}
