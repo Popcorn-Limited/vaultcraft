@@ -1,5 +1,5 @@
-import transformNetwork from "@/lib/transformNetwork";
-import { SUPPORTED_NETWORKS } from "pages/_app";
+import { SUPPORTED_NETWORKS } from "@/lib/connectors";
+import { transformNetwork } from "@/lib/helpers";
 
 interface Asset {
   type: string;

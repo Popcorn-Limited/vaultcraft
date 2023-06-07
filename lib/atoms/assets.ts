@@ -1,5 +1,5 @@
 import { atomWithStorage } from "jotai/utils";
-import assets from "./constants/assets.json";
+import assets from "@/lib/constants/assets.json";
 
 export type Asset = {
   chainId: number;

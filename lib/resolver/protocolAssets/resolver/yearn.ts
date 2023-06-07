@@ -5,6 +5,7 @@ import { BigNumber } from "ethers";
 const VAULT_REGISTRY_ADDRESS = "0x50c1a2eA0a861A967D9d0FFE2AE4012c2E053804";
 const VAULT_FACTORY_ADDRESS = "0x21b1FC8A52f179757bf555346130bF27c0C2A17A";
 
+// TODO use the actual chainId
 export async function yearn({ chainId }: { chainId: number }): Promise<string[]> {
     const numTokens = await readContract({
         address: VAULT_REGISTRY_ADDRESS,

@@ -1,9 +1,9 @@
+import { useRouter } from "next/router";
+import { CREATION_STAGES } from "@/lib/stages";
 import MainActionButton from "@/components/buttons/MainActionButton";
 import SecondaryActionButton from "@/components/buttons/SecondaryActionButton";
 import ProgressBar from "@/components/ProgressBar";
 import FeeConfiguration from "@/components/sections/FeeConfiguration";
-import { CREATION_STAGES } from "@/lib/stages";
-import { useRouter } from "next/router";
 
 export default function Fees() {
   const router = useRouter();
