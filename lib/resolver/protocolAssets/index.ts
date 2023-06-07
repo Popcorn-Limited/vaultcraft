@@ -1,4 +1,5 @@
-import { assetDefault, beefy, yearn, convex, stargate, compound, velodrome } from "./resolver";
+import { assetDefault, beefy, yearn, convex, stargate, compound, velodrome, aaveV2 } from "./resolver";
+
 
 export type ProtocolAssetResolver = (
   chainId: number,
@@ -13,6 +14,7 @@ export const ProtocolAssetResolvers = {
   stargate,
   compound,
   velodrome,
+  aaveV2,
   default: assetDefault
 };
 
