@@ -1,14 +1,14 @@
-import {
-  adapterAtom,
-  adapterConfigAtom,
-  checkInitParamValidity,
-} from "@/lib/adapter";
 import { useAtom } from "jotai";
 import { useEffect } from "react";
 import { RESET } from "jotai/utils";
 import { constants } from "ethers";
-import Fieldset from "../Fieldset";
-import Input from "../Input";
+import {
+  adapterAtom,
+  adapterConfigAtom,
+} from "@/lib/atoms";
+import { checkInitParamValidity } from "@/lib/helpers";
+import Fieldset from "@/components/inputs/Fieldset";
+import Input from "@/components/inputs/Input";
 
 
 const DEFAULT_VALUE = {
@@ -33,18 +33,18 @@ function StrategyConfiguration() {
   useEffect(
     () =>
       setAdapterConfig(
-        !!adapter?.initParams && adapter?.initParams.length > 0
+        !!adapter.initParams && adapter.initParams.length > 0
           ? // @ts-ignore
-          adapter?.initParams.map((param) => DEFAULT_VALUE[param.type])
-          : RESET
+          adapter.initParams.map((param) => DEFAULT_VALUE[param.type])
+          : []
       ),
     [adapter]
   );
 
   return (
     <section className="">
-      {adapter?.initParams && adapter?.initParams?.length > 0 ? (
-        adapter?.initParams.map((initParam, i) => {
+      {adapter.initParams && adapter.initParams?.length > 0 ? (
+        adapter.initParams.map((initParam, i) => {
           return (
             <div key={`fee-element-${initParam.name}`} className="flex gap-4">
               <Fieldset className="flex-grow" label={initParam.name} description="Test">

@@ -1,10 +1,11 @@
-import { Switch } from '@headlessui/react'
 import { useState } from "react";
-import Input from "../Input";
-import { validateBigNumberInput } from "@/lib/fees";
-import { formatUnits, parseUnits } from "ethers/lib/utils.js";
 import { useAtom } from 'jotai';
-import { limitAtom } from "@/lib/limits";
+import { formatUnits, parseUnits } from "ethers/lib/utils.js";
+import { Switch } from '@headlessui/react'
+import { limitAtom } from "@/lib/atoms/limits";
+import { validateBigNumberInput } from "@/lib/helpers";
+import Input from "@/components/inputs/Input";
+
 
 function DepositLimitConfiguration() {
   const [limit, setLimit] = useAtom(limitAtom);

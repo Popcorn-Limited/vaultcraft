@@ -1,6 +1,5 @@
-import { adapterAtom } from "@/lib/adapter";
-import { strategyAtom, useStrategies } from "@/lib/strategy";
 import { useAtom } from "jotai";
+import { adapterAtom, strategyAtom, useStrategies } from "@/lib/atoms";
 
 function StrategySelection() {
   const strategies = useStrategies();

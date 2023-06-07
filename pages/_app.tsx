@@ -1,20 +1,19 @@
 import "../styles/globals.css";
 import "@rainbow-me/rainbowkit/styles.css";
 import type { AppProps } from "next/app";
-
-import { Roboto } from "@next/font/google";
-import { WagmiConfig, createClient, configureChains, mainnet } from "wagmi";
-import { arbitrum, bsc, localhost, polygon } from "wagmi/chains";
+import { Roboto } from "next/font/google";
+import { WagmiConfig, createClient, configureChains } from "wagmi";
 import { publicProvider } from "wagmi/providers/public";
 import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { Toaster } from "react-hot-toast";
 // @ts-ignore
 import NoSSR from 'react-no-ssr';
-
 import Head from "next/head";
+import { Provider } from "jotai";
 import Page from "@/components/Page";
+import { SUPPORTED_NETWORKS } from "@/lib/connectors";
+import { stableAtom } from "@/lib/atoms/test";
 
-export const SUPPORTED_NETWORKS = [localhost, mainnet, polygon, bsc, arbitrum];
 const { provider, chains } = configureChains(SUPPORTED_NETWORKS, [
   publicProvider(),
 ]);
@@ -61,9 +60,11 @@ export default function App({ Component, pageProps }: AppProps) {
         <WagmiConfig client={client}>
           <RainbowKitProvider chains={chains} modalSize="compact">
             <NoSSR>
-              <Page>
-                <Component {...pageProps} />
-              </Page>
+              <Provider>
+                <Page>
+                  <Component {...pageProps} />
+                </Page>
+              </Provider>
             </NoSSR>
           </RainbowKitProvider>
         </WagmiConfig>

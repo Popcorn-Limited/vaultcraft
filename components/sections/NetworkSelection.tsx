@@ -1,17 +1,13 @@
 import { Fragment, useEffect } from "react";
-import { networkAtom } from "@/lib/networks";
 import { useAtom } from "jotai";
+import { RESET } from "jotai/utils";
 import { Chain, useNetwork } from "wagmi";
 import { useChainModal } from "@rainbow-me/rainbowkit";
-
 import Image from "next/image";
-import Selector, { Option } from "@/components/Selector";
-import { SUPPORTED_NETWORKS } from "pages/_app";
-import { assetAtom } from "@/lib/assets";
-import { RESET } from "jotai/utils";
-import { protocolAtom } from "@/lib/protocols";
-import { adapterAtom, adapterConfigAtom } from "@/lib/adapter";
-import { strategyAtom } from "@/lib/strategy";
+import { networkAtom, assetAtom, protocolAtom, adapterAtom, adapterConfigAtom, strategyAtom } from "@/lib/atoms";
+import { SUPPORTED_NETWORKS } from "@/lib/connectors";
+import Selector, { Option } from "@/components/inputs/Selector";
+
 
 const networkLogos = {
   1: "/images/icons/ethereum.svg",
@@ -44,7 +40,7 @@ function NetworkSelection() {
       return openChainModal?.();
     }
 
-    if (network?.id !== chain?.id) {
+    if (network.id !== chain?.id) {
       // Propt to change network when user changes from Selection Dropdown
       openChainModal?.();
     }
@@ -52,11 +48,11 @@ function NetworkSelection() {
 
   function selectNetwork(newNetwork: any) {
     if (newNetwork !== network) {
-      setAsset(RESET);
-      setProtocol(RESET);
-      setAdapter(RESET);
-      setAdapterConfig(RESET);
-      setStrategy(RESET)
+      // setAsset(RESET);
+      // setProtocol(RESET);
+      // setAdapter(RESET);
+      // setAdapterConfig(RESET);
+      // setStrategy(RESET)
     }
     setNetwork(newNetwork)
   }
