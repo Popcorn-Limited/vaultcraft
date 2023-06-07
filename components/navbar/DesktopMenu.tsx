@@ -1,10 +1,10 @@
-import { ChevronDownIcon } from "@heroicons/react/24/solid";
-import MainActionButton from "../buttons/MainActionButton";
+import { useMemo } from "react";
 import Link from "next/link";
 import { useNetwork, useAccount } from "wagmi";
 import { useChainModal, useConnectModal } from "@rainbow-me/rainbowkit";
-import { networkLogos } from "../../lib/connectors";
-import { useMemo } from "react";
+import { ChevronDownIcon } from "@heroicons/react/24/solid";
+import { networkLogos } from "@/lib/connectors";
+import MainActionButton from "@/components/buttons/MainActionButton";
 
 export default function DesktopMenu(): JSX.Element {
     const { openConnectModal } = useConnectModal();

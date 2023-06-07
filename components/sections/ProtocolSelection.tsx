@@ -1,13 +1,10 @@
-import { Protocol, protocolAtom, useProtocols } from "@/lib/protocols";
-import { Fragment } from "react";
-import Selector, { Option } from "../Selector";
-import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
-import { networkAtom } from "@/lib/networks";
-import { Adapter, adapterConfigAtom, useAdapters } from "@/lib/adapter";
+import { useAtom } from "jotai";
 import { RESET } from "jotai/utils";
-import { assetAtom } from "@/lib/assets";
+import { Adapter, adapterConfigAtom, useAdapters, assetAtom, networkAtom, Protocol, protocolAtom, useProtocols } from "@/lib/atoms";
 import { resolveProtocolAssets } from "@/lib/resolver/protocolAssets/protocolAssets";
+import Selector, { Option } from "@/components/inputs/Selector";
+
 
 interface ProtocolOption extends Protocol {
   disabled: boolean;
@@ -19,7 +16,7 @@ async function assetSupported(protocol: Protocol, adapters: Adapter[], chainId: 
   ).map(adapter => resolveProtocolAssets({ chainId: chainId, resolver: adapter.resolver })
   ))
 
-  return availableAssets.flat().map(a => a.toLowerCase()).filter((availableAsset) => availableAsset === asset).length > 0
+  return availableAssets.flat().map(a => a?.toLowerCase()).filter((availableAsset) => availableAsset === asset).length > 0
 }
 
 async function getProtocolOptions(protocols: Protocol[], adapters: Adapter[], chainId: number, asset: string): Promise<ProtocolOption[]> {
@@ -42,15 +39,16 @@ function ProtocolSelection() {
   const [asset] = useAtom(assetAtom);
 
   useEffect(() => {
-    if (network && asset) {
-      // TODO - remove hardcoded network id
-      getProtocolOptions(protocols, adapters, network.id, asset.address["1"].toLowerCase()).then(res => setOptions(res));
+    if (network && asset.symbol !== "none") {
+      console.log(asset)
+      console.log(network.id)
+      getProtocolOptions(protocols, adapters, network.id, asset.address[network.id].toLowerCase()).then(res => setOptions(res));
     }
   }, [network, asset]);
 
   function selectProtocol(newProtocol: any) {
     if (protocol !== newProtocol) {
-      setAdapterConfig(RESET)
+      setAdapterConfig([])
     }
     setProtocol(newProtocol)
   }
@@ -61,7 +59,7 @@ function ProtocolSelection() {
         selected={protocol}
         onSelect={(newProtocol) => selectProtocol(newProtocol)}
         actionContent={(selected) => (
-          <Fragment>
+          <div className="h-12 flex flex-row items-center w-full gap-x-2">
             {selected?.logoURI && (
               <figure className="h-12 py-2 flex-row items-center flex relative">
                 <img
@@ -72,7 +70,7 @@ function ProtocolSelection() {
               </figure>
             )}
             <span className="text-[white] w-full flex self-center flex-row justify-start">{selected?.name || "Protocol selection"}</span><span className="self-center text-[white] mr-2">{`>`}</span>
-          </Fragment>
+          </div>
         )}
       >
         <div className="w-full h-full bg-black flex flex-col items-start gap-y-1 px-8 py-9">
@@ -83,7 +81,7 @@ function ProtocolSelection() {
               <Option
                 key={`asset-selc-${protocolIter.name}`}
                 value={protocolIter}
-                selected={protocolIter?.name === protocol?.name}
+                selected={protocolIter?.name === protocol.name}
                 disabled={protocolIter.disabled}
               >
               </Option>

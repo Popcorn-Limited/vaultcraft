@@ -1,6 +1,5 @@
 import { Fragment } from "react";
 import { Listbox } from "@headlessui/react";
-import Image from "next/image";
 
 function Selector({
   selected,

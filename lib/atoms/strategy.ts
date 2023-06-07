@@ -1,8 +1,9 @@
 import { atomWithStorage } from "jotai/utils";
 import { InitParam } from "./adapter";
-import strategies from "./constants/strategies.json";
+import strategies from "@/lib/constants/strategies.json";
+import { atom } from "jotai";
 
-const STRATEGY = {
+export const DEFAULT_STRATEGY = {
   name: "Strategy",
   key: "strategy",
   description: "Strategy",
@@ -21,7 +22,4 @@ export const useStrategies = () => {
   return strategies as any as Array<Strategy>;
 };
 
-export const strategyAtom = atomWithStorage<Strategy>(
-  "select.strategy",
-  STRATEGY
-);
+export const strategyAtom = atom<Strategy>(DEFAULT_STRATEGY);
