@@ -48,11 +48,11 @@ function NetworkSelection() {
 
   function selectNetwork(newNetwork: any) {
     if (newNetwork !== network) {
-      setAsset(RESET);
-      setProtocol(RESET);
-      setAdapter(RESET);
-      setAdapterConfig(RESET);
-      setStrategy(RESET)
+      // setAsset(RESET);
+      // setProtocol(RESET);
+      // setAdapter(RESET);
+      // setAdapterConfig(RESET);
+      // setStrategy(RESET)
     }
     setNetwork(newNetwork)
   }

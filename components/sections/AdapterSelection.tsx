@@ -38,9 +38,8 @@ function AdapterSelection() {
 
   useEffect(() => {
     if (protocol.key !== "none" && asset.symbol !== "none" && network) {
-      // TODO - remove hardcoded network id
       getAdapterOptions(adapters.filter(
-        (adapter) => adapter.protocol === protocol.name), 42161, asset.address["42161"].toLowerCase())
+        (adapter) => adapter.protocol === protocol.name), network.id, asset.address[network.id].toLowerCase())
         .then(res => {
           setOptions(res);
           if (res.length > 0) setAdapter(res[0]);

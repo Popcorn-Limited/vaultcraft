@@ -33,8 +33,7 @@ function AdapterConfiguration() {
   useEffect(
     () => {
       !!adapter.initParams && adapter.initParams.length > 0 ?
-        // TODO - remove hardcoded network id
-        resolveAdapterDefaults({ chainId: 42161, address: asset.address["42161"], resolver: "beefy" }).then(res => setAdapterConfig(res)) :
+        resolveAdapterDefaults({ chainId: network.id, address: asset.address[network.id]}).then(res => setAdapterConfig(res)) :
         setAdapterConfig([])
     },
     [adapter]

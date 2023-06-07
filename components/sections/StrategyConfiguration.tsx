@@ -36,7 +36,7 @@ function StrategyConfiguration() {
         !!adapter.initParams && adapter.initParams.length > 0
           ? // @ts-ignore
           adapter.initParams.map((param) => DEFAULT_VALUE[param.type])
-          : RESET
+          : []
       ),
     [adapter]
   );

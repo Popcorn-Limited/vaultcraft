@@ -40,8 +40,9 @@ function ProtocolSelection() {
 
   useEffect(() => {
     if (network && asset.symbol !== "none") {
-      // TODO - remove hardcoded network id
-      getProtocolOptions(protocols, adapters, 42161, asset.address["42161"].toLowerCase()).then(res => setOptions(res));
+      console.log(asset)
+      console.log(network.id)
+      getProtocolOptions(protocols, adapters, network.id, asset.address[network.id].toLowerCase()).then(res => setOptions(res));
     }
   }, [network, asset]);
 

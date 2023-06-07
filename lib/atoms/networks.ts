@@ -1,6 +1,6 @@
 import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 import { Chain } from "wagmi";
-import { localhost } from "wagmi/chains";
+import { arbitrum, localhost } from "wagmi/chains";
 
-export const networkAtom = atom<Chain>(localhost);
+export const networkAtom = atom<Chain>(arbitrum);
