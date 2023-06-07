@@ -25,9 +25,9 @@ export async function convex({ chainId, address }: { chainId: number, address: s
         })
     }) as string[][]
 
-    const lpTokens = poolInfo.map(item => item[0])
+    const lpTokens = poolInfo.map(item => item[0].toLowerCase())
 
-    return lpTokens.indexOf(address)
+    return lpTokens.indexOf(address.toLowerCase())
 }
 
 const abi = [
