@@ -158,6 +158,36 @@
     "logoURI": "https://cdn.furucombo.app/assets/img/token/LUSD.png"
   },
   {
+    "chains": [1, 42161],
+    "address": {
+      "42161": "0x68f5d998F00bB2460511021741D098c05721d8fF"
+    },
+    "name": "Hop DAI",
+    "symbol": "hDAI",
+    "decimals": 18,
+    "logoURI": "https://cdn.furucombo.app/assets/img/token/DAI.png"
+  },
+  {
+    "chains": [1, 42161],
+    "address": {
+      "42161": "0xB67c014FA700E69681a673876eb8BAFAA36BFf71"
+    },
+    "name": "Hop USDC",
+    "symbol": "hUSDC",
+    "decimals": 18,
+    "logoURI": "https://cdn.furucombo.app/assets/img/token/USDC.png"
+  },
+  {
+    "chains": [1, 42161],
+    "address": {
+      "42161": "0xCe3B19D820CB8B9ae370E423B0a329c4314335fE"
+    },
+    "name": "Hop USDT",
+    "symbol": "hUSDT",
+    "decimals": 18,
+    "logoURI": "https://cdn.furucombo.app/assets/img/token/USDT.png"
+  },
+  {
     "chains": [1],
     "address": { "1": "0xd0cd466b34a24fcb2f87676278af2005ca8a78c4" },
     "name": "Popcorn",

@@ -1,23 +1,24 @@
 import { constants, ethers } from "ethers";
 import { useAccount, useContractWrite, usePrepareContractWrite } from "wagmi";
 import { useAtom } from "jotai";
-import { adapterDeploymentAtom, assetAtom, feeAtom } from "@/lib/atoms"
+import { adapterDeploymentAtom, assetAtom, feeAtom, metadataAtom } from "@/lib/atoms"
 
 
 export const useDeployVault = () => {
   const { address: account } = useAccount();
   const [asset] = useAtom(assetAtom);
   const [adapterData] = useAtom(adapterDeploymentAtom);
+  const [metadata] = useAtom(metadataAtom);
   const [fees] = useAtom(feeAtom);
 
   const { config, error: configError } = usePrepareContractWrite({
-    address: "0xee1eb820beeced56657ba74fa8d70748d7a6756c",
+    address: "0xF40749d72Ab5422CC5d735A373E66d67f7cA9393",
     abi,
     functionName: "deployVault",
     chainId: 1337,
     args: [
       {
-        asset: asset.address,
+        asset: asset.address["42161"],
         adapter: constants.AddressZero,
         fees: {
           deposit: fees.deposit,
@@ -40,7 +41,7 @@ export const useDeployVault = () => {
         vault: constants.AddressZero,
         staking: constants.AddressZero,
         creator: account,
-        metadataCID: "cid",
+        metadataCID: metadata?.ipfsHash || "cid",
         swapTokenAddresses: [
           constants.AddressZero,
           constants.AddressZero,

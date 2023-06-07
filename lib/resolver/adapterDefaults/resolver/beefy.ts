@@ -1,5 +1,5 @@
 import { constants } from "ethers";
-import transformNetwork from "@/lib/helpers";
+import { transformNetwork } from "@/lib/helpers";
 import { SUPPORTED_NETWORKS } from "@/lib/connectors";
 
 interface Vault {

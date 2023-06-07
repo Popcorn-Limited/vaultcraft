@@ -38,7 +38,7 @@ export const validateBigNumberInput = (value?: string | number) => {
   };
 };
 
-export default function transformNetwork(network: string | undefined): string {
+export function transformNetwork(network: string | undefined): string {
   switch (network) {
     case "homestead":
     case undefined:
@@ -48,4 +48,8 @@ export default function transformNetwork(network: string | undefined): string {
     default:
       return network.toLowerCase();
   }
+}
+
+export function cleanFileName(fileName: string): string {
+  return fileName.replace(/ /g, "-").replace(/[^a-zA-Z0-9]/g, "");
 }

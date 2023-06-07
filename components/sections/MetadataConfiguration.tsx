@@ -9,6 +9,12 @@ function MetadataConfiguration() {
   const [tags, setTags] = useState({});
 
   useEffect(() => {
+    // wipe old ipfs hash
+    if (metadata?.ipfsHash !== "") {
+      setMetadata((prefState) => { return { ...prefState, ipfsHash: "" } })
+    }
+
+    // set tags
     const newTags = {};
     VAULT_TAGS.forEach((tag) => {
       // @ts-ignore
@@ -26,7 +32,7 @@ function MetadataConfiguration() {
     setMetadata((prefState) => { return { ...prefState, tags: Object.keys(newTags).filter((tag) => newTags[tag]) } })
   }
 
-  console.log({ metadata })
+  console.log({metadata, tags})
 
   return (
     <section className="flex flex-col">

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
+import { arbitrum, localhost } from "wagmi/chains";
 import { constants, ethers } from "ethers";
 import { formatUnits } from "ethers/lib/utils.js";
 import { useAccount } from "wagmi";
@@ -22,7 +22,7 @@ import ReviewParam from "./ReviewParam";
 export default function Review(): JSX.Element {
   const { address: account } = useAccount();
   const [network] = useAtom(networkAtom);
-  const chainId = network.id === 1337 ? 1 : network.id;
+  const chainId = network.id === localhost.id ? arbitrum.id : network.id;
   const [asset] = useAtom(assetAtom);
   const [protocol] = useAtom(protocolAtom);
   const [adapter] = useAtom(adapterAtom);
@@ -45,6 +45,8 @@ export default function Review(): JSX.Element {
         : "0x",
     });
   }, [adapterConfig]);
+
+  console.log(Number(fees.deposit))
 
   return (
     <section>
@@ -85,22 +87,17 @@ export default function Review(): JSX.Element {
       </ReviewSection>
       <ReviewSection title="Deposit Limit">
         <ReviewParam title="Deposit Limit" value={`${formatUnits(limit)} ${asset?.symbol}`} />
-        {/* @ts-ignore */}
-        {devMode && <ReviewParam title="Deposit Limit Uint" value={String(Number(limit.hex))} />}
+        {devMode && <ReviewParam title="Deposit Limit Uint" value={String(Number(constants.MaxUint256))} />}
       </ReviewSection>
       <ReviewSection title="Fees">
         <ReviewParam title="Deposit Fee" value={`${formatUnits(fees.deposit)}%`} />
-        {/* @ts-ignore */}
-        {devMode && <ReviewParam title="Deposit Fee Uint" value={String(Number(fees.deposit.hex))} />}
+        {devMode && <ReviewParam title="Deposit Fee Uint" value={String(Number(fees.deposit))} />}
         <ReviewParam title="Withdrawal Fee" value={`${formatUnits(fees.withdrawal)}%`} />
-        {/* @ts-ignore */}
-        {devMode && <ReviewParam title="Withdrawal Fee Uint" value={String(Number(fees.withdrawal.hex))} />}
+        {devMode && <ReviewParam title="Withdrawal Fee Uint" value={String(Number(fees.withdrawal))} />}
         <ReviewParam title="Management Fee" value={`${formatUnits(fees.management)}%`} />
-        {/* @ts-ignore */}
-        {devMode && <ReviewParam title="Management Fee Uint" value={String(Number(fees.management.hex))} />}
+        {devMode && <ReviewParam title="Management Fee Uint" value={String(Number(fees.management))} />}
         <ReviewParam title="Performance Fee" value={`${formatUnits(fees.performance)}%`} />
-        {/* @ts-ignore */}
-        {devMode && <ReviewParam title="Performance Fee Uint" value={String(Number(fees.performance.hex))} />}
+        {devMode && <ReviewParam title="Performance Fee Uint" value={String(Number(fees.performance))} />}
         <ReviewParam title="Fee Recipient" value={fees.recipient} />
       </ReviewSection>
       {
@@ -126,8 +123,7 @@ export default function Review(): JSX.Element {
             <ReviewParam title="5" value={constants.AddressZero} />
             <ReviewParam title="6" value={constants.AddressZero} />
             <ReviewParam title="7" value={constants.AddressZero} />
-            {/* @ts-ignore */}
-            <ReviewParam title="Initial Deposit" value={String(Number(constants.Zero.hex))} />
+            <ReviewParam title="Initial Deposit" value={String(Number(constants.Zero))} />
           </ReviewSection>
         </>
       }

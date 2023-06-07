@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import { RESET } from "jotai/utils";
 import { Adapter, adapterConfigAtom, useAdapters, assetAtom, networkAtom, Protocol, protocolAtom, useProtocols } from "@/lib/atoms";
@@ -16,7 +16,7 @@ async function assetSupported(protocol: Protocol, adapters: Adapter[], chainId: 
   ).map(adapter => resolveProtocolAssets({ chainId: chainId, resolver: adapter.resolver })
   ))
 
-  return availableAssets.flat().map(a => a.toLowerCase()).filter((availableAsset) => availableAsset === asset).length > 0
+  return availableAssets.flat().map(a => a?.toLowerCase()).filter((availableAsset) => availableAsset === asset).length > 0
 }
 
 async function getProtocolOptions(protocols: Protocol[], adapters: Adapter[], chainId: number, asset: string): Promise<ProtocolOption[]> {
@@ -41,7 +41,7 @@ function ProtocolSelection() {
   useEffect(() => {
     if (network && asset) {
       // TODO - remove hardcoded network id
-      getProtocolOptions(protocols, adapters, 42161, asset.address["42161"].toLowerCase()).then(res => setOptions(res));
+      getProtocolOptions(protocols, adapters, 42161, asset?.address["42161"].toLowerCase()).then(res => setOptions(res));
     }
   }, [network, asset]);
 
@@ -58,7 +58,7 @@ function ProtocolSelection() {
         selected={protocol}
         onSelect={(newProtocol) => selectProtocol(newProtocol)}
         actionContent={(selected) => (
-          <Fragment>
+          <div className="h-12 flex flex-row items-center w-full gap-x-2">
             {selected?.logoURI && (
               <figure className="h-12 py-2 flex-row items-center flex relative">
                 <img
@@ -69,7 +69,7 @@ function ProtocolSelection() {
               </figure>
             )}
             <span className="text-[white] w-full flex self-center flex-row justify-start">{selected?.name || "Protocol selection"}</span><span className="self-center text-[white] mr-2">{`>`}</span>
-          </Fragment>
+          </div>
         )}
       >
         <div className="w-full h-full bg-black flex flex-col items-start gap-y-1 px-8 py-9">
