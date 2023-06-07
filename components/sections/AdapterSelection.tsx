@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import { RESET } from "jotai/utils";
-import { Adapter, adapterAtom, adapterConfigAtom, useAdapters, protocolAtom, networkAtom, assetAtom, strategyAtom } from "@/lib/atoms";
+import { Adapter, adapterAtom, adapterConfigAtom, useAdapters, protocolAtom, networkAtom, assetAtom, strategyAtom, DEFAULT_STRATEGY } from "@/lib/atoms";
 import { resolveProtocolAssets } from "@/lib/resolver/protocolAssets/protocolAssets";
 import Selector, { Option } from "@/components/inputs/Selector";
 
@@ -37,10 +37,9 @@ function AdapterSelection() {
   const [, setStrategy] = useAtom(strategyAtom);
 
   useEffect(() => {
-    if (protocol && asset && network) {
-      // TODO - remove hardcoded network id
+    if (protocol.key !== "none" && asset.symbol !== "none" && network) {
       getAdapterOptions(adapters.filter(
-        (adapter) => adapter.protocol === protocol.name), 42161, asset?.address["42161"].toLowerCase())
+        (adapter) => adapter.protocol === protocol.name), network.id, asset.address[network.id].toLowerCase())
         .then(res => {
           setOptions(res);
           if (res.length > 0) setAdapter(res[0]);
@@ -50,8 +49,8 @@ function AdapterSelection() {
 
   function selectAdapter(newAdapter: any) {
     if (adapter !== newAdapter) {
-      setAdapterConfig(RESET)
-      setStrategy(RESET)
+      setAdapterConfig([])
+      setStrategy(DEFAULT_STRATEGY)
     }
     setAdapter(newAdapter)
   }
@@ -84,7 +83,7 @@ function AdapterSelection() {
             {options.map((adapterIter) => (
               <Option
                 value={adapterIter}
-                selected={adapterIter.name === adapter?.name}
+                selected={adapterIter.name === adapter.name}
                 key={`asset-selc-${adapterIter.key}-${adapterIter.name}`}
               >
               </Option>

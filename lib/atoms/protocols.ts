@@ -1,9 +1,11 @@
 import { atomWithStorage } from "jotai/utils";
 import protocols from "@/lib/constants/protocols.json";
+import { atom } from "jotai";
 
 export type Protocol = {
   chains: number[];
   name: string;
+  key: string;
   logoURI: string;
 };
 
@@ -11,5 +13,4 @@ export const useProtocols = () => {
   return protocols as any as Array<Protocol>;
 };
 
-// @ts-ignore
-export const protocolAtom = atomWithStorage<Protocol>("select.protocol", null);
+export const protocolAtom = atom<Protocol>({ name: "Choose a Protocol", key: "none", logoURI: "", chains: [] });

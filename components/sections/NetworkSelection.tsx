@@ -40,7 +40,7 @@ function NetworkSelection() {
       return openChainModal?.();
     }
 
-    if (network?.id !== chain?.id) {
+    if (network.id !== chain?.id) {
       // Propt to change network when user changes from Selection Dropdown
       openChainModal?.();
     }
@@ -48,11 +48,11 @@ function NetworkSelection() {
 
   function selectNetwork(newNetwork: any) {
     if (newNetwork !== network) {
-      setAsset(RESET);
-      setProtocol(RESET);
-      setAdapter(RESET);
-      setAdapterConfig(RESET);
-      setStrategy(RESET)
+      // setAsset(RESET);
+      // setProtocol(RESET);
+      // setAdapter(RESET);
+      // setAdapterConfig(RESET);
+      // setStrategy(RESET)
     }
     setNetwork(newNetwork)
   }

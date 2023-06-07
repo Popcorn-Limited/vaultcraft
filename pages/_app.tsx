@@ -9,8 +9,10 @@ import { Toaster } from "react-hot-toast";
 // @ts-ignore
 import NoSSR from 'react-no-ssr';
 import Head from "next/head";
+import { Provider } from "jotai";
 import Page from "@/components/Page";
 import { SUPPORTED_NETWORKS } from "@/lib/connectors";
+import { stableAtom } from "@/lib/atoms/test";
 
 const { provider, chains } = configureChains(SUPPORTED_NETWORKS, [
   publicProvider(),
@@ -58,9 +60,11 @@ export default function App({ Component, pageProps }: AppProps) {
         <WagmiConfig client={client}>
           <RainbowKitProvider chains={chains} modalSize="compact">
             <NoSSR>
-              <Page>
-                <Component {...pageProps} />
-              </Page>
+              <Provider>
+                <Page>
+                  <Component {...pageProps} />
+                </Page>
+              </Provider>
             </NoSSR>
           </RainbowKitProvider>
         </WagmiConfig>
