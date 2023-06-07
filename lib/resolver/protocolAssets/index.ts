@@ -9,7 +9,6 @@ export type ProtocolAssetResolvers = typeof ProtocolAssetResolvers;
 export const ProtocolAssetResolvers = {
   beefy,
   yearn,
-  aaveV3,
   convex,
   stargate,
   compound,
