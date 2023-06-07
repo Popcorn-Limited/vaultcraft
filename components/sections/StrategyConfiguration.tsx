@@ -33,9 +33,9 @@ function StrategyConfiguration() {
   useEffect(
     () =>
       setAdapterConfig(
-        !!adapter?.initParams && adapter?.initParams.length > 0
+        !!adapter.initParams && adapter.initParams.length > 0
           ? // @ts-ignore
-          adapter?.initParams.map((param) => DEFAULT_VALUE[param.type])
+          adapter.initParams.map((param) => DEFAULT_VALUE[param.type])
           : RESET
       ),
     [adapter]
@@ -43,8 +43,8 @@ function StrategyConfiguration() {
 
   return (
     <section className="">
-      {adapter?.initParams && adapter?.initParams?.length > 0 ? (
-        adapter?.initParams.map((initParam, i) => {
+      {adapter.initParams && adapter.initParams?.length > 0 ? (
+        adapter.initParams.map((initParam, i) => {
           return (
             <div key={`fee-element-${initParam.name}`} className="flex gap-4">
               <Fieldset className="flex-grow" label={initParam.name} description="Test">

@@ -39,15 +39,15 @@ function ProtocolSelection() {
   const [asset] = useAtom(assetAtom);
 
   useEffect(() => {
-    if (network && asset) {
+    if (network && asset.symbol !== "none") {
       // TODO - remove hardcoded network id
-      getProtocolOptions(protocols, adapters, 42161, asset?.address["42161"].toLowerCase()).then(res => setOptions(res));
+      getProtocolOptions(protocols, adapters, 42161, asset.address["42161"].toLowerCase()).then(res => setOptions(res));
     }
   }, [network, asset]);
 
   function selectProtocol(newProtocol: any) {
     if (protocol !== newProtocol) {
-      setAdapterConfig(RESET)
+      setAdapterConfig([])
     }
     setProtocol(newProtocol)
   }
@@ -80,7 +80,7 @@ function ProtocolSelection() {
               <Option
                 key={`asset-selc-${protocolIter.name}`}
                 value={protocolIter}
-                selected={protocolIter?.name === protocol?.name}
+                selected={protocolIter?.name === protocol.name}
                 disabled={protocolIter.disabled}
               >
               </Option>

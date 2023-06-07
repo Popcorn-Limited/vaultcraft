@@ -1,5 +1,6 @@
 import { BigNumber, constants } from "ethers";
+import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 
 
-export const limitAtom = atomWithStorage<BigNumber>("config.limits", constants.Zero);
+export const limitAtom = atom<BigNumber>(constants.Zero);

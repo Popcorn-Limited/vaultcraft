@@ -1,4 +1,5 @@
 import { BigNumber, constants } from "ethers";
+import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 
 export type VaultFees = {
@@ -17,5 +18,5 @@ const DEFAULT_FEES = {
   recipient: constants.AddressZero,
 };
 
-export const feeAtom = atomWithStorage<VaultFees>("config.fees", DEFAULT_FEES);
+export const feeAtom = atom<VaultFees>(DEFAULT_FEES);
 

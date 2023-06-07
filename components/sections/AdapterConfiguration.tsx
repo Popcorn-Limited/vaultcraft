@@ -32,18 +32,18 @@ function AdapterConfiguration() {
 
   useEffect(
     () => {
-      !!adapter?.initParams && adapter?.initParams.length > 0 ?
+      !!adapter.initParams && adapter.initParams.length > 0 ?
         // TODO - remove hardcoded network id
         resolveAdapterDefaults({ chainId: 42161, address: asset.address["42161"], resolver: "beefy" }).then(res => setAdapterConfig(res)) :
-        setAdapterConfig(RESET)
+        setAdapterConfig([])
     },
     [adapter]
   );
 
   return (
     <section className="">
-      {adapter?.initParams && adapter?.initParams?.length > 0 ? (
-        adapter?.initParams.map((initParam, i) => {
+      {adapter.initParams && adapter.initParams?.length > 0 ? (
+        adapter.initParams.map((initParam, i) => {
           return (
             <div key={`fee-element-${initParam.name}`} className="flex gap-4">
               <Fieldset className="flex-grow" label={initParam.name} description={initParam.description || ""}>

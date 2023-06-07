@@ -1,3 +1,4 @@
+import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 
 export type Metadata = {
@@ -8,5 +9,4 @@ export type Metadata = {
 
 export const VAULT_TAGS = ["stable", "lsd", "compounding", "leverage"]
 
-// @ts-ignore
-export const metadataAtom = atomWithStorage<Metadata>("config.metadata", null);
+export const metadataAtom = atom<Metadata>({ name: "", tags: [], ipfsHash: "" });

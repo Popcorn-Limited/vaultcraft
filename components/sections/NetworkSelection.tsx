@@ -40,7 +40,7 @@ function NetworkSelection() {
       return openChainModal?.();
     }
 
-    if (network?.id !== chain?.id) {
+    if (network.id !== chain?.id) {
       // Propt to change network when user changes from Selection Dropdown
       openChainModal?.();
     }

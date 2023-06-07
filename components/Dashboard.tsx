@@ -35,12 +35,12 @@ function Dashboard() {
   const validFees = feesLargerZero ? (baseValidFees && nonZeroFeeRecipient) : baseValidFees
   const validAdapter = !!adapter;
 
-  const initParams = adapter?.initParams || [];
+  const initParams = adapter.initParams || [];
   const validAdapterConfig =
     initParams.length > 0 &&
     initParams.length === adapterConfig.length &&
     adapterConfig.every((config, i) =>
-      checkInitParamValidity(config, adapter?.initParams![i])
+      checkInitParamValidity(config, adapter.initParams![i])
     );
 
   return (

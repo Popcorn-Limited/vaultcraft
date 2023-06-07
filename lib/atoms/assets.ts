@@ -1,9 +1,10 @@
 import { atomWithStorage } from "jotai/utils";
 import assets from "@/lib/constants/assets.json";
+import { atom } from "jotai";
 
 export type Asset = {
-  chainId: number;
-  address: string;
+  chains: number[];
+  address: { [key: string]: string };
   name: string;
   symbol: string;
   decimals: number;
@@ -14,5 +15,4 @@ export const useAssets = () => {
   return assets;
 };
 
-// @ts-ignore
-export const assetAtom = atomWithStorage<Asset>("select.asset", null);
+export const assetAtom = atom<Asset>({ name: "Choose an Asset", symbol: "none", decimals: 0, logoURI: "", address: {}, chains: [] });

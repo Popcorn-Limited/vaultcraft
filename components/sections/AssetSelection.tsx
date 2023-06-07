@@ -9,8 +9,6 @@ function AssetSelection() {
   const [asset, setAsset] = useAtom(assetAtom);
   const assets = useAssets();
 
-  // useEffect(() => setAsset(RESET))
-
   return (
     <Selector
       selected={asset}
@@ -37,7 +35,7 @@ function AssetSelection() {
         <div className="flex flex-col overflow-y-scroll w-full">
           {assets.filter(a => a.chains?.includes(chainId)).map((assetIter) => (
             // @ts-ignore
-            <Option selected={asset?.name === assetIter.name} value={assetIter} key={`asset-selc-${assetIter.address[String(chainId)]}`}>
+            <Option selected={asset.name === assetIter.name} value={assetIter} key={`asset-selc-${assetIter.address[String(chainId)]}`}>
             </Option>
           ))}
         </div>

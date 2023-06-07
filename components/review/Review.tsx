@@ -67,10 +67,10 @@ export default function Review(): JSX.Element {
       <ReviewSection title="Basics">
         <ReviewParam title="Name" value={metadata?.name} />
         <ReviewParam title="Categories" value={String(metadata?.tags)} />
-        <ReviewParam title="Asset" value={asset?.name} img={asset?.logoURI} />
-        {devMode && <ReviewParam title="Asset Address" value={asset?.address[chainId] || constants.AddressZero} />}
-        <ReviewParam title="Protocol" value={protocol?.name} img={protocol?.logoURI} />
-        <ReviewParam title="Adapter" value={adapter?.name} img={adapter?.logoURI} />
+        <ReviewParam title="Asset" value={asset.name} img={asset.logoURI} />
+        {devMode && <ReviewParam title="Asset Address" value={asset.address[chainId] || constants.AddressZero} />}
+        <ReviewParam title="Protocol" value={protocol.name} img={protocol.logoURI} />
+        <ReviewParam title="Adapter" value={adapter.name} img={adapter.logoURI} />
         {/* TODO - At some point we should figure out if an adapter with the right config already exists and simply reuse it */}
         {devMode && <ReviewParam title="Adapter Address" value={constants.AddressZero} />}
         <ReviewParam title="Strategy" value={"Coming Soon"} />
@@ -86,7 +86,7 @@ export default function Review(): JSX.Element {
         {devMode && <ReviewParam title="Strategy Data" value={"0x"} />}
       </ReviewSection>
       <ReviewSection title="Deposit Limit">
-        <ReviewParam title="Deposit Limit" value={`${formatUnits(limit)} ${asset?.symbol}`} />
+        <ReviewParam title="Deposit Limit" value={`${formatUnits(limit)} ${asset.symbol}`} />
         {devMode && <ReviewParam title="Deposit Limit Uint" value={String(Number(constants.MaxUint256))} />}
       </ReviewSection>
       <ReviewSection title="Fees">
