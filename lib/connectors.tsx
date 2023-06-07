@@ -1,4 +1,5 @@
 import { ethers } from "ethers";
+import { arbitrum, bsc, localhost, mainnet, polygon } from "wagmi/chains";
 
 export enum ChainId {
     Ethereum = 1,
@@ -118,26 +119,4 @@ export const PRC_PROVIDERS = {
     [ChainId.Optimism]: new ethers.providers.JsonRpcProvider(RPC_URLS[ChainId.Optimism], ChainId.Optimism),
 };
 
-export type HardhatConfigNetworks = {
-    mainnet?: string;
-    goerli?: string;
-    bsc?: string;
-    polygon?: string;
-    hardhat?: string;
-    arbitrum?: string;
-    localhost?: string;
-    remote_fork?: string;
-};
-
-export const HardhatConfigNetworksChainIdMapping = {
-    mainnet: ChainId.Ethereum,
-    ethereum: ChainId.Ethereum,
-    goerli: ChainId.Goerli,
-    bsc: ChainId.BNB,
-    bnb: ChainId.BNB,
-    polygon: ChainId.Polygon,
-    hardhat: ChainId.Hardhat,
-    localhost: ChainId.Localhost,
-    arbitrum: ChainId.Arbitrum,
-    remote_fork: ChainId.RemoteFork,
-};
+export const SUPPORTED_NETWORKS = [localhost, mainnet, arbitrum, polygon, bsc];

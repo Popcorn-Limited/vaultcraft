@@ -1,51 +1,99 @@
 [
   {
-    "chains": [1],
-    "address": { "1": "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490" },
-    "name": "Curve.fi DAI/USDC/USDT",
-    "symbol": "3Crv",
-    "decimals": 18,
-    "logoURI": "https://cdn.furucombo.app/assets/img/token/3Crv.png"
-  },
-  {
-    "chains": [1],
-    "address": { "1": "0x6B175474E89094C44Da98b954EedeAC495271d0F" },
+    "chains": [1, 42161],
+    "address": {
+      "1": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+      "42161": "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1"
+    },
     "name": "Dai Stablecoin",
     "symbol": "DAI",
     "decimals": 18,
     "logoURI": "https://cdn.furucombo.app/assets/img/token/DAI.png"
   },
   {
-    "chains": [1],
-    "address": { "1": "0x853d955aCEf822Db058eb8505911ED77F175b99e" },
+    "chains": [1, 42161],
+    "address": {
+      "1": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      "42161": "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8"
+    },
+    "name": "USD Coin",
+    "symbol": "USDC",
+    "decimals": 6,
+    "logoURI": "https://cdn.furucombo.app/assets/img/token/USDC.png"
+  },
+  {
+    "chains": [1, 42161],
+    "address": {
+      "1": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+      "42161": "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8"
+    },
+    "name": "Tether USD",
+    "symbol": "USDT",
+    "decimals": 6,
+    "logoURI": "https://cdn.furucombo.app/assets/img/token/USDT.png"
+  },
+  {
+    "chains": [1, 42161],
+    "address": {
+      "1": "0x853d955aCEf822Db058eb8505911ED77F175b99e",
+      "42161": "0x17FC002b466eEc40DaE837Fc4bE5c67993ddBd6F"
+    },
     "name": "Frax",
     "symbol": "FRAX",
     "decimals": 18,
     "logoURI": "https://cdn.furucombo.app/assets/img/token/FRAX.png"
   },
   {
-    "chains": [1],
-    "address": { "1": "0x5f98805A4E8be255a32880FDeC7F6728C6568bA0" },
+    "chains": [1, 42161],
+    "address": {
+      "1": "0x5f98805A4E8be255a32880FDeC7F6728C6568bA0",
+      "42161": "0x93b346b6BC2548dA6A1E7d98E9a421B42541425b"
+    },
     "name": "LUSD Stablecoin",
     "symbol": "LUSD",
     "decimals": 18,
     "logoURI": "https://cdn.furucombo.app/assets/img/token/LUSD.png"
   },
   {
-    "chains": [1],
-    "address": { "1": "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0"},
-    "name": "Matic Token",
-    "symbol": "MATIC",
-    "decimals": 18,
-    "logoURI": "https://cdn.furucombo.app/assets/img/token/MATIC.png"
-  },
-  {
-    "chains": [1],
-    "address": { "1": "0x99D8a9C45b2ecA8864373A26D1459e3Dff1e17F3" },
+    "chains": [1, 42161],
+    "address": {
+      "1": "0x99D8a9C45b2ecA8864373A26D1459e3Dff1e17F3",
+      "42161": "0xFEa7a6a0B346362BF88A9e4A88416B77a57D6c2A"
+    },
     "name": "Magic Internet Money",
     "symbol": "MIM",
     "decimals": 18,
     "logoURI": "https://cdn.furucombo.app/assets/img/token/MIM.png"
+  },
+  {
+    "chains": [1, 42161],
+    "address": {
+      "1": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+      "42161": "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f"
+    },
+    "name": "Wrapped BTC",
+    "symbol": "WBTC",
+    "decimals": 8,
+    "logoURI": "https://cdn.furucombo.app/assets/img/token/WBTC.png"
+  },
+  {
+    "chains": [1, 42161],
+    "address": {
+      "1": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+      "42161": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"
+    },
+    "name": "Wrapped Ether",
+    "symbol": "WETH",
+    "decimals": 18,
+    "logoURI": "https://cdn.furucombo.app/assets/img/token/WETH.svg"
+  },
+  {
+    "chains": [1],
+    "address": { "1": "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0" },
+    "name": "Matic Token",
+    "symbol": "MATIC",
+    "decimals": 18,
+    "logoURI": "https://cdn.furucombo.app/assets/img/token/MATIC.png"
   },
   {
     "chains": [1],
@@ -56,44 +104,88 @@
     "logoURI": "https://cdn.furucombo.app/assets/img/token/OHM.png"
   },
   {
-    "chains": [1],
-    "address": { "1": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" },
-    "name": "USD Coin",
-    "symbol": "USDC",
+    "chains": [1, 42161],
+    "address": {
+      "1": "0x0Faf1d2d3CED330824de3B8200fc8dc6E397850d"
+    },
+    "name": "Stargate DAI",
+    "symbol": "stgDAI",
     "decimals": 6,
-    "logoURI": "https://cdn.furucombo.app/assets/img/token/USDC.png"
+    "logoURI": "https://cdn.furucombo.app/assets/img/token/DAI.png"
   },
   {
-    "chains": [1],
-    "address": { "1": "0xdf0770dF86a8034b3EFEf0A1Bb3c889B8332FF56" },
+    "chains": [1, 42161],
+    "address": {
+      "1": "0xdf0770dF86a8034b3EFEf0A1Bb3c889B8332FF56",
+      "42161": "0x892785f33CdeE22A30AEF750F285E18c18040c3e"
+    },
     "name": "Stargate USDC",
     "symbol": "stgUSDC",
     "decimals": 6,
     "logoURI": "https://cdn.furucombo.app/assets/img/token/USDC.png"
   },
   {
-    "chains": [1],
-    "address": { "1": "0xdAC17F958D2ee523a2206206994597C13D831ec7" },
-    "name": "Tether USD",
-    "symbol": "USDT",
+    "chains": [1, 42161],
+    "address": {
+      "1": "0x38EA452219524Bb87e18dE1C24D3bB59510BD783",
+      "42161": "0xB6CfcF89a7B22988bfC96632aC2A9D6daB60d641"
+    },
+    "name": "Stargate USDT",
+    "symbol": "stgUSDT",
     "decimals": 6,
     "logoURI": "https://cdn.furucombo.app/assets/img/token/USDT.png"
   },
   {
-    "chains": [1],
-    "address": { "1": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599" },
-    "name": "Wrapped BTC",
-    "symbol": "WBTC",
-    "decimals": 8,
-    "logoURI": "https://cdn.furucombo.app/assets/img/token/WBTC.png"
+    "chains": [1, 42161],
+    "address": {
+      "1": "0xfA0F307783AC21C39E939ACFF795e27b650F6e68",
+      "42161": "0xaa4BF442F024820B2C28Cd0FD72b82c63e66F56C"
+    },
+    "name": "Stargate FRAX",
+    "symbol": "stgFRAX",
+    "decimals": 6,
+    "logoURI": "https://cdn.furucombo.app/assets/img/token/FRAX.png"
   },
   {
-    "chains": [1],
-    "address": { "1": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" },
-    "name": "Wrapped Ether",
-    "symbol": "WETH",
+    "chains": [1, 42161],
+    "address": {
+      "1": "0xE8F55368C82D38bbbbDb5533e7F56AfC2E978CC2",
+      "42161": "0x600E576F9d853c95d58029093A16EE49646F3ca5"
+    },
+    "name": "Stargate LUSD",
+    "symbol": "stgLUSD",
+    "decimals": 6,
+    "logoURI": "https://cdn.furucombo.app/assets/img/token/LUSD.png"
+  },
+  {
+    "chains": [1, 42161],
+    "address": {
+      "42161": "0x68f5d998F00bB2460511021741D098c05721d8fF"
+    },
+    "name": "Hop DAI",
+    "symbol": "hDAI",
     "decimals": 18,
-    "logoURI": "https://cdn.furucombo.app/assets/img/token/WETH.svg"
+    "logoURI": "https://cdn.furucombo.app/assets/img/token/DAI.png"
+  },
+  {
+    "chains": [1, 42161],
+    "address": {
+      "42161": "0xB67c014FA700E69681a673876eb8BAFAA36BFf71"
+    },
+    "name": "Hop USDC",
+    "symbol": "hUSDC",
+    "decimals": 18,
+    "logoURI": "https://cdn.furucombo.app/assets/img/token/USDC.png"
+  },
+  {
+    "chains": [1, 42161],
+    "address": {
+      "42161": "0xCe3B19D820CB8B9ae370E423B0a329c4314335fE"
+    },
+    "name": "Hop USDT",
+    "symbol": "hUSDT",
+    "decimals": 18,
+    "logoURI": "https://cdn.furucombo.app/assets/img/token/USDT.png"
   },
   {
     "chains": [1],

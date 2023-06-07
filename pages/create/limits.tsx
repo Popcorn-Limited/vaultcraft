@@ -1,10 +1,10 @@
+import { useRouter } from "next/router";
+import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
+import { CREATION_STAGES } from "@/lib/stages";
 import MainActionButton from "@/components/buttons/MainActionButton";
 import SecondaryActionButton from "@/components/buttons/SecondaryActionButton";
 import ProgressBar from "@/components/ProgressBar";
 import DepositLimitConfiguration from "@/components/sections/DepositLimitConfiguration";
-import { CREATION_STAGES } from "@/lib/stages";
-import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
-import { useRouter } from "next/router";
 
 export default function Limits() {
   const router = useRouter();

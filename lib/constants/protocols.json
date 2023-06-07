@@ -1,6 +1,6 @@
 [
   {
-    "chains": [1, 5, 1337],
+    "chains": [1, 5, 1337, 42161],
     "name": "Aave",
     "logoURI": "https://cryptologos.cc/logos/aave-aave-logo.png?v=024"
   },
@@ -20,22 +20,22 @@
     "logoURI": "https://cryptologos.cc/logos/aave-aave-logo.png?v=024"
   },
   {
-    "chains": [1, 5, 1337],
+    "chains": [1, 5, 1337, 42161],
     "name": "Beefy",
     "logoURI": "https://cryptologos.cc/logos/beefy-finance-bifi-logo.png?v=024"
   },
   {
-    "chains": [1, 5, 1337],
+    "chains": [1, 5, 1337, 42161],
     "name": "Compound",
     "logoURI": "https://cdn.furucombo.app/assets/img/token/COMP.svg"
   },
   {
-    "chains": [1, 5, 1337],
+    "chains": [1, 5, 1337, 42161],
     "name": "Convex",
     "logoURI": "https://cdn.furucombo.app/assets/img/token/CVX.png"
   },
   {
-    "chains": [1, 5, 1337],
+    "chains": [1, 5, 1337, 42161],
     "name": "Curve",
     "logoURI": "https://cdn.furucombo.app/assets/img/token/CVX.png"
   },
@@ -65,7 +65,7 @@
     "logoURI": "https://cdn.furucombo.app/assets/img/token/CVX.png"
   },
   {
-    "chains": [1, 5, 1337],
+    "chains": [1, 5, 1337, 42161],
     "name": "Radiant",
     "logoURI": "https://cdn.furucombo.app/assets/img/token/CVX.png"
   },
@@ -75,7 +75,7 @@
     "logoURI": "https://cdn.furucombo.app/assets/img/token/CVX.png"
   },
   {
-    "chains": [1, 5, 1337],
+    "chains": [1, 5, 1337, 42161],
     "name": "Stargate",
     "logoURI": "https://cdn.furucombo.app/assets/img/token/CVX.png"
   },
@@ -90,7 +90,7 @@
     "logoURI": "https://cdn.furucombo.app/assets/img/token/CVX.png"
   },
   {
-    "chains": [1, 5, 1337],
+    "chains": [1, 5, 1337, 42161],
     "name": "Yearn",
     "logoURI": "https://cryptologos.cc/logos/yearn-finance-yfi-logo.png?v=024"
   }

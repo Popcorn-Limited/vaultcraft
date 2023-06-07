@@ -1,6 +1,6 @@
 import { atomWithStorage } from "jotai/utils";
 import { InitParam } from "./adapter";
-import strategies from "./constants/strategies.json";
+import strategies from "@/lib/constants/strategies.json";
 
 const STRATEGY = {
   name: "Strategy",

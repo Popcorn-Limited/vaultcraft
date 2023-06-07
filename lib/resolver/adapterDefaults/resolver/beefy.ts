@@ -1,6 +1,6 @@
-import transformNetwork from "@/lib/transformNetwork";
 import { constants } from "ethers";
-import { SUPPORTED_NETWORKS } from "pages/_app";
+import { transformNetwork } from "@/lib/helpers";
+import { SUPPORTED_NETWORKS } from "@/lib/connectors";
 
 interface Vault {
   tokenAddress: string;

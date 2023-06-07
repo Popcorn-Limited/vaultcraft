@@ -1,14 +1,14 @@
-import {
-  adapterAtom,
-  adapterConfigAtom,
-  checkInitParamValidity,
-} from "@/lib/adapter";
 import { useAtom } from "jotai";
 import { useEffect } from "react";
 import { RESET } from "jotai/utils";
 import { constants } from "ethers";
-import Fieldset from "../Fieldset";
-import Input from "../Input";
+import {
+  adapterAtom,
+  adapterConfigAtom,
+} from "@/lib/atoms";
+import { checkInitParamValidity } from "@/lib/helpers";
+import Fieldset from "@/components/inputs/Fieldset";
+import Input from "@/components/inputs/Input";
 
 
 const DEFAULT_VALUE = {

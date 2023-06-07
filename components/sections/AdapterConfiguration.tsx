@@ -1,16 +1,16 @@
-import {
-  adapterAtom,
-  adapterConfigAtom,
-  checkInitParamValidity,
-} from "@/lib/adapter";
 import { useAtom } from "jotai";
 import { useEffect } from "react";
 import { RESET } from "jotai/utils";
-import Fieldset from "../Fieldset";
-import Input from "../Input";
+import {
+  adapterAtom,
+  adapterConfigAtom,
+  assetAtom,
+  networkAtom
+} from "@/lib/atoms";
 import { resolveAdapterDefaults } from "@/lib/resolver/adapterDefaults/adapterDefaults";
-import { assetAtom } from "@/lib/assets";
-import { networkAtom } from "@/lib/networks";
+import { checkInitParamValidity } from "@/lib/helpers";
+import Fieldset from "@/components/inputs/Fieldset";
+import Input from "@/components/inputs/Input";
 
 function AdapterConfiguration() {
   const [adapter] = useAtom(adapterAtom);
@@ -34,7 +34,7 @@ function AdapterConfiguration() {
     () => {
       !!adapter?.initParams && adapter?.initParams.length > 0 ?
         // TODO - remove hardcoded network id
-        resolveAdapterDefaults({ chainId: network.id, address: asset.address["1"], resolver: "beefy" }).then(res => setAdapterConfig(res)) :
+        resolveAdapterDefaults({ chainId: 42161, address: asset.address["42161"], resolver: "beefy" }).then(res => setAdapterConfig(res)) :
         setAdapterConfig(RESET)
     },
     [adapter]
