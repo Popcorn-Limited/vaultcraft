@@ -5,4 +5,5 @@ export * from "./stargate";
 export * from "./compound";
 export * from "./velodrome";
 export * from "./aaveV2";
+export * from "./aave-v3";
 export * from "./default";
