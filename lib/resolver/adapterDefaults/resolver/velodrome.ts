@@ -1,7 +1,7 @@
 import { readContract } from "@wagmi/core";
+import { constants } from "ethers";
 
 const VELODROME_LENSE_ADDRESS = "0x8B70C5E53235AbBd1415957f7110FBFe5d0529d4";
-const NULL_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 export async function velodrome({ chainId, address }: { chainId: number, address: string }) {
     const { gauge, gauge_alive } = await readContract({
@@ -11,16 +11,14 @@ export async function velodrome({ chainId, address }: { chainId: number, address
         chainId: 1337,
         args: [
             address,
-            NULL_ADDRESS
+            constants.AddressZero
         ]
     }) as {
         gauge: string,
         gauge_alive: boolean
     }
 
-    const isNullAddress = !(gauge_alive && parseInt(gauge, 16))
-    
-    return isNullAddress ? NULL_ADDRESS : gauge
+    return gauge_alive && parseInt(gauge, 16) ? gauge : constants.AddressZero
 }
 
 const abi = [
