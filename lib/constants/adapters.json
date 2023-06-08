@@ -6,7 +6,7 @@
     "protocol": "Aave",
     "assets": ["USDC"],
     "chains": [1, 5, 1337],
-    "resolver": "default"
+    "resolver": "aaveV2"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
@@ -15,7 +15,7 @@
     "protocol": "Aave",
     "assets": ["USDC"],
     "chains": [1, 5, 1337, 42161],
-    "resolver": "default"
+    "resolver": "aaveV3"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
@@ -122,7 +122,7 @@
     ],
     "assets": ["USDC"],
     "chains": [1, 5, 1337],
-    "resolver": "default"
+    "resolver": "compoundV2"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
@@ -173,7 +173,7 @@
     ],
     "assets": ["USDC"],
     "chains": [1, 5, 1337, 42161],
-    "resolver": "default"
+    "resolver": "convex"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
@@ -344,7 +344,7 @@
     ],
     "assets": ["USDC"],
     "chains": [1, 5, 1337, 42161],
-    "resolver": "default"
+    "resolver": "stargate"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
@@ -407,7 +407,7 @@
     ],
     "assets": ["USDC"],
     "chains": [1, 5, 1337],
-    "resolver": "default"
+    "resolver": "velodrome"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
@@ -423,6 +423,6 @@
     ],
     "assets": ["USDC"],
     "chains": [1, 5, 1337, 42161],
-    "resolver": "default"
+    "resolver": "yearn"
   }
 ]

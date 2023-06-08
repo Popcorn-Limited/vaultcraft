@@ -35,13 +35,13 @@ export function Option({ value, children, selected, disabled }: { value: any; ch
       {({ active }) => {
         return (
           <button
-            className={`p-2 w-full flex gap-2 flex-row h-14 relative border border-transparent rounded-lg whitespace-nowrap text-left ${disabled ? "hover:bg-red-600 cursor-not-allowed" : "hover:bg-[gray]"} 
+            className={`flex flex-row text-left h-14 p-2 rounded-lg ${disabled ? "hover:bg-red-600 cursor-not-allowed" : "hover:bg-[gray]"} 
             ${selected ? 'bg-[white]' : ''}`}
             disabled={disabled}
           >
             <img
               alt=""
-              className="object-contain relative h-full w-fit z-10"
+              className="object-contain relative h-10 w-10 mr-4"
               src={value.logoURI}
             />
             <div className="flex flex-col self-center">

@@ -2,28 +2,30 @@ import { readContract } from "@wagmi/core";
 import { readContracts } from "wagmi";
 import { BigNumber } from "ethers";
 
-const STARGATE_ADDRESS = "0xB0D502E938ed5f4df2E681fE6E419ff29631d62b"
+const STARGATE_ADDRESS = { 1: "0xB0D502E938ed5f4df2E681fE6E419ff29631d62b", 42161: "0xeA8DfEE1898a7e0a59f7527F076106d7e44c2176" }
 
 export async function stargate({ chainId }: { chainId: number }): Promise<string[]> {
     const poolLength = await readContract({
-        address: STARGATE_ADDRESS,
+        // @ts-ignore
+        address: STARGATE_ADDRESS[chainId],
         abi,
         functionName: "poolLength",
-        chainId: 1337,
+        chainId,
         args: []
     }) as BigNumber
 
     const tokens = await readContracts({
         contracts: Array(poolLength.toNumber()).fill(undefined).map((item, idx) => {
             return {
-                address: STARGATE_ADDRESS,
+                // @ts-ignore
+                address: STARGATE_ADDRESS[chainId],
                 abi,
                 functionName: "poolInfo",
-                chainId: 1337,
+                chainId,
                 args: [idx]
             }
         })
-    }) as string [][]
+    }) as string[][]
 
     return tokens.map(item => item[0])
 }

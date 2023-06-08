@@ -2,13 +2,14 @@ import { readContract } from "@wagmi/core";
 import { readContracts } from "wagmi";
 import { BigNumber } from "ethers";
 
-const CONVEX_BOOSTER_ADDRESS = "0xF403C135812408BFbE8713b5A23a04b3D48AAE31";
+const CONVEX_BOOSTER_ADDRESS = { 1: "0xF403C135812408BFbE8713b5A23a04b3D48AAE31", 42161: "0xF403C135812408BFbE8713b5A23a04b3D48AAE31" }
 
 export async function convex({ chainId, address }: { chainId: number, address: string }) {
     const poolLength = await readContract({
-        address: CONVEX_BOOSTER_ADDRESS,
+        // @ts-ignore
+        address: CONVEX_BOOSTER_ADDRESS[chainId],
         abi,
-        chainId: 1337,
+        chainId,
         functionName: "poolLength",
         args: []
     }) as BigNumber
@@ -16,18 +17,17 @@ export async function convex({ chainId, address }: { chainId: number, address: s
     const poolInfo = await readContracts({
         contracts: Array(poolLength.toNumber()).fill(undefined).map((item, idx) => {
             return {
-                address: CONVEX_BOOSTER_ADDRESS,
+                // @ts-ignore
+                address: CONVEX_BOOSTER_ADDRESS[chainId],
                 abi,
                 functionName: "poolInfo",
-                chainId: 1337,
+                chainId,
                 args: [idx]
             }
         })
     }) as string[][]
 
-    const lpTokens = poolInfo.map(item => item[0].toLowerCase())
-
-    return lpTokens.indexOf(address.toLowerCase())
+    return poolInfo.map(item => item[0].toLowerCase()).indexOf(address.toLowerCase())
 }
 
 const abi = [

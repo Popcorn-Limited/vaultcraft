@@ -12,7 +12,6 @@ import Head from "next/head";
 import { Provider } from "jotai";
 import Page from "@/components/Page";
 import { SUPPORTED_NETWORKS } from "@/lib/connectors";
-import { stableAtom } from "@/lib/atoms/test";
 
 const { provider, chains } = configureChains(SUPPORTED_NETWORKS, [
   publicProvider(),

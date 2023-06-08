@@ -39,7 +39,7 @@ function AdapterSelection() {
   useEffect(() => {
     if (protocol.key !== "none" && asset.symbol !== "none" && network) {
       getAdapterOptions(adapters.filter(
-        (adapter) => adapter.protocol === protocol.name), network.id, asset.address[network.id].toLowerCase())
+        (adapter) => adapter.protocol === protocol.name).filter(adapter => adapter.chains.includes(network.id)), network.id, asset.address[network.id].toLowerCase())
         .then(res => {
           setOptions(res);
           if (res.length > 0) setAdapter(res[0]);
@@ -84,7 +84,7 @@ function AdapterSelection() {
               <Option
                 value={adapterIter}
                 selected={adapterIter.name === adapter.name}
-                key={`asset-selc-${adapterIter.key}-${adapterIter.name}`}
+                key={`adapter-selc-${adapterIter.key}-${adapterIter.name}`}
               >
               </Option>
             ))}

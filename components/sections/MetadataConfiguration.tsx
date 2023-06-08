@@ -32,8 +32,6 @@ function MetadataConfiguration() {
     setMetadata((prefState) => { return { ...prefState, tags: Object.keys(newTags).filter((tag) => newTags[tag]) } })
   }
 
-  console.log({metadata, tags})
-
   return (
     <section className="flex flex-col">
       <div className="mb-4">

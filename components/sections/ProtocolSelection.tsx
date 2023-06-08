@@ -13,7 +13,7 @@ interface ProtocolOption extends Protocol {
 async function assetSupported(protocol: Protocol, adapters: Adapter[], chainId: number, asset: string): Promise<boolean> {
   const availableAssets = await Promise.all(adapters.filter(
     (adapter) => adapter.protocol === protocol.name
-  ).map(adapter => resolveProtocolAssets({ chainId: chainId, resolver: adapter.resolver })
+  ).filter(adapter => adapter.chains.includes(chainId)).map(adapter => resolveProtocolAssets({ chainId: chainId, resolver: adapter.resolver })
   ))
 
   return availableAssets.flat().map(a => a?.toLowerCase()).filter((availableAsset) => availableAsset === asset).length > 0
@@ -40,8 +40,6 @@ function ProtocolSelection() {
 
   useEffect(() => {
     if (network && asset.symbol !== "none") {
-      console.log(asset)
-      console.log(network.id)
       getProtocolOptions(protocols, adapters, network.id, asset.address[network.id].toLowerCase()).then(res => setOptions(res));
     }
   }, [network, asset]);
@@ -79,7 +77,7 @@ function ProtocolSelection() {
           <div className="flex flex-col overflow-y-scroll w-full scrollbar-hide space-y-2">
             {options.map((protocolIter) => (
               <Option
-                key={`asset-selc-${protocolIter.name}`}
+                key={`protocol-selc-${protocolIter.name}`}
                 value={protocolIter}
                 selected={protocolIter?.name === protocol.name}
                 disabled={protocolIter.disabled}

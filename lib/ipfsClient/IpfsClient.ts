@@ -20,7 +20,6 @@ export const IpfsClient: IIpfsClient = {
   },
 
   add: async <T>(fileName: string, data: T): Promise<string> => {
-    console.log(cleanFileName(fileName));
     const headers = {
       pinata_api_key: process.env.PINATA_API_KEY,
       pinata_secret_api_key: process.env.PINATA_API_SECRET,

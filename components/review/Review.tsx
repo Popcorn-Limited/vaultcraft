@@ -46,8 +46,6 @@ export default function Review(): JSX.Element {
     });
   }, [adapterConfig]);
 
-  console.log(Number(fees.deposit))
-
   return (
     <section>
       <span className="flex flex-row items-center justify-end">

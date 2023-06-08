@@ -3,7 +3,7 @@ import { readContracts } from "wagmi";
 
 const COMPOUND_PROXY_CONTRACT = "0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B";
 
-export async function compound({ chainId }: { chainId: number }): Promise<string[]> {
+export async function compoundV2({ chainId }: { chainId: number }): Promise<string[]> {
     const allMarkets = await readContract({
         address: COMPOUND_PROXY_CONTRACT,
         abi: abiProxy,

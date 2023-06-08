@@ -79,7 +79,7 @@ function NetworkSelection() {
         )}
       >
         {SUPPORTED_NETWORKS.map((c) => (
-          <Option key={`asset-selc-${c.network}`} value={c} selected={c.id === chain?.id} >
+          <Option key={`network-selc-${c.network}`} value={c} selected={c.id === chain?.id} >
             <figure className="relative w-6 h-6">
               <Image
                 fill
