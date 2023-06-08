@@ -10,3 +10,4 @@ export * from "./default";
 export * from "./flux";
 export * from "./origin";
 export * from "./idle";
+export * from "./compoundV3";

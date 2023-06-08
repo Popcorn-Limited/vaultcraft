@@ -11,10 +11,11 @@
     "logoURI": "https://cdn.furucombo.app/assets/img/token/DAI.png"
   },
   {
-    "chains": [1, 42161],
+    "chains": [1, 42161, 137],
     "address": {
       "1": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-      "42161": "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8"
+      "42161": "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8",
+      "137": "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174"
     },
     "name": "USD Coin",
     "symbol": "USDC",

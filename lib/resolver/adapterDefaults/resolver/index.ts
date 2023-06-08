@@ -6,3 +6,4 @@ export * from "./default";
 export * from "./yearn";
 export * from "./origin";
 export * from "./idle";
+export * from "./compoundV3";
