@@ -4,21 +4,27 @@ import type { AppProps } from "next/app";
 import { Roboto } from "next/font/google";
 import { WagmiConfig, createClient, configureChains } from "wagmi";
 import { publicProvider } from "wagmi/providers/public";
+import { alchemyProvider } from "wagmi/providers/alchemy";
+import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { Toaster } from "react-hot-toast";
-// @ts-ignore
-import NoSSR from 'react-no-ssr';
 import Head from "next/head";
 import { Provider } from "jotai";
+// @ts-ignore
+import NoSSR from 'react-no-ssr';
 import Page from "@/components/Page";
 import { SUPPORTED_NETWORKS } from "@/lib/connectors";
 
-const { provider, chains } = configureChains(SUPPORTED_NETWORKS, [
+const { chains, provider } = configureChains(SUPPORTED_NETWORKS, [
   publicProvider(),
+  alchemyProvider({
+    apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY as string,
+  }),
+  jsonRpcProvider({ rpc: (chain) => ({ http: chain.rpcUrls.default.http[0] }) }),
 ]);
 
 const { connectors } = getDefaultWallets({
-  appName: "app.pop.network",
+  appName: "vaultcraft",
   chains,
 });
 
