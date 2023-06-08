@@ -78,7 +78,7 @@
     "logoURI": "https://icons.llamao.fi/icons/protocols/idle"
   },
   {
-    "chains": [],
+    "chains": [1, 1337],
     "name": "Origin",
     "key": "origin",
     "logoURI": "https://icons.llamao.fi/icons/protocols/origin-defi"

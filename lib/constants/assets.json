@@ -194,5 +194,21 @@
     "symbol": "POP",
     "decimals": 18,
     "logoURI": "https://cdn.furucombo.app/assets/img/token/WETH.svg"
+  },
+  {
+    "chains": [1],
+    "address": { "1": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86" },
+    "name": "Origin Dollar",
+    "symbol": "oUSD",
+    "decimals": 18,
+    "logoURI": "https://icons.llamao.fi/icons/protocols/origin-dollar"
+  },
+  {
+    "chains": [1],
+    "address": { "1": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3" },
+    "name": "Origin Ether",
+    "symbol": "oETH",
+    "decimals": 18,
+    "logoURI": "https://icons.llamao.fi/icons/protocols/origin-ether"
   }
 ]

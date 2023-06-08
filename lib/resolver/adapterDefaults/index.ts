@@ -1,4 +1,4 @@
-import { initDefault, beefy, convex, velodrome, flux, yearn } from "./resolver";
+import { initDefault, beefy, convex, velodrome, flux, yearn, origin } from "./resolver";
 
 export type AdapterDefaultResolver = (
   chainId: number,
@@ -13,6 +13,7 @@ export const AdapterDefaultResolvers: { [key: string]: ({ chainId, address }: { 
   velodrome,
   flux,
   yearn,
+  origin,
   default: initDefault
 };
 

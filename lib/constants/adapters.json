@@ -88,7 +88,7 @@
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
     "name": "Beefy Adapter",
-    "key": "BeefyAdapter",
+    "key": "BeefyAdapter3",
     "protocol": "beefy",
     "initParams": [
       {
@@ -300,7 +300,7 @@
       }
     ],
     "assets": ["USDC"],
-    "chains": [],
+    "chains": [1, 1337],
     "resolver": "default"
   },
   {
@@ -412,7 +412,7 @@
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
     "name": "Yearn Adapter",
-    "key": "YearnAdapter",
+    "key": "YearnAdapter1",
     "protocol": "yearn",
     "initParams": [
       {
