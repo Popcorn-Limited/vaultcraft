@@ -30,7 +30,7 @@
     "logoURI": "https://cryptologos.cc/logos/beefy-finance-bifi-logo.png?v=024"
   },
   {
-    "chains": [],
+    "chains": [1, 1337],
     "name": "Compound",
     "key": "compound",
     "logoURI": "https://cdn.furucombo.app/assets/img/token/COMP.svg"
