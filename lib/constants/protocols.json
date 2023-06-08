@@ -72,7 +72,7 @@
     "logoURI": "https://cdn.furucombo.app/assets/img/token/CVX.png"
   },
   {
-    "chains": [],
+    "chains": [1, 1337],
     "name": "Idle",
     "key": "idle",
     "logoURI": "https://icons.llamao.fi/icons/protocols/idle"
