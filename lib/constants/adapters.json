@@ -138,7 +138,7 @@
       }
     ],
     "assets": ["USDC"],
-    "chains": [1, 1337, 42161],
+    "chains": [],
     "resolver": "default"
   },
   {
@@ -266,7 +266,7 @@
       }
     ],
     "assets": ["USDC"],
-    "chains": [1, 1337],
+    "chains": [],
     "resolver": "default"
   },
   {
@@ -283,7 +283,7 @@
       }
     ],
     "assets": ["USDC"],
-    "chains": [1, 1337],
+    "chains": [],
     "resolver": "default"
   },
   {
@@ -300,7 +300,7 @@
       }
     ],
     "assets": ["USDC"],
-    "chains": [1, 1337],
+    "chains": [],
     "resolver": "default"
   },
   {
@@ -343,7 +343,7 @@
       }
     ],
     "assets": ["USDC"],
-    "chains": [1, 1337, 42161],
+    "chains": [],
     "resolver": "stargate"
   },
   {

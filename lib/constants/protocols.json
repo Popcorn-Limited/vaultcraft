@@ -30,7 +30,7 @@
     "logoURI": "https://cryptologos.cc/logos/beefy-finance-bifi-logo.png?v=024"
   },
   {
-    "chains": [1, 1337, 42161],
+    "chains": [],
     "name": "Compound",
     "key": "compound",
     "logoURI": "https://cdn.furucombo.app/assets/img/token/COMP.svg"
@@ -48,7 +48,7 @@
     "logoURI": "https://cdn.furucombo.app/assets/img/token/CVX.png"
   },
   {
-    "chains": [1, 1337, 42161],
+    "chains": [],
     "name": "Curve",
     "key": "curve",
     "logoURI": "https://cryptologos.cc/logos/curve-dao-token-crv-logo.png?v=025"
@@ -72,13 +72,13 @@
     "logoURI": "https://cdn.furucombo.app/assets/img/token/CVX.png"
   },
   {
-    "chains": [1, 1337],
+    "chains": [],
     "name": "Idle",
     "key": "idle",
     "logoURI": "https://icons.llamao.fi/icons/protocols/idle"
   },
   {
-    "chains": [1, 1337],
+    "chains": [],
     "name": "Origin",
     "key": "origin",
     "logoURI": "https://icons.llamao.fi/icons/protocols/origin-defi"
@@ -96,7 +96,7 @@
     "logoURI": "https://cdn.furucombo.app/assets/img/token/CVX.png"
   },
   {
-    "chains": [1, 1337, 42161],
+    "chains": [],
     "name": "Stargate",
     "key": "stargate",
     "logoURI": "https://icons.llama.fi/stargate.png"
