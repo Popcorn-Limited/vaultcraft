@@ -1,12 +1,13 @@
+import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import { VAULT_TAGS, metadataAtom } from "@/lib/atoms";
 import Input from "@/components/inputs/Input";
-import { useEffect, useState } from "react";
 
 
 function MetadataConfiguration() {
   const [metadata, setMetadata] = useAtom(metadataAtom);
   const [tags, setTags] = useState({});
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     // wipe old ipfs hash
@@ -49,6 +50,10 @@ function MetadataConfiguration() {
           placeholder="..."
           autoComplete="off"
           autoCorrect="off"
+          onBlur={(e) => {
+            if ((e.target as HTMLInputElement).value.length < 3) { setError("Name must be at least 3 characters long") } else { setError(null) }
+          }}
+          error={error}
         />
       </div>
 

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { arbitrum, localhost } from "wagmi/chains";
 import { constants, ethers } from "ethers";
 import { formatUnits } from "ethers/lib/utils.js";
-import { useAccount } from "wagmi";
+import { mainnet, useAccount } from "wagmi";
 import { useAtom } from "jotai";
 import { Switch } from '@headlessui/react'
 import {
@@ -22,7 +22,7 @@ import ReviewParam from "./ReviewParam";
 export default function Review(): JSX.Element {
   const { address: account } = useAccount();
   const [network] = useAtom(networkAtom);
-  const chainId = network.id === localhost.id ? arbitrum.id : network.id;
+  const chainId = network.id === localhost.id ? mainnet.id : network.id;
   const [asset] = useAtom(assetAtom);
   const [protocol] = useAtom(protocolAtom);
   const [adapter] = useAtom(adapterAtom);

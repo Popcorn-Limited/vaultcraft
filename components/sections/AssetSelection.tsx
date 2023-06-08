@@ -1,11 +1,11 @@
 import { useAtom } from "jotai";
-import { arbitrum, localhost } from "wagmi/chains";
+import { arbitrum, localhost, mainnet } from "wagmi/chains";
 import { assetAtom, useAssets, networkAtom } from "@/lib/atoms";
 import Selector, { Option } from "@/components/inputs/Selector";
 
 function AssetSelection() {
   const [network] = useAtom(networkAtom);
-  const chainId = network.id === localhost.id ? arbitrum.id : network.id;
+  const chainId = network.id === localhost.id ? mainnet.id : network.id;
   const [asset, setAsset] = useAtom(assetAtom);
   const assets = useAssets();
 
