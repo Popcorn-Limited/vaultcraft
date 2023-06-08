@@ -2,10 +2,11 @@ import { constants, utils } from "ethers";
 import { InitParam, InitParamRequirement } from "@/lib/atoms/adapter"
 
 export function noOp() { }
+
 export const beautifyAddress = (addr: string) =>
   `${addr.slice(0, 4)}...${addr.slice(-5, 5)}`;
 
-export function checkInitParamValidity(
+export function verifyInitParamValidity(
   value: any,
   inputParam: InitParam
 ): boolean {

@@ -1,14 +1,14 @@
 import { useAtom } from "jotai";
 import { useEffect } from "react";
-import { RESET } from "jotai/utils";
 import {
+  InitParamRequirement,
   adapterAtom,
   adapterConfigAtom,
   assetAtom,
   networkAtom
 } from "@/lib/atoms";
 import { resolveAdapterDefaults } from "@/lib/resolver/adapterDefaults/adapterDefaults";
-import { checkInitParamValidity } from "@/lib/helpers";
+import { verifyInitParamValidity } from "@/lib/helpers";
 import Fieldset from "@/components/inputs/Fieldset";
 import Input from "@/components/inputs/Input";
 
@@ -69,11 +69,8 @@ function AdapterConfiguration() {
                   minLength={1}
                   maxLength={79}
                   spellCheck="false"
-                  className={
-                    checkInitParamValidity(adapterConfig[i], initParam)
-                      ? ""
-                      : "border border-red-500"
-                  }
+                  info={initParam.requirements?.includes(InitParamRequirement.Required) ? "Required" : undefined}
+                  onBlur={() => verifyInitParamValidity(adapterConfig[i], initParam)}
                 />
               </Fieldset>
             </div>

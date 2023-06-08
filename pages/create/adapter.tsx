@@ -2,11 +2,23 @@ import MainActionButton from "@/components/buttons/MainActionButton";
 import SecondaryActionButton from "@/components/buttons/SecondaryActionButton";
 import ProgressBar from "@/components/ProgressBar";
 import AdapterConfiguration from "@/components/sections/AdapterConfiguration";
+import { adapterAtom, adapterConfigAtom } from "@/lib/atoms";
+import { verifyInitParamValidity } from "@/lib/helpers";
 import { CREATION_STAGES } from "@/lib/stages";
+import { useAtom } from "jotai";
 import { useRouter } from "next/router";
+
+export function isAdapterValid(adapter: any, adapterConfig: string[]): boolean {
+  if (adapter.initParams && adapter.initParams.length > 0) {
+    return adapterConfig.every((param: string, i: number) => verifyInitParamValidity(param, adapter.initParams[i]))
+  }
+  return true;
+}
 
 export default function Adapter() {
   const router = useRouter();
+  const [adapter] = useAtom(adapterAtom);
+  const [adapterConfig] = useAtom(adapterConfigAtom)
 
   return (
     <div className="bg-[#141416] md:max-w-[800px] w-full h-full flex flex-col justify-center mx-auto md:px-8 px-6">
@@ -21,7 +33,7 @@ export default function Adapter() {
 
         <div className="flex flex-row space-x-8 mt-16">
           <SecondaryActionButton label="Back" handleClick={() => router.push('/create/basics')} />
-          <MainActionButton label="Next" handleClick={() => router.push('/create/strategy')} />
+          <MainActionButton label="Next" handleClick={() => router.push('/create/strategy')} disabled={!isAdapterValid(adapter, adapterConfig)} />
         </div>
 
       </div>

@@ -6,7 +6,7 @@ import {
   adapterAtom,
   adapterConfigAtom,
 } from "@/lib/atoms";
-import { checkInitParamValidity } from "@/lib/helpers";
+import { verifyInitParamValidity } from "@/lib/helpers";
 import Fieldset from "@/components/inputs/Fieldset";
 import Input from "@/components/inputs/Input";
 
@@ -68,7 +68,7 @@ function StrategyConfiguration() {
                   maxLength={79}
                   spellCheck="false"
                   className={
-                    checkInitParamValidity(adapterConfig[i], initParam)
+                    verifyInitParamValidity(adapterConfig[i], initParam)
                       ? ""
                       : "border border-red-500"
                   }

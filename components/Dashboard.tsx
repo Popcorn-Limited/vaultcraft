@@ -9,7 +9,7 @@ import {
   adapterConfigAtom,
   feeAtom,
 } from "@/lib/atoms";
-import { checkInitParamValidity } from "@/lib/helpers";
+import { verifyInitParamValidity } from "@/lib/helpers";
 import AssetSelection from "@/components/sections/AssetSelection";
 import ProtocolSelection from "@/components/sections/ProtocolSelection";
 import AdapterSelection from "@/components/sections/AdapterSelection";
@@ -40,7 +40,7 @@ function Dashboard() {
     initParams.length > 0 &&
     initParams.length === adapterConfig.length &&
     adapterConfig.every((config, i) =>
-      checkInitParamValidity(config, adapter.initParams![i])
+      verifyInitParamValidity(config, adapter.initParams![i])
     );
 
   return (
