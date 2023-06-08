@@ -210,5 +210,21 @@
     "symbol": "oETH",
     "decimals": 18,
     "logoURI": "https://icons.llamao.fi/icons/protocols/origin-ether"
+  },
+  {
+    "chains": [1],
+    "address": { "1": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84" },
+    "name": "Staked Ether",
+    "symbol": "stETH",
+    "decimals": 18,
+    "logoURI": "https://cdn.furucombo.app/assets/img/token/stETH.svg"
+  },
+  {
+    "chains": [1],
+    "address": { "1": "0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0" },
+    "name": "Matic",
+    "symbol": "oETH",
+    "decimals": 18,
+    "logoURI": "https://icons.llamao.fi/icons/chains/rsz_polygon"
   }
 ]

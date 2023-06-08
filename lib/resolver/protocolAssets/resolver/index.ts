@@ -9,3 +9,4 @@ export * from "./aaveV3";
 export * from "./default";
 export * from "./flux";
 export * from "./origin";
+export * from "./idle";
