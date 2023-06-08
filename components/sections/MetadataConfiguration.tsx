@@ -3,10 +3,12 @@ import { useAtom } from "jotai";
 import { VAULT_TAGS, metadataAtom } from "@/lib/atoms";
 import Input from "@/components/inputs/Input";
 
+interface Tags { [key: string]: boolean }
+
 
 function MetadataConfiguration() {
   const [metadata, setMetadata] = useAtom(metadataAtom);
-  const [tags, setTags] = useState({});
+  const [tags, setTags] = useState<Tags>({});
   const [error, setError] = useState<string | undefined>(undefined)
 
   useEffect(() => {
@@ -15,10 +17,8 @@ function MetadataConfiguration() {
       setMetadata((prefState) => { return { ...prefState, ipfsHash: "" } })
     }
 
-    // set tags
-    const newTags = {};
-    VAULT_TAGS.forEach((tag) => {
-      // @ts-ignore
+    const newTags: Tags = {};
+    VAULT_TAGS.forEach((tag: string) => {
       newTags[tag] = metadata?.tags?.includes(tag)
     });
     setTags(newTags);
@@ -26,10 +26,8 @@ function MetadataConfiguration() {
 
   function handleChange(value: string) {
     const newTags = { ...tags };
-    // @ts-ignore
     newTags[value] = !newTags[value];
     setTags(newTags);
-    // @ts-ignore
     setMetadata((prefState) => { return { ...prefState, tags: Object.keys(newTags).filter((tag) => newTags[tag]) } })
   }
 
@@ -59,7 +57,7 @@ function MetadataConfiguration() {
           autoComplete="off"
           autoCorrect="off"
           onBlur={(e) => verifyName((e.target as HTMLInputElement).value)}
-          error={error}
+          errors={error ? [error] : undefined}
         />
       </div>
 
@@ -71,7 +69,6 @@ function MetadataConfiguration() {
               <button
                 key={`tag-element-${tag}`}
                 type="button"
-                // @ts-ignore
                 className={`${tags[tag] ? "text-black border-white bg-white" : "text-white border-[#ffffff80]"} border rounded-[4px]
                 px-2 py-0.5 transition-all ease-in-out duration-300 hover:bg-[#D7D7D7] hover:border-[#D7D7D7] hover:text-white`}
                 onClick={() => handleChange(tag)}>

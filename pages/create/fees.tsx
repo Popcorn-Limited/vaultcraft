@@ -1,12 +1,23 @@
 import { useRouter } from "next/router";
+import { useAtom } from "jotai";
 import { CREATION_STAGES } from "@/lib/stages";
+import { feeAtom } from "@/lib/atoms/fees";
 import MainActionButton from "@/components/buttons/MainActionButton";
 import SecondaryActionButton from "@/components/buttons/SecondaryActionButton";
 import ProgressBar from "@/components/ProgressBar";
 import FeeConfiguration from "@/components/sections/FeeConfiguration";
+import { constants, utils } from "ethers";
+
+export function isFeesValid(fees: any): boolean {
+  if (Object.keys(fees).filter(key => key !== "recipient").reduce((acc, key) => acc + Number(fees[key]), 0) >= 1000000000000000000) return false;
+  if (!utils.isAddress(fees.recipient)) return false;
+  if (fees.recipient === constants.AddressZero) return false;
+  return true;
+}
 
 export default function Fees() {
   const router = useRouter();
+  const [fees] = useAtom(feeAtom);
 
   return (
     <div className="bg-[#141416] md:max-w-[800px] w-full h-full flex flex-col justify-center mx-auto md:px-8 px-6">
@@ -21,7 +32,7 @@ export default function Fees() {
 
         <div className="flex flex-row space-x-8 mt-16">
           <SecondaryActionButton label="Back" handleClick={() => router.push('/create/limits')} />
-          <MainActionButton label="Next" handleClick={() => router.push('/create/review')} />
+          <MainActionButton label="Next" handleClick={() => router.push('/create/review')} disabled={!isFeesValid(fees)} />
         </div>
 
       </div>

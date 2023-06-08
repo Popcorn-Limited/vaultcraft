@@ -21,7 +21,7 @@ export const basicsAtom = atom((get) => {
     }
 })
 
-export function isBasicsComplete(basics: any): boolean {
+export function isBasicsValid(basics: any): boolean {
     if (basics.metadata.name.length < 3) return false;
     if (basics.asset.symbol === "none") return false;
     if (basics.protocol.key === "none") return false;
@@ -46,7 +46,7 @@ export default function Basics() {
                 <StrategySelection />
 
                 <div className="w-full h-full flex flex-col justify-end md:grow mt-8">
-                    <MainActionButton label="Next" handleClick={() => router.push('/create/adapter')} disabled={!isBasicsComplete(basics)} />
+                    <MainActionButton label="Next" handleClick={() => router.push('/create/adapter')} disabled={!isBasicsValid(basics)} />
                 </div>
 
             </div>

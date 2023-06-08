@@ -9,6 +9,6 @@ const CTOKENS: { [key: string]: string } = {
   "0x853d955acef822db058eb8505911ed77f175b99e": "0x1C9A2d6b33B4826757273D47ebEe0e2DddcD978B"  // FRAX
 }
 
-export async function flux({ chainId, address }: { chainId: number, address: string }): Promise<string> {
-  return chainId === mainnet.id ? (CTOKENS[address.toLowerCase()] || constants.AddressZero) : constants.AddressZero;
+export async function flux({ chainId, address }: { chainId: number, address: string }): Promise<any[]> {
+  return chainId === mainnet.id ? [(CTOKENS[address.toLowerCase()] || constants.AddressZero)] : [constants.AddressZero];
 }

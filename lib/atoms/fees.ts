@@ -15,7 +15,7 @@ const DEFAULT_FEES = {
   withdrawal: BigNumber.from(0),
   performance: BigNumber.from(0),
   management: BigNumber.from(0),
-  recipient: constants.AddressZero,
+  recipient: "",
 };
 
 export const feeAtom = atom<VaultFees>(DEFAULT_FEES);

@@ -13,7 +13,7 @@ interface Boost {
   status: "active" | "eol"
 }
 
-export async function beefy({ chainId, address }: { chainId: number, address: string }): Promise<any> {
+export async function beefy({ chainId, address }: { chainId: number, address: string }): Promise<any[]> {
   const network = transformNetwork(SUPPORTED_NETWORKS.find(chain => chain.id === chainId)?.network)
 
   const vaults = await (await fetch(`https://api.beefy.finance/vaults/${network}`)).json() as Vault[];

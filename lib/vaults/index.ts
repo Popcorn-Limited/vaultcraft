@@ -1,7 +1,7 @@
 import { constants, ethers } from "ethers";
 import { useAccount, useContractWrite, useNetwork, usePrepareContractWrite } from "wagmi";
 import { useAtom } from "jotai";
-import { adapterDeploymentAtom, assetAtom, feeAtom, metadataAtom } from "@/lib/atoms"
+import { adapterDeploymentAtom, assetAtom, feeAtom, limitAtom, metadataAtom } from "@/lib/atoms"
 
 const VAULT_CONTROLLER = {
   "1": "0x7D51BABA56C2CA79e15eEc9ECc4E92d9c0a7dbeb",
@@ -17,6 +17,7 @@ export const useDeployVault = () => {
   const [adapterData] = useAtom(adapterDeploymentAtom);
   const [metadata] = useAtom(metadataAtom);
   const [fees] = useAtom(feeAtom);
+  const [limit] = useAtom(limitAtom);
 
   const { config, error: configError } = usePrepareContractWrite({
     // @ts-ignore
@@ -36,7 +37,7 @@ export const useDeployVault = () => {
           performance: fees.performance,
         },
         feeRecipient: fees.recipient,
-        depositLimit: constants.MaxUint256,
+        depositLimit: Number(limit) > 0 ? limit : constants.MaxUint256,
         owner: account,
       },
       adapterData,

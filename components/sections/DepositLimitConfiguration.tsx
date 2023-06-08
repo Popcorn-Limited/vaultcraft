@@ -9,8 +9,7 @@ import Input from "@/components/inputs/Input";
 
 function DepositLimitConfiguration() {
   const [limit, setLimit] = useAtom(limitAtom);
-  // @ts-ignore
-  const [enabled, setEnabled] = useState(Number(limit.hex) > 0);
+  const [enabled, setEnabled] = useState(Number(limit) > 0);
 
   function handleChange(value: string) {
     setLimit(parseUnits(validateBigNumberInput(value).formatted))

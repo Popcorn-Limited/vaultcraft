@@ -4,7 +4,7 @@ import { BigNumber } from "ethers";
 
 const CONVEX_BOOSTER_ADDRESS = { 1: "0xF403C135812408BFbE8713b5A23a04b3D48AAE31", 42161: "0xF403C135812408BFbE8713b5A23a04b3D48AAE31" }
 
-export async function convex({ chainId, address }: { chainId: number, address: string }) {
+export async function convex({ chainId, address }: { chainId: number, address: string }): Promise<any[]> {
     const poolLength = await readContract({
         // @ts-ignore
         address: CONVEX_BOOSTER_ADDRESS[chainId],
@@ -27,7 +27,7 @@ export async function convex({ chainId, address }: { chainId: number, address: s
         })
     }) as string[][]
 
-    return poolInfo.map(item => item[0].toLowerCase()).indexOf(address.toLowerCase())
+    return [poolInfo.map(item => item[0].toLowerCase()).indexOf(address.toLowerCase())];
 }
 
 const abi = [

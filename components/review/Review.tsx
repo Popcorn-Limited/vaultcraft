@@ -84,7 +84,7 @@ export default function Review(): JSX.Element {
         {devMode && <ReviewParam title="Strategy Data" value={"0x"} />}
       </ReviewSection>
       <ReviewSection title="Deposit Limit">
-        <ReviewParam title="Deposit Limit" value={`${formatUnits(limit)} ${asset.symbol}`} />
+        <ReviewParam title="Deposit Limit" value={`${formatUnits(Number(limit) > 0 ? limit : constants.MaxUint256)} ${asset.symbol}`} />
         {devMode && <ReviewParam title="Deposit Limit Uint" value={String(Number(constants.MaxUint256))} />}
       </ReviewSection>
       <ReviewSection title="Fees">

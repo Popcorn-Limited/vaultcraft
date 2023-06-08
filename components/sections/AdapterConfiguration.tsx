@@ -33,7 +33,11 @@ function AdapterConfiguration() {
   useEffect(
     () => {
       !!adapter.initParams && adapter.initParams.length > 0 ?
-        resolveAdapterDefaults({ chainId: network.id, address: asset.address[network.id]}).then(res => setAdapterConfig(res)) :
+        resolveAdapterDefaults({
+          chainId: network.id,
+          address: asset.address[network.id].toLowerCase(),
+          resolver: adapter.resolver
+        }).then(res => setAdapterConfig(res)) :
         setAdapterConfig([])
     },
     [adapter]

@@ -6,7 +6,7 @@ export type ProtocolAssetResolver = (
 
 export type ProtocolAssetResolvers = typeof ProtocolAssetResolvers;
 
-export const ProtocolAssetResolvers = {
+export const ProtocolAssetResolvers: { [key: string]: ({ chainId }: { chainId: number }) => Promise<string[]> } = {
   beefy,
   yearn,
   convex,
