@@ -22,7 +22,7 @@ function Selector({
       <Listbox.Button className="border-1 border border-[#353945] rounded-lg flex gap-2 w-full px-2">
         {actionContent(selected)}
       </Listbox.Button>
-      <Listbox.Options className="z-[1] absolute flex flex-col min-w-[12rem] rounded-lg top-0 left-0 p-2 bg-white md:max-h-[80vh] w-full h-full overflow-auto">
+      <Listbox.Options className="z-[1] absolute flex flex-col min-w-[12rem] rounded-[20px] top-0 left-0 p-2 bg-black md:max-h-[80vh] w-full h-full overflow-auto">
         {children}
       </Listbox.Options>
     </Listbox >

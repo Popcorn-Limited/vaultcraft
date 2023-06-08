@@ -17,7 +17,7 @@
   {
     "chains": [1, 5, 1337],
     "name": "Balancer",
-    "logoURI": "https://cryptologos.cc/logos/aave-aave-logo.png?v=024"
+    "logoURI": "https://cryptologos.cc/logos/balancer-bal-logo.png?v=024"
   },
   {
     "chains": [1, 5, 1337, 42161],
@@ -37,7 +37,7 @@
   {
     "chains": [1, 5, 1337, 42161],
     "name": "Curve",
-    "logoURI": "https://cdn.furucombo.app/assets/img/token/CVX.png"
+    "logoURI": "https://cryptologos.cc/logos/curve-dao-token-crv-logo.png?v=025"
   },
   {
     "chains": [1, 5, 1337],
@@ -67,7 +67,7 @@
   {
     "chains": [1, 5, 1337, 42161],
     "name": "Radiant",
-    "logoURI": "https://cdn.furucombo.app/assets/img/token/CVX.png"
+    "logoURI": "https://icons.llama.fi/radiant.png"
   },
   {
     "chains": [1, 5, 1337],
@@ -77,7 +77,7 @@
   {
     "chains": [1, 5, 1337, 42161],
     "name": "Stargate",
-    "logoURI": "https://cdn.furucombo.app/assets/img/token/CVX.png"
+    "logoURI": "https://icons.llama.fi/stargate.png"
   },
   {
     "chains": [1, 5, 1337],

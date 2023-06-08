@@ -79,7 +79,7 @@ function AdapterSelection() {
         <div className="w-full h-full bg-black flex flex-col items-start gap-y-1 px-8 py-9">
           <p className="text-[white] text-2xl mb-9">Select Adapter</p>
           <p className="text-[white] mb-8">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna ut labore et dolore magna.</p>
-          <div className="flex flex-col overflow-y-scroll w-full">
+          <div className="flex flex-col overflow-y-scroll scrollbar-hide w-full">
             {options.map((adapterIter) => (
               <Option
                 value={adapterIter}

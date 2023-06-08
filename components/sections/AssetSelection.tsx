@@ -32,10 +32,14 @@ function AssetSelection() {
       <div className="w-full h-full bg-black flex flex-col items-start gap-y-1 px-8 py-9">
         <p className="text-[white] text-2xl mb-9">Select Asset</p>
         <p className="text-[white] mb-8">The denomination asset is the asset in which depositors deposit into your vault and which the vault’s share price and the performance are measured</p>
-        <div className="flex flex-col overflow-y-scroll w-full">
+        <div className="flex flex-col overflow-y-scroll scrollbar-hide w-full">
           {assets.filter(a => a.chains?.includes(chainId)).map((assetIter) => (
-            // @ts-ignore
-            <Option selected={asset.name === assetIter.name} value={assetIter} key={`asset-selc-${assetIter.address[String(chainId)]}`}>
+            <Option
+              // @ts-ignore
+              key={`asset-selc-${assetIter.address[String(chainId)]}`}
+              selected={asset.name === assetIter.name}
+              value={assetIter}
+            >
             </Option>
           ))}
         </div>
