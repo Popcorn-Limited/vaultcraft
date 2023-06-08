@@ -7,3 +7,4 @@ export * from "./velodrome";
 export * from "./aaveV2";
 export * from "./aaveV3";
 export * from "./default";
+export * from "./flux";

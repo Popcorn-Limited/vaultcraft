@@ -16,13 +16,13 @@ function AssetSelection() {
       actionContent={(selected) => (
         <div className="h-12 flex flex-row items-center w-full gap-x-2">
           {selected?.logoURI && (
-            <figure className="h-12 py-2 flex-row items-center flex relative">
+            <div className="w-9 h-8">
               <img
-                className="object-contain h-full w-fit"
-                alt="logo"
+                className="object-contain w-8 h-8 rounded-full"
+                alt="selected-asset"
                 src={selected?.logoURI}
               />
-            </figure>
+            </div>
           )}
           <span className="text-[white] w-full flex self-center flex-row justify-start">{selected?.name || "Select Asset"}</span>
           <span className="self-center text-[white] mr-2">{`>`}</span>

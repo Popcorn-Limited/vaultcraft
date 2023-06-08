@@ -7,7 +7,7 @@ import Input from "@/components/inputs/Input";
 function MetadataConfiguration() {
   const [metadata, setMetadata] = useAtom(metadataAtom);
   const [tags, setTags] = useState({});
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<string | undefined>(undefined)
 
   useEffect(() => {
     // wipe old ipfs hash
@@ -33,26 +33,32 @@ function MetadataConfiguration() {
     setMetadata((prefState) => { return { ...prefState, tags: Object.keys(newTags).filter((tag) => newTags[tag]) } })
   }
 
+  function handleNameChange(value: string) {
+    setMetadata((prefState) => { return { ...prefState, name: value } })
+  }
+
+  function verifyName(value: string) {
+    // Set Error
+    if (value.length < 3) {
+      setError("Name must be at least 3 characters long")
+    }
+    // Clear Error
+    if (value.length >= 3 && error) {
+      setError(undefined)
+    }
+  }
+
   return (
     <section className="flex flex-col">
       <div className="mb-4">
         <p className="text-sm text-white mb-2">Name</p>
         <Input
-          onChange={(e) =>
-            setMetadata((prefState) => {
-              return {
-                ...prefState,
-                name: (e.target as HTMLInputElement).value,
-              };
-            })
-          }
+          onChange={(e) => handleNameChange((e.target as HTMLInputElement).value)}
           defaultValue={metadata?.name}
           placeholder="..."
           autoComplete="off"
           autoCorrect="off"
-          onBlur={(e) => {
-            if ((e.target as HTMLInputElement).value.length < 3) { setError("Name must be at least 3 characters long") } else { setError(null) }
-          }}
+          onBlur={(e) => verifyName((e.target as HTMLInputElement).value)}
           error={error}
         />
       </div>
@@ -66,7 +72,8 @@ function MetadataConfiguration() {
                 key={`tag-element-${tag}`}
                 type="button"
                 // @ts-ignore
-                className={`border rounded-[4px] px-2 py-0.5 transition-all ease-in-out duration-300 hover:bg-[#D7D7D7] hover:border-[#D7D7D7] hover:text-white  ${tags[tag] ? "text-black border-white bg-white" : "text-white border-[#ffffff80]"}`}
+                className={`${tags[tag] ? "text-black border-white bg-white" : "text-white border-[#ffffff80]"} border rounded-[4px]
+                px-2 py-0.5 transition-all ease-in-out duration-300 hover:bg-[#D7D7D7] hover:border-[#D7D7D7] hover:text-white`}
                 onClick={() => handleChange(tag)}>
                 {tag[0].toUpperCase() + tag.slice(1)}
               </button>

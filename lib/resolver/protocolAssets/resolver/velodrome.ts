@@ -9,7 +9,7 @@ export async function velodrome({ chainId }: { chainId: number }) {
         address: PAIR_FACTORY_ADDRESS,
         abi: abiFactory,
         functionName: "allPairsLength",
-        chainId: 1337,
+        chainId,
         args: []
     }) as BigNumber
 
@@ -19,7 +19,7 @@ export async function velodrome({ chainId }: { chainId: number }) {
                 address: PAIR_FACTORY_ADDRESS,
                 abi: abiFactory,
                 functionName: "allPairs",
-                chainId: 1337,
+                chainId,
                 args: [idx]
             }
         })

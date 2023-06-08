@@ -3,25 +3,25 @@
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
     "name": "AaveV2 Adapter",
     "key": "AaveV2Adapter",
-    "protocol": "Aave",
+    "protocol": "aave",
     "assets": ["USDC"],
-    "chains": [1, 5, 1337],
+    "chains": [1, 1337],
     "resolver": "aaveV2"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
     "name": "AaveV3 Adapter",
     "key": "AaveV3Adapter",
-    "protocol": "Aave",
+    "protocol": "aave",
     "assets": ["USDC"],
-    "chains": [1, 5, 1337, 42161],
+    "chains": [1, 1337, 42161],
     "resolver": "aaveV3"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
     "name": "Alpaca LendV1 Adapter",
     "key": "AlpacaLendV1Adapter",
-    "protocol": "Alpaca",
+    "protocol": "alpaca",
     "initParams": [
       {
         "name": "AlpacaVault",
@@ -31,14 +31,14 @@
       }
     ],
     "assets": ["USDC"],
-    "chains": [1, 5, 1337],
+    "chains": [56],
     "resolver": "default"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
     "name": "Alpaca LendV2 Adapter",
     "key": "AlpacaLendV2Adapter",
-    "protocol": "Alpaca",
+    "protocol": "alpaca",
     "initParams": [
       {
         "name": "Pid",
@@ -48,14 +48,14 @@
       }
     ],
     "assets": ["USDC"],
-    "chains": [1, 5, 1337],
+    "chains": [56],
     "resolver": "default"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
     "name": "Aura Adapter",
     "key": "AuraAdapter",
-    "protocol": "Aura",
+    "protocol": "aura",
     "initParams": [
       {
         "name": "Pid",
@@ -65,14 +65,14 @@
       }
     ],
     "assets": ["USDC"],
-    "chains": [1, 5, 1337],
+    "chains": [],
     "resolver": "default"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
     "name": "Balancer Gauge Adapter",
     "key": "BalancerGaugeAdapter",
-    "protocol": "Balancer",
+    "protocol": "balancer",
     "initParams": [
       {
         "name": "BalancerGauge",
@@ -82,14 +82,14 @@
       }
     ],
     "assets": ["USDC"],
-    "chains": [1, 5, 1337],
+    "chains": [],
     "resolver": "default"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
     "name": "Beefy Adapter",
     "key": "BeefyAdapter",
-    "protocol": "Beefy",
+    "protocol": "beefy",
     "initParams": [
       {
         "name": "BeefyVault",
@@ -104,14 +104,14 @@
       }
     ],
     "assets": ["USDC"],
-    "chains": [1, 5, 1337, 42161],
+    "chains": [1, 1337, 42161],
     "resolver": "beefy"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
     "name": "CompoundV2 Adapter",
     "key": "CompoundV2Adapter",
-    "protocol": "Compound",
+    "protocol": "compound",
     "initParams": [
       {
         "name": "CToken",
@@ -121,14 +121,14 @@
       }
     ],
     "assets": ["USDC"],
-    "chains": [1, 5, 1337],
+    "chains": [],
     "resolver": "compoundV2"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
     "name": "CompoundV3 Adapter",
     "key": "CompoundV3Adapter",
-    "protocol": "Compound",
+    "protocol": "compound",
     "initParams": [
       {
         "name": "CToken",
@@ -138,14 +138,14 @@
       }
     ],
     "assets": ["USDC"],
-    "chains": [1, 5, 1337, 42161],
+    "chains": [1, 1337, 42161],
     "resolver": "default"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
     "name": "Flux Finance Adapter",
     "key": "CompoundV2Adapter",
-    "protocol": "Compound",
+    "protocol": "flux",
     "initParams": [
       {
         "name": "CToken",
@@ -155,14 +155,14 @@
       }
     ],
     "assets": ["USDC"],
-    "chains": [1, 5, 1337],
-    "resolver": "default"
+    "chains": [1, 1337],
+    "resolver": "flux"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
     "name": "Convex Adapter",
     "key": "ConvexAdapter",
-    "protocol": "Convex",
+    "protocol": "convex",
     "initParams": [
       {
         "name": "Pid",
@@ -172,14 +172,14 @@
       }
     ],
     "assets": ["USDC"],
-    "chains": [1, 5, 1337, 42161],
+    "chains": [1, 1337, 42161],
     "resolver": "convex"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
     "name": "Curve Gauge Adapter",
     "key": "CurveGaugeAdapter",
-    "protocol": "Curve",
+    "protocol": "curve",
     "initParams": [
       {
         "name": "GaugeId",
@@ -189,14 +189,14 @@
       }
     ],
     "assets": ["USDC"],
-    "chains": [1, 5, 1337],
+    "chains": [1, 1337],
     "resolver": "default"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
     "name": "Curve Child Gauge Adapter",
     "key": "CurveChildGaugeAdapter",
-    "protocol": "Curve",
+    "protocol": "curve",
     "initParams": [
       {
         "name": "CRV",
@@ -206,23 +206,23 @@
       }
     ],
     "assets": ["USDC"],
-    "chains": [1, 5, 1337, 42161],
+    "chains": [42161],
     "resolver": "default"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
     "name": "DotDot Gauge Adapter",
     "key": "DotDotGaugeAdapter",
-    "protocol": "DotDot",
+    "protocol": "dotdot",
     "assets": ["USDC"],
-    "chains": [1, 5, 1337],
+    "chains": [56],
     "resolver": "default"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
     "name": "Ellipsis Gauge Adapter",
     "key": "EllipsisGaugeAdapter",
-    "protocol": "Ellipsis",
+    "protocol": "ellipsis",
     "initParams": [
       {
         "name": "Pid",
@@ -232,14 +232,14 @@
       }
     ],
     "assets": ["USDC"],
-    "chains": [1, 5, 1337],
+    "chains": [56],
     "resolver": "default"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
     "name": "Gearbox Passive Adapter",
     "key": "GearboxPassiveAdapter",
-    "protocol": "Gearbox",
+    "protocol": "gearbox",
     "initParams": [
       {
         "name": "Pid",
@@ -249,14 +249,14 @@
       }
     ],
     "assets": ["USDC"],
-    "chains": [1, 5, 1337],
+    "chains": [],
     "resolver": "default"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
     "name": "Idle Junior Adapter",
     "key": "IdleJuniorAdapter",
-    "protocol": "Idle",
+    "protocol": "idle",
     "initParams": [
       {
         "name": "CDO",
@@ -266,14 +266,14 @@
       }
     ],
     "assets": ["USDC"],
-    "chains": [1, 5, 1337],
+    "chains": [1, 1337],
     "resolver": "default"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
     "name": "Idle Senior Adapter",
     "key": "IdleSeniorAdapter",
-    "protocol": "Idle",
+    "protocol": "idle",
     "initParams": [
       {
         "name": "CDO",
@@ -283,14 +283,14 @@
       }
     ],
     "assets": ["USDC"],
-    "chains": [1, 5, 1337],
+    "chains": [1, 1337],
     "resolver": "default"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
     "name": "Origin Adapter",
     "key": "OriginAdapter",
-    "protocol": "Origin",
+    "protocol": "origin",
     "initParams": [
       {
         "name": "Wrapped Asset",
@@ -300,23 +300,23 @@
       }
     ],
     "assets": ["USDC"],
-    "chains": [1, 5, 1337],
+    "chains": [1, 1337],
     "resolver": "default"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
     "name": "Radiant Adapter",
     "key": "RadiantAdapter",
-    "protocol": "Radiant",
+    "protocol": "radiant",
     "assets": ["USDC"],
-    "chains": [1, 5, 1337, 42161],
+    "chains": [56, 42161],
     "resolver": "default"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
     "name": "Solidly Adapter",
     "key": "SolidlyAdapter",
-    "protocol": "Solidly",
+    "protocol": "solidly",
     "initParams": [
       {
         "name": "Gauge",
@@ -326,14 +326,14 @@
       }
     ],
     "assets": ["USDC"],
-    "chains": [1, 5, 1337],
+    "chains": [250],
     "resolver": "default"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
     "name": "Stargate Adapter",
     "key": "StargateAdapter",
-    "protocol": "Stargate",
+    "protocol": "stargate",
     "initParams": [
       {
         "name": "Staking Id",
@@ -343,14 +343,14 @@
       }
     ],
     "assets": ["USDC"],
-    "chains": [1, 5, 1337, 42161],
+    "chains": [1, 1337, 42161],
     "resolver": "stargate"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
     "name": "MasterChefV1 Adapter",
     "key": "MasterChefV1Adapter",
-    "protocol": "Sushi",
+    "protocol": "sushi",
     "initParams": [
       {
         "name": "Pid",
@@ -366,14 +366,14 @@
       }
     ],
     "assets": ["USDC"],
-    "chains": [1, 5, 1337],
+    "chains": [],
     "resolver": "default"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
     "name": "MasterChefV2 Adapter",
     "key": "MasterChefV2Adapter",
-    "protocol": "Sushi",
+    "protocol": "sushi",
     "initParams": [
       {
         "name": "Pid",
@@ -389,14 +389,14 @@
       }
     ],
     "assets": ["USDC"],
-    "chains": [1, 5, 1337],
+    "chains": [],
     "resolver": "default"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
     "name": "Velodrome Adapter",
     "key": "VelodromeAdapter",
-    "protocol": "Velodrome",
+    "protocol": "velodrome",
     "initParams": [
       {
         "name": "Gauge",
@@ -406,14 +406,14 @@
       }
     ],
     "assets": ["USDC"],
-    "chains": [1, 5, 1337],
+    "chains": [],
     "resolver": "velodrome"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
     "name": "Yearn Adapter",
     "key": "YearnAdapter",
-    "protocol": "Yearn",
+    "protocol": "yearn",
     "initParams": [
       {
         "name": "MaxLoss",
@@ -422,7 +422,7 @@
       }
     ],
     "assets": ["USDC"],
-    "chains": [1, 5, 1337, 42161],
+    "chains": [1, 1337, 42161],
     "resolver": "yearn"
   }
 ]

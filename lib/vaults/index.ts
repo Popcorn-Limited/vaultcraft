@@ -72,7 +72,7 @@ export const useDeployVault = () => {
   //   address: "0xd855ce0c298537ad5b5b96060cf90e663696bbf6",
   //   abi,
   //   functionName: "deployAdapter",
-  //   chainId: 1337,
+  //   chainId,
   //   args: [
   //     asset.address,
   //     adapterData,

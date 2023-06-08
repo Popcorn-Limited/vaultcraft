@@ -38,8 +38,11 @@ function AdapterSelection() {
 
   useEffect(() => {
     if (protocol.key !== "none" && asset.symbol !== "none" && network) {
-      getAdapterOptions(adapters.filter(
-        (adapter) => adapter.protocol === protocol.name).filter(adapter => adapter.chains.includes(network.id)), network.id, asset.address[network.id].toLowerCase())
+      getAdapterOptions(
+        adapters.filter((adapter) => adapter.protocol === protocol.key).filter(adapter => adapter.chains.includes(network.id)),
+        network.id,
+        asset.address[network.id].toLowerCase()
+      )
         .then(res => {
           setOptions(res);
           if (res.length > 0) setAdapter(res[0]);
@@ -63,13 +66,13 @@ function AdapterSelection() {
         actionContent={(selected) => (
           <div className="h-12 flex flex-row items-center w-full gap-x-2">
             {selected?.logoURI && (
-              <figure className="h-12 py-2 flex-row items-center flex relative">
+              <div className="w-9 h-8">
                 <img
-                  className="object-contain h-full w-fit"
-                  alt="logo"
+                  className="object-contain w-8 h-8 rounded-full"
+                  alt="selected-adapter"
                   src={selected?.logoURI}
                 />
-              </figure>
+              </div>
             )}
             <span className="text-[white] w-full flex self-center flex-row justify-start">{selected?.name || "Adapter selection"}</span>
             <span className="self-center text-[white] mr-2">{`>`}</span>

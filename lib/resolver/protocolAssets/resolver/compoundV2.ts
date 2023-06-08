@@ -7,7 +7,7 @@ export async function compoundV2({ chainId }: { chainId: number }): Promise<stri
     const allMarkets = await readContract({
         address: COMPOUND_PROXY_CONTRACT,
         abi: abiProxy,
-        chainId: 1337,
+        chainId,
         functionName: "getAllMarkets",
         args: []
     }) as `0x${string}`[]
@@ -17,7 +17,7 @@ export async function compoundV2({ chainId }: { chainId: number }): Promise<stri
             return {
                 address: item,
                 abi: abiMarket,
-                chainId: 1337,
+                chainId,
                 functionName: "underlying",
                 args: []
             }

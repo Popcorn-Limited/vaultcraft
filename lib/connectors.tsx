@@ -119,4 +119,4 @@ export const PRC_PROVIDERS = {
     [ChainId.Optimism]: new ethers.providers.JsonRpcProvider(RPC_URLS[ChainId.Optimism], ChainId.Optimism),
 };
 
-export const SUPPORTED_NETWORKS = [localhost, mainnet, arbitrum, polygon, bsc];
+export const SUPPORTED_NETWORKS = [mainnet];

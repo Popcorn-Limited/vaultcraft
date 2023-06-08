@@ -7,7 +7,7 @@ export async function aaveV2 ({ chainId }: { chainId: number }) {
         address: POOL_ADDRESS,
         abi,
         functionName: "getReservesList",
-        chainId: 1337,
+        chainId,
         args: []
     }) as string[];
 }

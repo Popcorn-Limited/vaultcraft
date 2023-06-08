@@ -8,7 +8,7 @@ export async function velodrome({ chainId, address }: { chainId: number, address
         address: VELODROME_LENSE_ADDRESS,
         abi,
         functionName: "byAddress",
-        chainId: 1337,
+        chainId,
         args: [
             address,
             constants.AddressZero

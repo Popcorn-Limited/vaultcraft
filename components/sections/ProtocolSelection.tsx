@@ -12,7 +12,7 @@ interface ProtocolOption extends Protocol {
 
 async function assetSupported(protocol: Protocol, adapters: Adapter[], chainId: number, asset: string): Promise<boolean> {
   const availableAssets = await Promise.all(adapters.filter(
-    (adapter) => adapter.protocol === protocol.name
+    (adapter) => adapter.protocol === protocol.key
   ).filter(adapter => adapter.chains.includes(chainId)).map(adapter => resolveProtocolAssets({ chainId: chainId, resolver: adapter.resolver })
   ))
 
@@ -57,17 +57,18 @@ function ProtocolSelection() {
         selected={protocol}
         onSelect={(newProtocol) => selectProtocol(newProtocol)}
         actionContent={(selected) => (
-          <div className="h-12 flex flex-row items-center w-full gap-x-2">
+          <div className="h-12 flex flex-row items-center w-full gap-x-3">
             {selected?.logoURI && (
-              <figure className="h-12 py-2 flex-row items-center flex relative">
+              <div className="w-9 h-8">
                 <img
-                  className="object-contain h-full w-fit"
-                  alt="logo"
+                  className="object-contain w-8 h-8 rounded-full"
+                  alt="selected-protocol"
                   src={selected?.logoURI}
                 />
-              </figure>
+              </div>
             )}
-            <span className="text-[white] w-full flex self-center flex-row justify-start">{selected?.name || "Protocol selection"}</span><span className="self-center text-[white] mr-2">{`>`}</span>
+            <span className="text-[white] w-full flex self-center flex-row justify-start">{selected?.name || "Protocol selection"}</span>
+            <span className="self-center text-[white] mr-2">{`>`}</span>
           </div>
         )}
       >
@@ -75,7 +76,7 @@ function ProtocolSelection() {
           <p className="text-[white] text-2xl mb-9">Select Protocol</p>
           <p className="text-[white] mb-8">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna ut labore et dolore magna.</p>
           <div className="flex flex-col overflow-y-scroll w-full scrollbar-hide space-y-2">
-            {options.map((protocolIter) => (
+            {options.length > 0 ? options.map((protocolIter) => (
               <Option
                 key={`protocol-selc-${protocolIter.name}`}
                 value={protocolIter}
@@ -83,7 +84,7 @@ function ProtocolSelection() {
                 disabled={protocolIter.disabled}
               >
               </Option>
-            ))}
+            )) : <p className="text-white">Loading, please wait...</p>}
           </div>
         </div>
       </Selector>

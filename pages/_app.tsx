@@ -20,8 +20,12 @@ const { chains, provider } = configureChains(SUPPORTED_NETWORKS, [
   alchemyProvider({
     apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY as string,
   }),
-  jsonRpcProvider({ rpc: (chain) => ({ http: chain.rpcUrls.default.http[0] }) }),
-]);
+  jsonRpcProvider({ rpc: (chain) => ({ http: chain.rpcUrls.default.http[0] }) })],
+  {
+    pollingInterval: 7_000,
+    stallTimeout: 5_000, // time to change to another RPC if failed
+  }
+);
 
 const { connectors } = getDefaultWallets({
   appName: "vaultcraft",

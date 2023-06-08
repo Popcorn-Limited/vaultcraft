@@ -41,7 +41,7 @@ export function Option({ value, children, selected, disabled }: { value: any; ch
           >
             <img
               alt=""
-              className="object-contain relative h-10 w-10 mr-4"
+              className="object-contain relative h-10 w-10 mr-4 rounded-full"
               src={value.logoURI}
             />
             <div className="flex flex-col self-center">

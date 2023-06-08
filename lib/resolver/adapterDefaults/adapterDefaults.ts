@@ -1,4 +1,4 @@
-import { arbitrum, localhost, mainnet } from "wagmi/chains";
+import { localhost, mainnet } from "wagmi/chains";
 import AdapterDefaultResolvers from ".";
 
 export async function resolveAdapterDefaults({ chainId, address, resolver }: { chainId: number, address: string, resolver?: string }): Promise<any> {
