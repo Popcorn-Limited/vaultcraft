@@ -7,27 +7,26 @@ export const beautifyAddress = (addr: string) =>
   `${addr.slice(0, 4)}...${addr.slice(-5, 5)}`;
 
 export function verifyInitParamValidity(
-  value: any,
+  value: string,
   inputParam: InitParam
-): boolean {
-  if (!value) return false;
-  if (!inputParam?.requirements) {
+): string[] {
+  const errors: string[] = [];
+
+  if (!value) errors.push("Value is required");
+  if (!inputParam.requirements) {
     switch (inputParam.type) {
       case "address":
-        return utils.isAddress(value);
-      case "uint256":
-      default:
-        return true;
+        if (!utils.isAddress(value)) errors.push("Must be a valid address");
     }
   }
-  if (inputParam.requirements.includes(InitParamRequirement.NotAddressZero)) {
-    return utils.isAddress(value) && value !== constants.AddressZero;
-  }
-  if (inputParam.requirements.includes(InitParamRequirement.NotZero)) {
-    return value > 0;
+  if (inputParam.requirements && inputParam.requirements.length > 0) {
+    if (inputParam.requirements.includes(InitParamRequirement.NotAddressZero) &&
+      value !== constants.AddressZero) errors.push("Must not be zero address");
+
+    if (inputParam.requirements.includes(InitParamRequirement.NotZero) && Number(value) === 0) errors.push("Must not be zero");
   }
 
-  return true;
+  return errors;
 }
 
 export const validateBigNumberInput = (value?: string | number) => {

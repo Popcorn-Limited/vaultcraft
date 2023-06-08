@@ -67,11 +67,6 @@ function StrategyConfiguration() {
                   minLength={1}
                   maxLength={79}
                   spellCheck="false"
-                  className={
-                    verifyInitParamValidity(adapterConfig[i], initParam)
-                      ? ""
-                      : "border border-red-500"
-                  }
                 />
               </Fieldset>
             </div>

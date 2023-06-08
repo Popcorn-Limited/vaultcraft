@@ -10,7 +10,7 @@ import { useRouter } from "next/router";
 
 export function isAdapterValid(adapter: any, adapterConfig: string[]): boolean {
   if (adapter.initParams && adapter.initParams.length > 0) {
-    return adapterConfig.every((param: string, i: number) => verifyInitParamValidity(param, adapter.initParams[i]))
+    return adapterConfig.every((param: string, i: number) => verifyInitParamValidity(param, adapter.initParams[i]).length === 0)
   }
   return true;
 }

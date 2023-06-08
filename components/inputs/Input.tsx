@@ -15,7 +15,7 @@ function Input({ errors, info, className, ...props }: InputProps) {
       {errors &&
         <div className="">
           {errors.map(error =>
-            <p className="text-red-500 text-xs mt-1">{error}</p>
+            <p key={error} className="text-red-500 text-xs mt-1">{error}</p>
           )}
         </div>
       }

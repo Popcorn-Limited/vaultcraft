@@ -1,5 +1,5 @@
 import { useAtom } from "jotai";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   InitParamRequirement,
   adapterAtom,
@@ -16,9 +16,31 @@ function AdapterConfiguration() {
   const [adapter] = useAtom(adapterAtom);
   const [adapterConfig, setAdapterConfig] = useAtom(adapterConfigAtom);
 
-  const [network,] = useAtom(networkAtom);
-  const [asset,] = useAtom(assetAtom);
+  const [network] = useAtom(networkAtom);
+  const [asset] = useAtom(assetAtom);
 
+  const [errors, setErrors] = useState<any[]>([]);
+
+  useEffect(
+    () => {
+      // Set defaults if the adapter has init params
+      if (adapter.initParams && adapter.initParams.length > 0) {
+        // Set config defaults
+        resolveAdapterDefaults({
+          chainId: network.id,
+          address: asset.address[network.id].toLowerCase(),
+          resolver: adapter.resolver
+        }).then(res => setAdapterConfig(res))
+
+        // Set error defaults
+        setErrors(adapter.initParams.map(i => undefined))
+      } else {
+        // Set config defaults
+        setAdapterConfig([])
+      }
+    },
+    [adapter]
+  );
 
   function handleChange(value: string, index: number, paramType: string) {
     const newConfig = [...adapterConfig];
@@ -30,18 +52,11 @@ function AdapterConfiguration() {
     setAdapterConfig(newConfig);
   }
 
-  useEffect(
-    () => {
-      !!adapter.initParams && adapter.initParams.length > 0 ?
-        resolveAdapterDefaults({
-          chainId: network.id,
-          address: asset.address[network.id].toLowerCase(),
-          resolver: adapter.resolver
-        }).then(res => setAdapterConfig(res)) :
-        setAdapterConfig([])
-    },
-    [adapter]
-  );
+  function verifyInitParam(value: string, initParam: any, index: number) {
+    const newErrors = [...errors];
+    newErrors[index] = verifyInitParamValidity(value, initParam);
+    setErrors(newErrors);
+  }
 
   return (
     <section className="">
@@ -69,8 +84,9 @@ function AdapterConfiguration() {
                   minLength={1}
                   maxLength={79}
                   spellCheck="false"
-                  info={initParam.requirements?.includes(InitParamRequirement.Required) ? "Required" : undefined}
-                  onBlur={() => verifyInitParamValidity(adapterConfig[i], initParam)}
+                  info={initParam.requirements ? String(initParam.requirements) : undefined}
+                  onBlur={(e) => verifyInitParam((e.target as HTMLInputElement).value, initParam, i)}
+                  errors={errors[i] ? errors[i] : undefined}
                 />
               </Fieldset>
             </div>
