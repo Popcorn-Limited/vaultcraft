@@ -5,8 +5,8 @@ import { adapterDeploymentAtom, assetAtom, feeAtom, limitAtom, metadataAtom } fr
 
 const VAULT_CONTROLLER = {
   "1": "0x7D51BABA56C2CA79e15eEc9ECc4E92d9c0a7dbeb",
+  "1337": "0x7D51BABA56C2CA79e15eEc9ECc4E92d9c0a7dbeb",
   "42161": "0xF40749d72Ab5422CC5d735A373E66d67f7cA9393",
-  "1337": "0xF40749d72Ab5422CC5d735A373E66d67f7cA9393"
 }
 
 

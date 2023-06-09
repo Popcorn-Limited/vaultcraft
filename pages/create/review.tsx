@@ -10,7 +10,7 @@ import MainActionButton from "@/components/buttons/MainActionButton";
 import SecondaryActionButton from "@/components/buttons/SecondaryActionButton";
 import Modal from "@/components/Modal";
 import Image from "next/image";
-import { CheckCircleIcon } from "@heroicons/react/24/solid";
+import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
 import { noOp } from "@/lib/helpers";
 import { useDeployVault } from "@/lib/vaults";
 
@@ -22,26 +22,19 @@ export default function ReviewPage(): JSX.Element {
   const [metadata, setMetadata] = useAtom(metadataAtom);
   const [showModal, setShowModal] = useState(false);
 
-  const { write: deployVault = noOp, isLoading, isSuccess, data } = useDeployVault();
-
+  const { write: deployVault = noOp, isLoading, isSuccess, isError } = useDeployVault();
 
   function handleSubmit() {
     setShowModal(true);
     uploadMetadata();
   }
 
-
   function uploadMetadata() {
-    console.log("uploading metadata...");
     IpfsClient.add(metadata.name, { name: metadata.name, tags: metadata.tags }).then(res => {
       setMetadata((prefState) => { return { ...prefState, ipfsHash: res } })
       deployVault();
     });
   }
-
-  console.log({ metadata })
-  console.log({ isLoading, isSuccess, data })
-
 
   return (metadata && adapter ?
     <div className="bg-[#141416] md:max-w-[800px] w-full h-full flex flex-col justify-center mx-auto md:px-8 px-6">
@@ -70,10 +63,11 @@ export default function ReviewPage(): JSX.Element {
 
         {<Modal show={showModal} setShowModal={setShowModal} >
           <div>
-            <span className="flex flex-row">
-              <p className="text-black">Uploading Metadata to IPFS: </p>
+            <p className="text-[white] text-2xl mb-4">Creating Vault</p>
+            <span className="flex flex-row items-center mb-2">
+              <p className="text-white mr-2">Uploading Metadata to IPFS... </p>
               {metadata.ipfsHash === "" ?
-                <figure className="relative w-12 h-12">
+                <figure className="relative w-5 h-5 mt-0.5">
                   <Image
                     fill
                     className="object-contain"
@@ -85,19 +79,31 @@ export default function ReviewPage(): JSX.Element {
               }
             </span>
             <span className="flex flex-row">
-              <p className="text-black">Creating Vault: </p>
-              {metadata.ipfsHash === "" && isLoading && !isSuccess ?
-                <figure className="relative w-12 h-12">
+              <p className="text-white mr-2">Creating Vault... </p>
+              {(metadata.ipfsHash === "" || isLoading) &&
+                <figure className="relative w-5 h-5 mt-0.5">
                   <Image
                     fill
                     className="object-contain"
                     alt="loader"
                     src={"/images/loader/spinner.svg"}
                   />
-                </figure> :
+                </figure>
+              }
+              {metadata.ipfsHash !== "" && !isLoading && isSuccess &&
                 <CheckCircleIcon className="w-6 h-6 text-green-500" />
               }
+              {metadata.ipfsHash !== "" && !isLoading && isError &&
+                <XCircleIcon className="w-6 h-6 text-red-500" />
+              }
             </span>
+            <div className="mt-8">
+              <MainActionButton
+                label="Done"
+                handleClick={() => isSuccess ? router.push("https://app.pop.network/sweet-vaults") : setShowModal(false)}
+                disabled={metadata.ipfsHash === "" || isLoading}
+              />
+            </div>
           </div>
         </Modal>}
       </div>
