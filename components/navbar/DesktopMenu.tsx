@@ -11,6 +11,7 @@ export default function DesktopMenu(): JSX.Element {
     const { openChainModal } = useChainModal();
     const { address } = useAccount();
     const { chain, chains } = useNetwork();
+    
     // @ts-ignore
     const logo = useMemo(() => (address && chain?.id ? networkLogos[chain.id] : networkLogos["1"]), [chain?.id, address]);
     const chainName = useMemo(() => (address && chain?.name ? chain.name : "Ethereum"), [chain?.id, address]);

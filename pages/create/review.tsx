@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { useAtom } from "jotai";
+import { useAccount } from "wagmi";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
+import Image from "next/image";
+import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
+import { noOp } from "@/lib/helpers";
+import { useDeployVault } from "@/lib/vaults";
 import { metadataAtom, adapterAtom } from "@/lib/atoms";
 import { CREATION_STAGES } from "@/lib/stages";
 import { IpfsClient } from "@/lib/ipfsClient";
@@ -9,16 +15,14 @@ import Review from "@/components/review/Review";
 import MainActionButton from "@/components/buttons/MainActionButton";
 import SecondaryActionButton from "@/components/buttons/SecondaryActionButton";
 import Modal from "@/components/Modal";
-import Image from "next/image";
-import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
-import { noOp } from "@/lib/helpers";
-import { useDeployVault } from "@/lib/vaults";
 
 
 export default function ReviewPage(): JSX.Element {
   const router = useRouter();
-  const [adapter] = useAtom(adapterAtom);
+  const { address: account } = useAccount();
+  const { openConnectModal } = useConnectModal();
 
+  const [adapter] = useAtom(adapterAtom);
   const [metadata, setMetadata] = useAtom(metadataAtom);
   const [showModal, setShowModal] = useState(false);
 
@@ -56,8 +60,8 @@ export default function ReviewPage(): JSX.Element {
             handleClick={() => router.push('/create/fees')}
           />
           <MainActionButton
-            label="Deploy Vault"
-            handleClick={handleSubmit}
+            label={account ? "Deploy Vault" : "Connect Wallet"}
+            handleClick={account ? handleSubmit : openConnectModal}
           />
         </div>
 
