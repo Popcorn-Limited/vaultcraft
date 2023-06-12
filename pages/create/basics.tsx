@@ -10,8 +10,7 @@ import ProtocolSelection from "@/components/sections/ProtocolSelection";
 import StrategySelection from "@/components/sections/StrategySelection";
 import MetadataConfiguration from "@/components/sections/MetadataConfiguration";
 
-import { balancer } from "@/lib/resolver/protocolAssets/resolver/balancer";
-balancer({chainId: 1337, address: "1123"})
+
 export const basicsAtom = atom((get) => {
     return {
         metadata: get(metadataAtom),
