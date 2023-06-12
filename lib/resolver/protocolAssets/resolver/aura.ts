@@ -14,8 +14,6 @@ export async function aura({ chainId }: { chainId: number }): Promise<any[]> {
         lptoken: string
     }[];
 
-    console.log(pools.map(pool => pool.lptoken))
-
     return pools.map(pool => pool.lptoken)
 }
 

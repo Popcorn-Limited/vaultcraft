@@ -1,4 +1,19 @@
-import { assetDefault, beefy, yearn, convex, stargate, compoundV2, compoundV3, flux, velodrome, aaveV2, aaveV3, origin, idle, aura } from "./resolver";
+import {
+  assetDefault,
+  beefy,
+  yearn,
+  convex,
+  stargate,
+  compoundV2,
+  compoundV3,
+  flux,
+  velodrome,
+  aaveV2,
+  aaveV3,
+  origin,
+  idle,
+  aura
+} from "./resolver";
 
 export type ProtocolAssetResolver = (
   chainId: number,
