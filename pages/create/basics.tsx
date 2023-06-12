@@ -10,6 +10,7 @@ import ProtocolSelection from "@/components/sections/ProtocolSelection";
 import StrategySelection from "@/components/sections/StrategySelection";
 import MetadataConfiguration from "@/components/sections/MetadataConfiguration";
 
+
 export const basicsAtom = atom((get) => {
     return {
         metadata: get(metadataAtom),
