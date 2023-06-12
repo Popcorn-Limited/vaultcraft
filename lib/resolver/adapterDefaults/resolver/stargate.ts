@@ -30,9 +30,9 @@ export async function stargate({ chainId, address }: { chainId: number, address:
     const lpTokens = tokens.map(item => item.lpToken.toLowerCase())
 
     return [
-        !lpTokens.includes(address.toLowerCase())
-            ? constants.AddressZero
-            : lpTokens.indexOf(address.toLowerCase())
+        lpTokens.includes(address.toLowerCase())
+          ? lpTokens.indexOf(address.toLowerCase())
+          : constants.AddressZero
     ]
 }
 
