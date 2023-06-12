@@ -13,18 +13,6 @@ export async function compoundV2({ chainId, address }: { chainId: number, addres
         args: []
     }) as `0x${string}`[];
 
-    console.log(await readContracts({
-        contracts: cTokens.map(item => {
-            return {
-                address: item,
-                abi: abiMarket,
-                functionName: "underlying",
-                chainId,
-                args: []
-            }
-        })
-    }) as string[])
-
     const underlying = (await readContracts({
         contracts: cTokens.map(item => {
             return {
