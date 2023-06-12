@@ -51,10 +51,6 @@ export async function balancer({ chainId, address }: { chainId: number, address:
         })
     }) as (string | null)[]
 
-    console.log(lpTokens)
-
-    console.log(lpTokens.filter(lpToken => !!lpToken))
-
     return lpTokens.filter(lpToken => !!lpToken)
 }
 
