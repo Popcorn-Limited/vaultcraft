@@ -9,5 +9,5 @@ export async function alpacaV2({ chainId }: { chainId: number }) {
         }[]
     }
 
-    console.log(markets, markets.map(market => market.debtToken))
+    return markets.map(market => market.debtToken)
 }
