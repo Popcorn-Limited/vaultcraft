@@ -19,6 +19,5 @@ const ADDRESSES = {
 } as { [chainId: number]: string[] };
 
 export async function alpacaV1({ chainId }: { chainId: number }) {
-    console.log(ADDRESSES[chainId] || [])
     return ADDRESSES[chainId] || [];
 }
