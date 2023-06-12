@@ -10,7 +10,8 @@ import ProtocolSelection from "@/components/sections/ProtocolSelection";
 import StrategySelection from "@/components/sections/StrategySelection";
 import MetadataConfiguration from "@/components/sections/MetadataConfiguration";
 
-
+import { aura } from "@/lib/resolver/adapterDefaults/resolver/aura";
+aura({chainId:1, address:'0x3dd0843A028C86e0b760b1A76929d1C5Ef93a2dd'})
 export const basicsAtom = atom((get) => {
     return {
         metadata: get(metadataAtom),
