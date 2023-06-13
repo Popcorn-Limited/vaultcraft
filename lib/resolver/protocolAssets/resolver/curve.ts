@@ -14,9 +14,8 @@ const ENDPOINTS = {
 
 export async function curve({ chainId }: { chainId: number }): Promise<string[]> {
     const pools = (await Promise.all(ENDPOINTS?.[chainId]?.map(async endpoint => {
-        const response = await axios.get(BASE_URL + endpoint)
-        const responseData = response?.data?.data?.poolData
-        return responseData
+        const { data } = await axios.get(BASE_URL + endpoint)
+        return data?.data?.poolData
     }))).flat() as {
         gaugeAddress?: string
         lpTokenAddress: string
