@@ -10,8 +10,6 @@ import ProtocolSelection from "@/components/sections/ProtocolSelection";
 import StrategySelection from "@/components/sections/StrategySelection";
 import MetadataConfiguration from "@/components/sections/MetadataConfiguration";
 
-import { curve } from "@/lib/resolver/protocolAssets/resolver";
-curve({chainId:1337})
 
 export const basicsAtom = atom((get) => {
     return {
