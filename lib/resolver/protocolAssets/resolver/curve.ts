@@ -9,7 +9,6 @@ const ENDPOINTS = {
     250: ["/fantom/main", "/fantom/crypto", "/fantom/factory"],
     1337: ["/ethereum/main", "/ethereum/crypto", "/ethereum/factory"],
     42161: ["/arbitrum/main", "/arbitrum/crypto", "/arbitrum/factory"],
-    43114: ["/avalanche/main", "/avalanche/crypto", "/avalanche/factory"]
 } as { [chainId: number]: string[] }
 
 export async function curve({ chainId }: { chainId: number }): Promise<string[]> {
