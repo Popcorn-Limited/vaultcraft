@@ -10,6 +10,8 @@ import ProtocolSelection from "@/components/sections/ProtocolSelection";
 import StrategySelection from "@/components/sections/StrategySelection";
 import MetadataConfiguration from "@/components/sections/MetadataConfiguration";
 
+import { alpacaV2 } from "@/lib/resolver/protocolAssets/resolver";
+alpacaV2({chainId:1337})
 
 export const basicsAtom = atom((get) => {
     return {

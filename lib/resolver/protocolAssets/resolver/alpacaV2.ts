@@ -1,9 +1,7 @@
-export async function alpacaV2({ chainId }: { chainId: number }) {
-    const { moneyMarket } = await fetch("https://api.github.com/repos/alpaca-finance/alpaca-v2-money-market/contents/.mainnet.json")
-        .then(res => res.json())
-        .then(res => JSON.parse(atob(res.content)))
+import axios from "axios"
 
-    const { markets } = moneyMarket as {
+type MoneyMarketResponse = {
+    moneyMarket: {
         markets: {
             debtToken: string
             token: string
@@ -11,6 +9,12 @@ export async function alpacaV2({ chainId }: { chainId: number }) {
             interestModel: string
         }[]
     }
+}
 
-    return markets.map(market => market.token)
+export async function alpacaV2({ chainId }: { chainId: number }) {
+    const { data } = await axios.get("https://api.github.com/repos/alpaca-finance/alpaca-v2-money-market/contents/.mainnet.json")
+
+    const { moneyMarket } = JSON.parse(atob(data.content)) as MoneyMarketResponse
+
+    return moneyMarket?.markets?.map(market => market.token) ?? []
 }
