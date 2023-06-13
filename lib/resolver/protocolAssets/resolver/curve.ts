@@ -14,16 +14,16 @@ const ENDPOINTS = {
 
 export async function curve({ chainId }: { chainId: number }): Promise<string[]> {
 
-    const pools: {
-        gaugeAddress?: string
-        lpTokenAddress: string
-    }[] = []
-
-    for (const endpoint of ENDPOINTS[chainId] || []) {
+    const pools = (await Promise.all(ENDPOINTS?.[chainId]?.map(async endpoint => {
         const response = await axios.get(BASE_URL + endpoint)
         const responseData = response?.data?.data?.poolData
-        pools.push(...responseData)
-    }
+        return responseData
+    }))).flat() as {
+        gaugeAddress?: string
+        lpTokenAddress: string
+    }[]
+
+    console.log(pools)
 
     return pools.filter(pool => !!pool?.gaugeAddress).map(pool => pool.lpTokenAddress)
 }
