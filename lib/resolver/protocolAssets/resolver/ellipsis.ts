@@ -25,8 +25,6 @@ export async function ellipsis({ chainId }: { chainId: number }): Promise<string
         })
     }) as string[]
 
-    console.log(registeredTokens)
-
     return registeredTokens;
 }
 
