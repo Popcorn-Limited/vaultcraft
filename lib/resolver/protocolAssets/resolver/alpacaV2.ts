@@ -6,8 +6,11 @@ export async function alpacaV2({ chainId }: { chainId: number }) {
     const { markets } = moneyMarket as {
         markets: {
             debtToken: string
+            token: string
+            ibToken: string
+            interestModel: string
         }[]
     }
 
-    return markets.map(market => market.debtToken)
+    return markets.map(market => market.token)
 }
