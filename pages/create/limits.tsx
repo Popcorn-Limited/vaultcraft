@@ -11,7 +11,7 @@ export default function Limits() {
 
   return (
     <div className="bg-[#141416] md:max-w-[800px] w-full h-full flex flex-col justify-center mx-auto md:px-8 px-6">
-      <ProgressBar stages={CREATION_STAGES} activeStage={3} />
+      <ProgressBar stages={CREATION_STAGES} activeStage={2} />
       <div className="md:bg-[#23262F] self-center min-h-[500px] bg-transparent h-fit rounded-[20px] border-[#23262F] border-2 md:border border-none md:w-[600px] md:p-6 px-0 flex flex-col justify-between mt-10 md:relative w-full">
         <div>
           <div className="flex flex-row justify-between items-center">
@@ -34,7 +34,7 @@ export default function Limits() {
         </div>
 
         <div className="flex flex-row space-x-8">
-          <SecondaryActionButton label="Back" handleClick={() => router.push('/create/strategy')} />
+          <SecondaryActionButton label="Back" handleClick={() => router.push('/create/adapter')} />
           <MainActionButton label="Next" handleClick={() => router.push('/create/fees')} />
         </div>
 

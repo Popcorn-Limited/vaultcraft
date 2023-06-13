@@ -1,18 +1,36 @@
 import { useAtom } from "jotai";
 import { arbitrum, localhost, mainnet } from "wagmi/chains";
-import { assetAtom, useAssets, networkAtom } from "@/lib/atoms";
+import { assetAtom, useAssets, networkAtom, adapterAtom, adapterConfigAtom, strategyAtom, DEFAULT_ADAPTER, DEFAULT_STRATEGY, protocolAtom, DEFAULT_PROTOCOL } from "@/lib/atoms";
 import Selector, { Option } from "@/components/inputs/Selector";
 
 function AssetSelection() {
   const [network] = useAtom(networkAtom);
   const chainId = network.id === localhost.id ? mainnet.id : network.id;
+
   const [asset, setAsset] = useAtom(assetAtom);
   const assets = useAssets();
+
+  // Only for reset
+  const [, setAdapter] = useAtom(adapterAtom);
+  const [, setAdapterConfig] = useAtom(adapterConfigAtom);
+  const [, setStrategy] = useAtom(strategyAtom);
+  const [, setProtocol] = useAtom(protocolAtom);
+
+
+  function selectAsset(newAsset: any) {
+    if (asset !== newAsset) {
+      setProtocol(DEFAULT_PROTOCOL)
+      setAdapter(DEFAULT_ADAPTER)
+      setAdapterConfig([])
+      setStrategy(DEFAULT_STRATEGY)
+    }
+    setAsset(newAsset)
+  }
 
   return (
     <Selector
       selected={asset}
-      onSelect={setAsset}
+      onSelect={(newAsset) => selectAsset(newAsset)}
       actionContent={(selected) => (
         <div className="h-12 flex flex-row items-center w-full gap-x-2">
           {selected?.logoURI && (

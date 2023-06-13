@@ -21,7 +21,7 @@ export const useDeployVault = () => {
 
   const { config, error: configError } = usePrepareContractWrite({
     // @ts-ignore
-    address: VAULT_CONTROLLER[chain?.id],
+    address: "0x7D51BABA56C2CA79e15eEc9ECc4E92d9c0a7dbeb",
     abi,
     functionName: "deployVault",
     chainId: chain?.id,
