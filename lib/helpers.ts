@@ -11,7 +11,8 @@ export function verifyInitParamValidity(
   inputParam: InitParam
 ): string[] {
   const errors: string[] = [];
-  if (!!value) errors.push("Value is required");
+
+  if (value === "") errors.push("Value is required");
   if (!inputParam.requirements) {
     switch (inputParam.type) {
       case "address":
@@ -24,7 +25,7 @@ export function verifyInitParamValidity(
 
     if (inputParam.requirements.includes(InitParamRequirement.NotZero) && Number(value) === 0) errors.push("Must not be zero");
   }
-  
+
   return errors;
 }
 

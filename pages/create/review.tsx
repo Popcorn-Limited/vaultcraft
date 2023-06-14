@@ -34,11 +34,11 @@ export default function ReviewPage(): JSX.Element {
   }
 
   function uploadMetadata() {
-    // IpfsClient.add(metadata.name, { name: metadata.name, tags: metadata.tags }).then(res => {
-    //   setMetadata((prefState) => { return { ...prefState, ipfsHash: res } })
-    //   deployVault();
-    // });
-    deployVault();
+    IpfsClient.add(metadata.name, { name: metadata.name, tags: metadata.tags }).then(res => {
+      setMetadata((prefState) => { return { ...prefState, ipfsHash: res } })
+      deployVault();
+    });
+    //deployVault();
   }
 
   return (metadata && adapter ?
