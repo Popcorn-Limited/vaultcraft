@@ -8,3 +8,4 @@ export * from "./origin";
 export * from "./idle";
 export * from "./compoundV3";
 export * from "./alpacaV1";
+export * from "./stargate";
