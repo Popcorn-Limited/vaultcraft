@@ -8,7 +8,8 @@ import {
   origin,
   idle,
   compoundV3,
-  aura
+  aura,
+  stargate,
 } from "./resolver";
 
 export type AdapterDefaultResolver = (
@@ -28,6 +29,7 @@ export const AdapterDefaultResolvers: { [key: string]: ({ chainId, address }: { 
   idle,
   compoundV3,
   aura,
+  stargate,
   default: initDefault
 };
 
