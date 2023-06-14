@@ -51,7 +51,7 @@ export const useDeployVault = () => {
         vault: constants.AddressZero,
         staking: constants.AddressZero,
         creator: account,
-        metadataCID: metadata?.ipfsHash || "cid",
+        metadataCID: metadata?.ipfsHash,
         swapTokenAddresses: [
           constants.AddressZero,
           constants.AddressZero,

@@ -77,7 +77,6 @@ export default function getStrategyConfig(strategy: Strategy, adapter: string, a
         data[2][0].route[3] = THREE_POOL;
         data[2][0].route[4] = USDT;
         data[4][0] = 1;
-        
         break;
       case "stgDAI":
         data = BASE_STARGATE_DATA;
