@@ -105,7 +105,7 @@ export default function ReviewPage(): JSX.Element {
             <div className="mt-8">
               <MainActionButton
                 label="Done"
-                handleClick={() => isSuccess ? router.push("https://app.pop.network/sweet-vaults") : setShowModal(false)}
+                handleClick={() => isSuccess ? router.push("https://app.pop.network/experimental/sweet-vaults") : setShowModal(false)}
                 disabled={metadata.ipfsHash === "" || isLoading}
               />
             </div>
