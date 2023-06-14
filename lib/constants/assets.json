@@ -252,7 +252,7 @@
     "logoURI": "https://cdn.furucombo.app/assets/img/token/stETH.svg"
   },
   {
-    "chains": [1, 1337],
+    "chains": [],
     "address": {
       "1": "0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0",
       "1337": "0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0"
@@ -261,5 +261,27 @@
     "symbol": "oETH",
     "decimals": 18,
     "logoURI": "https://icons.llamao.fi/icons/chains/rsz_polygon"
+  },
+  {
+    "chains": [1,1337],
+    "address": {
+      "1": "0x76FCf0e8C7Ff37A47a799FA2cd4c13cDe0D981C9",
+      "1337": "0x76FCf0e8C7Ff37A47a799FA2cd4c13cDe0D981C9"
+    },
+    "name": "OHM / DAI LP ",
+    "symbol": "b-ohm-dai-lp",
+    "decimals": 9,
+    "logoURI": "https://cdn.furucombo.app/assets/img/token/OHM.png"
+  },
+  {
+    "chains": [1,1337],
+    "address": {
+      "1": "0x76FCf0e8C7Ff37A47a799FA2cd4c13cDe0D981C9",
+      "1337": "0x76FCf0e8C7Ff37A47a799FA2cd4c13cDe0D981C9"
+    },
+    "name": "OHM / DAI LP ",
+    "symbol": "b-ohm-dai-lp",
+    "decimals": 9,
+    "logoURI": "https://cdn.furucombo.app/assets/img/token/OHM.png"
   }
 ]
