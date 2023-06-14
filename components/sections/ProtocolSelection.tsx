@@ -74,7 +74,7 @@ function ProtocolSelection() {
       >
         <div className="w-full h-full bg-black flex flex-col items-start gap-y-1 px-8 py-9">
           <p className="text-[white] text-2xl mb-9">Select Protocol</p>
-          <p className="text-[white] mb-8">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna ut labore et dolore magna.</p>
+          <p className="text-[white] mb-8">Select a protocol you want to use to earn yield on your asset.</p>
           <div className="flex flex-col overflow-y-scroll w-full scrollbar-hide space-y-2">
             {options.length > 0 ? options.map((protocolIter) => (
               <Option

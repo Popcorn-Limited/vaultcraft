@@ -96,7 +96,7 @@
     "logoURI": "https://cdn.furucombo.app/assets/img/token/CVX.png"
   },
   {
-    "chains": [],
+    "chains": [1,1337],
     "name": "Stargate",
     "key": "stargate",
     "logoURI": "https://icons.llama.fi/stargate.png"

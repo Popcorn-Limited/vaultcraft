@@ -39,11 +39,14 @@ export function Option({ value, children, selected, disabled }: { value: any; ch
             ${selected ? 'bg-[white]' : ''}`}
             disabled={disabled}
           >
-            <img
-              alt=""
-              className="object-contain relative h-10 w-10 mr-4 rounded-full"
-              src={value.logoURI}
-            />
+            {value.logoURI ?
+              <img
+                alt=""
+                className="object-contain relative h-10 w-10 mr-4 rounded-full"
+                src={value.logoURI}
+              /> :
+              <div className="h-10 w-10 mr-4 rounded-full bg-black"></div>
+            }
             <div className="flex flex-col self-center">
               <p className={`${selected ? "text-[black]" : "text-[white]"}`}>{value.symbol}</p>
               <span className="flex flex-row">

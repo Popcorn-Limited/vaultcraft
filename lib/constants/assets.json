@@ -97,7 +97,7 @@
     "logoURI": "https://cdn.furucombo.app/assets/img/token/WETH.svg"
   },
   {
-    "chains": [1, 1337],
+    "chains": [],
     "address": {
       "1": "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0",
       "1337": "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0"
@@ -108,7 +108,7 @@
     "logoURI": "https://cdn.furucombo.app/assets/img/token/MATIC.png"
   },
   {
-    "chains": [1, 1337],
+    "chains": [],
     "address": {
       "1": "0x383518188C0C6d7730D91b2c03a03C837814a899",
       "1337": "0x383518188C0C6d7730D91b2c03a03C837814a899"
@@ -154,7 +154,7 @@
     "logoURI": "https://cdn.furucombo.app/assets/img/token/USDT.png"
   },
   {
-    "chains": [1, 1337, 42161],
+    "chains": [],
     "address": {
       "1": "0xfA0F307783AC21C39E939ACFF795e27b650F6e68",
       "1337": "0xfA0F307783AC21C39E939ACFF795e27b650F6e68",
@@ -166,7 +166,7 @@
     "logoURI": "https://cdn.furucombo.app/assets/img/token/FRAX.png"
   },
   {
-    "chains": [1, 1337, 42161],
+    "chains": [],
     "address": {
       "1": "0xE8F55368C82D38bbbbDb5533e7F56AfC2E978CC2",
       "1337": "0xE8F55368C82D38bbbbDb5533e7F56AfC2E978CC2",
@@ -208,7 +208,7 @@
     "logoURI": "https://cdn.furucombo.app/assets/img/token/USDT.png"
   },
   {
-    "chains": [1, 1337],
+    "chains": [],
     "address": {
       "1": "0xd0cd466b34a24fcb2f87676278af2005ca8a78c4",
       "1337": "0xd0cd466b34a24fcb2f87676278af2005ca8a78c4"

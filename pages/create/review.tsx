@@ -38,11 +38,12 @@ export default function ReviewPage(): JSX.Element {
       setMetadata((prefState) => { return { ...prefState, ipfsHash: res } })
       deployVault();
     });
+    //deployVault();
   }
 
   return (metadata && adapter ?
     <div className="bg-[#141416] md:max-w-[800px] w-full h-full flex flex-col justify-center mx-auto md:px-8 px-6">
-      <ProgressBar stages={CREATION_STAGES} activeStage={4} />
+      <ProgressBar stages={CREATION_STAGES} activeStage={3} />
       <div className="md:bg-[#23262F] self-center min-h-[500px] bg-transparent h-fit rounded-[20px] border-[#23262F] border-2 md:border border-none md:w-[600px] md:p-6 px-0 flex flex-col justify-between mt-10 md:relative w-full">
         <div>
           <h1 className="text-white text-2xl mb-2">Review</h1>
@@ -104,7 +105,7 @@ export default function ReviewPage(): JSX.Element {
             <div className="mt-8">
               <MainActionButton
                 label="Done"
-                handleClick={() => isSuccess ? router.push("https://app.pop.network/sweet-vaults") : setShowModal(false)}
+                handleClick={() => isSuccess ? router.push("https://app.pop.network/experimental/sweet-vaults") : setShowModal(false)}
                 disabled={metadata.ipfsHash === "" || isLoading}
               />
             </div>
