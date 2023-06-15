@@ -12,4 +12,6 @@ export const useProtocols = () => {
   return protocols as Array<Protocol>;
 };
 
-export const protocolAtom = atom<Protocol>({ name: "Choose a Protocol", key: "none", logoURI: "", chains: [] });
+export const DEFAULT_PROTOCOL: Protocol = { name: "Choose a Protocol", key: "none", logoURI: "", chains: [] }
+
+export const protocolAtom = atom<Protocol>(DEFAULT_PROTOCOL);

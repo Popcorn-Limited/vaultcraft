@@ -7,12 +7,12 @@ export default function Page({
 }): JSX.Element {
   return (
     <>
-      <nav className="flex bg-[#141416] flex-col min-h-screen h-fit z-10 font-landing">
+      <div className="bg-[#141416] min-h-screen w-full h-full">
         <DesktopMenu />
         <main className="max-w-screen-lg md:mx-auto py-4 w-full">
           {children}
         </main>
-      </nav>
+      </div>
     </>
   );
 }

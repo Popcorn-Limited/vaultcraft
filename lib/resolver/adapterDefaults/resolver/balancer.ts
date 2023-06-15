@@ -1,10 +1,10 @@
 import { readContract } from "@wagmi/core";
 import { readContracts } from "wagmi";
-import { BigNumber } from "ethers";
+import {BigNumber, constants} from "ethers";
 
 const CONTROLLER_ADDRESS = "0xC128468b7Ce63eA702C1f104D55A2566b13D3ABD";
 
-export async function balancer({ chainId, address }: { chainId: number, address: string }): Promise<string[]> {
+export async function balancer({ chainId, address }: { chainId: number, address: string }): Promise<any[]> {
     const n_gauges = await readContract({
         address: CONTROLLER_ADDRESS,
         abi: abiController,
@@ -51,7 +51,11 @@ export async function balancer({ chainId, address }: { chainId: number, address:
         })
     }) as (string | null)[]
 
-    return lpTokens.filter(lpToken => !!lpToken) as string[]
+    const tokenIdx = lpTokens.findIndex(lpToken => lpToken?.toLowerCase() === address.toLowerCase())
+
+    return [
+        tokenIdx !== -1 ? aliveGauges[tokenIdx] : constants.AddressZero,
+    ]
 }
 
 const abiController = [
