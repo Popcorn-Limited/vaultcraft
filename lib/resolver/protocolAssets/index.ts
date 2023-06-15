@@ -12,7 +12,8 @@ import {
   aaveV3,
   origin,
   idle,
-  aura
+  aura,
+  alpacaV1
 } from "./resolver";
 
 export type ProtocolAssetResolver = (
@@ -35,6 +36,7 @@ export const ProtocolAssetResolvers: { [key: string]: ({ chainId }: { chainId: n
   origin,
   idle,
   aura,
+  alpacaV1,
   default: assetDefault
 };
 
