@@ -7,6 +7,7 @@ export * from "./yearn";
 export * from "./origin";
 export * from "./idle";
 export * from "./compoundV3";
+export * from "./curve";
 export * from "./alpacaV1";
 export * from "./alpacaV2";
 export * from "./ellipsis";
