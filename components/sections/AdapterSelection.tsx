@@ -45,7 +45,7 @@ function AdapterSelection() {
       )
         .then(res => {
           setOptions(res);
-          if (res.length > 0) setAdapter(res[0]);
+          if (res.length > 0 && adapter.key === "none") setAdapter(res[0]);
         });
     }
   }, [protocol, asset, network]);

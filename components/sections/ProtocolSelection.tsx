@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import { RESET } from "jotai/utils";
-import { Adapter, adapterConfigAtom, useAdapters, assetAtom, networkAtom, Protocol, protocolAtom, useProtocols } from "@/lib/atoms";
+import { Adapter, adapterConfigAtom, useAdapters, assetAtom, networkAtom, Protocol, protocolAtom, useProtocols, adapterAtom, DEFAULT_ADAPTER } from "@/lib/atoms";
 import { resolveProtocolAssets } from "@/lib/resolver/protocolAssets/protocolAssets";
 import Selector, { Option } from "@/components/inputs/Selector";
 
@@ -35,6 +35,7 @@ function ProtocolSelection() {
   const [options, setOptions] = useState<ProtocolOption[]>([]);
 
   const adapters = useAdapters();
+  const [, setAdapter] = useAtom(adapterAtom);
   const [, setAdapterConfig] = useAtom(adapterConfigAtom);
   const [asset] = useAtom(assetAtom);
 
@@ -47,6 +48,7 @@ function ProtocolSelection() {
   function selectProtocol(newProtocol: any) {
     if (protocol !== newProtocol) {
       setAdapterConfig([])
+      setAdapter(DEFAULT_ADAPTER)
     }
     setProtocol(newProtocol)
   }

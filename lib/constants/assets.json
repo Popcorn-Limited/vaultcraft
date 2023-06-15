@@ -270,18 +270,7 @@
     },
     "name": "OHM / DAI LP ",
     "symbol": "b-ohm-dai-lp",
-    "decimals": 9,
-    "logoURI": "https://cdn.furucombo.app/assets/img/token/OHM.png"
-  },
-  {
-    "chains": [1,1337],
-    "address": {
-      "1": "0x76FCf0e8C7Ff37A47a799FA2cd4c13cDe0D981C9",
-      "1337": "0x76FCf0e8C7Ff37A47a799FA2cd4c13cDe0D981C9"
-    },
-    "name": "OHM / DAI LP ",
-    "symbol": "b-ohm-dai-lp",
-    "decimals": 9,
+    "decimals": 18,
     "logoURI": "https://cdn.furucombo.app/assets/img/token/OHM.png"
   }
 ]
