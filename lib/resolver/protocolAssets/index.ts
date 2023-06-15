@@ -15,9 +15,9 @@ import {
   idle,
   aura,
   alpacaV1,
+  alpacaV2,
   ellipsis
 } from "./resolver";
-
 
 export type ProtocolAssetResolver = (
   chainId: number,
@@ -41,6 +41,7 @@ export const ProtocolAssetResolvers: { [key: string]: ({ chainId }: { chainId: n
   ellipsis,
   aura,
   alpacaV1,
+  alpacaV2,
   default: assetDefault
 };
 
