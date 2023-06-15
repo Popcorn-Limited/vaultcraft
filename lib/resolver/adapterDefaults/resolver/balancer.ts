@@ -51,7 +51,7 @@ export async function balancer({ chainId, address }: { chainId: number, address:
         })
     }) as (string | null)[]
 
-    const tokenIdx = lpTokens.findIndex(lpToken => lpToken === address)
+    const tokenIdx = lpTokens.findIndex(lpToken => lpToken?.toLowerCase() === address.toLowerCase())
 
     return [
         tokenIdx !== -1 ? aliveGauges[tokenIdx] : constants.AddressZero,
