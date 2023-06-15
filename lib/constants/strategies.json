@@ -1,1 +1,55 @@
-[]
+[
+  {
+    "name": "Compounder",
+    "key": "CurveStargateCompounder",
+    "description": "description",
+    "compatibleAdapters": ["StargateLpStakingAdapter"],
+    "requiredAssets": [
+      "0x0Faf1d2d3CED330824de3B8200fc8dc6E397850d",
+      "0xdf0770dF86a8034b3EFEf0A1Bb3c889B8332FF56",
+      "0x38EA452219524Bb87e18dE1C24D3bB59510BD783",
+      "0xfA0F307783AC21C39E939ACFF795e27b650F6e68",
+      "0xE8F55368C82D38bbbbDb5533e7F56AfC2E978CC2"
+    ],
+    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "requiredNetworks": [1],
+      "initParams": [
+        {
+          "name": "Base Asset",
+          "type": "address",
+          "requirements": ["Required"],
+          "description": ""
+        },
+        {
+          "name": "Router",
+          "type": "address",
+          "requirements": ["Required"],
+          "description": ""
+        },
+        {
+          "name": "toBaseAssetRoutes",
+          "type": "address",
+          "requirements": ["Required"],
+          "description": ""
+        },
+        {
+          "name": "toAssetRoute",
+          "type": "address",
+          "requirements": ["Required"],
+          "description": ""
+        },
+        {
+          "name": "minTradeAmounts",
+          "type": "uint256",
+          "requirements": ["Required"],
+          "description": ""
+        },
+        {
+          "name": "optional",
+          "type": "uint256",
+          "requirements": ["Required"],
+          "description": ""
+        }
+      ]
+  }
+]
