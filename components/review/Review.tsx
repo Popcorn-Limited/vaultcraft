@@ -14,7 +14,9 @@ import {
   feeAtom,
   limitAtom,
   networkAtom,
-  metadataAtom
+  metadataAtom,
+  strategyAtom,
+  strategyConfigAtom
 } from "@/lib/atoms";
 import ReviewSection from "./ReviewSection";
 import ReviewParam from "./ReviewParam";
@@ -31,6 +33,8 @@ export default function Review(): JSX.Element {
   const [adapterData, setAdapterData] = useAtom(adapterDeploymentAtom);
   const [fees] = useAtom(feeAtom);
   const [metadata] = useAtom(metadataAtom);
+  const [strategy] = useAtom(strategyAtom);
+  const [strategyConfig] = useAtom(strategyConfigAtom);
 
   const [devMode, setDevMode] = useState(false);
 
@@ -79,9 +83,9 @@ export default function Review(): JSX.Element {
         {devMode && <ReviewParam title="Adapter Data" value={adapterData.data} />}
       </ReviewSection>
       <ReviewSection title="Strategy">
-        <p className="text-gray-500">Coming Soon</p>
-        {devMode && <ReviewParam title="Strategy Id" value={ethers.utils.formatBytes32String("")} />}
-        {devMode && <ReviewParam title="Strategy Data" value={"0x"} />}
+        <ReviewParam title="Strategy" value={strategy.key} />
+        {devMode && <ReviewParam title="Strategy Id" value={strategyConfig.id} />}
+        {devMode && <ReviewParam title="Strategy Data" value={strategyConfig.data} />}
       </ReviewSection>
       <ReviewSection title="Deposit Limit">
         <ReviewParam title="Deposit Limit" value={`${formatUnits(Number(limit) > 0 ? limit : constants.MaxUint256)} ${asset.symbol}`} />

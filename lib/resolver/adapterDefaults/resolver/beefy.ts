@@ -19,8 +19,8 @@ export async function beefy({ chainId, address }: { chainId: number, address: st
   const vaults = await (await fetch(`https://api.beefy.finance/vaults/${network}`)).json() as Vault[];
   const boosts = await (await fetch(`https://api.beefy.finance/boosts/${network}`)).json() as Boost[];
 
-  const vaultAddress = vaults.find(vault => vault.tokenAddress === address)?.earnContractAddress;
-  const boost = boosts.find(boost => boost.tokenAddress === vaultAddress);
+  const vaultAddress = vaults.find(vault => vault.tokenAddress.toLowerCase() === address.toLowerCase())?.earnContractAddress;
+  const boost = boosts.find(boost => boost.tokenAddress.toLowerCase() === vaultAddress?.toLowerCase());
 
   return [vaultAddress, boost && boost.status === "active" ? boost.earnContractAddress : constants.AddressZero]
 }
