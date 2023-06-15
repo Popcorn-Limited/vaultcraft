@@ -62,21 +62,8 @@ function NetworkSelection() {
       <Selector
         selected={network}
         onSelect={selectNetwork}
-        actionContent={(selected: Chain) => (
-          <Fragment>
-            {selected && (
-              <figure className="relative w-6 h-6">
-                <Image
-                  fill
-                  className="object-contain"
-                  alt="logo"
-                  src={(networkLogos as any)[selected.id]}
-                />
-              </figure>
-            )}
-            <span>{selected?.name || "Click to select"}</span>
-          </Fragment>
-        )}
+        title="Select Network"
+        description="Select the network you want to use."
       >
         {SUPPORTED_NETWORKS.map((c) => (
           <Option key={`network-selc-${c.network}`} value={c} selected={c.id === chain?.id} >
