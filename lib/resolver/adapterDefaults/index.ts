@@ -1,3 +1,4 @@
+
 import {
   initDefault,
   beefy,
@@ -13,7 +14,8 @@ import {
   ellipsis,
   alpacaV1,
   alpacaV2,
-  curve
+  curve,
+  gearbox
 } from "./resolver";
 
 export type AdapterDefaultResolver = (
@@ -32,6 +34,7 @@ export const AdapterDefaultResolvers: { [key: string]: ({ chainId, address }: { 
   origin,
   idle,
   compoundV3,
+  gearbox,
   curve,
   alpacaV1,
   alpacaV2,
