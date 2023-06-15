@@ -1,21 +1,21 @@
 
 import {
-  initDefault,
-  beefy,
-  convex,
-  velodrome,
-  flux,
-  yearn,
-  origin,
-  idle,
-  compoundV3,
-  aura,
-  stargate,
-  ellipsis,
   alpacaV1,
   alpacaV2,
+  aura,
+  beefy,
+  compoundV3,
+  convex,
   curve,
-  gearbox
+  initDefault,
+  ellipsis,
+  flux,
+  gearbox,
+  idle,
+  origin,
+  stargate,
+  velodrome,
+  yearn,
 } from "./resolver";
 
 export type AdapterDefaultResolver = (
@@ -26,22 +26,22 @@ export type AdapterDefaultResolver = (
 export type AdapterDefaultResolvers = typeof AdapterDefaultResolvers;
 
 export const AdapterDefaultResolvers: { [key: string]: ({ chainId, address }: { chainId: number, address: string }) => Promise<any[]> } = {
-  beefy,
-  convex,
-  velodrome,
-  flux,
-  yearn,
-  origin,
-  idle,
-  compoundV3,
-  gearbox,
-  curve,
   alpacaV1,
   alpacaV2,
-  ellipsis,
   aura,
+  beefy,
+  compoundV3,
+  convex,
+  curve,
+  ellipsis,
+  flux,
+  gearbox,
+  idle,
+  origin,
   stargate,
-  default: initDefault
+  velodrome,
+  yearn,
+  default:initDefault,
 };
 
 export default AdapterDefaultResolvers;

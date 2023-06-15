@@ -3,7 +3,7 @@ import { readContracts } from "wagmi";
 
 const REGISTER_ADDRESS = "0xA50d4E7D8946a7c90652339CDBd262c375d54D99";
 
-export async function gearbox({ chainId }: { chainId: number }) {
+export async function gearbox({ chainId }: { chainId: number }): Promise<string[]> {
     const pools = await readContract({
         address: REGISTER_ADDRESS,
         abi: abiRegister,
@@ -22,7 +22,7 @@ export async function gearbox({ chainId }: { chainId: number }) {
         })),
     });
 
-    return tokens
+    return tokens as string[];
 }
 
 const abiRegister = [
