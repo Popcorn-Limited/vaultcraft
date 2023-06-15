@@ -73,14 +73,12 @@ function AdapterConfiguration() {
                       String(initParam.type)
                     )
                   }
-                  defaultValue={adapterConfig[i] || ""}
+                  defaultValue={adapterConfig[i]}
                   autoComplete="off"
                   autoCorrect="off"
                   type="text"
                   pattern="^[0-9]*[.,]?[0-9]*$"
-                  placeholder={
-                    String(initParam.type) === "address" ? "0x00" : "0.0"
-                  }
+                  placeholder={""}
                   minLength={1}
                   maxLength={79}
                   spellCheck="false"

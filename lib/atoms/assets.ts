@@ -15,4 +15,6 @@ export const useAssets = () => {
   return assets;
 };
 
-export const assetAtom = atom<Asset>({ name: "Choose an Asset", symbol: "none", decimals: 0, logoURI: "", address: {}, chains: [] });
+export const DEFAULT_ASSET: Asset = { name: "Choose an Asset", symbol: "none", decimals: 0, logoURI: "", address: {}, chains: [] }
+
+export const assetAtom = atom<Asset>(DEFAULT_ASSET);
