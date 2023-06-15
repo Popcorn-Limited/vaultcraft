@@ -332,7 +332,7 @@
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
     "name": "Stargate Adapter",
-    "key": "StargateAdapter",
+    "key": "StargateLpStakingAdapter",
     "protocol": "stargate",
     "initParams": [
       {
@@ -343,7 +343,7 @@
       }
     ],
     "assets": ["USDC"],
-    "chains": [],
+    "chains": [1,1337],
     "resolver": "stargate"
   },
   {
