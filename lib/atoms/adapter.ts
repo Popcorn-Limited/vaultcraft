@@ -36,8 +36,9 @@ export const useAdapters = () => {
   return adapters as any as Array<Adapter>;
 };
 
+export const DEFAULT_ADAPTER: Adapter = { name: "Choose an Adapter", key: "none", logoURI: "", protocol: "none", assets: [], chains: [] }
 
-export const adapterAtom = atom<Adapter>({name:"Choose an Adapter", key:"none", logoURI:"",protocol:"none",assets:[],chains:[]});
+export const adapterAtom = atom<Adapter>(DEFAULT_ADAPTER);
 
 export const adapterConfigAtom = atom<Array<string>>([]);
 export const adapterDeploymentAtom = atom<AdapterConfig>({ id: ethers.utils.formatBytes32String(""), data: "0x" });
