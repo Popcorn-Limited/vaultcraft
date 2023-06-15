@@ -1,4 +1,3 @@
-
 import {
   initDefault,
   beefy,
@@ -11,7 +10,8 @@ import {
   compoundV3,
   aura,
   stargate,
-  ellipsis
+  ellipsis,
+  alpacaV2
 } from "./resolver";
 
 export type AdapterDefaultResolver = (
@@ -30,6 +30,7 @@ export const AdapterDefaultResolvers: { [key: string]: ({ chainId, address }: { 
   origin,
   idle,
   compoundV3,
+  alpacaV2,
   ellipsis,
   aura,
   stargate,
