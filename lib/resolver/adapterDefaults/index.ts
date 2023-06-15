@@ -1,3 +1,4 @@
+
 import {
   initDefault,
   beefy,
@@ -11,6 +12,7 @@ import {
   aura,
   stargate,
   ellipsis,
+  alpacaV1
   alpacaV2
 } from "./resolver";
 
@@ -30,6 +32,7 @@ export const AdapterDefaultResolvers: { [key: string]: ({ chainId, address }: { 
   origin,
   idle,
   compoundV3,
+  alpacaV1,
   alpacaV2,
   ellipsis,
   aura,
