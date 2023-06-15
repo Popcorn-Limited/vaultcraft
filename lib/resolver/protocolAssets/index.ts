@@ -1,3 +1,4 @@
+
 import {
   assetDefault,
   beefy,
@@ -16,7 +17,8 @@ import {
   alpacaV1,
   alpacaV2,
   ellipsis,
-  radiant
+  radiant,
+  curve
 } from "./resolver";
 
 export type ProtocolAssetResolver = (
@@ -38,6 +40,7 @@ export const ProtocolAssetResolvers: { [key: string]: ({ chainId }: { chainId: n
   aaveV3,
   origin,
   idle,
+  curve,
   radiant,
   ellipsis,
   aura,
