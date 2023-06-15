@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
-import { VAULT_TAGS, metadataAtom } from "@/lib/atoms";
+import { VaultTag, metadataAtom } from "@/lib/atoms";
 import Input from "@/components/inputs/Input";
 
 interface Tags { [key: string]: boolean }
-
 
 function MetadataConfiguration() {
   const [metadata, setMetadata] = useAtom(metadataAtom);
@@ -18,8 +17,8 @@ function MetadataConfiguration() {
     }
 
     const newTags: Tags = {};
-    VAULT_TAGS.forEach((tag: string) => {
-      newTags[tag] = metadata?.tags?.includes(tag)
+    Object.keys(VaultTag).forEach((key: string) => {
+      newTags[key] = metadata?.tags?.includes(key)
     });
     setTags(newTags);
   }, [])
@@ -63,16 +62,18 @@ function MetadataConfiguration() {
 
       <div className="mb-4">
         <p className="text-sm text-white mb-2">Categories</p>
-        <div className="flex flex-row space-x-2">
-          {VAULT_TAGS.map((tag) => {
+        <div className="flex flex-row flex-wrap md:space-x-2">
+          {Object.keys(VaultTag).map((key) => {
             return (
               <button
-                key={`tag-element-${tag}`}
+                key={`tag-element-${key}`}
                 type="button"
-                className={`${tags[tag] ? "text-black border-white bg-white" : "text-white border-[#ffffff80]"} border rounded-[4px]
-                px-2 py-0.5 transition-all ease-in-out duration-300 hover:bg-[#D7D7D7] hover:border-[#D7D7D7] hover:text-white`}
-                onClick={() => handleChange(tag)}>
-                {tag[0].toUpperCase() + tag.slice(1)}
+                className={`${tags[key] ? "text-black border-white bg-white" : "text-white border-[#ffffff80]"} border rounded-[4px]
+                px-2 py-0.5 transition-all ease-in-out duration-300 hover:bg-[#D7D7D7] hover:border-[#D7D7D7] hover:text-white mr-3 mb-3 md:m-0`}
+                onClick={() => handleChange(key)}>
+                { //@ts-ignore
+                  VaultTag[key]
+                }
               </button>
             );
           })}

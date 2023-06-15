@@ -1,11 +1,12 @@
 import { useAtom } from "jotai";
+import { useState } from "react";
 import { constants, utils } from "ethers";
 import { formatUnits, parseUnits } from "ethers/lib/utils.js";
 import { feeAtom } from "@/lib/atoms/fees";
 import { validateBigNumberInput } from "@/lib/helpers";
 import Fieldset from "@/components/inputs/Fieldset";
 import Input from "@/components/inputs/Input";
-import { useState } from "react";
+
 
 
 const FEE_INPUTS = [
