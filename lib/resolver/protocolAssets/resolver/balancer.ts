@@ -4,7 +4,7 @@ import { BigNumber } from "ethers";
 
 const CONTROLLER_ADDRESS = "0xC128468b7Ce63eA702C1f104D55A2566b13D3ABD";
 
-export async function balancer({ chainId, address }: { chainId: number, address: string }): Promise<string[]> {
+export async function balancer({ chainId }: { chainId: number }): Promise<string[]> {
     const n_gauges = await readContract({
         address: CONTROLLER_ADDRESS,
         abi: abiController,
