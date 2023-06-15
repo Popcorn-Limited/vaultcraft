@@ -12,7 +12,7 @@ export function verifyInitParamValidity(
 ): string[] {
   const errors: string[] = [];
 
-  if (!value) errors.push("Value is required");
+  if (value === "") errors.push("Value is required");
   if (!inputParam.requirements) {
     switch (inputParam.type) {
       case "address":

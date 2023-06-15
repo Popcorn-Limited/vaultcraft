@@ -26,7 +26,7 @@ export async function stargate({ chainId }: { chainId: number }): Promise<string
             }
         })
     }) as string[][]
-
+    
     return tokens.map(item => item[0])
 }
 

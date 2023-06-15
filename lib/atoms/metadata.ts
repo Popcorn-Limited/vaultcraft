@@ -1,5 +1,4 @@
 import { atom } from "jotai";
-import { atomWithStorage } from "jotai/utils";
 
 export type Metadata = {
   name: string;
@@ -7,6 +6,12 @@ export type Metadata = {
   ipfsHash: string;
 };
 
-export const VAULT_TAGS = ["stable", "lsd", "compounding", "leverage"]
+export enum VaultTag {
+  deltaNeutral = "Delta Neutral",
+  lsd = "LSD",
+  degen = "Full Degen",
+  decentralized = "Decentralization Maxi",
+  wildcard = "Wildcard",
+}
 
 export const metadataAtom = atom<Metadata>({ name: "", tags: [], ipfsHash: "" });
