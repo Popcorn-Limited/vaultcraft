@@ -11,6 +11,7 @@ export * from "./flux";
 export * from "./origin";
 export * from "./idle";
 export * from "./compoundV3";
+export * from "./radiant";
 export * from "./ellipsis";
 export * from "./alpacaV1";
 export * from "./alpacaV2";
