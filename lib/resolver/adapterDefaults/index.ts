@@ -3,6 +3,7 @@ import {
   alpacaV1,
   alpacaV2,
   aura,
+  balancer,
   beefy,
   compoundV3,
   convex,
@@ -29,6 +30,7 @@ export const AdapterDefaultResolvers: { [key: string]: ({ chainId, address }: { 
   alpacaV1,
   alpacaV2,
   aura,
+  balancer,
   beefy,
   compoundV3,
   convex,
@@ -41,7 +43,7 @@ export const AdapterDefaultResolvers: { [key: string]: ({ chainId, address }: { 
   stargate,
   velodrome,
   yearn,
-  default:initDefault,
+  default: initDefault,
 };
 
 export default AdapterDefaultResolvers;
