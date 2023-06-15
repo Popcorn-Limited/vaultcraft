@@ -1,16 +1,19 @@
 import { Fragment } from "react";
 import { Listbox } from "@headlessui/react";
+import { ChevronLeftIcon, XMarkIcon } from "@heroicons/react/24/solid";
 
 function Selector({
   selected,
   onSelect,
+  title,
+  description,
   children,
-  actionContent,
 }: {
   selected?: any;
   onSelect: (value: any) => void;
+  title:string;
+  description:string;
   children: any;
-  actionContent: (selected: any) => JSX.Element;
 }) {
   return (
     <Listbox
@@ -19,12 +22,47 @@ function Selector({
       value={selected}
       onChange={onSelect}
     >
-      <Listbox.Button className="border-1 border border-[#353945] rounded-lg flex gap-2 w-full px-2">
-        {actionContent(selected)}
-      </Listbox.Button>
-      <Listbox.Options className="z-[1] absolute flex flex-col min-w-[12rem] rounded-[20px] top-0 left-0 p-2 bg-black md:max-h-[80vh] w-full h-full overflow-auto">
-        {children}
-      </Listbox.Options>
+      {({ open }) => (
+        <>
+          <Listbox.Button className="border-1 border border-[#353945] rounded-lg flex gap-2 w-full px-2">
+            <div className="h-12 flex flex-row items-center w-full gap-x-2">
+              {selected?.logoURI && (
+                <div className="w-9 h-8">
+                  <img
+                    className="object-contain w-8 h-8 rounded-full"
+                    alt="selected-asset"
+                    src={selected?.logoURI}
+                  />
+                </div>
+              )}
+              <span className="text-[white] w-full flex self-center flex-row justify-start">{selected?.name}</span>
+              <span className="self-center text-[white] mr-2">{`>`}</span>
+            </div>
+          </Listbox.Button>
+          {open && (
+            <Listbox.Options className="z-[1] absolute flex flex-col min-w-[12rem] rounded-[20px] top-0 left-0 p-2 bg-black md:max-h-[80vh] w-full h-full overflow-auto">
+              <div className="w-full h-full bg-black flex flex-col items-start gap-y-1 px-8 py-9">
+                <div className="flex flex-row items-center mb-9 justify-between w-full">
+                  <Listbox.Option value={selected} as={Fragment}>
+                    <ChevronLeftIcon className="text-white w-10 h-10 -ml-3 cursor-pointer md:hidden" />
+                  </Listbox.Option>
+                  <p className="text-[white] text-2xl">
+                    Select Asset
+                  </p>
+                  <Listbox.Option value={selected} as={Fragment}>
+                    <XMarkIcon className="md:text-white w-10 h-10 cursor-pointer" />
+                  </Listbox.Option>
+                </div>
+                <p className="text-[white] mb-8">Choose an asset that you want to deposit into your vault and earn yield on.</p>
+
+                <div className="flex flex-col overflow-y-scroll scrollbar-hide w-full">
+                  {children}
+                </div>
+              </div>
+            </Listbox.Options>
+          )}
+        </>
+      )}
     </Listbox >
   );
 }

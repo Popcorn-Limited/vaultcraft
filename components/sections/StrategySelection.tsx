@@ -1,8 +1,9 @@
 import { useAtom } from "jotai";
-import { Strategy, adapterAtom, assetAtom, networkAtom, strategyAtom, strategyConfigAtom, useStrategies } from "@/lib/atoms";
-import Selector, { Option } from "@/components/inputs/Selector";
 import { useEffect, useState } from "react";
+import { Strategy, adapterAtom, assetAtom, networkAtom, strategyAtom, strategyConfigAtom, useStrategies } from "@/lib/atoms";
 import getStrategyConfig from "@/lib/getStrategyConfig";
+import Selector, { Option } from "@/components/inputs/Selector";
+
 
 const STRATEGY_NON_AVAILABLE: Strategy = {
   name: "No Strategy available",
@@ -59,36 +60,17 @@ function StrategySelection() {
       <Selector
         selected={strategy}
         onSelect={(newStrategy) => selectStrategy(newStrategy)}
-        actionContent={(selected) => (
-          <div className="h-12 flex flex-row items-center w-full gap-x-2">
-            {selected?.logoURI && (
-              <div className="w-9 h-8">
-                <img
-                  className="object-contain w-8 h-8 rounded-full"
-                  alt="selected-strategy"
-                  src={selected?.logoURI}
-                />
-              </div>
-            )}
-            <span className="text-[white] w-full flex self-center flex-row justify-start">{selected?.name || "Strategy selection"}</span>
-            <span className="self-center text-[white] mr-2">{`>`}</span>
-          </div>
-        )}
+        title="Select Strategy"
+        description="Select a strategy to apply on with your vault."
       >
-        <div className="w-full h-full bg-black flex flex-col items-start gap-y-1 px-8 py-9">
-          <p className="text-[white] text-2xl mb-9">Select Strategy</p>
-          <p className="text-[white] mb-8">Select a strategy to apply on with your vault.</p>
-          <div className="flex flex-col overflow-y-scroll scrollbar-hide w-full">
-            {options.map((strategyIter) => (
-              <Option
-                value={strategyIter}
-                selected={strategyIter.name === strategy.name}
-                key={`strategy-selc-${strategyIter.key}-${strategyIter.name}`}
-              >
-              </Option>
-            ))}
-          </div>
-        </div>
+        {options.map((strategyIter) => (
+          <Option
+            value={strategyIter}
+            selected={strategyIter.name === strategy.name}
+            key={`strategy-selc-${strategyIter.key}-${strategyIter.name}`}
+          >
+          </Option>
+        ))}
       </Selector>
     </section>
   );

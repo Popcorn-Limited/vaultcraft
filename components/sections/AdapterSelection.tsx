@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
-import { RESET } from "jotai/utils";
 import { Adapter, adapterAtom, adapterConfigAtom, useAdapters, protocolAtom, networkAtom, assetAtom, strategyAtom, DEFAULT_STRATEGY } from "@/lib/atoms";
 import { resolveProtocolAssets } from "@/lib/resolver/protocolAssets/protocolAssets";
 import Selector, { Option } from "@/components/inputs/Selector";
@@ -63,36 +62,17 @@ function AdapterSelection() {
       <Selector
         selected={adapter}
         onSelect={(newAdapter) => selectAdapter(newAdapter)}
-        actionContent={(selected) => (
-          <div className="h-12 flex flex-row items-center w-full gap-x-2">
-            {selected?.logoURI && (
-              <div className="w-9 h-8">
-                <img
-                  className="object-contain w-8 h-8 rounded-full"
-                  alt="selected-adapter"
-                  src={selected?.logoURI}
-                />
-              </div>
-            )}
-            <span className="text-[white] w-full flex self-center flex-row justify-start">{selected?.name || "Adapter selection"}</span>
-            <span className="self-center text-[white] mr-2">{`>`}</span>
-          </div>
-        )}
+        title="Select Adapter"
+        description="Choose an adapter for your selected protocol."
       >
-        <div className="w-full h-full bg-black flex flex-col items-start gap-y-1 px-8 py-9">
-          <p className="text-[white] text-2xl mb-9">Select Adapter</p>
-          <p className="text-[white] mb-8">Choose an adapter for your chosen protocol.</p>
-          <div className="flex flex-col overflow-y-scroll scrollbar-hide w-full">
-            {options.map((adapterIter) => (
-              <Option
-                value={adapterIter}
-                selected={adapterIter.name === adapter.name}
-                key={`adapter-selc-${adapterIter.key}-${adapterIter.name}`}
-              >
-              </Option>
-            ))}
-          </div>
-        </div>
+        {options.map((adapterIter) => (
+          <Option
+            value={adapterIter}
+            selected={adapterIter.name === adapter.name}
+            key={`adapter-selc-${adapterIter.key}-${adapterIter.name}`}
+          >
+          </Option>
+        ))}
       </Selector>
     </section>
   );

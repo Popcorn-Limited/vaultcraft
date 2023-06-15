@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
-import { RESET } from "jotai/utils";
 import { Adapter, adapterConfigAtom, useAdapters, assetAtom, networkAtom, Protocol, protocolAtom, useProtocols, adapterAtom, DEFAULT_ADAPTER } from "@/lib/atoms";
 import { resolveProtocolAssets } from "@/lib/resolver/protocolAssets/protocolAssets";
 import Selector, { Option } from "@/components/inputs/Selector";
@@ -58,37 +57,18 @@ function ProtocolSelection() {
       <Selector
         selected={protocol}
         onSelect={(newProtocol) => selectProtocol(newProtocol)}
-        actionContent={(selected) => (
-          <div className="h-12 flex flex-row items-center w-full gap-x-3">
-            {selected?.logoURI && (
-              <div className="w-9 h-8">
-                <img
-                  className="object-contain w-8 h-8 rounded-full"
-                  alt="selected-protocol"
-                  src={selected?.logoURI}
-                />
-              </div>
-            )}
-            <span className="text-[white] w-full flex self-center flex-row justify-start">{selected?.name || "Protocol selection"}</span>
-            <span className="self-center text-[white] mr-2">{`>`}</span>
-          </div>
-        )}
+        title="Select Protocol"
+        description="Select a protocol you want to use to earn yield on your asset."
       >
-        <div className="w-full h-full bg-black flex flex-col items-start gap-y-1 px-8 py-9">
-          <p className="text-[white] text-2xl mb-9">Select Protocol</p>
-          <p className="text-[white] mb-8">Select a protocol you want to use to earn yield on your asset.</p>
-          <div className="flex flex-col overflow-y-scroll w-full scrollbar-hide space-y-2">
-            {options.length > 0 ? options.map((protocolIter) => (
-              <Option
-                key={`protocol-selc-${protocolIter.name}`}
-                value={protocolIter}
-                selected={protocolIter?.name === protocol.name}
-                disabled={protocolIter.disabled}
-              >
-              </Option>
-            )) : <p className="text-white">Loading, please wait...</p>}
-          </div>
-        </div>
+        {options.length > 0 ? options.map((protocolIter) => (
+          <Option
+            key={`protocol-selc-${protocolIter.name}`}
+            value={protocolIter}
+            selected={protocolIter?.name === protocol.name}
+            disabled={protocolIter.disabled}
+          >
+          </Option>
+        )) : <p className="text-white">Loading, please wait...</p>}
       </Selector>
     </section>
   );

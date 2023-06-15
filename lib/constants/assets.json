@@ -61,7 +61,7 @@
     "logoURI": "https://cdn.furucombo.app/assets/img/token/LUSD.png"
   },
   {
-    "chains": [1, 1337, 42161],
+    "chains": [],
     "address": {
       "1": "0x99D8a9C45b2ecA8864373A26D1459e3Dff1e17F3",
       "1337": "0x99D8a9C45b2ecA8864373A26D1459e3Dff1e17F3",
