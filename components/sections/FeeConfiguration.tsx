@@ -11,9 +11,9 @@ import Input from "@/components/inputs/Input";
 
 const FEE_INPUTS = [
   { name: "Deposit Fee", key: "deposit", description: "Deposit fees are charged with every new deposit." },
-  { name: "Withdrawal Fee", key: "withdrawal", description: "This fee is set separately for in-kind redemptions or for specific asset redemptions." },
-  { name: "Performance Fee", key: "performance", description: "The performance fee is subject to a high-water mark." },
-  { name: "Management Fee", key: "management", description: "The management fee accrues continuously and is automatically paid out with every deposit and redemption." },
+  { name: "Withdrawal Fee", key: "withdrawal", description: "Withdrawal fees are charged with every new withdrawal." },
+  { name: "Performance Fee", key: "performance", description: "Charge a fee whenever the share value reaches a new all time high." },
+  { name: "Management Fee", key: "management", description: "Charge a continues fee on the total value of deposits." },
 ];
 
 interface Errors { [key: string]: string[] | undefined }
@@ -93,7 +93,7 @@ function FeeConfiguration() {
         );
       })}
       <div className="">
-        <Fieldset className="flex-grow" label="Fee Recipient" description="Fee Recipient Description">
+        <Fieldset className="flex-grow" label="Fee Recipient" description="Which address should receive the fees?">
           <Input
             onChange={(e) =>
               setFee((prefState) => {
