@@ -3,6 +3,7 @@ export * from "./alpacaV2";
 export * from "./aura";
 export * from "./balancer";
 export * from "./beefy";
+export * from "./compoundV2";
 export * from "./compoundV3";
 export * from "./convex";
 export * from "./curve";
