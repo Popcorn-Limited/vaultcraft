@@ -47,13 +47,13 @@ function Selector({
                     <ChevronLeftIcon className="text-white w-10 h-10 -ml-3 cursor-pointer md:hidden" />
                   </Listbox.Option>
                   <p className="text-[white] text-2xl">
-                    Select Asset
+                    {title}
                   </p>
                   <Listbox.Option value={selected} as={Fragment}>
                     <XMarkIcon className="md:text-white w-10 h-10 cursor-pointer" />
                   </Listbox.Option>
                 </div>
-                <p className="text-[white] mb-8">Choose an asset that you want to deposit into your vault and earn yield on.</p>
+                <p className="text-[white] mb-8">{description}</p>
 
                 <div className="flex flex-col overflow-y-scroll scrollbar-hide w-full">
                   {children}
