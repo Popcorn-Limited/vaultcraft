@@ -61,7 +61,7 @@ function StrategySelection() {
         selected={strategy}
         onSelect={(newStrategy) => selectStrategy(newStrategy)}
         title="Select Strategy"
-        description="Select a strategy to apply on with your vault."
+        description="Select a strategy to apply on your vault."
       >
         {options.map((strategyIter) => (
           <Option
