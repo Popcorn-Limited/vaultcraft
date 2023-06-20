@@ -57,8 +57,8 @@ function ProtocolSelection() {
   const [, setAdapterConfig] = useAtom(adapterConfigAtom);
   const [asset] = useAtom(assetAtom);
 
-  const loadProtocols = async () => {
-    if (network && protocolsArr.length === 0) {
+  const loadProtocols = async (hardReload?: boolean) => {
+    if ((network && protocolsArr.length === 0) || hardReload) {
       const protocolQueries = assets.map(item => getProtocolOptions(protocols, adapters, network.id, item.address[network.id]?.toLowerCase()))
       console.log(protocolQueries)
       const protocolsResult = await Promise.all(protocolQueries)
@@ -74,7 +74,11 @@ function ProtocolSelection() {
 
   useEffect(() => {
     loadProtocols()
-  }, [network, asset]);
+  }, [asset]);
+
+  useEffect(() => {
+    loadProtocols(true)
+  }, [network])
 
   function selectProtocol(newProtocol: any) {
     if (protocol !== newProtocol) {
