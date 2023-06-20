@@ -1,6 +1,18 @@
 import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
-import { Adapter, adapterConfigAtom, useAdapters, assetAtom, networkAtom, Protocol, protocolAtom, useProtocols, adapterAtom, DEFAULT_ADAPTER } from "@/lib/atoms";
+import {
+  Adapter,
+  adapterConfigAtom,
+  useAdapters,
+  assetAtom,
+  networkAtom,
+  Protocol,
+  protocolAtom,
+  useProtocols,
+  adapterAtom,
+  DEFAULT_ADAPTER,
+  useAssets
+} from "@/lib/atoms";
 import { resolveProtocolAssets } from "@/lib/resolver/protocolAssets/protocolAssets";
 import Selector, { Option } from "@/components/inputs/Selector";
 
@@ -28,8 +40,15 @@ async function getProtocolOptions(protocols: Protocol[], adapters: Adapter[], ch
 }
 
 function ProtocolSelection() {
+  const [protocolsArr, setProtocols] = useState([] as ProtocolOption[][])
+
   const [network] = useAtom(networkAtom);
   const [protocol, setProtocol] = useAtom(protocolAtom);
+  const assets = useAssets() as {
+    address: {
+      [key: number]: string
+    }
+  }[];
   const protocols = useProtocols();
   const [options, setOptions] = useState<ProtocolOption[]>([]);
 
@@ -39,8 +58,19 @@ function ProtocolSelection() {
   const [asset] = useAtom(assetAtom);
 
   useEffect(() => {
-    if (network && asset.symbol !== "none") {
-      getProtocolOptions(protocols, adapters, network.id, asset.address[network.id].toLowerCase()).then(res => setOptions(res));
+    if (network && protocolsArr.length === 0) {
+      const protocolQueries = assets.map(item => getProtocolOptions(protocols, adapters, network.id, item.address[network.id]?.toLowerCase()))
+      console.log(protocolQueries)
+      Promise.all(protocolQueries).then(res => {
+        setProtocols(res)
+      })
+      console.log(protocolsArr)
+    }
+
+    if (network && protocolsArr.length > 0 && asset.symbol !== "none") {
+        setOptions(protocolsArr[assets.findIndex(
+            item => item.address[network.id].toLowerCase() === asset.address[network.id].toLowerCase()
+        )])
     }
   }, [network, asset]);
 
