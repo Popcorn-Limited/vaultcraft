@@ -27,7 +27,7 @@ export async function stargate({ chainId }: { chainId: number }): Promise<string
         })
     }) as string[][]
     
-    return tokens.map(item => item[0])
+    return tokens.map(item => item?.[0]).filter(item => Boolean(item))
 }
 
 const abi = [
