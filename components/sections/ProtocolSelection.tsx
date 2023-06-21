@@ -33,24 +33,28 @@ function ProtocolSelection() {
   const [availableAssets, setAvailableAssets] = useAtom(availableAssetsAtom);
   const [asset] = useAtom(assetAtom);
 
-  const addProtocolAssets = async () => {
+  async function addProtocolAssets() {
     const protocolQueries = [] as Promise<string[]>[]
     const filteredAdapters = adapters.filter(adapter => adapter.chains.includes(network.id))
 
-    filteredAdapters.forEach(
-        adapter => protocolQueries.push(resolveProtocolAssets({ chainId: network.id, resolver: adapter.resolver }))
-    )
+    try {
+      filteredAdapters.forEach(
+          adapter => protocolQueries.push(resolveProtocolAssets({ chainId: network.id, resolver: adapter.resolver }))
+      )
 
-    const protocolsResult = await Promise.all(protocolQueries)
-    const assetsToAdd = {} as {
-      [key: string]: string[]
+      const protocolsResult = await Promise.all(protocolQueries)
+      const assetsToAdd = {} as {
+        [key: string]: string[]
+      }
+
+      filteredAdapters.forEach((item, idx) => {
+        assetsToAdd[item.protocol] = protocolsResult[idx]
+      })
+
+      setAvailableAssets({...availableAssets, [network.id]: assetsToAdd})
+    } catch (e) {
+      console.error(e)
     }
-
-    filteredAdapters.forEach((item, idx) => {
-      assetsToAdd[item.protocol] = protocolsResult[idx]
-    })
-
-    setAvailableAssets({...availableAssets, [network.id]: assetsToAdd})
   }
 
   async function assetSupported(protocol: Protocol, adapters: Adapter[], chainId: number, asset: string): Promise<boolean> {
