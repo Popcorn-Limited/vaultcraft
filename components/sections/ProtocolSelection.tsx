@@ -45,11 +45,15 @@ function ProtocolSelection() {
   const [pools, setPools] = useState<Pool[]>([]);
 
   async function getPools() {
-    const { data } = await axios.get<{
-      data: Pool[]
-    }>('https://yields.llama.fi/pools')
+    try {
+      const { data } = await axios.get<{
+        data: Pool[]
+      }>('https://yields.llama.fi/pools')
 
-    setPools(data.data)
+      setPools(data.data)
+    } catch (e) {
+      console.error(e)
+    }
   }
 
   async function getProtocolOptions(protocols: Protocol[], adapters: Adapter[], chainId: number, asset: string): Promise<ProtocolOption[]> {
