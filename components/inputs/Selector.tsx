@@ -67,7 +67,7 @@ function Selector({
   );
 }
 
-export function Option({ value, children, selected, disabled }: { value: any; children: any, selected: boolean, disabled?: boolean }) {
+export function Option({ value, children, selected, disabled, apy }: { value: any; children: any, selected: boolean, disabled?: boolean, apy?: number | string }) {
   return (
     <Listbox.Option value={value} as={Fragment} disabled={disabled}>
       {({ active }) => {
@@ -92,6 +92,7 @@ export function Option({ value, children, selected, disabled }: { value: any; ch
                 {disabled && <p className={`ml-1 ${selected ? "text-[black]" : "text-[#ffffff99]"}`}>- Asset not supported</p>}
               </span>
             </div>
+            {apy && <p className={`ml-auto self-center ${selected ? "text-[black]" : "text-[white]"}`}>~{apy}%</p>}
           </button>
         );
       }}
