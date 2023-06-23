@@ -71,16 +71,15 @@ function ProtocolSelection() {
   async function getProtocolOptions(protocols: Protocol[], adapters: Adapter[], chainId: number, asset: string): Promise<ProtocolOption[]> {
     return Promise.all(protocols
         .filter((p) => p.chains.includes(chainId))
-        .map(
-            async (p) => {
-              const disabled = !(await assetSupported(p, adapters, chainId, asset))
-              return {
-                ...p,
-                disabled,
-                ...(pools.length && !disabled && { apy: (getApy(p))})
-              }
-            }
-        )
+        .map(async (p) => {
+          const disabled = !(await assetSupported(p, adapters, chainId, asset))
+
+          return {
+            ...p,
+            disabled,
+            ...(pools.length && !disabled && { apy: (getApy(p))})
+          }
+        })
     )
   }
 
