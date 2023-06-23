@@ -56,24 +56,31 @@ function ProtocolSelection() {
     }
   }
 
+  function getApy(protocol: Protocol) {
+    const filteredPools = pools.filter(
+        pool =>
+            pool.chain === poolNetworkMap[network.id as keyof typeof poolNetworkMap] &&
+            pool.project.includes(protocol.key)
+    )
+
+    const avgApy = filteredPools.reduce((avg, val, _, { length }) => avg + val.apy / length, 0)
+
+    return avgApy.toFixed(2)
+  }
+
   async function getProtocolOptions(protocols: Protocol[], adapters: Adapter[], chainId: number, asset: string): Promise<ProtocolOption[]> {
-    return Promise.all(protocols.filter(
-        (p) => p.chains.includes(chainId)).map(
-        async (p) => {
-          const disabled = !(await assetSupported(p, adapters, chainId, asset))
-          return {
-            ...p,
-            disabled,
-            ...(pools.length && !disabled && { apy:
-                  pools
-                  .filter(
-                      pool => pool.chain === poolNetworkMap[network.id as keyof typeof poolNetworkMap] && pool.project.includes(p.key)
-                  )
-                  .reduce((avg, val, _, { length }) => avg + val.apy / length, 0)
-                  .toFixed(2)
-            })
-          }
-        })
+    return Promise.all(protocols
+        .filter((p) => p.chains.includes(chainId))
+        .map(
+            async (p) => {
+              const disabled = !(await assetSupported(p, adapters, chainId, asset))
+              return {
+                ...p,
+                disabled,
+                ...(pools.length && !disabled && { apy: (getApy(p))})
+              }
+            }
+        )
     )
   }
 
@@ -92,12 +99,7 @@ function ProtocolSelection() {
     setOptions(options.map(option => {
       return {
         ...option,
-        apy: pools
-            .filter(
-                pool => pool.chain === poolNetworkMap[network.id as keyof typeof poolNetworkMap] && pool.project.includes(option.key)
-            )
-            .reduce((avg, val, _, { length }) => avg + val.apy / length, 0)
-            .toFixed(2)
+        apy: getApy(option)
       }
     }))
   }, [pools])
