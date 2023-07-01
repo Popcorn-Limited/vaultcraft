@@ -11,7 +11,7 @@ interface AdapterOption extends Adapter {
 async function assetSupported(adapter: Adapter, chainId: number, asset: string): Promise<boolean> {
   const availableAssets = await resolveProtocolAssets({ chainId: chainId, resolver: adapter.resolver })
 
-  return availableAssets.flat().map(a => a.toLowerCase()).filter((availableAsset) => availableAsset === asset).length > 0
+  return availableAssets.flat().filter(a => a !== undefined && a.toLowerCase() === asset).length > 0
 }
 
 async function getAdapterOptions(adapters: Adapter[], chainId: number, asset: string): Promise<AdapterOption[]> {

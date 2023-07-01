@@ -1,0 +1,4478 @@
+{
+    "success": true,
+    "data": {
+        "poolData": [
+            {
+                "id": "0",
+                "address": "0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7",
+                "coinsAddresses": [
+                    "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+                    "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                    "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "18",
+                    "6",
+                    "6",
+                    "0"
+                ],
+                "virtualPrice": "1026290306048291206",
+                "amplificationCoefficient": "2000",
+                "assetType": "0",
+                "totalSupply": "306768929465189749410126661",
+                "name": "Curve.fi DAI/USDC/USDT",
+                "lpTokenAddress": "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490",
+                "symbol": "3Crv",
+                "priceOracle": 0,
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/3pool/swap",
+                        "https://classic.curve.fi/3pool"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/3pool/deposit",
+                        "https://classic.curve.fi/3pool/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/3pool/withdraw",
+                        "https://classic.curve.fi/3pool/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "assetTypeName": "usd",
+                "coins": [
+                    {
+                        "address": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+                        "usdPrice": 0.999743,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "DAI",
+                        "poolBalance": "88227197302725634471072647"
+                    },
+                    {
+                        "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                        "usdPrice": 0.999841,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDC",
+                        "poolBalance": "88672319096081"
+                    },
+                    {
+                        "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+                        "usdPrice": 0.999782,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDT",
+                        "poolBalance": "137938189776755"
+                    }
+                ],
+                "usdTotal": 314770862.3617472,
+                "isMetaPool": false,
+                "usdTotalExcludingBasePool": 314770862.3617472,
+                "gaugeAddress": "0xbfcf63294ad7105dea65aa58f8ae5be2d9d0952a",
+                "gaugeRewards": [],
+                "gaugeCrvApy": [
+                    0.7226737086955461,
+                    1.8066842717388654
+                ]
+            },
+            {
+                "id": "1",
+                "address": "0xDeBF20617708857ebe4F679508E7b7863a8A8EeE",
+                "coinsAddresses": [
+                    "0x028171bCA77440897B824Ca71D1c56caC55b68A3",
+                    "0xBcca60bB61934080951369a648Fb03DF4F96263C",
+                    "0x3Ed3B47Dd13EC9a98b44e6204A523E766B225811",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "18",
+                    "6",
+                    "6",
+                    "0"
+                ],
+                "virtualPrice": "1115071549834612104",
+                "amplificationCoefficient": "2000",
+                "assetType": "0",
+                "totalSupply": "19050417878383927304968709",
+                "name": "Curve.fi aDAI/aUSDC/aUSDT",
+                "lpTokenAddress": "0xFd2a8fA60Abd58Efe3EeE34dd494cD491dC14900",
+                "symbol": "a3CRV",
+                "priceOracle": 0,
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/aave/swap",
+                        "https://classic.curve.fi/aave"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/aave/deposit",
+                        "https://classic.curve.fi/aave/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/aave/withdraw",
+                        "https://classic.curve.fi/aave/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "assetTypeName": "usd",
+                "coins": [
+                    {
+                        "address": "0x028171bCA77440897B824Ca71D1c56caC55b68A3",
+                        "usdPrice": 1,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "aDAI",
+                        "poolBalance": "7031247661989715743246955"
+                    },
+                    {
+                        "address": "0xBcca60bB61934080951369a648Fb03DF4F96263C",
+                        "usdPrice": 1.004,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "aUSDC",
+                        "poolBalance": "7260078918437"
+                    },
+                    {
+                        "address": "0x3Ed3B47Dd13EC9a98b44e6204A523E766B225811",
+                        "usdPrice": 1.001,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "aUSDT",
+                        "poolBalance": "6951254210735"
+                    }
+                ],
+                "usdTotal": 21278572.3610462,
+                "isMetaPool": false,
+                "usdTotalExcludingBasePool": 21278572.3610462,
+                "gaugeAddress": "0xd662908ada2ea1916b3318327a97eb18ad588b5d",
+                "gaugeRewards": [],
+                "gaugeCrvApy": [
+                    0.01290677883195091,
+                    0.032266947079877276
+                ]
+            },
+            {
+                "id": "2",
+                "address": "0xA96A65c051bF88B4095Ee1f2451C2A9d43F53Ae2",
+                "coinsAddresses": [
+                    "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+                    "0xE95A203B1a91a908F9B9CE46459d101078c2c3cb",
+                    "0x0000000000000000000000000000000000000000",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "18",
+                    "18",
+                    "0",
+                    "0"
+                ],
+                "virtualPrice": "1073430001785398951",
+                "amplificationCoefficient": "10",
+                "assetType": "1",
+                "totalSupply": "1625570989779652221254",
+                "name": "Curve.fi ETH/aETH",
+                "lpTokenAddress": "0xaA17A236F2bAdc98DDc0Cf999AbB47D47Fc0A6Cf",
+                "symbol": "ankrCRV",
+                "priceOracle": 0,
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/ankreth/swap",
+                        "https://classic.curve.fi/ankreth"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/ankreth/deposit",
+                        "https://classic.curve.fi/ankreth/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/ankreth/withdraw",
+                        "https://classic.curve.fi/ankreth/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "assetTypeName": "eth",
+                "coins": [
+                    {
+                        "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+                        "usdPrice": 1925.09,
+                        "poolBalance": "871898542429282019627",
+                        "decimals": 18,
+                        "symbol": "ETH",
+                        "isBasePoolLpToken": false
+                    },
+                    {
+                        "address": "0xE95A203B1a91a908F9B9CE46459d101078c2c3cb",
+                        "usdPrice": 2156.121753514318,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "ankrETH",
+                        "poolBalance": "778995504938005413761"
+                    }
+                ],
+                "usdTotal": 3358092.3191318903,
+                "isMetaPool": false,
+                "usdTotalExcludingBasePool": 3358092.3191318903,
+                "gaugeAddress": "0x6d10ed2cf043e6fcf51a0e7b4c2af3fa06695707",
+                "gaugeRewards": [
+                    {
+                        "gaugeAddress": "0x6d10ed2cf043e6fcf51a0e7b4c2af3fa06695707",
+                        "tokenPrice": 0.02358415,
+                        "name": "Ankr Network",
+                        "symbol": "ANKR",
+                        "decimals": "18",
+                        "apy": 0,
+                        "tokenAddress": "0x8290333ceF9e6D528dD5618Fb97a76f268f3EDD4"
+                    }
+                ],
+                "gaugeCrvApy": [
+                    0.27620455019953744,
+                    0.6905113754988436
+                ]
+            },
+            {
+                "id": "3",
+                "address": "0x79a8C46DeA5aDa233ABaFFD40F3A0A2B1e5A4F27",
+                "coinsAddresses": [
+                    "0xC2cB1040220768554cf699b0d863A3cd4324ce32",
+                    "0x26EA744E5B887E5205727f55dFBE8685e3b21951",
+                    "0xE6354ed5bC4b393a5Aad09f21c46E101e692d447",
+                    "0x04bC0Ab673d88aE9dbC9DA2380cB6B79C4BCa9aE"
+                ],
+                "decimals": [
+                    "18",
+                    "6",
+                    "6",
+                    "18"
+                ],
+                "virtualPrice": "21559957129172939",
+                "amplificationCoefficient": "500",
+                "assetType": "0",
+                "totalSupply": "8635953351789693504384782",
+                "name": "Curve.fi yDAI/yUSDC/yUSDT/yBUSD",
+                "lpTokenAddress": "0x3B3Ac5386837Dc563660FB6a0937DFAa5924333B",
+                "symbol": "yDAI+yUSDC+yUSDT+yBUSD",
+                "priceOracle": 0,
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/busd/swap",
+                        "https://classic.curve.fi/busd"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/busd/deposit",
+                        "https://classic.curve.fi/busd/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/busd/withdraw",
+                        "https://classic.curve.fi/busd/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "assetTypeName": "usd",
+                "coins": [
+                    {
+                        "address": "0xC2cB1040220768554cf699b0d863A3cd4324ce32",
+                        "usdPrice": 0.999743,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "yDAI",
+                        "poolBalance": "30153731531899893330718"
+                    },
+                    {
+                        "address": "0x26EA744E5B887E5205727f55dFBE8685e3b21951",
+                        "usdPrice": 0.999841,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "yUSDC",
+                        "poolBalance": "38918574918"
+                    },
+                    {
+                        "address": "0xE6354ed5bC4b393a5Aad09f21c46E101e692d447",
+                        "usdPrice": 2.63626214646112e-10,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "yUSDT",
+                        "poolBalance": "138774459672589072214"
+                    },
+                    {
+                        "address": "0x04bC0Ab673d88aE9dbC9DA2380cB6B79C4BCa9aE",
+                        "usdPrice": 0.999956,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "yBUSD",
+                        "poolBalance": "55314878000223214471287"
+                    }
+                ],
+                "usdTotal": 160955.39852611962,
+                "isMetaPool": false,
+                "usdTotalExcludingBasePool": 160955.39852611962,
+                "gaugeAddress": "0x69fb7c45726cfe2badee8317005d3f94be838840",
+                "gaugeRewards": [],
+                "gaugeCrvApy": [
+                    0,
+                    0
+                ]
+            },
+            {
+                "id": "4",
+                "address": "0xA2B47E3D5c44877cca798226B7B8118F9BFb7A56",
+                "coinsAddresses": [
+                    "0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643",
+                    "0x39AA39c021dfbaE8faC545936693aC917d5E7563",
+                    "0x0000000000000000000000000000000000000000",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "8",
+                    "8",
+                    "0",
+                    "0"
+                ],
+                "virtualPrice": "1121635819903750723",
+                "amplificationCoefficient": "4500",
+                "assetType": "0",
+                "totalSupply": "5681247197188902278886117",
+                "name": "Curve.fi cDAI/cUSDC",
+                "lpTokenAddress": "0x845838DF265Dcd2c412A1Dc9e959c7d08537f8a2",
+                "symbol": "cDAI+cUSDC",
+                "priceOracle": 0,
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/compound/swap",
+                        "https://classic.curve.fi/compound"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/compound/deposit",
+                        "https://classic.curve.fi/compound/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/compound/withdraw",
+                        "https://classic.curve.fi/compound/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "assetTypeName": "usd",
+                "coins": [
+                    {
+                        "address": "0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643",
+                        "usdPrice": 0.02228729,
+                        "decimals": "8",
+                        "isBasePoolLpToken": false,
+                        "symbol": "cDAI",
+                        "poolBalance": "9157271183951501"
+                    },
+                    {
+                        "address": "0x39AA39c021dfbaE8faC545936693aC917d5E7563",
+                        "usdPrice": 0.0228954925371409,
+                        "decimals": "8",
+                        "isBasePoolLpToken": false,
+                        "symbol": "cUSDC",
+                        "poolBalance": "18908601161150607"
+                    }
+                ],
+                "usdTotal": 6370124.952582679,
+                "isMetaPool": false,
+                "usdTotalExcludingBasePool": 6370124.952582679,
+                "gaugeAddress": "0x7ca5b0a2910b33e9759dc7ddb0413949071d7575",
+                "gaugeRewards": [],
+                "gaugeCrvApy": [
+                    1.179234400740279,
+                    2.948086001850698
+                ]
+            },
+            {
+                "id": "5",
+                "address": "0x0Ce6a5fF5217e38315f87032CF90686C96627CAA",
+                "coinsAddresses": [
+                    "0xdB25f211AB05b1c97D595516F45794528a807ad8",
+                    "0xD71eCFF9342A5Ced620049e616c5035F1dB98620",
+                    "0x0000000000000000000000000000000000000000",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "2",
+                    "18",
+                    "0",
+                    "0"
+                ],
+                "virtualPrice": "1005791410329786414",
+                "amplificationCoefficient": "100",
+                "assetType": "3",
+                "totalSupply": "3409036056513660805697792",
+                "name": "Curve.fi EURS/sEUR",
+                "lpTokenAddress": "0x194eBd173F6cDacE046C53eACcE9B953F28411d1",
+                "symbol": "eursCRV",
+                "priceOracle": 0,
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/eurs/swap",
+                        "https://classic.curve.fi/eurs"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/eurs/deposit",
+                        "https://classic.curve.fi/eurs/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/eurs/withdraw",
+                        "https://classic.curve.fi/eurs/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "assetTypeName": "other",
+                "coins": [
+                    {
+                        "address": "0xdB25f211AB05b1c97D595516F45794528a807ad8",
+                        "usdPrice": 1.092,
+                        "decimals": "2",
+                        "isBasePoolLpToken": false,
+                        "symbol": "EURS",
+                        "poolBalance": "189630521"
+                    },
+                    {
+                        "address": "0xD71eCFF9342A5Ced620049e616c5035F1dB98620",
+                        "usdPrice": 1.092,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "sEUR",
+                        "poolBalance": "1532667019917052489389778"
+                    }
+                ],
+                "usdTotal": 3744437.6750694215,
+                "isMetaPool": false,
+                "usdTotalExcludingBasePool": 3744437.6750694215,
+                "gaugeAddress": "0x90bb609649e0451e5ad952683d64bd2d1f245840",
+                "gaugeRewards": [],
+                "gaugeCrvApy": [
+                    0.1548972851746577,
+                    0.38724321293664427
+                ]
+            },
+            {
+                "id": "6",
+                "address": "0x4CA9b3063Ec5866A4B82E437059D2C43d1be596F",
+                "coinsAddresses": [
+                    "0x0316EB71485b0Ab14103307bf65a021042c6d380",
+                    "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+                    "0x0000000000000000000000000000000000000000",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "18",
+                    "8",
+                    "0",
+                    "0"
+                ],
+                "virtualPrice": "1011478178639219399",
+                "amplificationCoefficient": "1000",
+                "assetType": "2",
+                "totalSupply": "218802581830719513895",
+                "name": "Curve.fi hBTC/wBTC",
+                "lpTokenAddress": "0xb19059ebb43466C323583928285a49f558E572Fd",
+                "symbol": "hCRV",
+                "priceOracle": 0,
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/hbtc/swap",
+                        "https://classic.curve.fi/hbtc"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/hbtc/deposit",
+                        "https://classic.curve.fi/hbtc/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/hbtc/withdraw",
+                        "https://classic.curve.fi/hbtc/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "assetTypeName": "btc",
+                "coins": [
+                    {
+                        "address": "0x0316EB71485b0Ab14103307bf65a021042c6d380",
+                        "usdPrice": 30581.34007393,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "HBTC",
+                        "poolBalance": "144705241689053965057"
+                    },
+                    {
+                        "address": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+                        "usdPrice": 30617,
+                        "decimals": "8",
+                        "isBasePoolLpToken": false,
+                        "symbol": "WBTC",
+                        "poolBalance": "7662034874"
+                    }
+                ],
+                "usdTotal": 6771165.4239457715,
+                "isMetaPool": false,
+                "usdTotalExcludingBasePool": 6771165.4239457715,
+                "gaugeAddress": "0x4c18e409dc8619bfb6a1cb56d114c3f592e0ae79",
+                "gaugeRewards": [],
+                "gaugeCrvApy": [
+                    1.0756295555153936,
+                    2.689073888788484
+                ]
+            },
+            {
+                "id": "7",
+                "address": "0x2dded6Da1BF5DBdF597C45fcFaa3194e53EcfeAF",
+                "coinsAddresses": [
+                    "0x8e595470Ed749b85C6F7669de83EAe304C2ec68F",
+                    "0x76Eb2FE28b36B3ee97F3Adae0C69606eeDB2A37c",
+                    "0x48759F220ED983dB51fA7A8C0D2AAb8f3ce4166a",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "8",
+                    "8",
+                    "8",
+                    "0"
+                ],
+                "virtualPrice": "1103960685513248073",
+                "amplificationCoefficient": "6000",
+                "assetType": "0",
+                "totalSupply": "5866989931598593493398643",
+                "name": "Curve.fi cyDAI/cyUSDC/cyUSDT",
+                "lpTokenAddress": "0x5282a4eF67D9C33135340fB3289cc1711c13638C",
+                "symbol": "ib3CRV",
+                "priceOracle": 0,
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/ib/swap",
+                        "https://classic.curve.fi/ib"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/ib/deposit",
+                        "https://classic.curve.fi/ib/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/ib/withdraw",
+                        "https://classic.curve.fi/ib/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "assetTypeName": "usd",
+                "coins": [
+                    {
+                        "address": "0x8e595470Ed749b85C6F7669de83EAe304C2ec68F",
+                        "usdPrice": 0.011074122461334665,
+                        "decimals": "8",
+                        "isBasePoolLpToken": false,
+                        "symbol": "iDAI",
+                        "poolBalance": "10073064297191144"
+                    },
+                    {
+                        "address": "0x76Eb2FE28b36B3ee97F3Adae0C69606eeDB2A37c",
+                        "usdPrice": 0.010924729287046558,
+                        "decimals": "8",
+                        "isBasePoolLpToken": false,
+                        "symbol": "iUSDC",
+                        "poolBalance": "16366886968224668"
+                    },
+                    {
+                        "address": "0x48759F220ED983dB51fA7A8C0D2AAb8f3ce4166a",
+                        "usdPrice": 0.011661046685721292,
+                        "decimals": "8",
+                        "isBasePoolLpToken": false,
+                        "symbol": "iUSDT",
+                        "poolBalance": "30626889336124776"
+                    }
+                ],
+                "usdTotal": 6474957.433745081,
+                "isMetaPool": false,
+                "usdTotalExcludingBasePool": 6474957.433745081,
+                "gaugeAddress": "0xf5194c3325202f456c95c1cf0ca36f8475c1949f",
+                "gaugeRewards": [],
+                "gaugeCrvApy": [
+                    0.6605360771998939,
+                    1.651340192999735
+                ]
+            },
+            {
+                "id": "8",
+                "address": "0xF178C0b5Bb7e7aBF4e12A4838C7b7c5bA2C623c0",
+                "coinsAddresses": [
+                    "0x514910771AF9Ca656af840dff83E8264EcF986CA",
+                    "0xbBC455cb4F1B9e4bFC4B73970d360c8f032EfEE6",
+                    "0x0000000000000000000000000000000000000000",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "18",
+                    "18",
+                    "0",
+                    "0"
+                ],
+                "virtualPrice": "1002841430774761103",
+                "amplificationCoefficient": "100",
+                "assetType": "3",
+                "totalSupply": "259967383209303789542274",
+                "name": "Curve.fi LINK/sLINK",
+                "lpTokenAddress": "0xcee60cFa923170e4f8204AE08B4fA6A3F5656F3a",
+                "symbol": "linkCRV",
+                "priceOracle": 0,
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/link/swap",
+                        "https://classic.curve.fi/link"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/link/deposit",
+                        "https://classic.curve.fi/link/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/link/withdraw",
+                        "https://classic.curve.fi/link/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "assetTypeName": "other",
+                "coins": [
+                    {
+                        "address": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
+                        "usdPrice": 6.46,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "LINK",
+                        "poolBalance": "248149628917298413491988"
+                    },
+                    {
+                        "address": "0xbBC455cb4F1B9e4bFC4B73970d360c8f032EfEE6",
+                        "usdPrice": 8.362328011212051,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "sLINK",
+                        "poolBalance": "16622609947386661516491"
+                    }
+                ],
+                "usdTotal": 1742050.3195882314,
+                "isMetaPool": false,
+                "usdTotalExcludingBasePool": 1742050.3195882314,
+                "gaugeAddress": "0xfd4d8a17df4c27c1dd245d153ccf4499e806c87d",
+                "gaugeRewards": [],
+                "gaugeCrvApy": [
+                    0.16510511624670487,
+                    0.4127627906167622
+                ]
+            },
+            {
+                "id": "9",
+                "address": "0x06364f10B501e868329afBc005b3492902d6C763",
+                "coinsAddresses": [
+                    "0x99d1Fa417f94dcD62BfE781a1213c092a47041Bc",
+                    "0x9777d7E2b60bB01759D0E2f8be2095df444cb07E",
+                    "0x1bE5d71F2dA660BFdee8012dDc58D024448A0A59",
+                    "0x8E870D67F660D95d5be530380D0eC0bd388289E1"
+                ],
+                "decimals": [
+                    "18",
+                    "6",
+                    "6",
+                    "18"
+                ],
+                "virtualPrice": "75311574859845515",
+                "amplificationCoefficient": "200",
+                "assetType": "0",
+                "totalSupply": "362570082883587269994253",
+                "name": "Curve.fi DAI/USDC/USDT/PAX",
+                "lpTokenAddress": "0xD905e2eaeBe188fc92179b6350807D8bd91Db0D8",
+                "symbol": "ypaxCrv",
+                "priceOracle": 0,
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/pax/swap",
+                        "https://classic.curve.fi/pax"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/pax/deposit",
+                        "https://classic.curve.fi/pax/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/pax/withdraw",
+                        "https://classic.curve.fi/pax/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "assetTypeName": "usd",
+                "coins": [
+                    {
+                        "address": "0x99d1Fa417f94dcD62BfE781a1213c092a47041Bc",
+                        "usdPrice": 1.0183551397763788,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "ycDAI",
+                        "poolBalance": "7894841951796291023022"
+                    },
+                    {
+                        "address": "0x9777d7E2b60bB01759D0E2f8be2095df444cb07E",
+                        "usdPrice": 1.0339596832415274,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "ycUSDC",
+                        "poolBalance": "7722006082"
+                    },
+                    {
+                        "address": "0x1bE5d71F2dA660BFdee8012dDc58D024448A0A59",
+                        "usdPrice": 4.905771126124896e-8,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "ycUSDT",
+                        "poolBalance": "90401036037487592"
+                    },
+                    {
+                        "address": "0x8E870D67F660D95d5be530380D0eC0bd388289E1",
+                        "usdPrice": 0.999583,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDP",
+                        "poolBalance": "6834197396318475846635"
+                    }
+                ],
+                "usdTotal": 27290.21130151684,
+                "isMetaPool": false,
+                "usdTotalExcludingBasePool": 27290.21130151684,
+                "gaugeAddress": "0x64e3c23bfc40722d3b649844055f1d51c1ac041d",
+                "gaugeRewards": [],
+                "gaugeCrvApy": [
+                    0,
+                    0
+                ]
+            },
+            {
+                "id": "10",
+                "address": "0x93054188d876f558f4a66B2EF1d97d16eDf0895B",
+                "coinsAddresses": [
+                    "0xEB4C2781e4ebA804CE9a9803C67d0893436bB27D",
+                    "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+                    "0x0000000000000000000000000000000000000000",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "8",
+                    "8",
+                    "0",
+                    "0"
+                ],
+                "virtualPrice": "1024781999763127132",
+                "amplificationCoefficient": "1000",
+                "assetType": "2",
+                "totalSupply": "193769521634995230765",
+                "name": "Curve.fi renBTC/wBTC",
+                "lpTokenAddress": "0x49849C98ae39Fff122806C06791Fa73784FB3675",
+                "symbol": "crvRenWBTC",
+                "priceOracle": 0,
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/ren/swap",
+                        "https://classic.curve.fi/ren"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/ren/deposit",
+                        "https://classic.curve.fi/ren/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/ren/withdraw",
+                        "https://classic.curve.fi/ren/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "assetTypeName": "btc",
+                "coins": [
+                    {
+                        "address": "0xEB4C2781e4ebA804CE9a9803C67d0893436bB27D",
+                        "usdPrice": 31626.82183463,
+                        "decimals": "8",
+                        "isBasePoolLpToken": false,
+                        "symbol": "renBTC",
+                        "poolBalance": "1160921050"
+                    },
+                    {
+                        "address": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+                        "usdPrice": 30617,
+                        "decimals": "8",
+                        "isBasePoolLpToken": false,
+                        "symbol": "WBTC",
+                        "poolBalance": "18731310195"
+                    }
+                ],
+                "usdTotal": 6102127.674527367,
+                "isMetaPool": false,
+                "usdTotalExcludingBasePool": 6102127.674527367,
+                "gaugeAddress": "0xb1f2cdec61db658f091671f5f199635aef202cac",
+                "gaugeRewards": [],
+                "gaugeCrvApy": [
+                    0.1795283435213309,
+                    0.4488208588033272
+                ]
+            },
+            {
+                "id": "11",
+                "address": "0xEB16Ae0052ed37f479f7fe63849198Df1765a733",
+                "coinsAddresses": [
+                    "0x028171bCA77440897B824Ca71D1c56caC55b68A3",
+                    "0x6C5024Cd4F8A59110119C56f8933403A539555EB",
+                    "0x0000000000000000000000000000000000000000",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "18",
+                    "18",
+                    "0",
+                    "0"
+                ],
+                "virtualPrice": "1094068822147375785",
+                "amplificationCoefficient": "100",
+                "assetType": "0",
+                "totalSupply": "1541826350413174956009147",
+                "name": "Curve.fi aDAI/aSUSD",
+                "lpTokenAddress": "0x02d341CcB60fAaf662bC0554d13778015d1b285C",
+                "symbol": "saCRV",
+                "priceOracle": 0,
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/saave/swap",
+                        "https://classic.curve.fi/saave"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/saave/deposit",
+                        "https://classic.curve.fi/saave/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/saave/withdraw",
+                        "https://classic.curve.fi/saave/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "assetTypeName": "usd",
+                "coins": [
+                    {
+                        "address": "0x028171bCA77440897B824Ca71D1c56caC55b68A3",
+                        "usdPrice": 1,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "aDAI",
+                        "poolBalance": "818872080442663553427401"
+                    },
+                    {
+                        "address": "0x6C5024Cd4F8A59110119C56f8933403A539555EB",
+                        "usdPrice": 0.9990225570437684,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "aSUSD",
+                        "poolBalance": "867999147488602883142199"
+                    }
+                ],
+                "usdTotal": 1686022.8082785388,
+                "isMetaPool": false,
+                "usdTotalExcludingBasePool": 1686022.8082785388,
+                "gaugeAddress": "0x462253b8f74b72304c145db0e4eebd326b22ca39",
+                "gaugeRewards": [],
+                "gaugeCrvApy": [
+                    0,
+                    0
+                ]
+            },
+            {
+                "id": "12",
+                "address": "0x7fC77b5c7614E1533320Ea6DDc2Eb61fa00A9714",
+                "coinsAddresses": [
+                    "0xEB4C2781e4ebA804CE9a9803C67d0893436bB27D",
+                    "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+                    "0xfE18be6b3Bd88A2D2A7f928d00292E7a9963CfC6",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "8",
+                    "8",
+                    "18",
+                    "0"
+                ],
+                "virtualPrice": "1019873174175189027",
+                "amplificationCoefficient": "100",
+                "assetType": "2",
+                "totalSupply": "219401998112250652841",
+                "name": "Curve.fi renBTC/wBTC/sBTC",
+                "lpTokenAddress": "0x075b1bb99792c9E1041bA13afEf80C91a1e70fB3",
+                "symbol": "crvRenWSBTC",
+                "priceOracle": 0,
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/sbtc/swap",
+                        "https://classic.curve.fi/sbtc"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/sbtc/deposit",
+                        "https://classic.curve.fi/sbtc/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/sbtc/withdraw",
+                        "https://classic.curve.fi/sbtc/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "assetTypeName": "btc",
+                "coins": [
+                    {
+                        "address": "0xEB4C2781e4ebA804CE9a9803C67d0893436bB27D",
+                        "usdPrice": 31626.82183463,
+                        "decimals": "8",
+                        "isBasePoolLpToken": false,
+                        "symbol": "renBTC",
+                        "poolBalance": "2516336096"
+                    },
+                    {
+                        "address": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+                        "usdPrice": 30617,
+                        "decimals": "8",
+                        "isBasePoolLpToken": false,
+                        "symbol": "WBTC",
+                        "poolBalance": "9775034998"
+                    },
+                    {
+                        "address": "0xfE18be6b3Bd88A2D2A7f928d00292E7a9963CfC6",
+                        "usdPrice": 30450.695918704292,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "sBTC",
+                        "poolBalance": "101344211103528231089"
+                    }
+                ],
+                "usdTotal": 6874661.354614577,
+                "isMetaPool": false,
+                "usdTotalExcludingBasePool": 6874661.354614577,
+                "gaugeAddress": "0x705350c4bcd35c9441419ddd5d2f097d7a55410f",
+                "gaugeRewards": [
+                    {
+                        "gaugeAddress": "0x705350c4bcd35c9441419ddd5d2f097d7a55410f",
+                        "name": "Balancer Pool Token",
+                        "symbol": "BPT",
+                        "decimals": "18",
+                        "apy": 0,
+                        "tokenAddress": "0x330416C863f2acCE7aF9C9314B422d24c672534a"
+                    }
+                ],
+                "gaugeCrvApy": [
+                    0.06762187607238347,
+                    0.16905469018095867
+                ]
+            },
+            {
+                "id": "13",
+                "address": "0xc5424B857f758E906013F3555Dad202e4bdB4567",
+                "coinsAddresses": [
+                    "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+                    "0x5e74C9036fb86BD7eCdcb084a0673EFc32eA31cb",
+                    "0x0000000000000000000000000000000000000000",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "18",
+                    "18",
+                    "0",
+                    "0"
+                ],
+                "virtualPrice": "1018381601816821231",
+                "amplificationCoefficient": "256",
+                "assetType": "1",
+                "totalSupply": "16209482209419860318949",
+                "name": "Curve.fi ETH/sETH",
+                "lpTokenAddress": "0xA3D87FffcE63B53E0d54fAa1cc983B7eB0b74A9c",
+                "symbol": "eCRV",
+                "priceOracle": 0,
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/seth/swap",
+                        "https://classic.curve.fi/seth"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/seth/deposit",
+                        "https://classic.curve.fi/seth/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/seth/withdraw",
+                        "https://classic.curve.fi/seth/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "assetTypeName": "eth",
+                "coins": [
+                    {
+                        "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+                        "usdPrice": 1925.09,
+                        "poolBalance": "7995622099491150517908",
+                        "decimals": 18,
+                        "symbol": "ETH",
+                        "isBasePoolLpToken": false
+                    },
+                    {
+                        "address": "0x5e74C9036fb86BD7eCdcb084a0673EFc32eA31cb",
+                        "usdPrice": 1924.2348121037094,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "sETH",
+                        "poolBalance": "8511847795786853386367"
+                    }
+                ],
+                "usdTotal": 31771085.991490703,
+                "isMetaPool": false,
+                "usdTotalExcludingBasePool": 31771085.991490703,
+                "gaugeAddress": "0x3c0ffff15ea30c35d7a85b85c0782d6c94e1d238",
+                "gaugeRewards": [],
+                "gaugeCrvApy": [
+                    0.8838179561713763,
+                    2.2095448904284405
+                ]
+            },
+            {
+                "id": "14",
+                "address": "0xDC24316b9AE028F1497c275EB9192a3Ea0f67022",
+                "coinsAddresses": [
+                    "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+                    "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",
+                    "0x0000000000000000000000000000000000000000",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "18",
+                    "18",
+                    "0",
+                    "0"
+                ],
+                "virtualPrice": "1075593639021392226",
+                "amplificationCoefficient": "30",
+                "assetType": "1",
+                "totalSupply": "428123003615238476524678",
+                "name": "Curve.fi ETH/stETH",
+                "lpTokenAddress": "0x06325440D014e39736583c165C2963BA99fAf14E",
+                "symbol": "steCRV",
+                "priceOracle": 0,
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/steth/swap",
+                        "https://classic.curve.fi/steth"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/steth/deposit",
+                        "https://classic.curve.fi/steth/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/steth/withdraw",
+                        "https://classic.curve.fi/steth/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "assetTypeName": "eth",
+                "coins": [
+                    {
+                        "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+                        "usdPrice": 1925.09,
+                        "poolBalance": "228793604506421530951953",
+                        "decimals": 18,
+                        "symbol": "ETH",
+                        "isBasePoolLpToken": false
+                    },
+                    {
+                        "address": "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",
+                        "usdPrice": 1923.5380834635862,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "stETH",
+                        "poolBalance": "231693069372412509499548"
+                    }
+                ],
+                "usdTotal": 886118722.711673,
+                "isMetaPool": false,
+                "usdTotalExcludingBasePool": 886118722.711673,
+                "gaugeAddress": "0x182b723a58739a9c974cfdb385ceadb237453c28",
+                "gaugeRewards": [
+                    {
+                        "gaugeAddress": "0x182b723a58739a9c974cfdb385ceadb237453c28",
+                        "tokenPrice": 2.13,
+                        "name": "Lido DAO Token",
+                        "symbol": "LDO",
+                        "decimals": "18",
+                        "apy": 0,
+                        "tokenAddress": "0x5A98FcBEA516Cf06857215779Fd812CA3beF1B32"
+                    }
+                ],
+                "gaugeCrvApy": [
+                    0.0007059142160783004,
+                    0.001764785540195751
+                ]
+            },
+            {
+                "id": "15",
+                "address": "0xA5407eAE9Ba41422680e2e00537571bcC53efBfD",
+                "coinsAddresses": [
+                    "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+                    "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                    "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+                    "0x57Ab1ec28D129707052df4dF418D58a2D46d5f51"
+                ],
+                "decimals": [
+                    "18",
+                    "6",
+                    "6",
+                    "18"
+                ],
+                "virtualPrice": "1064432154034581568",
+                "amplificationCoefficient": "256",
+                "assetType": "0",
+                "totalSupply": "56232147534647481178965019",
+                "name": "Curve.fi DAI/USDC/USDT/sUSD",
+                "lpTokenAddress": "0xC25a3A3b969415c80451098fa907EC722572917F",
+                "symbol": "crvPlain3andSUSD",
+                "priceOracle": 0,
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/susd/swap",
+                        "https://classic.curve.fi/susd"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/susd/deposit",
+                        "https://classic.curve.fi/susd/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/susd/withdraw",
+                        "https://classic.curve.fi/susd/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "assetTypeName": "usd",
+                "coins": [
+                    {
+                        "address": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+                        "usdPrice": 0.999743,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "DAI",
+                        "poolBalance": "14569122907201602988328881"
+                    },
+                    {
+                        "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                        "usdPrice": 0.999841,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDC",
+                        "poolBalance": "14438700939047"
+                    },
+                    {
+                        "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+                        "usdPrice": 0.999782,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDT",
+                        "poolBalance": "15335911208867"
+                    },
+                    {
+                        "address": "0x57Ab1ec28D129707052df4dF418D58a2D46d5f51",
+                        "usdPrice": 0.9992998757094688,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "sUSD",
+                        "poolBalance": "15511684116983566814575235"
+                    }
+                ],
+                "usdTotal": 59835175.81858182,
+                "isMetaPool": false,
+                "usdTotalExcludingBasePool": 59835175.81858182,
+                "gaugeAddress": "0xa90996896660decc6e997655e065b23788857849",
+                "gaugeRewards": [
+                    {
+                        "gaugeAddress": "0xa90996896660decc6e997655e065b23788857849",
+                        "tokenPrice": 2.28,
+                        "name": "Synthetix Network Token",
+                        "symbol": "SNX",
+                        "decimals": "18",
+                        "apy": 0,
+                        "tokenAddress": "0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F"
+                    }
+                ],
+                "gaugeCrvApy": [
+                    0.9721385442954203,
+                    2.4303463607385507
+                ]
+            },
+            {
+                "id": "16",
+                "address": "0x52EA46506B9CC5Ef470C5bf89f17Dc28bB35D85C",
+                "coinsAddresses": [
+                    "0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643",
+                    "0x39AA39c021dfbaE8faC545936693aC917d5E7563",
+                    "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "8",
+                    "8",
+                    "6",
+                    "0"
+                ],
+                "virtualPrice": "2953389297511999868",
+                "amplificationCoefficient": "2000",
+                "assetType": "0",
+                "totalSupply": "113520135856893945413278",
+                "name": "Curve.fi cDAI/cUSDC/USDT",
+                "lpTokenAddress": "0x9fC689CCaDa600B6DF723D9E47D84d76664a1F23",
+                "symbol": "cDAI+cUSDC+USDT",
+                "priceOracle": 0,
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/usdt/swap",
+                        "https://classic.curve.fi/usdt"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/usdt/deposit",
+                        "https://classic.curve.fi/usdt/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/usdt/withdraw",
+                        "https://classic.curve.fi/usdt/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "assetTypeName": "usd",
+                "coins": [
+                    {
+                        "address": "0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643",
+                        "usdPrice": 0.02228729,
+                        "decimals": "8",
+                        "isBasePoolLpToken": false,
+                        "symbol": "cDAI",
+                        "poolBalance": "448687270915013"
+                    },
+                    {
+                        "address": "0x39AA39c021dfbaE8faC545936693aC917d5E7563",
+                        "usdPrice": 0.0228954925371409,
+                        "decimals": "8",
+                        "isBasePoolLpToken": false,
+                        "symbol": "cUSDC",
+                        "poolBalance": "585222464021026"
+                    },
+                    {
+                        "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+                        "usdPrice": 0.999782,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDT",
+                        "poolBalance": "101212852696"
+                    }
+                ],
+                "usdTotal": 335180.58713163296,
+                "isMetaPool": false,
+                "usdTotalExcludingBasePool": 335180.58713163296,
+                "gaugeAddress": "0xbc89cd85491d81c6ad2954e6d0362ee29fca8f53",
+                "gaugeRewards": [],
+                "gaugeCrvApy": [
+                    0,
+                    0
+                ]
+            },
+            {
+                "id": "17",
+                "address": "0x45F783CCE6B7FF23B2ab2D70e416cdb7D6055f51",
+                "coinsAddresses": [
+                    "0x16de59092dAE5CcF4A1E6439D611fd0653f0Bd01",
+                    "0xd6aD7a6750A7593E092a9B218d66C0A814a3436e",
+                    "0x83f798e925BcD4017Eb265844FDDAbb448f1707D",
+                    "0x73a052500105205d34Daf004eAb301916DA8190f"
+                ],
+                "decimals": [
+                    "18",
+                    "6",
+                    "6",
+                    "18"
+                ],
+                "virtualPrice": "11722020647865280",
+                "amplificationCoefficient": "2048",
+                "assetType": "0",
+                "totalSupply": "12381029177404471182235063",
+                "name": "Curve.fi yDAI/yUSDC/yUSDT/yTUSD",
+                "lpTokenAddress": "0xdF5e0e81Dff6FAF3A7e52BA697820c5e32D806A8",
+                "symbol": "yDAI+yUSDC+yUSDT+yTUSD",
+                "priceOracle": 0,
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/iearn/swap",
+                        "https://classic.curve.fi/iearn"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/iearn/deposit",
+                        "https://classic.curve.fi/iearn/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/iearn/withdraw",
+                        "https://classic.curve.fi/iearn/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "assetTypeName": "usd",
+                "coins": [
+                    {
+                        "address": "0x16de59092dAE5CcF4A1E6439D611fd0653f0Bd01",
+                        "usdPrice": 0.999743,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "yDAI",
+                        "poolBalance": "29393137713214856970649"
+                    },
+                    {
+                        "address": "0xd6aD7a6750A7593E092a9B218d66C0A814a3436e",
+                        "usdPrice": 0.999841,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "yUSDC",
+                        "poolBalance": "14695444956"
+                    },
+                    {
+                        "address": "0x83f798e925BcD4017Eb265844FDDAbb448f1707D",
+                        "usdPrice": 7.035128507191001e-12,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "yUSDT",
+                        "poolBalance": "2704348104901266478282"
+                    },
+                    {
+                        "address": "0x73a052500105205d34Daf004eAb301916DA8190f",
+                        "usdPrice": 1.1719392024797854,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "yTUSD",
+                        "poolBalance": "53824829988221849598930"
+                    }
+                ],
+                "usdTotal": 126183.55683324017,
+                "isMetaPool": false,
+                "usdTotalExcludingBasePool": 126183.55683324017,
+                "gaugeAddress": "0xfa712ee4788c042e2b7bb55e6cb8ec569c4530c1",
+                "gaugeRewards": [],
+                "gaugeCrvApy": [
+                    10.585488810489284,
+                    26.46372202622321
+                ]
+            },
+            {
+                "id": "18",
+                "address": "0x8038C01A0390a8c547446a0b2c18fc9aEFEcc10c",
+                "coinsAddresses": [
+                    "0x5BC25f649fc4e26069dDF4cF4010F9f706c23831",
+                    "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490",
+                    "0x0000000000000000000000000000000000000000",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "18",
+                    "18",
+                    "0",
+                    "0"
+                ],
+                "virtualPrice": "1025051918201100677",
+                "amplificationCoefficient": "200",
+                "underlyingDecimals": [
+                    "18",
+                    "18",
+                    "6",
+                    "6",
+                    "0",
+                    "0",
+                    "0",
+                    "0"
+                ],
+                "assetType": "0",
+                "totalSupply": "74173809989089760579996",
+                "name": "Curve.fi DUSD/3Crv",
+                "lpTokenAddress": "0x3a664Ab939FD8482048609f652f9a0B0677337B9",
+                "symbol": "dusd3CRV",
+                "priceOracle": 0,
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/dusd/swap",
+                        "https://classic.curve.fi/dusd"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/dusd/deposit",
+                        "https://classic.curve.fi/dusd/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/dusd/withdraw",
+                        "https://classic.curve.fi/dusd/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "assetTypeName": "usd",
+                "coins": [
+                    {
+                        "address": "0x5BC25f649fc4e26069dDF4cF4010F9f706c23831",
+                        "usdPrice": 0.9941158352723056,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "DUSD",
+                        "poolBalance": "52736289254522078424531"
+                    },
+                    {
+                        "address": "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490",
+                        "usdPrice": 1.0260845611402294,
+                        "decimals": "18",
+                        "isBasePoolLpToken": true,
+                        "symbol": "3Crv",
+                        "poolBalance": "22731311641921704767498"
+                    }
+                ],
+                "usdTotal": 75750.22817166414,
+                "isMetaPool": true,
+                "underlyingCoins": [
+                    {
+                        "address": "0x5BC25f649fc4e26069dDF4cF4010F9f706c23831",
+                        "usdPrice": 0.9941158352723056,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "DUSD",
+                        "poolBalance": "52736289254522078424531"
+                    },
+                    {
+                        "address": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+                        "usdPrice": 0.999743,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "DAI",
+                        "poolBalance": "6537558809094272007110"
+                    },
+                    {
+                        "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                        "usdPrice": 0.999841,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDC",
+                        "poolBalance": "6570541948"
+                    },
+                    {
+                        "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+                        "usdPrice": 0.999782,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDT",
+                        "poolBalance": "10221100242"
+                    }
+                ],
+                "usdTotalExcludingBasePool": 52425.98024142113,
+                "gaugeAddress": "0xaea6c312f4b3e04d752946d329693f7293bc2e6d",
+                "gaugeRewards": [
+                    {
+                        "gaugeAddress": "0xaea6c312f4b3e04d752946d329693f7293bc2e6d",
+                        "tokenPrice": 0.00119981,
+                        "name": "DefiDollar DAO",
+                        "symbol": "DFD",
+                        "decimals": "18",
+                        "apy": 0,
+                        "tokenAddress": "0x20c36f062a31865bED8a5B1e512D9a1A20AA333A"
+                    }
+                ],
+                "gaugeCrvApy": [
+                    1.985089575922661,
+                    4.9627239398066525
+                ]
+            },
+            {
+                "id": "19",
+                "address": "0x4f062658EaAF2C1ccf8C8e36D6824CDf41167956",
+                "coinsAddresses": [
+                    "0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd",
+                    "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490",
+                    "0x0000000000000000000000000000000000000000",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "2",
+                    "18",
+                    "0",
+                    "0"
+                ],
+                "virtualPrice": "1036829072169068803",
+                "amplificationCoefficient": "1000",
+                "underlyingDecimals": [
+                    "2",
+                    "18",
+                    "6",
+                    "6",
+                    "0",
+                    "0",
+                    "0",
+                    "0"
+                ],
+                "assetType": "0",
+                "totalSupply": "5127228777294988665285689",
+                "name": "Curve.fi GUSD/3Crv",
+                "lpTokenAddress": "0xD2967f45c4f384DEEa880F807Be904762a3DeA07",
+                "symbol": "gusd3CRV",
+                "priceOracle": 0,
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/gusd/swap",
+                        "https://classic.curve.fi/gusd"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/gusd/deposit",
+                        "https://classic.curve.fi/gusd/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/gusd/withdraw",
+                        "https://classic.curve.fi/gusd/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "assetTypeName": "usd",
+                "coins": [
+                    {
+                        "address": "0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd",
+                        "usdPrice": 0.9986157340108703,
+                        "decimals": "2",
+                        "isBasePoolLpToken": false,
+                        "symbol": "GUSD",
+                        "poolBalance": "350244380"
+                    },
+                    {
+                        "address": "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490",
+                        "usdPrice": 1.0260845611402294,
+                        "decimals": "18",
+                        "isBasePoolLpToken": true,
+                        "symbol": "3Crv",
+                        "poolBalance": "1767447211586763745769912"
+                    }
+                ],
+                "usdTotal": 5311145.782608349,
+                "isMetaPool": true,
+                "underlyingCoins": [
+                    {
+                        "address": "0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd",
+                        "usdPrice": 0.9986157340108703,
+                        "decimals": "2",
+                        "isBasePoolLpToken": false,
+                        "symbol": "GUSD",
+                        "poolBalance": "350244380"
+                    },
+                    {
+                        "address": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+                        "usdPrice": 0.999743,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "DAI",
+                        "poolBalance": "508320429095191089589472"
+                    },
+                    {
+                        "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                        "usdPrice": 0.999841,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDC",
+                        "poolBalance": "510884995441"
+                    },
+                    {
+                        "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+                        "usdPrice": 0.999782,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDT",
+                        "poolBalance": "794729992106"
+                    }
+                ],
+                "usdTotalExcludingBasePool": 3497595.486168822,
+                "gaugeAddress": "0xc5cfada84e902ad92dd40194f0883ad49639b023",
+                "gaugeRewards": [],
+                "gaugeCrvApy": [
+                    3.3752684324204876,
+                    8.43817108105122
+                ]
+            },
+            {
+                "id": "20",
+                "address": "0x3eF6A01A0f81D6046290f3e2A8c5b843e738E604",
+                "coinsAddresses": [
+                    "0xdF574c24545E5FfEcb9a659c229253D4111d87e1",
+                    "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490",
+                    "0x0000000000000000000000000000000000000000",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "8",
+                    "18",
+                    "0",
+                    "0"
+                ],
+                "virtualPrice": "1055078780441999357",
+                "amplificationCoefficient": "200",
+                "underlyingDecimals": [
+                    "8",
+                    "18",
+                    "6",
+                    "6",
+                    "0",
+                    "0",
+                    "0",
+                    "0"
+                ],
+                "assetType": "0",
+                "totalSupply": "23986018694643043022325",
+                "name": "Curve.fi HUSD/3Crv",
+                "lpTokenAddress": "0x5B5CFE992AdAC0C9D48E05854B2d91C73a003858",
+                "symbol": "husd3CRV",
+                "priceOracle": 0,
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/husd/swap",
+                        "https://classic.curve.fi/husd"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/husd/deposit",
+                        "https://classic.curve.fi/husd/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/husd/withdraw",
+                        "https://classic.curve.fi/husd/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "assetTypeName": "usd",
+                "coins": [
+                    {
+                        "address": "0xdF574c24545E5FfEcb9a659c229253D4111d87e1",
+                        "usdPrice": 0.07032195414726246,
+                        "decimals": "8",
+                        "isBasePoolLpToken": false,
+                        "symbol": "HUSD",
+                        "poolBalance": "2739159365335"
+                    },
+                    {
+                        "address": "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490",
+                        "usdPrice": 1.0260845611402294,
+                        "decimals": "18",
+                        "isBasePoolLpToken": true,
+                        "symbol": "3Crv",
+                        "poolBalance": "156132559606558365658"
+                    }
+                ],
+                "usdTotal": 2086.43560181492,
+                "isMetaPool": true,
+                "underlyingCoins": [
+                    {
+                        "address": "0xdF574c24545E5FfEcb9a659c229253D4111d87e1",
+                        "usdPrice": 0.07032195414726246,
+                        "decimals": "8",
+                        "isBasePoolLpToken": false,
+                        "symbol": "HUSD",
+                        "poolBalance": "2739159365335"
+                    },
+                    {
+                        "address": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+                        "usdPrice": 0.999743,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "DAI",
+                        "poolBalance": "44903954796864503479"
+                    },
+                    {
+                        "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                        "usdPrice": 0.999841,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDC",
+                        "poolBalance": "45130503"
+                    },
+                    {
+                        "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+                        "usdPrice": 0.999782,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDT",
+                        "poolBalance": "70204772"
+                    }
+                ],
+                "usdTotalExcludingBasePool": 1926.230392911324,
+                "gaugeAddress": "0x2db0e83599a91b508ac268a6197b8b14f5e72840",
+                "gaugeRewards": [],
+                "gaugeCrvApy": [
+                    0,
+                    0
+                ]
+            },
+            {
+                "id": "21",
+                "address": "0xE7a24EF0C5e95Ffb0f6684b813A78F2a3AD7D171",
+                "coinsAddresses": [
+                    "0x0E2EC54fC0B509F445631Bf4b91AB8168230C752",
+                    "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490",
+                    "0x0000000000000000000000000000000000000000",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "18",
+                    "18",
+                    "0",
+                    "0"
+                ],
+                "virtualPrice": "1013057157448500428",
+                "amplificationCoefficient": "5",
+                "underlyingDecimals": [
+                    "18",
+                    "18",
+                    "6",
+                    "6",
+                    "0",
+                    "0",
+                    "0",
+                    "0"
+                ],
+                "assetType": "0",
+                "totalSupply": "34337940169421124627094",
+                "name": "Curve.fi LinkUSD/3Crv",
+                "lpTokenAddress": "0x6D65b498cb23deAba52db31c93Da9BFFb340FB8F",
+                "symbol": "LinkUSD3CRV",
+                "priceOracle": 0,
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/linkusd/swap",
+                        "https://classic.curve.fi/linkusd"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/linkusd/deposit",
+                        "https://classic.curve.fi/linkusd/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/linkusd/withdraw",
+                        "https://classic.curve.fi/linkusd/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "assetTypeName": "usd",
+                "coins": [
+                    {
+                        "address": "0x0E2EC54fC0B509F445631Bf4b91AB8168230C752",
+                        "usdPrice": 0.9341142935676943,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "LINKUSD",
+                        "poolBalance": "20795734613974609903911"
+                    },
+                    {
+                        "address": "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490",
+                        "usdPrice": 1.0260845611402294,
+                        "decimals": "18",
+                        "isBasePoolLpToken": true,
+                        "symbol": "3Crv",
+                        "poolBalance": "13739511908444518981051"
+                    }
+                ],
+                "usdTotal": 33523.49399501139,
+                "isMetaPool": true,
+                "underlyingCoins": [
+                    {
+                        "address": "0x0E2EC54fC0B509F445631Bf4b91AB8168230C752",
+                        "usdPrice": 0.9341142935676943,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "LINKUSD",
+                        "poolBalance": "20795734613974609903911"
+                    },
+                    {
+                        "address": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+                        "usdPrice": 0.999743,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "DAI",
+                        "poolBalance": "3951503922195731246363"
+                    },
+                    {
+                        "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                        "usdPrice": 0.999841,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDC",
+                        "poolBalance": "3971439957"
+                    },
+                    {
+                        "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+                        "usdPrice": 0.999782,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDT",
+                        "poolBalance": "6177950956"
+                    }
+                ],
+                "usdTotalExcludingBasePool": 19425.592948154143
+            },
+            {
+                "id": "22",
+                "address": "0x8474DdbE98F5aA3179B3B3F5942D724aFcdec9f6",
+                "coinsAddresses": [
+                    "0xe2f2a5C287993345a840Db3B0845fbC70f5935a5",
+                    "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490",
+                    "0x0000000000000000000000000000000000000000",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "18",
+                    "18",
+                    "0",
+                    "0"
+                ],
+                "virtualPrice": "1021976615007298601",
+                "amplificationCoefficient": "200",
+                "underlyingDecimals": [
+                    "18",
+                    "18",
+                    "6",
+                    "6",
+                    "0",
+                    "0",
+                    "0",
+                    "0"
+                ],
+                "assetType": "0",
+                "totalSupply": "1747336071881344829864268",
+                "name": "Curve.fi MUSD/3Crv",
+                "lpTokenAddress": "0x1AEf73d49Dedc4b1778d0706583995958Dc862e6",
+                "symbol": "musd3CRV",
+                "priceOracle": 0,
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/musd/swap",
+                        "https://classic.curve.fi/musd"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/musd/deposit",
+                        "https://classic.curve.fi/musd/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/musd/withdraw",
+                        "https://classic.curve.fi/musd/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "assetTypeName": "usd",
+                "coins": [
+                    {
+                        "address": "0xe2f2a5C287993345a840Db3B0845fbC70f5935a5",
+                        "usdPrice": 0.9992152928700452,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "mUSD",
+                        "poolBalance": "909407785478011027897188"
+                    },
+                    {
+                        "address": "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490",
+                        "usdPrice": 1.0260845611402294,
+                        "decimals": "18",
+                        "isBasePoolLpToken": true,
+                        "symbol": "3Crv",
+                        "poolBalance": "853881536268177005711511"
+                    }
+                ],
+                "usdTotal": 1784848.8281121873,
+                "isMetaPool": true,
+                "underlyingCoins": [
+                    {
+                        "address": "0xe2f2a5C287993345a840Db3B0845fbC70f5935a5",
+                        "usdPrice": 0.9992152928700452,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "mUSD",
+                        "poolBalance": "909407785478011027897188"
+                    },
+                    {
+                        "address": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+                        "usdPrice": 0.999743,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "DAI",
+                        "poolBalance": "245577591266574303606238"
+                    },
+                    {
+                        "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                        "usdPrice": 0.999841,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDC",
+                        "poolBalance": "246816573589"
+                    },
+                    {
+                        "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+                        "usdPrice": 0.999782,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDT",
+                        "poolBalance": "383946554177"
+                    }
+                ],
+                "usdTotalExcludingBasePool": 908694.16670471,
+                "gaugeAddress": "0x5f626c30ec1215f4edcc9982265e8b1f411d1352",
+                "gaugeRewards": [
+                    {
+                        "gaugeAddress": "0x5f626c30ec1215f4edcc9982265e8b1f411d1352",
+                        "tokenPrice": 0.03103213,
+                        "name": "Meta",
+                        "symbol": "MTA",
+                        "decimals": "18",
+                        "apy": 0,
+                        "tokenAddress": "0xa3BeD4E1c75D00fa6f4E5E6922DB7261B5E9AcD2"
+                    }
+                ],
+                "gaugeCrvApy": [
+                    3.349194786727551,
+                    8.372986966818877
+                ]
+            },
+            {
+                "id": "23",
+                "address": "0xC18cC39da8b11dA8c3541C598eE022258F9744da",
+                "coinsAddresses": [
+                    "0x196f4727526eA7FB1e17b2071B3d8eAA38486988",
+                    "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490",
+                    "0x0000000000000000000000000000000000000000",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "18",
+                    "18",
+                    "0",
+                    "0"
+                ],
+                "virtualPrice": "1031976580343692762",
+                "amplificationCoefficient": "200",
+                "underlyingDecimals": [
+                    "18",
+                    "18",
+                    "6",
+                    "6",
+                    "0",
+                    "0",
+                    "0",
+                    "0"
+                ],
+                "assetType": "0",
+                "totalSupply": "20669414070765636657611",
+                "name": "Curve.fi RSV/3Crv",
+                "lpTokenAddress": "0xC2Ee6b0334C261ED60C72f6054450b61B8f18E35",
+                "symbol": "rsv3CRV",
+                "priceOracle": 0,
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/rsv/swap",
+                        "https://classic.curve.fi/rsv"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/rsv/deposit",
+                        "https://classic.curve.fi/rsv/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/rsv/withdraw",
+                        "https://classic.curve.fi/rsv/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "assetTypeName": "usd",
+                "coins": [
+                    {
+                        "address": "0x196f4727526eA7FB1e17b2071B3d8eAA38486988",
+                        "usdPrice": 0.9969573256659731,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "RSV",
+                        "poolBalance": "13038098532690458341345"
+                    },
+                    {
+                        "address": "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490",
+                        "usdPrice": 1.0260845611402294,
+                        "decimals": "18",
+                        "isBasePoolLpToken": true,
+                        "symbol": "3Crv",
+                        "poolBalance": "8082519423100312605086"
+                    }
+                ],
+                "usdTotal": 21291.77624007979,
+                "isMetaPool": true,
+                "underlyingCoins": [
+                    {
+                        "address": "0x196f4727526eA7FB1e17b2071B3d8eAA38486988",
+                        "usdPrice": 0.9969573256659731,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "RSV",
+                        "poolBalance": "13038098532690458341345"
+                    },
+                    {
+                        "address": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+                        "usdPrice": 0.999743,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "DAI",
+                        "poolBalance": "2324544526357912739103"
+                    },
+                    {
+                        "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                        "usdPrice": 0.999841,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDC",
+                        "poolBalance": "2336272264"
+                    },
+                    {
+                        "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+                        "usdPrice": 0.999782,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDT",
+                        "poolBalance": "3634292756"
+                    }
+                ],
+                "usdTotalExcludingBasePool": 12998.427844920527,
+                "gaugeAddress": "0x4dc4a289a8e33600d8bd4cf5f6313e43a37adec7",
+                "gaugeRewards": [
+                    {
+                        "gaugeAddress": "0x4dc4a289a8e33600d8bd4cf5f6313e43a37adec7",
+                        "tokenPrice": 0.00248674,
+                        "name": "Reserve Rights",
+                        "symbol": "RSR",
+                        "decimals": "18",
+                        "apy": 0,
+                        "tokenAddress": "0x8762db106B2c2A0bccB3A80d1Ed41273552616E8"
+                    }
+                ],
+                "gaugeCrvApy": [
+                    0,
+                    0
+                ]
+            },
+            {
+                "id": "24",
+                "address": "0x3E01dD8a5E1fb3481F0F589056b428Fc308AF0Fb",
+                "coinsAddresses": [
+                    "0x1c48f86ae57291F7686349F12601910BD8D470bb",
+                    "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490",
+                    "0x0000000000000000000000000000000000000000",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "18",
+                    "18",
+                    "0",
+                    "0"
+                ],
+                "virtualPrice": "2083605911760109602",
+                "amplificationCoefficient": "200",
+                "underlyingDecimals": [
+                    "18",
+                    "18",
+                    "6",
+                    "6",
+                    "0",
+                    "0",
+                    "0",
+                    "0"
+                ],
+                "assetType": "0",
+                "totalSupply": "49946737276987633095693",
+                "name": "Curve.fi USDK/3Crv",
+                "lpTokenAddress": "0x97E2768e8E73511cA874545DC5Ff8067eB19B787",
+                "symbol": "usdk3CRV",
+                "priceOracle": 0,
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/usdk/swap",
+                        "https://classic.curve.fi/usdk"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/usdk/deposit",
+                        "https://classic.curve.fi/usdk/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/usdk/withdraw",
+                        "https://classic.curve.fi/usdk/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "assetTypeName": "usd",
+                "coins": [
+                    {
+                        "address": "0x1c48f86ae57291F7686349F12601910BD8D470bb",
+                        "usdPrice": 1.0038926132762966,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDK",
+                        "poolBalance": "33900949716673997735311"
+                    },
+                    {
+                        "address": "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490",
+                        "usdPrice": 1.0260845611402294,
+                        "decimals": "18",
+                        "isBasePoolLpToken": true,
+                        "symbol": "3Crv",
+                        "poolBalance": "68405772794217484467570"
+                    }
+                ],
+                "usdTotal": 104223.02036063309,
+                "isMetaPool": true,
+                "underlyingCoins": [
+                    {
+                        "address": "0x1c48f86ae57291F7686349F12601910BD8D470bb",
+                        "usdPrice": 1.0038926132762966,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDK",
+                        "poolBalance": "33900949716673997735311"
+                    },
+                    {
+                        "address": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+                        "usdPrice": 0.999743,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "DAI",
+                        "poolBalance": "19673601311196967243273"
+                    },
+                    {
+                        "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                        "usdPrice": 0.999841,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDC",
+                        "poolBalance": "19772858105"
+                    },
+                    {
+                        "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+                        "usdPrice": 0.999782,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDT",
+                        "poolBalance": "30758553306"
+                    }
+                ],
+                "usdTotalExcludingBasePool": 34032.91300362019,
+                "gaugeAddress": "0xc2b1df84112619d190193e48148000e3990bf627",
+                "gaugeRewards": [],
+                "gaugeCrvApy": [
+                    0,
+                    0
+                ]
+            },
+            {
+                "id": "25",
+                "address": "0x0f9cb53Ebe405d49A0bbdBD291A65Ff571bC83e1",
+                "coinsAddresses": [
+                    "0x674C6Ad92Fd080e4004b2312b45f796a192D27a0",
+                    "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490",
+                    "0x0000000000000000000000000000000000000000",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "18",
+                    "18",
+                    "0",
+                    "0"
+                ],
+                "virtualPrice": "1066592251908617192",
+                "amplificationCoefficient": "250",
+                "underlyingDecimals": [
+                    "18",
+                    "18",
+                    "6",
+                    "6",
+                    "0",
+                    "0",
+                    "0",
+                    "0"
+                ],
+                "assetType": "0",
+                "totalSupply": "4000616375772312946442029",
+                "name": "Curve.fi USDN/3Crv",
+                "lpTokenAddress": "0x4f3E8F405CF5aFC05D68142F3783bDfE13811522",
+                "symbol": "usdn3CRV",
+                "priceOracle": 0,
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/usdn/swap",
+                        "https://classic.curve.fi/usdn"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/usdn/deposit",
+                        "https://classic.curve.fi/usdn/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/usdn/withdraw",
+                        "https://classic.curve.fi/usdn/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "assetTypeName": "usd",
+                "coins": [
+                    {
+                        "address": "0x674C6Ad92Fd080e4004b2312b45f796a192D27a0",
+                        "usdPrice": 0.04309996091660507,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDN",
+                        "poolBalance": "4689741325955619172208076"
+                    },
+                    {
+                        "address": "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490",
+                        "usdPrice": 1.0260845611402294,
+                        "decimals": "18",
+                        "isBasePoolLpToken": true,
+                        "symbol": "3Crv",
+                        "poolBalance": "17948717137351099366565"
+                    }
+                ],
+                "usdTotal": 220544.56940458383,
+                "isMetaPool": true,
+                "underlyingCoins": [
+                    {
+                        "address": "0x674C6Ad92Fd080e4004b2312b45f796a192D27a0",
+                        "usdPrice": 0.04309996091660507,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDN",
+                        "poolBalance": "4689741325955619172208076"
+                    },
+                    {
+                        "address": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+                        "usdPrice": 0.999743,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "DAI",
+                        "poolBalance": "5162077564271650166513"
+                    },
+                    {
+                        "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                        "usdPrice": 0.999841,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDC",
+                        "poolBalance": "5188121157"
+                    },
+                    {
+                        "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+                        "usdPrice": 0.999782,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDT",
+                        "poolBalance": "8070613784"
+                    }
+                ],
+                "usdTotalExcludingBasePool": 202127.66785767482,
+                "gaugeAddress": "0xf98450b5602fa59cc66e1379dffb6fddc724cfc4",
+                "gaugeRewards": [],
+                "gaugeCrvApy": [
+                    0,
+                    0
+                ]
+            },
+            {
+                "id": "26",
+                "address": "0x42d7025938bEc20B69cBae5A77421082407f053A",
+                "coinsAddresses": [
+                    "0x1456688345527bE1f37E9e627DA0837D6f08C925",
+                    "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490",
+                    "0x0000000000000000000000000000000000000000",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "18",
+                    "18",
+                    "0",
+                    "0"
+                ],
+                "virtualPrice": "1010864262198646774",
+                "amplificationCoefficient": "100",
+                "underlyingDecimals": [
+                    "18",
+                    "18",
+                    "6",
+                    "6",
+                    "0",
+                    "0",
+                    "0",
+                    "0"
+                ],
+                "assetType": "0",
+                "totalSupply": "2737195054549201158174455",
+                "name": "Curve.fi USDP/3Crv",
+                "lpTokenAddress": "0x7Eb40E450b9655f4B3cC4259BCC731c63ff55ae6",
+                "symbol": "usdp3CRV",
+                "priceOracle": 0,
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/usdp/swap",
+                        "https://classic.curve.fi/usdp"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/usdp/deposit",
+                        "https://classic.curve.fi/usdp/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/usdp/withdraw",
+                        "https://classic.curve.fi/usdp/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "assetTypeName": "usd",
+                "coins": [
+                    {
+                        "address": "0x1456688345527bE1f37E9e627DA0837D6f08C925",
+                        "usdPrice": 0.974665056927983,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDP",
+                        "poolBalance": "2185737720680411371705304"
+                    },
+                    {
+                        "address": "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490",
+                        "usdPrice": 1.0260845611402294,
+                        "decimals": "18",
+                        "isBasePoolLpToken": true,
+                        "symbol": "3Crv",
+                        "poolBalance": "572902728103357319495467"
+                    }
+                ],
+                "usdTotal": 2718208.8242985867,
+                "isMetaPool": true,
+                "underlyingCoins": [
+                    {
+                        "address": "0x1456688345527bE1f37E9e627DA0837D6f08C925",
+                        "usdPrice": 0.974665056927983,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDP",
+                        "poolBalance": "2185737720680411371705304"
+                    },
+                    {
+                        "address": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+                        "usdPrice": 0.999743,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "DAI",
+                        "poolBalance": "164767670949480161553133"
+                    },
+                    {
+                        "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                        "usdPrice": 0.999841,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDC",
+                        "poolBalance": "165598952951"
+                    },
+                    {
+                        "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+                        "usdPrice": 0.999782,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDT",
+                        "poolBalance": "257604853824"
+                    }
+                ],
+                "usdTotalExcludingBasePool": 2130362.179956613,
+                "gaugeAddress": "0x055be5ddb7a925bfef3417fc157f53ca77ca7222",
+                "gaugeRewards": [
+                    {
+                        "gaugeAddress": "0x055be5ddb7a925bfef3417fc157f53ca77ca7222",
+                        "tokenPrice": 0.004392,
+                        "name": "Unit Protocol",
+                        "symbol": "DUCK",
+                        "decimals": "18",
+                        "apy": 0,
+                        "tokenAddress": "0x92E187a03B6CD19CB6AF293ba17F2745Fd2357D5"
+                    }
+                ],
+                "gaugeCrvApy": [
+                    0.2268598236065043,
+                    0.5671495590162607
+                ]
+            },
+            {
+                "id": "27",
+                "address": "0x890f4e345B1dAED0367A877a1612f86A1f86985f",
+                "coinsAddresses": [
+                    "0xa47c8bf37f92aBed4A126BDA807A7b7498661acD",
+                    "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490",
+                    "0x0000000000000000000000000000000000000000",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "18",
+                    "18",
+                    "0",
+                    "0"
+                ],
+                "virtualPrice": "1068571606118169991",
+                "amplificationCoefficient": "100",
+                "underlyingDecimals": [
+                    "18",
+                    "18",
+                    "6",
+                    "6",
+                    "0",
+                    "0",
+                    "0",
+                    "0"
+                ],
+                "assetType": "0",
+                "totalSupply": "297302631552091288824147",
+                "name": "Curve.fi UST/3Crv",
+                "lpTokenAddress": "0x94e131324b6054c0D789b190b2dAC504e4361b53",
+                "symbol": "ust3CRV",
+                "priceOracle": 0,
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/ust/swap",
+                        "https://classic.curve.fi/ust"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/ust/deposit",
+                        "https://classic.curve.fi/ust/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/ust/withdraw",
+                        "https://classic.curve.fi/ust/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "assetTypeName": "usd",
+                "coins": [
+                    {
+                        "address": "0xa47c8bf37f92aBed4A126BDA807A7b7498661acD",
+                        "usdPrice": 0.013114114452733854,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "UST",
+                        "poolBalance": "410331834812978571350874"
+                    },
+                    {
+                        "address": "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490",
+                        "usdPrice": 1.0260845611402294,
+                        "decimals": "18",
+                        "isBasePoolLpToken": true,
+                        "symbol": "3Crv",
+                        "poolBalance": "999118572333307332708"
+                    }
+                ],
+                "usdTotal": 6406.318787157357,
+                "isMetaPool": true,
+                "underlyingCoins": [
+                    {
+                        "address": "0xa47c8bf37f92aBed4A126BDA807A7b7498661acD",
+                        "usdPrice": 0.013114114452733854,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "UST",
+                        "poolBalance": "410331834812978571350874"
+                    },
+                    {
+                        "address": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+                        "usdPrice": 0.999743,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "DAI",
+                        "poolBalance": "287347977397009898315"
+                    },
+                    {
+                        "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                        "usdPrice": 0.999841,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDC",
+                        "poolBalance": "288797699"
+                    },
+                    {
+                        "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+                        "usdPrice": 0.999782,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDT",
+                        "poolBalance": "449252170"
+                    }
+                ],
+                "usdTotalExcludingBasePool": 5381.138645337683,
+                "gaugeAddress": "0x3b7020743bc2a4ca9eaf9d0722d42e20d6935855",
+                "gaugeRewards": [],
+                "gaugeCrvApy": [
+                    0,
+                    0
+                ]
+            },
+            {
+                "id": "28",
+                "address": "0x071c661B4DeefB59E2a3DdB20Db036821eeE8F4b",
+                "coinsAddresses": [
+                    "0x9BE89D2a4cd102D8Fecc6BF9dA793be995C22541",
+                    "0x075b1bb99792c9E1041bA13afEf80C91a1e70fB3",
+                    "0x0000000000000000000000000000000000000000",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "8",
+                    "18",
+                    "0",
+                    "0"
+                ],
+                "virtualPrice": "1023094219069591965",
+                "amplificationCoefficient": "200",
+                "underlyingDecimals": [
+                    "8",
+                    "8",
+                    "8",
+                    "18",
+                    "0",
+                    "0",
+                    "0",
+                    "0"
+                ],
+                "assetType": "2",
+                "totalSupply": "18907555299021492789",
+                "name": "Curve.fi bBTC/sbtcCRV",
+                "lpTokenAddress": "0x410e3E86ef427e30B9235497143881f717d93c2A",
+                "symbol": "bBTC/sbtcCRV",
+                "priceOracle": 0,
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/bbtc/swap",
+                        "https://classic.curve.fi/bbtc"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/bbtc/deposit",
+                        "https://classic.curve.fi/bbtc/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/bbtc/withdraw",
+                        "https://classic.curve.fi/bbtc/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "assetTypeName": "btc",
+                "coins": [
+                    {
+                        "address": "0x9BE89D2a4cd102D8Fecc6BF9dA793be995C22541",
+                        "usdPrice": 30449.479111061682,
+                        "decimals": "8",
+                        "isBasePoolLpToken": false,
+                        "symbol": "BBTC",
+                        "poolBalance": "1393729364"
+                    },
+                    {
+                        "address": "0x075b1bb99792c9E1041bA13afEf80C91a1e70fB3",
+                        "usdPrice": 31333.6314790413,
+                        "decimals": "18",
+                        "isBasePoolLpToken": true,
+                        "symbol": "sbtcCrv",
+                        "poolBalance": "5312879694028604606"
+                    }
+                ],
+                "usdTotal": 590855.1459810869,
+                "isMetaPool": true,
+                "underlyingCoins": [
+                    {
+                        "address": "0x9BE89D2a4cd102D8Fecc6BF9dA793be995C22541",
+                        "usdPrice": 30449.479111061682,
+                        "decimals": "8",
+                        "isBasePoolLpToken": false,
+                        "symbol": "BBTC",
+                        "poolBalance": "1393729364"
+                    },
+                    {
+                        "address": "0xEB4C2781e4ebA804CE9a9803C67d0893436bB27D",
+                        "usdPrice": 31626.82183463,
+                        "decimals": "8",
+                        "isBasePoolLpToken": false,
+                        "symbol": "renBTC",
+                        "poolBalance": "60933770"
+                    },
+                    {
+                        "address": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+                        "usdPrice": 30617,
+                        "decimals": "8",
+                        "isBasePoolLpToken": false,
+                        "symbol": "WBTC",
+                        "poolBalance": "236705159"
+                    },
+                    {
+                        "address": "0xfE18be6b3Bd88A2D2A7f928d00292E7a9963CfC6",
+                        "usdPrice": 30450.695918704292,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "sBTC",
+                        "poolBalance": "2454077929608514721"
+                    }
+                ],
+                "usdTotalExcludingBasePool": 424383.33155591285,
+                "gaugeAddress": "0xdfc7adfa664b08767b735de28f9e84cd30492aee",
+                "gaugeRewards": [],
+                "gaugeCrvApy": [
+                    0,
+                    0
+                ]
+            },
+            {
+                "id": "29",
+                "address": "0xd81dA8D904b52208541Bade1bD6595D8a251F8dd",
+                "coinsAddresses": [
+                    "0x8064d9Ae6cDf087b1bcd5BDf3531bD5d8C537a68",
+                    "0x075b1bb99792c9E1041bA13afEf80C91a1e70fB3",
+                    "0x0000000000000000000000000000000000000000",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "18",
+                    "18",
+                    "0",
+                    "0"
+                ],
+                "virtualPrice": "1009068300967020455",
+                "amplificationCoefficient": "200",
+                "underlyingDecimals": [
+                    "18",
+                    "8",
+                    "8",
+                    "18",
+                    "0",
+                    "0",
+                    "0",
+                    "0"
+                ],
+                "assetType": "2",
+                "totalSupply": "7032926472063475161",
+                "name": "Curve.fi oBTC/sbtcCRV",
+                "lpTokenAddress": "0x2fE94ea3d5d4a175184081439753DE15AeF9d614",
+                "symbol": "oBTC/sbtcCRV",
+                "priceOracle": 0,
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/obtc/swap",
+                        "https://classic.curve.fi/obtc"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/obtc/deposit",
+                        "https://classic.curve.fi/obtc/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/obtc/withdraw",
+                        "https://classic.curve.fi/obtc/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "assetTypeName": "btc",
+                "coins": [
+                    {
+                        "address": "0x8064d9Ae6cDf087b1bcd5BDf3531bD5d8C537a68",
+                        "usdPrice": 30052.154825761358,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "oBTC",
+                        "poolBalance": "5345944450225048784"
+                    },
+                    {
+                        "address": "0x075b1bb99792c9E1041bA13afEf80C91a1e70fB3",
+                        "usdPrice": 31333.6314790413,
+                        "decimals": "18",
+                        "isBasePoolLpToken": true,
+                        "symbol": "sbtcCrv",
+                        "poolBalance": "1722569018548089213"
+                    }
+                ],
+                "usdTotal": 214631.49313248252,
+                "isMetaPool": true,
+                "underlyingCoins": [
+                    {
+                        "address": "0x8064d9Ae6cDf087b1bcd5BDf3531bD5d8C537a68",
+                        "usdPrice": 30052.154825761358,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "oBTC",
+                        "poolBalance": "5345944450225048784"
+                    },
+                    {
+                        "address": "0xEB4C2781e4ebA804CE9a9803C67d0893436bB27D",
+                        "usdPrice": 31626.82183463,
+                        "decimals": "8",
+                        "isBasePoolLpToken": false,
+                        "symbol": "renBTC",
+                        "poolBalance": "19756259"
+                    },
+                    {
+                        "address": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+                        "usdPrice": 30617,
+                        "decimals": "8",
+                        "isBasePoolLpToken": false,
+                        "symbol": "WBTC",
+                        "poolBalance": "76745757"
+                    },
+                    {
+                        "address": "0xfE18be6b3Bd88A2D2A7f928d00292E7a9963CfC6",
+                        "usdPrice": 30450.695918704292,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "sBTC",
+                        "poolBalance": "795673693759252370"
+                    }
+                ],
+                "usdTotalExcludingBasePool": 160657.15030808284,
+                "gaugeAddress": "0x11137b10c210b579405c21a07489e28f3c040ab1",
+                "gaugeRewards": [
+                    {
+                        "gaugeAddress": "0x11137b10c210b579405c21a07489e28f3c040ab1",
+                        "tokenPrice": 0.00236253,
+                        "name": "BoringDAO",
+                        "symbol": "BORING",
+                        "decimals": "18",
+                        "apy": 2.686734587256428,
+                        "tokenAddress": "0xBC19712FEB3a26080eBf6f2F7849b417FdD792CA"
+                    }
+                ],
+                "gaugeCrvApy": [
+                    0,
+                    0
+                ]
+            },
+            {
+                "id": "30",
+                "address": "0x7F55DDe206dbAD629C080068923b36fe9D6bDBeF",
+                "coinsAddresses": [
+                    "0x5228a22e72ccC52d415EcFd199F99D0665E7733b",
+                    "0x075b1bb99792c9E1041bA13afEf80C91a1e70fB3",
+                    "0x0000000000000000000000000000000000000000",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "18",
+                    "18",
+                    "0",
+                    "0"
+                ],
+                "virtualPrice": "1012191868449285152",
+                "amplificationCoefficient": "200",
+                "underlyingDecimals": [
+                    "18",
+                    "8",
+                    "8",
+                    "18",
+                    "0",
+                    "0",
+                    "0",
+                    "0"
+                ],
+                "assetType": "2",
+                "totalSupply": "14208691940025515837",
+                "name": "Curve.fi pBTC/sbtcCRV",
+                "lpTokenAddress": "0xDE5331AC4B3630f94853Ff322B66407e0D6331E8",
+                "symbol": "pBTC/sbtcCRV",
+                "priceOracle": 0,
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/pbtc/swap",
+                        "https://classic.curve.fi/pbtc"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/pbtc/deposit",
+                        "https://classic.curve.fi/pbtc/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/pbtc/withdraw",
+                        "https://classic.curve.fi/pbtc/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "assetTypeName": "btc",
+                "coins": [
+                    {
+                        "address": "0x5228a22e72ccC52d415EcFd199F99D0665E7733b",
+                        "usdPrice": 30971.143879386032,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "pBTC",
+                        "poolBalance": "3193299351315752211"
+                    },
+                    {
+                        "address": "0x075b1bb99792c9E1041bA13afEf80C91a1e70fB3",
+                        "usdPrice": 31333.6314790413,
+                        "decimals": "18",
+                        "isBasePoolLpToken": true,
+                        "symbol": "sbtcCrv",
+                        "poolBalance": "10986298591728392954"
+                    }
+                ],
+                "usdTotal": 443140.76505147817,
+                "isMetaPool": true,
+                "underlyingCoins": [
+                    {
+                        "address": "0x5228a22e72ccC52d415EcFd199F99D0665E7733b",
+                        "usdPrice": 30971.143879386032,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "pBTC",
+                        "poolBalance": "3193299351315752211"
+                    },
+                    {
+                        "address": "0xEB4C2781e4ebA804CE9a9803C67d0893436bB27D",
+                        "usdPrice": 31626.82183463,
+                        "decimals": "8",
+                        "isBasePoolLpToken": false,
+                        "symbol": "renBTC",
+                        "poolBalance": "126002589"
+                    },
+                    {
+                        "address": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+                        "usdPrice": 30617,
+                        "decimals": "8",
+                        "isBasePoolLpToken": false,
+                        "symbol": "WBTC",
+                        "poolBalance": "489473451"
+                    },
+                    {
+                        "address": "0xfE18be6b3Bd88A2D2A7f928d00292E7a9963CfC6",
+                        "usdPrice": 30450.695918704292,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "sBTC",
+                        "poolBalance": "5074692907568141000"
+                    }
+                ],
+                "usdTotalExcludingBasePool": 98900.13365955027,
+                "gaugeAddress": "0xd7d147c6bb90a718c3de8c0568f9b560c79fa416",
+                "gaugeRewards": [
+                    {
+                        "gaugeAddress": "0xd7d147c6bb90a718c3de8c0568f9b560c79fa416",
+                        "tokenPrice": 0.103788,
+                        "name": "pNetwork Token",
+                        "symbol": "PNT",
+                        "decimals": "18",
+                        "apy": 0,
+                        "tokenAddress": "0x89Ab32156e46F46D02ade3FEcbe5Fc4243B9AAeD"
+                    }
+                ],
+                "gaugeCrvApy": [
+                    0,
+                    0
+                ]
+            },
+            {
+                "id": "31",
+                "address": "0xC25099792E9349C7DD09759744ea681C7de2cb66",
+                "coinsAddresses": [
+                    "0x8dAEBADE922dF735c38C80C7eBD708Af50815fAa",
+                    "0x075b1bb99792c9E1041bA13afEf80C91a1e70fB3",
+                    "0x0000000000000000000000000000000000000000",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "18",
+                    "18",
+                    "0",
+                    "0"
+                ],
+                "virtualPrice": "1014429770573755257",
+                "amplificationCoefficient": "150",
+                "underlyingDecimals": [
+                    "18",
+                    "8",
+                    "8",
+                    "18",
+                    "0",
+                    "0",
+                    "0",
+                    "0"
+                ],
+                "assetType": "2",
+                "totalSupply": "83075316194646600201",
+                "name": "Curve.fi tBTC/sbtcCrv",
+                "lpTokenAddress": "0x64eda51d3Ad40D56b9dFc5554E06F94e1Dd786Fd",
+                "symbol": "tbtc/sbtcCrv",
+                "priceOracle": 0,
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/tbtc/swap",
+                        "https://classic.curve.fi/tbtc"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/tbtc/deposit",
+                        "https://classic.curve.fi/tbtc/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/tbtc/withdraw",
+                        "https://classic.curve.fi/tbtc/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "assetTypeName": "btc",
+                "coins": [
+                    {
+                        "address": "0x8dAEBADE922dF735c38C80C7eBD708Af50815fAa",
+                        "usdPrice": 34312.376911733576,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "TBTC",
+                        "poolBalance": "6525406201826742161"
+                    },
+                    {
+                        "address": "0x075b1bb99792c9E1041bA13afEf80C91a1e70fB3",
+                        "usdPrice": 31333.6314790413,
+                        "decimals": "18",
+                        "isBasePoolLpToken": true,
+                        "symbol": "sbtcCrv",
+                        "poolBalance": "76913649948418298038"
+                    }
+                ],
+                "usdTotal": 2633886.160290966,
+                "isMetaPool": true,
+                "underlyingCoins": [
+                    {
+                        "address": "0x8dAEBADE922dF735c38C80C7eBD708Af50815fAa",
+                        "usdPrice": 34312.376911733576,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "TBTC",
+                        "poolBalance": "6525406201826742161"
+                    },
+                    {
+                        "address": "0xEB4C2781e4ebA804CE9a9803C67d0893436bB27D",
+                        "usdPrice": 31626.82183463,
+                        "decimals": "8",
+                        "isBasePoolLpToken": false,
+                        "symbol": "renBTC",
+                        "poolBalance": "882127762"
+                    },
+                    {
+                        "address": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+                        "usdPrice": 30617,
+                        "decimals": "8",
+                        "isBasePoolLpToken": false,
+                        "symbol": "WBTC",
+                        "poolBalance": "3426740078"
+                    },
+                    {
+                        "address": "0xfE18be6b3Bd88A2D2A7f928d00292E7a9963CfC6",
+                        "usdPrice": 30450.695918704292,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "sBTC",
+                        "poolBalance": "35527266133316703321"
+                    }
+                ],
+                "usdTotalExcludingBasePool": 223902.197099243,
+                "gaugeAddress": "0x6828bcf74279ee32f2723ec536c22c51eed383c6",
+                "gaugeRewards": [
+                    {
+                        "gaugeAddress": "0x6828bcf74279ee32f2723ec536c22c51eed383c6",
+                        "tokenPrice": 0.115509,
+                        "name": "KEEP Token",
+                        "symbol": "KEEP",
+                        "decimals": "18",
+                        "apy": 0,
+                        "tokenAddress": "0x85Eee30c52B0b379b046Fb0F85F4f3Dc3009aFEC"
+                    }
+                ],
+                "gaugeCrvApy": [
+                    0,
+                    0
+                ]
+            },
+            {
+                "id": "32",
+                "address": "0xEcd5e75AFb02eFa118AF914515D6521aaBd189F1",
+                "coinsAddresses": [
+                    "0x0000000000085d4780B73119b644AE5ecd22b376",
+                    "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490",
+                    "0x0000000000000000000000000000000000000000",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "18",
+                    "18",
+                    "0",
+                    "0"
+                ],
+                "virtualPrice": "1012412864497752639",
+                "amplificationCoefficient": "600",
+                "underlyingDecimals": [
+                    "18",
+                    "18",
+                    "6",
+                    "6",
+                    "0",
+                    "0",
+                    "0",
+                    "0"
+                ],
+                "assetType": "0",
+                "totalSupply": "6887949864503063589348303",
+                "name": "Curve.fi Factory USD Metapool: TrueUSD",
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/tusd/swap",
+                        "https://classic.curve.fi/tusd"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/tusd/deposit",
+                        "https://classic.curve.fi/tusd/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/tusd/withdraw",
+                        "https://classic.curve.fi/tusd/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "lpTokenAddress": "0xEcd5e75AFb02eFa118AF914515D6521aaBd189F1",
+                "assetTypeName": "usd",
+                "coins": [
+                    {
+                        "address": "0x0000000000085d4780B73119b644AE5ecd22b376",
+                        "usdPrice": 0.9981128996812942,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "TUSD",
+                        "poolBalance": "4583833062441700353839787"
+                    },
+                    {
+                        "address": "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490",
+                        "usdPrice": 1.0260845611402294,
+                        "decimals": "18",
+                        "isBasePoolLpToken": true,
+                        "symbol": "3Crv",
+                        "poolBalance": "2329022137379490549945543"
+                    }
+                ],
+                "usdTotal": 6964956.567327585,
+                "isMetaPool": true,
+                "underlyingCoins": [
+                    {
+                        "address": "0x0000000000085d4780B73119b644AE5ecd22b376",
+                        "usdPrice": 0.9981128996812942,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "TUSD",
+                        "poolBalance": "4583833062441700353839787"
+                    },
+                    {
+                        "address": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+                        "usdPrice": 0.999743,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "DAI",
+                        "poolBalance": "669830207365615941832151"
+                    },
+                    {
+                        "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                        "usdPrice": 0.999841,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDC",
+                        "poolBalance": "673209619069"
+                    },
+                    {
+                        "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+                        "usdPrice": 0.999782,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDT",
+                        "poolBalance": "1047241316584"
+                    }
+                ],
+                "usdTotalExcludingBasePool": 4575182.909608672,
+                "gaugeAddress": "0x359fd5d6417ae3d8d6497d9b2e7a890798262ba4",
+                "gaugeRewards": [],
+                "gaugeCrvApy": [
+                    6.3374268958450175,
+                    15.843567239612543
+                ]
+            },
+            {
+                "id": "33",
+                "address": "0xEd279fDD11cA84bEef15AF5D39BB4d4bEE23F0cA",
+                "coinsAddresses": [
+                    "0x5f98805A4E8be255a32880FDeC7F6728C6568bA0",
+                    "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490",
+                    "0x0000000000000000000000000000000000000000",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "18",
+                    "18",
+                    "0",
+                    "0"
+                ],
+                "virtualPrice": "1024460656678798648",
+                "amplificationCoefficient": "500",
+                "underlyingDecimals": [
+                    "18",
+                    "18",
+                    "6",
+                    "6",
+                    "0",
+                    "0",
+                    "0",
+                    "0"
+                ],
+                "assetType": "0",
+                "totalSupply": "23159997021533462568012961",
+                "name": "Curve.fi Factory USD Metapool: Liquity",
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/lusd/swap",
+                        "https://classic.curve.fi/lusd"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/lusd/deposit",
+                        "https://classic.curve.fi/lusd/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/lusd/withdraw",
+                        "https://classic.curve.fi/lusd/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "lpTokenAddress": "0xEd279fDD11cA84bEef15AF5D39BB4d4bEE23F0cA",
+                "assetTypeName": "usd",
+                "coins": [
+                    {
+                        "address": "0x5f98805A4E8be255a32880FDeC7F6728C6568bA0",
+                        "usdPrice": 1.0017070326589355,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "LUSD",
+                        "poolBalance": "7064643874788852861329401"
+                    },
+                    {
+                        "address": "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490",
+                        "usdPrice": 1.0260845611402294,
+                        "decimals": "18",
+                        "isBasePoolLpToken": true,
+                        "symbol": "3Crv",
+                        "poolBalance": "16239552606050191790407388"
+                    }
+                ],
+                "usdTotal": 23739857.661499545,
+                "isMetaPool": true,
+                "underlyingCoins": [
+                    {
+                        "address": "0x5f98805A4E8be255a32880FDeC7F6728C6568bA0",
+                        "usdPrice": 1.0017070326589355,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "LUSD",
+                        "poolBalance": "7064643874788852861329401"
+                    },
+                    {
+                        "address": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+                        "usdPrice": 0.999743,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "DAI",
+                        "poolBalance": "4670519320127446152269480"
+                    },
+                    {
+                        "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                        "usdPrice": 0.999841,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDC",
+                        "poolBalance": "4694082915019"
+                    },
+                    {
+                        "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+                        "usdPrice": 0.999782,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDT",
+                        "poolBalance": "7302090512126"
+                    }
+                ],
+                "usdTotalExcludingBasePool": 7076703.452606866,
+                "gaugeAddress": "0x9b8519a9a00100720ccdc8a120fbed319ca47a14",
+                "gaugeRewards": [
+                    {
+                        "gaugeAddress": "0x9b8519a9a00100720ccdc8a120fbed319ca47a14",
+                        "tokenPrice": 0.943382,
+                        "name": "LQTY",
+                        "symbol": "LQTY",
+                        "decimals": "18",
+                        "apy": 0,
+                        "tokenAddress": "0x6DEA81C8171D0bA574754EF6F8b412F2Ed88c54D"
+                    }
+                ],
+                "gaugeCrvApy": [
+                    0.6674873025013942,
+                    1.6687182562534855
+                ]
+            },
+            {
+                "id": "34",
+                "address": "0xd632f22692FaC7611d2AA1C0D552930D43CAEd3B",
+                "coinsAddresses": [
+                    "0x853d955aCEf822Db058eb8505911ED77F175b99e",
+                    "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490",
+                    "0x0000000000000000000000000000000000000000",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "18",
+                    "18",
+                    "0",
+                    "0"
+                ],
+                "virtualPrice": "1010551285971727422",
+                "amplificationCoefficient": "1500",
+                "underlyingDecimals": [
+                    "18",
+                    "18",
+                    "6",
+                    "6",
+                    "0",
+                    "0",
+                    "0",
+                    "0"
+                ],
+                "assetType": "0",
+                "totalSupply": "177294378912651440985797216",
+                "name": "Curve.fi Factory USD Metapool: Frax",
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/frax/swap",
+                        "https://classic.curve.fi/frax"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/frax/deposit",
+                        "https://classic.curve.fi/frax/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/frax/withdraw",
+                        "https://classic.curve.fi/frax/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "lpTokenAddress": "0xd632f22692FaC7611d2AA1C0D552930D43CAEd3B",
+                "assetTypeName": "usd",
+                "coins": [
+                    {
+                        "address": "0x853d955aCEf822Db058eb8505911ED77F175b99e",
+                        "usdPrice": 0.9987912953577388,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "FRAX",
+                        "poolBalance": "121055322591951459813815482"
+                    },
+                    {
+                        "address": "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490",
+                        "usdPrice": 1.0260845611402294,
+                        "decimals": "18",
+                        "isBasePoolLpToken": true,
+                        "symbol": "3Crv",
+                        "poolBalance": "56629337056665994267136272"
+                    }
+                ],
+                "usdTotal": 179015490.9230154,
+                "isMetaPool": true,
+                "underlyingCoins": [
+                    {
+                        "address": "0x853d955aCEf822Db058eb8505911ED77F175b99e",
+                        "usdPrice": 0.9987912953577388,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "FRAX",
+                        "poolBalance": "121055322591951459813815482"
+                    },
+                    {
+                        "address": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+                        "usdPrice": 0.999743,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "DAI",
+                        "poolBalance": "16286680995794803695827664"
+                    },
+                    {
+                        "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                        "usdPrice": 0.999841,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDC",
+                        "poolBalance": "16368850178023"
+                    },
+                    {
+                        "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+                        "usdPrice": 0.999782,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDT",
+                        "poolBalance": "25463296610489"
+                    }
+                ],
+                "usdTotalExcludingBasePool": 120909002.46156414,
+                "gaugeAddress": "0x72e158d38dbd50a483501c24f792bdaaa3e7d55c",
+                "gaugeRewards": [
+                    {
+                        "gaugeAddress": "0x72e158d38dbd50a483501c24f792bdaaa3e7d55c",
+                        "tokenPrice": 5.9,
+                        "name": "Frax Share",
+                        "symbol": "FXS",
+                        "decimals": "18",
+                        "apy": 0,
+                        "tokenAddress": "0x3432B6A60D23Ca0dFCa7761B7ab56459D9C964D0"
+                    }
+                ],
+                "gaugeCrvApy": [
+                    0.7042078272859785,
+                    1.7605195682149464
+                ]
+            },
+            {
+                "id": "35",
+                "address": "0x4807862AA8b2bF68830e4C8dc86D0e9A998e085a",
+                "coinsAddresses": [
+                    "0x4Fabb145d64652a948d72533023f6E7A623C7C53",
+                    "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490",
+                    "0x0000000000000000000000000000000000000000",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "18",
+                    "18",
+                    "0",
+                    "0"
+                ],
+                "virtualPrice": "1020481669849060679",
+                "amplificationCoefficient": "5000",
+                "underlyingDecimals": [
+                    "18",
+                    "18",
+                    "6",
+                    "6",
+                    "0",
+                    "0",
+                    "0",
+                    "0"
+                ],
+                "assetType": "0",
+                "totalSupply": "3566959486120374710529353",
+                "name": "Curve.fi Factory USD Metapool: Binance USD",
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/busdv2/swap",
+                        "https://classic.curve.fi/busdv2"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/busdv2/deposit",
+                        "https://classic.curve.fi/busdv2/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/busdv2/withdraw",
+                        "https://classic.curve.fi/busdv2/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "lpTokenAddress": "0x4807862AA8b2bF68830e4C8dc86D0e9A998e085a",
+                "assetTypeName": "usd",
+                "coins": [
+                    {
+                        "address": "0x4Fabb145d64652a948d72533023f6E7A623C7C53",
+                        "usdPrice": 0.9990305780366052,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "BUSD",
+                        "poolBalance": "2745034841326673004143853"
+                    },
+                    {
+                        "address": "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490",
+                        "usdPrice": 1.0260845611402294,
+                        "decimals": "18",
+                        "isBasePoolLpToken": true,
+                        "symbol": "3Crv",
+                        "poolBalance": "872178794107471421796805"
+                    }
+                ],
+                "usdTotal": 3637302.9394487864,
+                "isMetaPool": true,
+                "underlyingCoins": [
+                    {
+                        "address": "0x4Fabb145d64652a948d72533023f6E7A623C7C53",
+                        "usdPrice": 0.9990305780366052,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "BUSD",
+                        "poolBalance": "2745034841326673004143853"
+                    },
+                    {
+                        "address": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+                        "usdPrice": 0.999743,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "DAI",
+                        "poolBalance": "250839909651622651177877"
+                    },
+                    {
+                        "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                        "usdPrice": 0.999841,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDC",
+                        "poolBalance": "252105441300"
+                    },
+                    {
+                        "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+                        "usdPrice": 0.999782,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDT",
+                        "poolBalance": "392173888766"
+                    }
+                ],
+                "usdTotalExcludingBasePool": 2742373.744261207,
+                "gaugeAddress": "0xd4b22fedca85e684919955061fdf353b9d38389b",
+                "gaugeRewards": [],
+                "gaugeCrvApy": [
+                    2.365821285900699,
+                    5.914553214751748
+                ]
+            },
+            {
+                "id": "36",
+                "address": "0xF9440930043eb3997fc70e1339dBb11F341de7A8",
+                "coinsAddresses": [
+                    "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+                    "0x9559Aaa82d9649C7A7b220E7c461d2E74c9a3593",
+                    "0x0000000000000000000000000000000000000000",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "18",
+                    "18",
+                    "0",
+                    "0"
+                ],
+                "virtualPrice": "1034793963076922602",
+                "amplificationCoefficient": "10",
+                "assetType": "1",
+                "totalSupply": "1846527746368610598947",
+                "name": "Curve.fi ETH/rETH",
+                "lpTokenAddress": "0x53a901d48795C58f485cBB38df08FA96a24669D5",
+                "symbol": "rCRV",
+                "priceOracle": 0,
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/reth/swap",
+                        "https://classic.curve.fi/reth"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/reth/deposit",
+                        "https://classic.curve.fi/reth/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/reth/withdraw",
+                        "https://classic.curve.fi/reth/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "assetTypeName": "eth",
+                "coins": [
+                    {
+                        "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+                        "usdPrice": 1925.09,
+                        "poolBalance": "934072283367503601940",
+                        "decimals": 18,
+                        "symbol": "ETH",
+                        "isBasePoolLpToken": false
+                    },
+                    {
+                        "address": "0x9559Aaa82d9649C7A7b220E7c461d2E74c9a3593",
+                        "usdPrice": 2018.23,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "rETH",
+                        "poolBalance": "925689178682429364884"
+                    }
+                ],
+                "usdTotal": 3666426.8830801873,
+                "isMetaPool": false,
+                "usdTotalExcludingBasePool": 3666426.8830801873,
+                "gaugeAddress": "0x824f13f1a2f29cfeea81154b46c0fc820677a637",
+                "gaugeRewards": [
+                    {
+                        "gaugeAddress": "0x824f13f1a2f29cfeea81154b46c0fc820677a637",
+                        "tokenPrice": 0.299514,
+                        "name": "StaFi",
+                        "symbol": "FIS",
+                        "decimals": "18",
+                        "apy": 0,
+                        "tokenAddress": "0xef3A930e1FfFFAcd2fc13434aC81bD278B0ecC8d"
+                    }
+                ],
+                "gaugeCrvApy": [
+                    3.9734053893817447,
+                    9.933513473454362
+                ]
+            },
+            {
+                "id": "37",
+                "address": "0x43b4FdFD4Ff969587185cDB6f0BD875c5Fc83f8c",
+                "coinsAddresses": [
+                    "0xBC6DA0FE9aD5f3b0d58160288917AA56653660E9",
+                    "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490",
+                    "0x0000000000000000000000000000000000000000",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "18",
+                    "18",
+                    "0",
+                    "0"
+                ],
+                "virtualPrice": "1011845521881415972",
+                "amplificationCoefficient": "200",
+                "underlyingDecimals": [
+                    "18",
+                    "18",
+                    "6",
+                    "6",
+                    "0",
+                    "0",
+                    "0",
+                    "0"
+                ],
+                "assetType": "0",
+                "totalSupply": "18582015617790298732632602",
+                "name": "Curve.fi Factory USD Metapool: Alchemix USD",
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/alusd/swap",
+                        "https://classic.curve.fi/alusd"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/alusd/deposit",
+                        "https://classic.curve.fi/alusd/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/alusd/withdraw",
+                        "https://classic.curve.fi/alusd/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "lpTokenAddress": "0x43b4FdFD4Ff969587185cDB6f0BD875c5Fc83f8c",
+                "assetTypeName": "usd",
+                "coins": [
+                    {
+                        "address": "0xBC6DA0FE9aD5f3b0d58160288917AA56653660E9",
+                        "usdPrice": 0.996990850848137,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "alUSD",
+                        "poolBalance": "11469235337182403426597435"
+                    },
+                    {
+                        "address": "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490",
+                        "usdPrice": 1.0260845611402294,
+                        "decimals": "18",
+                        "isBasePoolLpToken": true,
+                        "symbol": "3Crv",
+                        "poolBalance": "7147362238333619391351252"
+                    }
+                ],
+                "usdTotal": 18768520.743025802,
+                "isMetaPool": true,
+                "underlyingCoins": [
+                    {
+                        "address": "0xBC6DA0FE9aD5f3b0d58160288917AA56653660E9",
+                        "usdPrice": 0.996990850848137,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "alUSD",
+                        "poolBalance": "11469235337182403426597435"
+                    },
+                    {
+                        "address": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+                        "usdPrice": 0.999743,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "DAI",
+                        "poolBalance": "2055591938514968129275127"
+                    },
+                    {
+                        "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                        "usdPrice": 0.999841,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDC",
+                        "poolBalance": "2065962762910"
+                    },
+                    {
+                        "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+                        "usdPrice": 0.999782,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDT",
+                        "poolBalance": "3213800727972"
+                    }
+                ],
+                "usdTotalExcludingBasePool": 11434722.697395004,
+                "gaugeAddress": "0x9582c4adacb3bce56fea3e590f05c3ca2fb9c477",
+                "gaugeRewards": [
+                    {
+                        "gaugeAddress": "0x9582c4adacb3bce56fea3e590f05c3ca2fb9c477",
+                        "tokenPrice": 14.28,
+                        "name": "Alchemix",
+                        "symbol": "ALCX",
+                        "decimals": "18",
+                        "apy": 0,
+                        "tokenAddress": "0xdBdb4d16EdA451D0503b854CF79D55697F90c8DF"
+                    }
+                ],
+                "gaugeCrvApy": [
+                    1.661167107204222,
+                    4.152917768010555
+                ]
+            },
+            {
+                "id": "38",
+                "address": "0x80466c64868E1ab14a1Ddf27A676C3fcBE638Fe5",
+                "coinsAddresses": [
+                    "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+                    "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+                    "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "6",
+                    "8",
+                    "18",
+                    "0"
+                ],
+                "virtualPrice": "1023259424082799391",
+                "amplificationCoefficient": "3645",
+                "assetType": "4",
+                "totalSupply": "319932807222709773784",
+                "name": "Curve.fi USD-BTC-ETH",
+                "lpTokenAddress": "0xcA3d75aC011BF5aD07a98d02f18225F9bD9A6BDF",
+                "symbol": "crvTricrypto",
+                "priceOracle": 30784.931283485417,
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/tricrypto/swap",
+                        "https://classic.curve.fi/tricrypto"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/tricrypto/deposit",
+                        "https://classic.curve.fi/tricrypto/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/tricrypto/withdraw",
+                        "https://classic.curve.fi/tricrypto/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "assetTypeName": "unknown",
+                "coins": [
+                    {
+                        "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+                        "usdPrice": 0.999782,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDT",
+                        "poolBalance": "129127538614"
+                    },
+                    {
+                        "address": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+                        "usdPrice": 30617,
+                        "decimals": "8",
+                        "isBasePoolLpToken": false,
+                        "symbol": "WBTC",
+                        "poolBalance": "411960382"
+                    },
+                    {
+                        "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+                        "usdPrice": 1925.02,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "WETH",
+                        "poolBalance": "65690027306394983106"
+                    }
+                ],
+                "usdTotal": 381683.9153328786,
+                "isMetaPool": false,
+                "usdTotalExcludingBasePool": 381683.9153328786,
+                "gaugeAddress": "0x6955a55416a06839309018a8b0cb72c4ddc11f15",
+                "gaugeRewards": [],
+                "gaugeCrvApy": [
+                    0,
+                    0
+                ]
+            },
+            {
+                "id": "39",
+                "address": "0x618788357D0EBd8A37e763ADab3bc575D54c2C7d",
+                "coinsAddresses": [
+                    "0x03ab458634910AaD20eF5f1C8ee96F1D6ac54919",
+                    "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490",
+                    "0x0000000000000000000000000000000000000000",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "18",
+                    "18",
+                    "0",
+                    "0"
+                ],
+                "virtualPrice": "978592132667307488",
+                "amplificationCoefficient": "100",
+                "underlyingDecimals": [
+                    "18",
+                    "18",
+                    "6",
+                    "6",
+                    "0",
+                    "0",
+                    "0",
+                    "0"
+                ],
+                "assetType": "0",
+                "totalSupply": "833504749459691662666204",
+                "name": "RAI3CRV",
+                "lpTokenAddress": "0x6BA5b4e438FA0aAf7C1bD179285aF65d13bD3D90",
+                "symbol": "RAI3CRV",
+                "priceOracle": 0,
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/rai/swap",
+                        "https://classic.curve.fi/rai"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/rai/deposit",
+                        "https://classic.curve.fi/rai/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/rai/withdraw",
+                        "https://classic.curve.fi/rai/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "assetTypeName": "usd",
+                "coins": [
+                    {
+                        "address": "0x03ab458634910AaD20eF5f1C8ee96F1D6ac54919",
+                        "usdPrice": 2.756230608223425,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "RAI",
+                        "poolBalance": "150336152800654113909030"
+                    },
+                    {
+                        "address": "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490",
+                        "usdPrice": 1.0260845611402294,
+                        "decimals": "18",
+                        "isBasePoolLpToken": true,
+                        "symbol": "3Crv",
+                        "poolBalance": "390642796237682684090175"
+                    }
+                ],
+                "usdTotal": 815193.6480118512,
+                "isMetaPool": true,
+                "underlyingCoins": [
+                    {
+                        "address": "0x03ab458634910AaD20eF5f1C8ee96F1D6ac54919",
+                        "usdPrice": 2.756230608223425,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "RAI",
+                        "poolBalance": "150336152800654113909030"
+                    },
+                    {
+                        "address": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+                        "usdPrice": 0.999743,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "DAI",
+                        "poolBalance": "112349445293029208069764"
+                    },
+                    {
+                        "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                        "usdPrice": 0.999841,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDC",
+                        "poolBalance": "112916268088"
+                    },
+                    {
+                        "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+                        "usdPrice": 0.999782,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDT",
+                        "poolBalance": "175651948378"
+                    }
+                ],
+                "usdTotalExcludingBasePool": 414361.10587171663,
+                "gaugeAddress": "0x66ec719045bbd62db5ebb11184c18237d3cc2e62",
+                "gaugeRewards": [],
+                "gaugeCrvApy": [
+                    0.5631544203467723,
+                    1.4078860508669309
+                ]
+            },
+            {
+                "id": "40",
+                "address": "0x5a6A4D54456819380173272A5E8E9B9904BdF41B",
+                "coinsAddresses": [
+                    "0x99D8a9C45b2ecA8864373A26D1459e3Dff1e17F3",
+                    "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490",
+                    "0x0000000000000000000000000000000000000000",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "18",
+                    "18",
+                    "0",
+                    "0"
+                ],
+                "virtualPrice": "1010835732483633948",
+                "amplificationCoefficient": "2000",
+                "underlyingDecimals": [
+                    "18",
+                    "18",
+                    "6",
+                    "6",
+                    "0",
+                    "0",
+                    "0",
+                    "0"
+                ],
+                "assetType": "0",
+                "totalSupply": "81817535858365970588540324",
+                "name": "Curve.fi Factory USD Metapool: Magic Internet Money 3Pool",
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/mim/swap",
+                        "https://classic.curve.fi/mim"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/mim/deposit",
+                        "https://classic.curve.fi/mim/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/mim/withdraw",
+                        "https://classic.curve.fi/mim/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "lpTokenAddress": "0x5a6A4D54456819380173272A5E8E9B9904BdF41B",
+                "assetTypeName": "usd",
+                "coins": [
+                    {
+                        "address": "0x99D8a9C45b2ecA8864373A26D1459e3Dff1e17F3",
+                        "usdPrice": 0.9962836045371727,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "MIM",
+                        "poolBalance": "71194694019684306727053838"
+                    },
+                    {
+                        "address": "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490",
+                        "usdPrice": 1.0260845611402294,
+                        "decimals": "18",
+                        "isBasePoolLpToken": true,
+                        "symbol": "3Crv",
+                        "poolBalance": "11236375251632790179286077"
+                    }
+                ],
+                "usdTotal": 82459577.55073074,
+                "isMetaPool": true,
+                "underlyingCoins": [
+                    {
+                        "address": "0x99D8a9C45b2ecA8864373A26D1459e3Dff1e17F3",
+                        "usdPrice": 0.9962836045371727,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "MIM",
+                        "poolBalance": "71194694019684306727053838"
+                    },
+                    {
+                        "address": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+                        "usdPrice": 0.999743,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "DAI",
+                        "poolBalance": "3231598121822707081584075"
+                    },
+                    {
+                        "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                        "usdPrice": 0.999841,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDC",
+                        "poolBalance": "3247902105122"
+                    },
+                    {
+                        "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+                        "usdPrice": 0.999782,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDT",
+                        "poolBalance": "5052419306494"
+                    }
+                ],
+                "usdTotalExcludingBasePool": 70930106.38185216,
+                "gaugeAddress": "0xd8b712d29381748db89c36bca0138d7c75866ddf",
+                "gaugeRewards": [
+                    {
+                        "gaugeAddress": "0xd8b712d29381748db89c36bca0138d7c75866ddf",
+                        "tokenPrice": 0.00048007,
+                        "name": "Spell Token",
+                        "symbol": "SPELL",
+                        "decimals": "18",
+                        "apy": 0,
+                        "tokenAddress": "0x090185f2135308BaD17527004364eBcC2D37e5F6"
+                    }
+                ],
+                "gaugeCrvApy": [
+                    3.6638807896777545,
+                    9.159701974194386
+                ]
+            },
+            {
+                "id": "41",
+                "address": "0xFD5dB7463a3aB53fD211b4af195c5BCCC1A03890",
+                "coinsAddresses": [
+                    "0xC581b735A1688071A1746c968e0798D642EDE491",
+                    "0xD71eCFF9342A5Ced620049e616c5035F1dB98620",
+                    "0x0000000000000000000000000000000000000000",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "6",
+                    "18",
+                    "0",
+                    "0"
+                ],
+                "virtualPrice": "1009600535958499281",
+                "amplificationCoefficient": "100",
+                "assetType": "0",
+                "totalSupply": "20031636943644062971808",
+                "name": "Curve.fi Factory Plain Pool: Euro Tether",
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/eurt/swap",
+                        "https://classic.curve.fi/eurt"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/eurt/deposit",
+                        "https://classic.curve.fi/eurt/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/eurt/withdraw",
+                        "https://classic.curve.fi/eurt/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "lpTokenAddress": "0xFD5dB7463a3aB53fD211b4af195c5BCCC1A03890",
+                "assetTypeName": "usd",
+                "coins": [
+                    {
+                        "address": "0xC581b735A1688071A1746c968e0798D642EDE491",
+                        "usdPrice": 1.0914697920142464,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "EURT",
+                        "poolBalance": "10155174998"
+                    },
+                    {
+                        "address": "0xD71eCFF9342A5Ced620049e616c5035F1dB98620",
+                        "usdPrice": 1.092,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "sEUR",
+                        "poolBalance": "10068778223626417250956"
+                    }
+                ],
+                "usdTotal": 22079.172563135384,
+                "isMetaPool": false,
+                "usdTotalExcludingBasePool": 22079.172563135384,
+                "gaugeAddress": "0xe8060ad8971450e624d5289a10017dd30f5da85f",
+                "gaugeRewards": [],
+                "gaugeCrvApy": [
+                    0,
+                    0
+                ]
+            },
+            {
+                "id": "42",
+                "address": "0x4e0915C88bC70750D68C481540F081fEFaF22273",
+                "coinsAddresses": [
+                    "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                    "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+                    "0xa693B19d2931d498c5B318dF961919BB4aee87a5",
+                    "0x853d955aCEf822Db058eb8505911ED77F175b99e"
+                ],
+                "decimals": [
+                    "6",
+                    "6",
+                    "6",
+                    "18"
+                ],
+                "virtualPrice": "1007513675217789137",
+                "amplificationCoefficient": "500",
+                "assetType": "0",
+                "totalSupply": "57258597212463346579533",
+                "name": "Curve.fi 4pool USDC/USDT/UST/FRAX",
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/4pool/swap",
+                        "https://classic.curve.fi/4pool"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/4pool/deposit",
+                        "https://classic.curve.fi/4pool/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/4pool/withdraw",
+                        "https://classic.curve.fi/4pool/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "lpTokenAddress": "0x4e0915C88bC70750D68C481540F081fEFaF22273",
+                "assetTypeName": "usd",
+                "coins": [
+                    {
+                        "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                        "usdPrice": 0.999841,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDC",
+                        "poolBalance": "542234099"
+                    },
+                    {
+                        "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+                        "usdPrice": 0.999782,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDT",
+                        "poolBalance": "541602440"
+                    },
+                    {
+                        "address": "0xa693B19d2931d498c5B318dF961919BB4aee87a5",
+                        "usdPrice": 0.012762970365,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "UST",
+                        "poolBalance": "120701204736"
+                    },
+                    {
+                        "address": "0x853d955aCEf822Db058eb8505911ED77F175b99e",
+                        "usdPrice": 0.9987912953577388,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "FRAX",
+                        "poolBalance": "544389898400297647088"
+                    }
+                ],
+                "usdTotal": 3167.8700453146052,
+                "isMetaPool": false,
+                "usdTotalExcludingBasePool": 3167.8700453146052,
+                "gaugeAddress": "0x34883134a39b206a451c2d3b0e7cac44be4d9181",
+                "gaugeRewards": [],
+                "gaugeCrvApy": [
+                    null,
+                    null
+                ]
+            },
+            {
+                "id": "43",
+                "address": "0x1005F7406f32a61BD760CfA14aCCd2737913d546",
+                "coinsAddresses": [
+                    "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                    "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+                    "0x0000000000000000000000000000000000000000",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "6",
+                    "6",
+                    "0",
+                    "0"
+                ],
+                "virtualPrice": "1006763395012993597",
+                "amplificationCoefficient": "1500",
+                "assetType": "0",
+                "totalSupply": "208092128367874420986",
+                "name": "Curve.fi 2Pool USDC/USDT",
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/2pool/swap",
+                        "https://classic.curve.fi/2pool"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/2pool/deposit",
+                        "https://classic.curve.fi/2pool/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/2pool/withdraw",
+                        "https://classic.curve.fi/2pool/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "lpTokenAddress": "0x1005F7406f32a61BD760CfA14aCCd2737913d546",
+                "assetTypeName": "usd",
+                "coins": [
+                    {
+                        "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                        "usdPrice": 0.999841,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDC",
+                        "poolBalance": "116847746"
+                    },
+                    {
+                        "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+                        "usdPrice": 0.999782,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDT",
+                        "poolBalance": "92652735"
+                    }
+                ],
+                "usdTotal": 209.461703912156,
+                "isMetaPool": false,
+                "usdTotalExcludingBasePool": 209.461703912156,
+                "gaugeAddress": "0x9f330db38caaae5b61b410e2f0aad63fff2109d8",
+                "gaugeRewards": [],
+                "gaugeCrvApy": [
+                    null,
+                    null
+                ]
+            },
+            {
+                "id": "44",
+                "address": "0xDcEF968d416a41Cdac0ED8702fAC8128A64241A2",
+                "coinsAddresses": [
+                    "0x853d955aCEf822Db058eb8505911ED77F175b99e",
+                    "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                    "0x0000000000000000000000000000000000000000",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "18",
+                    "6",
+                    "0",
+                    "0"
+                ],
+                "virtualPrice": "1001253925194212890",
+                "amplificationCoefficient": "1500",
+                "assetType": "0",
+                "totalSupply": "614545384247316215258750198",
+                "name": "Curve.fi FRAX/USDC",
+                "lpTokenAddress": "0x3175Df0976dFA876431C2E9eE6Bc45b65d3473CC",
+                "symbol": "crvFRAX",
+                "priceOracle": 0,
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/fraxusdc/swap",
+                        "https://classic.curve.fi/fraxusdc"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/fraxusdc/deposit",
+                        "https://classic.curve.fi/fraxusdc/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/fraxusdc/withdraw",
+                        "https://classic.curve.fi/fraxusdc/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "assetTypeName": "usd",
+                "coins": [
+                    {
+                        "address": "0x853d955aCEf822Db058eb8505911ED77F175b99e",
+                        "usdPrice": 0.9987912953577388,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "FRAX",
+                        "poolBalance": "433364938293749772847288459"
+                    },
+                    {
+                        "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                        "usdPrice": 0.999841,
+                        "decimals": "6",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDC",
+                        "poolBalance": "181992088655095"
+                    }
+                ],
+                "usdTotal": 614804279.9940398,
+                "isMetaPool": false,
+                "usdTotalExcludingBasePool": 614804279.9940398,
+                "gaugeAddress": "0xcfc25170633581bf896cb6cdee170e3e3aa59503",
+                "gaugeRewards": [],
+                "gaugeCrvApy": [
+                    1.1911688037729782,
+                    2.9779220094324454
+                ]
+            },
+            {
+                "id": "45",
+                "address": "0xa1F8A6807c402E4A15ef4EBa36528A3FED24E577",
+                "coinsAddresses": [
+                    "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+                    "0x5E8422345238F34275888049021821E8E08CAa1f",
+                    "0x0000000000000000000000000000000000000000",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "18",
+                    "18",
+                    "0",
+                    "0"
+                ],
+                "virtualPrice": "1001123169996475231",
+                "amplificationCoefficient": "1200",
+                "assetType": "0",
+                "totalSupply": "80620380433228016745148",
+                "name": "Curve.fi ETH/frxETH",
+                "lpTokenAddress": "0xf43211935C781D5ca1a41d2041F397B8A7366C7A",
+                "symbol": "frxETHCRV",
+                "priceOracle": 0.998767097659574,
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/frxeth/swap",
+                        "https://classic.curve.fi/frxeth"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/frxeth/deposit",
+                        "https://classic.curve.fi/frxeth/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/frxeth/withdraw",
+                        "https://classic.curve.fi/frxeth/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "assetTypeName": "eth",
+                "coins": [
+                    {
+                        "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+                        "usdPrice": 1925.09,
+                        "poolBalance": "21761768243974757344370",
+                        "decimals": 18,
+                        "symbol": "ETH",
+                        "isBasePoolLpToken": false
+                    },
+                    {
+                        "address": "0x5E8422345238F34275888049021821E8E08CAa1f",
+                        "usdPrice": 1922.7165520334693,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "frxETH",
+                        "poolBalance": "58958219207655627922576"
+                    }
+                ],
+                "usdTotal": 155253306.37777045,
+                "isMetaPool": false,
+                "usdTotalExcludingBasePool": 155253306.37777045,
+                "gaugeAddress": "0x2932a86df44fe8d2a706d8e9c5d51c24883423f5",
+                "gaugeRewards": [],
+                "gaugeCrvApy": [
+                    1.8297560807489561,
+                    4.57439020187239
+                ]
+            },
+            {
+                "id": "46",
+                "address": "0xf253f83AcA21aAbD2A20553AE0BF7F65C755A07F",
+                "coinsAddresses": [
+                    "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+                    "0xfE18be6b3Bd88A2D2A7f928d00292E7a9963CfC6",
+                    "0x0000000000000000000000000000000000000000",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "8",
+                    "18",
+                    "0",
+                    "0"
+                ],
+                "virtualPrice": "1001932163850309933",
+                "amplificationCoefficient": "100",
+                "assetType": "0",
+                "totalSupply": "495782394729234508521",
+                "name": "Curve.fi wBTC/sBTC",
+                "lpTokenAddress": "0x051d7e5609917Bd9b73f04BAc0DED8Dd46a74301",
+                "symbol": "crvWSBTC",
+                "priceOracle": 0,
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/sbtc2/swap",
+                        "https://classic.curve.fi/sbtc2"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/sbtc2/deposit",
+                        "https://classic.curve.fi/sbtc2/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/sbtc2/withdraw",
+                        "https://classic.curve.fi/sbtc2/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "assetTypeName": "usd",
+                "coins": [
+                    {
+                        "address": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+                        "usdPrice": 30617,
+                        "decimals": "8",
+                        "isBasePoolLpToken": false,
+                        "symbol": "WBTC",
+                        "poolBalance": "22691551698"
+                    },
+                    {
+                        "address": "0xfE18be6b3Bd88A2D2A7f928d00292E7a9963CfC6",
+                        "usdPrice": 30450.695918704292,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "sBTC",
+                        "poolBalance": "269843311230927882379"
+                    }
+                ],
+                "usdTotal": 15164388.999365928,
+                "isMetaPool": false,
+                "usdTotalExcludingBasePool": 15164388.999365928,
+                "gaugeAddress": "0x6d787113f23bed1d5e1530402b3f364d0a6e5af3",
+                "gaugeRewards": [],
+                "gaugeCrvApy": [
+                    1.1464241844462741,
+                    2.8660604611156852
+                ]
+            },
+            {
+                "id": "47",
+                "address": "0xaE34574AC03A15cd58A92DC79De7B1A0800F1CE3",
+                "coinsAddresses": [
+                    "0x853d955aCEf822Db058eb8505911ED77F175b99e",
+                    "0x8E870D67F660D95d5be530380D0eC0bd388289E1",
+                    "0x0000000000000000000000000000000000000000",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "18",
+                    "18",
+                    "0",
+                    "0"
+                ],
+                "virtualPrice": "1000158425833193005",
+                "amplificationCoefficient": "1000",
+                "assetType": "0",
+                "totalSupply": "112170311639414735181902206",
+                "name": "Curve.fi FRAX/USDP",
+                "lpTokenAddress": "0xFC2838a17D8e8B1D5456E0a351B0708a09211147",
+                "symbol": "crvfraxUSDP",
+                "priceOracle": 0,
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/fraxusdp/swap",
+                        "https://classic.curve.fi/fraxusdp"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/fraxusdp/deposit",
+                        "https://classic.curve.fi/fraxusdp/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/fraxusdp/withdraw",
+                        "https://classic.curve.fi/fraxusdp/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "assetTypeName": "usd",
+                "coins": [
+                    {
+                        "address": "0x853d955aCEf822Db058eb8505911ED77F175b99e",
+                        "usdPrice": 0.9987912953577388,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "FRAX",
+                        "poolBalance": "62496612668961603467131086"
+                    },
+                    {
+                        "address": "0x8E870D67F660D95d5be530380D0eC0bd388289E1",
+                        "usdPrice": 0.999583,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "USDP",
+                        "poolBalance": "49692209235230729740716307"
+                    }
+                ],
+                "usdTotal": 112092560.30708267,
+                "isMetaPool": false,
+                "usdTotalExcludingBasePool": 112092560.30708267,
+                "gaugeAddress": "0xfb860600f1be1f1c72a89b2ef5caf345aff7d39d",
+                "gaugeRewards": [],
+                "gaugeCrvApy": [
+                    0.4682594984133651,
+                    1.1706487460334127
+                ]
+            },
+            {
+                "id": "48",
+                "address": "0xBfAb6FA95E0091ed66058ad493189D2cB29385E6",
+                "coinsAddresses": [
+                    "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+                    "0xa2E3356610840701BDf5611a53974510Ae27E2e1",
+                    "0x0000000000000000000000000000000000000000",
+                    "0x0000000000000000000000000000000000000000"
+                ],
+                "decimals": [
+                    "18",
+                    "18",
+                    "0",
+                    "0"
+                ],
+                "virtualPrice": "1005061636797470629",
+                "amplificationCoefficient": "500",
+                "assetType": "0",
+                "totalSupply": "4581807408462338560821",
+                "name": "Curve.fi ETH/wBETH",
+                "poolUrls": {
+                    "swap": [
+                        "https://curve.fi/#/ethereum/pools/wbeth/swap",
+                        "https://classic.curve.fi/wbeth"
+                    ],
+                    "deposit": [
+                        "https://curve.fi/#/ethereum/pools/wbeth/deposit",
+                        "https://classic.curve.fi/wbeth/deposit"
+                    ],
+                    "withdraw": [
+                        "https://curve.fi/#/ethereum/pools/wbeth/withdraw",
+                        "https://classic.curve.fi/wbeth/withdraw"
+                    ]
+                },
+                "implementation": "",
+                "lpTokenAddress": "0xBfAb6FA95E0091ed66058ad493189D2cB29385E6",
+                "assetTypeName": "eth",
+                "coins": [
+                    {
+                        "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+                        "usdPrice": 1925.09,
+                        "poolBalance": "1730949096013948500919",
+                        "decimals": 18,
+                        "symbol": "ETH",
+                        "isBasePoolLpToken": false
+                    },
+                    {
+                        "address": "0xa2E3356610840701BDf5611a53974510Ae27E2e1",
+                        "usdPrice": 1936.6768345655448,
+                        "decimals": "18",
+                        "isBasePoolLpToken": false,
+                        "symbol": "wBETH",
+                        "poolBalance": "2852796885792543374192"
+                    }
+                ],
+                "usdTotal": 8857178.43768064,
+                "isMetaPool": false,
+                "usdTotalExcludingBasePool": 8857178.43768064,
+                "gaugeAddress": "0x50161102a240b1456d770dbb55c76d8dc2d160aa",
+                "gaugeRewards": [],
+                "gaugeCrvApy": [
+                    0.000048187015084395245,
+                    0.00012046753771098812
+                ]
+            }
+        ],
+        "tvlAll": 2493648215.7280273,
+        "tvl": 2493648215.7280273
+    },
+    "generatedTimeMs": 1688250416229
+}
