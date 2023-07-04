@@ -50,6 +50,8 @@ export default function Review(): JSX.Element {
     });
   }, [adapterConfig]);
 
+  console.log("Strategy", strategy);
+
   return (
     <section>
       <span className="flex flex-row items-center justify-end">
@@ -75,7 +77,7 @@ export default function Review(): JSX.Element {
         <ReviewParam title="Adapter" value={adapter.name} img={adapter.logoURI} />
         {/* TODO - At some point we should figure out if an adapter with the right config already exists and simply reuse it */}
         {devMode && <ReviewParam title="Adapter Address" value={constants.AddressZero} />}
-        <ReviewParam title="Strategy" value={"Coming Soon"} />
+        <ReviewParam title="Strategy" value={strategy.name} img={strategy.logoURI} />
       </ReviewSection>
       <ReviewSection title="Adapter">
         {adapter.initParams?.map((param, i) => <ReviewParam key={param.name} title={param.name} value={adapterConfig[i]} />)}
