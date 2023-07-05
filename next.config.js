@@ -12,6 +12,7 @@ const nextConfig = {
     PINATA_API_KEY: process.env.PINATA_API_KEY,
     PINATA_JWT: process.env.PINATA_JWT,
     IPFS_URL: process.env.IPFS_URL,
+    DUNE_API_KEY: process.env.DUNE_API_KEY,
   },
 };
 

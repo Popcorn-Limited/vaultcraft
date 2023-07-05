@@ -9,7 +9,7 @@ export default function Page({
     <>
       <div className="bg-[#141416] min-h-screen w-full h-full">
         <DesktopMenu />
-        <main className="max-w-screen-lg md:mx-auto py-4 w-full">
+        <main className="py-4">
           {children}
         </main>
       </div>
