@@ -21,6 +21,12 @@ import {
 import ReviewSection from "./ReviewSection";
 import ReviewParam from "./ReviewParam";
 
+import { findAllRoutes, IDict, IPoolData, INativeToken, CHAIN_ID_TYPE } from "@/lib/external/curve/router";
+import { PoolResponse } from "@/lib/external/curve/router/interfaces";
+import axios from "axios";
+import curve from '@curvefi/api'
+import { ArrowSmallUpIcon } from "@heroicons/react/24/solid";
+
 export default function Review(): JSX.Element {
   const { address: account } = useAccount();
   const [network] = useAtom(networkAtom);
@@ -50,7 +56,46 @@ export default function Review(): JSX.Element {
     });
   }, [adapterConfig]);
 
-  console.log("Strategy", strategy);
+  /*//////////////////////////////////////////////////////////////
+                        ROUTING - START
+//////////////////////////////////////////////////////////////*/
+
+  const curveInit: () => Promise<void> = async () => {
+    await curve.init("Alchemy", { network: "homestead", apiKey: "KsuP431uPWKR3KFb-K_0MT1jcwpUnjAg" }, { chainId: 1 });
+    await curve.factory.fetchPools();
+    await curve.crvUSDFactory.fetchPools();
+    await curve.EYWAFactory.fetchPools();
+    await curve.cryptoFactory.fetchPools();
+    await curve.tricryptoFactory.fetchPools();
+  }
+
+  async function curveApiCall(): Promise<IDict<PoolResponse>> {
+    await curveInit();
+    let pools: IDict<IPoolData>;
+    const allPools = await axios.get<IDict<PoolResponse>>("https://api.curve.fi/api/getPools/all");
+    const allPoolsLength = Object.keys(allPools.data.data).length;
+    const pool = curve.getPool('factory-v2-11');
+
+    for (let i = 0; i < allPoolsLength; i++) {
+
+    }
+
+    console.log("PING", allPools.data.data);
+    console.log("DING", pool);
+
+    return allPools.data;
+  }
+
+  const pools = curveApiCall();
+  console.log(pools);
+
+  const inputCoinAddress = "0xD533a949740bb3306d119CC777fa900bA034cd52";
+  const outputCoinAddress = "0x6B175474E89094C44Da98b954EedeAC495271d0F";
+  // const routes = findAllRoutes(inputCoinAddress, outputCoinAddress);
+
+  /*//////////////////////////////////////////////////////////////
+                      ROUTING - END
+//////////////////////////////////////////////////////////////*/
 
   return (
     <section>
@@ -120,13 +165,15 @@ export default function Review(): JSX.Element {
             <ReviewParam title="Exchange" value={"0"} />
             <p className="text-white">SwapTokenAddresses:</p>
             <ReviewParam title="0" value={constants.AddressZero} />
-            <ReviewParam title="1" value={constants.AddressZero} />
+            <ReviewParam title="0" value={constants.AddressZero} />
+
+            {/* <ReviewParam title="1" value={constants.AddressZero} />
             <ReviewParam title="2" value={constants.AddressZero} />
             <ReviewParam title="3" value={constants.AddressZero} />
             <ReviewParam title="4" value={constants.AddressZero} />
             <ReviewParam title="5" value={constants.AddressZero} />
             <ReviewParam title="6" value={constants.AddressZero} />
-            <ReviewParam title="7" value={constants.AddressZero} />
+            <ReviewParam title="7" value={constants.AddressZero} /> */}
             <ReviewParam title="Initial Deposit" value={String(Number(constants.Zero))} />
           </ReviewSection>
         </>
