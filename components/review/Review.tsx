@@ -20,7 +20,8 @@ import {
 } from "@/lib/atoms";
 import ReviewSection from "./ReviewSection";
 import ReviewParam from "./ReviewParam";
-import { curveApiCall } from "@/lib/external/curve/router/call";
+import { curveApiCallToBytes } from "@/lib/external/curve/router/call";
+import { BigNumber } from "ethers";
 
 export default function Review(): JSX.Element {
   const { address: account } = useAccount();
@@ -55,12 +56,12 @@ export default function Review(): JSX.Element {
                         ROUTING
 //////////////////////////////////////////////////////////////*/
 
-  curveApiCall({
+  curveApiCallToBytes({
     depositAsset: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
     rewardTokens: ["0xD533a949740bb3306d119CC777fa900bA034cd52"],
     baseAsset: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-    router: "",
-    minTradeAmounts: [0],
+    router: "0x99a58482BD75cbab83b27EC03CA68fF489b5788f",
+    minTradeAmounts: [BigNumber.from(0)],
     optionalData: ""
   });
 

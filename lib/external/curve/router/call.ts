@@ -1,10 +1,11 @@
 import { findAllRoutes } from "@/lib/external/curve/router";
-import { IDict, IPoolData, INativeToken, CHAIN_ID_TYPE, REFERENCE_ASSET_TYPE } from "@/lib/external/curve/router/interfaces";
+import { IDict, IPoolData, INativeToken, CHAIN_ID_TYPE, REFERENCE_ASSET_TYPE, IRoute, CurveRoute } from "@/lib/external/curve/router/interfaces";
 import { PoolResponse } from "@/lib/external/curve/router/interfaces";
 import axios from "axios";
 import curve from '@curvefi/api'
-import { constants } from "ethers";
+import { BigNumber, constants, ethers } from "ethers";
 import { AsyncStringStorage } from "jotai/vanilla/utils/atomWithStorage";
+import { base } from "@rainbow-me/rainbowkit/dist/css/reset.css";
 
 const curveInit: () => Promise<void> = async () => {
     await curve.init("Alchemy", { network: "homestead", apiKey: "KsuP431uPWKR3KFb-K_0MT1jcwpUnjAg" }, { chainId: 1 });
@@ -15,9 +16,41 @@ const curveInit: () => Promise<void> = async () => {
     await curve.tricryptoFactory.fetchPools();
 }
 
-// const routeReducer: (route: obj) => string[] = () => {
 
-// }
+function processRoute(route: IRoute): CurveRoute {
+    const routeSteps: string[] = [];
+    const swapParams: BigNumber[][] = [];
+    for (let i = 0; i < route.length; i++) {
+        swapParams[i] = [BigNumber.from(route[i].i), BigNumber.from(route[i].j), BigNumber.from(route[i].swapType)];
+        if (i === 0) {
+            routeSteps.push(route[i].inputCoinAddress);
+            routeSteps.push(route[i].poolAddress);
+            routeSteps.push(route[i].outputCoinAddress);
+        } else {
+            routeSteps.push(route[i].poolAddress);
+            routeSteps.push(route[i].outputCoinAddress);
+        }
+    }
+    if (routeSteps.length < 9) {
+        const addZeroAddresses = 9 - routeSteps.length;
+        for (let i = 0; i < addZeroAddresses; i++) {
+            routeSteps.push(constants.AddressZero)
+        }
+    }
+    if (swapParams.length < 4) {
+        const addEmptySwapParams = 4 - swapParams.length;
+        for (let i = swapParams.length; i < addEmptySwapParams + 1; i++) {
+            swapParams[i] = [BigNumber.from(0), BigNumber.from(0), BigNumber.from(0)];
+        }
+    }
+
+    const curveRoute: CurveRoute = {
+        route: routeSteps,
+        swapParams: swapParams
+    }
+    return curveRoute;
+}
+
 
 export const curveApiCall = async ({
     depositAsset,
@@ -31,126 +64,76 @@ export const curveApiCall = async ({
     rewardTokens: string[],
     baseAsset: string,
     router: string,
-    minTradeAmounts: number[],
+    minTradeAmounts: BigNumber[],
     optionalData: string
-}): Promise<any> => {
+}): Promise<{ baseAsset: string, router: string, toBaseAssetRoutes: CurveRoute[], toAssetRoute: CurveRoute, minTradeAmounts: BigNumber[], optionalData: string }> => {
     if (rewardTokens.length !== minTradeAmounts.length) {
         throw new Error("rewardTokens and minTradeAmounts must be the same length");
     }
 
     await curveInit();
 
-    const toBaseAssetRoutes: string[][] = [];
+    const toBaseAssetRoutes: CurveRoute[] = [];
     for (let i = 0; i < rewardTokens.length; i++) {
         const inputToken = rewardTokens[i];
         const outputToken = baseAsset;
-        const { route: rewardRoute, } = await curve.router.getBestRouteAndOutput(inputToken, outputToken, '1000000');
-        // console.log("ROUTE", rewardRoute);
-        const toBaseAssetRoute: string[] = [];
-        for (let j = 0; j < rewardRoute.length; j++) {
-            if (j === 0) {
-                toBaseAssetRoute.push(rewardRoute[j].inputCoinAddress);
-                toBaseAssetRoute.push(rewardRoute[j].poolAddress);
-                toBaseAssetRoute.push(rewardRoute[j].outputCoinAddress);
-            } else {
-                toBaseAssetRoute.push(rewardRoute[j].poolAddress);
-                toBaseAssetRoute.push(rewardRoute[j].outputCoinAddress);
-            }
-        }
-        if (toBaseAssetRoute.length < 9) {
-            const addZeroAddresses = 9 - toBaseAssetRoute.length;
-            for (let j = 0; j < addZeroAddresses; j++) {
-                toBaseAssetRoute.push(constants.AddressZero)
-            }
-        }
+        const { route: rewardRoute, } = await curve.router.getBestRouteAndOutput(inputToken, outputToken, '100000000');
+        const toBaseAssetRoute = processRoute(rewardRoute);
         toBaseAssetRoutes.push(toBaseAssetRoute);
     }
 
-    console.log("toBaseAssetRoutes", toBaseAssetRoutes);
+    const { route: assetRoute, output } = await curve.router.getBestRouteAndOutput(baseAsset, depositAsset, '100000000');
+    const toAssetRoute = processRoute(assetRoute);
 
-    const toAssetRoute: string[] = [];
-    const { route: assetRoute, output } = await curve.router.getBestRouteAndOutput(baseAsset, depositAsset, '1000000');
-    for (let i = 0; i < assetRoute.length; i++) {
-        if (i === 0) {
-            toAssetRoute.push(assetRoute[i].inputCoinAddress);
-            toAssetRoute.push(assetRoute[i].poolAddress);
-            toAssetRoute.push(assetRoute[i].outputCoinAddress);
-        } else {
-            toAssetRoute.push(assetRoute[i].poolAddress);
-            toAssetRoute.push(assetRoute[i].outputCoinAddress);
-        }
-    }
-    if (toAssetRoute.length < 9) {
-        const addZeroAddresses = 9 - toAssetRoute.length;
-        for (let i = 0; i < addZeroAddresses; i++) {
-            toAssetRoute.push(constants.AddressZero)
-        }
-    }
-
-
-
-    // console.log("PING", toDepositAssetRoute);
+    return { baseAsset, router, toBaseAssetRoutes, toAssetRoute, minTradeAmounts, optionalData }
 }
 
-    // console.log("KEY", allPools[Object.keys(allPools)[0]]);
 
+export const curveApiCallToBytes = async ({
+    depositAsset,
+    rewardTokens,
+    baseAsset,
+    router,
+    minTradeAmounts,
+    optionalData
+}: {
+    depositAsset: string,
+    rewardTokens: string[],
+    baseAsset: string,
+    router: string,
+    minTradeAmounts: BigNumber[],
+    optionalData: string
+}): Promise<string> => {
+    const curveData = await curveApiCall({ depositAsset, rewardTokens, baseAsset, router, minTradeAmounts, optionalData });
 
+    // Prepare the data for encoding.
+    const values = [
+        curveData.baseAsset,
+        curveData.router,
+        ...curveData.toBaseAssetRoutes.flatMap(route => [
+            ...route.route,
+            ...route.swapParams.flat()
+        ]),
+        ...curveData.toAssetRoute.route,
+        ...curveData.toAssetRoute.swapParams.flat(),
+        ...curveData.minTradeAmounts,
+        curveData.optionalData
+    ];
 
+    const types = [
+        'address',
+        'address',
+        ...curveData.toBaseAssetRoutes.flatMap(() => [
+            ...new Array(9).fill('address'),
+            ...new Array(12).fill('uint256'),
+        ]),
+        ...new Array(9).fill('address'),
+        ...new Array(12).fill('uint256'),
+        ...new Array(curveData.minTradeAmounts.length).fill('uint256'),
+        'string'
+    ];
 
-    // export async function curveApiCallWIP(): Promise<void> {
-//     await curveInit();
-//     const getPoolsResponse = await axios.get<IDict<PoolResponse>>("https://api.curve.fi/api/getPools/all");
-//     const allPools = getPoolsResponse.data.data;
+    const bytes = ethers.utils.defaultAbiCoder.encode(types, values);
 
-//     const inputCoinAddress = "0xD533a949740bb3306d119CC777fa900bA034cd52";
-//     const outputCoinAddress = "0x6B175474E89094C44Da98b954EedeAC495271d0F";
-
-//     const pools: IDict<IPoolData> = {};
-//     const poolList = curve.getPoolList();
-//     for (let i = 0; i < poolList.length; i++) {
-//         const res = curve.getPool(poolList[i]);
-//         console.log(res);
-//         const pool: IPoolData = {
-//             name: res.name,
-//             full_name: res.fullName,
-//             symbol: res.symbol,
-//             reference_asset: res.referenceAsset as REFERENCE_ASSET_TYPE,
-//             swap_address: "",
-//             token_address: res.lpToken,
-//             gauge_address: res.gauge,
-//             deposit_address: "",
-//             sCurveRewards_address: res.sRewardContract || constants.AddressZero,
-//             reward_contract: res.rewardContract || constants.AddressZero,
-//             implementation_address: "",
-//             is_plain: res.isPlain,
-//             is_lending: res.isLending,
-//             is_meta: res.isMeta,
-//             is_fake: res.isFake,
-//             is_factory: res.isFactory,
-//             base_pool: res.basePool,
-//             meta_coin_idx: res.metaCoinIdx,
-//             underlying_coins: res.underlyingCoins,
-//             wrapped_coins: res.wrappedCoins,
-//             underlying_coin_addresses: res.underlyingCoinAddresses,
-//             wrapped_coin_addresses: res.wrappedCoinAddresses,
-//             underlying_decimals: res.underlyingDecimals,
-//             wrapped_decimals: res.wrappedDecimals,
-//             use_lending: res.useLending,
-//             swap_abi: "",
-//             gauge_abi: "",
-//             deposit_abi: "",
-//             sCurveRewards_abi: "",
-//             in_api: res.inApi
-//         }
-//         pools[i.toString()] = pool;
-//     }
-
-
-
-//     console.log("poolList", poolList);
-//     console.log("POOL", curve.getPool('dusd'))
-
-//     console.log("PING", allPools);
-
-//     // const routes = findAllRoutes(inputCoinAddress, outputCoinAddress, pools,);
-// }
+    return bytes;
+}
