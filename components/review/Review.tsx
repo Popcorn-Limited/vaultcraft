@@ -20,6 +20,8 @@ import {
 } from "@/lib/atoms";
 import ReviewSection from "./ReviewSection";
 import ReviewParam from "./ReviewParam";
+import { curveApiCallToBytes } from "@/lib/external/curve/router/call";
+import { BigNumber } from "ethers";
 
 export default function Review(): JSX.Element {
   const { address: account } = useAccount();
@@ -34,7 +36,7 @@ export default function Review(): JSX.Element {
   const [fees] = useAtom(feeAtom);
   const [metadata] = useAtom(metadataAtom);
   const [strategy] = useAtom(strategyAtom);
-  const [strategyConfig] = useAtom(strategyConfigAtom);
+  const [strategyConfig, setStrategyConfig] = useAtom(strategyConfigAtom);
 
   const [devMode, setDevMode] = useState(false);
 
@@ -49,6 +51,29 @@ export default function Review(): JSX.Element {
         : "0x",
     });
   }, [adapterConfig]);
+
+  // Populate Strategy Data with dummy data that trades CRV -> USDC -> DAI
+  // Specific bytes output may be different depending on optimal routes at API Call.
+  useEffect(() => {
+    const fetchCurveStrategyBytes = async () => {
+      const data = await curveApiCallToBytes({
+        depositAsset: "0x6B175474E89094C44Da98b954EedeAC495271d0F", // DAI
+        rewardTokens: ["0xD533a949740bb3306d119CC777fa900bA034cd52"], // CRV
+        baseAsset: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // USDC
+        router: "0x99a58482BD75cbab83b27EC03CA68fF489b5788f",
+        minTradeAmounts: [BigNumber.from(0)],
+        optionalData: ""
+      });
+
+      setStrategyConfig({
+        id: "Test Strategy Config",
+        data: data
+      });
+    };
+
+    fetchCurveStrategyBytes();
+  }, [strategyConfig]);
+
 
   return (
     <section>
@@ -75,7 +100,7 @@ export default function Review(): JSX.Element {
         <ReviewParam title="Adapter" value={adapter.name} img={adapter.logoURI} />
         {/* TODO - At some point we should figure out if an adapter with the right config already exists and simply reuse it */}
         {devMode && <ReviewParam title="Adapter Address" value={constants.AddressZero} />}
-        <ReviewParam title="Strategy" value={"Coming Soon"} />
+        <ReviewParam title="Strategy" value={strategy.name} img={strategy.logoURI} />
       </ReviewSection>
       <ReviewSection title="Adapter">
         {adapter.initParams?.map((param, i) => <ReviewParam key={param.name} title={param.name} value={adapterConfig[i]} />)}
@@ -118,6 +143,8 @@ export default function Review(): JSX.Element {
             <ReviewParam title="Exchange" value={"0"} />
             <p className="text-white">SwapTokenAddresses:</p>
             <ReviewParam title="0" value={constants.AddressZero} />
+            <ReviewParam title="0" value={constants.AddressZero} />
+
             <ReviewParam title="1" value={constants.AddressZero} />
             <ReviewParam title="2" value={constants.AddressZero} />
             <ReviewParam title="3" value={constants.AddressZero} />

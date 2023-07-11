@@ -19,6 +19,6 @@ export async function curve({ chainId }: { chainId: number }): Promise<string[]>
         gaugeAddress?: string
         lpTokenAddress: string
     }[]
-
+    console.log("PING");
     return pools.filter(pool => !!pool?.gaugeAddress).map(pool => pool.lpTokenAddress)
 }

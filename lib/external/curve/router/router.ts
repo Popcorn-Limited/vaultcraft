@@ -405,5 +405,7 @@ export const findAllRoutes = (
 
   const routes = [...(routesByTvl[outputCoinAddress] ?? []), ...(routesByLength[outputCoinAddress] ?? [])];
 
+  console.log(routes);
+
   return routes.map((r) => r.route);
 }

@@ -11,8 +11,8 @@ function Selector({
 }: {
   selected?: any;
   onSelect: (value: any) => void;
-  title:string;
-  description:string;
+  title: string;
+  description: string;
   children: any;
 }) {
   return (

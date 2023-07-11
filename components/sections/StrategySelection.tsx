@@ -55,6 +55,8 @@ function StrategySelection() {
     setStrategy(newStrategy)
   }
 
+  console.log(options);
+
   return (
     <section className="mb-4">
       <Selector
