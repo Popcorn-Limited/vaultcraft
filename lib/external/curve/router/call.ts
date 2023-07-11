@@ -1,11 +1,6 @@
-import { findAllRoutes } from "@/lib/external/curve/router";
-import { IDict, IPoolData, INativeToken, CHAIN_ID_TYPE, REFERENCE_ASSET_TYPE, IRoute, CurveRoute } from "@/lib/external/curve/router/interfaces";
-import { PoolResponse } from "@/lib/external/curve/router/interfaces";
-import axios from "axios";
 import curve from '@curvefi/api'
 import { BigNumber, constants, ethers } from "ethers";
-import { AsyncStringStorage } from "jotai/vanilla/utils/atomWithStorage";
-import { base } from "@rainbow-me/rainbowkit/dist/css/reset.css";
+import { CurveRoute, IRoute } from './interfaces';
 
 const curveInit: () => Promise<void> = async () => {
     await curve.init("Alchemy", { network: "homestead", apiKey: "KsuP431uPWKR3KFb-K_0MT1jcwpUnjAg" }, { chainId: 1 });
@@ -82,7 +77,7 @@ export const curveApiCall = async ({
         toBaseAssetRoutes.push(toBaseAssetRoute);
     }
 
-    const { route: assetRoute, output } = await curve.router.getBestRouteAndOutput(baseAsset, depositAsset, '100000000');
+    const { route: assetRoute, } = await curve.router.getBestRouteAndOutput(baseAsset, depositAsset, '100000000');
     const toAssetRoute = processRoute(assetRoute);
 
     return { baseAsset, router, toBaseAssetRoutes, toAssetRoute, minTradeAmounts, optionalData }

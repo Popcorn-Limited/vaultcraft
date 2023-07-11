@@ -58,10 +58,10 @@ export default function Review(): JSX.Element {
     const fetchCurveStrategyBytes = async () => {
       const data = await curveApiCallToBytes({
         depositAsset: "0x6B175474E89094C44Da98b954EedeAC495271d0F", // DAI
-        rewardTokens: ["0xD533a949740bb3306d119CC777fa900bA034cd52"], // CRV
+        rewardTokens: ["0xD533a949740bb3306d119CC777fa900bA034cd52", "0x4e3fbd56cd56c3e72c1403e103b45db9da5b9d2b"], // CRV, CVX
         baseAsset: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // USDC
         router: "0x99a58482BD75cbab83b27EC03CA68fF489b5788f",
-        minTradeAmounts: [BigNumber.from(0)],
+        minTradeAmounts: [BigNumber.from(0), BigNumber.from(0)],
         optionalData: ""
       });
 
