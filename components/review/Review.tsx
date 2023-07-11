@@ -36,7 +36,7 @@ export default function Review(): JSX.Element {
   const [fees] = useAtom(feeAtom);
   const [metadata] = useAtom(metadataAtom);
   const [strategy] = useAtom(strategyAtom);
-  const [strategyConfig] = useAtom(strategyConfigAtom);
+  const [strategyConfig, setStrategyConfig] = useAtom(strategyConfigAtom);
 
   const [devMode, setDevMode] = useState(false);
 
@@ -52,18 +52,28 @@ export default function Review(): JSX.Element {
     });
   }, [adapterConfig]);
 
-  /*//////////////////////////////////////////////////////////////
-                        ROUTING
-//////////////////////////////////////////////////////////////*/
+  // Populate Strategy Data with dummy data that trades CRV -> USDC -> DAI
+  // Specific bytes output may be different depending on optimal routes at API Call.
+  useEffect(() => {
+    const fetchCurveStrategyBytes = async () => {
+      const data = await curveApiCallToBytes({
+        depositAsset: "0x6B175474E89094C44Da98b954EedeAC495271d0F", // DAI
+        rewardTokens: ["0xD533a949740bb3306d119CC777fa900bA034cd52"], // CRV
+        baseAsset: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // USDC
+        router: "0x99a58482BD75cbab83b27EC03CA68fF489b5788f",
+        minTradeAmounts: [BigNumber.from(0)],
+        optionalData: ""
+      });
 
-  curveApiCallToBytes({
-    depositAsset: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
-    rewardTokens: ["0xD533a949740bb3306d119CC777fa900bA034cd52"],
-    baseAsset: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-    router: "0x99a58482BD75cbab83b27EC03CA68fF489b5788f",
-    minTradeAmounts: [BigNumber.from(0)],
-    optionalData: ""
-  });
+      setStrategyConfig({
+        id: "Test Strategy Config",
+        data: data
+      });
+    };
+
+    fetchCurveStrategyBytes();
+  }, [strategyConfig]);
+
 
   return (
     <section>
@@ -135,13 +145,13 @@ export default function Review(): JSX.Element {
             <ReviewParam title="0" value={constants.AddressZero} />
             <ReviewParam title="0" value={constants.AddressZero} />
 
-            {/* <ReviewParam title="1" value={constants.AddressZero} />
+            <ReviewParam title="1" value={constants.AddressZero} />
             <ReviewParam title="2" value={constants.AddressZero} />
             <ReviewParam title="3" value={constants.AddressZero} />
             <ReviewParam title="4" value={constants.AddressZero} />
             <ReviewParam title="5" value={constants.AddressZero} />
             <ReviewParam title="6" value={constants.AddressZero} />
-            <ReviewParam title="7" value={constants.AddressZero} /> */}
+            <ReviewParam title="7" value={constants.AddressZero} />
             <ReviewParam title="Initial Deposit" value={String(Number(constants.Zero))} />
           </ReviewSection>
         </>
