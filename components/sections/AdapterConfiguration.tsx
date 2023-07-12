@@ -1,7 +1,6 @@
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import {
-  InitParamRequirement,
   adapterAtom,
   adapterConfigAtom,
   assetAtom,

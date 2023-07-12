@@ -1,30 +1,24 @@
 import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
-import { Adapter, adapterConfigAtom, useAdapters, assetAtom, networkAtom, Protocol, protocolAtom, useProtocols, adapterAtom, DEFAULT_ADAPTER } from "@/lib/atoms";
+import {
+  Adapter,
+  adapterConfigAtom,
+  useAdapters,
+  assetAtom,
+  networkAtom,
+  Protocol,
+  protocolAtom,
+  useProtocols,
+  adapterAtom,
+  DEFAULT_ADAPTER,
+  assetAddressesAtom
+} from "@/lib/atoms";
 import { resolveProtocolAssets } from "@/lib/resolver/protocolAssets/protocolAssets";
 import Selector, { Option } from "@/components/inputs/Selector";
 
 
 interface ProtocolOption extends Protocol {
   disabled: boolean;
-}
-
-async function assetSupported(protocol: Protocol, adapters: Adapter[], chainId: number, asset: string): Promise<boolean> {
-  const availableAssets = await Promise.all(adapters.filter(
-    (adapter) => adapter.protocol === protocol.key
-  ).filter(adapter => adapter.chains.includes(chainId)).map(adapter => resolveProtocolAssets({ chainId: chainId, resolver: adapter.resolver })
-  ))
-
-  return availableAssets.flat().map(a => a?.toLowerCase()).filter((availableAsset) => availableAsset === asset).length > 0
-}
-
-async function getProtocolOptions(protocols: Protocol[], adapters: Adapter[], chainId: number, asset: string): Promise<ProtocolOption[]> {
-  return Promise.all(protocols.filter(
-    (p) => p.chains.includes(chainId)).map(
-      async (p) => {
-        return { ...p, disabled: !(await assetSupported(p, adapters, chainId, asset)) }
-      })
-  )
 }
 
 function ProtocolSelection() {
@@ -36,7 +30,35 @@ function ProtocolSelection() {
   const adapters = useAdapters();
   const [, setAdapter] = useAtom(adapterAtom);
   const [, setAdapterConfig] = useAtom(adapterConfigAtom);
+  const [availableAssets] = useAtom(assetAddressesAtom);
   const [asset] = useAtom(assetAtom);
+
+  async function assetSupported(protocol: Protocol, adapters: Adapter[], chainId: number, asset: string): Promise<boolean> {
+    if (!availableAssets[chainId]) {
+      const availableAssets = await Promise.all(adapters.filter(
+        (adapter) => adapter.protocol === protocol.key
+      ).filter(adapter => adapter.chains.includes(chainId)).map(adapter => resolveProtocolAssets({ chainId: chainId, resolver: adapter.resolver })
+      ))
+
+      return availableAssets.flat().map(a => a?.toLowerCase()).filter((availableAsset) => availableAsset === asset).length > 0
+    }
+
+    return (
+      availableAssets[chainId][protocol.key]
+        ?.map(a => a.toLowerCase())
+        ?.filter((availableAsset) => availableAsset === asset)
+        ?.length > 0
+    )
+  }
+
+  async function getProtocolOptions(protocols: Protocol[], adapters: Adapter[], chainId: number, asset: string): Promise<ProtocolOption[]> {
+    return Promise.all(protocols.filter(
+      (p) => p.chains.includes(chainId)).map(
+        async (p) => {
+          return { ...p, disabled: !(await assetSupported(p, adapters, chainId, asset)) }
+        })
+    )
+  }
 
   useEffect(() => {
     if (network && asset.symbol !== "none") {
