@@ -12,6 +12,7 @@ export type Strategy = {
   requiredAssets?: string[];
   requiredNetworks?: number[];
   initParams?: InitParam[];
+  resolver?: string;
 };
 
 export const useStrategies = () => {

@@ -8,6 +8,8 @@ import ProtocolSelection from "@/components/sections/ProtocolSelection";
 import StrategySelection from "@/components/sections/StrategySelection";
 import MetadataConfiguration from "@/components/sections/MetadataConfiguration";
 import VaultCreationContainer from "@/components/VaultCreationContainer";
+import DepositLimitConfiguration from "@/components/sections/DepositLimitConfiguration";
+import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
 
 
 export const basicsAtom = atom((get) => {
@@ -41,6 +43,7 @@ export default function Basics() {
             <ProtocolSelection />
             <AdapterSelection />
             <StrategySelection />
+            <DepositLimitConfiguration />
 
             <div className="w-full h-full flex flex-col justify-end md:grow mt-8">
                 <MainActionButton label="Next" handleClick={() => router.push('/create/adapter')} disabled={!isBasicsValid(basics)} />

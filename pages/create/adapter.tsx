@@ -31,7 +31,7 @@ export default function Adapter() {
 
       <div className="flex flex-row space-x-8 mt-16">
         <SecondaryActionButton label="Back" handleClick={() => router.push('/create/basics')} />
-        <MainActionButton label="Next" handleClick={() => router.push('/create/limits')} disabled={!isAdapterValid(adapter, adapterConfig)} />
+        <MainActionButton label="Next" handleClick={() => router.push('/create/strategy')} disabled={!isAdapterValid(adapter, adapterConfig)} />
       </div>
     </VaultCreationContainer >
   )

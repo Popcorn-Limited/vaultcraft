@@ -2,11 +2,9 @@
   {
     "name": "Compounder",
     "key": "CurveStargateCompounder",
+    "resolver": "curveStargateCompounder",
     "description": "description",
-    "compatibleAdapters": [
-      "StargateLpStakingAdapter",
-      "CurveGaugeAdapter"
-    ],
+    "compatibleAdapters": ["StargateLpStakingAdapter", "CurveGaugeAdapter"],
     "requiredAssets": [
       "0x0Faf1d2d3CED330824de3B8200fc8dc6E397850d",
       "0xdf0770dF86a8034b3EFEf0A1Bb3c889B8332FF56",
@@ -15,57 +13,33 @@
       "0xE8F55368C82D38bbbbDb5533e7F56AfC2E978CC2"
     ],
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
-    "requiredNetworks": [
-      1
-    ],
+    "requiredNetworks": [1],
     "initParams": [
+      {
+        "name": "Reward Token",
+        "type": "address",
+        "requirements": ["Required"],
+        "description": "Addresses of reward tokens",
+        "multiple": true
+      },
+      {
+        "name": "Minimum Trade Amounts",
+        "type": "uint256",
+        "requirements": ["Required"],
+        "description": "The minimum amount of tokens to trade",
+        "multiple": true
+      },
       {
         "name": "Base Asset",
         "type": "address",
-        "requirements": [
-          "Required"
-        ],
-        "description": ""
+        "requirements": ["Required"],
+        "description": "Middle asset to trade through"
       },
       {
-        "name": "Router",
-        "type": "address",
-        "requirements": [
-          "Required"
-        ],
-        "description": ""
-      },
-      {
-        "name": "toBaseAssetRoutes",
-        "type": "address",
-        "requirements": [
-          "Required"
-        ],
-        "description": ""
-      },
-      {
-        "name": "toAssetRoute",
-        "type": "address",
-        "requirements": [
-          "Required"
-        ],
-        "description": ""
-      },
-      {
-        "name": "minTradeAmounts",
+        "name": "Optional",
         "type": "uint256",
-        "requirements": [
-          "Required"
-        ],
-        "description": ""
-      },
-      {
-        "name": "optional",
-        "type": "uint256",
-        "requirements": [
-          "Required"
-        ],
-        "description": ""
+        "requirements": ["Required"],
+        "description": "Stargate Router Address"
       }
     ]
   },
@@ -73,65 +47,49 @@
     "name": "Compounder",
     "key": "CurveCompounder",
     "description": "description",
-    "compatibleAdapters": [
-      "CurveGaugeAdapter"
-    ],
+    "compatibleAdapters": ["CurveGaugeAdapter"],
     "requiredAssets": [
       "0x6B175474E89094C44Da98b954EedeAC495271d0F",
       "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
       "0xdAC17F958D2ee523a2206206994597C13D831ec7"
     ],
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
-    "requiredNetworks": [
-      1
-    ],
+    "requiredNetworks": [1],
     "initParams": [
       {
         "name": "Base Asset",
         "type": "address",
-        "requirements": [
-          "Required"
-        ],
+        "requirements": ["Required"],
         "description": ""
       },
       {
         "name": "Router",
         "type": "address",
-        "requirements": [
-          "Required"
-        ],
+        "requirements": ["Required"],
         "description": ""
       },
       {
         "name": "toBaseAssetRoutes",
         "type": "address",
-        "requirements": [
-          "Required"
-        ],
+        "requirements": ["Required"],
         "description": ""
       },
       {
         "name": "toAssetRoute",
         "type": "address",
-        "requirements": [
-          "Required"
-        ],
+        "requirements": ["Required"],
         "description": ""
       },
       {
         "name": "minTradeAmounts",
         "type": "uint256",
-        "requirements": [
-          "Required"
-        ],
+        "requirements": ["Required"],
         "description": ""
       },
       {
         "name": "optional",
         "type": "uint256",
-        "requirements": [
-          "Required"
-        ],
+        "requirements": ["Required"],
         "description": ""
       }
     ]

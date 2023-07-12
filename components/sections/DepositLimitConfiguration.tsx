@@ -5,6 +5,7 @@ import { Switch } from '@headlessui/react'
 import { limitAtom } from "@/lib/atoms/limits";
 import { validateBigNumberInput } from "@/lib/helpers";
 import Input from "@/components/inputs/Input";
+import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
 
 
 function DepositLimitConfiguration() {
@@ -23,7 +24,7 @@ function DepositLimitConfiguration() {
   return (
     <section>
       <div className="flex flex-row items-center justify-between">
-        <p className="text-white text-lg">Deposit Limit</p>
+        <p className="text-sm text-white mb-2">Deposit Limit</p>
         <Switch
           checked={enabled}
           onChange={handleToggle}
@@ -39,21 +40,29 @@ function DepositLimitConfiguration() {
       <p className="text-gray-500 text-sm">
         Restricts the amount of a single deposit with either a minimum, a maximum, or both.
       </p>
-      {enabled && <div className="flex flex-col mt-4">
-        <label className="text-white text-sm mb-3">Deposit Limit</label>
-        <Input
-          onChange={(e) => handleChange((e.target as HTMLInputElement).value)}
-          defaultValue={formatUnits(limit)}
-          autoComplete="off"
-          autoCorrect="off"
-          type="text"
-          pattern="^[0-9]*[.,]?[0-9]*$"
-          placeholder={"0.0"}
-          minLength={1}
-          maxLength={79}
-          spellCheck="false"
-        />
-      </div>
+      {enabled &&
+        <div className="flex flex-col mt-4">
+          <Input
+            onChange={(e) => handleChange((e.target as HTMLInputElement).value)}
+            defaultValue={formatUnits(limit)}
+            autoComplete="off"
+            autoCorrect="off"
+            type="text"
+            pattern="^[0-9]*[.,]?[0-9]*$"
+            placeholder={"0.0"}
+            minLength={1}
+            maxLength={79}
+            spellCheck="false"
+          />
+          <div className="border-2 border-[#353945] rounded-lg flex flex-row justify-between w-full px-2 py-3 h-full bg-[#23262F] text-white mt-4">
+            <div className="flex flex-row">
+              <ExclamationCircleIcon className="text-white w-16 h-16 mr-4 pb-2" />
+              <p className="text-white text-sm">Deposits can be changed at any time after vault creation.
+                Settings in this section are restrictive. Enable them to control who can deposit in your vault, and in what amounts.
+                If disabled, anyone can deposit any amount into your vault. </p>
+            </div>
+          </div>
+        </div>
       }
     </section>
   );
