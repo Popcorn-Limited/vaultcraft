@@ -1,9 +1,9 @@
+import { IRoute, CurveRoute } from "@/lib/external/curve/router/interfaces";
 import curve from '@curvefi/api'
 import { BigNumber, constants, ethers } from "ethers";
-import { CurveRoute, IRoute } from './interfaces';
 
 const curveInit: () => Promise<void> = async () => {
-    await curve.init("Alchemy", { network: "homestead", apiKey: "KsuP431uPWKR3KFb-K_0MT1jcwpUnjAg" }, { chainId: 1 });
+    await curve.init("Alchemy", { network: "homestead", apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY as string }, { chainId: 1 });
     await curve.factory.fetchPools();
     await curve.crvUSDFactory.fetchPools();
     await curve.EYWAFactory.fetchPools();
