@@ -8,12 +8,14 @@ function Selector({
   title,
   description,
   children,
+  optionalChildren,
 }: {
   selected?: any;
   onSelect: (value: any) => void;
-  title:string;
-  description:string;
+  title: string;
+  description: string;
   children: any;
+  optionalChildren?: any;
 }) {
   return (
     <Listbox
@@ -53,8 +55,10 @@ function Selector({
                     <XMarkIcon className="md:text-white w-10 h-10 cursor-pointer" />
                   </Listbox.Option>
                 </div>
-                <p className="text-[white] mb-8">{description}</p>
-
+                <p className="text-white">{description}</p>
+                <div className="mt-2 mb-6 w-full">
+                  {optionalChildren}
+                </div>
                 <div className="flex flex-col overflow-y-scroll scrollbar-hide w-full">
                   {children}
                 </div>
