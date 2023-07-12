@@ -16,12 +16,18 @@ type Pool = {
   chain: string
   project: string
   underlyingTokens: string[]
+  symbol: string
 }
 
 const poolNetworkMap = {
   ...networkMap,
   [ChainId.BNB]: "BSC",
 }
+
+const assetPoolMap = {
+  "stgUSDT": "USDT",
+  "stgUSDC": "USDC",
+} as { [key: string]: string }
 
 async function assetSupported(protocol: Protocol, adapters: Adapter[], chainId: number, asset: string): Promise<boolean> {
   const availableAssets = await Promise.all(adapters.filter(
@@ -60,7 +66,8 @@ function ProtocolSelection() {
     const filteredPools = pools.filter(
         pool =>
             pool.chain === poolNetworkMap[network.id as keyof typeof poolNetworkMap] &&
-            pool.project.includes(protocol.key)
+            pool.project.includes(protocol.key) &&
+            pool.symbol.includes(Object.keys(assetPoolMap).includes(asset.symbol) ? assetPoolMap[asset.symbol] : '')
     )
 
     const avgApy = filteredPools.reduce((avg, val, _, { length }) => avg + val.apy / length, 0)
