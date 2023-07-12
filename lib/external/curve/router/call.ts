@@ -77,7 +77,7 @@ export const curveApiCall = async ({
         toBaseAssetRoutes.push(toBaseAssetRoute);
     }
 
-    const { route: assetRoute, output } = await curve.router.getBestRouteAndOutput(baseAsset, depositAsset, '100000000');
+    const { route: assetRoute, } = await curve.router.getBestRouteAndOutput(baseAsset, depositAsset, '100000000');
     const toAssetRoute = processRoute(assetRoute);
 
     return { baseAsset, router, toBaseAssetRoutes, toAssetRoute, minTradeAmounts, optionalData }
