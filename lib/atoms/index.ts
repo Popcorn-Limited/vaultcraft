@@ -6,4 +6,3 @@ export * from "./metadata";
 export * from "./networks";
 export * from "./protocols";
 export * from "./strategy";
-export * from "./available-assets";

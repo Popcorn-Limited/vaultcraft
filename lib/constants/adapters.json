@@ -172,7 +172,7 @@
       }
     ],
     "assets": ["USDC"],
-    "chains": [1, 1337, 42161],
+    "chains": [1337, 42161],
     "resolver": "convex"
   },
   {
@@ -189,8 +189,8 @@
       }
     ],
     "assets": ["USDC"],
-    "chains": [1, 1337],
-    "resolver": "default"
+    "chains": [1337],
+    "resolver": "curve"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
@@ -207,7 +207,7 @@
     ],
     "assets": ["USDC"],
     "chains": [42161],
-    "resolver": "default"
+    "resolver": "curve"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",

@@ -10,7 +10,7 @@ import {
   assetAtom,
   strategyAtom,
   DEFAULT_STRATEGY,
-  availableAssetsAtom
+  assetAddressesAtom
 } from "@/lib/atoms";
 import { resolveProtocolAssets } from "@/lib/resolver/protocolAssets/protocolAssets";
 import Selector, { Option } from "@/components/inputs/Selector";
@@ -23,7 +23,7 @@ function AdapterSelection() {
   const [network] = useAtom(networkAtom);
   const [protocol] = useAtom(protocolAtom);
   const [asset] = useAtom(assetAtom);
-  const [availableAssets] = useAtom(availableAssetsAtom);
+  const [availableAssetAddresses, setAvailableAssetsAddresses] = useAtom(assetAddressesAtom);
 
   const [adapter, setAdapter] = useAtom(adapterAtom);
   const adapters = useAdapters();
@@ -34,25 +34,28 @@ function AdapterSelection() {
   const [, setStrategy] = useAtom(strategyAtom);
 
   async function assetSupported(adapter: Adapter, chainId: number, asset: string): Promise<boolean> {
-    if(!availableAssets[chainId]) {
-      const availableAssets = await resolveProtocolAssets({ chainId: chainId, resolver: adapter.resolver })
+    if (!availableAssetAddresses[chainId]) {
+      const protocolAssets = await resolveProtocolAssets({ chainId: chainId, resolver: adapter.resolver })
+      const newAvailable = {...availableAssetAddresses}
+      newAvailable[chainId][adapter.protocol] = protocolAssets
+      setAvailableAssetsAddresses(newAvailable)
 
-      return availableAssets.flat().map(a => a.toLowerCase()).filter((availableAsset) => availableAsset === asset).length > 0
+      return protocolAssets.map(a => a.toLowerCase()).filter((availableAsset) => availableAsset === asset).length > 0
     }
 
     return (
-        availableAssets[chainId][adapter.protocol]
-            .map(a => a.toLowerCase())
-            .filter((availableAsset) => availableAsset === asset)
-            .length > 0
+      availableAssetAddresses[chainId][adapter.protocol]
+        .map(a => a.toLowerCase())
+        .filter((availableAsset) => availableAsset === asset)
+        .length > 0
     )
   }
 
   async function getAdapterOptions(adapters: Adapter[], chainId: number, asset: string): Promise<AdapterOption[]> {
     return Promise.all(
-        adapters.map(async (adapter) => {
-          return { ...adapter, disabled: !(await assetSupported(adapter, chainId, asset)) }
-        })
+      adapters.map(async (adapter) => {
+        return { ...adapter, disabled: !(await assetSupported(adapter, chainId, asset)) }
+      })
     )
   }
 
