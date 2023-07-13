@@ -92,7 +92,7 @@ export const RPC_URLS = {
     [ChainId.RemoteFork]: `http://localhost:8545`,
   };
 
-export const PRC_PROVIDERS = {
+export const RPC_PROVIDERS = {
     [ChainId.Ethereum]: new ethers.providers.JsonRpcProvider(RPC_URLS[ChainId.Ethereum], ChainId.Ethereum),
     [ChainId.Goerli]: new ethers.providers.JsonRpcProvider(RPC_URLS[ChainId.Goerli], ChainId.Goerli),
     [ChainId.Arbitrum]: new ethers.providers.JsonRpcProvider(RPC_URLS[ChainId.Arbitrum], ChainId.Arbitrum),

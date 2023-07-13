@@ -16,19 +16,11 @@ import {
 } from "@/lib/atoms";
 import { resolveProtocolAssets } from "@/lib/resolver/protocolAssets/protocolAssets";
 import Selector, { Option } from "@/components/inputs/Selector";
-import { ChainId, networkMap } from "@/lib/connectors";
+import { resolveAdapterApy } from "@/lib/resolver/adapterApy/adapterApy";
 
 interface ProtocolOption extends Protocol {
   disabled: boolean;
-  apy?: string | number;
-}
-
-type Pool = {
-  apy: number
-  chain: string
-  project: string
-  underlyingTokens: string[]
-  symbol: string
+  apy?: number;
 }
 
 function ProtocolSelection() {
@@ -42,47 +34,6 @@ function ProtocolSelection() {
   const [, setAdapterConfig] = useAtom(adapterConfigAtom);
   const [availableAssets] = useAtom(assetAddressesAtom);
   const [asset] = useAtom(assetAtom);
-  const [pools, setPools] = useState<Pool[]>([]);
-
-  async function getPools() {
-    try {
-      const { data } = await axios.get<{
-        data: Pool[]
-      }>('https://yields.llama.fi/pools')
-
-      setPools(data.data)
-    } catch (e) {
-      console.error(e)
-    }
-  }
-
-  function getApy(protocol: Protocol) {
-    const filteredPools = pools.filter(
-        pool =>
-            pool.chain === poolNetworkMap[network.id as keyof typeof poolNetworkMap] &&
-            pool.project.includes(protocol.key) &&
-            pool.symbol.includes(Object.keys(assetPoolMap).includes(asset.symbol) ? assetPoolMap[asset.symbol] : '')
-    )
-
-    const avgApy = filteredPools.reduce((avg, val, _, { length }) => avg + val.apy / length, 0)
-
-    return avgApy.toFixed(2)
-  }
-
-  async function getProtocolOptions(protocols: Protocol[], adapters: Adapter[], chainId: number, asset: string): Promise<ProtocolOption[]> {
-    return Promise.all(protocols
-        .filter((p) => p.chains.includes(chainId))
-        .map(async (p) => {
-          const disabled = !(await assetSupported(p, adapters, chainId, asset))
-
-          return {
-            ...p,
-            disabled,
-            ...(pools.length && !disabled && { apy: (getApy(p))})
-          }
-        })
-    )
-  }
 
   async function assetSupported(protocol: Protocol, adapters: Adapter[], chainId: number, asset: string): Promise<boolean> {
     if (!availableAssets[chainId]) {
@@ -106,30 +57,19 @@ function ProtocolSelection() {
     return Promise.all(protocols.filter(
       (p) => p.chains.includes(chainId)).map(
         async (p) => {
-          return { ...p, disabled: !(await assetSupported(p, adapters, chainId, asset)) }
+          const isAssetSupported = await assetSupported(p, adapters, chainId, asset)
+          const protocolOption: ProtocolOption = { ...p, disabled: !isAssetSupported }
+          if (isAssetSupported) protocolOption.apy = await resolveAdapterApy({ chainId: chainId, address: asset, resolver: p.key })
+          return protocolOption
         })
     )
   }
 
   useEffect(() => {
-    if(!pools.length) {
-      getPools()
-    }
     if (network && asset.symbol !== "none") {
       getProtocolOptions(protocols, adapters, network.id, asset.address[network.id].toLowerCase()).then(res => setOptions(res));
     }
   }, [network, asset]);
-
-  useEffect(() => {
-    if(!options.length) return
-
-    setOptions(options.map(option => {
-      return {
-        ...option,
-        apy: getApy(option)
-      }
-    }))
-  }, [pools])
 
   function selectProtocol(newProtocol: any) {
     if (protocol !== newProtocol) {
