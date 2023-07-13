@@ -1,7 +1,7 @@
-import { atomWithStorage } from "jotai/utils";
 import { AdapterConfig, InitParam } from "./adapter";
 import strategies from "@/lib/constants/strategies.json";
 import { atom } from "jotai";
+import { ethers } from "ethers";
 
 export type Strategy = {
   name: string;
@@ -29,4 +29,5 @@ export const DEFAULT_STRATEGY = {
 
 export const strategyAtom = atom<Strategy>(DEFAULT_STRATEGY);
 
-export const strategyConfigAtom = atom<AdapterConfig>({ id: "", data: "" })
+export const strategyConfigAtom = atom<any[]>([]);
+export const strategyDeploymentAtom = atom<AdapterConfig>({ id: ethers.utils.formatBytes32String(""), data: "0x" });

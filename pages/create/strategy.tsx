@@ -1,19 +1,12 @@
 import { useAtom } from "jotai";
 import { useRouter } from "next/router";
 import { adapterAtom, adapterConfigAtom } from "@/lib/atoms";
-import { verifyInitParamValidity } from "@/lib/helpers";
 import MainActionButton from "@/components/buttons/MainActionButton";
 import SecondaryActionButton from "@/components/buttons/SecondaryActionButton";
 import VaultCreationContainer from "@/components/VaultCreationContainer";
 import StrategyConfiguration from "@/components/sections/StrategyConfiguration";
+import { isConfigValid } from "./adapter";
 
-
-export function isAdapterValid(adapter: any, adapterConfig: string[]): boolean {
-  if (adapter.initParams && adapter.initParams.length > 0) {
-    return adapterConfig.every((param: string, i: number) => verifyInitParamValidity(param, adapter.initParams[i]).length === 0)
-  }
-  return true;
-}
 
 export default function Strategy() {
   const router = useRouter();
@@ -31,7 +24,7 @@ export default function Strategy() {
 
       <div className="flex flex-row space-x-8 mt-16">
         <SecondaryActionButton label="Back" handleClick={() => router.push('/create/adapter')} />
-        <MainActionButton label="Next" handleClick={() => router.push('/create/fees')} disabled={!isAdapterValid(adapter, adapterConfig)} />
+        <MainActionButton label="Next" handleClick={() => router.push('/create/fees')} disabled={!isConfigValid(adapter, adapterConfig)} />
       </div>
     </VaultCreationContainer >
   )
