@@ -1,11 +1,12 @@
-// pages/api/balancerProxy.ts
 import axios, { AxiosRequestConfig } from 'axios';
 import { NextApiRequest, NextApiResponse } from 'next';
 
-export default async function handler(
-    req: NextApiRequest,
-    res: NextApiResponse
-) {
+export const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+    if (!req.url) {
+        res.status(400).json({ error: "Missing request URL" });
+        return;
+    }
+
     try {
         const url = 'https://api.balancer.fi' + req.url.replace('/api/balancerProxy', '');
         const config: AxiosRequestConfig = {

@@ -21,7 +21,7 @@ import {
 import ReviewSection from "./ReviewSection";
 import ReviewParam from "./ReviewParam";
 
-import { balancerApiCall } from "@/lib/external/balancer/router/call";
+import { balancerApiCall, balancerApiProxyCall } from "@/lib/external/balancer/router/call";
 
 export default function Review(): JSX.Element {
   const { address: account } = useAccount();
@@ -52,7 +52,8 @@ export default function Review(): JSX.Element {
     });
   }, [adapterConfig]);
 
-  balancerApiCall();
+  // balancerApiCall();
+  // balancerApiProxyCall();
 
   return (
     <section>
