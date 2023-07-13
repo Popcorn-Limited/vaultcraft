@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { arbitrum, localhost } from "wagmi/chains";
+import { localhost } from "wagmi/chains";
 import { constants, ethers } from "ethers";
 import { formatUnits } from "ethers/lib/utils.js";
 import { mainnet, useAccount } from "wagmi";
@@ -16,25 +16,31 @@ import {
   networkAtom,
   metadataAtom,
   strategyAtom,
-  strategyConfigAtom
+  strategyConfigAtom,
+  strategyDeploymentAtom
 } from "@/lib/atoms";
 import ReviewSection from "./ReviewSection";
 import ReviewParam from "./ReviewParam";
+import { resolveStrategyEncoding } from "@/lib/resolver/strategyEncoding/strategyDefaults";
 
 export default function Review(): JSX.Element {
   const { address: account } = useAccount();
   const [network] = useAtom(networkAtom);
   const chainId = network.id === localhost.id ? mainnet.id : network.id;
+
   const [asset] = useAtom(assetAtom);
   const [protocol] = useAtom(protocolAtom);
-  const [adapter] = useAtom(adapterAtom);
-  const [adapterConfig] = useAtom(adapterConfigAtom);
   const [limit] = useAtom(limitAtom);
-  const [adapterData, setAdapterData] = useAtom(adapterDeploymentAtom);
   const [fees] = useAtom(feeAtom);
   const [metadata] = useAtom(metadataAtom);
+
+  const [adapter] = useAtom(adapterAtom);
+  const [adapterConfig] = useAtom(adapterConfigAtom);
+  const [adapterData, setAdapterData] = useAtom(adapterDeploymentAtom);
+
   const [strategy] = useAtom(strategyAtom);
   const [strategyConfig] = useAtom(strategyConfigAtom);
+  const [strategyData, setStrategyData] = useAtom(strategyDeploymentAtom);
 
   const [devMode, setDevMode] = useState(false);
 
@@ -49,6 +55,27 @@ export default function Review(): JSX.Element {
         : "0x",
     });
   }, [adapterConfig]);
+
+  // Populate Strategy Data with dummy data that trades CRV -> USDC -> DAI
+  // Specific bytes output may be different depending on optimal routes at API Call.
+  useEffect(() => {
+    const fetchCurveStrategyBytes = async () => {
+      const data = await resolveStrategyEncoding({
+        chainId: chainId,
+        address: asset.address[chainId],
+        params: strategyConfig,
+        resolver: strategy.resolver
+      })
+
+      setStrategyData({
+        id: strategy.key,
+        data: data
+      });
+    };
+
+    fetchCurveStrategyBytes();
+  }, [strategyConfig]);
+
 
   return (
     <section>
@@ -75,7 +102,7 @@ export default function Review(): JSX.Element {
         <ReviewParam title="Adapter" value={adapter.name} img={adapter.logoURI} />
         {/* TODO - At some point we should figure out if an adapter with the right config already exists and simply reuse it */}
         {devMode && <ReviewParam title="Adapter Address" value={constants.AddressZero} />}
-        <ReviewParam title="Strategy" value={"Coming Soon"} />
+        <ReviewParam title="Strategy" value={strategy.name} img={strategy.logoURI} />
       </ReviewSection>
       <ReviewSection title="Adapter">
         {adapter.initParams?.map((param, i) => <ReviewParam key={param.name} title={param.name} value={adapterConfig[i]} />)}
@@ -84,8 +111,9 @@ export default function Review(): JSX.Element {
       </ReviewSection>
       <ReviewSection title="Strategy">
         <ReviewParam title="Strategy" value={strategy.key} />
-        {devMode && <ReviewParam title="Strategy Id" value={strategyConfig.id} />}
-        {devMode && <ReviewParam title="Strategy Data" value={strategyConfig.data} />}
+        {strategy.initParams?.map((param, i) => <ReviewParam key={param.name} title={param.name} value={strategyConfig[i]} />)}
+        {devMode && <ReviewParam title="Strategy Id" value={strategyData.id} />}
+        {devMode && <ReviewParam title="Strategy Data" value={strategyData.data} />}
       </ReviewSection>
       <ReviewSection title="Deposit Limit">
         <ReviewParam title="Deposit Limit" value={`${formatUnits(Number(limit) > 0 ? limit : constants.MaxUint256)} ${asset.symbol}`} />
@@ -118,6 +146,8 @@ export default function Review(): JSX.Element {
             <ReviewParam title="Exchange" value={"0"} />
             <p className="text-white">SwapTokenAddresses:</p>
             <ReviewParam title="0" value={constants.AddressZero} />
+            <ReviewParam title="0" value={constants.AddressZero} />
+
             <ReviewParam title="1" value={constants.AddressZero} />
             <ReviewParam title="2" value={constants.AddressZero} />
             <ReviewParam title="3" value={constants.AddressZero} />

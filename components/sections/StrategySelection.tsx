@@ -1,7 +1,6 @@
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
-import { Strategy, adapterAtom, assetAtom, networkAtom, strategyAtom, strategyConfigAtom, useStrategies } from "@/lib/atoms";
-import getStrategyConfig from "@/lib/getStrategyConfig";
+import { Strategy, adapterAtom, assetAtom, networkAtom, strategyAtom, useStrategies } from "@/lib/atoms";
 import Selector, { Option } from "@/components/inputs/Selector";
 
 
@@ -27,7 +26,6 @@ function StrategySelection() {
 
   const strategies = useStrategies();
   const [strategy, setStrategy] = useAtom(strategyAtom);
-  const [, setStrategyConfig] = useAtom(strategyConfigAtom);
   const [options, setOptions] = useState<Strategy[]>([]);
 
   useEffect(() => {
@@ -42,24 +40,16 @@ function StrategySelection() {
           setOptions(res);
           if (res.length > 0) {
             setStrategy(res[0]);
-            setStrategyConfig(getStrategyConfig(res[0], adapter.key, asset, network.id));
           }
         });
     }
   }, [adapter, asset, network]);
 
-  function selectStrategy(newStrategy: Strategy) {
-    if (strategy !== newStrategy) {
-      setStrategyConfig(getStrategyConfig(newStrategy, adapter.key, asset, network.id))
-    }
-    setStrategy(newStrategy)
-  }
-
   return (
     <section className="mb-4">
       <Selector
         selected={strategy}
-        onSelect={(newStrategy) => selectStrategy(newStrategy)}
+        onSelect={(newStrategy) => setStrategy(newStrategy)}
         title="Select Strategy"
         description="Select a strategy to apply on your vault."
       >

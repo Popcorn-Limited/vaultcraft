@@ -2,6 +2,6 @@
 export const CREATION_STAGES = [
     'Basics',
     'Adapter',
-    'Limits',
+    'Strategy',
     'Fees',
 ];
