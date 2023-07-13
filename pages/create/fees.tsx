@@ -28,7 +28,7 @@ export default function Fees() {
       <FeeConfiguration />
 
       <div className="flex flex-row space-x-8 mt-16">
-        <SecondaryActionButton label="Back" handleClick={() => router.push('/create/limits')} />
+        <SecondaryActionButton label="Back" handleClick={() => router.push('/create/strategy')} />
         <MainActionButton label="Next" handleClick={() => router.push('/create/review')} disabled={!isFeesValid(fees)} />
       </div>
     </VaultCreationContainer>

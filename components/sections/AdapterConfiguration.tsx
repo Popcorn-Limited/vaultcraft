@@ -1,7 +1,6 @@
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import {
-  InitParamRequirement,
   adapterAtom,
   adapterConfigAtom,
   assetAtom,
@@ -25,6 +24,8 @@ function AdapterConfiguration() {
     () => {
       // Set defaults if the adapter has init params
       if (adapter.initParams && adapter.initParams.length > 0) {
+        setAdapterConfig(adapter.initParams.map(i => "loading..."))
+
         // Set config defaults
         resolveAdapterDefaults({
           chainId: network.id,
