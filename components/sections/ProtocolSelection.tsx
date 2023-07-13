@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import {
@@ -15,10 +16,11 @@ import {
 } from "@/lib/atoms";
 import { resolveProtocolAssets } from "@/lib/resolver/protocolAssets/protocolAssets";
 import Selector, { Option } from "@/components/inputs/Selector";
-
+import { resolveAdapterApy } from "@/lib/resolver/adapterApy/adapterApy";
 
 interface ProtocolOption extends Protocol {
   disabled: boolean;
+  apy?: number;
 }
 
 function ProtocolSelection() {
@@ -55,7 +57,10 @@ function ProtocolSelection() {
     return Promise.all(protocols.filter(
       (p) => p.chains.includes(chainId)).map(
         async (p) => {
-          return { ...p, disabled: !(await assetSupported(p, adapters, chainId, asset)) }
+          const isAssetSupported = await assetSupported(p, adapters, chainId, asset)
+          const protocolOption: ProtocolOption = { ...p, disabled: !isAssetSupported }
+          if (isAssetSupported) protocolOption.apy = await resolveAdapterApy({ chainId: chainId, address: asset, resolver: p.key })
+          return protocolOption
         })
     )
   }
@@ -88,6 +93,7 @@ function ProtocolSelection() {
             value={protocolIter}
             selected={protocolIter?.name === protocol.name}
             disabled={protocolIter.disabled}
+            apy={protocolIter?.apy}
           >
           </Option>
         )) : <p className="text-white">Loading, please wait...</p>}

@@ -10,7 +10,7 @@ import { RPC_URLS } from "@/lib/connectors";
 
 async function addProtocolAssets(adapters: Adapter[], chainId: number): Promise<{ [key: string]: string[] }> {
   const protocolQueries = [] as Promise<string[]>[]
-  let filteredAdapters: Adapter[] = adapters.filter(adapter => adapter.chains.includes(chainId))
+  const filteredAdapters: Adapter[] = adapters.filter(adapter => adapter.chains.includes(chainId))
 
   try {
     filteredAdapters.forEach(

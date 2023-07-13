@@ -1,4 +1,4 @@
-import { PRC_PROVIDERS } from "@/lib/connectors";
+import { RPC_PROVIDERS } from "@/lib/connectors";
 import { curveApiCallToBytes } from "@/lib/external/curve/router/call";
 import { BigNumber, Contract, ethers } from "ethers";
 
@@ -7,7 +7,7 @@ export async function curveStargateCompounder({ chainId, address, params }: { ch
     address,
     ["function token() view returns (address)"],
     // @ts-ignore
-    PRC_PROVIDERS[chainId])
+    RPC_PROVIDERS[chainId])
 
   const depositAsset = await lpToken.token()
 
