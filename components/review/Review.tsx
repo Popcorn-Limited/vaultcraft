@@ -21,6 +21,8 @@ import {
 import ReviewSection from "./ReviewSection";
 import ReviewParam from "./ReviewParam";
 
+import { balancerApiCall } from "@/lib/external/balancer/router/call";
+
 export default function Review(): JSX.Element {
   const { address: account } = useAccount();
   const [network] = useAtom(networkAtom);
@@ -49,6 +51,8 @@ export default function Review(): JSX.Element {
         : "0x",
     });
   }, [adapterConfig]);
+
+  balancerApiCall();
 
   return (
     <section>
