@@ -68,6 +68,7 @@ function StrategyConfiguration() {
                 {// @ts-ignore
                   initParam.multiple ? strategyConfig[i].map((item, n) =>
                     <Input
+                      key={`${initParam.name}-${n}`}
                       onChange={(e) =>
                         handleChange(
                           (e.target as HTMLInputElement).value,

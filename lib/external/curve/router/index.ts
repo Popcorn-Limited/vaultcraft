@@ -1,5 +1,5 @@
-import { findAllRoutes } from "./router";
+import { curveApiCallToBytes } from "./call";
 
 export {
-  findAllRoutes
+  curveApiCallToBytes
 };
