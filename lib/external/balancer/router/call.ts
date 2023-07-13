@@ -1,9 +1,8 @@
-import { BigNumber, constants, ethers } from "ethers";
-
+// This is your front-end request
 import axios from 'axios';
 
 export const balancerApiCall = async () => {
-    const endpointUrl = "https://api.balancer.fi/sor/1";
+    const endpointUrl = "/api/balancerProxy/sor/1"; // Updated URL
 
     const data = {
         sellToken: "0xba100000625a3754423978a60c9317c58a424e3d",
@@ -22,5 +21,3 @@ export const balancerApiCall = async () => {
         throw error;
     }
 };
-
-
