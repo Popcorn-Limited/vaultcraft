@@ -2,6 +2,15 @@ import { IRoute, CurveRoute } from "@/lib/external/curve/router/interfaces";
 import curve from '@curvefi/api'
 import { BigNumber, constants, ethers } from "ethers";
 
+const EMPTY_ROUTE = [constants.AddressZero, constants.AddressZero, constants.AddressZero, constants.AddressZero, constants.AddressZero, constants.AddressZero, constants.AddressZero, constants.AddressZero, constants.AddressZero]
+
+const EMPTY_SWAP_PARAMS = [
+    [BigNumber.from(0), BigNumber.from(0), BigNumber.from(0)],
+    [BigNumber.from(0), BigNumber.from(0), BigNumber.from(0)],
+    [BigNumber.from(0), BigNumber.from(0), BigNumber.from(0)],
+    [BigNumber.from(0), BigNumber.from(0), BigNumber.from(0)]
+]
+
 const curveInit: () => Promise<void> = async () => {
     await curve.init("Alchemy", { network: "homestead", apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY as string }, { chainId: 1 });
     await curve.factory.fetchPools();
@@ -10,7 +19,6 @@ const curveInit: () => Promise<void> = async () => {
     await curve.cryptoFactory.fetchPools();
     await curve.tricryptoFactory.fetchPools();
 }
-
 
 function processRoute(route: IRoute): CurveRoute {
     const routeSteps: string[] = [];
@@ -77,8 +85,17 @@ export const curveApiCall = async ({
         toBaseAssetRoutes.push(toBaseAssetRoute);
     }
 
-    const { route: assetRoute, } = await curve.router.getBestRouteAndOutput(baseAsset, depositAsset, '100000000');
-    const toAssetRoute = processRoute(assetRoute);
+    let toAssetRoute;
+    if (baseAsset.toLowerCase() !== depositAsset.toLowerCase()) {
+        const { route: assetRoute, } = await curve.router.getBestRouteAndOutput(baseAsset, depositAsset, '100000000');
+        toAssetRoute = processRoute(assetRoute);
+    } else {
+        // fill empty route
+        toAssetRoute = {
+            route: EMPTY_ROUTE,
+            swapParams: EMPTY_SWAP_PARAMS
+        }
+    }
 
     return { baseAsset, router, toBaseAssetRoutes, toAssetRoute, minTradeAmounts, optionalData }
 }
