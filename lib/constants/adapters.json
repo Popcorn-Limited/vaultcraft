@@ -343,7 +343,7 @@
       }
     ],
     "assets": ["USDC"],
-    "chains": [1,1337],
+    "chains": [1, 1337],
     "resolver": "stargate"
   },
   {

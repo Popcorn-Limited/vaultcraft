@@ -14,7 +14,7 @@ export async function compoundV2Apy({ chainId, address, resolver }: { chainId: n
 
   const supplyRate = await cToken.supplyRatePerBlock();
 
-  return (((Number(supplyRate) / 1e18 * 7200 + 1) ^ 365) - 1)
+  return (((Math.pow((Number(supplyRate) / 1e18 * 7200) + 1, 365))) - 1) * 100
 }
 
 export async function compoundV2({ chainId, address }: { chainId: number, address: string }): Promise<number> {
