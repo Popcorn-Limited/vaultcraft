@@ -26,7 +26,7 @@
         "name": "Minimum Trade Amounts",
         "type": "uint256",
         "requirements": ["Required"],
-        "description": "The minimum amount of tokens to trade",
+        "description": "The minimum amount of tokens to trade (in wei)",
         "multiple": true
       },
       {
@@ -36,7 +36,7 @@
         "description": "Middle asset to trade through"
       },
       {
-        "name": "Optional",
+        "name": "Stargate Router",
         "type": "uint256",
         "requirements": ["Required"],
         "description": "Stargate Router Address"

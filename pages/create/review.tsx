@@ -7,13 +7,14 @@ import Image from "next/image";
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
 import { noOp } from "@/lib/helpers";
 import { useDeployVault } from "@/lib/vaults";
-import { metadataAtom, adapterAtom } from "@/lib/atoms";
+import { metadataAtom, adapterAtom, strategyDeploymentAtom } from "@/lib/atoms";
 import { IpfsClient } from "@/lib/ipfsClient";
 import Review from "@/components/review/Review";
 import MainActionButton from "@/components/buttons/MainActionButton";
 import SecondaryActionButton from "@/components/buttons/SecondaryActionButton";
 import Modal from "@/components/Modal";
 import VaultCreationContainer from "@/components/VaultCreationContainer";
+import { ethers } from "ethers";
 
 
 export default function ReviewPage(): JSX.Element {
@@ -22,6 +23,7 @@ export default function ReviewPage(): JSX.Element {
   const { openConnectModal } = useConnectModal();
 
   const [adapter] = useAtom(adapterAtom);
+  const [strategyData] = useAtom(strategyDeploymentAtom);
   const [metadata, setMetadata] = useAtom(metadataAtom);
   const [showModal, setShowModal] = useState(false);
 
@@ -103,7 +105,7 @@ export default function ReviewPage(): JSX.Element {
             <MainActionButton
               label="Done"
               handleClick={() => isSuccess ? router.push("https://app.pop.network/experimental/sweet-vaults") : setShowModal(false)}
-              disabled={metadata.ipfsHash === "" || isLoading}
+              disabled={metadata.ipfsHash === "" || isLoading || (strategyData.id !== ethers.utils.formatBytes32String("") && strategyData.data === "0x")}
             />
           </div>
         </div>

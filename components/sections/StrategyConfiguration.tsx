@@ -58,8 +58,6 @@ function StrategyConfiguration() {
     setErrors(newErrors);
   }
 
-  console.log(strategy.initParams)
-
   return (
     <section className="">
       {strategy.initParams && strategy.initParams?.length > 0 ? (

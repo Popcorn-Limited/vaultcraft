@@ -111,6 +111,7 @@ export default function Review(): JSX.Element {
       </ReviewSection>
       <ReviewSection title="Strategy">
         <ReviewParam title="Strategy" value={strategy.key} />
+        {strategy.initParams?.map((param, i) => <ReviewParam key={param.name} title={param.name} value={strategyConfig[i]} />)}
         {devMode && <ReviewParam title="Strategy Id" value={strategyData.id} />}
         {devMode && <ReviewParam title="Strategy Data" value={strategyData.data} />}
       </ReviewSection>
