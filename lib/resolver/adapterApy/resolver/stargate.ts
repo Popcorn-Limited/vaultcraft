@@ -1,4 +1,4 @@
-import { RPC_PROVIDERS } from "@/lib/connectors";
+import { RPC_PROVIDERS, networkMap } from "@/lib/connectors";
 import { Contract } from "ethers";
 
 interface Pool {
@@ -20,7 +20,7 @@ export async function stargate({ chainId, address }: { chainId: number, address:
   const pools = await (await fetch("https://yields.llama.fi/pools")).json();
 
   // @ts-ignore
-  const filteredPools: Pool[] = pools.data.filter((pool: Pool) => pool.chain === NETWORK_NAMES[chainId] && pool.project === "stargate")
+  const filteredPools: Pool[] = pools.data.filter((pool: Pool) => pool.chain === networkMap[chainId] && pool.project === "stargate")
   const pool = filteredPools.find(pool => pool.underlyingTokens[0].toLowerCase() === token.toLowerCase())
   return pool === undefined ? 0 : pool.apy
 }

@@ -84,6 +84,8 @@ function AssetSelection() {
   const [, setStrategy] = useAtom(strategyAtom);
   const [, setProtocol] = useAtom(protocolAtom);
 
+  console.log(availableAssetAddresses)
+
   useEffect(() => {
     if (!availableAssetAddresses[chainId] || Object.keys(availableAssetAddresses[chainId]).length === 0) {
       addProtocolAssets(

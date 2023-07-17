@@ -96,7 +96,7 @@ export function Option({ value, children, selected, disabled, apy }: { value: an
                 {disabled && <p className={`ml-1 ${selected ? "text-[black]" : "text-[#ffffff99]"}`}>- Asset not supported</p>}
               </span>
             </div>
-            {apy !== undefined && <p className={`ml-auto self-center ${selected ? "text-[black]" : "text-[white]"}`}>~{apy.toFixed(2)}%</p>}
+            {apy !== undefined && <p className={`ml-auto self-center ${selected ? "text-[black]" : "text-[white]"}`}>~{apy === Infinity ? "?" : apy.toFixed(2)}%</p>}
           </button>
         );
       }}

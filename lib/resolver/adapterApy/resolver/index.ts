@@ -3,6 +3,7 @@ export * from "./aaveV3";
 export * from "./beefy";
 export * from "./compoundV2";
 export * from "./compoundV3";
+export * from "./convex";
 export * from "./curve";
 export * from "./default";
 export * from "./flux";
