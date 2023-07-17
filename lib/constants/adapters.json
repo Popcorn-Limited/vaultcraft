@@ -110,7 +110,7 @@
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
     "name": "CompoundV2 Adapter",
-    "key": "CompoundV2Adapter",
+    "key": "CompoundAdapter",
     "protocol": "compoundV2",
     "initParams": [
       {
@@ -121,7 +121,7 @@
       }
     ],
     "assets": ["USDC"],
-    "chains": [],
+    "chains": [1],
     "resolver": "compoundV2"
   },
   {

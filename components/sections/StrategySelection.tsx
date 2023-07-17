@@ -13,9 +13,11 @@ const STRATEGY_NON_AVAILABLE: Strategy = {
 }
 
 async function getStrategyOptions(strategies: Strategy[], asset: string, adapter: string, chainId: number): Promise<Strategy[]> {
+  // First filter by network, than by required asset if given, than by adapter
   const options = strategies.filter(strategy => strategy.requiredNetworks && strategy.requiredNetworks.length > 0 && strategy.requiredNetworks.includes(chainId))
-    .filter((strategy) => strategy.requiredAssets && strategy.requiredAssets.length > 0 && strategy.requiredAssets.map(a => a.toLowerCase()).includes(asset))
+    .filter((strategy) => (strategy.requiredAssets && strategy.requiredAssets.length > 0) ? strategy.requiredAssets.map(a => a.toLowerCase()).includes(asset) : true)
     .filter((strategy) => strategy.compatibleAdapters.includes(adapter))
+
   return options.length > 0 ? options : [STRATEGY_NON_AVAILABLE];
 }
 

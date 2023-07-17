@@ -1,6 +1,7 @@
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import {
+  adapterAtom,
   assetAtom,
   networkAtom,
   strategyAtom,
@@ -17,6 +18,7 @@ function StrategyConfiguration() {
 
   const [network] = useAtom(networkAtom);
   const [asset] = useAtom(assetAtom);
+  const [adapter] = useAtom(adapterAtom);
 
   const [errors, setErrors] = useState<any[]>([]);
 
@@ -28,6 +30,7 @@ function StrategyConfiguration() {
         resolveStrategyDefaults({
           chainId: network.id,
           address: asset.address[network.id].toLowerCase(),
+          adapter: adapter.key,
           resolver: strategy.resolver
         }).then(res => setStrategyConfig(res))
 

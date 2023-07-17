@@ -36,7 +36,7 @@
     "logoURI": "https://cryptologos.cc/logos/beefy-finance-bifi-logo.png?v=024"
   },
   {
-    "chains": [],
+    "chains": [1],
     "name": "Compound V2",
     "key": "compoundV2",
     "logoURI": "https://cdn.furucombo.app/assets/img/token/COMP.svg"
@@ -54,7 +54,7 @@
     "logoURI": "https://icons.llamao.fi/icons/protocols/flux-finance"
   },
   {
-    "chains": [42161],
+    "chains": [1, 42161],
     "name": "Convex",
     "key": "convex",
     "logoURI": "https://cdn.furucombo.app/assets/img/token/CVX.png"

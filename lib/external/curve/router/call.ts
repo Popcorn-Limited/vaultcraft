@@ -42,7 +42,7 @@ function processRoute(route: IRoute): CurveRoute {
     }
     if (swapParams.length < 4) {
         const addEmptySwapParams = 4 - swapParams.length;
-        for (let i = swapParams.length; i < addEmptySwapParams + 1; i++) {
+        for (let i = swapParams.length; i < addEmptySwapParams; i++) {
             swapParams[i] = [BigNumber.from(0), BigNumber.from(0), BigNumber.from(0)];
         }
     }
@@ -145,7 +145,5 @@ export const curveApiCallToBytes = async ({
         'string'
     ];
 
-    const bytes = ethers.utils.defaultAbiCoder.encode(types, values);
-
-    return bytes;
+    return ethers.utils.defaultAbiCoder.encode(types, values);
 }

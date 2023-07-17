@@ -13,7 +13,8 @@ export async function compoundV2({ chainId }: { chainId: number }): Promise<stri
     }) as `0x${string}`[]
 
     return await readContracts({
-        contracts: allMarkets.map(item => {
+        // filter out cETH
+        contracts: allMarkets.filter(item => item !== "0x4Ddc2D193948926D02f9B1fE9e1daa0718270ED5").map(item => {
             return {
                 address: item,
                 abi: abiMarket,
