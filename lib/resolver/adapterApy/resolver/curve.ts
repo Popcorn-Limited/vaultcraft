@@ -12,6 +12,6 @@ export async function curve({ chainId, address }: { chainId: number, address: st
   const allPools = [...main.data.poolData, ...crypto.data.poolData, ...factory.data.poolData, ...factoryCrypto.data.poolData, ...factoryCrvusd.data.poolData, ...factoryTtricrypto.data.poolData]
 
   const pool = allPools.find(pool => pool.lpTokenAddress.toLowerCase() === address.toLowerCase())
-  return pool === undefined ? 0 : pool.gaugeCrvApy[0]
+  return pool === undefined ? 0 : (pool.gaugeCrvApy[0] || 0)
 }
 
