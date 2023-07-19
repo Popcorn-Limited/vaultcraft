@@ -26,7 +26,7 @@ function Selector({
     >
       {({ open }) => (
         <>
-          <Listbox.Button className="border-1 border border-[#353945] rounded-lg flex gap-2 w-full px-2">
+          <Listbox.Button className="border border-[#353945] rounded-lg flex gap-2 w-full px-2">
             <div className="h-12 flex flex-row items-center w-full gap-x-2">
               {selected?.logoURI && (
                 <div className="w-9 h-8">
