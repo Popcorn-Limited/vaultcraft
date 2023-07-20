@@ -23,6 +23,8 @@ import ReviewSection from "./ReviewSection";
 import ReviewParam from "./ReviewParam";
 import { resolveStrategyEncoding } from "@/lib/resolver/strategyEncoding/strategyDefaults";
 
+import { balancerApiProxyCall } from "@/lib/external/balancer/router/call";
+
 export default function Review(): JSX.Element {
   const { address: account } = useAccount();
   const [network] = useAtom(networkAtom);
@@ -55,27 +57,6 @@ export default function Review(): JSX.Element {
         : "0x",
     });
   }, [adapterConfig]);
-
-  // Populate Strategy Data with dummy data that trades CRV -> USDC -> DAI
-  // Specific bytes output may be different depending on optimal routes at API Call.
-  useEffect(() => {
-    const fetchCurveStrategyBytes = async () => {
-      const data = await resolveStrategyEncoding({
-        chainId: chainId,
-        address: asset.address[chainId],
-        params: strategyConfig,
-        resolver: strategy.resolver
-      })
-
-      setStrategyData({
-        id: strategy.key,
-        data: data
-      });
-    };
-
-    fetchCurveStrategyBytes();
-  }, [strategyConfig]);
-
 
   return (
     <section>

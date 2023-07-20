@@ -13,6 +13,15 @@ const nextConfig = {
     PINATA_JWT: process.env.PINATA_JWT,
     IPFS_URL: process.env.IPFS_URL,
   },
+  async rewrites() {
+    return [
+      {
+        source: '/api/balancerProxy/:path*',
+        destination: 'https://api.balancer.fi/:path*',
+      },
+    ]
+  },
 };
 
 module.exports = nextConfig;
+
