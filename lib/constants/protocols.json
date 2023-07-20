@@ -1,8 +1,14 @@
 [
   {
     "chains": [1, 1337, 42161],
-    "name": "Aave",
-    "key": "aave",
+    "name": "Aave V2",
+    "key": "aaveV2",
+    "logoURI": "https://cryptologos.cc/logos/aave-aave-logo.png?v=024"
+  },
+  {
+    "chains": [1, 1337, 42161],
+    "name": "Aave V3",
+    "key": "aaveV3",
     "logoURI": "https://cryptologos.cc/logos/aave-aave-logo.png?v=024"
   },
   {
@@ -30,9 +36,15 @@
     "logoURI": "https://cryptologos.cc/logos/beefy-finance-bifi-logo.png?v=024"
   },
   {
+    "chains": [1],
+    "name": "Compound V2",
+    "key": "compoundV2",
+    "logoURI": "https://cdn.furucombo.app/assets/img/token/COMP.svg"
+  },
+  {
     "chains": [1, 1337],
-    "name": "Compound",
-    "key": "compound",
+    "name": "Compound V3",
+    "key": "compoundV3",
     "logoURI": "https://cdn.furucombo.app/assets/img/token/COMP.svg"
   },
   {
@@ -42,13 +54,13 @@
     "logoURI": "https://icons.llamao.fi/icons/protocols/flux-finance"
   },
   {
-    "chains": [42161],
+    "chains": [1, 42161],
     "name": "Convex",
     "key": "convex",
     "logoURI": "https://cdn.furucombo.app/assets/img/token/CVX.png"
   },
   {
-    "chains": [],
+    "chains": [1],
     "name": "Curve",
     "key": "curve",
     "logoURI": "https://cryptologos.cc/logos/curve-dao-token-crv-logo.png?v=025"
@@ -96,7 +108,7 @@
     "logoURI": "https://cdn.furucombo.app/assets/img/token/CVX.png"
   },
   {
-    "chains": [1,1337],
+    "chains": [1, 1337],
     "name": "Stargate",
     "key": "stargate",
     "logoURI": "https://icons.llama.fi/stargate.png"

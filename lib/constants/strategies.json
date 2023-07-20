@@ -2,8 +2,9 @@
   {
     "name": "Compounder",
     "key": "CurveStargateCompounder",
+    "resolver": "curveStargateCompounder",
     "description": "description",
-    "compatibleAdapters": ["StargateLpStakingAdapter"],
+    "compatibleAdapters": ["StargateLpStakingAdapter", "CurveGaugeAdapter"],
     "requiredAssets": [
       "0x0Faf1d2d3CED330824de3B8200fc8dc6E397850d",
       "0xdf0770dF86a8034b3EFEf0A1Bb3c889B8332FF56",
@@ -13,43 +14,64 @@
     ],
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
     "requiredNetworks": [1],
-      "initParams": [
-        {
-          "name": "Base Asset",
-          "type": "address",
-          "requirements": ["Required"],
-          "description": ""
-        },
-        {
-          "name": "Router",
-          "type": "address",
-          "requirements": ["Required"],
-          "description": ""
-        },
-        {
-          "name": "toBaseAssetRoutes",
-          "type": "address",
-          "requirements": ["Required"],
-          "description": ""
-        },
-        {
-          "name": "toAssetRoute",
-          "type": "address",
-          "requirements": ["Required"],
-          "description": ""
-        },
-        {
-          "name": "minTradeAmounts",
-          "type": "uint256",
-          "requirements": ["Required"],
-          "description": ""
-        },
-        {
-          "name": "optional",
-          "type": "uint256",
-          "requirements": ["Required"],
-          "description": ""
-        }
-      ]
+    "initParams": [
+      {
+        "name": "Reward Token",
+        "type": "address",
+        "requirements": ["Required"],
+        "description": "Addresses of reward tokens",
+        "multiple": true
+      },
+      {
+        "name": "Minimum Trade Amounts",
+        "type": "uint256",
+        "requirements": ["Required"],
+        "description": "The minimum amount of tokens to trade (in wei)",
+        "multiple": true
+      },
+      {
+        "name": "Base Asset",
+        "type": "address",
+        "requirements": ["Required"],
+        "description": "Middle asset to trade through"
+      },
+      {
+        "name": "Stargate Router",
+        "type": "uint256",
+        "requirements": ["Required"],
+        "description": "Stargate Router Address"
+      }
+    ]
+  },
+  {
+    "name": "Compounder",
+    "key": "CurveCompounder",
+    "resolver": "curveCompounder",
+    "description": "description",
+    "compatibleAdapters": ["CurveGaugeAdapter", "ConvexAdapter"],
+    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "requiredNetworks": [1],
+    "initParams": [
+      {
+        "name": "Reward Token",
+        "type": "address",
+        "requirements": ["Required"],
+        "description": "Addresses of reward tokens",
+        "multiple": true
+      },
+      {
+        "name": "Minimum Trade Amounts",
+        "type": "uint256",
+        "requirements": ["Required"],
+        "description": "The minimum amount of tokens to trade (in wei)",
+        "multiple": true
+      },
+      {
+        "name": "Base Asset",
+        "type": "address",
+        "requirements": ["Required"],
+        "description": "Middle asset to trade through"
+      }
+    ]
   }
 ]

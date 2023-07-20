@@ -26,7 +26,7 @@ function Selector({
     >
       {({ open }) => (
         <>
-          <Listbox.Button className="border-1 border border-[#353945] rounded-lg flex gap-2 w-full px-2">
+          <Listbox.Button className="border border-[#353945] rounded-lg flex gap-2 w-full px-2">
             <div className="h-12 flex flex-row items-center w-full gap-x-2">
               {selected?.logoURI && (
                 <div className="w-9 h-8">
@@ -71,7 +71,7 @@ function Selector({
   );
 }
 
-export function Option({ value, children, selected, disabled }: { value: any; children: any, selected: boolean, disabled?: boolean }) {
+export function Option({ value, children, selected, disabled, apy }: { value: any; children: any, selected: boolean, disabled?: boolean, apy?: number }) {
   return (
     <Listbox.Option value={value} as={Fragment} disabled={disabled}>
       {({ active }) => {
@@ -96,6 +96,7 @@ export function Option({ value, children, selected, disabled }: { value: any; ch
                 {disabled && <p className={`ml-1 ${selected ? "text-[black]" : "text-[#ffffff99]"}`}>- Asset not supported</p>}
               </span>
             </div>
+            {apy !== undefined && <p className={`ml-auto self-center ${selected ? "text-[black]" : "text-[white]"}`}>~{apy === Infinity ? "?" : apy.toFixed(2)}%</p>}
           </button>
         );
       }}

@@ -3,7 +3,7 @@
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
     "name": "AaveV2 Adapter",
     "key": "AaveV2Adapter",
-    "protocol": "aave",
+    "protocol": "aaveV2",
     "assets": ["USDC"],
     "chains": [1, 1337],
     "resolver": "aaveV2"
@@ -12,7 +12,7 @@
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
     "name": "AaveV3 Adapter",
     "key": "AaveV3Adapter",
-    "protocol": "aave",
+    "protocol": "aaveV3",
     "assets": ["USDC"],
     "chains": [1, 1337, 42161],
     "resolver": "aaveV3"
@@ -110,8 +110,8 @@
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
     "name": "CompoundV2 Adapter",
-    "key": "CompoundV2Adapter",
-    "protocol": "compound",
+    "key": "CompoundAdapter",
+    "protocol": "compoundV2",
     "initParams": [
       {
         "name": "CToken",
@@ -121,14 +121,14 @@
       }
     ],
     "assets": ["USDC"],
-    "chains": [],
+    "chains": [1],
     "resolver": "compoundV2"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
     "name": "CompoundV3 Adapter",
     "key": "CompoundV3Adapter",
-    "protocol": "compound",
+    "protocol": "compoundV3",
     "initParams": [
       {
         "name": "CToken",
@@ -172,7 +172,7 @@
       }
     ],
     "assets": ["USDC"],
-    "chains": [1337, 42161],
+    "chains": [1, 1337, 42161],
     "resolver": "convex"
   },
   {
@@ -189,7 +189,7 @@
       }
     ],
     "assets": ["USDC"],
-    "chains": [1337],
+    "chains": [1, 1337],
     "resolver": "curve"
   },
   {
@@ -343,7 +343,7 @@
       }
     ],
     "assets": ["USDC"],
-    "chains": [1,1337],
+    "chains": [1, 1337],
     "resolver": "stargate"
   },
   {

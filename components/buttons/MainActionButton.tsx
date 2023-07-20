@@ -16,10 +16,10 @@ const MainActionButton: React.FC<ButtonProps> = ({
 }) => {
     return (
         <button
-            className={`w-full px-8 py-3 rounded-[4px] bg-white border border-[#ffffff80] font-medium text-base text-black 
-            transition-all ease-in-out duration-500 hover:bg-[#D7D7D7] hover:border-[#D7D7D7] hover:text-white 
-            disabled:bg-customLightGray disabled:border-customLightGray disabled:text-secondaryLight disabled:cursor-not-allowed 
-            disabled:hover:border-customLightGray disabled:hover:bg-customLightGray disabled:hover:text-secondaryLight 
+            className={`w-full px-8 py-3 rounded-[4px] bg-white border border-white font-semibold text-base text-black 
+            transition-all ease-in-out duration-500 hover:bg-[#DFFF1C] hover:border-[#DFFF1C] 
+            disabled:bg-[#D7D7D7] disabled:border-[#D7D7D7] disabled:text-white disabled:cursor-not-allowed 
+            disabled:hover:border-[#D7D7D7] disabled:hover:bg-[#D7D7D7] disabled:hover:text-white
             ${hidden ? "hidden" : ""}`}
             onClick={handleClick}
             type={type}

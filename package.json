@@ -11,6 +11,7 @@
     "format:write": "prettier --write ."
   },
   "dependencies": {
+    "@curvefi/api": "^2.42.0",
     "@headlessui/react": "^1.7.10",
     "@heroicons/react": "^2.0.18",
     "@rainbow-me/rainbowkit": "^0.12.9",

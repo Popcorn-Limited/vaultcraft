@@ -19,6 +19,7 @@ export type InitParam = {
   type: string;
   requirements?: InitParamRequirement[];
   description?: string;
+  multiple?: boolean;
 };
 
 export enum InitParamRequirement {
