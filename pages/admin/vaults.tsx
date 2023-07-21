@@ -527,7 +527,7 @@ export default function Vaults() {
                     <div className={`md:col-span-2`}>
                         <h2 className={`text-[1.5rem] font-bold mb-2`}>{'Snapshot PIP\'s'}</h2>
                         <div className={`bg-[#23262f] flex flex-col border-[1px] border-[#353945] rounded-[1rem]`}>
-                            <div className={`min-h-[4rem] max-h-[4rem] grid grid-cols-[2.5rem_1fr] md:grid-cols-[2.5rem_1fr_1fr_3rem] content-center border-b-[1px] border-[#353945] px-[1.5rem]`}>
+                            <div className={`min-h-[4rem] max-h-[4rem] grid grid-cols-[2.5rem_1fr] gap-[1rem] md:grid-cols-[2.5rem_1fr_1fr_3rem] content-center border-b-[1px] border-[#353945] px-[1.5rem]`}>
                                 <span>#</span>
                                 <span>Title</span>
                                 <span className={`hidden md:block`}>Date</span>
