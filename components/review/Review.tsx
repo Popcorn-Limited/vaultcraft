@@ -58,6 +58,26 @@ export default function Review(): JSX.Element {
     });
   }, [adapterConfig]);
 
+  // Populate Strategy Data with dummy data that trades CRV -> USDC -> DAI
+  // Specific bytes output may be different depending on optimal routes at API Call.
+  useEffect(() => {
+    const fetchAndSetStrategyData = async () => {
+      const data = await resolveStrategyEncoding({
+        chainId: chainId,
+        address: asset.address[chainId],
+        params: strategyConfig,
+        resolver: strategy.resolver
+      })
+
+      setStrategyData({
+        id: strategy.key,
+        data: data
+      });
+    };
+
+    fetchAndSetStrategyData();
+  }, [strategyConfig]);
+
   return (
     <section>
       <span className="flex flex-row items-center justify-end">

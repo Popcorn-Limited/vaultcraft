@@ -2,6 +2,7 @@
 import {
   aaveV2,
   aaveV3,
+  aura,
   beefy,
   compoundV2,
   compoundV3,
@@ -25,6 +26,7 @@ export type AdapterApyResolvers = typeof AdapterApyResolvers;
 export const AdapterApyResolvers: { [key: string]: ({ chainId, address }: { chainId: number, address: string }) => Promise<number> } = {
   aaveV2,
   aaveV3,
+  aura,
   beefy,
   compoundV2,
   compoundV3,

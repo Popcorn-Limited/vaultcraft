@@ -15,10 +15,14 @@ export enum SwapKind {
 
 export interface BatchSwapStep {
     poolId: string;
-    assetInIndex: BigNumber;
-    assetOutIndex: BigNumber;
-    amount: BigNumber;
+    assetInIndex: number;
+    assetOutIndex: number;
+    amount: string;
     userData: string;
+}
+
+interface SwapResponse extends BatchSwapStep {
+    returnAmount: string;
 }
 
 export interface BatchSwapStruct {
@@ -34,16 +38,16 @@ export interface FundManagement {
     toInternalBalance: boolean;
 }
 
-export interface BalancerAdapterData {
-    asset: string;
-    baseAsset: string;
-    vault: string;
-    poolId: string;
-    swapKind: SwapKind;
-    toBaseAssetPaths: BatchSwapStruct[];
-    toAssetPath: BatchSwapStruct;
-    funds: FundManagement;
-    tokens: string[];
-    optionalData: string;
+export interface BalanceSORResponse {
+    marketSp: string;
+    returnAmount: string;
+    returnAmountConsideringFees: string;
+    returnAmountFromSwaps: string;
+    swapAmount: string;
+    swapAmountFromSwaps: string;
+    swaps: SwapResponse[];
+    tokenAddresses: string[];
+    tokenIn: string;
+    tokenOut: string;
 }
 

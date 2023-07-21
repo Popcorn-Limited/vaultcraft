@@ -9,12 +9,9 @@ export async function aura({ chainId }: { chainId: number }): Promise<any[]> {
         abi,
         functionName: "getPools",
         chainId,
-        args: [ BOOSTER_ADDRESS ]
-    }) as {
-        lptoken: string
-    }[];
-
-    return pools.map(pool => pool.lptoken)
+        args: [BOOSTER_ADDRESS]
+    })
+    return (pools as any[][]).filter(pool => !pool[6]).map(pool => pool[1]) // filter out disabled pools and get the lpToken address
 }
 
 const abi = [
