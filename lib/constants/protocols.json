@@ -24,7 +24,7 @@
     "logoURI": "https://app.aura.finance/assets/aura-362899d2.png"
   },
   {
-    "chains": [],
+    "chains": [1],
     "name": "Balancer",
     "key": "balancer",
     "logoURI": "https://cryptologos.cc/logos/balancer-bal-logo.png?v=024"

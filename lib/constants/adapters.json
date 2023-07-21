@@ -82,8 +82,8 @@
       }
     ],
     "assets": ["USDC"],
-    "chains": [],
-    "resolver": "default"
+    "chains": [1],
+    "resolver": "balancer"
   },
   {
     "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
