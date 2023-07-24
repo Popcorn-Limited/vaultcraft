@@ -64,7 +64,7 @@ function StrategyConfiguration() {
   return (
     <section className="">
       {strategy.initParams && strategy.initParams?.length > 0 ? (
-        strategyConfig.length > 0 && strategy.initParams.map((initParam, i) => {
+        strategyConfig.length > 0 ? strategy.initParams.map((initParam, i) => {
           return (
             <div key={`fee-element-${initParam.name}`} className="flex gap-4">
               <Fieldset className="flex-grow" label={initParam.name} description={initParam.description || ""}>
@@ -120,7 +120,7 @@ function StrategyConfiguration() {
               </Fieldset>
             </div>
           );
-        })
+        }) : <p className="text-white">Loading...</p>
       ) : (
         <p className="text-white">No configuration required</p>
       )}

@@ -1,7 +1,8 @@
 
 import {
   curveStargateCompounder,
-  curveCompounder
+  curveCompounder,
+  balancerLpCompounder
 } from "./resolver";
 
 export type StrategyDefaultResolver = (
@@ -14,7 +15,8 @@ export type StrategyDefaultResolvers = typeof StrategyDefaultResolvers;
 
 export const StrategyDefaultResolvers: { [key: string]: ({ chainId, address, adapter }: { chainId: number, address: string, adapter: string }) => Promise<any[]> } = {
   curveStargateCompounder,
-  curveCompounder
+  curveCompounder,
+  balancerLpCompounder
 };
 
 export default StrategyDefaultResolvers;

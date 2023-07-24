@@ -73,5 +73,43 @@
         "description": "Middle asset to trade through"
       }
     ]
+  },
+  {
+    "name": "Compounder",
+    "key": "BalancerLpCompounder",
+    "resolver": "balancerLpCompounder",
+    "description": "description",
+    "compatibleAdapters": ["BalancerGaugeAdapter", "AuraAdapter"],
+    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "requiredNetworks": [1],
+    "initParams": [
+      {
+        "name": "Reward Token",
+        "type": "address",
+        "requirements": ["Required"],
+        "description": "Addresses of reward tokens",
+        "multiple": true
+      },
+      {
+        "name": "Minimum Trade Amounts",
+        "type": "uint256",
+        "requirements": ["Required"],
+        "description": "The minimum amount of tokens to trade (in wei)",
+        "multiple": true
+      },
+      {
+        "name": "Base Asset",
+        "type": "address",
+        "requirements": ["Required"],
+        "description": "Middle asset to trade through"
+      },
+      {
+        "name": "Optional Data",
+        "type": "bytes32",
+        "requirements": ["Required"],
+        "description": "Pool Id of the LpToken and Index of the DepositToken",
+        "multiple": true
+      }
+    ]
   }
 ]

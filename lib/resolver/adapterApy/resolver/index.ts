@@ -1,5 +1,7 @@
 export * from "./aaveV2";
 export * from "./aaveV3";
+export * from "./aura";
+export * from "./balancer";
 export * from "./beefy";
 export * from "./compoundV2";
 export * from "./compoundV3";

@@ -1,24 +1,22 @@
+import { RPC_PROVIDERS } from "@/lib/connectors";
 import { readContract } from "@wagmi/core";
-import { BigNumber, constants } from "ethers";
+import { Contract } from "ethers";
 
-const AURA_VIEW_HELPER_ADDRESS = "0x129bBda5087e132983e7c20ae1F761333D40c229";
+const VIEW_HELPER_ADDRESS = "0x129bBda5087e132983e7c20ae1F761333D40c229";
 const BOOSTER_ADDRESS = "0xA57b8d98dAE62B26Ec3bcC4a365338157060B234";
 
 export async function aura({ chainId, address }: { chainId: number, address: string }): Promise<any[]> {
-    const pools = await readContract({
-        address: AURA_VIEW_HELPER_ADDRESS,
+    const viewer = new Contract(
+        VIEW_HELPER_ADDRESS,
         abi,
-        functionName: "getPools",
-        chainId,
-        args: [ BOOSTER_ADDRESS ]
-    }) as {
-        lptoken: string
-        pid: BigNumber
-    }[]
+        // @ts-ignore
+        RPC_PROVIDERS[chainId]
+    )
+    const pools = await viewer.getPools(BOOSTER_ADDRESS)
 
-    const pool = pools.find((pool: any) => pool.lptoken.toLowerCase() === address.toLowerCase())
-
-    return [ pool ? pool.pid.toString() : constants.AddressZero ]
+    // Filter disabled pools and find the pool with the given lpToken address
+    const pool = (pools as any[][]).filter(pool => !pool[6]).find(pool => pool[1].toLowerCase() === address.toLowerCase())
+    return [pool ? Number(pool[0]) : 0]
 }
 
 const abi = [

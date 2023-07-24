@@ -33,10 +33,12 @@ function AdapterSelection() {
   const [, setAdapterConfig] = useAtom(adapterConfigAtom);
   const [, setStrategy] = useAtom(strategyAtom);
 
+  console.log({ availableAssetAddresses })
+
   async function assetSupported(adapter: Adapter, chainId: number, asset: string): Promise<boolean> {
     if (!availableAssetAddresses[chainId]) {
       const protocolAssets = await resolveProtocolAssets({ chainId: chainId, resolver: adapter.resolver })
-      const newAvailable = {...availableAssetAddresses}
+      const newAvailable = { ...availableAssetAddresses }
       newAvailable[chainId][adapter.protocol] = protocolAssets
       setAvailableAssetsAddresses(newAvailable)
 
