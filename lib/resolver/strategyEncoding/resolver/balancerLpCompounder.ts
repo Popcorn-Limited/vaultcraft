@@ -72,7 +72,7 @@ async function createRouteWithTypes(sellToken: string, buyToken: string, chainId
 }
 
 export async function balancerLpCompounder({ chainId, address, params }: { chainId: number, address: string, params: any[] }): Promise<string> {
-  const route1 = await createRouteWithTypes(params[0][0], params[2][0], chainId, parseUnits("1", 9).toString()) // TODO - fetch gas price dynamically
+  const route1 = await createRouteWithTypes(params[0][0], params[2], chainId, parseUnits("1", 9).toString()) // TODO - fetch gas price dynamically
 
   const values = [
     ...route1.route.swaps.map(swap => Object.entries(swap).map(([key, value]) => value)).flat(), // toBaseAssetRoutes1.swaps
@@ -86,7 +86,7 @@ export async function balancerLpCompounder({ chainId, address, params }: { chain
   ]
 
   if (params[0].length == 2) {
-    const route2 = await createRouteWithTypes(params[0][0], params[2][0], chainId, parseUnits("1", 9).toString()) // TODO - fetch gas price dynamically
+    const route2 = await createRouteWithTypes(params[0][0], params[2], chainId, parseUnits("1", 9).toString()) // TODO - fetch gas price dynamically
 
     values.push(...route2.route.swaps.map(swap => Object.entries(swap).map(([key, value]) => value)).flat())
     values.push(...route2.route.assets)
@@ -109,7 +109,7 @@ export async function balancerLpCompounder({ chainId, address, params }: { chain
       "bytes", // optionalData
     ],
     [
-      params[2][0], // baseAsset
+      params[2], // baseAsset
       // @ts-ignore
       BALANCER_VAULT[chainId], // vault
       ...values,
