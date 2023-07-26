@@ -3,12 +3,9 @@ import MainActionButton from "@/components/buttons/MainActionButton";
 import SecondaryActionButton from "@/components/buttons/SecondaryActionButton";
 import Input from "@/components/inputs/Input";
 import addProtocolAssets from "@/lib/addProtocolAssets";
-import { assetAddressesAtom, useAdapters } from "@/lib/atoms";
+import { useAdapters } from "@/lib/atoms";
 import { networkLogos } from "@/lib/connectors";
 import { resolveAdapterApy } from "@/lib/resolver/adapterApy/adapterApy";
-import { useConnectModal } from "@rainbow-me/rainbowkit";
-import { useAtom } from "jotai";
-import { Main } from "next/document";
 import Image from "next/image";
 import { FC, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
@@ -18,25 +15,16 @@ interface NetworkStickerProps {
   chainId?: number;
 }
 
-export const NetworkSticker: FC<NetworkStickerProps> = ({ chainId }) => {
+const NetworkSticker: FC<NetworkStickerProps> = ({ chainId }) => {
   return (
     <div className="absolute top-0 -left-2 md:-left-4">
-      <div className="hidden md:block">
-        <Image
-          src={networkLogos[chainId]}
-          alt={chainId}
-          height="24"
-          width="24"
-        />
-      </div>
-      <div className="md:hidden">
-        <Image
-          src={networkLogos[chainId]}
-          alt={chainId}
-          height="12"
-          width="12"
-        />
-      </div>
+      <Image
+        // @ts-ignore
+        src={networkLogos[chainId]}
+        alt={String(chainId)}
+        height="24"
+        width="24"
+      />
     </div>
   );
 };
@@ -59,10 +47,10 @@ async function getTokenApy(address: string, assetAddresses: any): Promise<{ key:
 
 
 interface BalanceWithApy extends Balance {
-  apys?: { [key: string]: number }
+  apy: any | null
 }
 
-export default function Dashboard(): JSX.Element {
+export default function Dashboard() {
   const { address: account } = useAccount()
   const [availableToken, setAvailableToken] = useState<any[]>([])
   const [total, setTotal] = useState(0)
@@ -93,7 +81,7 @@ export default function Dashboard(): JSX.Element {
       balances = balances.filter(balance => Number(balance.balanceUsdValue) > 1)
 
       const newBalances = await Promise.all(balances.map(async (balance) => await getTokenApy(balance.address, availableAssetAddresses)))
-      newBalances.forEach((balance, index) => balances[index].apy = balance)
+      newBalances.forEach((balance, index) => (balances[index] as BalanceWithApy).apy = balance)
 
       const tempTotal = balances.reduce((acc, balance) => acc + Number(balance.balanceUsdValue), 0)
 
@@ -137,6 +125,13 @@ export default function Dashboard(): JSX.Element {
           </div>
         </>
       </Modal>
+      <div className="mb-8">
+        <h1 className="text-5xl">Portfolio</h1>
+        <p className="text-gray-400">
+          Watch your portfolio and find <br />
+          yield opportinitues for any of your assets
+        </p>
+      </div>
       <div className="w-full flex flex-row items-center mb-2">
         <div className="w-6/12 flex flex-row items-center">
           <h1 className="text-3xl">
