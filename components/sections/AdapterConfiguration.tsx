@@ -24,7 +24,7 @@ function AdapterConfiguration() {
     () => {
       // Set defaults if the adapter has init params
       if (adapter.initParams && adapter.initParams.length > 0) {
-        setAdapterConfig(adapter.initParams.map(i => "loading..."))
+        setAdapterConfig(adapter.initParams.map(i => "Loading configuration..."))
 
         // Set config defaults
         resolveAdapterDefaults({
@@ -56,7 +56,7 @@ function AdapterConfiguration() {
   function verifyInitParam(value: string, initParam: any, index: number) {
     const newErrors = [...errors];
     newErrors[index] = verifyInitParamValidity(value, initParam);
-    setErrors(newErrors);
+    if (newErrors.length > 0) setErrors(newErrors);
   }
 
   return (
@@ -85,7 +85,8 @@ function AdapterConfiguration() {
                   spellCheck="false"
                   info={initParam.requirements ? String(initParam.requirements) : undefined}
                   onBlur={(e) => verifyInitParam((e.target as HTMLInputElement).value, initParam, i)}
-                  errors={errors[i] ? errors[i] : undefined}
+                  errors={errors[i]?.lenght > 0 ? errors[i] : undefined}
+                  disabled={adapterConfig[i] === "Loading configuration..."}
                 />
               </Fieldset>
             </div>
