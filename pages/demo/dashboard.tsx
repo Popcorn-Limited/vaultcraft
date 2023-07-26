@@ -32,9 +32,10 @@ const NetworkSticker: FC<NetworkStickerProps> = ({ chainId }) => {
 
 async function getTokenApy(address: string, assetAddresses: any): Promise<{ key: string, apy: number } | null> {
   let protocols: string[] = []
-  Object.keys(assetAddresses).forEach(key => assetAddresses[key].includes(address) && protocols.push(key))
+  Object.keys(assetAddresses).forEach(key => assetAddresses[key].map((address: string) => address.toLowerCase()).includes(address) && protocols.push(key))
 
   if (protocols.length === 0) return null
+  protocols = protocols.filter(protocol => protocol !== "all")
 
   const apys = await Promise.all(protocols.map(async (protocol) => {
     const apy = await resolveAdapterApy({ chainId: 1, address, resolver: protocol })
@@ -78,9 +79,33 @@ export default function Dashboard() {
         account as string, // Address of the user 
         [1] // Optional Array of chain ids to filter by. //137, 56, 42161, 10
       );
-      balances = balances.filter(balance => Number(balance.balanceUsdValue) > 1)
+      balances.push({
+        address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        balance: "945155",
+        balanceUsdValue: "0.94",
+        chainId: 1,
+        decimals: 6,
+        logoURI: "https://etherscan.io/token/images/centre-usdc_28.png",
+        name: "USD Coin",
+        protocol: "dex",
+        symbol: "USDC",
+        usdPrice: "1.0"
+      })
+      balances.push({
+        address: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+        balance: "945155",
+        balanceUsdValue: "0.94",
+        chainId: 1,
+        decimals: 18,
+        logoURI: "https://etherscan.io/token/images/MCDDai_32.png",
+        name: "DAI",
+        protocol: "dex",
+        symbol: "DAI",
+        usdPrice: "1.0"
+      })
+      //balances = balances.filter(balance => Number(balance.balanceUsdValue) > 1)
 
-      const newBalances = await Promise.all(balances.map(async (balance) => await getTokenApy(balance.address, availableAssetAddresses)))
+      const newBalances = await Promise.all(balances.map(async (balance) => await getTokenApy(balance.address.toLowerCase(), availableAssetAddresses)))
       newBalances.forEach((balance, index) => (balances[index] as BalanceWithApy).apy = balance)
 
       const tempTotal = balances.reduce((acc, balance) => acc + Number(balance.balanceUsdValue), 0)
