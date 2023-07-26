@@ -42,8 +42,8 @@ function processRoute(route: IRoute): CurveRoute {
     }
     if (swapParams.length < 4) {
         const addEmptySwapParams = 4 - swapParams.length;
-        for (let i = swapParams.length; i < addEmptySwapParams; i++) {
-            swapParams[i] = [BigNumber.from(0), BigNumber.from(0), BigNumber.from(0)];
+        for (let i = 0; i < addEmptySwapParams; i++) {
+            swapParams.push([BigNumber.from(0), BigNumber.from(0), BigNumber.from(0)]);
         }
     }
 
@@ -96,7 +96,7 @@ export const curveApiCall = async ({
             swapParams: EMPTY_SWAP_PARAMS
         }
     }
-
+    
     return { baseAsset, router, toBaseAssetRoutes, toAssetRoute, minTradeAmounts, optionalData }
 }
 
@@ -142,7 +142,7 @@ export const curveApiCallToBytes = async ({
         ...new Array(9).fill('address'),
         ...new Array(12).fill('uint256'),
         ...new Array(curveData.minTradeAmounts.length).fill('uint256'),
-        'string'
+        'bytes'
     ];
 
     return ethers.utils.defaultAbiCoder.encode(types, values);

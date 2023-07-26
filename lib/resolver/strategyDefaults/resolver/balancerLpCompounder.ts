@@ -47,7 +47,7 @@ export async function balancerLpCompounder({ chainId, address, adapter }: { chai
 
   // @ts-ignore
   const rewardTokens = [BAL[chainId]];
-  const baseAsset = [tokens[0]] // TODO - find a smarter algorithm to determine the base asset
+  const baseAsset = tokens[0] // TODO - find a smarter algorithm to determine the base asset
   const minTradeAmounts = [constants.Zero.toString()];
   const optionalData = [poolId, 0];
 

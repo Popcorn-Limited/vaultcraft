@@ -73,10 +73,10 @@ export default function Review(): JSX.Element {
         id: strategy.key,
         data: data
       });
-    };
-
-    fetchAndSetStrategyData();
-  }, [strategyConfig]);
+    };  
+    
+    if (strategy.key !== "none") fetchAndSetStrategyData();
+  }, [strategy, strategyConfig]);
 
   return (
     <section>
