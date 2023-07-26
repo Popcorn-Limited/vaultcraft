@@ -84,12 +84,16 @@ function AssetSelection() {
   const [, setStrategy] = useAtom(strategyAtom);
   const [, setProtocol] = useAtom(protocolAtom);
 
+  const networkAssetsAvailable = (availableAssetAddresses[chainId] && Object.keys(availableAssetAddresses[chainId]).length > 0) || false
+
   useEffect(() => {
-    if (!availableAssetAddresses[chainId] || Object.keys(availableAssetAddresses[chainId]).length === 0) {
-      addProtocolAssets(
-        adapters.filter(adapter => adapter.chains.includes(chainId)), chainId)
-        .then(res => setAvailableAssetsAddresses({ ...availableAssetAddresses, [chainId]: res })
-        )
+    async function setUpNetworkAssets() {
+      const networkAssets = await addProtocolAssets(adapters.filter(adapter => adapter.chains.includes(chainId)), chainId)
+      setAvailableAssetsAddresses({ ...availableAssetAddresses, [chainId]: networkAssets })
+    }
+
+    if (!networkAssetsAvailable) {
+      setUpNetworkAssets()
     }
   }, [chainId]);
 
@@ -131,10 +135,11 @@ function AssetSelection() {
         <div className="h-12">
           <Input
             onChange={(e) => setSearchTerm((e.target as HTMLInputElement).value.toLowerCase())}
-            placeholder="Search by name, symbol or address"
+            placeholder={networkAssetsAvailable ? "Search by name, symbol or address" : "Loading more assets..."}
             defaultValue={searchTerm}
             autoComplete="off"
             autoCorrect="off"
+            disabled={!networkAssetsAvailable}
           />
         </div>
       }
