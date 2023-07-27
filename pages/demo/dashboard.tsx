@@ -79,7 +79,7 @@ export default function Dashboard() {
         account as string, // Address of the user 
         [1] // Optional Array of chain ids to filter by. //137, 56, 42161, 10
       );
-      
+
       // balances.push({
       //   address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
       //   balance: "945155",
@@ -197,69 +197,72 @@ export default function Dashboard() {
         </div>
       </div>
       <div className="space-y-2">
-        {availableToken.sort((a, b) => Number(b.balanceUsdValue) - Number(a.balanceUsdValue)).map(token =>
-          <div key={token.symbol} className="bg-gray-700 px-8 py-2 rounded-md">
-            <div className="flex flex-row items-center justify-between">
+        {!account && <p>Please connnect your wallet</p>}
+        {account && total === 0 ?
+          <p>Loading...</p>
+          : availableToken.sort((a, b) => Number(b.balanceUsdValue) - Number(a.balanceUsdValue)).map(token =>
+            <div key={token.symbol} className="bg-gray-700 px-8 py-2 rounded-md">
+              <div className="flex flex-row items-center justify-between">
 
-              <div className="flex flex-row items-center w-4/12">
-                <div className="flex flex-row items-center">
-                  <div className="relative">
-                    <NetworkSticker chainId={token.chainId} />
-                    <img
-                      src={token.logoURI}
-                      alt={token.symbol}
-                      height="40"
-                      width="40"
-                    />
+                <div className="flex flex-row items-center w-4/12">
+                  <div className="flex flex-row items-center">
+                    <div className="relative">
+                      <NetworkSticker chainId={token.chainId} />
+                      <img
+                        src={token.logoURI}
+                        alt={token.symbol}
+                        height="40"
+                        width="40"
+                      />
+                    </div>
+
+                    <div className="ml-4">
+                      <p className="font-medium text-xs md:text-lg">
+                        {token.name}
+                      </p>
+                      <p className="text-tokenTextGray text-[10px] md:text-base">
+                        $ {token.usdPrice}
+                      </p>
+                    </div>
                   </div>
+                </div>
 
-                  <div className="ml-4">
+                <div className="w-2/12">
+                  {token.apy && token.apy.apy.toFixed(2) > 0 &&
+                    <button
+                      onClick={() => {
+                        setSelectedFarm(token.apy)
+                        setShowModal(true)
+                      }}
+                      className="bg-white text-black rounded-3xl px-3 py-2 hover:bg-[#DFFF1C]"
+                    >
+                      Earn {token.apy.apy.toFixed(2)} %
+                    </button>
+                  }
+                </div>
+
+                <div className="w-3/12 flex flex-row items-center justify-end">
+                  <div>
                     <p className="font-medium text-xs md:text-lg">
-                      {token.name}
+                      {token.allocation.toFixed(2)} %
+                    </p>
+                  </div>
+                </div>
+
+                <div className="w-3/12 flex flex-row items-center justify-end">
+                  <div className="w-6/12">
+                    <p className="font-medium text-xs md:text-lg">
+                      $ {token.balanceUsdValue}
                     </p>
                     <p className="text-tokenTextGray text-[10px] md:text-base">
-                      $ {token.usdPrice}
+                      {Number(Number(token.balance) / (10 ** token.decimals)).toFixed(2)} {token.symbol.slice(0, 10)}
                     </p>
                   </div>
                 </div>
-              </div>
 
-              <div className="w-2/12">
-                {token.apy && token.apy.apy.toFixed(2) > 0 &&
-                  <button
-                    onClick={() => {
-                      setSelectedFarm(token.apy)
-                      setShowModal(true)
-                    }}
-                    className="bg-white text-black rounded-3xl px-3 py-2 hover:bg-[#DFFF1C]"
-                  >
-                    Earn {token.apy.apy.toFixed(2)} %
-                  </button>
-                }
               </div>
-
-              <div className="w-3/12 flex flex-row items-center justify-end">
-                <div>
-                  <p className="font-medium text-xs md:text-lg">
-                    {token.allocation.toFixed(2)} %
-                  </p>
-                </div>
-              </div>
-
-              <div className="w-3/12 flex flex-row items-center justify-end">
-                <div className="w-6/12">
-                  <p className="font-medium text-xs md:text-lg">
-                    $ {token.balanceUsdValue}
-                  </p>
-                  <p className="text-tokenTextGray text-[10px] md:text-base">
-                    {Number(Number(token.balance) / (10 ** token.decimals)).toFixed(2)} {token.symbol.slice(0, 10)}
-                  </p>
-                </div>
-              </div>
-
             </div>
-          </div>
-        )}
+          )}
       </div>
     </div>
   )
