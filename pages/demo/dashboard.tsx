@@ -79,30 +79,31 @@ export default function Dashboard() {
         account as string, // Address of the user 
         [1] // Optional Array of chain ids to filter by. //137, 56, 42161, 10
       );
-      balances.push({
-        address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-        balance: "945155",
-        balanceUsdValue: "0.94",
-        chainId: 1,
-        decimals: 6,
-        logoURI: "https://etherscan.io/token/images/centre-usdc_28.png",
-        name: "USD Coin",
-        protocol: "dex",
-        symbol: "USDC",
-        usdPrice: "1.0"
-      })
-      balances.push({
-        address: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
-        balance: "945155",
-        balanceUsdValue: "0.94",
-        chainId: 1,
-        decimals: 18,
-        logoURI: "https://etherscan.io/token/images/MCDDai_32.png",
-        name: "DAI",
-        protocol: "dex",
-        symbol: "DAI",
-        usdPrice: "1.0"
-      })
+      
+      // balances.push({
+      //   address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      //   balance: "945155",
+      //   balanceUsdValue: "0.94",
+      //   chainId: 1,
+      //   decimals: 6,
+      //   logoURI: "https://etherscan.io/token/images/centre-usdc_28.png",
+      //   name: "USD Coin",
+      //   protocol: "dex",
+      //   symbol: "USDC",
+      //   usdPrice: "1.0"
+      // })
+      // balances.push({
+      //   address: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+      //   balance: "945155",
+      //   balanceUsdValue: "0.94",
+      //   chainId: 1,
+      //   decimals: 18,
+      //   logoURI: "https://etherscan.io/token/images/MCDDai_32.png",
+      //   name: "DAI",
+      //   protocol: "dex",
+      //   symbol: "DAI",
+      //   usdPrice: "1.0"
+      // })
       //balances = balances.filter(balance => Number(balance.balanceUsdValue) > 1)
 
       const newBalances = await Promise.all(balances.map(async (balance) => await getTokenApy(balance.address.toLowerCase(), availableAssetAddresses)))
