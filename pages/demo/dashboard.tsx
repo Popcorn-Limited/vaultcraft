@@ -105,7 +105,7 @@ export default function Dashboard() {
       //   usdPrice: "1.0"
       // })
       //balances = balances.filter(balance => Number(balance.balanceUsdValue) > 1)
-
+      
       const newBalances = await Promise.all(balances.map(async (balance) => await getTokenApy(balance.address.toLowerCase(), availableAssetAddresses)))
       newBalances.forEach((balance, index) => (balances[index] as BalanceWithApy).apy = balance)
 
