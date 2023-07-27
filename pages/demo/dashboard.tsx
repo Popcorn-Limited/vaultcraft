@@ -105,7 +105,7 @@ export default function Dashboard() {
       //   usdPrice: "1.0"
       // })
       //balances = balances.filter(balance => Number(balance.balanceUsdValue) > 1)
-      
+
       const newBalances = await Promise.all(balances.map(async (balance) => await getTokenApy(balance.address.toLowerCase(), availableAssetAddresses)))
       newBalances.forEach((balance, index) => (balances[index] as BalanceWithApy).apy = balance)
 
@@ -152,10 +152,10 @@ export default function Dashboard() {
         </>
       </Modal>
       <div className="mb-8">
-        <h1 className="text-5xl">Portfolio</h1>
+        <h1 className="text-5xl">Zap into Best Yield Vaults</h1>
         <p className="text-gray-400">
-          Watch your portfolio and find <br />
-          yield opportinitues for any of your assets
+          Best Yield Vaults are asset strategies that automatically route your assets <br/> 
+          into the highest-yield products across DeFi in 1 click!
         </p>
       </div>
       <div className="w-full flex flex-row items-center mb-2">
