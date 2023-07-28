@@ -61,7 +61,7 @@
     "logoURI": "https://cdn.furucombo.app/assets/img/token/LUSD.png"
   },
   {
-    "chains": [],
+    "chains": [1],
     "address": {
       "1": "0x99D8a9C45b2ecA8864373A26D1459e3Dff1e17F3",
       "1337": "0x99D8a9C45b2ecA8864373A26D1459e3Dff1e17F3",
@@ -71,6 +71,17 @@
     "symbol": "MIM",
     "decimals": 18,
     "logoURI": "https://cdn.furucombo.app/assets/img/token/MIM.png"
+  },
+  {
+    "chains": [1, 1337],
+    "address": {
+      "1": "0x57Ab1ec28D129707052df4dF418D58a2D46d5f51",
+      "1337": "0x57Ab1ec28D129707052df4dF418D58a2D46d5f51"
+    },
+    "name": "Synth USD",
+    "symbol": "sUSD",
+    "decimals": 18,
+    "logoURI": "https://etherscan.io/token/images/SynthetixsUSD_32.png"
   },
   {
     "chains": [1, 1337, 42161],
@@ -97,18 +108,18 @@
     "logoURI": "https://cdn.furucombo.app/assets/img/token/WETH.svg"
   },
   {
-    "chains": [],
+    "chains": [1, 1337],
     "address": {
-      "1": "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0",
-      "1337": "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0"
+      "1": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+      "1337": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84"
     },
-    "name": "Matic Token",
-    "symbol": "MATIC",
+    "name": "Staked Ether",
+    "symbol": "stETH",
     "decimals": 18,
-    "logoURI": "https://cdn.furucombo.app/assets/img/token/MATIC.png"
+    "logoURI": "https://cdn.furucombo.app/assets/img/token/stETH.svg"
   },
   {
-    "chains": [],
+    "chains": [1],
     "address": {
       "1": "0x383518188C0C6d7730D91b2c03a03C837814a899",
       "1337": "0x383518188C0C6d7730D91b2c03a03C837814a899"
@@ -117,6 +128,50 @@
     "symbol": "OHM",
     "decimals": 9,
     "logoURI": "https://cdn.furucombo.app/assets/img/token/OHM.png"
+  },
+  {
+    "chains": [1, 1337],
+    "address": {
+      "1": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+      "1337": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86"
+    },
+    "name": "Origin Dollar",
+    "symbol": "oUSD",
+    "decimals": 18,
+    "logoURI": "https://icons.llamao.fi/icons/protocols/origin-dollar"
+  },
+  {
+    "chains": [1, 1337],
+    "address": {
+      "1": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
+      "1337": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3"
+    },
+    "name": "Origin Ether",
+    "symbol": "oETH",
+    "decimals": 18,
+    "logoURI": "https://icons.llamao.fi/icons/protocols/origin-ether"
+  },
+  {
+    "chains": [1,1337],
+    "address": {
+      "1": "0xD533a949740bb3306d119CC777fa900bA034cd52",
+      "1337": "0xD533a949740bb3306d119CC777fa900bA034cd52"
+    },
+    "name": "Curve",
+    "symbol": "CRV",
+    "decimals": 18,
+    "logoURI": "https://etherscan.io/token/images/Curvefi_32.png"
+  },
+  {
+    "chains": [1,1337],
+    "address": {
+      "1": "0xba100000625a3754423978a60c9317c58a424e3D",
+      "1337": "0xba100000625a3754423978a60c9317c58a424e3D"
+    },
+    "name": "Balancer",
+    "symbol": "BAL",
+    "decimals": 18,
+    "logoURI": "https://etherscan.io/token/images/Balancer_32.png"
   },
   {
     "chains": [1, 1337],
@@ -154,7 +209,7 @@
     "logoURI": "https://cdn.furucombo.app/assets/img/token/USDT.png"
   },
   {
-    "chains": [],
+    "chains": [1],
     "address": {
       "1": "0xfA0F307783AC21C39E939ACFF795e27b650F6e68",
       "1337": "0xfA0F307783AC21C39E939ACFF795e27b650F6e68",
@@ -166,7 +221,7 @@
     "logoURI": "https://cdn.furucombo.app/assets/img/token/FRAX.png"
   },
   {
-    "chains": [],
+    "chains": [1],
     "address": {
       "1": "0xE8F55368C82D38bbbbDb5533e7F56AfC2E978CC2",
       "1337": "0xE8F55368C82D38bbbbDb5533e7F56AfC2E978CC2",
@@ -178,7 +233,7 @@
     "logoURI": "https://cdn.furucombo.app/assets/img/token/LUSD.png"
   },
   {
-    "chains": [42161],
+    "chains": [],
     "address": {
       "42161": "0x68f5d998F00bB2460511021741D098c05721d8fF"
     },
@@ -188,7 +243,7 @@
     "logoURI": "https://cdn.furucombo.app/assets/img/token/DAI.png"
   },
   {
-    "chains": [42161],
+    "chains": [],
     "address": {
       "42161": "0xB67c014FA700E69681a673876eb8BAFAA36BFf71"
     },
@@ -217,39 +272,6 @@
     "symbol": "POP",
     "decimals": 18,
     "logoURI": "https://cdn.furucombo.app/assets/img/token/WETH.svg"
-  },
-  {
-    "chains": [1, 1337],
-    "address": {
-      "1": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
-      "1337": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86"
-    },
-    "name": "Origin Dollar",
-    "symbol": "oUSD",
-    "decimals": 18,
-    "logoURI": "https://icons.llamao.fi/icons/protocols/origin-dollar"
-  },
-  {
-    "chains": [1, 1337],
-    "address": {
-      "1": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
-      "1337": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3"
-    },
-    "name": "Origin Ether",
-    "symbol": "oETH",
-    "decimals": 18,
-    "logoURI": "https://icons.llamao.fi/icons/protocols/origin-ether"
-  },
-  {
-    "chains": [1, 1337],
-    "address": {
-      "1": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
-      "1337": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84"
-    },
-    "name": "Staked Ether",
-    "symbol": "stETH",
-    "decimals": 18,
-    "logoURI": "https://cdn.furucombo.app/assets/img/token/stETH.svg"
   },
   {
     "chains": [],

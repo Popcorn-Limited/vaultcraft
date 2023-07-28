@@ -16,6 +16,8 @@ const apr2apy = (apr: BigNumber) => {
 export async function idle({ chainId, address }: { chainId: number, address: string }): Promise<number> {
   // @ts-ignore
   const idleAddresses = tranches[address];
+  if (idleAddresses === undefined) return 0
+  
   const cdo = new Contract(
     idleAddresses.cdo,
     ["function getApr(address) view returns (uint256)"],

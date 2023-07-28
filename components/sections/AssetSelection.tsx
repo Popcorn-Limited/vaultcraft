@@ -1,72 +1,14 @@
 import { useAtom } from "jotai";
 import { localhost, mainnet } from "wagmi/chains";
-import { assetAtom, networkAtom, adapterAtom, adapterConfigAtom, strategyAtom, DEFAULT_ADAPTER, DEFAULT_STRATEGY, protocolAtom, DEFAULT_PROTOCOL, availableAssetsAtom, Adapter, useAdapters, Asset, assetAddressesAtom, assets } from "@/lib/atoms";
+import { assetAtom, networkAtom, adapterAtom, adapterConfigAtom, strategyAtom, DEFAULT_ADAPTER, DEFAULT_STRATEGY, protocolAtom, DEFAULT_PROTOCOL, availableAssetsAtom, Adapter, useAdapters, assetAddressesAtom, assets } from "@/lib/atoms";
 import Selector, { Option } from "@/components/inputs/Selector";
-import { resolveProtocolAssets } from "@/lib/resolver/protocolAssets/protocolAssets";
 import { useEffect, useState } from "react";
 import Input from "../inputs/Input";
 import { utils } from "ethers";
-import { RPC_URLS } from "@/lib/connectors";
+import getTokenMetadata from "@/lib/getTokenMetadata";
+import addProtocolAssets from "@/lib/addProtocolAssets";
 
-async function addProtocolAssets(adapters: Adapter[], chainId: number): Promise<{ [key: string]: string[] }> {
-  const protocolQueries = [] as Promise<string[]>[]
-  const filteredAdapters: Adapter[] = adapters.filter(adapter => adapter.chains.includes(chainId))
 
-  try {
-    filteredAdapters.forEach(
-      adapter => protocolQueries.push(resolveProtocolAssets({ chainId: chainId, resolver: adapter.resolver }))
-    )
-
-    const protocolsResult = await Promise.all(protocolQueries)
-    const result = {} as {
-      [key: string]: string[]
-    }
-    filteredAdapters.forEach((item, idx) => {
-      result[item.protocol] = protocolsResult[idx]
-    })
-    result.all = Object.keys(result).map(key => result[key]).flat().map(address => address.toLowerCase())
-
-    return result
-  } catch (e) {
-    console.error("error", e)
-    return {}
-  }
-}
-
-async function getTokenMetadata(address: string, chainId: number): Promise<Asset> {
-  const metadata = {
-    name: "",
-    symbol: "",
-    decimals: 0,
-    logoURI: "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
-    address: { [chainId]: address },
-    chains: [chainId]
-  }
-
-  const options = {
-    method: 'POST',
-    headers: { accept: 'application/json', 'content-type': 'application/json' },
-    body: JSON.stringify({
-      id: chainId,
-      jsonrpc: '2.0',
-      method: 'alchemy_getTokenMetadata',
-      params: [address]
-    })
-  };
-
-  try {
-    // @ts-ignore
-    const res = await fetch(RPC_URLS[chainId], options)
-    const data = await res.json()
-
-    metadata.name = data.result.name
-    metadata.symbol = data.result.symbol
-    metadata.decimals = data.result.decimals
-    if (data.result.logo) metadata.logoURI = data.result.logo
-  } catch (e) { console.error("error", e) }
-
-  return metadata
-}
 
 function AssetSelection() {
   const [network] = useAtom(networkAtom);
