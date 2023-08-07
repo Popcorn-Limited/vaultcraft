@@ -68,6 +68,12 @@ export default function Vaults() {
             title: string
             count: number
         }[]
+        tvlMonthByMonth: {
+            date: number
+            tokens: {
+                [key: string]: number
+            }
+        }[]
         totalRevenue: number
         cPopRevenue: number
         publicGoodFunding: number
@@ -101,6 +107,7 @@ export default function Vaults() {
         cPopExercised: 0,
         networkId: 0,
         vaultTvl: [],
+        tvlMonthByMonth: [],
         totalRevenue: 0,
         cPopRevenue: 0,
         publicGoodFunding: 0,
@@ -233,7 +240,7 @@ export default function Vaults() {
                 },
                 tooltip: {
                     formatter: function() {
-                        return String(this.y);
+                        return Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(this.y as number);
                     },
                 },
                 plotOptions: {
@@ -269,9 +276,19 @@ export default function Vaults() {
     }
 
     async function init() {
-        const opts = {
+        const duneOpts = {
             headers: {
                 'x-dune-api-key': process.env.DUNE_API_KEY
+            }
+        }
+
+        const mexcOpts = {
+            headers: {
+                'X-MEXC-APIKEY': process.env.MEXC_API_KEY,
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET, POST, DELETE',
+                'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With'
             }
         }
 
@@ -282,7 +299,9 @@ export default function Vaults() {
             duneHoldersWithPopMoreThousand,
             duneHoldersWithPopMoreHundredThousand,
             duneHoldersWithPopMoreMillion,
-            snapshotPips
+            snapshotPips,
+            duneDexVolume,
+            tvlByTime,
         ] = await Promise.all([
             axios.get<DuneQueryResult<{
                 FDV: number
@@ -290,26 +309,38 @@ export default function Vaults() {
                 price: number
                 CirculatingSupply: number
                 MarketCap: number
-            }>>('https://api.dune.com/api/v1/query/2521095/results', opts),
+            }>>('https://api.dune.com/api/v1/query/2521095/results', duneOpts),
             axios.get<DuneQueryResult<{
                 total_holders: number
-            }>>('https://api.dune.com/api/v1/query/2490604/results', opts),
+            }>>('https://api.dune.com/api/v1/query/2490604/results', duneOpts),
             axios.get<DuneQueryResult<{
                 total_holders: number
-            }>>('https://api.dune.com/api/v1/query/2490577/results', opts),
+            }>>('https://api.dune.com/api/v1/query/2490577/results', duneOpts),
             axios.get<DuneQueryResult<{
                 total_holders: number
-            }>>('https://api.dune.com/api/v1/query/2490615/results', opts),
+            }>>('https://api.dune.com/api/v1/query/2490615/results', duneOpts),
             axios.get<DuneQueryResult<{
                 total_holders: number
-            }>>('https://api.dune.com/api/v1/query/2490624/results', opts),
+            }>>('https://api.dune.com/api/v1/query/2490624/results', duneOpts),
             axios.get<DuneQueryResult<{
                 total_holders: number
-            }>>('https://api.dune.com/api/v1/query/2490650/results', opts),
+            }>>('https://api.dune.com/api/v1/query/2490650/results', duneOpts),
             axios.get<DuneQueryResult<{
                 created: number
                 title: string
-            }>>('https://api.dune.com/api/v1/query/2548926/results', opts),
+            }>>('https://api.dune.com/api/v1/query/2548926/results', duneOpts),
+            axios.get<DuneQueryResult<{
+                'USD Volume': number
+                blockchain: string
+            }>>('https://api.dune.com/api/v1/query/2490697/results', duneOpts),
+            axios.get<{
+                tokensInUsd: {
+                    date: number
+                    tokens: {
+                        [key: string]: number
+                    }
+                }[]
+            }>('https://api.llama.fi/protocol/popcorn')
         ])
 
         setStatistics({
@@ -324,10 +355,14 @@ export default function Vaults() {
             walletsPopMoreThousand: duneHoldersWithPopMoreThousand.data.result.rows[0].total_holders,
             walletsPopMoreHundredThousand: duneHoldersWithPopMoreHundredThousand.data.result.rows[0].total_holders,
             walletsPopMoreMillion: duneHoldersWithPopMoreMillion.data.result.rows[0].total_holders,
-            snapshotPips: snapshotPips.data.result.rows
+            snapshotPips: snapshotPips.data.result.rows,
+            weekDexVolume: duneDexVolume.data.result.rows.reduce((acc, item) => acc + item['USD Volume'], 0),
+            tvlMonthByMonth: tvlByTime.data.tokensInUsd,
+            tvl: Object.keys(tvlByTime.data.tokensInUsd.slice(-1)[0].tokens).reduce((acc, key) => acc + tvlByTime.data.tokensInUsd.slice(-1)[0].tokens[key], 0)
         })
 
-        initDonutChart(liquidPopMarketChartElem.current, [
+        initDonutChart(liquidPopMarketChartElem.current,
+            [
                 {
                     name: "POP in 80/20 BAL pool",
                     y: statistics.popInBalPool,
@@ -338,7 +373,8 @@ export default function Vaults() {
                     y: statistics.wethInBalPool,
                     color: "#9B55FF"
                 }
-            ])
+            ]
+        )
         initDonutChart(vaultTvlChartElem.current, statistics.vaultTvl.map((item, idx) => {
             return {
                 name: item.title,
@@ -346,10 +382,10 @@ export default function Vaults() {
                 color: vaultTvlChartColors[idx % vaultTvlChartColors.length]
             }
         }))
-        initLineChart(TVLOverTimeChartElem.current, [5136121, 6331324, 7610111, 12600000, 8300000, 7000000, 8000000, 7700000, 5600000, 4800000, 4300000, 4000000].map((item, idx) => {
+        initLineChart(TVLOverTimeChartElem.current, tvlByTime.data.tokensInUsd.map(item => {
             return {
-                x: new Date(2022, idx, 1).getTime(),
-                y: item,
+                x: item.date * 1000,
+                y: Object.keys(item.tokens).reduce((acc, key) => acc + item.tokens[key], 0),
             }
         }))
     }
@@ -358,10 +394,10 @@ export default function Vaults() {
         init()
 
         function resizeHandler() {
-            initLineChart(TVLOverTimeChartElem.current, [5136121, 6331324, 7610111, 12600000, 8300000, 7000000, 8000000, 7700000, 5600000, 4800000, 4300000, 4000000].map((item, idx) => {
+            initLineChart(TVLOverTimeChartElem.current, statistics.tvlMonthByMonth.map(item => {
                 return {
-                    x: new Date(2022, idx, 1).getTime(),
-                    y: item,
+                    x: item.date * 1000,
+                    y: Object.keys(item.tokens).reduce((acc, key) => acc + item.tokens[key], 0),
                 }
             }))
         }
