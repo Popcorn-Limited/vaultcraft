@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import Highcharts from "highcharts";
-import axios from "axios";
-
+import axios, { AxiosRequestHeaders } from "axios";
+import { BalancerSDK, Network } from '@balancer-labs/sdk';
 import SelectField from "@/components/inputs/SelectField";
 
 type DuneQueryResult<T> = {
@@ -39,6 +39,8 @@ const leaderboardOptions = [{
 }, {
     label: 'Top Depositors'
 }]
+
+const balancerPoolId = '0x5c6ee304399dbdb9c8ef030ab642b10820db8f56000200000000000000000014'
 
 const formatDate = (timestamp: number) => {
     const date = new Date(timestamp)
@@ -279,20 +281,16 @@ export default function Vaults() {
         const duneOpts = {
             headers: {
                 'x-dune-api-key': process.env.DUNE_API_KEY
-            }
+            } as AxiosRequestHeaders
         }
 
-        const mexcOpts = {
-            headers: {
-                'X-MEXC-APIKEY': process.env.MEXC_API_KEY,
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'GET, POST, DELETE',
-                'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With'
-            }
-        }
+        const balancer = new BalancerSDK({
+            network: Network.MAINNET,
+            rpcUrl: process.env.INFURA_URL as string,
+        })
 
         const [
+            balancerPool,
             duneTokenResult,
             duneHoldersWithPop,
             duneHoldersWithPopMoreHundred,
@@ -303,6 +301,7 @@ export default function Vaults() {
             duneDexVolume,
             tvlByTime,
         ] = await Promise.all([
+            balancer.pools.find(balancerPoolId),
             axios.get<DuneQueryResult<{
                 FDV: number
                 TotalSupply: number
@@ -343,6 +342,9 @@ export default function Vaults() {
             }>('https://api.llama.fi/protocol/popcorn')
         ])
 
+        const popInBalPool = balancerPool?.tokens.find(token => token.symbol === 'BAL')
+        const wethInBalPool = balancerPool?.tokens.find(token => token.symbol === 'WETH')
+
         setStatistics({
             ...statistics,
             fdv: duneTokenResult.data.result.rows[0].FDV,
@@ -358,21 +360,23 @@ export default function Vaults() {
             snapshotPips: snapshotPips.data.result.rows,
             weekDexVolume: duneDexVolume.data.result.rows.reduce((acc, item) => acc + item['USD Volume'], 0),
             tvlMonthByMonth: tvlByTime.data.tokensInUsd,
-            tvl: Object.keys(tvlByTime.data.tokensInUsd.slice(-1)[0].tokens).reduce((acc, key) => acc + tvlByTime.data.tokensInUsd.slice(-1)[0].tokens[key], 0)
+            tvl: Object.keys(tvlByTime.data.tokensInUsd.slice(-1)[0].tokens).reduce((acc, key) => acc + tvlByTime.data.tokensInUsd.slice(-1)[0].tokens[key], 0),
+            popInBalPool: Number(popInBalPool?.balance),
+            wethInBalPool: Number(wethInBalPool?.balance),
         })
 
         initDonutChart(liquidPopMarketChartElem.current,
             [
                 {
-                    name: "POP in 80/20 BAL pool",
-                    y: statistics.popInBalPool,
-                    color: "#7AFB79"
+                    name: "WETH in 80/20 BAL pool, USD",
+                    y: Number(wethInBalPool?.token?.latestUSDPrice) * Number(wethInBalPool?.balance),
+                    color: "#9B55FF"
                 },
                 {
-                    name: "WETH in 80/20 BAL pool",
-                    y: statistics.wethInBalPool,
-                    color: "#9B55FF"
-                }
+                    name: "POP in 80/20 BAL pool, USD",
+                    y: Number(popInBalPool?.token?.latestUSDPrice) * Number(popInBalPool?.balance),
+                    color: "#7AFB79"
+                },
             ]
         )
         initDonutChart(vaultTvlChartElem.current, statistics.vaultTvl.map((item, idx) => {
