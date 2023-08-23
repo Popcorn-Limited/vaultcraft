@@ -34,12 +34,6 @@ const FEE_INPUTS = [
         placeholder: "0%",
         type: INPUT_TYPES.PERCENTAGE,
         key: "withdrawal",
-      },
-      {
-        title: "Withdraw Fee Rate for specific asset",
-        placeholder: "0%",
-        type: INPUT_TYPES.PERCENTAGE,
-        key: "withdrawalSpecific",
       }
     ]
   },
