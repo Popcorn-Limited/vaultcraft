@@ -19,7 +19,7 @@ export default function DesktopMenu(): JSX.Element {
 
     return (
         <div className="bg-transparent w-full">
-            <div className="flex flex-row items-center justify-between w-full md:p-[36px] p-6 z-30">
+            <div className="flex flex-row items-center justify-between w-full md:p-[36px] p-6 z-30 border-b-[#353945] border-b-[1px]">
                 <div className="flex flex-row items-center">
                     <div>
                         <Link href={`/`} passHref>

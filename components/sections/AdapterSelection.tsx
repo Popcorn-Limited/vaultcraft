@@ -13,13 +13,16 @@ import {
   assetAddressesAtom
 } from "@/lib/atoms";
 import { resolveProtocolAssets } from "@/lib/resolver/protocolAssets/protocolAssets";
+import { resolveAdapterDefaults } from "@/lib/resolver/adapterDefaults/adapterDefaults";
 import Selector, { Option } from "@/components/inputs/Selector";
 
 interface AdapterOption extends Adapter {
   disabled: boolean;
 }
 
-function AdapterSelection() {
+function AdapterSelection({
+  isDisabled = false,
+}) {
   const [network] = useAtom(networkAtom);
   const [protocol] = useAtom(protocolAtom);
   const [asset] = useAtom(assetAtom);
@@ -32,8 +35,6 @@ function AdapterSelection() {
   // Only for reset
   const [, setAdapterConfig] = useAtom(adapterConfigAtom);
   const [, setStrategy] = useAtom(strategyAtom);
-
-  console.log({ availableAssetAddresses })
 
   async function assetSupported(adapter: Adapter, chainId: number, asset: string): Promise<boolean> {
     if (!availableAssetAddresses[chainId]) {
@@ -75,21 +76,41 @@ function AdapterSelection() {
     }
   }, [protocol, asset, network]);
 
+  useEffect(
+    () => {
+      // Set defaults if the adapter has init params
+      if (adapter.initParams && adapter.initParams.length > 0) {
+        setAdapterConfig(adapter.initParams.map(i => "Loading configuration..."))
+
+        // Set config defaults
+        resolveAdapterDefaults({
+          chainId: network.id,
+          address: asset.address[network.id].toLowerCase(),
+          resolver: adapter.resolver
+        }).then(res => setAdapterConfig(res))
+      } else {
+        // Set config defaults
+        setAdapterConfig([])
+      }
+    },
+    [adapter]
+  );
+
   function selectAdapter(newAdapter: any) {
     if (adapter !== newAdapter) {
       setAdapterConfig([])
       setStrategy(DEFAULT_STRATEGY)
     }
-    setAdapter(newAdapter)
   }
 
   return (
-    <section className="mb-4">
+    <section>
       <Selector
         selected={adapter}
         onSelect={(newAdapter) => selectAdapter(newAdapter)}
         title="Select Adapter"
         description="Choose an adapter for your selected protocol."
+        disabled={isDisabled}
       >
         {options.map((adapterIter) => (
           <Option

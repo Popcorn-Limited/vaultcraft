@@ -1,3 +1,4 @@
+import { PRO_CREATION_STAGES } from "@/lib/stages";
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { useAtom } from "jotai";
@@ -35,7 +36,7 @@ export default function ReviewPage(): JSX.Element {
   }
 
   function uploadMetadata() {
-    IpfsClient.add(metadata.name, { name: metadata.name, tags: metadata.tags }).then(res => {
+    IpfsClient.add(metadata.name, { name: metadata.name }).then(res => {
       setMetadata((prefState) => { return { ...prefState, ipfsHash: res } })
       deployVault();
     });
@@ -43,7 +44,7 @@ export default function ReviewPage(): JSX.Element {
   }
 
   return (metadata && adapter ?
-    <VaultCreationContainer activeStage={3} >
+    <VaultCreationContainer activeStage={3} stages={PRO_CREATION_STAGES} >
       <div>
         <h1 className="text-white text-2xl mb-2">Review</h1>
         <p className="text-white">
@@ -54,14 +55,16 @@ export default function ReviewPage(): JSX.Element {
 
       <Review />
 
-      <div className="flex flex-row space-x-8 mt-16">
+      <div className="flex justify-end mt-8 gap-3">
         <SecondaryActionButton
           label="Back"
-          handleClick={() => router.push('/create/fees')}
+          handleClick={() => router.push('/pro/fees')}
+          className={`max-w-[150px]`}
         />
         <MainActionButton
           label={account ? "Deploy Vault" : "Connect Wallet"}
           handleClick={account ? handleSubmit : openConnectModal}
+          className={`max-w-[200px]`}
         />
       </div>
 

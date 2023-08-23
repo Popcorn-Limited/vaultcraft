@@ -8,10 +8,11 @@ const SecondaryActionButton: React.FC<ButtonProps> = ({
     disabled = false,
     type = "button",
     hidden = false,
+    className = "",
 }) => {
     return (
         <button
-            className={`border border-white text-white hover:bg-[#D7D7D7] hover:border-[#D7D7D7] px-8 py-3 rounded-[4px] font-semibold text-base transition-all ease-in-out duration-500 w-full disabled:bg-customLightGray disabled:border-customLightGray disabled:text-secondaryLight disabled:hover:border-customLightGray disabled:hover:bg-customLightGray disabled:hover:text-secondaryLight ${hidden ? "hidden" : ""}`}
+            className={`${className} border border-white text-white hover:bg-[#D7D7D7] hover:border-[#D7D7D7] px-8 py-3 rounded-[4px] font-semibold text-base transition-all ease-in-out duration-500 w-full disabled:bg-customLightGray disabled:border-customLightGray disabled:text-secondaryLight disabled:hover:border-customLightGray disabled:hover:bg-customLightGray disabled:hover:text-secondaryLight ${hidden ? "hidden" : ""}`}
             onClick={handleClick}
             type={type}
             disabled={disabled}

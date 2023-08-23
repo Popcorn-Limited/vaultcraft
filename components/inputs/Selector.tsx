@@ -9,6 +9,7 @@ function Selector({
   description,
   children,
   optionalChildren,
+  disabled,
 }: {
   selected?: any;
   onSelect: (value: any) => void;
@@ -16,6 +17,7 @@ function Selector({
   description: string;
   children: any;
   optionalChildren?: any;
+  disabled?: boolean;
 }) {
   return (
     <Listbox
@@ -26,7 +28,7 @@ function Selector({
     >
       {({ open }) => (
         <>
-          <Listbox.Button className="border border-[#353945] rounded-lg flex gap-2 w-full px-2">
+          <Listbox.Button className="border border-[#353945] rounded-lg flex gap-2 w-full px-2" aria-disabled={disabled}>
             <div className="h-12 flex flex-row items-center w-full gap-x-2">
               {selected?.logoURI && (
                 <div className="w-9 h-8">
@@ -37,8 +39,8 @@ function Selector({
                   />
                 </div>
               )}
-              <span className="text-[white] w-full flex self-center flex-row justify-start">{selected?.name}</span>
-              <span className="self-center text-[white] mr-2">{`>`}</span>
+              <span className={`w-full flex self-center flex-row justify-start ${!disabled ? 'text-[white]' : 'text-[#353945]'}`}>{selected?.name}</span>
+              <span className={`self-center text-[white] mr-2 ${disabled && 'hidden'}`}>{`>`}</span>
             </div>
           </Listbox.Button>
           {open && (

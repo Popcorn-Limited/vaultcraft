@@ -7,49 +7,113 @@ import { validateBigNumberInput } from "@/lib/helpers";
 import Fieldset from "@/components/inputs/Fieldset";
 import Input from "@/components/inputs/Input";
 
-
+enum INPUT_TYPES {
+  PERCENTAGE = "PERCENTAGE",
+  ADDRESS = "ADDRESS",
+}
 
 const FEE_INPUTS = [
-  { name: "Deposit Fee", key: "deposit", description: "Deposit fees are charged with every new deposit." },
-  { name: "Withdrawal Fee", key: "withdrawal", description: "Withdrawal fees are charged with every new withdrawal." },
-  { name: "Performance Fee", key: "performance", description: "Charge a fee whenever the share value reaches a new all time high." },
-  { name: "Management Fee", key: "management", description: "Charge a continues fee on the total value of deposits." },
+  {
+    name: "Deposit Fee",
+    description: "Deposit fees are charged with every new deposit.",
+    inputs: [
+      {
+        title: "Deposit Fee",
+        placeholder: "0%",
+        type: INPUT_TYPES.PERCENTAGE,
+        key: "deposit",
+      }
+    ]
+  },
+  {
+    name: "Withdraw Fee",
+    description: "Withdrawal fees are charged with every new withdrawal.",
+    inputs: [
+      {
+        title: "Withdraw Fee Rate",
+        placeholder: "0%",
+        type: INPUT_TYPES.PERCENTAGE,
+        key: "withdrawal",
+      },
+      {
+        title: "Withdraw Fee Rate for specific asset",
+        placeholder: "0%",
+        type: INPUT_TYPES.PERCENTAGE,
+        key: "withdrawalSpecific",
+      }
+    ]
+  },
+  {
+    name: "Charge Performance Fee",
+    description: "Charge a fee whenever the share value reaches a new all time high.",
+    inputs: [
+      {
+        title: "Performance Fee Rate",
+        placeholder: "0%",
+        type: INPUT_TYPES.PERCENTAGE,
+        key: "performance",
+      }
+    ]
+  },
+  {
+    name: "Charge Management Fee",
+    description: "Charge a continues fee on the total value of deposits.",
+    inputs: [
+      {
+        title: "Management Fee Rate",
+        placeholder: "0%",
+        type: INPUT_TYPES.PERCENTAGE,
+        key: "management",
+      }
+    ]
+  },
 ];
 
 interface Errors { [key: string]: string[] | undefined }
 
-const DEFAULT_ERRORS: Errors = {
-  deposit: undefined,
-  withdrawal: undefined,
-  performance: undefined,
-  management: undefined,
-}
-
 function FeeConfiguration() {
   const [fees, setFee] = useAtom(feeAtom);
-  const [feeErrors, setFeeErrors] = useState(DEFAULT_ERRORS)
+  const [errors, setErrors] = useState<Errors>()
   const [recipientErrors, setRecipientErrors] = useState<string[] | undefined>(undefined)
+  const [areCategoriesOpened, setAreCategoriesOpened] = useState(FEE_INPUTS.map(item => false))
 
-  function handleChange(value: string, key: string) {
+  function handlePercentageChange(value: string, key: string) {
     setFee({
       ...fees,
-      [key]: parseUnits(String(Number(validateBigNumberInput(value).formatted) / 100)),
+      [key]: parseUnits(validateBigNumberInput(value).formatted),
+    });
+  }
+
+  function handleAddressChange(value: string, key: string) {
+    setFee({
+      ...fees,
+      [key]: value,
     });
   }
 
   function verifyFees() {
     // @ts-ignore
-    const totalFee = Object.keys(DEFAULT_ERRORS).reduce((acc, key) => acc + Number(fees[key]), 0) >= 1000000000000000000;
+    const totalFee = Object.keys(fees).filter(key => typeof fees[key] !== 'string').reduce((acc, key) => acc + Number(fees[key]), 0) >= 100000000000000000000;
 
     const newErrors: Errors = {}
-    Object.keys(DEFAULT_ERRORS).forEach((key) => {
+    Object.entries(fees).forEach(el => {
+      const [key, val] = el
       const inputErrors = []
-      // @ts-ignore
-      if (Number(fees[key]) >= 1000000000000000000) inputErrors.push("Fee must be less than 100%")
-      if (totalFee) inputErrors.push("Total fee must be less than 100%")
+
+      if (typeof val !== 'string') {
+        if (Number(val) >= 100000000000000000000) inputErrors.push("Fee must be less than 100%")
+        if (Number(val) < 0) inputErrors.push("Fee must be greater or equal to 0%")
+        if (totalFee) inputErrors.push("Total fee must be less than 100%")
+      }
+
+      if (typeof val === 'string') {
+        if (!utils.isAddress(val) && val.length > 0) inputErrors.push("Recipient must be a valid address")
+        if (val === constants.AddressZero) inputErrors.push("Recipient must not be the zero address")
+      }
+
       newErrors[key] = inputErrors.length > 0 ? inputErrors : undefined
     })
-    setFeeErrors(newErrors)
+    setErrors(newErrors)
   }
 
   function verifyRecipient() {
@@ -62,57 +126,80 @@ function FeeConfiguration() {
 
   return (
     <section className="flex flex-col gap-y-4 divide-y-2 divide-[#353945]">
-      {FEE_INPUTS.map((input) => {
+      {FEE_INPUTS.map((category, idx) => {
         return (
-          <div key={`fee-element-${input.name}`}>
-            <Fieldset label={input.name} description={input.description}>
-              <Input
-                onChange={(e) =>
-                  handleChange(
-                    (e.target as HTMLInputElement).value,
-                    input.key
+          <div key={`fee-element-${category.name}`}>
+            <Fieldset
+              label={category.name}
+              description={category.description}
+              isOpened={areCategoriesOpened[idx]}
+              handleIsOpenedChange={isOpened => {
+                const newAreCategoriesOpened = [...areCategoriesOpened]
+                newAreCategoriesOpened[idx] = isOpened
+                setAreCategoriesOpened(newAreCategoriesOpened)
+              }}
+            >
+              <div className={`flex flex-col gap-4`}>
+                {category.inputs.map(input => {
+                  return (
+                    <div className={``} key={`fee-input-${input.key}`}>
+                      <label className="text-white text-sm mb-3">{input.title}</label>
+                      <Input
+                        onChange={
+                          e => {
+                            if (input.type === INPUT_TYPES.PERCENTAGE) {
+                              handlePercentageChange(
+                                (e.target as HTMLInputElement).value,
+                                input.key
+                              )
+                            } else {
+                              handleAddressChange(
+                                (e.target as HTMLInputElement).value,
+                                input.key
+                              )
+                            }
+                          }
+                        }
+                        type={input.type === INPUT_TYPES.PERCENTAGE ? "number" : "text"}
+                        className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        autoComplete="off"
+                        autoCorrect="off"
+                        placeholder={input.placeholder}
+                        minLength={1}
+                        maxLength={79}
+                        spellCheck="false"
+                        onBlur={verifyFees}
+                        errors={errors?.[input.key]}
+                      />
+                    </div>
                   )
-                }
-                // @ts-ignore
-                defaultValue={String(Number(formatUnits(fees[input.key])) * 100)}
-                inputMode="decimal"
-                autoComplete="off"
-                autoCorrect="off"
-                type="text"
-                pattern="^[0-9]*[.,]?[0-9]*$"
-                placeholder={"0.0"}
-                minLength={1}
-                maxLength={79}
-                spellCheck="false"
-                info={"Enter a value in percent (0-100)"}
-                onBlur={verifyFees}
-                errors={feeErrors[input.key]}
-              />
+                })}
+              </div>
             </Fieldset>
           </div>
         );
       })}
       <div className="">
-        <Fieldset className="flex-grow" label="Fee Recipient" description="Which address should receive the fees?">
-          <Input
-            onChange={(e) =>
-              setFee((prefState) => {
-                return {
-                  ...prefState,
-                  recipient: (e.target as HTMLInputElement).value,
-                };
-              })
-            }
-            defaultValue={fees.recipient}
-            placeholder="0x00"
-            autoComplete="off"
-            autoCorrect="off"
-            info={"Required"}
-            onBlur={verifyRecipient}
-            errors={recipientErrors}
-          />
-        </Fieldset>
-      </div>
+       <Fieldset className="flex-grow" label="Fee Recipient" description="Which address should receive the fees?" isSwitchNeeded={false}>
+         <Input
+           onChange={(e) =>
+             setFee((prefState) => {
+               return {
+                 ...prefState,
+                 recipient: (e.target as HTMLInputElement).value,
+               };
+             })
+           }
+           defaultValue={fees.recipient}
+           placeholder="0x00"
+           autoComplete="off"
+           autoCorrect="off"
+           info={"Required"}
+           onBlur={verifyRecipient}
+           errors={recipientErrors}
+         />
+       </Fieldset>
+      </div> 
     </section>
   );
 }

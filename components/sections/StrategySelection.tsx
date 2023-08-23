@@ -48,7 +48,7 @@ function StrategySelection() {
   }, [adapter, asset, network]);
 
   return (
-    <section className="mb-4">
+    <section>
       <Selector
         selected={strategy}
         onSelect={(newStrategy) => setStrategy(newStrategy)}

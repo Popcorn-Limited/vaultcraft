@@ -122,7 +122,10 @@ function StrategyConfiguration() {
           );
         }) : <p className="text-white">Loading configuration...</p>
       ) : (
-        <p className="text-white">No configuration required</p>
+        <div className={`text-white border-[1px] border-[#353945] rounded-[4px] p-4 flex gap-3`}>
+          <img src="/images/icons/exclamationCircleIconWhite.svg" />
+          <span>No Strategy Available</span>
+        </div>
       )}
     </section>
   );
