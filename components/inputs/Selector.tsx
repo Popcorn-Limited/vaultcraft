@@ -28,12 +28,12 @@ function Selector({
     >
       {({ open }) => (
         <>
-          <Listbox.Button className="border border-[#353945] rounded-lg flex gap-2 w-full px-2" aria-disabled={disabled}>
-            <div className="h-12 flex flex-row items-center w-full gap-x-2">
+          <Listbox.Button className="border-2 border-[#353945] rounded-[4px] flex gap-2 w-full px-2" aria-disabled={disabled}>
+            <div className="h-14 flex flex-row items-center w-full gap-x-2">
               {selected?.logoURI && (
-                <div className="w-9 h-8">
+                <div className="w-9 h-7">
                   <img
-                    className="object-contain w-8 h-8 rounded-full"
+                    className="object-fill w-9 h-7 rounded-full"
                     alt="selected-asset"
                     src={selected?.logoURI}
                   />
@@ -79,7 +79,7 @@ export function Option({ value, children, selected, disabled, apy }: { value: an
       {({ active }) => {
         return (
           <button
-            className={`flex flex-row text-left h-14 p-2 rounded-lg ${disabled ? "hover:bg-red-600 cursor-not-allowed" : "hover:bg-[gray]"} 
+            className={`flex flex-row text-left h-14 p-3 rounded-[4px] ${disabled ? "hover:bg-red-600 cursor-not-allowed" : "hover:bg-[gray]"} 
             ${selected ? 'bg-[white]' : ''}`}
             disabled={disabled}
           >
@@ -87,7 +87,7 @@ export function Option({ value, children, selected, disabled, apy }: { value: an
               <img
                 alt=""
                 className="object-contain relative h-10 w-10 mr-4 rounded-full"
-                src={value.logoURI}
+                src={value.logoURI || "/images/icons/popLogo.svg"}
               /> :
               <div className="h-10 w-10 mr-4 rounded-full bg-black"></div>
             }

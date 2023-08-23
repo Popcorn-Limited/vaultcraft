@@ -61,7 +61,7 @@ async function getTokenMetadata(address: string, chainId: number): Promise<Asset
         name: "",
         symbol: "",
         decimals: 0,
-        logoURI: "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+        logoURI: "/images/icons/popLogo.svg",
         address: { [chainId]: address },
         chains: [chainId]
     }

@@ -1,6 +1,6 @@
 [
   {
-    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "logoURI": "/images/icons/popLogo.svg",
     "name": "AaveV2 Adapter",
     "key": "AaveV2Adapter",
     "protocol": "aaveV2",
@@ -9,7 +9,7 @@
     "resolver": "aaveV2"
   },
   {
-    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "logoURI": "/images/icons/popLogo.svg",
     "name": "AaveV3 Adapter",
     "key": "AaveV3Adapter",
     "protocol": "aaveV3",
@@ -18,7 +18,7 @@
     "resolver": "aaveV3"
   },
   {
-    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "logoURI": "/images/icons/popLogo.svg",
     "name": "Alpaca LendV1 Adapter",
     "key": "AlpacaLendV1Adapter",
     "protocol": "alpaca",
@@ -35,7 +35,7 @@
     "resolver": "default"
   },
   {
-    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "logoURI": "/images/icons/popLogo.svg",
     "name": "Alpaca LendV2 Adapter",
     "key": "AlpacaLendV2Adapter",
     "protocol": "alpaca",
@@ -52,7 +52,7 @@
     "resolver": "default"
   },
   {
-    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "logoURI": "/images/icons/popLogo.svg",
     "name": "Aura Adapter",
     "key": "AuraAdapter",
     "protocol": "aura",
@@ -69,7 +69,7 @@
     "resolver": "aura"
   },
   {
-    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "logoURI": "/images/icons/popLogo.svg",
     "name": "Balancer Gauge Adapter",
     "key": "BalancerGaugeAdapter",
     "protocol": "balancer",
@@ -86,7 +86,7 @@
     "resolver": "balancer"
   },
   {
-    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "logoURI": "/images/icons/popLogo.svg",
     "name": "Beefy Adapter",
     "key": "BeefyAdapter3",
     "protocol": "beefy",
@@ -108,7 +108,7 @@
     "resolver": "beefy"
   },
   {
-    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "logoURI": "/images/icons/popLogo.svg",
     "name": "CompoundV2 Adapter",
     "key": "CompoundAdapter",
     "protocol": "compoundV2",
@@ -125,7 +125,7 @@
     "resolver": "compoundV2"
   },
   {
-    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "logoURI": "/images/icons/popLogo.svg",
     "name": "CompoundV3 Adapter",
     "key": "CompoundV3Adapter",
     "protocol": "compoundV3",
@@ -142,7 +142,7 @@
     "resolver": "compoundV3"
   },
   {
-    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "logoURI": "/images/icons/popLogo.svg",
     "name": "Flux Finance Adapter",
     "key": "CompoundV2Adapter",
     "protocol": "flux",
@@ -159,7 +159,7 @@
     "resolver": "flux"
   },
   {
-    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "logoURI": "/images/icons/popLogo.svg",
     "name": "Convex Adapter",
     "key": "ConvexAdapter",
     "protocol": "convex",
@@ -176,7 +176,7 @@
     "resolver": "convex"
   },
   {
-    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "logoURI": "/images/icons/popLogo.svg",
     "name": "Curve Gauge Adapter",
     "key": "CurveGaugeAdapter",
     "protocol": "curve",
@@ -193,7 +193,7 @@
     "resolver": "curve"
   },
   {
-    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "logoURI": "/images/icons/popLogo.svg",
     "name": "Curve Child Gauge Adapter",
     "key": "CurveChildGaugeAdapter",
     "protocol": "curve",
@@ -210,7 +210,7 @@
     "resolver": "curve"
   },
   {
-    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "logoURI": "/images/icons/popLogo.svg",
     "name": "DotDot Gauge Adapter",
     "key": "DotDotGaugeAdapter",
     "protocol": "dotdot",
@@ -219,7 +219,7 @@
     "resolver": "default"
   },
   {
-    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "logoURI": "/images/icons/popLogo.svg",
     "name": "Ellipsis Gauge Adapter",
     "key": "EllipsisGaugeAdapter",
     "protocol": "ellipsis",
@@ -236,7 +236,7 @@
     "resolver": "default"
   },
   {
-    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "logoURI": "/images/icons/popLogo.svg",
     "name": "Gearbox Passive Adapter",
     "key": "GearboxPassiveAdapter",
     "protocol": "gearbox",
@@ -253,7 +253,7 @@
     "resolver": "default"
   },
   {
-    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "logoURI": "/images/icons/popLogo.svg",
     "name": "Idle Junior Adapter",
     "key": "IdleJuniorAdapter",
     "protocol": "idle",
@@ -270,7 +270,7 @@
     "resolver": "idle"
   },
   {
-    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "logoURI": "/images/icons/popLogo.svg",
     "name": "Idle Senior Adapter",
     "key": "IdleSeniorAdapter",
     "protocol": "idle",
@@ -287,7 +287,7 @@
     "resolver": "idle"
   },
   {
-    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "logoURI": "/images/icons/popLogo.svg",
     "name": "Origin Adapter",
     "key": "OriginAdapter",
     "protocol": "origin",
@@ -304,7 +304,7 @@
     "resolver": "origin"
   },
   {
-    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "logoURI": "/images/icons/popLogo.svg",
     "name": "Radiant Adapter",
     "key": "RadiantAdapter",
     "protocol": "radiant",
@@ -313,7 +313,7 @@
     "resolver": "default"
   },
   {
-    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "logoURI": "/images/icons/popLogo.svg",
     "name": "Solidly Adapter",
     "key": "SolidlyAdapter",
     "protocol": "solidly",
@@ -330,7 +330,7 @@
     "resolver": "default"
   },
   {
-    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "logoURI": "/images/icons/popLogo.svg",
     "name": "Stargate Adapter",
     "key": "StargateLpStakingAdapter",
     "protocol": "stargate",
@@ -347,7 +347,7 @@
     "resolver": "stargate"
   },
   {
-    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "logoURI": "/images/icons/popLogo.svg",
     "name": "MasterChefV1 Adapter",
     "key": "MasterChefV1Adapter",
     "protocol": "sushi",
@@ -370,7 +370,7 @@
     "resolver": "default"
   },
   {
-    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "logoURI": "/images/icons/popLogo.svg",
     "name": "MasterChefV2 Adapter",
     "key": "MasterChefV2Adapter",
     "protocol": "sushi",
@@ -393,7 +393,7 @@
     "resolver": "default"
   },
   {
-    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "logoURI": "/images/icons/popLogo.svg",
     "name": "Velodrome Adapter",
     "key": "VelodromeAdapter",
     "protocol": "velodrome",
@@ -410,7 +410,7 @@
     "resolver": "velodrome"
   },
   {
-    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "logoURI": "/images/icons/popLogo.svg",
     "name": "Yearn Adapter",
     "key": "YearnAdapter1",
     "protocol": "yearn",

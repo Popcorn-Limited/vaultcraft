@@ -34,20 +34,20 @@ function MetadataConfiguration() {
   }
 
   return (
-      <section className="flex flex-col">
-        <div>
-          <p className="text-sm text-white mb-2">Name</p>
-          <Input
-              onChange={(e) => handleNameChange((e.target as HTMLInputElement).value)}
-              defaultValue={metadata?.name}
-              placeholder="Type name's vault"
-              autoComplete="off"
-              autoCorrect="off"
-              onBlur={(e) => verifyName((e.target as HTMLInputElement).value)}
-              errors={error ? [error] : undefined}
-          />
-        </div>
-      </section>
+    <section className="flex flex-col">
+      <div>
+        <p className="text-sm text-white mb-2">Name</p>
+        <Input
+          onChange={(e) => handleNameChange((e.target as HTMLInputElement).value)}
+          defaultValue={metadata?.name}
+          placeholder="Type name's vault"
+          autoComplete="off"
+          autoCorrect="off"
+          onBlur={(e) => verifyName((e.target as HTMLInputElement).value)}
+          errors={error ? [error] : undefined}
+        />
+      </div>
+    </section>
   );
 }
 

@@ -9,17 +9,18 @@ import MetadataConfiguration from "@/components/sections/MetadataConfiguration";
 import AssetProtocolSelection from "@/components/sections/AssetProtocolSelection";
 import VaultCreationContainer from "@/components/VaultCreationContainer";
 import DepositLimitConfiguration from "@/components/sections/DepositLimitConfiguration";
+import AdapterConfiguration from "@/components/sections/AdapterConfiguration";
 
 
 export const basicsAtom = atom(get => ({
-  metadata: get(metadataAtom),
-  asset: get(assetAtom),
-  protocol: get(protocolAtom),
-  adapter: get(adapterAtom),
-  strategy: get(strategyAtom),
+    metadata: get(metadataAtom),
+    asset: get(assetAtom),
+    protocol: get(protocolAtom),
+    adapter: get(adapterAtom),
+    strategy: get(strategyAtom),
 }))
 
-export function isBasicsValid (basics: any): boolean {
+export function isBasicsValid(basics: any): boolean {
     if (basics.metadata.name.length < 3) return false;
     if (basics.asset.symbol === "none") return false;
     if (basics.protocol.key === "none") return false;
@@ -36,10 +37,11 @@ export default function Basics() {
             <h1 className="text-[white] text-2xl mb-2">Set up a new vault</h1>
 
             <div className={`flex flex-col gap-6`}>
-              <MetadataConfiguration />
-              <AssetProtocolSelection />
-              <AdapterSelection isDisabled={basics.asset.symbol === 'none' || basics.protocol.key === 'none'} />
-              <DepositLimitConfiguration />
+                <MetadataConfiguration />
+                <AssetProtocolSelection />
+                <AdapterSelection isDisabled={basics.asset.symbol === 'none' || basics.protocol.key === 'none'} />
+                {/* <AdapterConfiguration /> */}
+                <DepositLimitConfiguration />
             </div>
 
             <div className="flex justify-end mt-8 gap-3">

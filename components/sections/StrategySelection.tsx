@@ -21,7 +21,7 @@ export async function getStrategyOptions(strategies: Strategy[], asset: string, 
   return options.length > 0 ? options : [STRATEGY_NON_AVAILABLE];
 }
 
-function StrategySelection() {
+function StrategySelection({ isDisabled }: { isDisabled?: boolean }) {
   const [network] = useAtom(networkAtom);
   const [asset] = useAtom(assetAtom);
   const [adapter] = useAtom(adapterAtom);
@@ -49,10 +49,22 @@ function StrategySelection() {
 
   return (
     <section>
-      <div className={`text-white border-[1px] border-[#353945] rounded-[4px] p-4 flex gap-3`}>
-        <img src="/images/icons/exclamationCircleIconWhite.svg" />
-        <span>{strategy.name}</span>
-      </div>
+      <Selector
+        selected={strategy}
+        onSelect={(newStrategy) => setStrategy(newStrategy)}
+        title="Select Strategy"
+        description="Select a strategy to apply on your vault."
+        disabled={isDisabled ? isDisabled : strategy.key === "none"}
+      >
+        {options.map((strategyIter) => (
+          <Option
+            value={strategyIter}
+            selected={strategyIter.name === strategy.name}
+            key={`strategy-selc-${strategyIter.key}-${strategyIter.name}`}
+          >
+          </Option>
+        ))}
+      </Selector>
     </section>
   );
 }
