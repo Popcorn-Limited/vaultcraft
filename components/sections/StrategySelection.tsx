@@ -12,7 +12,7 @@ const STRATEGY_NON_AVAILABLE: Strategy = {
   compatibleAdapters: [],
 }
 
-async function getStrategyOptions(strategies: Strategy[], asset: string, adapter: string, chainId: number): Promise<Strategy[]> {
+export async function getStrategyOptions(strategies: Strategy[], asset: string, adapter: string, chainId: number): Promise<Strategy[]> {
   // First filter by network, than by required asset if given, than by adapter
   const options = strategies.filter(strategy => strategy.requiredNetworks && strategy.requiredNetworks.length > 0 && strategy.requiredNetworks.includes(chainId))
     .filter((strategy) => (strategy.requiredAssets && strategy.requiredAssets.length > 0) ? strategy.requiredAssets.map(a => a.toLowerCase()).includes(asset) : true)
@@ -49,21 +49,10 @@ function StrategySelection() {
 
   return (
     <section>
-      <Selector
-        selected={strategy}
-        onSelect={(newStrategy) => setStrategy(newStrategy)}
-        title="Select Strategy"
-        description="Select a strategy to apply on your vault."
-      >
-        {options.map((strategyIter) => (
-          <Option
-            value={strategyIter}
-            selected={strategyIter.name === strategy.name}
-            key={`strategy-selc-${strategyIter.key}-${strategyIter.name}`}
-          >
-          </Option>
-        ))}
-      </Selector>
+      <div className={`text-white border-[1px] border-[#353945] rounded-[4px] p-4 flex gap-3`}>
+        <img src="/images/icons/exclamationCircleIconWhite.svg" />
+        <span>{strategy.name}</span>
+      </div>
     </section>
   );
 }

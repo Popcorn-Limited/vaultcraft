@@ -7,6 +7,7 @@ import MainActionButton from "@/components/buttons/MainActionButton";
 import SecondaryActionButton from "@/components/buttons/SecondaryActionButton";
 import VaultCreationContainer from "@/components/VaultCreationContainer";
 import StrategyConfiguration from "@/components/sections/StrategyConfiguration";
+import StrategySelection from "@/components/sections/StrategySelection";
 
 export function isConfigValid(adapter: any, adapterConfig: string[]): boolean {
   if (adapter.initParams && adapter.initParams.length > 0) {
@@ -20,6 +21,7 @@ export default function Strategy() {
   const [adapter] = useAtom(adapterAtom);
   const [adapterConfig] = useAtom(adapterConfigAtom)
 
+
   return (
     <VaultCreationContainer activeStage={1} stages={PRO_CREATION_STAGES} >
       <div className={`mb-6`}>
@@ -27,6 +29,7 @@ export default function Strategy() {
         <p className="text-white">Configure your Strategy</p>
       </div>
 
+      <StrategySelection />
       <StrategyConfiguration />
 
       <div className="flex justify-end gap-3 mt-6">
