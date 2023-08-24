@@ -44,7 +44,7 @@ function Selector({
             </div>
           </Listbox.Button>
           {open && (
-            <Listbox.Options className="z-[1] absolute flex flex-col min-w-[12rem] rounded-[20px] top-0 left-0 p-2 bg-black md:max-h-[80vh] w-full h-full overflow-auto">
+            <Listbox.Options className="z-[1] absolute flex flex-col min-w-[12rem] rounded-[20px] top-0 left-0 p-2 bg-black md:max-h-[100vh] w-full h-full overflow-auto">
               <div className="w-full h-full bg-black flex flex-col items-start gap-y-1 px-8 py-9">
                 <div className="flex flex-row items-center mb-9 justify-between w-full">
                   <Listbox.Option value={selected} as={Fragment}>
@@ -79,7 +79,7 @@ export function Option({ value, children, selected, disabled, apy }: { value: an
       {({ active }) => {
         return (
           <button
-            className={`flex flex-row text-left h-14 p-3 rounded-[4px] ${disabled ? "hover:bg-red-600 cursor-not-allowed" : "hover:bg-[gray]"} 
+            className={`flex flex-row items-center text-left h-14 p-3 rounded-[4px] ${disabled ? "hover:bg-red-600 cursor-not-allowed" : "hover:bg-[gray]"} 
             ${selected ? 'bg-[white]' : ''}`}
             disabled={disabled}
           >
@@ -98,6 +98,7 @@ export function Option({ value, children, selected, disabled, apy }: { value: an
                 {disabled && <p className={`ml-1 ${selected ? "text-[black]" : "text-[#ffffff99]"}`}>- Asset not supported</p>}
               </span>
             </div>
+            {children}
             {apy !== undefined && <p className={`ml-auto self-center ${selected ? "text-[black]" : "text-[white]"}`}>~{apy === Infinity ? "?" : apy.toFixed(2)}%</p>}
           </button>
         );

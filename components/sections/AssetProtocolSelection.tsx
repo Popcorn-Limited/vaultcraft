@@ -25,6 +25,7 @@ import Input from "../inputs/Input";
 import { utils } from "ethers";
 import { RPC_URLS } from "@/lib/connectors";
 import { resolveAdapterApy } from "@/lib/resolver/adapterApy/adapterApy";
+import TooltipIcon from "../tooltipIcon";
 
 interface ProtocolOption extends Protocol {
     disabled: boolean;
@@ -91,7 +92,11 @@ async function getTokenMetadata(address: string, chainId: number): Promise<Asset
     return metadata
 }
 
-function AssetProtocolSelection() {
+function AssetProtocolSelection({
+    isWithTooltips,
+}: {
+    isWithTooltips?: boolean
+}) {
     const [network] = useAtom(networkAtom);
     const chainId = network.id === localhost.id ? mainnet.id : network.id;
     const adapters = useAdapters();
@@ -242,6 +247,11 @@ function AssetProtocolSelection() {
                   disabled={protocolIter.disabled}
                   apy={protocolIter?.apy}
                 >
+                    {
+                        isWithTooltips && (
+                            <TooltipIcon className={`my-auto px-2`} message={'123'} />
+                        )
+                    }
                 </Option>
               )) : <p className="text-white">Loading, please wait...</p>}
           </Selector>
