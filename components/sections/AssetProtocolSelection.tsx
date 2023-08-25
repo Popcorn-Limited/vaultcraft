@@ -29,6 +29,7 @@ import TooltipIcon from "../tooltipIcon";
 
 interface ProtocolOption extends Protocol {
     disabled: boolean;
+    description?: string;
     apy?: number;
 }
 
@@ -249,7 +250,7 @@ function AssetProtocolSelection({
                 >
                     {
                         isWithTooltips && (
-                            <TooltipIcon className={`my-auto px-2`} message={'123'} />
+                            <TooltipIcon className={`my-auto px-2`} message={protocolIter.description} title={protocolIter.name} />
                         )
                     }
                 </Option>
