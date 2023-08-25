@@ -29,8 +29,13 @@ import TooltipIcon from "../tooltipIcon";
 
 interface ProtocolOption extends Protocol {
     disabled: boolean;
-    description?: string;
     apy?: number;
+}
+
+const protocolDescriptions = {
+    "yearn": "The Yearn protocol is a decentralized finance (DeFi) protocol that aims to optimize yield generation for cryptocurrency holders. In a vault creation, integrating the Yearn protocol allows users to deposit their assets into a Yearn vault, which automatically allocates and manages those assets across various yield-generating strategies in the DeFi ecosystem. The Yearn protocol actively seeks out the highest yield opportunities and optimizes asset allocation to maximize returns. By choosing the Yearn protocol in a vault creation, users can benefit from automated and optimized yield farming strategies, potentially earning higher yields compared to managing their assets individually.",
+} as {
+    [key: string]: string
 }
 
 async function addProtocolAssets(adapters: Adapter[], chainId: number): Promise<{ [key: string]: string[] }> {
@@ -250,7 +255,7 @@ function AssetProtocolSelection({
                 >
                     {
                         isWithTooltips && (
-                            <TooltipIcon className={`my-auto px-2`} message={protocolIter.description} title={protocolIter.name} />
+                            <TooltipIcon className={`my-auto px-2`} message={protocolDescriptions[protocolIter.key]} title={protocolIter.name} />
                         )
                     }
                 </Option>
