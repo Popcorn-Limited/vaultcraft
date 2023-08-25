@@ -18,6 +18,7 @@ import {
   strategyAtom,
   strategyConfigAtom,
   strategyDeploymentAtom,
+  conditionsAtom,
   DEFAULT_STRATEGY
 } from "@/lib/atoms";
 import ReviewSection from "./ReviewSection";
@@ -34,6 +35,7 @@ export default function Review(): JSX.Element {
   const { address: account } = useAccount();
   const [network] = useAtom(networkAtom);
   const chainId = network.id === localhost.id ? mainnet.id : network.id;
+  const [conditions, setConditions] = useAtom(conditionsAtom);
 
   const [asset] = useAtom(assetAtom);
   const [protocol] = useAtom(protocolAtom);
@@ -110,6 +112,19 @@ export default function Review(): JSX.Element {
           value={`${formatUnits(limit.maximum.toString())} ${asset.symbol}`}
         />
       </ReviewSection>
+      <div className={`flex items-center gap-3 mt-6`}>
+        <Switch
+          checked={conditions}
+          onChange={setConditions}
+          className={`
+            ${conditions ? 'bg-[#45B26B]' : 'border-[2px] border-[#353945]'}
+            w-6 h-6 rounded-[4px]
+          `}
+        >
+          <img className={`${conditions ? '' : 'hidden'}`} src="/images/icons/checkIcon.svg" />
+        </Switch>
+        <span className={`text-white text-[14px]`}>I have read and agree to the <a href="https://google.com/" className={`text-[#87C1F8]`}>Terms & Conditions</a></span>
+      </div>
     </section >
   );
 }

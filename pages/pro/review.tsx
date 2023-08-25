@@ -8,7 +8,7 @@ import Image from "next/image";
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
 import { noOp } from "@/lib/helpers";
 import { useDeployVault } from "@/lib/vaults";
-import { metadataAtom, adapterAtom, strategyDeploymentAtom } from "@/lib/atoms";
+import { metadataAtom, adapterAtom, strategyDeploymentAtom, conditionsAtom } from "@/lib/atoms";
 import { IpfsClient } from "@/lib/ipfsClient";
 import Review from "@/components/review/Review";
 import MainActionButton from "@/components/buttons/MainActionButton";
@@ -27,6 +27,7 @@ export default function ReviewPage(): JSX.Element {
   const [strategyData] = useAtom(strategyDeploymentAtom);
   const [metadata, setMetadata] = useAtom(metadataAtom);
   const [showModal, setShowModal] = useState(false);
+  const [conditions] = useAtom(conditionsAtom);
 
   const { write: deployVault = noOp, isLoading, isSuccess, isError } = useDeployVault();
 
@@ -65,6 +66,7 @@ export default function ReviewPage(): JSX.Element {
           label={account ? "Deploy Vault" : "Connect Wallet"}
           handleClick={account ? handleSubmit : openConnectModal}
           className={`max-w-[200px]`}
+          disabled={account && !conditions}
         />
       </div>
 
