@@ -17,7 +17,9 @@ import {
   metadataAtom,
   strategyAtom,
   strategyConfigAtom,
-  strategyDeploymentAtom
+  strategyDeploymentAtom,
+  conditionsAtom,
+  DEFAULT_STRATEGY
 } from "@/lib/atoms";
 import ReviewSection from "./ReviewSection";
 import ReviewParam from "./ReviewParam";
@@ -25,10 +27,15 @@ import { resolveStrategyEncoding } from "@/lib/resolver/strategyEncoding/strateg
 
 import { balancerApiProxyCall } from "@/lib/external/balancer/router/call";
 
+function shortenAddress(address: string): string {
+  return `${address.slice(0, 6)}...${address.slice(-4)}`;
+}
+
 export default function Review(): JSX.Element {
   const { address: account } = useAccount();
   const [network] = useAtom(networkAtom);
   const chainId = network.id === localhost.id ? mainnet.id : network.id;
+  const [conditions, setConditions] = useAtom(conditionsAtom);
 
   const [asset] = useAtom(assetAtom);
   const [protocol] = useAtom(protocolAtom);
@@ -44,7 +51,7 @@ export default function Review(): JSX.Element {
   const [strategyConfig] = useAtom(strategyConfigAtom);
   const [strategyData, setStrategyData] = useAtom(strategyDeploymentAtom);
 
-  const [devMode, setDevMode] = useState(false);
+  // const [devMode, setDevMode] = useState(false);
 
   useEffect(() => {
     setAdapterData({
@@ -80,86 +87,44 @@ export default function Review(): JSX.Element {
 
   return (
     <section>
-      <span className="flex flex-row items-center justify-end">
-        <p className="text-gray-500 mr-4">Dev Mode</p>
-        <Switch
-          checked={devMode}
-          onChange={setDevMode}
-          className={`${devMode ? 'bg-[#45B26B]' : 'bg-[#353945]'} 
-          relative inline-flex items-center h-5 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none`}
-        >
-          <span
-            aria-hidden="true"
-            className={`${devMode ? 'translate-x-6 bg-white' : 'translate-x-1 bg-[#777E90]'} first-letter:pointer-events-none inline-block h-3 w-3 transform rounded-full shadow ring-0 transition duration-200 ease-in-out`}
-          />
-        </Switch>
-      </span>
       <ReviewSection title="Basics">
-        <ReviewParam title="Name" value={metadata?.name} />
-        <ReviewParam title="Categories" value={String(metadata?.tags)} />
+        <ReviewParam title="Vault Name" value={metadata?.name} />
         <ReviewParam title="Asset" value={asset.name} img={asset.logoURI} />
-        {devMode && <ReviewParam title="Asset Address" value={asset.address[chainId] || constants.AddressZero} />}
         <ReviewParam title="Protocol" value={protocol.name} img={protocol.logoURI} />
         <ReviewParam title="Adapter" value={adapter.name} img={adapter.logoURI} />
-        {/* TODO - At some point we should figure out if an adapter with the right config already exists and simply reuse it */}
-        {devMode && <ReviewParam title="Adapter Address" value={constants.AddressZero} />}
-        <ReviewParam title="Strategy" value={strategy.name} img={strategy.logoURI} />
-      </ReviewSection>
-      <ReviewSection title="Adapter">
-        {adapter.initParams?.map((param, i) => <ReviewParam key={param.name} title={param.name} value={adapterConfig[i]} />)}
-        {devMode && <ReviewParam title="Adapter Id" value={adapterData.id} />}
-        {devMode && <ReviewParam title="Adapter Data" value={adapterData.data} />}
-      </ReviewSection>
-      <ReviewSection title="Strategy">
-        <ReviewParam title="Strategy" value={strategy.key} />
-        {strategy.initParams?.map((param, i) => <ReviewParam key={param.name} title={param.name} value={strategyConfig[i]} />)}
-        {devMode && <ReviewParam title="Strategy Id" value={strategyData.id} />}
-        {devMode && <ReviewParam title="Strategy Data" value={strategyData.data} />}
-      </ReviewSection>
-      <ReviewSection title="Deposit Limit">
-        <ReviewParam title="Deposit Limit" value={`${formatUnits(Number(limit) > 0 ? limit : constants.MaxUint256)} ${asset.symbol}`} />
-        {devMode && <ReviewParam title="Deposit Limit Uint" value={String(Number(constants.MaxUint256))} />}
+        <ReviewParam title="Strategy" value={strategy.name === DEFAULT_STRATEGY.name ? '-' : strategy.name} img={strategy.logoURI} />
       </ReviewSection>
       <ReviewSection title="Fees">
         <ReviewParam title="Deposit Fee" value={`${formatUnits(fees.deposit)}%`} />
-        {devMode && <ReviewParam title="Deposit Fee Uint" value={String(Number(fees.deposit))} />}
         <ReviewParam title="Withdrawal Fee" value={`${formatUnits(fees.withdrawal)}%`} />
-        {devMode && <ReviewParam title="Withdrawal Fee Uint" value={String(Number(fees.withdrawal))} />}
+        <ReviewParam title="Withdrawal Fee For Specifit Asset" value={`${formatUnits(fees.withdrawalFeeForSpecificAsset)}%`} />
         <ReviewParam title="Management Fee" value={`${formatUnits(fees.management)}%`} />
-        {devMode && <ReviewParam title="Management Fee Uint" value={String(Number(fees.management))} />}
         <ReviewParam title="Performance Fee" value={`${formatUnits(fees.performance)}%`} />
-        {devMode && <ReviewParam title="Performance Fee Uint" value={String(Number(fees.performance))} />}
-        <ReviewParam title="Fee Recipient" value={fees.recipient} />
+        <ReviewParam title="Fee Recipient" value={shortenAddress(fees.recipient)} fullValue={fees.recipient} />
       </ReviewSection>
-      {
-        devMode &&
-        <>
-          <ReviewSection title="Staking">
-            <ReviewParam title="Deploy Staking" value={"false"} />
-            <ReviewParam title="RewardsData" value={"0x"} />
-          </ReviewSection>
-          <ReviewSection title="Data">
-            <ReviewParam title="Vault" value={constants.AddressZero} />
-            <ReviewParam title="Adapter" value={constants.AddressZero} />
-            <ReviewParam title="Creator" value={account || constants.AddressZero} />
-            <ReviewParam title="MetadataCID" value={""} />
-            <ReviewParam title="SwapAddress" value={constants.AddressZero} />
-            <ReviewParam title="Exchange" value={"0"} />
-            <p className="text-white">SwapTokenAddresses:</p>
-            <ReviewParam title="0" value={constants.AddressZero} />
-            <ReviewParam title="0" value={constants.AddressZero} />
-
-            <ReviewParam title="1" value={constants.AddressZero} />
-            <ReviewParam title="2" value={constants.AddressZero} />
-            <ReviewParam title="3" value={constants.AddressZero} />
-            <ReviewParam title="4" value={constants.AddressZero} />
-            <ReviewParam title="5" value={constants.AddressZero} />
-            <ReviewParam title="6" value={constants.AddressZero} />
-            <ReviewParam title="7" value={constants.AddressZero} />
-            <ReviewParam title="Initial Deposit" value={String(Number(constants.Zero))} />
-          </ReviewSection>
-        </>
-      }
+      <ReviewSection title="Deposits Limit">
+        <ReviewParam
+          title="Minimum deposit amount"
+          value={`${formatUnits(limit.minimum.toString())} ${asset.symbol}`}
+        />
+        <ReviewParam
+          title="Maximum deposit amount"
+          value={`${formatUnits(limit.maximum.toString())} ${asset.symbol}`}
+        />
+      </ReviewSection>
+      <div className={`flex items-center gap-3 mt-6`}>
+        <Switch
+          checked={conditions}
+          onChange={setConditions}
+          className={`
+            ${conditions ? 'bg-[#45B26B]' : 'border-[2px] border-[#353945]'}
+            w-6 h-6 rounded-[4px]
+          `}
+        >
+          <img className={`${conditions ? '' : 'hidden'}`} src="/images/icons/checkIcon.svg" />
+        </Switch>
+        <span className={`text-white text-[14px]`}>I have read and agree to the <a href="https://google.com/" className={`text-[#87C1F8]`}>Terms & Conditions</a></span>
+      </div>
     </section >
   );
 }

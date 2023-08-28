@@ -65,7 +65,12 @@ function AdapterConfiguration() {
         adapter.initParams.map((initParam, i) => {
           return (
             <div key={`fee-element-${initParam.name}`} className="flex gap-4">
-              <Fieldset className="flex-grow" label={initParam.name} description={initParam.description || ""}>
+              <Fieldset
+                className="flex-grow"
+                label={initParam.name}
+                description={initParam.description || ""}
+                isSwitchNeeded={false}
+              >
                 <Input
                   onChange={(e) =>
                     handleChange(
@@ -86,14 +91,13 @@ function AdapterConfiguration() {
                   info={initParam.requirements ? String(initParam.requirements) : undefined}
                   onBlur={(e) => verifyInitParam((e.target as HTMLInputElement).value, initParam, i)}
                   errors={errors[i]?.lenght > 0 ? errors[i] : undefined}
-                  disabled={adapterConfig[i] === "Loading configuration..."}
                 />
               </Fieldset>
             </div>
           );
         })
       ) : (
-        <p className="text-white">No configuration required</p>
+        <p className="text-white">No Protocol Configuration required</p>
       )}
     </section>
   );

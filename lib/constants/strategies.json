@@ -12,7 +12,7 @@
       "0xfA0F307783AC21C39E939ACFF795e27b650F6e68",
       "0xE8F55368C82D38bbbbDb5533e7F56AfC2E978CC2"
     ],
-    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "logoURI": "/images/icons/popLogo.svg",
     "requiredNetworks": [1],
     "initParams": [
       {
@@ -49,7 +49,7 @@
     "resolver": "curveCompounder",
     "description": "description",
     "compatibleAdapters": ["CurveGaugeAdapter", "ConvexAdapter"],
-    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "logoURI": "/images/icons/popLogo.svg",
     "requiredNetworks": [1],
     "initParams": [
       {
@@ -80,7 +80,7 @@
     "resolver": "balancerLpCompounder",
     "description": "description",
     "compatibleAdapters": ["BalancerGaugeAdapter", "AuraAdapter"],
-    "logoURI": "https://forum.popcorn.network/uploads/default/optimized/1X/4ad0b80c41129e6d8b04d49799bbbfcc6c8e9a91_2_32x32.png",
+    "logoURI": "/images/icons/popLogo.svg",
     "requiredNetworks": [1],
     "initParams": [
       {

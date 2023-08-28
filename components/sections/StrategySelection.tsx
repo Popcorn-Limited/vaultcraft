@@ -12,7 +12,7 @@ const STRATEGY_NON_AVAILABLE: Strategy = {
   compatibleAdapters: [],
 }
 
-async function getStrategyOptions(strategies: Strategy[], asset: string, adapter: string, chainId: number): Promise<Strategy[]> {
+export async function getStrategyOptions(strategies: Strategy[], asset: string, adapter: string, chainId: number): Promise<Strategy[]> {
   // First filter by network, than by required asset if given, than by adapter
   const options = strategies.filter(strategy => strategy.requiredNetworks && strategy.requiredNetworks.length > 0 && strategy.requiredNetworks.includes(chainId))
     .filter((strategy) => (strategy.requiredAssets && strategy.requiredAssets.length > 0) ? strategy.requiredAssets.map(a => a.toLowerCase()).includes(asset) : true)
@@ -21,7 +21,7 @@ async function getStrategyOptions(strategies: Strategy[], asset: string, adapter
   return options.length > 0 ? options : [STRATEGY_NON_AVAILABLE];
 }
 
-function StrategySelection() {
+function StrategySelection({ isDisabled }: { isDisabled?: boolean }) {
   const [network] = useAtom(networkAtom);
   const [asset] = useAtom(assetAtom);
   const [adapter] = useAtom(adapterAtom);
@@ -48,12 +48,13 @@ function StrategySelection() {
   }, [adapter, asset, network]);
 
   return (
-    <section className="mb-4">
+    <section>
       <Selector
         selected={strategy}
         onSelect={(newStrategy) => setStrategy(newStrategy)}
         title="Select Strategy"
         description="Select a strategy to apply on your vault."
+        disabled={isDisabled ? isDisabled : strategy.key === "none"}
       >
         {options.map((strategyIter) => (
           <Option

@@ -91,7 +91,7 @@ function StrategyConfiguration() {
                       spellCheck="false"
                       info={initParam.requirements ? String(initParam.requirements) : undefined}
                       onBlur={(e) => verifyInitParam((e.target as HTMLInputElement).value, initParam, i)}
-                      errors={errors[i]?.lenght > 0  ? errors[i] : undefined}
+                      errors={errors[i]?.lenght > 0 ? errors[i] : undefined}
                     />
                   )
                     :
@@ -122,7 +122,7 @@ function StrategyConfiguration() {
           );
         }) : <p className="text-white">Loading configuration...</p>
       ) : (
-        <p className="text-white">No configuration required</p>
+        <></>
       )}
     </section>
   );

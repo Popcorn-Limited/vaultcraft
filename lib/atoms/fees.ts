@@ -5,6 +5,7 @@ import { atomWithStorage } from "jotai/utils";
 export type VaultFees = {
   deposit: BigNumber;
   withdrawal: BigNumber;
+  withdrawalFeeForSpecificAsset: BigNumber;
   performance: BigNumber;
   management: BigNumber;
   recipient: string;
@@ -13,6 +14,7 @@ export type VaultFees = {
 const DEFAULT_FEES = {
   deposit: BigNumber.from(0),
   withdrawal: BigNumber.from(0),
+  withdrawalFeeForSpecificAsset: BigNumber.from(0),
   performance: BigNumber.from(0),
   management: BigNumber.from(0),
   recipient: "",

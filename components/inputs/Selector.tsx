@@ -9,6 +9,7 @@ function Selector({
   description,
   children,
   optionalChildren,
+  disabled,
 }: {
   selected?: any;
   onSelect: (value: any) => void;
@@ -16,6 +17,7 @@ function Selector({
   description: string;
   children: any;
   optionalChildren?: any;
+  disabled?: boolean;
 }) {
   return (
     <Listbox
@@ -26,23 +28,23 @@ function Selector({
     >
       {({ open }) => (
         <>
-          <Listbox.Button className="border border-[#353945] rounded-lg flex gap-2 w-full px-2">
-            <div className="h-12 flex flex-row items-center w-full gap-x-2">
+          <Listbox.Button className="border-2 border-[#353945] rounded-[4px] flex gap-2 w-full px-2" aria-disabled={disabled}>
+            <div className="h-14 flex flex-row items-center w-full gap-x-2">
               {selected?.logoURI && (
-                <div className="w-9 h-8">
+                <div className="w-9 h-7">
                   <img
-                    className="object-contain w-8 h-8 rounded-full"
+                    className="object-fill w-9 h-7 rounded-full"
                     alt="selected-asset"
                     src={selected?.logoURI}
                   />
                 </div>
               )}
-              <span className="text-[white] w-full flex self-center flex-row justify-start">{selected?.name}</span>
-              <span className="self-center text-[white] mr-2">{`>`}</span>
+              <span className={`w-full flex self-center flex-row justify-start ${!disabled ? 'text-[white]' : 'text-[#353945]'}`}>{selected?.name}</span>
+              <span className={`self-center text-[white] mr-2 ${disabled && 'hidden'}`}>{`>`}</span>
             </div>
           </Listbox.Button>
           {open && (
-            <Listbox.Options className="z-[1] absolute flex flex-col min-w-[12rem] rounded-[20px] top-0 left-0 p-2 bg-black md:max-h-[80vh] w-full h-full overflow-auto">
+            <Listbox.Options className="z-[1] absolute flex flex-col min-w-[12rem] rounded-[20px] top-0 left-0 p-2 bg-black w-full h-full overflow-hidden" >
               <div className="w-full h-full bg-black flex flex-col items-start gap-y-1 px-8 py-9">
                 <div className="flex flex-row items-center mb-9 justify-between w-full">
                   <Listbox.Option value={selected} as={Fragment}>
@@ -77,7 +79,7 @@ export function Option({ value, children, selected, disabled, apy }: { value: an
       {({ active }) => {
         return (
           <button
-            className={`flex flex-row text-left h-14 p-2 rounded-lg ${disabled ? "hover:bg-red-600 cursor-not-allowed" : "hover:bg-[gray]"} 
+            className={`flex flex-row items-center text-left h-14 p-3 rounded-[4px] ${disabled ? "hover:bg-red-600 cursor-not-allowed" : "hover:bg-[gray]"} 
             ${selected ? 'bg-[white]' : ''}`}
             disabled={disabled}
           >
@@ -85,7 +87,7 @@ export function Option({ value, children, selected, disabled, apy }: { value: an
               <img
                 alt=""
                 className="object-contain relative h-10 w-10 mr-4 rounded-full"
-                src={value.logoURI}
+                src={value.logoURI || "/images/icons/popLogo.svg"}
               /> :
               <div className="h-10 w-10 mr-4 rounded-full bg-black"></div>
             }
@@ -96,6 +98,7 @@ export function Option({ value, children, selected, disabled, apy }: { value: an
                 {disabled && <p className={`ml-1 ${selected ? "text-[black]" : "text-[#ffffff99]"}`}>- Asset not supported</p>}
               </span>
             </div>
+            {children}
             {apy !== undefined && <p className={`ml-auto self-center ${selected ? "text-[black]" : "text-[white]"}`}>~{apy === Infinity ? "?" : apy.toFixed(2)}%</p>}
           </button>
         );
