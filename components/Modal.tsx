@@ -2,7 +2,7 @@ import { Fragment } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 
 export default function Modal({ show, setShowModal, children }: { show: boolean, setShowModal: any, children: any }) {
-  const closeModal = (e) => {
+  const closeModal = (e: any) => {
     setShowModal(false)
   }
 
