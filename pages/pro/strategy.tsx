@@ -8,6 +8,7 @@ import SecondaryActionButton from "@/components/buttons/SecondaryActionButton";
 import VaultCreationContainer from "@/components/VaultCreationContainer";
 import StrategyConfiguration from "@/components/sections/StrategyConfiguration";
 import StrategySelection from "@/components/sections/StrategySelection";
+import AdapterConfiguration from "@/components/sections/AdapterConfiguration";
 
 export function isConfigValid(adapter: any, adapterConfig: string[]): boolean {
   if (adapter.initParams && adapter.initParams.length > 0) {
@@ -26,7 +27,11 @@ export default function Strategy() {
     <VaultCreationContainer activeStage={1} stages={PRO_CREATION_STAGES} >
       <div className={`mb-6`}>
         <h1 className="text-white text-2xl mb-2">Strategy Configuration</h1>
-        <p className="text-white">Configure your Strategy</p>
+        <p className="text-white">Your Strategy will be auto configured. Change values only if they dont load or you dislike the default values.</p>
+      </div>
+
+      <div className="mb-4">
+        <AdapterConfiguration />
       </div>
 
       <StrategySelection />

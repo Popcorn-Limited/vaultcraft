@@ -44,7 +44,7 @@ function Selector({
             </div>
           </Listbox.Button>
           {open && (
-            <Listbox.Options className="z-[1] absolute flex flex-col min-w-[12rem] rounded-[20px] top-0 left-0 p-2 bg-black w-full h-full overflow-hidden">
+            <Listbox.Options className="z-[1] absolute flex flex-col min-w-[12rem] rounded-[20px] top-0 left-0 p-2 bg-black w-full h-full overflow-hidden" >
               <div className="w-full h-full bg-black flex flex-col items-start gap-y-1 px-8 py-9">
                 <div className="flex flex-row items-center mb-9 justify-between w-full">
                   <Listbox.Option value={selected} as={Fragment}>

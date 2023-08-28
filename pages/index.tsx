@@ -1,4 +1,3 @@
-import MainActionButton from "@/components/buttons/MainActionButton";
 import { useRouter } from "next/router";
 
 export default function Home() {
@@ -16,15 +15,15 @@ export default function Home() {
               duration-[0.1s] hover:border-[#DFFF1C] hover:bg-[#23262F] group
             `}
             type="button"
-            onClick={() => router.push('/pro/basics')}
+            onClick={() => router.push('/easy/basics')}
           >
             <div className={`flex justify-between`}>
-              <p className={`text-[24px] font-[500]`}>Pro mode</p>
+              <p className={`text-[24px] font-[500]`}>Easy mode</p>
               <img src="/images/icons/arrow-right-icon.svg" className={`w-6 h-6 group-hover:hidden`} />
               <img src="/images/icons/arrow-right-icon-green.svg" className={`w-6 h-6 hidden group-hover:block`} />
             </div>
             <p className={`text-left`}>
-              Users have complete control and customization over protocols, strategies, and settings for their vault.
+              Recommended for most user. Set up a vault in just a few clicks. We take care of the rest.
             </p>
           </button>
 
@@ -34,15 +33,15 @@ export default function Home() {
               duration-[0.1s] hover:border-[#DFFF1C] hover:bg-[#23262F] group
             `}
             type="button"
-            onClick={() => router.push('/easy/basics')}
+            onClick={() => router.push('/pro/basics')}
           >
             <div className={`flex justify-between`}>
-              <p className={`text-[24px] font-[500]`}>Easy mode</p>
+              <p className={`text-[24px] font-[500]`}>Dev mode</p>
               <img src="/images/icons/arrow-right-icon.svg" className={`w-6 h-6 group-hover:hidden`} />
               <img src="/images/icons/arrow-right-icon-green.svg" className={`w-6 h-6 hidden group-hover:block`} />
             </div>
             <p className={`text-left`}>
-              Users can quickly set up a vault with pre-defined options, requiring minimal configuration, focusing on ease of use.
+              Users see all pre-configured settings and have complete control to change anything. Only recommended for experienced users.
             </p>
           </button>
         </div>
