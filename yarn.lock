@@ -5584,10 +5584,10 @@ valtio@1.11.0:
     proxy-compare "2.5.1"
     use-sync-external-store "1.2.0"
 
-vaultcraft-sdk@^0.0.3:
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/vaultcraft-sdk/-/vaultcraft-sdk-0.0.3.tgz#7a484f4403701de5e33a160173652f4cf30ee452"
-  integrity sha512-JoXOZyUYXgcYCxIGgxf8VN3UrH2CyzyTl22yYxYHEgaXfLrU7vNoehpFrX93Cna6naiuWmwuGIvxUwrC2No+9w==
+vaultcraft-sdk@^0.0.11:
+  version "0.0.11"
+  resolved "https://registry.yarnpkg.com/vaultcraft-sdk/-/vaultcraft-sdk-0.0.11.tgz#a8c47522090d78de306fdddc65895826ffa80a46"
+  integrity sha512-5z/FpsOrfOJviEXAi9LjzoEnYmA8Dqe6wD8npuq+A0mJejCMUR8rT3GONK4F4OV6HuxpCfkSdjZu66DxR3zl6A==
   dependencies:
     "@curvefi/api" "^2.42.0"
     autoprefixer "^10.4.13"

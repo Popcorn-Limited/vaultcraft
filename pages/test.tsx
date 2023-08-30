@@ -1,6 +1,6 @@
 import { ChainId, RPC_URLS } from '@/lib/connectors'
-import YieldOptions from 'vaultcraft-sdk/src/yieldOptions'
 import { useState, useEffect } from "react";
+import { YieldOptions } from 'vaultcraft-sdk';
 
 export default function Test() {
   const [ready, setReady] = useState(false)
