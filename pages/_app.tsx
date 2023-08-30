@@ -28,6 +28,7 @@ const { chains, provider } = configureChains(SUPPORTED_NETWORKS, [
 );
 
 const { connectors } = getDefaultWallets({
+  projectId: "vaultcraft",
   appName: "vaultcraft",
   chains,
 });
