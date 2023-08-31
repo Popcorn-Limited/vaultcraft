@@ -38,7 +38,7 @@ export default function Basics() {
 
       <div className={`flex flex-col gap-6`}>
         <MetadataConfiguration />
-        <AssetProtocolSelection isWithTooltips={true} />
+        <AssetProtocolSelection isWithTooltips={false} />
         <AdapterSelection isDisabled={basics.asset.symbol === 'none' || basics.protocol.key === 'none'} />
         <StrategySelection isDisabled={basics.adapter.key === "none"} />
         <DepositLimitConfiguration />

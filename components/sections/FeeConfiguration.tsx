@@ -154,7 +154,7 @@ function FeeConfiguration() {
                             }
                           }
                         }
-                        type={input.type === INPUT_TYPES.PERCENTAGE ? "number" : "text"}
+                        type="text"
                         className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         autoComplete="off"
                         autoCorrect="off"
