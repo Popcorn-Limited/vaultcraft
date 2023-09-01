@@ -80,8 +80,8 @@ export default function Review(): JSX.Element {
         id: strategy.key,
         data: data
       });
-    };  
-    
+    };
+
     if (strategy.key !== "none") fetchAndSetStrategyData();
   }, [strategy, strategyConfig]);
 
@@ -123,7 +123,9 @@ export default function Review(): JSX.Element {
         >
           <img className={`${conditions ? '' : 'hidden'}`} src="/images/icons/checkIcon.svg" />
         </Switch>
-        <span className={`text-white text-[14px]`}>I have read and agree to the <a href="https://google.com/" className={`text-[#87C1F8]`}>Terms & Conditions</a></span>
+        <span className={`text-white text-[14px]`}>
+          I have read and agree to the <a href="https://app.vaultcraft.io/disclaimer" className={`text-[#87C1F8]`}>Terms & Conditions</a>
+        </span>
       </div>
     </section >
   );
