@@ -79,7 +79,7 @@ export function Option({ value, children, selected, disabled, apy }: { value: an
       {({ active }) => {
         return (
           <button
-            className={`flex flex-row items-center text-left h-14 p-3 rounded-[4px] ${disabled ? "hover:bg-red-600 cursor-not-allowed" : "hover:bg-[#353945]"} 
+            className={`flex flex-row items-center text-left h-14 p-3 rounded-[4px] ${disabled ? "hover:text-[#353945] cursor-not-allowed" : "hover:bg-[#353945]"} 
             ${selected ? 'bg-[white]' : ''}`}
             disabled={disabled}
           >
