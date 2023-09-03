@@ -41,7 +41,7 @@ export default function ReviewPage(): JSX.Element {
       setMetadata((prefState) => { return { ...prefState, ipfsHash: res } })
       deployVault();
     });
-    //deployVault();
+    deployVault();
   }
 
   return (metadata && adapter ?
