@@ -40,7 +40,7 @@ function MetadataConfiguration() {
         <Input
           onChange={(e) => handleNameChange((e.target as HTMLInputElement).value)}
           defaultValue={metadata?.name}
-          placeholder="Type name's vault"
+          placeholder="Type vault name"
           autoComplete="off"
           autoCorrect="off"
           onBlur={(e) => verifyName((e.target as HTMLInputElement).value)}
