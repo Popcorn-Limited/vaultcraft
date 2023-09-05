@@ -25,7 +25,6 @@ interface ProtocolOption extends Protocol {
 
 async function assetSupported(protocol: Protocol, chainId: number, asset: string, availableAssets: any): Promise<boolean> {
   if (!availableAssets[chainId] || Object.keys(availableAssets[chainId]).length === 0) {
-    console.log("if")
     const availableAssets = await resolveProtocolAssets({ chainId: chainId, resolver: protocol.key })
 
     return availableAssets.flat().map(a => a?.toLowerCase()).filter((availableAsset) => availableAsset === asset).length > 0
@@ -57,14 +56,13 @@ function ProtocolSelection() {
   const protocols = useProtocols();
   const [options, setOptions] = useState<ProtocolOption[]>([]);
 
-  const adapters = useAdapters();
-  const [, setAdapter] = useAtom(adapterAtom);
   const [, setAdapterConfig] = useAtom(adapterConfigAtom);
   const [availableAssets] = useAtom(assetAddressesAtom);
   const [asset] = useAtom(assetAtom);
 
   useEffect(() => {
     if (network && asset.symbol !== "none") {
+      setOptions([])
       getProtocolOptions(protocols, network.id, asset.address[network.id].toLowerCase(), availableAssets[network.id]).then(res => setOptions(res));
     }
   }, [network, asset]);
@@ -72,25 +70,25 @@ function ProtocolSelection() {
   function selectProtocol(newProtocol: any) {
     if (protocol !== newProtocol) {
       setAdapterConfig([])
-      setAdapter(DEFAULT_ADAPTER)
     }
     setProtocol(newProtocol)
   }
 
+  if (asset.symbol === "none") return <p className="text-white">Please select an asset first</p>
   return (
     <Selector
       selected={protocol}
       onSelect={(newProtocol) => selectProtocol(newProtocol)}
       title="Select Protocol"
-      description="Select a protocol you want to use to earn yield on your asset."
+      description="Select a protocol you want to use to earn yield on your asset. (You need to select an asset first)"
     >
-      {options.length > 0 ? options.map((protocolIter) => (
+      {options.length > 0 ? options.filter(option => !option.disabled).sort((a, b) => (b.apy || 0) - (a.apy || 0)).map((option) => (
         <Option
-          key={`protocol-selc-${protocolIter.name}`}
-          value={protocolIter}
-          selected={protocolIter?.name === protocol.name}
-          disabled={protocolIter.disabled}
-          apy={protocolIter?.apy}
+          key={`protocol-selc-${option.name}`}
+          value={option}
+          selected={option?.name === protocol.name}
+          disabled={option.disabled}
+          apy={option?.apy}
         >
         </Option>
       )) : <p className="text-white">Loading, please wait...</p>}

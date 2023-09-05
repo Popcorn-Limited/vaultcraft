@@ -4,6 +4,7 @@
     "key": "CurveStargateCompounder",
     "resolver": "curveStargateCompounder",
     "protocol": "stargate",
+    "adapter": "StargateLpStakingAdapter",
     "chains": [1],
     "description": "description",
     "logoURI": "/images/icons/popLogo.svg",
@@ -47,6 +48,7 @@
     "key": "CurveCompounder",
     "resolver": "curveCompounder",
     "protocol": "curve",
+    "adapter": "CurveGaugeAdapter",
     "chains": [1],
     "description": "description",
     "logoURI": "/images/icons/popLogo.svg",
@@ -80,10 +82,49 @@
     ]
   },
   {
+    "name": "Convex Compounder",
+    "key": "CurveCompounder",
+    "resolver": "convexCompounder",
+    "protocol": "convex",
+    "adapter": "ConvexAdapter",
+    "chains": [1],
+    "description": "description",
+    "logoURI": "/images/icons/popLogo.svg",
+    "initParams": [
+      {
+        "name": "Pid",
+        "type": "uint256",
+        "requirements": ["Required"],
+        "description": "Pid of the Convex Pool"
+      },
+      {
+        "name": "Reward Token",
+        "type": "address",
+        "requirements": ["Required"],
+        "description": "Addresses of reward tokens",
+        "multiple": true
+      },
+      {
+        "name": "Minimum Trade Amounts",
+        "type": "uint256",
+        "requirements": ["Required"],
+        "description": "The minimum amount of tokens to trade (in wei)",
+        "multiple": true
+      },
+      {
+        "name": "Base Asset",
+        "type": "address",
+        "requirements": ["Required"],
+        "description": "Middle asset to trade through"
+      }
+    ]
+  },
+  {
     "name": "Balancer Compounder",
     "key": "BalancerLpCompounder",
     "resolver": "balancerLpCompounder",
     "protocol": "balancer",
+    "adapter": "BalancerGaugeAdapter",
     "chains": [1],
     "description": "description",
     "logoURI": "/images/icons/popLogo.svg",
@@ -93,6 +134,51 @@
         "type": "address",
         "requirements": ["Required", "NotAddressZero"],
         "description": "Address of the Balancer Gauge to use"
+      },
+      {
+        "name": "Reward Token",
+        "type": "address",
+        "requirements": ["Required"],
+        "description": "Addresses of reward tokens",
+        "multiple": true
+      },
+      {
+        "name": "Minimum Trade Amounts",
+        "type": "uint256",
+        "requirements": ["Required"],
+        "description": "The minimum amount of tokens to trade (in wei)",
+        "multiple": true
+      },
+      {
+        "name": "Base Asset",
+        "type": "address",
+        "requirements": ["Required"],
+        "description": "Middle asset to trade through"
+      },
+      {
+        "name": "Optional Data",
+        "type": "bytes32",
+        "requirements": ["Required"],
+        "description": "Pool Id of the LpToken and Index of the DepositToken",
+        "multiple": true
+      }
+    ]
+  },
+  {
+    "name": "Aura Compounder",
+    "key": "BalancerLpCompounder",
+    "resolver": "auraLpCompounder",
+    "protocol": "aura",
+    "adapter": "AuraAdapter",
+    "chains": [1],
+    "description": "description",
+    "logoURI": "/images/icons/popLogo.svg",
+    "initParams": [
+      {
+        "name": "Pid",
+        "type": "uint256",
+        "requirements": ["Required"],
+        "description": "Pid of the Aura Pool"
       },
       {
         "name": "Reward Token",
