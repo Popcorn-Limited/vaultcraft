@@ -30,7 +30,6 @@ function StrategyConfiguration() {
         resolveStrategyDefaults({
           chainId: network.id,
           address: asset.address[network.id].toLowerCase(),
-          adapter: adapter.key,
           resolver: strategy.resolver
         }).then(res => setStrategyConfig(res))
 

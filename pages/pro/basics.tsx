@@ -6,10 +6,11 @@ import MainActionButton from "@/components/buttons/MainActionButton";
 import SecondaryActionButton from "@/components/buttons/SecondaryActionButton";
 import AdapterSelection from "@/components/sections/AdapterSelection";
 import MetadataConfiguration from "@/components/sections/MetadataConfiguration";
-import AssetProtocolSelection from "@/components/sections/AssetProtocolSelection";
 import VaultCreationContainer from "@/components/VaultCreationContainer";
 import DepositLimitConfiguration from "@/components/sections/DepositLimitConfiguration";
 import AdapterConfiguration from "@/components/sections/AdapterConfiguration";
+import AssetSelection from "@/components/sections/AssetSelection";
+import ProtocolSelection from "@/components/sections/ProtocolSelection";
 
 
 export const basicsAtom = atom(get => ({
@@ -38,7 +39,10 @@ export default function Basics() {
 
             <div className={`flex flex-col gap-6`}>
                 <MetadataConfiguration />
-                <AssetProtocolSelection />
+                <div className="flex flex-col md:flex-row gap-6 md:gap-4">
+                    <AssetSelection />
+                    <ProtocolSelection />
+                </div>
                 <AdapterSelection isDisabled={basics.asset.symbol === 'none' || basics.protocol.key === 'none'} />
                 {/* <AdapterConfiguration /> */}
                 <DepositLimitConfiguration />
