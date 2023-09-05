@@ -74,7 +74,10 @@ function ProtocolSelection() {
     setProtocol(newProtocol)
   }
 
-  if (asset.symbol === "none") return <p className="text-white">Please select an asset first</p>
+  if (asset.symbol === "none") return (
+    <div className="border-2 border-[#353945] rounded-[4px] flex gap-2 w-full px-2 h-15 flex-row items-center">
+      <p className="text-gray-600">Select an asset first</p>
+    </div>)
   return (
     <Selector
       selected={protocol}

@@ -56,7 +56,7 @@ export default function Basics() {
   useEffect(() => {
     if (strategy.key !== "none") {
       // Set config defaults
-      
+
       // @ts-ignore
       async function getStrategyDefaultsAndEncode() {
         let adapterId = ethers.utils.formatBytes32String("")
@@ -90,13 +90,11 @@ export default function Basics() {
             address: asset.address[network.id].toLowerCase(),
             resolver: strategy.resolver
           })
-          // TODO should adapters still be handled seperately until v2?
-          // If not does the data get added to config and init params first as an array
-          // How does that affect display on the review component?
+          console.log({ strategyDefaults, initParams: strategy.initParams })
           adapterInitParams = ethers.utils.defaultAbiCoder.encode(
             // @ts-ignore
-            strategy.initParams[0].map((param) => param.type),
-            strategyDefaults[0]
+            [strategy.initParams[0]],
+            [strategyDefaults[0]]
           )
 
           strategyInitParams = await resolveStrategyEncoding({
@@ -104,11 +102,18 @@ export default function Basics() {
             address: asset.address[network.id],
             params: strategyDefaults.slice(1),
             resolver: strategy.resolver
-          })   
+          })
         }
-
-        setStrategyConfig(strategyDefaults)
-
+        console.log({
+          adapter: {
+            id: adapterId,
+            data: adapterInitParams,
+          },
+          strategy: {
+            id: strategyId,
+            data: strategyInitParams
+          }
+        })
         setAdapterData({
           id: adapterId,
           data: adapterInitParams,

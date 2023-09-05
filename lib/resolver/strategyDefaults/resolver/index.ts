@@ -10,6 +10,7 @@ export * from "./compoundV3";
 export * from "./convex";
 export * from "./convexCompounder";
 export * from "./curve";
+export * from "./curveChild";
 export * from "./curveCompounder";
 export * from "./curveStargateCompounder";
 export * from "./default";

@@ -1,4 +1,5 @@
 import { constants } from "ethers";
+import { convex } from "./convex";
 
 const CRV = { 1: "0xD533a949740bb3306d119CC777fa900bA034cd52" }
 const CVX = { 1: "0x4e3FBD56CD56c3e72c1403e103b45Db9da5B9D2B" }
@@ -10,5 +11,7 @@ export async function convexCompounder({ chainId, address }: { chainId: number, 
   const minTradeAmounts = [constants.Zero.toString(), constants.Zero.toString()];
   const optionalData = ["0x"];
 
-  return [rewardTokens, minTradeAmounts, baseAsset, optionalData]
+  const [convexPoolId] = await convex({ chainId, address })
+
+  return [convexPoolId, rewardTokens, minTradeAmounts, baseAsset, optionalData]
 }

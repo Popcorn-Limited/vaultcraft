@@ -1,5 +1,6 @@
 import { RPC_PROVIDERS } from "@/lib/connectors";
-import { Contract, constants, utils } from "ethers";
+import { Contract, constants } from "ethers";
+import { aura } from "./aura";
 
 const BAL = { 1: "0xba100000625a3754423978a60c9317c58a424e3D" }
 const AURA = { 1: "0xC0c293ce456fF0ED870ADd98a0828Dd4d2903DBF" }
@@ -23,10 +24,12 @@ export async function auraCompounder({ chainId, address }: { chainId: number, ad
   const [tokens, ,] = await balancerVault.getPoolTokens(poolId)
 
   // @ts-ignore
-  const rewardTokens = [BAL[chainId],AURA[chainId]];
+  const rewardTokens = [BAL[chainId], AURA[chainId]];
   const baseAsset = tokens[0] // TODO - find a smarter algorithm to determine the base asset
-  const minTradeAmounts = [constants.Zero.toString(),constants.Zero.toString()];
+  const minTradeAmounts = [constants.Zero.toString(), constants.Zero.toString()];
   const optionalData = [poolId, 0];
 
-  return [rewardTokens, minTradeAmounts, baseAsset, optionalData]
+  const [auraPoolId] = await aura({ chainId, address })
+
+  return [auraPoolId, rewardTokens, minTradeAmounts, baseAsset, optionalData]
 }

@@ -1,5 +1,6 @@
 import { RPC_PROVIDERS } from "@/lib/connectors";
 import { Contract, constants, utils } from "ethers";
+import { balancer } from "./balancer";
 
 const BAL = { 1: "0xba100000625a3754423978a60c9317c58a424e3D" }
 const AURA = { 1: "0xC0c293ce456fF0ED870ADd98a0828Dd4d2903DBF" }
@@ -28,5 +29,7 @@ export async function balancerLpCompounder({ chainId, address }: { chainId: numb
   const minTradeAmounts = [constants.Zero.toString()];
   const optionalData = [poolId, 0];
 
-  return [rewardTokens, minTradeAmounts, baseAsset, optionalData]
+  const [gaugeAddress] = await balancer({ chainId, address })
+
+  return [gaugeAddress, rewardTokens, minTradeAmounts, baseAsset, optionalData]
 }

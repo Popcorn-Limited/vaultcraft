@@ -39,7 +39,7 @@ function Selector({
                   />
                 </div>
               )}
-              <span className={`w-full flex self-center flex-row justify-start ${!disabled ? 'text-[white]' : 'text-[#353945]'}`}>{selected?.name}</span>
+              <span className={`w-full flex self-center flex-row justify-start ${!disabled ? 'text-[white]' : 'text-gray-600'}`}>{selected?.name}</span>
               <ChevronRightIcon className={`self-center text-white mr-2 h-5 cursor-pointer ${disabled ? 'hidden' : ""}`} />
             </div>
           </Listbox.Button>
