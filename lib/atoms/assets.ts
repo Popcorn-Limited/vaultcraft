@@ -8,6 +8,7 @@ export type Asset = {
   symbol: string;
   decimals: number;
   logoURI: string;
+  apy?: number;
 };
 
 type AssetAddresses = {

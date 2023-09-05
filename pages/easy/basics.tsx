@@ -1,15 +1,17 @@
 import { BASIC_CREATION_STAGES } from "@/lib/stages";
 import { useRouter } from "next/router";
 import { atom, useAtom } from "jotai";
-import { metadataAtom, assetAtom, protocolAtom, adapterAtom, strategyAtom } from "@/lib/atoms";
+import { metadataAtom, assetAtom, protocolAtom, adapterAtom, strategyAtom, Asset, assetAddressesAtom, availableAssetsAtom } from "@/lib/atoms";
 import MainActionButton from "@/components/buttons/MainActionButton";
 import SecondaryActionButton from "@/components/buttons/SecondaryActionButton";
 import AdapterSelection from "@/components/sections/AdapterSelection";
 import MetadataConfiguration from "@/components/sections/MetadataConfiguration";
-import AssetProtocolSelection from "@/components/sections/AssetProtocolSelection";
 import VaultCreationContainer from "@/components/VaultCreationContainer";
 import DepositLimitConfiguration from "@/components/sections/DepositLimitConfiguration";
 import StrategySelection from "@/components/sections/StrategySelection";
+import { useEffect } from "react";
+import AssetSelection from "@/components/sections/AssetSelection";
+import ProtocolSelection from "@/components/sections/ProtocolSelection";
 
 
 export const basicsAtom = atom(get => ({
@@ -28,9 +30,17 @@ export function isBasicsValid(basics: any): boolean {
   return true;
 }
 
+async function getSupportedAssetAddressesByChain(chainId: number): Promise<{ [key: string]: string[] }> {
+  // TODO actually fetch addresses
+  return { all: [""] }
+}
+
 export default function Basics() {
   const router = useRouter();
   const [basics] = useAtom(basicsAtom)
+  const [, setAvailableAssetAddresses] = useAtom(assetAddressesAtom);
+
+  useEffect(() => { getSupportedAssetAddressesByChain(1).then(res => setAvailableAssetAddresses({ 1: res })) }, [])
 
   return (
     <VaultCreationContainer activeStage={0} stages={BASIC_CREATION_STAGES} >
@@ -38,7 +48,10 @@ export default function Basics() {
 
       <div className={`flex flex-col gap-6`}>
         <MetadataConfiguration />
-        <AssetProtocolSelection isWithTooltips={false} />
+        <div className="flex flex-col md:flex-row gap-6 md:gap-4">
+          <AssetSelection />
+          <ProtocolSelection />
+        </div>
         <AdapterSelection isDisabled={basics.asset.symbol === 'none' || basics.protocol.key === 'none'} />
         <StrategySelection isDisabled={basics.adapter.key === "none"} />
         <DepositLimitConfiguration />
