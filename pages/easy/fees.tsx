@@ -25,7 +25,9 @@ export default function Fees() {
     <VaultCreationContainer activeStage={1} stages={BASIC_CREATION_STAGES} >
       <div className={`mb-6`}>
         <h1 className="text-white text-2xl mb-2">Fee Configuration</h1>
-        <p className="text-white">Vault managers can charge several types of fees, all of which are paid out in shares of the vault.  Fees can be changed at any time after fund creation</p>
+        <p className="text-white">
+          Vault managers can charge several types of fees, all of which are paid out in shares of the vault. Fees can be changed at any time after fund creation.
+        </p>
       </div>
 
       <FeeConfiguration />

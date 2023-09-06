@@ -49,15 +49,16 @@ export default function ReviewPage(): JSX.Element {
       <div>
         <h1 className="text-white text-2xl mb-2">Review</h1>
         <p className="text-white">
-          Please review the vault configuration carefully before creating.
-          All configuration settings are permanent. Interact with created vaults
+          Please review your configuration carefully.
+          Your configuration settings are permanent.
+          You can interact with vaults that you created on
           <a
             href="https://app.pop.network/experimental/sweet-vaults"
             rel="noopener noreferrer"
             target="_blank"
             className="text-customPurple"
           >
-           {" "} here
+            {" "} app.pop.network
           </a>.
         </p>
       </div>
@@ -79,50 +80,50 @@ export default function ReviewPage(): JSX.Element {
       </div>
 
       {<Modal show={showModal} setShowModal={setShowModal} >
-          <div>
-            <p className="text-[white] text-2xl mb-4">Creating Vault</p>
-            <span className="flex flex-row items-center mb-2">
-              <p className="text-white mr-2">Uploading Metadata to IPFS... </p>
-              {metadata.ipfsHash === "" ?
-                <figure className="relative w-5 h-5 mt-0.5">
-                  <Image
-                    fill
-                    className="object-contain"
-                    alt="loader"
-                    src={"/images/loader/spinner.svg"}
-                  />
-                </figure> :
-                <CheckCircleIcon className="w-6 h-6 text-green-500" />
-              }
-            </span>
-            <span className="flex flex-row">
-              <p className="text-white mr-2">Creating Vault... </p>
-              {(metadata.ipfsHash === "" || isLoading) &&
-                <figure className="relative w-5 h-5 mt-0.5">
-                  <Image
-                    fill
-                    className="object-contain"
-                    alt="loader"
-                    src={"/images/loader/spinner.svg"}
-                  />
-                </figure>
-              }
-              {metadata.ipfsHash !== "" && !isLoading && isSuccess &&
-                <CheckCircleIcon className="w-6 h-6 text-green-500" />
-              }
-              {metadata.ipfsHash !== "" && !isLoading && isError &&
-                <XCircleIcon className="w-6 h-6 text-red-500" />
-              }
-            </span>
-            <div className="mt-8">
-              <MainActionButton
-                label="Done"
-                handleClick={() => isSuccess ? router.push("https://app.pop.network/experimental/sweet-vaults") : setShowModal(false)}
-                disabled={metadata.ipfsHash === "" || isLoading || (strategyData.id !== ethers.utils.formatBytes32String("") && strategyData.data === "0x")}
-              />
-            </div>
+        <div>
+          <p className="text-[white] text-2xl mb-4">Creating Vault</p>
+          <span className="flex flex-row items-center mb-2">
+            <p className="text-white mr-2">Uploading Metadata to IPFS... </p>
+            {metadata.ipfsHash === "" ?
+              <figure className="relative w-5 h-5 mt-0.5">
+                <Image
+                  fill
+                  className="object-contain"
+                  alt="loader"
+                  src={"/images/loader/spinner.svg"}
+                />
+              </figure> :
+              <CheckCircleIcon className="w-6 h-6 text-green-500" />
+            }
+          </span>
+          <span className="flex flex-row">
+            <p className="text-white mr-2">Creating Vault... </p>
+            {(metadata.ipfsHash === "" || isLoading) &&
+              <figure className="relative w-5 h-5 mt-0.5">
+                <Image
+                  fill
+                  className="object-contain"
+                  alt="loader"
+                  src={"/images/loader/spinner.svg"}
+                />
+              </figure>
+            }
+            {metadata.ipfsHash !== "" && !isLoading && isSuccess &&
+              <CheckCircleIcon className="w-6 h-6 text-green-500" />
+            }
+            {metadata.ipfsHash !== "" && !isLoading && isError &&
+              <XCircleIcon className="w-6 h-6 text-red-500" />
+            }
+          </span>
+          <div className="mt-8">
+            <MainActionButton
+              label="Done"
+              handleClick={() => isSuccess ? router.push("https://app.pop.network/experimental/sweet-vaults") : setShowModal(false)}
+              disabled={metadata.ipfsHash === "" || isLoading || (strategyData.id !== ethers.utils.formatBytes32String("") && strategyData.data === "0x")}
+            />
           </div>
-        </Modal>}
+        </div>
+      </Modal>}
     </VaultCreationContainer> :
     <></>
   )

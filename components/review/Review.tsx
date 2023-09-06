@@ -137,7 +137,7 @@ export default function Review(): JSX.Element {
           <img className={`${conditions ? '' : 'hidden'}`} src="/images/icons/checkIcon.svg" />
         </Switch>
         <span className={`text-white text-[14px]`}>
-          I have read and agree to the <a href="https://app.vaultcraft.io/disclaimer" className={`text-[#87C1F8]`}>Terms & Conditions</a>
+          I have read and agree to the <a href="https://app.vaultcraft.io/disclaimer" className={`text-[#87C1F8]`}>Terms & Conditions</a>.
         </span>
 
         {strategy.key !== "none" && loading && <p className="text-white mt-6">Loading Configuration, please wait...</p>}

@@ -23,7 +23,7 @@ export default function Home() {
               <img src="/images/icons/arrow-right-icon-green.svg" className={`w-6 h-6 hidden group-hover:block`} />
             </div>
             <p className={`text-left`}>
-              Recommended for most users. Build a custom vaults in minutes.
+              Recommended for most users. Build a custom vault in minutes.
             </p>
           </button>
 
@@ -41,19 +41,19 @@ export default function Home() {
               <img src="/images/icons/arrow-right-icon-green.svg" className={`w-6 h-6 hidden group-hover:block`} />
             </div>
             <p className={`text-left`}>
-              Users see all pre-configured settings and have complete control to change anything. Only recommended for experienced users.
+              Users can view all pre-configured settings and have complete control to modify them as desired. Dev mode is recommended exclusively for experienced users.
             </p>
           </button>
         </div>
 
         <a className={`mt-6 p-4 border-[1px] border-[#353945] flex flex-col items-stretch gap-2 rounded-[12px] bg-[url(/images/guide-bg.png)] bg-cover group`} href="https://google.com">
           <div className={`flex justify-between`}>
-            <p className={`text-[24px] font-[500]`}>Step by step guide</p>
+            <p className={`text-[24px] font-[500]`}>How do I build a vault?</p>
             <img src="/images/icons/arrow-right-icon.svg" className={`w-6 h-6 group-hover:hidden`} />
             <img src="/images/icons/arrow-right-icon-green.svg" className={`w-6 h-6 hidden group-hover:block`} />
           </div>
           <p className={`text-left`}>
-            How to create your vaults
+            Watch our tutorials.
           </p>
         </a>
       </div>
