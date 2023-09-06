@@ -8,7 +8,7 @@ import {
   strategyConfigAtom
 } from "@/lib/atoms";
 import { resolveStrategyDefaults } from "@/lib/resolver/strategyDefaults/strategyDefaults";
-import { validateBigNumberInput, verifyInitParamValidity } from "@/lib/helpers";
+import { validateInput, verifyInitParamValidity } from "@/lib/helpers";
 import Fieldset from "@/components/inputs/Fieldset";
 import Input from "@/components/inputs/Input";
 
@@ -41,7 +41,7 @@ function StrategyConfiguration() {
   );
 
   function handleChange(value: string, paramType: string, index: number, index2?: number) {
-    if (paramType === "uint256") value = validateBigNumberInput(value).formatted
+    if (paramType === "uint256") value = validateInput(value).formatted
 
     const newConfig = [...strategyConfig];
     if (newConfig.length < index) {

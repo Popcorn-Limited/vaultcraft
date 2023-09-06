@@ -44,7 +44,6 @@ export default function Basics() {
                     <ProtocolSelection />
                 </div>
                 <AdapterSelection isDisabled={basics.asset.symbol === 'none' || basics.protocol.key === 'none'} />
-                {/* <AdapterConfiguration /> */}
                 <DepositLimitConfiguration />
             </div>
 

@@ -91,22 +91,16 @@ export default function Review(): JSX.Element {
         <ReviewParam title="Vault Name" value={metadata?.name} />
         <ReviewParam title="Asset" value={asset.name} img={asset.logoURI} />
         <ReviewParam title="Protocol" value={protocol.name} img={protocol.logoURI} />
-        <ReviewParam title="Adapter" value={adapter.name} img={adapter.logoURI} />
         <ReviewParam title="Strategy" value={strategy.name === DEFAULT_STRATEGY.name ? '-' : strategy.name} img={strategy.logoURI} />
       </ReviewSection>
       <ReviewSection title="Fees">
         <ReviewParam title="Deposit Fee" value={`${formatUnits(fees.deposit)}%`} />
         <ReviewParam title="Withdrawal Fee" value={`${formatUnits(fees.withdrawal)}%`} />
-        <ReviewParam title="Withdrawal Fee For Specifit Asset" value={`${formatUnits(fees.withdrawalFeeForSpecificAsset)}%`} />
-        <ReviewParam title="Management Fee" value={`${formatUnits(fees.management)}%`} />
         <ReviewParam title="Performance Fee" value={`${formatUnits(fees.performance)}%`} />
+        <ReviewParam title="Management Fee" value={`${formatUnits(fees.management)}%`} />
         <ReviewParam title="Fee Recipient" value={shortenAddress(fees.recipient)} fullValue={fees.recipient} />
       </ReviewSection>
       <ReviewSection title="Deposits Limit">
-        <ReviewParam
-          title="Minimum deposit amount"
-          value={`${formatUnits(limit.minimum.toString())} ${asset.symbol}`}
-        />
         <ReviewParam
           title="Maximum deposit amount"
           value={`${formatUnits(limit.maximum.toString())} ${asset.symbol}`}

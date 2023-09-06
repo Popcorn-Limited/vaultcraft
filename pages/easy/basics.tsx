@@ -45,10 +45,10 @@ export default function Basics() {
 
   const [loading, setLoading] = useState(false)
 
-  const [adapterData, setAdapterData] = useAtom(adapterDeploymentAtom);
-  const [strategyData, setStrategyData] = useAtom(strategyDeploymentAtom);
+  const [, setAdapterData] = useAtom(adapterDeploymentAtom);
+  const [, setStrategyData] = useAtom(strategyDeploymentAtom);
 
-  const [strategyConfig, setStrategyConfig] = useAtom(strategyConfigAtom);
+  const [, setStrategyConfig] = useAtom(strategyConfigAtom);
 
 
   const [, setAvailableAssetAddresses] = useAtom(assetAddressesAtom);

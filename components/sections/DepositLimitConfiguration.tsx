@@ -5,7 +5,7 @@ import Input from "@/components/inputs/Input";
 import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
 import { assetAtom, limitAtom } from "@/lib/atoms";
 import { parseUnits } from "ethers/lib/utils";
-import { validateBigNumberInput } from "@/lib/helpers";
+import { validateInput } from "@/lib/helpers";
 
 
 function DepositLimitConfiguration() {
@@ -17,17 +17,10 @@ function DepositLimitConfiguration() {
     setEnabled(checked)
   }
 
-  function setMinimumDeposit (value: string) {
-    setLimit((prevLimit) => ({
-      ...prevLimit,
-      minimum: parseUnits(validateBigNumberInput(value).formatted)
-    }))
-  }
-
   function setMaximumDeposit (value: string) {
     setLimit((prevLimit) => ({
       ...prevLimit,
-      maximum: parseUnits(validateBigNumberInput(value).formatted)
+      maximum: parseUnits(validateInput(value).formatted)
     }))
   }
 
@@ -62,20 +55,11 @@ function DepositLimitConfiguration() {
           </div>
 
           <div className={`flex flex-col gap-3 mt-4`}>
-            <span className={`text-white`}>Minimum deposit amount</span>
-            <Input
-              onChange={(e) => setMinimumDeposit((e.target as HTMLInputElement).value)}
-              placeholder={`0 ${asset.symbol === 'none' ? '' : asset.symbol}`}
-              type="number"
-            />
-          </div>
-
-          <div className={`flex flex-col gap-3 mt-4`}>
             <span className={`text-white`}>Maximum deposit amount</span>
             <Input
               placeholder={`0 ${asset.symbol === 'none' ? '' : asset.symbol}`}
               onChange={(e) => setMaximumDeposit((e.target as HTMLInputElement).value)}
-              type="number"
+              type="text"
             />
           </div>
         </div>

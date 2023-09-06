@@ -3,7 +3,7 @@ import { useState } from "react";
 import { constants, utils } from "ethers";
 import { formatUnits, parseUnits } from "ethers/lib/utils.js";
 import { feeAtom } from "@/lib/atoms/fees";
-import { validateBigNumberInput } from "@/lib/helpers";
+import { validateInput } from "@/lib/helpers";
 import Fieldset from "@/components/inputs/Fieldset";
 import Input from "@/components/inputs/Input";
 
@@ -38,7 +38,7 @@ const FEE_INPUTS = [
     ]
   },
   {
-    name: "Charge Performance Fee",
+    name: "Performance Fee",
     description: "Charge a fee whenever the share value reaches a new all time high.",
     inputs: [
       {
@@ -50,7 +50,7 @@ const FEE_INPUTS = [
     ]
   },
   {
-    name: "Charge Management Fee",
+    name: "Management Fee",
     description: "Charge a continues fee on the total value of deposits.",
     inputs: [
       {
@@ -74,7 +74,7 @@ function FeeConfiguration() {
   function handlePercentageChange(value: string, key: string) {
     setFee({
       ...fees,
-      [key]: parseUnits(validateBigNumberInput(value).formatted),
+      [key]: parseUnits(validateInput(value).formatted),
     });
   }
 
@@ -114,7 +114,7 @@ function FeeConfiguration() {
     const newErrors: string[] = []
     if (!utils.isAddress(fees.recipient)) newErrors.push("Recipient must be a valid address")
     if (fees.recipient === constants.AddressZero) newErrors.push("Recipient must not be the zero address")
-    
+
     setRecipientErrors(newErrors.length > 0 ? newErrors : undefined)
   }
 
@@ -128,6 +128,7 @@ function FeeConfiguration() {
               description={category.description}
               isOpened={areCategoriesOpened[idx]}
               handleIsOpenedChange={isOpened => {
+                handlePercentageChange("0", category.inputs[0].key)
                 const newAreCategoriesOpened = [...areCategoriesOpened]
                 newAreCategoriesOpened[idx] = isOpened
                 setAreCategoriesOpened(newAreCategoriesOpened)
@@ -154,11 +155,15 @@ function FeeConfiguration() {
                             }
                           }
                         }
-                        type="text"
+                        // @ts-ignore
+                        value={formatUnits(fees[input.key]) === "0.0" ? "" : Number(formatUnits(fees[input.key])) }
+                        placeholder="0%"
                         className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         autoComplete="off"
                         autoCorrect="off"
-                        placeholder={input.placeholder}
+                        // text-specific options
+                        type="text"
+                        pattern="^[0-9]*[.,]?[0-9]*$"
                         minLength={1}
                         maxLength={79}
                         spellCheck="false"
@@ -174,26 +179,26 @@ function FeeConfiguration() {
         );
       })}
       <div className="">
-       <Fieldset className="flex-grow" label="Fee Recipient" description="Which address should receive the fees?" isSwitchNeeded={false}>
-         <Input
-           onChange={(e) =>
-             setFee((prefState) => {
-               return {
-                 ...prefState,
-                 recipient: (e.target as HTMLInputElement).value,
-               };
-             })
-           }
-           defaultValue={fees.recipient}
-           placeholder="0x00"
-           autoComplete="off"
-           autoCorrect="off"
-           info={"Required"}
-           onBlur={verifyRecipient}
-           errors={recipientErrors}
-         />
-       </Fieldset>
-      </div> 
+        <Fieldset className="flex-grow" label="Fee Recipient" description="Which address should receive the fees?" isSwitchNeeded={false}>
+          <Input
+            onChange={(e) =>
+              setFee((prefState) => {
+                return {
+                  ...prefState,
+                  recipient: (e.target as HTMLInputElement).value,
+                };
+              })
+            }
+            defaultValue={fees.recipient}
+            placeholder="0x00"
+            autoComplete="off"
+            autoCorrect="off"
+            info={"Required"}
+            onBlur={verifyRecipient}
+            errors={recipientErrors}
+          />
+        </Fieldset>
+      </div>
     </section>
   );
 }

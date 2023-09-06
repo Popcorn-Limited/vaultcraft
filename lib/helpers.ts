@@ -29,7 +29,7 @@ export function verifyInitParamValidity(
   return errors;
 }
 
-export const validateBigNumberInput = (value?: string | number) => {
+export const validateInput = (value?: string | number) => {
   let formatted = value === "." ? "0" : (`${value || "0"}`.replace(/\.$/, ".0") as any);
   formatted = formatted.replace(/[^0-9.]/g, "")
   return {
