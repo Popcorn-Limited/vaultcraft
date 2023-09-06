@@ -51,7 +51,7 @@ const FEE_INPUTS = [
   },
   {
     name: "Management Fee",
-    description: "Charge a continues fee on the total value of deposits.",
+    description: "Charge a continuous fee on the total value of deposits.",
     inputs: [
       {
         title: "Management Fee Rate",

@@ -92,9 +92,9 @@ export function Option({ value, children, selected, disabled, apy }: { value: an
               <div className="h-10 w-10 mr-4 rounded-full bg-black"></div>
             }
             <div className="flex flex-col self-center w-full">
-              <p className={`${selected ? "text-[black]" : "text-[white]"}`}>{value.symbol}</p>
+              <p className={`${selected ? "text-[black]" : "text-[white]"}`}>{value.symbol || value.name}</p>
               <span className="flex flex-row justify-between w-full">
-                <p className={`${selected ? "text-[black]" : "text-[#ffffff99]"}`}>{value.name}</p>
+                {value.symbol && <p className={`${selected ? "text-[black]" : "text-[#ffffff99]"}`}>{value.name}</p>}
                 {disabled && <span className="border border-customRed bg-customRed/20 rounded-md py-1 px-2">
                   <p className={`self-end text-customRed`}>Not supported</p>
                 </span>

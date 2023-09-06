@@ -51,7 +51,9 @@ function DepositLimitConfiguration() {
             <div className="flex flex-row">
               <ExclamationCircleIcon className="text-white w-16 h-16 mr-4 pb-2" />
               <p className="text-white text-sm">
-                Settings in this section are restrictive. Enable them to control how much can be deposited into your vault. Deposit limits, can be changed at any time after vault creation
+                Settings in this section are restrictive.
+                Enable them to control how much can be deposited into your vault.
+                Deposit limits can be changed at any time after vault creation.
               </p>
             </div>
           </div>
