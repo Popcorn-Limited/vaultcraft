@@ -39,7 +39,7 @@ export const useDeployVault = () => {
           performance: parseUnits(String(Number(fees.performance) / 100)),
         },
         feeRecipient: fees.recipient,
-        depositLimit: Number(limit) > 0 ? limit : constants.MaxUint256,
+        depositLimit: Number(limit.maximum) === 0 ? constants.MaxUint256 : String(Number(limit.maximum) * (10 ** asset.decimals)),
         owner: account,
       },
       adapterData,

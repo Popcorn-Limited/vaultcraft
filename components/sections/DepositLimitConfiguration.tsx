@@ -10,17 +10,19 @@ import { validateInput } from "@/lib/helpers";
 
 function DepositLimitConfiguration() {
   const [asset] = useAtom(assetAtom);
-  const [enabled, setEnabled] = useState(false);
   const [limit, setLimit] = useAtom(limitAtom);
+  const [enabled, setEnabled] = useState(Number(limit.maximum) > 0);
 
   function handleToggle(checked: boolean) {
+    setMaximumDeposit("0")
     setEnabled(checked)
   }
 
   function setMaximumDeposit(value: string) {
-    setLimit((prevLimit) => ({
+    const formattedValue = validateInput(value)
+    if (formattedValue.isValid) setLimit((prevLimit) => ({
       ...prevLimit,
-      maximum: parseUnits(validateInput(value).formatted)
+      maximum: formattedValue.formatted
     }))
   }
 
@@ -59,7 +61,7 @@ function DepositLimitConfiguration() {
             <Input
               placeholder={`0 ${asset.symbol === 'none' ? '' : asset.symbol}`}
               onChange={(e) => setMaximumDeposit((e.target as HTMLInputElement).value)}
-              type="text"
+              value={limit.maximum}
             />
           </div>
         </div>

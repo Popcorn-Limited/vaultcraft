@@ -30,8 +30,7 @@ export function verifyInitParamValidity(
 }
 
 export const validateInput = (value?: string | number) => {
-  let formatted = value === "." ? "0" : (`${value || "0"}`.replace(/\.$/, ".0") as any);
-  formatted = formatted.replace(/[^0-9.]/g, "")
+  let formatted = String(value).replace(/[^0-9.]/g, "")
   return {
     formatted,
     isValid: value === "" || isFinite(Number(formatted)),

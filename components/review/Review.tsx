@@ -122,7 +122,7 @@ export default function Review(): JSX.Element {
       <ReviewSection title="Deposits Limit">
         <ReviewParam
           title="Maximum deposit amount"
-          value={`${formatUnits(limit.maximum.toString())} ${asset.symbol}`}
+          value={`${Number(limit.maximum) === 0 ? "∞" : Number(limit.maximum)} ${asset.symbol}`}
         />
       </ReviewSection>
       <div className={`flex items-center gap-3 mt-6`}>

@@ -73,9 +73,11 @@ function FeeConfiguration() {
   const [areCategoriesOpened, setAreCategoriesOpened] = useState(FEE_INPUTS.map(fee => fees[fee.inputs[0].key] > 0))
 
   function handlePercentageChange(value: string, key: string) {
-    setFee({
+    const formattedValue = validateInput(value)
+
+    if (formattedValue.isValid) setFee({
       ...fees,
-      [key]: validateInput(value).isValid ? (value as any) : 0,
+      [key]: formattedValue.formatted,
     });
   }
 
@@ -158,14 +160,6 @@ function FeeConfiguration() {
                         value={fees[input.key] === "0" ? "" : fees[input.key]}
                         placeholder="0%"
                         className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                        autoComplete="off"
-                        autoCorrect="off"
-                        // text-specific options
-                        type="text"
-                        pattern="^[0-9]*[.,]?[0-9]*$"
-                        minLength={1}
-                        maxLength={79}
-                        spellCheck="false"
                         onBlur={verifyFees}
                         errors={errors?.[input.key]}
                       />
