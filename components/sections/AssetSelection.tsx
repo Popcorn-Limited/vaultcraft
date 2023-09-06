@@ -7,21 +7,7 @@ import { localhost, mainnet } from "wagmi/chains";
 import { utils } from "ethers";
 import { RPC_URLS } from "@/lib/connectors";
 
-
-// 1. Display json tokenlist 
-// 2. Fetch all asset addresses
-// 3. Allow to add a token via address (-> add the metadata)
-
-async function getTokenMetadata(address: string, chainId: number, protocol: string): Promise<Asset> {
-  const metadata = {
-    name: "",
-    symbol: "",
-    decimals: 0,
-    logoURI: "https://etherscan.io/images/main/empty-token.png",
-    address: { [chainId]: address },
-    chains: [chainId]
-  }
-
+async function fetchViaAlchemy(address: string, chainId: number, metadata: any) {
   const options = {
     method: 'POST',
     headers: { accept: 'application/json', 'content-type': 'application/json' },
@@ -32,16 +18,66 @@ async function getTokenMetadata(address: string, chainId: number, protocol: stri
       params: [address]
     })
   };
+  // @ts-ignore
+  const res = await fetch(RPC_URLS[chainId], options)
+  const data = await res.json()
+
+  metadata.name = data.result.name
+  metadata.symbol = data.result.symbol
+  metadata.decimals = data.result.decimals
+  if (data.result.logo) metadata.logoURI = data.result.logo
+
+  return metadata
+}
+
+async function fetchViaZerion(address: string, chainId: number, metadata: any) {
+  // const options = {
+  //   method: 'GET',
+  //   headers: {
+  //     accept: 'application/json',
+  //     authorization: 'Basic emtfZGV2XzM1MmU3YWQxNjI1YzRhMWU4ZmY3MzE4MGE4ODc4OTMyOg=='
+  //   }
+  // };
+
+  // const res = await fetch(`https://api.zerion.io/v1/fungibles/${address}/?currency=usd`, options)
+  // const data = await res.json()
+  // console.log(data)
+
+  // metadata.name = data.result.name
+  // metadata.symbol = data.result.symbol
+  // metadata.decimals = data.result.decimals
+  // if (data.result.logo) metadata.logoURI = data.result.logo
+
+  const options = {
+    method: 'GET',
+    headers: {
+      accept: 'application/json',
+      authorization: `Basic ${process.env.NEXT_PUBLIC_ZERION_KEY}`
+    }
+  };
+
+  fetch('https://api.zerion.io/v1/fungibles/0x1e19cf2d73a72ef1332c882f20534b6519be0276/?currency=usd', options)
+    .then(response => response.json())
+    .then(response => console.log(response))
+    .catch(err => console.error(err));
+
+  return metadata
+}
+
+async function getTokenMetadata(address: string, chainId: number, protocol: string): Promise<Asset> {
+  let metadata = {
+    name: "",
+    symbol: "",
+    decimals: 0,
+    logoURI: "https://etherscan.io/images/main/empty-token.png",
+    address: { [chainId]: address },
+    chains: [chainId]
+  }
 
   try {
-    //@ts-ignore
-    const res = await fetch(RPC_URLS[chainId], options)
-    const data = await res.json()
+    await fetchViaZerion(address, chainId, metadata)
+    metadata = await fetchViaAlchemy(address, chainId, metadata)
 
-    metadata.name = data.result.name
-    metadata.symbol = data.result.symbol
-    metadata.decimals = data.result.decimals
-    if (data.result.logo) metadata.logoURI = data.result.logo
   } catch (e) { console.error("error", e) }
 
   return metadata
