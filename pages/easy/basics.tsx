@@ -15,6 +15,7 @@ import ProtocolSelection from "@/components/sections/ProtocolSelection";
 import { ethers } from "ethers";
 import { resolveStrategyDefaults } from "@/lib/resolver/strategyDefaults/strategyDefaults";
 import { resolveStrategyEncoding } from "@/lib/resolver/strategyEncoding/strategyDefaults";
+import getSupportedAssetAddressesByChain from "@/lib/getSupportedAssetAddressesByChain";
 
 
 export const basicsAtom = atom(get => ({
@@ -31,11 +32,6 @@ export function isBasicsValid(basics: any): boolean {
   return true;
 }
 
-async function getSupportedAssetAddressesByChain(chainId: number): Promise<{ [key: string]: string[] }> {
-  // TODO actually fetch addresses
-  return { all: [""] }
-}
-
 export default function Basics() {
   const router = useRouter();
   const [basics] = useAtom(basicsAtom)
@@ -45,11 +41,7 @@ export default function Basics() {
 
   const [loading, setLoading] = useState(false)
 
-  const [, setAdapterData] = useAtom(adapterDeploymentAtom);
-  const [, setStrategyData] = useAtom(strategyDeploymentAtom);
-
   const [, setStrategyConfig] = useAtom(strategyConfigAtom);
-
 
   const [, setAvailableAssetAddresses] = useAtom(assetAddressesAtom);
 
@@ -57,76 +49,31 @@ export default function Basics() {
 
   useEffect(() => {
     // @ts-ignore
-    async function getStrategyDefaultsAndEncode() {
+    async function getStrategyDefaults() {
       setLoading(true)
-      let adapterId = ethers.utils.formatBytes32String("")
-      let adapterInitParams = "0x"
-
-      let strategyId = ethers.utils.formatBytes32String("")
-      let strategyInitParams = "0x"
 
       let strategyDefaults = []
 
       if (strategy.name.includes("Depositor")) {
-        adapterId = ethers.utils.formatBytes32String(strategy.key)
-
         if (strategy.initParams && strategy.initParams.length > 0) {
           strategyDefaults = await resolveStrategyDefaults({
             chainId: network.id,
             address: asset.address[network.id].toLowerCase(),
             resolver: strategy.resolver
           })
-          adapterInitParams = ethers.utils.defaultAbiCoder.encode(
-            strategy.initParams.map((param) => param.type),
-            strategyDefaults
-          )
         }
       } else {
-        adapterId = ethers.utils.formatBytes32String((strategy.adapter as string))
-        strategyId = ethers.utils.formatBytes32String((strategy.key as string))
-
         strategyDefaults = await resolveStrategyDefaults({
           chainId: network.id,
           address: asset.address[network.id].toLowerCase(),
           resolver: strategy.resolver
         })
-        console.log({ strategyDefaults, initParams: strategy.initParams })
-        adapterInitParams = ethers.utils.defaultAbiCoder.encode(
-          // @ts-ignore
-          [strategy.initParams[0]],
-          [strategyDefaults[0]]
-        )
-
-        strategyInitParams = await resolveStrategyEncoding({
-          chainId: network.id,
-          address: asset.address[network.id],
-          params: strategyDefaults.slice(1),
-          resolver: strategy.resolver
-        })
       }
-      console.log({
-        adapter: {
-          id: adapterId,
-          data: adapterInitParams,
-        },
-        strategy: {
-          id: strategyId,
-          data: strategyInitParams
-        }
-      })
-      setAdapterData({
-        id: adapterId,
-        data: adapterInitParams,
-      });
-
-      setStrategyData({
-        id: strategyId,
-        data: strategyInitParams
-      });
+      setStrategyConfig(strategyDefaults)
       setLoading(false)
     }
 
-    if (strategy.key !== "none") getStrategyDefaultsAndEncode();
+    if (strategy.key !== "none") getStrategyDefaults();
   }, [strategy])
 
   return (
@@ -147,7 +94,9 @@ export default function Basics() {
         <StrategySelection isDisabled={basics.protocol.key === "none"} />
         <DepositLimitConfiguration />
       </div>
+
       {strategy.key !== "none" && loading && <p className="text-white mt-6">Loading Configuration, please wait...</p>}
+
       <div className="flex justify-end mt-8 gap-3">
         <SecondaryActionButton
           label="Back"
