@@ -83,7 +83,7 @@ function ProtocolSelection() {
       selected={protocol}
       onSelect={(newProtocol) => selectProtocol(newProtocol)}
       title="Select Protocol"
-      description="Select a protocol to use to earn yield. You need to select an asset first"
+      description="Select a protocol to use to earn yield. You need to select an asset first."
     >
       {options.length > 0 ? options.filter(option => !option.disabled).sort((a, b) => (b.apy || 0) - (a.apy || 0)).map((option) => (
         <Option
