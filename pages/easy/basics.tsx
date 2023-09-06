@@ -9,7 +9,7 @@ import MetadataConfiguration from "@/components/sections/MetadataConfiguration";
 import VaultCreationContainer from "@/components/VaultCreationContainer";
 import DepositLimitConfiguration from "@/components/sections/DepositLimitConfiguration";
 import StrategySelection from "@/components/sections/StrategySelection";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import AssetSelection from "@/components/sections/AssetSelection";
 import ProtocolSelection from "@/components/sections/ProtocolSelection";
 import { ethers } from "ethers";
@@ -43,6 +43,8 @@ export default function Basics() {
   const [network] = useAtom(networkAtom);
   const [asset] = useAtom(assetAtom);
 
+  const [loading, setLoading] = useState(false)
+
   const [adapterData, setAdapterData] = useAtom(adapterDeploymentAtom);
   const [strategyData, setStrategyData] = useAtom(strategyDeploymentAtom);
 
@@ -54,78 +56,77 @@ export default function Basics() {
   useEffect(() => { getSupportedAssetAddressesByChain(1).then(res => setAvailableAssetAddresses({ 1: res })) }, [])
 
   useEffect(() => {
-    if (strategy.key !== "none") {
-      // Set config defaults
+    // @ts-ignore
+    async function getStrategyDefaultsAndEncode() {
+      setLoading(true)
+      let adapterId = ethers.utils.formatBytes32String("")
+      let adapterInitParams = "0x"
 
-      // @ts-ignore
-      async function getStrategyDefaultsAndEncode() {
-        let adapterId = ethers.utils.formatBytes32String("")
-        let adapterInitParams = "0x"
+      let strategyId = ethers.utils.formatBytes32String("")
+      let strategyInitParams = "0x"
 
-        let strategyId = ethers.utils.formatBytes32String("")
-        let strategyInitParams = "0x"
+      let strategyDefaults = []
 
-        let strategyDefaults = []
+      if (strategy.name.includes("Depositor")) {
+        adapterId = ethers.utils.formatBytes32String(strategy.key)
 
-        if (strategy.name.includes("Depositor")) {
-          adapterId = ethers.utils.formatBytes32String(strategy.key)
-
-          if (strategy.initParams && strategy.initParams.length > 0) {
-            strategyDefaults = await resolveStrategyDefaults({
-              chainId: network.id,
-              address: asset.address[network.id].toLowerCase(),
-              resolver: strategy.resolver
-            })
-            adapterInitParams = ethers.utils.defaultAbiCoder.encode(
-              strategy.initParams.map((param) => param.type),
-              strategyDefaults
-            )
-          }
-        } else {
-          adapterId = ethers.utils.formatBytes32String((strategy.adapter as string))
-          strategyId = ethers.utils.formatBytes32String((strategy.key as string))
-
+        if (strategy.initParams && strategy.initParams.length > 0) {
           strategyDefaults = await resolveStrategyDefaults({
             chainId: network.id,
             address: asset.address[network.id].toLowerCase(),
             resolver: strategy.resolver
           })
-          console.log({ strategyDefaults, initParams: strategy.initParams })
           adapterInitParams = ethers.utils.defaultAbiCoder.encode(
-            // @ts-ignore
-            [strategy.initParams[0]],
-            [strategyDefaults[0]]
+            strategy.initParams.map((param) => param.type),
+            strategyDefaults
           )
-
-          strategyInitParams = await resolveStrategyEncoding({
-            chainId: network.id,
-            address: asset.address[network.id],
-            params: strategyDefaults.slice(1),
-            resolver: strategy.resolver
-          })
         }
-        console.log({
-          adapter: {
-            id: adapterId,
-            data: adapterInitParams,
-          },
-          strategy: {
-            id: strategyId,
-            data: strategyInitParams
-          }
+      } else {
+        adapterId = ethers.utils.formatBytes32String((strategy.adapter as string))
+        strategyId = ethers.utils.formatBytes32String((strategy.key as string))
+
+        strategyDefaults = await resolveStrategyDefaults({
+          chainId: network.id,
+          address: asset.address[network.id].toLowerCase(),
+          resolver: strategy.resolver
         })
-        setAdapterData({
+        console.log({ strategyDefaults, initParams: strategy.initParams })
+        adapterInitParams = ethers.utils.defaultAbiCoder.encode(
+          // @ts-ignore
+          [strategy.initParams[0]],
+          [strategyDefaults[0]]
+        )
+
+        strategyInitParams = await resolveStrategyEncoding({
+          chainId: network.id,
+          address: asset.address[network.id],
+          params: strategyDefaults.slice(1),
+          resolver: strategy.resolver
+        })
+      }
+      console.log({
+        adapter: {
           id: adapterId,
           data: adapterInitParams,
-        });
-
-        setStrategyData({
+        },
+        strategy: {
           id: strategyId,
           data: strategyInitParams
-        });
-      }
-      getStrategyDefaultsAndEncode();
+        }
+      })
+      setAdapterData({
+        id: adapterId,
+        data: adapterInitParams,
+      });
+
+      setStrategyData({
+        id: strategyId,
+        data: strategyInitParams
+      });
+      setLoading(false)
     }
+
+    if (strategy.key !== "none") getStrategyDefaultsAndEncode();
   }, [strategy])
 
   return (
@@ -146,10 +147,19 @@ export default function Basics() {
         <StrategySelection isDisabled={basics.protocol.key === "none"} />
         <DepositLimitConfiguration />
       </div>
-
+      {strategy.key !== "none" && loading && <p className="text-white mt-6">Loading Configuration, please wait...</p>}
       <div className="flex justify-end mt-8 gap-3">
-        <SecondaryActionButton label="Back" handleClick={() => router.push('/')} className={`max-w-[100px]`} />
-        <MainActionButton label="Next" handleClick={() => router.push('/easy/fees')} className={`max-w-[100px]`} disabled={!isBasicsValid(basics)} />
+        <SecondaryActionButton
+          label="Back"
+          handleClick={() => router.push('/')}
+          className={`max-w-[100px]`}
+        />
+        <MainActionButton
+          label="Next"
+          handleClick={() => router.push('/easy/fees')}
+          className={`max-w-[100px]`}
+          disabled={!isBasicsValid(basics) || loading}
+        />
       </div>
     </VaultCreationContainer>
   )
