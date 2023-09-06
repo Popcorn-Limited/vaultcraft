@@ -7,15 +7,7 @@ import MainActionButton from "@/components/buttons/MainActionButton";
 import SecondaryActionButton from "@/components/buttons/SecondaryActionButton";
 import FeeConfiguration from "@/components/sections/FeeConfiguration";
 import VaultCreationContainer from "@/components/VaultCreationContainer";
-
-export function isFeesValid(fees: any): boolean {
-  if (Object.keys(fees).filter(key => typeof fees[key] !== 'string').reduce((acc, key) => acc + Number(fees[key]), 0) >= 100000000000000000000) return false;
-  if (!Object.keys(fees).filter(key => typeof fees[key] === 'string').reduce((acc, key) => {
-    return acc && (utils.isAddress(fees[key]) || fees[key].length === 0)
-  }, true)) return false;
-  if (fees.recipient === constants.AddressZero || fees.recipient.length === 0) return false;
-  return true;
-}
+import { isFeesValid } from "pages/pro/fees";
 
 export default function Fees() {
   const router = useRouter();
