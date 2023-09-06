@@ -252,6 +252,17 @@
     "logoURI": "https://cdn.furucombo.app/assets/img/token/stETH.svg"
   },
   {
+    "chains": [1, 1337],
+    "address": {
+      "1": "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+      "1337": "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0"
+    },
+    "name": "Wrapped Staked Ether",
+    "symbol": "wstETH",
+    "decimals": 18,
+    "logoURI": "https://cdn.furucombo.app/assets/img/token/stETH.svg"
+  },
+  {
     "chains": [],
     "address": {
       "1": "0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0",
