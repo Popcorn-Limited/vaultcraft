@@ -346,6 +346,12 @@
         "type": "address",
         "requirements": ["Required", "NotAddressZero"],
         "description": "Address of the fitting CToken for the asset"
+      },
+      {
+        "name": "CometRewarder",
+        "type": "address",
+        "requirements": ["Required", "NotAddressZero"],
+        "description": "Address of the fitting CometRewarder for the asset"
       }
     ],
     "chains": [1, 1337],
