@@ -50,7 +50,6 @@ export default function ReviewPage(): JSX.Element {
         <h1 className="text-white text-2xl mb-2">Review</h1>
         <p className="text-white">
           Please review your configuration carefully.
-          Your configuration settings are permanent.
           You can interact with vaults that you created on
           <a
             href="https://app.pop.network/experimental/sweet-vaults"

@@ -96,7 +96,7 @@ function AssetSelection() {
       selected={asset}
       onSelect={(newAsset) => selectAsset(newAsset)}
       title="Select Asset"
-      description="Choose an asset that you want to deposit into your vault and earn yield on. If you cant find your asset in the list, paste its address into the search bar to add it."
+      description="Choose an asset that you want to deposit into your vault and earn yield on. If you can't find your asset in the list, paste its address into the search bar to add it."
       optionalChildren={
         <div className="h-12">
           <Input
