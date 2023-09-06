@@ -38,13 +38,13 @@ export default function ReviewPage(): JSX.Element {
   }
 
   function uploadMetadata() {
-    // IpfsClient.add(metadata.name, { name: metadata.name }).then(res => {
-    //   setMetadata((prefState) => { return { ...prefState, ipfsHash: res } })
-    //   toast.loading("Deploying Vault...")
-    //   deployVault();
-    // });
-    toast.loading("Deploying Vault...")
-    deployVault();
+    IpfsClient.add(metadata.name, { name: metadata.name }).then(res => {
+      setMetadata((prefState) => { return { ...prefState, ipfsHash: res } })
+      toast.loading("Deploying Vault...")
+      deployVault();
+    });
+    // toast.loading("Deploying Vault...")
+    // deployVault();
   }
 
   return (metadata && adapter ?

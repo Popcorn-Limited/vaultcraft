@@ -16,6 +16,7 @@ import SecondaryActionButton from "@/components/buttons/SecondaryActionButton";
 import Modal from "@/components/Modal";
 import VaultCreationContainer from "@/components/VaultCreationContainer";
 import { ethers } from "ethers";
+import { toast } from "react-hot-toast";
 
 
 export default function ReviewPage(): JSX.Element {
@@ -37,11 +38,13 @@ export default function ReviewPage(): JSX.Element {
   }
 
   function uploadMetadata() {
-    // IpfsClient.add(metadata.name, { name: metadata.name }).then(res => {
-    //   setMetadata((prefState) => { return { ...prefState, ipfsHash: res } })
-    //   deployVault();
-    // });
-    deployVault();
+    IpfsClient.add(metadata.name, { name: metadata.name }).then(res => {
+      setMetadata((prefState) => { return { ...prefState, ipfsHash: res } })
+      toast.loading("Deploying Vault...")
+      deployVault();
+    });
+    // toast.loading("Deploying Vault...")
+    // deployVault();
   }
 
   return (metadata && adapter ?
