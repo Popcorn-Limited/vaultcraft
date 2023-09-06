@@ -167,7 +167,7 @@
   {
     "name": "Aura Compounder",
     "key": "BalancerLpCompounder",
-    "resolver": "auraLpCompounder",
+    "resolver": "auraCompounder",
     "protocol": "aura",
     "adapter": "AuraAdapter",
     "chains": [1],

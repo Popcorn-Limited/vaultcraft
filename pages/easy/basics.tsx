@@ -1,7 +1,7 @@
 import { BASIC_CREATION_STAGES } from "@/lib/stages";
 import { useRouter } from "next/router";
 import { atom, useAtom } from "jotai";
-import { metadataAtom, assetAtom, protocolAtom, adapterAtom, strategyAtom, Asset, assetAddressesAtom, availableAssetsAtom, networkAtom, adapterConfigAtom, strategyConfigAtom, adapterDeploymentAtom, strategyDeploymentAtom } from "@/lib/atoms";
+import { metadataAtom, assetAtom, protocolAtom, adapterAtom, strategyAtom, Asset, assetAddressesAtom, availableAssetsAtom, networkAtom, adapterConfigAtom, strategyConfigAtom, adapterDeploymentAtom, strategyDeploymentAtom, useProtocols } from "@/lib/atoms";
 import MainActionButton from "@/components/buttons/MainActionButton";
 import SecondaryActionButton from "@/components/buttons/SecondaryActionButton";
 import AdapterSelection from "@/components/sections/AdapterSelection";
@@ -15,7 +15,7 @@ import ProtocolSelection from "@/components/sections/ProtocolSelection";
 import { ethers } from "ethers";
 import { resolveStrategyDefaults } from "@/lib/resolver/strategyDefaults/strategyDefaults";
 import { resolveStrategyEncoding } from "@/lib/resolver/strategyEncoding/strategyDefaults";
-import getSupportedAssetAddressesByChain from "@/lib/getSupportedAssetAddressesByChain";
+import getSupportedAssetAddresses from "@/lib/getSupportedAssetAddresses";
 
 
 export const basicsAtom = atom(get => ({
@@ -39,13 +39,15 @@ export default function Basics() {
   const [network] = useAtom(networkAtom);
   const [asset] = useAtom(assetAtom);
 
+  const protocols = useProtocols()
+
   const [loading, setLoading] = useState(false)
 
   const [, setStrategyConfig] = useAtom(strategyConfigAtom);
 
   const [, setAvailableAssetAddresses] = useAtom(assetAddressesAtom);
 
-  useEffect(() => { getSupportedAssetAddressesByChain(1).then(res => setAvailableAssetAddresses({ 1: res })) }, [])
+  useEffect(() => { getSupportedAssetAddresses(1, protocols).then((res: any) => setAvailableAssetAddresses({ 1: res })) }, [])
 
   useEffect(() => {
     // @ts-ignore

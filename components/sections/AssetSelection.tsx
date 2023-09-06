@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import { localhost, mainnet } from "wagmi/chains";
 import { utils } from "ethers";
+import { RPC_URLS } from "@/lib/connectors";
 
 
 // 1. Display json tokenlist 
@@ -33,7 +34,7 @@ async function getTokenMetadata(address: string, chainId: number, protocol: stri
   };
 
   try {
-    // @ts-ignore
+    //@ts-ignore
     const res = await fetch(RPC_URLS[chainId], options)
     const data = await res.json()
 

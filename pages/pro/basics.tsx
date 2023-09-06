@@ -1,7 +1,7 @@
 import { PRO_CREATION_STAGES } from "@/lib/stages";
 import { useRouter } from "next/router";
 import { atom, useAtom } from "jotai";
-import { metadataAtom, assetAtom, protocolAtom, adapterAtom, strategyAtom, networkAtom, adapterDeploymentAtom, strategyDeploymentAtom, strategyConfigAtom, assetAddressesAtom } from "@/lib/atoms";
+import { metadataAtom, assetAtom, protocolAtom, adapterAtom, strategyAtom, networkAtom, adapterDeploymentAtom, strategyDeploymentAtom, strategyConfigAtom, assetAddressesAtom, useProtocols } from "@/lib/atoms";
 import MainActionButton from "@/components/buttons/MainActionButton";
 import SecondaryActionButton from "@/components/buttons/SecondaryActionButton";
 import AdapterSelection from "@/components/sections/AdapterSelection";
@@ -12,10 +12,11 @@ import AdapterConfiguration from "@/components/sections/AdapterConfiguration";
 import AssetSelection from "@/components/sections/AssetSelection";
 import ProtocolSelection from "@/components/sections/ProtocolSelection";
 import { useEffect, useState } from "react";
-import getSupportedAssetAddressesByChain from "@/lib/getSupportedAssetAddressesByChain";
+import getSupportedAssetAddresses from "@/lib/getSupportedAssetAddresses";
 import { ethers } from "ethers";
 import { resolveStrategyDefaults } from "@/lib/resolver/strategyDefaults/strategyDefaults";
 import StrategySelection from "@/components/sections/StrategySelection";
+import ProtocolAssetResolvers from "@/lib/resolver/protocolAssets";
 
 
 export const basicsAtom = atom(get => ({
@@ -40,13 +41,15 @@ export default function Basics() {
     const [network] = useAtom(networkAtom);
     const [asset] = useAtom(assetAtom);
 
+    const protocols = useProtocols()
+
     const [loading, setLoading] = useState(false)
 
     const [, setStrategyConfig] = useAtom(strategyConfigAtom);
 
     const [, setAvailableAssetAddresses] = useAtom(assetAddressesAtom);
 
-    useEffect(() => { getSupportedAssetAddressesByChain(1).then(res => setAvailableAssetAddresses({ 1: res })) }, [])
+    useEffect(() => { console.log("start"); getSupportedAssetAddresses(1, protocols).then((res: any) => { setAvailableAssetAddresses({ 1: res }); console.log("stop"); }); }, [])
 
     useEffect(() => {
         // @ts-ignore
@@ -76,7 +79,6 @@ export default function Basics() {
 
         if (strategy.key !== "none") getStrategyDefaults();
     }, [strategy])
-
 
     return (
         <VaultCreationContainer activeStage={0} stages={PRO_CREATION_STAGES} >
