@@ -30,11 +30,6 @@ export default function Strategy() {
         <p className="text-white">Your Strategy will be auto configured. Change values only if they dont load or you dislike the default values.</p>
       </div>
 
-      <div className="mb-4">
-        <AdapterConfiguration />
-      </div>
-
-      <StrategySelection />
       <StrategyConfiguration />
 
       <div className="flex justify-end gap-3 mt-6">

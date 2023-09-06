@@ -5,29 +5,24 @@ import Input from "@/components/inputs/Input";
 import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
 import { assetAtom, limitAtom } from "@/lib/atoms";
 import { parseUnits } from "ethers/lib/utils";
-import { validateBigNumberInput } from "@/lib/helpers";
+import { validateInput } from "@/lib/helpers";
 
 
 function DepositLimitConfiguration() {
   const [asset] = useAtom(assetAtom);
-  const [enabled, setEnabled] = useState(false);
   const [limit, setLimit] = useAtom(limitAtom);
+  const [enabled, setEnabled] = useState(Number(limit.maximum) > 0);
 
   function handleToggle(checked: boolean) {
+    setMaximumDeposit("0")
     setEnabled(checked)
   }
 
-  function setMinimumDeposit (value: string) {
-    setLimit((prevLimit) => ({
+  function setMaximumDeposit(value: string) {
+    const formattedValue = validateInput(value)
+    if (formattedValue.isValid) setLimit((prevLimit) => ({
       ...prevLimit,
-      minimum: parseUnits(validateBigNumberInput(value).formatted)
-    }))
-  }
-
-  function setMaximumDeposit (value: string) {
-    setLimit((prevLimit) => ({
-      ...prevLimit,
-      maximum: parseUnits(validateBigNumberInput(value).formatted)
+      maximum: formattedValue.formatted
     }))
   }
 
@@ -48,26 +43,17 @@ function DepositLimitConfiguration() {
         </Switch>
       </div>
       <p className="text-gray-500 text-sm">
-        Restricts the amount of a single deposit with either a minimum, a maximum, or both.
+        Restricts the maximum of assets that can be deposited into the vault.
       </p>
       {enabled &&
         <div className="flex flex-col mt-4">
           <div className="border-2 border-[#353945] rounded-lg flex flex-row justify-between w-full px-2 py-3 h-full bg-[#23262F] text-white mt-4">
             <div className="flex flex-row">
               <ExclamationCircleIcon className="text-white w-16 h-16 mr-4 pb-2" />
-              <p className="text-white text-sm">Deposits can be changed at any time after vault creation.
-                Settings in this section are restrictive. Enable them to control who can deposit in your vault, and in what amounts.
-                If disabled, anyone can deposit any amount into your vault. </p>
+              <p className="text-white text-sm">
+                Settings in this section are restrictive. Enable them to control how much can be deposited into your vault. Deposit limits, can be changed at any time after vault creation
+              </p>
             </div>
-          </div>
-
-          <div className={`flex flex-col gap-3 mt-4`}>
-            <span className={`text-white`}>Minimum deposit amount</span>
-            <Input
-              onChange={(e) => setMinimumDeposit((e.target as HTMLInputElement).value)}
-              placeholder={`0 ${asset.symbol === 'none' ? '' : asset.symbol}`}
-              type="number"
-            />
           </div>
 
           <div className={`flex flex-col gap-3 mt-4`}>
@@ -75,7 +61,7 @@ function DepositLimitConfiguration() {
             <Input
               placeholder={`0 ${asset.symbol === 'none' ? '' : asset.symbol}`}
               onChange={(e) => setMaximumDeposit((e.target as HTMLInputElement).value)}
-              type="number"
+              value={limit.maximum}
             />
           </div>
         </div>

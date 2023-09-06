@@ -6,13 +6,13 @@ import { ethers } from "ethers";
 export type Strategy = {
   name: string;
   key: string;
-  description: string;
   logoURI: string;
-  compatibleAdapters: string[];
-  requiredAssets?: string[];
-  requiredNetworks?: number[];
+  protocol: string;
+  description: string;
+  chains: number[];
   initParams?: InitParam[];
   resolver?: string;
+  adapter?: string;
 };
 
 export const useStrategies = () => {
@@ -24,7 +24,8 @@ export const DEFAULT_STRATEGY = {
   key: "none",
   description: "none",
   logoURI: "",
-  compatibleAdapters: [],
+  protocol: "none",
+  chains: [1]
 };
 
 export const strategyAtom = atom<Strategy>(DEFAULT_STRATEGY);
