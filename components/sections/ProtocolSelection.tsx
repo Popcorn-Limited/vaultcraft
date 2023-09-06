@@ -61,9 +61,7 @@ function ProtocolSelection() {
   const [asset] = useAtom(assetAtom);
 
   useEffect(() => {
-    console.log("use effect")
     if (network && asset.symbol !== "none") {
-      console.log("if")
       setOptions([])
       getProtocolOptions(protocols, network.id, asset.address[network.id].toLowerCase(), availableAssets[network.id]).then(res => setOptions(res));
     }

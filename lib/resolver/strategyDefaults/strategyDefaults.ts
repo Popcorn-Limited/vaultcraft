@@ -3,5 +3,11 @@ import StrategyDefaultResolvers from ".";
 
 export async function resolveStrategyDefaults({ chainId, address, resolver }: { chainId: number, address: string, resolver?: string }): Promise<any[]> {
   if (chainId === localhost.id) chainId = mainnet.id;
-  return resolver ? StrategyDefaultResolvers[resolver]({ chainId, address }) : StrategyDefaultResolvers.default({ chainId, address })
+  
+  try {
+    return resolver ? StrategyDefaultResolvers[resolver]({ chainId, address }) : StrategyDefaultResolvers.default({ chainId, address })
+  } catch (e) {
+    console.log(`resolveStrategyDefaults-${chainId}-${address}-${resolver}`, e)
+    return []
+  }
 }
