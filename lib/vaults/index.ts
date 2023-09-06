@@ -3,6 +3,8 @@ import { useAccount, useContractWrite, useNetwork, usePrepareContractWrite } fro
 import { useAtom } from "jotai";
 import { adapterDeploymentAtom, assetAtom, feeAtom, limitAtom, metadataAtom, strategyDeploymentAtom } from "@/lib/atoms"
 import { parseUnits } from "ethers/lib/utils.js";
+import { toast } from "react-hot-toast";
+import { extractRevertReason } from "../helpers";
 
 const VAULT_CONTROLLER = {
   "1": "0x7D51BABA56C2CA79e15eEc9ECc4E92d9c0a7dbeb",
@@ -84,7 +86,16 @@ export const useDeployVault = () => {
   //   ]
   // })
 
-  return useContractWrite(config);
+  return useContractWrite({
+    ...config, onSuccess: () => {
+      toast.dismiss()
+      toast.success("Vault Deployed!");
+    },
+    onError: (error) => {
+      toast.dismiss()
+      toast.error(extractRevertReason(error));
+    }
+  });
 };
 
 const abi = [

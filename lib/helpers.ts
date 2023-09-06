@@ -52,3 +52,16 @@ export function transformNetwork(network: string | undefined): string {
 export function cleanFileName(fileName: string): string {
   return fileName.replace(/ /g, "-").replace(/[^a-zA-Z0-9]/g, "");
 }
+
+
+export function extractRevertReason(error: any): string {
+  if (error.reason) {
+      return error.reason;
+  }
+
+  if (error.data && error.data.message) {
+      return error.data.message;
+  }
+
+  return error;
+}
