@@ -121,7 +121,6 @@ function FeeConfiguration() {
   return (
     <section className="flex flex-col gap-y-4 divide-y-2 divide-[#353945]">
       {FEE_INPUTS.map((category, idx) => {
-        console.log()
         return (
           <div key={`fee-element-${category.name}`}>
             <Fieldset

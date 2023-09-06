@@ -467,7 +467,7 @@
     "logoURI": "/images/icons/popLogo.svg",
     "name": "Idle Junior Depositor",
     "key": "IdleJuniorAdapter",
-    "protocol": "idle",
+    "protocol": "idleJunior",
     "initParams": [
       {
         "name": "CDO",
@@ -484,7 +484,7 @@
     "logoURI": "/images/icons/popLogo.svg",
     "name": "Idle Senior Depositor",
     "key": "IdleSeniorAdapter",
-    "protocol": "idle",
+    "protocol": "idleSenior",
     "initParams": [
       {
         "name": "CDO",
