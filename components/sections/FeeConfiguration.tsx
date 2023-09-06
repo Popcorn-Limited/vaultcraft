@@ -1,5 +1,5 @@
 import { useAtom } from "jotai";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { constants, utils } from "ethers";
 import { formatUnits, parseUnits } from "ethers/lib/utils.js";
 import { feeAtom } from "@/lib/atoms/fees";
@@ -69,12 +69,13 @@ function FeeConfiguration() {
   const [fees, setFee] = useAtom(feeAtom);
   const [errors, setErrors] = useState<Errors>()
   const [recipientErrors, setRecipientErrors] = useState<string[] | undefined>(undefined)
-  const [areCategoriesOpened, setAreCategoriesOpened] = useState(FEE_INPUTS.map(item => false))
+  // @ts-ignore
+  const [areCategoriesOpened, setAreCategoriesOpened] = useState(FEE_INPUTS.map(fee => fees[fee.inputs[0].key] > 0))
 
   function handlePercentageChange(value: string, key: string) {
     setFee({
       ...fees,
-      [key]: parseUnits(validateInput(value).formatted),
+      [key]: validateInput(value).isValid ? (value as any) : 0,
     });
   }
 
@@ -87,24 +88,21 @@ function FeeConfiguration() {
 
   function verifyFees() {
     // @ts-ignore
-    const totalFee = Object.keys(fees).filter(key => typeof fees[key] !== 'string').reduce((acc, key) => acc + Number(fees[key]), 0) >= 100000000000000000000;
+    const totalFee = Object.keys(fees).filter(key => typeof fees[key] !== 'string').reduce((acc, key) => acc + Number(fees[key]), 0) >= 100;
 
     const newErrors: Errors = {}
     Object.entries(fees).forEach(el => {
       const [key, val] = el
       const inputErrors = []
 
-      if (typeof val !== 'string') {
-        if (Number(val) >= 100000000000000000000) inputErrors.push("Fee must be less than 100%")
+      if (key === "recipient") {
+        if (!utils.isAddress(val) && val.length > 0) inputErrors.push("Recipient must be a valid address")
+        if (val === constants.AddressZero) inputErrors.push("Recipient must not be the zero address")
+      } else {
+        if (Number(val) >= 100) inputErrors.push("Fee must be less than 100%")
         if (Number(val) < 0) inputErrors.push("Fee must be greater or equal to 0%")
         if (totalFee) inputErrors.push("Total fee must be less than 100%")
       }
-
-      if (typeof val === 'string') {
-        if (!utils.isAddress(val) && val.length > 0) inputErrors.push("Recipient must be a valid address")
-        if (val === constants.AddressZero) inputErrors.push("Recipient must not be the zero address")
-      }
-
       newErrors[key] = inputErrors.length > 0 ? inputErrors : undefined
     })
     setErrors(newErrors)
@@ -121,6 +119,7 @@ function FeeConfiguration() {
   return (
     <section className="flex flex-col gap-y-4 divide-y-2 divide-[#353945]">
       {FEE_INPUTS.map((category, idx) => {
+        console.log()
         return (
           <div key={`fee-element-${category.name}`}>
             <Fieldset
@@ -156,7 +155,7 @@ function FeeConfiguration() {
                           }
                         }
                         // @ts-ignore
-                        value={formatUnits(fees[input.key]) === "0.0" ? "" : Number(formatUnits(fees[input.key])) }
+                        value={fees[input.key] === "0" ? "" : fees[input.key]}
                         placeholder="0%"
                         className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         autoComplete="off"

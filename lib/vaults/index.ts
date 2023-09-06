@@ -1,7 +1,8 @@
 import { constants, ethers } from "ethers";
 import { useAccount, useContractWrite, useNetwork, usePrepareContractWrite } from "wagmi";
 import { useAtom } from "jotai";
-import { adapterDeploymentAtom, assetAtom, feeAtom, limitAtom, metadataAtom } from "@/lib/atoms"
+import { adapterDeploymentAtom, assetAtom, feeAtom, limitAtom, metadataAtom, strategyDeploymentAtom } from "@/lib/atoms"
+import { parseUnits } from "ethers/lib/utils.js";
 
 const VAULT_CONTROLLER = {
   "1": "0x7D51BABA56C2CA79e15eEc9ECc4E92d9c0a7dbeb",
@@ -15,6 +16,7 @@ export const useDeployVault = () => {
   const { chain } = useNetwork()
   const [asset] = useAtom(assetAtom);
   const [adapterData] = useAtom(adapterDeploymentAtom);
+  const [strategyData] = useAtom(strategyDeploymentAtom);
   const [metadata] = useAtom(metadataAtom);
   const [fees] = useAtom(feeAtom);
   const [limit] = useAtom(limitAtom);
@@ -31,20 +33,17 @@ export const useDeployVault = () => {
         asset: asset.address[chain?.id],
         adapter: constants.AddressZero,
         fees: {
-          deposit: fees.deposit,
-          withdrawal: fees.withdrawal,
-          management: fees.management,
-          performance: fees.performance,
+          deposit: parseUnits(String(Number(fees.deposit) / 100)),
+          withdrawal: parseUnits(String(Number(fees.withdrawal) / 100)),
+          management: parseUnits(String(Number(fees.management) / 100)),
+          performance: parseUnits(String(Number(fees.performance) / 100)),
         },
         feeRecipient: fees.recipient,
         depositLimit: Number(limit) > 0 ? limit : constants.MaxUint256,
         owner: account,
       },
       adapterData,
-      {
-        id: ethers.utils.formatBytes32String(""),
-        data: "0x",
-      },
+      strategyData,
       false,
       "0x",
       {
