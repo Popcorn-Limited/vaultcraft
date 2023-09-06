@@ -31,6 +31,7 @@ const apr2apy = (apr: BigNumber) => {
 }
 
 async function idle({ chainId, address, key }: { chainId: number, address: string, key: string }): Promise<number> {
+  if(address.toLowerCase() === "0xae7ab96520de3a18e5e111b5eaab095312d7fe84") return Infinity // stEth returns 0 on getAPR
   // @ts-ignore
   const idleAddresses = tranches[address];
   const cdo = new Contract(
