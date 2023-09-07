@@ -12,7 +12,6 @@ const nextConfig = {
     PINATA_API_KEY: process.env.PINATA_API_KEY,
     PINATA_JWT: process.env.PINATA_JWT,
     IPFS_URL: process.env.IPFS_URL,
-    NEXT_PUBLIC_ZERION_KEY: process.env.ZERION_KEY,
   },
   async rewrites() {
     return [

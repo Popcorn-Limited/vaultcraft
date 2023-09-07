@@ -30,40 +30,6 @@ async function fetchViaAlchemy(address: string, chainId: number, metadata: any) 
   return metadata
 }
 
-async function fetchViaZerion(address: string, chainId: number, metadata: any) {
-  // const options = {
-  //   method: 'GET',
-  //   headers: {
-  //     accept: 'application/json',
-  //     authorization: 'Basic emtfZGV2XzM1MmU3YWQxNjI1YzRhMWU4ZmY3MzE4MGE4ODc4OTMyOg=='
-  //   }
-  // };
-
-  // const res = await fetch(`https://api.zerion.io/v1/fungibles/${address}/?currency=usd`, options)
-  // const data = await res.json()
-  // console.log(data)
-
-  // metadata.name = data.result.name
-  // metadata.symbol = data.result.symbol
-  // metadata.decimals = data.result.decimals
-  // if (data.result.logo) metadata.logoURI = data.result.logo
-
-  const options = {
-    method: 'GET',
-    headers: {
-      accept: 'application/json',
-      authorization: `Basic ${process.env.NEXT_PUBLIC_ZERION_KEY}`
-    }
-  };
-
-  fetch('https://api.zerion.io/v1/fungibles/0x1e19cf2d73a72ef1332c882f20534b6519be0276/?currency=usd', options)
-    .then(response => response.json())
-    .then(response => console.log(response))
-    .catch(err => console.error(err));
-
-  return metadata
-}
-
 async function getTokenMetadata(address: string, chainId: number, protocol: string): Promise<Asset> {
   let metadata = {
     name: "",
@@ -75,7 +41,6 @@ async function getTokenMetadata(address: string, chainId: number, protocol: stri
   }
 
   try {
-    await fetchViaZerion(address, chainId, metadata)
     metadata = await fetchViaAlchemy(address, chainId, metadata)
 
   } catch (e) { console.error("error", e) }
