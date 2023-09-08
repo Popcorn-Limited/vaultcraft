@@ -7,7 +7,7 @@ import { useConnectModal } from "@rainbow-me/rainbowkit";
 import Image from "next/image";
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
 import { noOp } from "@/lib/helpers";
-import { useDeployVault } from "@/lib/vaults";
+import { useDeployVault } from "@/lib/vaults/useDeployVault";
 import { metadataAtom, adapterAtom, strategyDeploymentAtom, conditionsAtom } from "@/lib/atoms";
 import { IpfsClient } from "@/lib/ipfsClient";
 import Review from "@/components/review/Review";
