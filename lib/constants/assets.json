@@ -274,14 +274,353 @@
     "logoURI": "https://icons.llamao.fi/icons/chains/rsz_polygon"
   },
   {
-    "chains": [1,1337],
+    "chains": [1, 1337],
     "address": {
       "1": "0x76FCf0e8C7Ff37A47a799FA2cd4c13cDe0D981C9",
       "1337": "0x76FCf0e8C7Ff37A47a799FA2cd4c13cDe0D981C9"
     },
-    "name": "OHM / DAI LP ",
+    "name": "OHM / DAI LP",
     "symbol": "b-ohm-dai-lp",
     "decimals": 18,
     "logoURI": "https://cdn.furucombo.app/assets/img/token/OHM.png"
+  },
+  {
+    "chains": [1, 1337],
+    "address": {
+      "1": "0xFCc5c47bE19d06BF83eB04298b026F81069ff65b",
+      "1337": "0xFCc5c47bE19d06BF83eB04298b026F81069ff65b"
+    },
+    "name": "yCRV",
+    "symbol": "yCRV",
+    "decimals": 18,
+    "logoURI": "https://etherscan.io/token/images/yearncrvnew_32.png"
+  },
+  {
+    "chains": [1, 1337],
+    "address": {
+      "1": "0x27B5739e22ad9033bcBf192059122d163b60349D",
+      "1337": "0x27B5739e22ad9033bcBf192059122d163b60349D"
+    },
+    "name": "Staked yCRV",
+    "symbol": "st-yCRV",
+    "decimals": 18,
+    "logoURI": "https://etherscan.io/token/images/styearncrv_32.png"
+  },
+  {
+    "chains": [1],
+    "address": {
+      "1": "0x3175df0976dfa876431c2e9ee6bc45b65d3473cc"
+    },
+    "name": "FRAX / USDC LP",
+    "symbol": "crvFRAX",
+    "decimals": 18,
+    "logoURI": "/images/icons/curve-lp.png"
+  }, {
+    "chains": [1],
+    "address": {
+      "1": "0x06325440d014e39736583c165c2963ba99faf14e"
+    },
+    "name": "ETH / stETH LP",
+    "symbol": "steCRV",
+    "decimals": 18,
+    "logoURI": "/images/icons/curve-lp.png"
+  }, {
+    "chains": [1],
+    "address": {
+      "1": "0x6c3f90f043a72fa612cbac8115ee7e52bde6e490"
+    },
+    "name": "3Pool",
+    "symbol": "3CRV",
+    "decimals": 18,
+    "logoURI": "https://etherscan.io/token/images/3pool_32.png"
+  }, {
+    "chains": [1],
+    "address": {
+      "1": "0xf43211935c781d5ca1a41d2041f397b8a7366c7a"
+    },
+    "name": "ETH / frxETH LP ",
+    "symbol": "crvFrxETH",
+    "decimals": 18,
+    "logoURI": "/images/icons/curve-lp.png"
+  },
+  {
+    "chains": [1],
+    "address": {
+      "1": "0xc4ad29ba4b3c580e6d59105fff484999997675ff"
+    },
+    "name": "TryCripto2",
+    "symbol": "crv3crypto",
+    "decimals": 18,
+    "logoURI": "/images/icons/curve-lp.png"
+  },
+  {
+    "chains": [1],
+    "address": {
+      "1": "0x94b17476a93b3262d87b9a326965d1e91f9c13e7"
+    },
+    "name": "ETH / OETH LP",
+    "symbol": "crvOETH",
+    "decimals": 18,
+    "logoURI": "/images/icons/curve-lp.png"
+  },
+  {
+    "chains": [1],
+    "address": {
+      "1": "0x21e27a5e5513d6e65c4f830167390997aa84843a"
+    },
+    "name": "stETH-ng",
+    "symbol": "crvStETH-ng",
+    "decimals": 18,
+    "logoURI": "/images/icons/curve-lp.png"
+  },
+  {
+    "chains": [1],
+    "address": {
+      "1": "0xb30da2376f63de30b42dc055c93fa474f31330a5"
+    },
+    "name": "alUSDFRAXBP",
+    "symbol": "alUSD FRAX USDC",
+    "decimals": 18,
+    "logoURI": "/images/icons/curve-lp.png"
+  },
+  {
+    "chains": [1],
+    "address": {
+      "1": "0x4dece678ceceb27446b35c672dc7d61f30bad69e"
+    },
+    "name": "crvUSD/USDC",
+    "symbol": "USDC crvUSD",
+    "decimals": 18,
+    "logoURI": "/images/icons/curve-lp.png"
+  },
+  {
+    "chains": [1],
+    "address": {
+      "1": "0x390f3595bca2df7d23783dfd126427cceb997bf4"
+    },
+    "name": "crvUSD/USDT",
+    "symbol": "USDT crvUSD",
+    "decimals": 18,
+    "logoURI": "/images/icons/curve-lp.png"
+  },
+  {
+    "chains": [1],
+    "address": {
+      "1": "0xf5f5b97624542d72a9e06f04804bf81baa15e2b4"
+    },
+    "name": "TricryptoUSDT",
+    "symbol": "USDT WBTC ETH",
+    "decimals": 18,
+    "logoURI": "/images/icons/curve-lp.png"
+  },
+  {
+    "chains": [1],
+    "address": {
+      "1": "0x7f86bf177dd4f3494b841a37e810a34dd56c829b"
+    },
+    "name": "TricryptoUSDC",
+    "symbol": "USDC WBTC ETH",
+    "decimals": 18,
+    "logoURI": "/images/icons/curve-lp.png"
+  },
+  {
+    "chains": [1],
+    "address": {
+      "1": "0x971add32ea87f10bd192671630be3be8a11b8623"
+    },
+    "name": "cvxCrv/Crv",
+    "symbol": "CRV cvxCRV",
+    "decimals": 18,
+    "logoURI": "/images/icons/curve-lp.png"
+  },
+  {
+    "chains": [1],
+    "address": {
+      "1": "0x4704ab1fb693ce163f7c9d3a31b3ff4eaf797714"
+    },
+    "name": "FPI2Pool",
+    "symbol": "FRAX FPI",
+    "decimals": 18,
+    "logoURI": "/images/icons/curve-lp.png"
+  },
+  {
+    "chains": [1],
+    "address": {
+      "1": "0x5a6a4d54456819380173272a5e8e9b9904bdf41b"
+    },
+    "name": "mim",
+    "symbol": "MIM DAI USDC USDT",
+    "decimals": 18,
+    "logoURI": "/images/icons/curve-lp.png"
+  },
+  {
+    "chains": [1],
+    "address": {
+      "1": "0xc9c32cd16bf7efb85ff14e0c8603cc90f6f2ee49"
+    },
+    "name": "Bean",
+    "symbol": "BEAN DAI USDC USDT",
+    "decimals": 18,
+    "logoURI": "https://etherscan.io/token/images/bean3crv_32.png"
+  },
+  {
+    "chains": [1],
+    "address": {
+      "1": "0xed279fdd11ca84beef15af5d39bb4d4bee23f0ca"
+    },
+    "name": "lusd",
+    "symbol": "LUSD DAI USDC USDT",
+    "decimals": 18,
+    "logoURI": "/images/icons/curve-lp.png"
+  },
+  {
+    "chains": [1],
+    "address": {
+      "1": "0xc25a3a3b969415c80451098fa907ec722572917f"
+    },
+    "name": "susd",
+    "symbol": "DAI USDC USDT sUSD",
+    "decimals": 18,
+    "logoURI": "https://etherscan.io/token/images/Curvefi_sCrv_32.png"
+  },
+  {
+    "chains": [1],
+    "address": {
+      "1": "0xfd2a8fa60abd58efe3eee34dd494cd491dc14900"
+    },
+    "name": "aave",
+    "symbol": "DAI USDC USDT",
+    "decimals": 18,
+    "logoURI": "/images/icons/curve-lp.png"
+  },
+  {
+    "chains": [1],
+    "address": {
+      "1": "0xe57180685e3348589e9521aa53af0bcd497e884d"
+    },
+    "name": "DOLA/FRAXBP",
+    "symbol": "DOLA FRAX USDC",
+    "decimals": 18,
+    "logoURI": "/images/icons/curve-lp.png"
+  },
+  {
+    "chains": [1],
+    "address": {
+      "1": "0x43b4fdfd4ff969587185cdb6f0bd875c5fc83f8c"
+    },
+    "name": "alusd",
+    "symbol": "alUSD DAI USDC USDT",
+    "decimals": 18,
+    "logoURI": "/images/icons/curve-lp.png"
+  },
+  {
+    "chains": [1],
+    "address": {
+      "1": "0x5c6Ee304399DBdB9C8Ef030aB642B10820DB8F56"
+    },
+    "name": "Bal 80 Eth 20",
+    "symbol": "BAL WETH",
+    "decimals": 18,
+    "logoURI": "/images/icons/balancer-lp.png"
+  },
+  {
+    "chains": [1],
+    "address": {
+      "1": "0x1E19CF2D73a72Ef1332C882F20534B6519Be0276"
+    },
+    "name": "rETH wETH",
+    "symbol": "rETH WETH",
+    "decimals": 18,
+    "logoURI": "/images/icons/balancer-lp.png"
+  },
+  {
+    "chains": [1],
+    "address": {
+      "1": "0x20a61B948E33879ce7F23e535CC7BAA3BC66c5a9"
+    },
+    "name": "R DAI",
+    "symbol": "R DAI",
+    "decimals": 18,
+    "logoURI": "/images/icons/balancer-lp.png"
+  },
+  {
+    "chains": [1],
+    "address": {
+      "1": "0x42ED016F826165C2e5976fe5bC3df540C5aD0Af7"
+    },
+    "name": "wstETH sfrxETH rETH",
+    "symbol": "wstETH sfrxETH rETH",
+    "decimals": 18,
+    "logoURI": "/images/icons/balancer-lp.png"
+  },
+  {
+    "chains": [1],
+    "address": {
+      "1": "0x1ee442b5326009Bb18F2F472d3e0061513d1A0fF"
+    },
+    "name": "BADGER 50 rETH 50",
+    "symbol": "BADGER rETH",
+    "decimals": 18,
+    "logoURI": "/images/icons/balancer-lp.png"
+  },
+  {
+    "chains": [1],
+    "address": {
+      "1": "0x87a867f5D240a782d43D90b6B06DEa470F3f8F22"
+    },
+    "name": "wstETH 50 COMP 50",
+    "symbol": "wstETH COMP",
+    "decimals": 18,
+    "logoURI": "/images/icons/balancer-lp.png"
+  },
+  {
+    "chains": [1],
+    "address": {
+      "1": "0x76FCf0e8C7Ff37A47a799FA2cd4c13cDe0D981C9"
+    },
+    "name": "OHM 50 DAI 50",
+    "symbol": "OHM DAI",
+    "decimals": 18,
+    "logoURI": "/images/icons/balancer-lp.png"
+  },
+  {
+    "chains": [1],
+    "address": {
+      "1": "0x3ff3a210e57cFe679D9AD1e9bA6453A716C56a2e"
+    },
+    "name": "USDC 50 STG 50",
+    "symbol": "USDC STG",
+    "decimals": 18,
+    "logoURI": "/images/icons/balancer-lp.png"
+  },
+  {
+    "chains": [1],
+    "address": {
+      "1": "0x3dd0843A028C86e0b760b1A76929d1C5Ef93a2dd"
+    },
+    "name": "AuraBAL Stable Pool",
+    "symbol": "B-80BAL-20WETH auraBAL",
+    "decimals": 18,
+    "logoURI": "/images/icons/balancer-lp.png"
+  },
+  {
+    "chains": [1],
+    "address": {
+      "1": "0xE7e2c68d3b13d905BBb636709cF4DfD21076b9D2"
+    },
+    "name": "WETH swETH",
+    "symbol": "WETH swETH",
+    "decimals": 18,
+    "logoURI": "/images/icons/balancer-lp.png"
+  },
+  {
+    "chains": [1],
+    "address": {
+      "1": "0x32296969Ef14EB0c6d29669C550D4a0449130230"
+    },
+    "name": "wstETH WETH",
+    "symbol": "wstETH WETH",
+    "decimals": 18,
+    "logoURI": "/images/icons/balancer-lp.png"
   }
 ]

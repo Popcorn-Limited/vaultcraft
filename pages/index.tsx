@@ -46,7 +46,7 @@ export default function Home() {
           </button>
         </div>
 
-        <a className={`mt-6 p-4 border-[1px] border-[#353945] flex flex-col items-stretch gap-2 rounded-[12px] bg-[url(/images/guide-bg.png)] bg-cover group`} href="https://google.com">
+        <a className={`mt-6 p-4 border-[1px] border-[#353945] flex flex-col items-stretch gap-2 rounded-[12px] bg-[url(/images/guide-bg.png)] bg-cover group`} href="https://www.youtube.com/watch?v=H4iDCa37LfQ">
           <div className={`flex justify-between`}>
             <p className={`text-[24px] font-[500]`}>How do I build a vault?</p>
             <img src="/images/icons/arrow-right-icon.svg" className={`w-6 h-6 group-hover:hidden`} />
