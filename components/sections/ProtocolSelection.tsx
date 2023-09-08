@@ -43,8 +43,10 @@ async function getProtocolOptions(protocols: Protocol[], chainId: number, asset:
     (p) => p.chains.includes(chainId)).map(
       async (p) => {
         const isAssetSupported = await assetSupported(p, chainId, asset, availableAssets)
+        console.log(p.name, isAssetSupported)
         const protocolOption: ProtocolOption = { ...p, disabled: !isAssetSupported }
         if (isAssetSupported) protocolOption.apy = await resolveAdapterApy({ chainId: chainId, address: asset, resolver: p.key })
+        console.log(p.name, protocolOption.apy)
         return protocolOption
       })
   )
@@ -73,6 +75,8 @@ function ProtocolSelection() {
     }
     setProtocol(newProtocol)
   }
+
+  console.log(options.filter(option => !option.disabled))
 
   if (asset.symbol === "none") return (
     <div className="border-2 border-[#353945] rounded-[4px] flex gap-2 w-full px-2 h-15 flex-row items-center">
