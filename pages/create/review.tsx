@@ -41,6 +41,7 @@ export default function ReviewPage(): JSX.Element {
     });
     //deployVault();
   }
+  //
 
   return (metadata && adapter ?
     <VaultCreationContainer activeStage={3} >
