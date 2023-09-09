@@ -10,14 +10,14 @@ const VAULT_CONTROLLER = {
 }
 
 
-export const useDeployVault = () => {
-  const { address: account } = useAccount();
-  const { chain } = useNetwork()
-  const [asset] = useAtom(assetAtom);
-  const [adapterData] = useAtom(adapterDeploymentAtom);
-  const [metadata] = useAtom(metadataAtom);
-  const [fees] = useAtom(feeAtom);
-  const [limit] = useAtom(limitAtom);
+export const useDeployVault = (account: any, chain: any, asset: any, adapterData: any, metadata: any, fees: any, limit: any) => {
+  // const { address: account } = useAccount();
+  // const { chain } = useNetwork()
+  // const [asset] = useAtom(assetAtom);
+  // const [adapterData] = useAtom(adapterDeploymentAtom);
+  // const [metadata] = useAtom(metadataAtom);
+  // const [fees] = useAtom(feeAtom);
+  // const [limit] = useAtom(limitAtom);
 
   const { config, error: configError } = usePrepareContractWrite({
     // @ts-ignore

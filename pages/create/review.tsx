@@ -31,7 +31,7 @@ export default function ReviewPage(): JSX.Element {
   const [fees] = useAtom(feeAtom);
   const [limit] = useAtom(limitAtom); const [showModal, setShowModal] = useState(false);
 
-  const { write: deployVault = noOp, isLoading, isSuccess, isError } = useDeployVault();
+  const { write: deployVault = noOp, isLoading, isSuccess, isError } = useDeployVault(account, chain, asset, adapterData, metadata, fees, limit);
 
   function handleSubmit() {
     setShowModal(true);
@@ -40,22 +40,22 @@ export default function ReviewPage(): JSX.Element {
 
   console.log("PING", metadata)
 
-  // function uploadMetadata() {
-  //   IpfsClient.add(metadata.name, { name: metadata.name, tags: metadata.tags }).then(res => {
-  //     setMetadata((prefState) => { return { ...prefState, ipfsHash: res } })
-  //     deployVault();
-  //   });
-  // }
-
-  async function uploadMetadata() {
-    try {
-      const res = await IpfsClient.add(metadata.name, { name: metadata.name, tags: metadata.tags });
-      setMetadata((prevState) => { return { ...prevState, ipfsHash: res } });
-      await deployVaultEthers(account, chain, asset, adapter, metadata, fees, limit);
-    } catch (error) {
-      console.error("Error in uploadMetadata:", error);
-    }
+  function uploadMetadata() {
+    IpfsClient.add(metadata.name, { name: metadata.name, tags: metadata.tags }).then(res => {
+      setMetadata((prefState) => { return { ...prefState, ipfsHash: res } })
+      deployVault();
+    });
   }
+
+  // async function uploadMetadata() {
+  //   try {
+  //     const res = await IpfsClient.add(metadata.name, { name: metadata.name, tags: metadata.tags });
+  //     setMetadata((prevState) => { return { ...prevState, ipfsHash: res } });
+  //     await deployVaultEthers(account, chain, asset, adapter, metadata, fees, limit);
+  //   } catch (error) {
+  //     console.error("Error in uploadMetadata:", error);
+  //   }
+  // }
 
   //
 
