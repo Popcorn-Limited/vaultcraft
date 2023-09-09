@@ -88,6 +88,104 @@ export const useDeployVault = () => {
   return useContractWrite(config);
 };
 
+
+export const deployVaultEthers = async (account: any, chain: any, asset: any, adapterData: any, metadata: any, fees: any, limit: any) => {
+
+  console.log("DING0")
+
+
+  // Check for Ethereum provider
+  if (typeof window === 'undefined' || !window.ethereum) {
+    console.error("Ethereum provider is not available");
+    throw new Error("Ethereum provider is not available");
+  }
+
+  console.log("DING1")
+
+  const provider = new ethers.providers.Web3Provider(window.ethereum as ethers.providers.ExternalProvider);
+  const signer = provider.getSigner();
+
+  console.log("DING2")
+
+
+  const contract = new ethers.Contract(
+    "0x7D51BABA56C2CA79e15eEc9ECc4E92d9c0a7dbeb",
+    abi,
+    signer
+  );
+
+  console.log("DING3")
+
+
+  const chainId = chain?.id;
+
+  if (!chainId) {
+    throw new Error("Chain ID is not available");
+  }
+
+  const assetAddress = asset.address[chainId];
+
+  console.log("DING4")
+
+
+  const vaultConfig = {
+    asset: assetAddress || "",
+    adapter: ethers.constants.AddressZero,
+    fees: {
+      deposit: fees.deposit,
+      withdrawal: fees.withdrawal,
+      management: fees.management,
+      performance: fees.performance,
+    },
+    feeRecipient: fees.recipient,
+    depositLimit: Number(limit) > 0 ? limit : ethers.constants.MaxUint256,
+    owner: account,
+  };
+
+  console.log("DING5", vaultConfig)
+
+
+  const swapConfig = {
+    vault: ethers.constants.AddressZero,
+    staking: ethers.constants.AddressZero,
+    creator: account,
+    metadataCID: metadata?.ipfsHash,
+    swapTokenAddresses: new Array(8).fill(ethers.constants.AddressZero),
+    swapAddress: ethers.constants.AddressZero,
+    exchange: 0,
+  };
+
+  console.log("DING6", swapConfig)
+
+
+  try {
+    console.log("DING7")
+
+    const tx = await contract.deployVault(
+      vaultConfig,
+      adapterData,
+      {
+        id: ethers.utils.formatBytes32String(""),
+        data: "0x",
+      },
+      false,
+      "0x",
+      swapConfig,
+      0
+    );
+
+    console.log("DING8")
+
+
+    const receipt = await tx.wait();
+    return receipt;
+  } catch (error) {
+    console.error("Error deploying vault:", error);
+    throw error;
+  }
+};
+
+
 const abi = [
   {
     inputs: [

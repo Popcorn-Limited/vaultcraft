@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { useAtom } from "jotai";
-import { useAccount } from "wagmi";
+import { useAccount, useNetwork } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import Image from "next/image";
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
 import { noOp } from "@/lib/helpers";
-import { useDeployVault } from "@/lib/vaults";
-import { metadataAtom, adapterAtom, strategyDeploymentAtom } from "@/lib/atoms";
+import { useDeployVault, deployVaultEthers } from "@/lib/vaults";
+import { adapterDeploymentAtom, assetAtom, feeAtom, limitAtom, metadataAtom, adapterAtom, strategyDeploymentAtom } from "@/lib/atoms";
 import { IpfsClient } from "@/lib/ipfsClient";
 import Review from "@/components/review/Review";
 import MainActionButton from "@/components/buttons/MainActionButton";
@@ -24,8 +24,12 @@ export default function ReviewPage(): JSX.Element {
 
   const [adapter] = useAtom(adapterAtom);
   const [strategyData] = useAtom(strategyDeploymentAtom);
+  const { chain } = useNetwork();
+  const [asset] = useAtom(assetAtom);
+  const [adapterData] = useAtom(adapterDeploymentAtom);
   const [metadata, setMetadata] = useAtom(metadataAtom);
-  const [showModal, setShowModal] = useState(false);
+  const [fees] = useAtom(feeAtom);
+  const [limit] = useAtom(limitAtom); const [showModal, setShowModal] = useState(false);
 
   const { write: deployVault = noOp, isLoading, isSuccess, isError } = useDeployVault();
 
@@ -34,13 +38,25 @@ export default function ReviewPage(): JSX.Element {
     uploadMetadata();
   }
 
-  function uploadMetadata() {
-    IpfsClient.add(metadata.name, { name: metadata.name, tags: metadata.tags }).then(res => {
-      setMetadata((prefState) => { return { ...prefState, ipfsHash: res } })
-      deployVault();
-    });
-    //deployVault();
+  console.log("PING", metadata)
+
+  // function uploadMetadata() {
+  //   IpfsClient.add(metadata.name, { name: metadata.name, tags: metadata.tags }).then(res => {
+  //     setMetadata((prefState) => { return { ...prefState, ipfsHash: res } })
+  //     deployVault();
+  //   });
+  // }
+
+  async function uploadMetadata() {
+    try {
+      const res = await IpfsClient.add(metadata.name, { name: metadata.name, tags: metadata.tags });
+      setMetadata((prevState) => { return { ...prevState, ipfsHash: res } });
+      await deployVaultEthers(account, chain, asset, adapter, metadata, fees, limit);
+    } catch (error) {
+      console.error("Error in uploadMetadata:", error);
+    }
   }
+
   //
 
   return (metadata && adapter ?
