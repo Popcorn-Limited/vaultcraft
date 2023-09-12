@@ -576,16 +576,6 @@
   {
     "chains": [1],
     "address": {
-      "1": "0x76FCf0e8C7Ff37A47a799FA2cd4c13cDe0D981C9"
-    },
-    "name": "OHM 50 DAI 50",
-    "symbol": "OHM DAI",
-    "decimals": 18,
-    "logoURI": "/images/icons/balancer-lp.png"
-  },
-  {
-    "chains": [1],
-    "address": {
       "1": "0x3ff3a210e57cFe679D9AD1e9bA6453A716C56a2e"
     },
     "name": "USDC 50 STG 50",

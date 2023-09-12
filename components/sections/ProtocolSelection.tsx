@@ -24,7 +24,7 @@ interface ProtocolOption extends Protocol {
 }
 
 async function assetSupported(protocol: Protocol, chainId: number, asset: string, availableAssets: any): Promise<boolean> {
-  if (!availableAssets[chainId] || Object.keys(availableAssets[chainId]).length === 0) {
+  if (!availableAssets?.[chainId] || Object.keys(availableAssets[chainId]).length === 0) {
     const availableAssets = await resolveProtocolAssets({ chainId: chainId, resolver: protocol.key })
 
     return availableAssets.flat().map(a => a?.toLowerCase()).filter((availableAsset) => availableAsset === asset).length > 0

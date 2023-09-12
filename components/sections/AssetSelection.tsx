@@ -116,7 +116,7 @@ function AssetSelection() {
         availableAssets.map((assetIter) => (
           <Option
             // @ts-ignore
-            key={`asset-selc-${assetIter.address[String(chainId)]}`}
+            key={`asset-selc-${assetIter.address[String(chainId)]}-${chainId}`}
             selected={asset.name === assetIter.name}
             value={assetIter}
             apy={assetIter.apy}
