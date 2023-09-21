@@ -16,12 +16,11 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: '/api/balancerProxy/:path*',
-        destination: 'https://api.balancer.fi/:path*',
+        source: "/api/balancerProxy/:path*",
+        destination: "https://api.balancer.fi/:path*",
       },
-    ]
+    ];
   },
 };
 
 module.exports = nextConfig;
-

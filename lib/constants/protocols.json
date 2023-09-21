@@ -13,8 +13,14 @@
   },
   {
     "chains": [56],
-    "name": "Alpaca",
-    "key": "alpaca",
+    "name": "Alpaca V1",
+    "key": "alpacaV1",
+    "logoURI": "https://cryptologos.cc/logos/aave-aave-logo.png?v=024"
+  },
+  {
+    "chains": [56],
+    "name": "Alpaca V2",
+    "key": "alpacaV2",
     "logoURI": "https://cryptologos.cc/logos/aave-aave-logo.png?v=024"
   },
   {
@@ -85,8 +91,14 @@
   },
   {
     "chains": [1, 1337],
-    "name": "Idle",
-    "key": "idle",
+    "name": "Idle Junior",
+    "key": "idleJunior",
+    "logoURI": "https://icons.llamao.fi/icons/protocols/idle"
+  },
+  {
+    "chains": [1, 1337],
+    "name": "Idle Senior",
+    "key": "idleSenior",
     "logoURI": "https://icons.llamao.fi/icons/protocols/idle"
   },
   {
@@ -126,7 +138,7 @@
     "logoURI": "https://cdn.furucombo.app/assets/img/token/CVX.png"
   },
   {
-    "chains": [1, 1337, 42161],
+    "chains": [],
     "name": "Yearn",
     "key": "yearn",
     "logoURI": "https://cryptologos.cc/logos/yearn-finance-yfi-logo.png?v=024"

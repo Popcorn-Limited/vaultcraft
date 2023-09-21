@@ -1,22 +1,19 @@
-import { BigNumber, constants } from "ethers";
+import { BigNumber } from "ethers";
 import { atom } from "jotai";
-import { atomWithStorage } from "jotai/utils";
 
 export type VaultFees = {
-  deposit: BigNumber;
-  withdrawal: BigNumber;
-  withdrawalFeeForSpecificAsset: BigNumber;
-  performance: BigNumber;
-  management: BigNumber;
+  deposit: string;
+  withdrawal: string;
+  performance: string;
+  management: string;
   recipient: string;
 };
 
 const DEFAULT_FEES = {
-  deposit: BigNumber.from(0),
-  withdrawal: BigNumber.from(0),
-  withdrawalFeeForSpecificAsset: BigNumber.from(0),
-  performance: BigNumber.from(0),
-  management: BigNumber.from(0),
+  deposit: "0",
+  withdrawal: "0",
+  performance: "0",
+  management: "0",
   recipient: "",
 };
 

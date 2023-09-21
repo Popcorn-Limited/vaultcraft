@@ -1,42 +1,41 @@
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
-import { Strategy, adapterAtom, assetAtom, networkAtom, strategyAtom, useStrategies } from "@/lib/atoms";
+import { Strategy, adapterAtom, assetAtom, networkAtom, protocolAtom, strategyAtom, useStrategies } from "@/lib/atoms";
 import Selector, { Option } from "@/components/inputs/Selector";
 
 
-const STRATEGY_NON_AVAILABLE: Strategy = {
+const STRATEGY_NOT_AVAILABLE: Strategy = {
   name: "No Strategy available",
   key: "none",
   description: "none",
   logoURI: "",
-  compatibleAdapters: [],
+  protocol: "none",
+  chains: [1]
 }
 
-export async function getStrategyOptions(strategies: Strategy[], asset: string, adapter: string, chainId: number): Promise<Strategy[]> {
+export async function getStrategyOptions(strategies: Strategy[], chainId: number, protocol: string): Promise<Strategy[]> {
   // First filter by network, than by required asset if given, than by adapter
-  const options = strategies.filter(strategy => strategy.requiredNetworks && strategy.requiredNetworks.length > 0 && strategy.requiredNetworks.includes(chainId))
-    .filter((strategy) => (strategy.requiredAssets && strategy.requiredAssets.length > 0) ? strategy.requiredAssets.map(a => a.toLowerCase()).includes(asset) : true)
-    .filter((strategy) => strategy.compatibleAdapters.includes(adapter))
+  const options = strategies.filter(strategy => strategy.chains.includes(chainId))
+    .filter((strategy) => strategy.protocol === protocol)
 
-  return options.length > 0 ? options : [STRATEGY_NON_AVAILABLE];
+  return options.length > 0 ? options : [STRATEGY_NOT_AVAILABLE];
 }
 
 function StrategySelection({ isDisabled }: { isDisabled?: boolean }) {
   const [network] = useAtom(networkAtom);
   const [asset] = useAtom(assetAtom);
-  const [adapter] = useAtom(adapterAtom);
+  const [protocol] = useAtom(protocolAtom);
 
   const strategies = useStrategies();
   const [strategy, setStrategy] = useAtom(strategyAtom);
   const [options, setOptions] = useState<Strategy[]>([]);
 
   useEffect(() => {
-    if (adapter.key !== "none" && asset.symbol !== "none" && network) {
+    if (protocol.key !== "none" && asset.symbol !== "none" && network) {
       getStrategyOptions(
         strategies,
-        asset.address[network.id].toLowerCase(),
-        adapter.key,
         network.id,
+        protocol.key
       )
         .then(res => {
           setOptions(res);
@@ -45,7 +44,7 @@ function StrategySelection({ isDisabled }: { isDisabled?: boolean }) {
           }
         });
     }
-  }, [adapter, asset, network]);
+  }, [asset, network, protocol]);
 
   return (
     <section>

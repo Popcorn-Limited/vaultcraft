@@ -2,13 +2,11 @@ import { BASIC_CREATION_STAGES } from "@/lib/stages";
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { useAtom } from "jotai";
-import { useAccount } from "wagmi";
+import { useAccount, useNetwork } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import Image from "next/image";
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
-import { noOp } from "@/lib/helpers";
-import { useDeployVault } from "@/lib/vaults";
-import { metadataAtom, adapterAtom, strategyDeploymentAtom, conditionsAtom } from "@/lib/atoms";
+import { metadataAtom, adapterAtom, strategyDeploymentAtom, conditionsAtom, adapterDeploymentAtom, feeAtom, limitAtom, assetAtom } from "@/lib/atoms";
 import { IpfsClient } from "@/lib/ipfsClient";
 import Review from "@/components/review/Review";
 import MainActionButton from "@/components/buttons/MainActionButton";
@@ -16,12 +14,14 @@ import SecondaryActionButton from "@/components/buttons/SecondaryActionButton";
 import Modal from "@/components/Modal";
 import VaultCreationContainer from "@/components/VaultCreationContainer";
 import { ethers } from "ethers";
+import { deployVault } from "@/lib/vaults/deployVault";
 
 
 export default function ReviewPage(): JSX.Element {
   const router = useRouter();
-  const { address: account } = useAccount();
+  const { address: account, connector } = useAccount();
   const { openConnectModal } = useConnectModal();
+  const { chain } = useNetwork()
 
   const [adapter] = useAtom(adapterAtom);
   const [strategyData] = useAtom(strategyDeploymentAtom);
@@ -29,19 +29,30 @@ export default function ReviewPage(): JSX.Element {
   const [showModal, setShowModal] = useState(false);
   const [conditions] = useAtom(conditionsAtom);
 
-  const { write: deployVault = noOp, isLoading, isSuccess, isError } = useDeployVault();
+  const [asset] = useAtom(assetAtom);
+  const [adapterData] = useAtom(adapterDeploymentAtom);
+  const [fees] = useAtom(feeAtom);
+  const [limit] = useAtom(limitAtom);
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [isError, setIsError] = useState(false);
 
   function handleSubmit() {
     setShowModal(true);
-    uploadMetadata();
+    deploy();
   }
 
-  function uploadMetadata() {
+  function deploy() {
     IpfsClient.add(metadata.name, { name: metadata.name }).then(res => {
-      setMetadata((prefState) => { return { ...prefState, ipfsHash: res } })
-      deployVault();
+      setMetadata((prefState) => { return { ...prefState, ipfsHash: res } });
+      setIsLoading(true)
+      deployVault(chain, connector, fees, asset, limit, account, adapterData, strategyData, res).then(res => {
+        !!res ? setIsSuccess(true) : setIsError(true);
+        setIsLoading(false)
+      }
+      )
     });
-    //deployVault();
   }
 
   return (metadata && adapter ?
@@ -49,8 +60,16 @@ export default function ReviewPage(): JSX.Element {
       <div>
         <h1 className="text-white text-2xl mb-2">Review</h1>
         <p className="text-white">
-          Please review the vault configuration carefully before creating.
-          All configuration settings are permanent
+          Please review your configuration carefully.
+          You can interact with vaults that you created on
+          <a
+            href="https://app.pop.network/experimental/sweet-vaults"
+            rel="noopener noreferrer"
+            target="_blank"
+            className="text-customPurple"
+          >
+            {" "} app.pop.network
+          </a>.
         </p>
       </div>
 

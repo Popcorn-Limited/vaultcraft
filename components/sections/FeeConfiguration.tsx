@@ -1,9 +1,9 @@
 import { useAtom } from "jotai";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { constants, utils } from "ethers";
 import { formatUnits, parseUnits } from "ethers/lib/utils.js";
 import { feeAtom } from "@/lib/atoms/fees";
-import { validateBigNumberInput } from "@/lib/helpers";
+import { validateInput } from "@/lib/helpers";
 import Fieldset from "@/components/inputs/Fieldset";
 import Input from "@/components/inputs/Input";
 
@@ -38,7 +38,7 @@ const FEE_INPUTS = [
     ]
   },
   {
-    name: "Charge Performance Fee",
+    name: "Performance Fee",
     description: "Charge a fee whenever the share value reaches a new all time high.",
     inputs: [
       {
@@ -50,8 +50,8 @@ const FEE_INPUTS = [
     ]
   },
   {
-    name: "Charge Management Fee",
-    description: "Charge a continues fee on the total value of deposits.",
+    name: "Management Fee",
+    description: "Charge a continuous fee on the total value of deposits.",
     inputs: [
       {
         title: "Management Fee Rate",
@@ -69,12 +69,15 @@ function FeeConfiguration() {
   const [fees, setFee] = useAtom(feeAtom);
   const [errors, setErrors] = useState<Errors>()
   const [recipientErrors, setRecipientErrors] = useState<string[] | undefined>(undefined)
-  const [areCategoriesOpened, setAreCategoriesOpened] = useState(FEE_INPUTS.map(item => false))
+  // @ts-ignore
+  const [areCategoriesOpened, setAreCategoriesOpened] = useState(FEE_INPUTS.map(fee => fees[fee.inputs[0].key] > 0))
 
   function handlePercentageChange(value: string, key: string) {
-    setFee({
+    const formattedValue = validateInput(value)
+
+    if (formattedValue.isValid) setFee({
       ...fees,
-      [key]: parseUnits(validateBigNumberInput(value).formatted),
+      [key]: formattedValue.formatted,
     });
   }
 
@@ -87,24 +90,21 @@ function FeeConfiguration() {
 
   function verifyFees() {
     // @ts-ignore
-    const totalFee = Object.keys(fees).filter(key => typeof fees[key] !== 'string').reduce((acc, key) => acc + Number(fees[key]), 0) >= 100000000000000000000;
+    const totalFee = Object.keys(fees).filter(key => typeof fees[key] !== 'string').reduce((acc, key) => acc + Number(fees[key]), 0) >= 100;
 
     const newErrors: Errors = {}
     Object.entries(fees).forEach(el => {
       const [key, val] = el
       const inputErrors = []
 
-      if (typeof val !== 'string') {
-        if (Number(val) >= 100000000000000000000) inputErrors.push("Fee must be less than 100%")
+      if (key === "recipient") {
+        if (!utils.isAddress(val) && val.length > 0) inputErrors.push("Recipient must be a valid address")
+        if (val === constants.AddressZero) inputErrors.push("Recipient must not be the zero address")
+      } else {
+        if (Number(val) >= 100) inputErrors.push("Fee must be less than 100%")
         if (Number(val) < 0) inputErrors.push("Fee must be greater or equal to 0%")
         if (totalFee) inputErrors.push("Total fee must be less than 100%")
       }
-
-      if (typeof val === 'string') {
-        if (!utils.isAddress(val) && val.length > 0) inputErrors.push("Recipient must be a valid address")
-        if (val === constants.AddressZero) inputErrors.push("Recipient must not be the zero address")
-      }
-
       newErrors[key] = inputErrors.length > 0 ? inputErrors : undefined
     })
     setErrors(newErrors)
@@ -114,7 +114,7 @@ function FeeConfiguration() {
     const newErrors: string[] = []
     if (!utils.isAddress(fees.recipient)) newErrors.push("Recipient must be a valid address")
     if (fees.recipient === constants.AddressZero) newErrors.push("Recipient must not be the zero address")
-    
+
     setRecipientErrors(newErrors.length > 0 ? newErrors : undefined)
   }
 
@@ -128,6 +128,7 @@ function FeeConfiguration() {
               description={category.description}
               isOpened={areCategoriesOpened[idx]}
               handleIsOpenedChange={isOpened => {
+                handlePercentageChange("0", category.inputs[0].key)
                 const newAreCategoriesOpened = [...areCategoriesOpened]
                 newAreCategoriesOpened[idx] = isOpened
                 setAreCategoriesOpened(newAreCategoriesOpened)
@@ -154,14 +155,10 @@ function FeeConfiguration() {
                             }
                           }
                         }
-                        type={input.type === INPUT_TYPES.PERCENTAGE ? "number" : "text"}
+                        // @ts-ignore
+                        value={fees[input.key] === "0" ? "" : fees[input.key]}
+                        placeholder="0%"
                         className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                        autoComplete="off"
-                        autoCorrect="off"
-                        placeholder={input.placeholder}
-                        minLength={1}
-                        maxLength={79}
-                        spellCheck="false"
                         onBlur={verifyFees}
                         errors={errors?.[input.key]}
                       />
@@ -174,26 +171,26 @@ function FeeConfiguration() {
         );
       })}
       <div className="">
-       <Fieldset className="flex-grow" label="Fee Recipient" description="Which address should receive the fees?" isSwitchNeeded={false}>
-         <Input
-           onChange={(e) =>
-             setFee((prefState) => {
-               return {
-                 ...prefState,
-                 recipient: (e.target as HTMLInputElement).value,
-               };
-             })
-           }
-           defaultValue={fees.recipient}
-           placeholder="0x00"
-           autoComplete="off"
-           autoCorrect="off"
-           info={"Required"}
-           onBlur={verifyRecipient}
-           errors={recipientErrors}
-         />
-       </Fieldset>
-      </div> 
+        <Fieldset className="flex-grow" label="Fee Recipient" description="Which address should receive the fees?" isSwitchNeeded={false}>
+          <Input
+            onChange={(e) =>
+              setFee((prefState) => {
+                return {
+                  ...prefState,
+                  recipient: (e.target as HTMLInputElement).value,
+                };
+              })
+            }
+            defaultValue={fees.recipient}
+            placeholder="0x00"
+            autoComplete="off"
+            autoCorrect="off"
+            info={"Required"}
+            onBlur={verifyRecipient}
+            errors={recipientErrors}
+          />
+        </Fieldset>
+      </div>
     </section>
   );
 }

@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import { Listbox } from "@headlessui/react";
-import { ChevronLeftIcon, XMarkIcon } from "@heroicons/react/24/solid";
+import { ChevronLeftIcon, ChevronRightIcon, XMarkIcon } from "@heroicons/react/24/outline";
 
 function Selector({
   selected,
@@ -21,7 +21,7 @@ function Selector({
 }) {
   return (
     <Listbox
-      className="self-start w-full border-none"
+      className="self-start w-full border-none overflow-hidden"
       as="div"
       value={selected}
       onChange={onSelect}
@@ -39,16 +39,16 @@ function Selector({
                   />
                 </div>
               )}
-              <span className={`w-full flex self-center flex-row justify-start ${!disabled ? 'text-[white]' : 'text-[#353945]'}`}>{selected?.name}</span>
-              <span className={`self-center text-[white] mr-2 ${disabled && 'hidden'}`}>{`>`}</span>
+              <span className={`w-full flex self-center flex-row justify-start ${!disabled ? 'text-[white]' : 'text-gray-600'}`}>{selected?.name}</span>
+              <ChevronRightIcon className={`self-center text-white mr-2 h-5 cursor-pointer ${disabled ? 'hidden' : ""}`} />
             </div>
           </Listbox.Button>
           {open && (
-            <Listbox.Options className="z-[1] absolute flex flex-col min-w-[12rem] rounded-[20px] top-0 left-0 p-2 bg-black w-full h-full overflow-hidden" >
+            <Listbox.Options className="z-[1] absolute flex flex-col min-w-[12rem] rounded-[20px] top-0 left-0 p-2 bg-black w-full h-136 overflow-hidden" >
               <div className="w-full h-full bg-black flex flex-col items-start gap-y-1 px-8 py-9">
                 <div className="flex flex-row items-center mb-9 justify-between w-full">
                   <Listbox.Option value={selected} as={Fragment}>
-                    <ChevronLeftIcon className="text-white w-10 h-10 -ml-3 cursor-pointer md:hidden" />
+                    <ChevronLeftIcon className="text-white w-4 h-10 -ml-3 cursor-pointer md:hidden" />
                   </Listbox.Option>
                   <p className="text-[white] text-2xl">
                     {title}
@@ -79,7 +79,7 @@ export function Option({ value, children, selected, disabled, apy }: { value: an
       {({ active }) => {
         return (
           <button
-            className={`flex flex-row items-center text-left h-14 p-3 rounded-[4px] ${disabled ? "hover:bg-red-600 cursor-not-allowed" : "hover:bg-[gray]"} 
+            className={`flex flex-row items-center text-left h-14 p-3 rounded-[4px] ${disabled ? "hover:text-[#353945] cursor-not-allowed" : "hover:bg-[#353945]"} 
             ${selected ? 'bg-[white]' : ''}`}
             disabled={disabled}
           >
@@ -91,11 +91,14 @@ export function Option({ value, children, selected, disabled, apy }: { value: an
               /> :
               <div className="h-10 w-10 mr-4 rounded-full bg-black"></div>
             }
-            <div className="flex flex-col self-center">
-              <p className={`${selected ? "text-[black]" : "text-[white]"}`}>{value.symbol}</p>
-              <span className="flex flex-row">
-                <p className={`${selected ? "text-[black]" : "text-[#ffffff99]"}`}>{value.name}</p>
-                {disabled && <p className={`ml-1 ${selected ? "text-[black]" : "text-[#ffffff99]"}`}>- Asset not supported</p>}
+            <div className="flex flex-col self-center w-full">
+              <p className={`${selected ? "text-[black]" : "text-[white]"}`}>{value.symbol || value.name}</p>
+              <span className="flex flex-row justify-between w-full">
+                {value.symbol && <p className={`${selected ? "text-[black]" : "text-[#ffffff99]"}`}>{value.name}</p>}
+                {disabled && <span className="border border-customRed bg-customRed/20 rounded-md py-1 px-2">
+                  <p className={`self-end text-customRed`}>Not supported</p>
+                </span>
+                }
               </span>
             </div>
             {children}

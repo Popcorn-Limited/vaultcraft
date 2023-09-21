@@ -51,39 +51,58 @@ export default function Review(): JSX.Element {
   const [strategyConfig] = useAtom(strategyConfigAtom);
   const [strategyData, setStrategyData] = useAtom(strategyDeploymentAtom);
 
-  // const [devMode, setDevMode] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    setAdapterData({
-      id: ethers.utils.formatBytes32String(adapter.key ? adapter.key : ""),
-      data: !!adapter.initParams
-        ? ethers.utils.defaultAbiCoder.encode(
-          adapter.initParams?.map((param) => param.type),
-          adapterConfig
+    // @ts-ignore
+    async function encodeStrategyData() {
+      setLoading(true)
+      let adapterId = ethers.utils.formatBytes32String("")
+      let adapterInitParams = "0x"
+
+      let strategyId = ethers.utils.formatBytes32String("")
+      let strategyInitParams = "0x"
+
+      if (strategy.name.includes("Depositor")) {
+        adapterId = ethers.utils.formatBytes32String(strategy.key)
+
+        if (strategy.initParams && strategy.initParams.length > 0) {
+          adapterInitParams = ethers.utils.defaultAbiCoder.encode(
+            strategy.initParams.map((param) => param.type),
+            strategyConfig
+          )
+        }
+      } else {
+        adapterId = ethers.utils.formatBytes32String((strategy.adapter as string))
+        strategyId = ethers.utils.formatBytes32String((strategy.key as string))
+
+        adapterInitParams = ethers.utils.defaultAbiCoder.encode(
+          // @ts-ignore
+          [strategy.initParams[0]],
+          [strategyConfig[0]]
         )
-        : "0x",
-    });
-  }, [adapterConfig]);
 
-  // Populate Strategy Data with dummy data that trades CRV -> USDC -> DAI
-  // Specific bytes output may be different depending on optimal routes at API Call.
-  useEffect(() => {
-    const fetchAndSetStrategyData = async () => {
-      const data = await resolveStrategyEncoding({
-        chainId: chainId,
-        address: asset.address[chainId],
-        params: strategyConfig,
-        resolver: strategy.resolver
-      })
+        strategyInitParams = await resolveStrategyEncoding({
+          chainId: network.id,
+          address: asset.address[network.id],
+          params: strategyConfig.slice(1),
+          resolver: strategy.resolver
+        })
+      }
+      setAdapterData({
+        id: adapterId,
+        data: adapterInitParams,
+      });
 
       setStrategyData({
-        id: strategy.key,
-        data: data
+        id: strategyId,
+        data: strategyInitParams
       });
-    };  
-    
-    if (strategy.key !== "none") fetchAndSetStrategyData();
-  }, [strategy, strategyConfig]);
+      setLoading(false)
+    }
+
+    if (strategy.key !== "none") encodeStrategyData();
+  }, [strategy, strategyConfig])
 
   return (
     <section>
@@ -91,25 +110,19 @@ export default function Review(): JSX.Element {
         <ReviewParam title="Vault Name" value={metadata?.name} />
         <ReviewParam title="Asset" value={asset.name} img={asset.logoURI} />
         <ReviewParam title="Protocol" value={protocol.name} img={protocol.logoURI} />
-        <ReviewParam title="Adapter" value={adapter.name} img={adapter.logoURI} />
         <ReviewParam title="Strategy" value={strategy.name === DEFAULT_STRATEGY.name ? '-' : strategy.name} img={strategy.logoURI} />
       </ReviewSection>
       <ReviewSection title="Fees">
-        <ReviewParam title="Deposit Fee" value={`${formatUnits(fees.deposit)}%`} />
-        <ReviewParam title="Withdrawal Fee" value={`${formatUnits(fees.withdrawal)}%`} />
-        <ReviewParam title="Withdrawal Fee For Specifit Asset" value={`${formatUnits(fees.withdrawalFeeForSpecificAsset)}%`} />
-        <ReviewParam title="Management Fee" value={`${formatUnits(fees.management)}%`} />
-        <ReviewParam title="Performance Fee" value={`${formatUnits(fees.performance)}%`} />
+        <ReviewParam title="Deposit Fee" value={`${Number(fees.deposit)}%`} />
+        <ReviewParam title="Withdrawal Fee" value={`${fees.withdrawal}%`} />
+        <ReviewParam title="Performance Fee" value={`${fees.performance}%`} />
+        <ReviewParam title="Management Fee" value={`${fees.management}%`} />
         <ReviewParam title="Fee Recipient" value={shortenAddress(fees.recipient)} fullValue={fees.recipient} />
       </ReviewSection>
       <ReviewSection title="Deposits Limit">
         <ReviewParam
-          title="Minimum deposit amount"
-          value={`${formatUnits(limit.minimum.toString())} ${asset.symbol}`}
-        />
-        <ReviewParam
           title="Maximum deposit amount"
-          value={`${formatUnits(limit.maximum.toString())} ${asset.symbol}`}
+          value={`${Number(limit.maximum) === 0 ? "∞" : Number(limit.maximum)} ${asset.symbol}`}
         />
       </ReviewSection>
       <div className={`flex items-center gap-3 mt-6`}>
@@ -123,7 +136,12 @@ export default function Review(): JSX.Element {
         >
           <img className={`${conditions ? '' : 'hidden'}`} src="/images/icons/checkIcon.svg" />
         </Switch>
-        <span className={`text-white text-[14px]`}>I have read and agree to the <a href="https://google.com/" className={`text-[#87C1F8]`}>Terms & Conditions</a></span>
+        <span className={`text-white text-[14px]`}>
+          I have read and agree to the <a href="https://app.vaultcraft.io/disclaimer" className={`text-[#87C1F8]`}>Terms & Conditions</a>.
+        </span>
+
+        {strategy.key !== "none" && loading && <p className="text-white mt-6">Loading Configuration, please wait...</p>}
+
       </div>
     </section >
   );

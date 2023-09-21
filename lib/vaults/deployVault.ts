@@ -1,7 +1,10 @@
-import { constants, ethers } from "ethers";
+import { Contract, constants, ethers } from "ethers";
 import { useAccount, useContractWrite, useNetwork, usePrepareContractWrite } from "wagmi";
 import { useAtom } from "jotai";
-import { adapterDeploymentAtom, assetAtom, feeAtom, limitAtom, metadataAtom } from "@/lib/atoms"
+import { adapterDeploymentAtom, assetAtom, feeAtom, limitAtom, metadataAtom, strategyDeploymentAtom } from "@/lib/atoms"
+import { parseUnits } from "ethers/lib/utils.js";
+import { toast } from "react-hot-toast";
+import { extractRevertReason } from "../helpers";
 
 const VAULT_CONTROLLER = {
   "1": "0x7D51BABA56C2CA79e15eEc9ECc4E92d9c0a7dbeb",
@@ -10,48 +13,37 @@ const VAULT_CONTROLLER = {
 }
 
 
-export const useDeployVault = () => {
-  const { address: account } = useAccount();
-  const { chain } = useNetwork()
-  const [asset] = useAtom(assetAtom);
-  const [adapterData] = useAtom(adapterDeploymentAtom);
-  const [metadata] = useAtom(metadataAtom);
-  const [fees] = useAtom(feeAtom);
-  const [limit] = useAtom(limitAtom);
+export async function deployVault(chain: any, connector: any, fees: any, asset: any, limit: any, account: any, adapterData: any, strategyData: any, ipfsHash: any): Promise<boolean> {
+  toast.loading("Deploying Vault...")
+  const signer = await connector.getSigner()
 
-  const { config, error: configError } = usePrepareContractWrite({
-    // @ts-ignore
-    address: "0x7D51BABA56C2CA79e15eEc9ECc4E92d9c0a7dbeb",
-    abi,
-    functionName: "deployVault",
-    chainId: chain?.id,
-    args: [
+  const controller = new Contract("0x7D51BABA56C2CA79e15eEc9ECc4E92d9c0a7dbeb", abi, signer)
+
+  try {
+    const tx = await controller.deployVault(
       {
         // @ts-ignore
         asset: asset.address[chain?.id],
         adapter: constants.AddressZero,
         fees: {
-          deposit: fees.deposit,
-          withdrawal: fees.withdrawal,
-          management: fees.management,
-          performance: fees.performance,
+          deposit: parseUnits(String(Number(fees.deposit) / 100)),
+          withdrawal: parseUnits(String(Number(fees.withdrawal) / 100)),
+          management: parseUnits(String(Number(fees.management) / 100)),
+          performance: parseUnits(String(Number(fees.performance) / 100)),
         },
         feeRecipient: fees.recipient,
-        depositLimit: Number(limit) > 0 ? limit : constants.MaxUint256,
+        depositLimit: Number(limit.maximum) === 0 ? constants.MaxUint256 : String(Number(limit.maximum) * (10 ** asset.decimals)),
         owner: account,
       },
       adapterData,
-      {
-        id: ethers.utils.formatBytes32String(""),
-        data: "0x",
-      },
+      strategyData,
       false,
       "0x",
       {
         vault: constants.AddressZero,
         staking: constants.AddressZero,
         creator: account,
-        metadataCID: metadata?.ipfsHash,
+        metadataCID: ipfsHash,
         swapTokenAddresses: [
           constants.AddressZero,
           constants.AddressZero,
@@ -66,8 +58,16 @@ export const useDeployVault = () => {
         exchange: 0,
       },
       0,
-    ],
-  });
+    );
+    await tx.wait(1)
+    toast.dismiss()
+    toast.success("Vault Deployed!");
+    return true
+  } catch (error) {
+    toast.dismiss()
+    toast.error(extractRevertReason(error));
+    return false
+  }
 
   // const { config, error: configError } = usePrepareContractWrite({
   //   address: "0xd855ce0c298537ad5b5b96060cf90e663696bbf6",
@@ -84,8 +84,6 @@ export const useDeployVault = () => {
   //     0
   //   ]
   // })
-
-  return useContractWrite(config);
 };
 
 const abi = [

@@ -29,9 +29,8 @@ export function verifyInitParamValidity(
   return errors;
 }
 
-export const validateBigNumberInput = (value?: string | number) => {
-  let formatted = value === "." ? "0" : (`${value || "0"}`.replace(/\.$/, ".0") as any);
-  formatted = formatted.replace(/[^0-9.]/g, "")
+export const validateInput = (value?: string | number) => {
+  let formatted = String(value).replace(/[^0-9.]/g, "")
   return {
     formatted,
     isValid: value === "" || isFinite(Number(formatted)),
@@ -52,4 +51,17 @@ export function transformNetwork(network: string | undefined): string {
 
 export function cleanFileName(fileName: string): string {
   return fileName.replace(/ /g, "-").replace(/[^a-zA-Z0-9]/g, "");
+}
+
+
+export function extractRevertReason(error: any): string {
+  if (error.reason) {
+      return error.reason;
+  }
+
+  if (error.data && error.data.message) {
+      return error.data.message;
+  }
+
+  return error;
 }

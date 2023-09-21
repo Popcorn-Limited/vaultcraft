@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import { atomWithStorage } from "jotai/utils";
-import adapters from "@/lib/constants/adapters.json";
+import strategies from "@/lib/constants/strategies.json";
 import { atom, useAtom } from "jotai";
 
 export type Adapter = {
@@ -8,7 +8,7 @@ export type Adapter = {
   key: string;
   logoURI: string;
   protocol: string;
-  assets: string[];
+  description: string;
   chains: number[];
   initParams?: InitParam[];
   resolver?: string;
@@ -34,10 +34,10 @@ export interface AdapterConfig {
 }
 
 export const useAdapters = () => {
-  return adapters as any as Array<Adapter>;
+  return strategies as any as Array<Adapter>;
 };
 
-export const DEFAULT_ADAPTER: Adapter = { name: "Choose an Adapter", key: "none", logoURI: "", protocol: "none", assets: [], chains: [] }
+export const DEFAULT_ADAPTER: Adapter = { name: "Choose an Adapter", key: "none", logoURI: "", protocol: "none", description: "none", chains: [] }
 
 export const adapterAtom = atom<Adapter>(DEFAULT_ADAPTER);
 
