@@ -138,7 +138,7 @@
     "logoURI": "https://cdn.furucombo.app/assets/img/token/CVX.png"
   },
   {
-    "chains": [1, 1337],
+    "chains": [],
     "name": "Yearn",
     "key": "yearn",
     "logoURI": "https://cryptologos.cc/logos/yearn-finance-yfi-logo.png?v=024"
