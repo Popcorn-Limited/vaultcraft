@@ -1,7 +1,6 @@
 import { BASIC_CREATION_STAGES } from "@/lib/stages";
 import { useRouter } from "next/router";
 import { useAtom } from "jotai";
-import { constants, utils } from "ethers";
 import { feeAtom } from "@/lib/atoms/fees";
 import MainActionButton from "@/components/buttons/MainActionButton";
 import SecondaryActionButton from "@/components/buttons/SecondaryActionButton";

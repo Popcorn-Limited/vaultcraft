@@ -1,11 +1,11 @@
-import { Asset, DEFAULT_ADAPTER, DEFAULT_PROTOCOL, DEFAULT_STRATEGY, adapterAtom, adapterConfigAtom, assetAddressesAtom, assetAtom, assets, networkAtom, protocolAtom, strategyAtom, useAdapters } from "@/lib/atoms";
+import { Asset, DEFAULT_PROTOCOL, DEFAULT_STRATEGY, adapterAtom, adapterConfigAtom, assetAddressesAtom, assetAtom, assets, networkAtom, protocolAtom, strategyAtom, useAdapters } from "@/lib/atoms";
 import Input from "../inputs/Input";
 import Selector, { Option } from "../inputs/Selector";
 import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import { localhost, mainnet } from "wagmi/chains";
-import { utils } from "ethers";
 import { RPC_URLS } from "@/lib/connectors";
+import { isAddress } from "viem";
 
 async function fetchViaAlchemy(address: string, chainId: number, metadata: any) {
   const options = {
@@ -76,7 +76,7 @@ function AssetSelection() {
     )
 
     if (avAssets.length === 0
-      && utils.isAddress(searchTerm)
+      && isAddress(searchTerm)
       && availableAssetAddresses[chainId].all.includes(searchTerm)) {
       getTokenMetadata(searchTerm, chainId, protocol.key).then(res => setAvailableAssets([res]))
     } else {

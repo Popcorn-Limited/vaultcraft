@@ -27,9 +27,9 @@ export default function DesktopMenu(): JSX.Element {
                         </Link>
                     </div>
                 </div>
-                <div className="flex flex h-full flex-row w-fit-content gap-x-6">
+                <div className="flex h-full flex-row w-fit-content gap-x-6">
                     {address ? (
-                        <div className={`relative flex flex flex-row z-10`}>
+                        <div className={`relative flex flex-row z-10`}>
                             <div
                                 className={`w-fit cursor-pointer h-full py-3 md:px-6 flex md:flex-row flex-row-reverse items-center justify-between border border-[#d7d7d766] md:rounded-[4px] rounded-[30px]  text-primary`}
                                 onClick={openChainModal}

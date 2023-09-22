@@ -1,5 +1,3 @@
-import {active} from "@rainbow-me/rainbowkit/dist/css/touchableStyles.css";
-
 export default function ProgressBar({ stages, activeStage }: { stages: string[], activeStage: number }) {
     return (
         <div className="flex flex-col">

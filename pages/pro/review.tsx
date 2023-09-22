@@ -1,4 +1,4 @@
-import { BASIC_CREATION_STAGES } from "@/lib/stages";
+import { PRO_CREATION_STAGES } from "@/lib/stages";
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { useAtom } from "jotai";
@@ -13,7 +13,6 @@ import MainActionButton from "@/components/buttons/MainActionButton";
 import SecondaryActionButton from "@/components/buttons/SecondaryActionButton";
 import Modal from "@/components/Modal";
 import VaultCreationContainer from "@/components/VaultCreationContainer";
-import { ethers } from "ethers";
 import { deployVault } from "@/lib/vaults/deployVault";
 import { stringToHex } from "viem";
 
@@ -57,7 +56,7 @@ export default function ReviewPage(): JSX.Element {
   }
 
   return (metadata && adapter ?
-    <VaultCreationContainer activeStage={2} stages={BASIC_CREATION_STAGES} >
+    <VaultCreationContainer activeStage={3} stages={PRO_CREATION_STAGES} >
       <div>
         <h1 className="text-white text-2xl mb-2">Review</h1>
         <p className="text-white">

@@ -1,6 +1,6 @@
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
-import { Strategy, adapterAtom, assetAtom, networkAtom, protocolAtom, strategyAtom, useStrategies } from "@/lib/atoms";
+import { Strategy, assetAtom, networkAtom, protocolAtom, strategyAtom, useStrategies } from "@/lib/atoms";
 import Selector, { Option } from "@/components/inputs/Selector";
 
 

@@ -7,8 +7,6 @@ import MainActionButton from "@/components/buttons/MainActionButton";
 import SecondaryActionButton from "@/components/buttons/SecondaryActionButton";
 import VaultCreationContainer from "@/components/VaultCreationContainer";
 import StrategyConfiguration from "@/components/sections/StrategyConfiguration";
-import StrategySelection from "@/components/sections/StrategySelection";
-import AdapterConfiguration from "@/components/sections/AdapterConfiguration";
 
 export function isConfigValid(adapter: any, adapterConfig: string[]): boolean {
   if (adapter.initParams && adapter.initParams.length > 0) {

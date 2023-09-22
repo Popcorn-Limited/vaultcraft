@@ -1,11 +1,11 @@
 import { useAtom } from "jotai";
-import { useEffect, useState } from "react";
-import { constants, utils } from "ethers";
-import { formatUnits, parseUnits } from "ethers/lib/utils.js";
+import { useState } from "react";
 import { feeAtom } from "@/lib/atoms/fees";
 import { validateInput } from "@/lib/helpers";
 import Fieldset from "@/components/inputs/Fieldset";
 import Input from "@/components/inputs/Input";
+import { ADDRESS_ZERO } from "@/lib/constants";
+import { isAddress } from "viem";
 
 enum INPUT_TYPES {
   PERCENTAGE = "PERCENTAGE",
@@ -98,8 +98,8 @@ function FeeConfiguration() {
       const inputErrors = []
 
       if (key === "recipient") {
-        if (!utils.isAddress(val) && val.length > 0) inputErrors.push("Recipient must be a valid address")
-        if (val === constants.AddressZero) inputErrors.push("Recipient must not be the zero address")
+        if (!isAddress(val) && val.length > 0) inputErrors.push("Recipient must be a valid address")
+        if (val === ADDRESS_ZERO) inputErrors.push("Recipient must not be the zero address")
       } else {
         if (Number(val) >= 100) inputErrors.push("Fee must be less than 100%")
         if (Number(val) < 0) inputErrors.push("Fee must be greater or equal to 0%")
@@ -112,8 +112,8 @@ function FeeConfiguration() {
 
   function verifyRecipient() {
     const newErrors: string[] = []
-    if (!utils.isAddress(fees.recipient)) newErrors.push("Recipient must be a valid address")
-    if (fees.recipient === constants.AddressZero) newErrors.push("Recipient must not be the zero address")
+    if (!isAddress(fees.recipient)) newErrors.push("Recipient must be a valid address")
+    if (fees.recipient === ADDRESS_ZERO) newErrors.push("Recipient must not be the zero address")
 
     setRecipientErrors(newErrors.length > 0 ? newErrors : undefined)
   }

@@ -1,5 +1,7 @@
-import { Protocol, useProtocols } from "./atoms";
+import { Protocol } from "./atoms";
 import { resolveProtocolAssets } from "./resolver/protocolAssets/protocolAssets";
+
+// TODO update this using the sdk
 
 export default async function getSupportedAssetAddresses(chainId: number, protocols: Protocol[]): Promise<{ [key: string]: string[] }> {
   const applicableProtocols = protocols.filter((p) => p.chains.includes(chainId))

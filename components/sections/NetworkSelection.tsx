@@ -1,7 +1,6 @@
-import { Fragment, useEffect } from "react";
+import { useEffect } from "react";
 import { useAtom } from "jotai";
-import { RESET } from "jotai/utils";
-import { Chain, useNetwork } from "wagmi";
+import { useNetwork } from "wagmi";
 import { useChainModal } from "@rainbow-me/rainbowkit";
 import Image from "next/image";
 import { networkAtom, assetAtom, protocolAtom, adapterAtom, adapterConfigAtom, strategyAtom } from "@/lib/atoms";

@@ -1,4 +1,3 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import {
@@ -17,6 +16,8 @@ import {
 import { resolveProtocolAssets } from "@/lib/resolver/protocolAssets/protocolAssets";
 import Selector, { Option } from "@/components/inputs/Selector";
 import { resolveAdapterApy } from "@/lib/resolver/adapterApy/adapterApy";
+
+// TODO update this using the sdk
 
 interface ProtocolOption extends Protocol {
   disabled: boolean;
