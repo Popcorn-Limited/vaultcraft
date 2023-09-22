@@ -1,9 +1,9 @@
-import { RPC_PROVIDERS } from "@/lib/connectors";
+import { RPC_URLS } from "@/lib/connectors";
+import { ADDRESS_ZERO, MAX_INT256, ZERO } from "@/lib/constants";
 import { balancerApiProxyCall } from "@/lib/external/balancer/router/call";
 import { BatchSwapStep } from "@/lib/external/balancer/router/interfaces";
-import { BigNumber, Contract, constants, utils } from "ethers";
-import { parseUnits } from "ethers/lib/utils.js";
-import { useFeeData } from "wagmi";
+import { Address, createPublicClient, encodeAbiParameters, http, parseAbiParameters, parseUnits, stringToHex } from "viem";
+import { mainnet } from "wagmi";
 
 interface BalancerRoute {
   swaps: BatchSwapStep[];
@@ -21,25 +21,30 @@ interface RouteWithTypes {
 const batchSwapStepType = ["bytes32", "uint256", "uint256", "uint256", "bytes"]
 
 const toAssetRoute = [
-  utils.formatBytes32String(""), // toAssetRoute.swaps.poolId
+  stringToHex("", { size: 32 }), // toAssetRoute.swaps.poolId
   0,  // toAssetRoute.swaps.assetInIndex
   0,  // toAssetRoute.swaps.assetOutIndex
-  constants.Zero.toString(), // toAssetRoute.swaps.amount
+  ADDRESS_ZERO, // toAssetRoute.swaps.amount
   "0x",  // toAssetRoute.swaps.userData
-  constants.AddressZero, // toAssetRoute.assets
-  constants.Zero.toString(), // toAssetRoute.limits
+  ADDRESS_ZERO, // toAssetRoute.assets
+  ZERO.toString(), // toAssetRoute.limits
 ]
 
 const BALANCER_VAULT = { 1: "0xBA12222222228d8Ba445958a75a0704d566BF2C8" }
 
-async function createRouteWithTypes(sellToken: string, buyToken: string, chainId: number, gasPrice: string | null | undefined): Promise<RouteWithTypes> {
-  const token = new Contract(
-    sellToken,
-    ["function decimals() view returns (uint8)"],
+async function createRouteWithTypes(sellToken: Address, buyToken: Address, chainId: number, gasPrice: string | null | undefined): Promise<RouteWithTypes> {
+  // TODO -- temp solution, we should pass the client into the function
+  const client = createPublicClient({
+    chain: mainnet,
     // @ts-ignore
-    RPC_PROVIDERS[chainId]
-  )
-  const decimals = await token.decimals()
+    transport: http(RPC_URLS[chainId])
+  })
+
+  const decimals = await client.readContract({
+    address: sellToken,
+    abi: tokenDecimalsAbi,
+    functionName: "decimals"
+  })
 
   const res = await balancerApiProxyCall({
     sellToken: sellToken,
@@ -60,7 +65,7 @@ async function createRouteWithTypes(sellToken: string, buyToken: string, chainId
       }
     }),
     assets: res.tokenAddresses,
-    limits: res.tokenAddresses.map((address, i) => i < (res.tokenAddresses.length - 1) ? constants.MaxInt256.toString() : BigNumber.from("-1").toString())
+    limits: res.tokenAddresses.map((address, i) => i < (res.tokenAddresses.length - 1) ? MAX_INT256.toString() : BigInt("-1").toString())
   }
 
   return {
@@ -97,8 +102,8 @@ export async function balancerLpCompounder({ chainId, address, params }: { chain
     types.push(...route2.limitTypes)
   }
 
-  return utils.defaultAbiCoder.encode(
-    [
+  return encodeAbiParameters(parseAbiParameters(
+    String([
       "address", // baseAsset
       "address", // vault
       ...types,
@@ -107,7 +112,7 @@ export async function balancerLpCompounder({ chainId, address, params }: { chain
       "int256",  // toAssetRoute.limits
       ...params[1].map((value: string) => "uint256"), // minTradeAmounts
       "bytes", // optionalData
-    ],
+    ])),
     [
       params[2], // baseAsset
       // @ts-ignore
@@ -115,8 +120,8 @@ export async function balancerLpCompounder({ chainId, address, params }: { chain
       ...values,
       ...toAssetRoute,
       ...params[1], // minTradeAmounts
-      utils.defaultAbiCoder.encode(["bytes32", "uint8"], params[3])  // optionalData
+      encodeAbiParameters(parseAbiParameters("bytes32,uint8"), params[3])  // optionalData
     ]);
 }
 
-
+const tokenDecimalsAbi = [{ "constant": true, "inputs": [], "name": "decimals", "outputs": [{ "internalType": "uint8", "name": "", "type": "uint8" }], "payable": false, "stateMutability": "view", "type": "function" }] as const

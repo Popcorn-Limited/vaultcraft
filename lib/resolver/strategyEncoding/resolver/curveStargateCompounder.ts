@@ -1,17 +1,24 @@
+import { RPC_URLS } from "@/lib/connectors";
 import { curveApiCallToBytes } from "@/lib/external/curve/router/call";
-import { encodeAbiParameters, parseAbiParameters } from "viem";
+import { Address, createPublicClient, encodeAbiParameters, http, parseAbiParameters } from "viem";
+import { mainnet } from "wagmi";
 
-export async function curveStargateCompounder({ chainId, address, params }: { chainId: number, address: string, params: any[] }): Promise<string> {
-  const lpToken = new Contract(
-    address,
-    ["function token() view returns (address)"],
+export async function curveStargateCompounder({ chainId, address, params }: { chainId: number, address: Address, params: any[] }): Promise<string> {
+  // TODO -- temp solution, we should pass the client into the function
+  const client = createPublicClient({
+    chain: mainnet,
     // @ts-ignore
-    RPC_PROVIDERS[chainId])
+    transport: http(RPC_URLS[chainId])
+  })
 
-  const depositAsset = await lpToken.token()
+  const token = await client.readContract({
+    address,
+    abi: lpTokenAbi,
+    functionName: "token"
+  })
 
   const data = await curveApiCallToBytes({
-    depositAsset: depositAsset,
+    depositAsset: token,
     rewardTokens: params[0],
     baseAsset: params[2],
     router: "0x99a58482BD75cbab83b27EC03CA68fF489b5788f",
@@ -22,3 +29,6 @@ export async function curveStargateCompounder({ chainId, address, params }: { ch
 
   return data
 }
+
+
+const lpTokenAbi = [{ "inputs": [], "name": "token", "outputs": [{ "internalType": "address", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" }] as const
