@@ -78,7 +78,7 @@ export async function deployVault(chain: any, connector: any, fees: any, asset: 
   //     asset.address,
   //     adapterData,
   //     {
-  //       id: ethers.utils.formatBytes32String(""),
+  //       id: stringToHex(""),
   //       data: "0x"
   //     },
   //     0

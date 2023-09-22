@@ -8,7 +8,7 @@ export default function Page({
   return (
     <>
       <div className="bg-[#141416] w-full min-h-screen">
-        <DesktopMenu />
+        {/* <DesktopMenu /> */}
         <main className="max-w-screen-lg md:mx-auto py-4 w-full">
           {children}
         </main>

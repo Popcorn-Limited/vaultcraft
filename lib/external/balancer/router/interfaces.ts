@@ -1,5 +1,3 @@
-import { BigNumber } from 'ethers';
-
 export interface BalancerData {
     sellToken: string,
     buyToken: string,
@@ -27,8 +25,8 @@ interface SwapResponse extends BatchSwapStep {
 
 export interface BatchSwapStruct {
     poolId: string;
-    assetInIndex: BigNumber;
-    assetOutIndex: BigNumber;
+    assetInIndex: BigInt;
+    assetOutIndex: BigInt;
 }
 
 export interface FundManagement {

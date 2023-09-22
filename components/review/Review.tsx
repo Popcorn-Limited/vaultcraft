@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 import { localhost } from "wagmi/chains";
-import { constants, ethers } from "ethers";
-import { formatUnits } from "ethers/lib/utils.js";
 import { mainnet, useAccount } from "wagmi";
 import { useAtom } from "jotai";
 import { Switch } from '@headlessui/react'
@@ -24,8 +22,7 @@ import {
 import ReviewSection from "./ReviewSection";
 import ReviewParam from "./ReviewParam";
 import { resolveStrategyEncoding } from "@/lib/resolver/strategyEncoding/strategyDefaults";
-
-import { balancerApiProxyCall } from "@/lib/external/balancer/router/call";
+import { encodeAbiParameters, parseAbiParameters, stringToHex } from "viem";
 
 function shortenAddress(address: string): string {
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
@@ -53,32 +50,33 @@ export default function Review(): JSX.Element {
 
   const [loading, setLoading] = useState(false);
 
+  encodeAbiParameters(parseAbiParameters("string,uint256"), ["token", BigInt("1000000000000000000")])
+
   useEffect(() => {
     // @ts-ignore
     async function encodeStrategyData() {
       setLoading(true)
-      let adapterId = ethers.utils.formatBytes32String("")
+      let adapterId = stringToHex("", { size: 32 })
       let adapterInitParams = "0x"
 
-      let strategyId = ethers.utils.formatBytes32String("")
+      let strategyId = stringToHex("", { size: 32 })
       let strategyInitParams = "0x"
 
       if (strategy.name.includes("Depositor")) {
-        adapterId = ethers.utils.formatBytes32String(strategy.key)
+        adapterId = stringToHex(strategy.key, { size: 32 })
 
         if (strategy.initParams && strategy.initParams.length > 0) {
-          adapterInitParams = ethers.utils.defaultAbiCoder.encode(
-            strategy.initParams.map((param) => param.type),
+          adapterInitParams = encodeAbiParameters(
+            parseAbiParameters(String(strategy.initParams.map((param) => param.type))),
             strategyConfig
           )
         }
       } else {
-        adapterId = ethers.utils.formatBytes32String((strategy.adapter as string))
-        strategyId = ethers.utils.formatBytes32String((strategy.key as string))
+        adapterId = stringToHex((strategy.adapter as string), { size: 32 })
+        strategyId = stringToHex((strategy.key as string), { size: 32 })
 
-        adapterInitParams = ethers.utils.defaultAbiCoder.encode(
-          // @ts-ignore
-          [strategy.initParams[0]],
+        adapterInitParams = encodeAbiParameters(
+          parseAbiParameters(strategy.initParams?.[0].type as string),
           [strategyConfig[0]]
         )
 

@@ -15,6 +15,7 @@ import Modal from "@/components/Modal";
 import VaultCreationContainer from "@/components/VaultCreationContainer";
 import { ethers } from "ethers";
 import { deployVault } from "@/lib/vaults/deployVault";
+import { stringToHex } from "viem";
 
 
 export default function ReviewPage(): JSX.Element {
@@ -129,7 +130,7 @@ export default function ReviewPage(): JSX.Element {
             <MainActionButton
               label="Done"
               handleClick={() => isSuccess ? router.push("https://app.pop.network/experimental/sweet-vaults") : setShowModal(false)}
-              disabled={metadata.ipfsHash === "" || isLoading || (strategyData.id !== ethers.utils.formatBytes32String("") && strategyData.data === "0x")}
+              disabled={metadata.ipfsHash === "" || isLoading || (strategyData.id !== stringToHex("", { size: 32 }) && strategyData.data === "0x")}
             />
           </div>
         </div>

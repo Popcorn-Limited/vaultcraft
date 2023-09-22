@@ -1,7 +1,7 @@
 import { AdapterConfig, InitParam } from "./adapter";
 import strategies from "@/lib/constants/strategies.json";
 import { atom } from "jotai";
-import { ethers } from "ethers";
+import { stringToHex } from "viem";
 
 export type Strategy = {
   name: string;
@@ -31,4 +31,4 @@ export const DEFAULT_STRATEGY = {
 export const strategyAtom = atom<Strategy>(DEFAULT_STRATEGY);
 
 export const strategyConfigAtom = atom<any[]>([]);
-export const strategyDeploymentAtom = atom<AdapterConfig>({ id: ethers.utils.formatBytes32String(""), data: "0x" });
+export const strategyDeploymentAtom = atom<AdapterConfig>({ id: stringToHex("", { size: 32 }), data: "0x" });

@@ -1,6 +1,5 @@
-import { RPC_PROVIDERS } from "@/lib/connectors";
 import { curveApiCallToBytes } from "@/lib/external/curve/router/call";
-import { BigNumber, Contract, ethers } from "ethers";
+import { encodeAbiParameters, parseAbiParameters } from "viem";
 
 export async function curveStargateCompounder({ chainId, address, params }: { chainId: number, address: string, params: any[] }): Promise<string> {
   const lpToken = new Contract(
@@ -18,7 +17,7 @@ export async function curveStargateCompounder({ chainId, address, params }: { ch
     router: "0x99a58482BD75cbab83b27EC03CA68fF489b5788f",
     // @ts-ignore
     minTradeAmounts: params[1].map(value => BigNumber.from(value)),
-    optionalData: ethers.utils.defaultAbiCoder.encode(["address"], params[3]),
+    optionalData: encodeAbiParameters(parseAbiParameters("address"), params[3]),
   });
 
   return data

@@ -58,4 +58,4 @@ export const convexBoosterAbi = [
       "stateMutability": "view",
       "type": "function"
   },
-]
+] as const
