@@ -1,34 +1,39 @@
-import { readContract } from "@wagmi/core";
-import { readContracts } from "wagmi";
-import { constants } from "ethers";
+import { RPC_URLS } from "@/lib/connectors";
+import { ADDRESS_ZERO } from "@/lib/constants";
+import { Address, createPublicClient, getAddress, http } from "viem";
+import { mainnet } from "wagmi";
 
-const COMPTROLLER_ADDRESS = "0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B";
+const COMPTROLLER_ADDRESS: Address = "0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B";
 
-export async function compoundV2({ chainId, address }: { chainId: number, address: string }) {
-    const cTokens = await readContract({
+export async function compoundV2({ chainId, address }: { chainId: number, address: Address }): Promise<any[]> {
+    // TODO -- temp solution, we should pass the client into the function
+    const client = createPublicClient({
+        chain: mainnet,
+        // @ts-ignore
+        transport: http(RPC_URLS[chainId])
+    })
+
+    const cTokens = await client.readContract({
         address: COMPTROLLER_ADDRESS,
         abi: abiComptroller,
         functionName: "getAllMarkets",
-        chainId,
-        args: []
-    }) as `0x${string}`[];
+    })
 
-    const underlying = (await readContracts({
-        contracts: cTokens.map(item => {
+    const underlyingRes = await client.multicall({
+        contracts: cTokens.map(address => {
             return {
-                address: item,
+                address,
                 abi: abiMarket,
                 functionName: "underlying",
-                chainId,
-                args: []
             }
         })
-    }) as string[]).map(item => item ? item.toLowerCase() : item)
+    })
+    const underlying: Address[] = underlyingRes.filter(token => token.status === "success").map((token: any) => getAddress(token.result))
 
     return [
-        underlying.includes(address.toLowerCase())
-            ? cTokens[underlying.indexOf(address.toLowerCase())]
-            : constants.AddressZero
+        underlying.includes(getAddress(address))
+            ? getAddress(cTokens[underlying.indexOf(getAddress(address))])
+            : ADDRESS_ZERO
     ]
 }
 
@@ -48,7 +53,7 @@ const abiComptroller = [
         "stateMutability": "view",
         "type": "function"
     },
-]
+] as const;
 const abiMarket = [
     {
         "constant": true,
@@ -64,4 +69,4 @@ const abiMarket = [
         "stateMutability": "view",
         "type": "function"
     }
-]
+] as const;

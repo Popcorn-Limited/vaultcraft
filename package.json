@@ -16,6 +16,7 @@
     "@heroicons/react": "^2.0.18",
     "@rainbow-me/rainbowkit": "^1.0.11",
     "autoprefixer": "^10.4.13",
+    "base58-js": "^2.0.0",
     "dotenv": "^16.0.3",
     "find-config": "^1.0.0",
     "jotai": "^2.0.1",

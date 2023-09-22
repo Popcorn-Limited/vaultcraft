@@ -1,5 +1,6 @@
-import { constants, utils } from "ethers";
 import { InitParam, InitParamRequirement } from "@/lib/atoms/adapter"
+import { isAddress } from "viem";
+import { ADDRESS_ZERO } from "./constants";
 
 export function noOp() { }
 
@@ -16,12 +17,12 @@ export function verifyInitParamValidity(
   if (!inputParam.requirements) {
     switch (inputParam.type) {
       case "address":
-        if (!utils.isAddress(value)) errors.push("Must be a valid address");
+        if (!isAddress(value)) errors.push("Must be a valid address");
     }
   }
   if (inputParam.requirements && inputParam.requirements.length > 0) {
     if (inputParam.requirements.includes(InitParamRequirement.NotAddressZero) &&
-      value !== constants.AddressZero) errors.push("Must not be zero address");
+      value !== ADDRESS_ZERO) errors.push("Must not be zero address");
 
     if (inputParam.requirements.includes(InitParamRequirement.NotZero) && Number(value) === 0) errors.push("Must not be zero");
   }

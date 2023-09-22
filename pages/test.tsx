@@ -6,9 +6,8 @@ import { createPublicClient, http } from 'viem'
 import { mainnet } from 'viem/chains'
 // @ts-ignore
 import NoSSR from 'react-no-ssr';
-import { useAtom } from 'jotai';
 import axios from "axios";
-import { getConvexPools } from '@/lib/external/convex';
+
 
 async function setUpYieldOptions() {
   const ttl = 360_000;
@@ -21,7 +20,6 @@ async function setUpYieldOptions() {
 }
 
 function TestContainer() {
-  getConvexPools({ chainId: 1 })
 
   return <></>
 }

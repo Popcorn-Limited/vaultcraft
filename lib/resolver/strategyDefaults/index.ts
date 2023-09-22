@@ -1,4 +1,5 @@
 
+import { Address } from "viem";
 import {
   alpacaV1,
   alpacaV2,
@@ -27,12 +28,12 @@ import {
 
 export type StrategyDefaultResolver = (
   chainId: number,
-  address: string,
+  address: Address,
 ) => Promise<any[]>;
 
 export type StrategyDefaultResolvers = typeof StrategyDefaultResolvers;
 
-export const StrategyDefaultResolvers: { [key: string]: ({ chainId, address }: { chainId: number, address: string }) => Promise<any[]> } = {
+export const StrategyDefaultResolvers: { [key: string]: ({ chainId, address }: { chainId: number, address: Address }) => Promise<any[]> } = {
   alpacaV1,
   alpacaV2,
   aura,

@@ -1,5 +1,6 @@
+import { ADDRESS_ZERO } from "@/lib/constants"
 import axios from "axios"
-import { constants } from "ethers";
+import { Address, getAddress } from "viem";
 
 type MoneyMarketResponse = {
     moneyMarket: {
@@ -12,12 +13,12 @@ type MoneyMarketResponse = {
     }
 }
 
-export async function alpacaV2({ chainId, address }: { chainId: number, address: string }) {
+export async function alpacaV2({ chainId, address }: { chainId: number, address: Address }): Promise<any[]> {
     const { data } = await axios.get("https://api.github.com/repos/alpaca-finance/alpaca-v2-money-market/contents/.mainnet.json")
 
     const { moneyMarket } = JSON.parse(atob(data.content)) as MoneyMarketResponse
 
     const matchingMarket = moneyMarket.markets.find(market => market.token.toLowerCase() === address.toLowerCase())
 
-    return [ matchingMarket?.ibToken || constants.AddressZero ]
+    return [matchingMarket?.ibToken ? getAddress(matchingMarket?.ibToken) : ADDRESS_ZERO]
 }

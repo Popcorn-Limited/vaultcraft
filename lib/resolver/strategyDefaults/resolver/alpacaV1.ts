@@ -1,5 +1,6 @@
+import { ADDRESS_ZERO } from "@/lib/constants";
 import axios from "axios";
-import { constants } from "ethers";
+import { Address, getAddress } from "viem";
 
 type VaultsResponse = {
     Vaults: {
@@ -13,9 +14,11 @@ const TOKEN_ADDRESS = {
     250: "https://api.github.com/repos/alpaca-finance/bsc-alpaca-contract/contents/.fantom_mainnet.json",
 } as { [chainId: number]: string }
 
-export async function alpacaV1({ chainId, address }: { chainId: number, address: string }): Promise<any[]> {
+export async function alpacaV1({ chainId, address }: { chainId: number, address: Address }): Promise<any[]> {
     const { data } = await axios.get(TOKEN_ADDRESS?.[chainId] || TOKEN_ADDRESS[56])
     const { Vaults: vaults } = JSON.parse(atob(data.content)) as VaultsResponse
 
-    return [ vaults.find(item => item.baseToken.toLowerCase() === address.toLowerCase())?.address || constants.AddressZero ]
+    const vault = vaults.find(item => item.baseToken.toLowerCase() === address.toLowerCase())
+
+    return [vault !== undefined ? getAddress(vault.address) : ADDRESS_ZERO]
 }
