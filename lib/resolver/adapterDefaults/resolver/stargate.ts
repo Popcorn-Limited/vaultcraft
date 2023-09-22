@@ -1,38 +1,40 @@
-import { readContract } from "@wagmi/core";
-import { readContracts } from "wagmi";
-import { BigNumber, constants } from "ethers";
+import { RPC_URLS } from "@/lib/connectors";
+import { ADDRESS_ZERO } from "@/lib/constants";
+import { Address, createPublicClient, getAddress, http } from "viem";
+import { mainnet } from "wagmi";
 
 const STAKING_ADDRESS = "0xB0D502E938ed5f4df2E681fE6E419ff29631d62b";
 
 export async function stargate({ chainId, address }: { chainId: number, address: string }) {
-    const poolLength = await readContract({
+    // TODO -- temp solution, we should pass the client into the function
+    const client = createPublicClient({
+        chain: mainnet,
+        // @ts-ignore
+        transport: http(RPC_URLS[chainId])
+    })
+
+    const poolLength = await client.readContract({
         address: STAKING_ADDRESS,
         abi,
         functionName: "poolLength",
-        chainId,
-        args: []
-    }) as BigNumber
+    }) as BigInt
 
-    const tokens = await readContracts({
-        contracts: Array(poolLength.toNumber()).fill(undefined).map((item, idx) => {
+    const tokenRes = await client.multicall({
+        contracts: Array(Number(poolLength)).fill(undefined).map((item, idx) => {
             return {
                 address: STAKING_ADDRESS,
                 abi,
                 functionName: "poolInfo",
-                chainId,
                 args: [idx]
             }
         })
-    }) as Array<{
-        lpToken: string,
-    }>
-
-    const lpTokens = tokens.map(item => item.lpToken.toLowerCase())
+    })
+    const lpTokens: Address[] = tokenRes.filter(token => token.status === "success").map((token: any) => getAddress(token.result[0]))
 
     return [
-        lpTokens.includes(address.toLowerCase())
-          ? lpTokens.indexOf(address.toLowerCase())
-          : constants.AddressZero
+        lpTokens.includes(getAddress(address))
+            ? lpTokens.indexOf(getAddress(address))
+            : ADDRESS_ZERO
     ]
 }
 
@@ -84,4 +86,4 @@ const abi = [
         "stateMutability": "view",
         "type": "function"
     },
-]
+] as const

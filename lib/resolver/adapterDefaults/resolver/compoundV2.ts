@@ -28,8 +28,7 @@ export async function compoundV2({ chainId, address }: { chainId: number, addres
             }
         })
     })
-    // TODO check response (token.result[0])
-    const underlying: Address[] = underlyingRes.filter(token => token.status === "success").map((token: any) => getAddress(token.result[0]))
+    const underlying: Address[] = underlyingRes.filter(token => token.status === "success").map((token: any) => getAddress(token.result))
 
     return [
         underlying.includes(getAddress(address))

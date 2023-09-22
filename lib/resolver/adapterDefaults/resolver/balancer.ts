@@ -1,6 +1,6 @@
 import { RPC_URLS } from "@/lib/connectors";
 import { ADDRESS_ZERO } from "@/lib/constants";
-import { Address, createPublicClient, http } from "viem";
+import { Address, createPublicClient, getAddress, http } from "viem";
 import { mainnet } from "wagmi";
 
 const CONTROLLER_ADDRESS: Address = "0xC128468b7Ce63eA702C1f104D55A2566b13D3ABD";
@@ -29,8 +29,7 @@ export async function balancer({ chainId, address }: { chainId: number, address:
             }
         })
     })
-    // TODO check response (gauge.result[0])
-    const gauges: Address[] = gaugesRes.filter(gauge => gauge.status === "success").map((gauge: any) => gauge.result[0])
+    const gauges: Address[] = gaugesRes.filter(gauge => gauge.status === "success").map((gauge: any) => getAddress(gauge.result))
 
     const areGaugesKilledRes = await client.multicall({
         contracts: gauges.map((gauge: Address) => {
@@ -41,8 +40,7 @@ export async function balancer({ chainId, address }: { chainId: number, address:
             }
         })
     })
-    // TODO check response (entry.result[0])
-    const areGaugesKilled: boolean[] = areGaugesKilledRes.filter(entry => entry.status === "success").map((entry: any) => entry.result[0])
+    const areGaugesKilled: boolean[] = areGaugesKilledRes.filter(entry => entry.status === "success").map((entry: any) => entry.result)
     const aliveGauges = gauges.filter((gauge: Address, idx: number) => !areGaugesKilled[idx])
 
     const lpTokensRes = await client.multicall({
@@ -54,8 +52,7 @@ export async function balancer({ chainId, address }: { chainId: number, address:
             }
         })
     })
-    // TODO check response (token.result[0])
-    const lpTokens: Address[] = lpTokensRes.filter(token => token.status === "success").map((token: any) => token.result[0])
+    const lpTokens: Address[] = lpTokensRes.filter(token => token.status === "success").map((token: any) => token.result)
 
     const tokenIdx = lpTokens.findIndex(lpToken => lpToken?.toLowerCase() === address.toLowerCase())
 
