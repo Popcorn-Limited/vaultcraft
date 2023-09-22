@@ -66,6 +66,10 @@ function ProtocolSelection() {
   useEffect(() => {
     if (network && asset.symbol !== "none") {
       setOptions([])
+      // TODO: update this using the sdk
+      // 1. First use getProtocolsByAsset() to find applicable protocols
+      // 2. Then loop over the protocols and call getApy()
+      // 3. Add both data together and set it as options
       getProtocolOptions(protocols, network.id, asset.address[network.id].toLowerCase(), availableAssets[network.id]).then(res => setOptions(res));
     }
   }, [network, asset]);

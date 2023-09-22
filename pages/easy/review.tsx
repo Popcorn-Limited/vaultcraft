@@ -47,7 +47,8 @@ export default function ReviewPage(): JSX.Element {
     IpfsClient.add(metadata.name, { name: metadata.name }).then(res => {
       setMetadata((prefState) => { return { ...prefState, ipfsHash: res } });
       setIsLoading(true)
-      deployVault(chain, connector, fees, asset, limit, account, adapterData, strategyData, res).then(res => {
+      // TODO --> adjust input params
+      deployVault(chain, connector, fees, asset, limit, adapterData, strategyData, res).then(res => {
         !!res ? setIsSuccess(true) : setIsError(true);
         setIsLoading(false)
       }

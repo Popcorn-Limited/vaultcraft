@@ -45,6 +45,8 @@ export default function Basics() {
 
   const [, setAvailableAssetAddresses] = useAtom(assetAddressesAtom);
 
+
+  // TODO - replace this with yieldOptions.getAssets(1)
   useEffect(() => { getSupportedAssetAddresses(1, protocols).then((res: any) => setAvailableAssetAddresses({ 1: res })) }, [])
 
   useEffect(() => {
