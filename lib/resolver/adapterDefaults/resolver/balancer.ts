@@ -1,60 +1,66 @@
-import { readContract } from "@wagmi/core";
-import { readContracts } from "wagmi";
-import {BigNumber, constants} from "ethers";
+import { RPC_URLS } from "@/lib/connectors";
+import { ADDRESS_ZERO } from "@/lib/constants";
+import { Address, createPublicClient, http } from "viem";
+import { mainnet } from "wagmi";
 
-const CONTROLLER_ADDRESS = "0xC128468b7Ce63eA702C1f104D55A2566b13D3ABD";
+const CONTROLLER_ADDRESS: Address = "0xC128468b7Ce63eA702C1f104D55A2566b13D3ABD";
 
 export async function balancer({ chainId, address }: { chainId: number, address: string }): Promise<any[]> {
-    const n_gauges = await readContract({
+    // TODO -- temp solution, we should pass the client into the function
+    const client = createPublicClient({
+        chain: mainnet,
+        // @ts-ignore
+        transport: http(RPC_URLS[chainId])
+    })
+
+    const n_gauges = await client.readContract({
         address: CONTROLLER_ADDRESS,
         abi: abiController,
-        functionName: "n_gauges",
-        chainId,
-        args: []
-    }) as BigNumber
+        functionName: "n_gauges"
+    })
 
-    const gauges = await readContracts({
-        contracts: Array(n_gauges.toNumber()).fill(undefined).map((item, idx) => {
+    const gaugesRes = await client.multicall({
+        contracts: Array(Number(n_gauges)).fill(undefined).map((item, idx) => {
             return {
                 address: CONTROLLER_ADDRESS,
                 abi: abiController,
                 functionName: "gauges",
-                chainId,
                 args: [idx]
             }
         })
-    }) as string[]
+    })
+    // TODO check response (gauge.result[0])
+    const gauges: Address[] = gaugesRes.filter(gauge => gauge.status === "success").map((gauge: any) => gauge.result[0])
 
-    const areGaugesKilled = await readContracts({
-        contracts: gauges.map((gauge: any) => {
+    const areGaugesKilledRes = await client.multicall({
+        contracts: gauges.map((gauge: Address) => {
             return {
                 address: gauge,
                 abi: abiGauge,
                 functionName: "is_killed",
-                chainId,
-                args: []
             }
         })
-    }) as boolean[]
+    })
+    // TODO check response (entry.result[0])
+    const areGaugesKilled: boolean[] = areGaugesKilledRes.filter(entry => entry.status === "success").map((entry: any) => entry.result[0])
+    const aliveGauges = gauges.filter((gauge: Address, idx: number) => !areGaugesKilled[idx])
 
-    const aliveGauges = gauges.filter((gauge: any, idx: number) => !areGaugesKilled[idx])
-
-    const lpTokens = await readContracts({
-        contracts: aliveGauges.map((gauge: any) => {
+    const lpTokensRes = await client.multicall({
+        contracts: aliveGauges.map((gauge: Address) => {
             return {
                 address: gauge,
                 abi: abiGauge,
-                functionName: "lp_token",
-                chainId,
-                args: [],
+                functionName: "lp_token"
             }
         })
-    }) as (string | null)[]
+    })
+    // TODO check response (token.result[0])
+    const lpTokens: Address[] = lpTokensRes.filter(token => token.status === "success").map((token: any) => token.result[0])
 
     const tokenIdx = lpTokens.findIndex(lpToken => lpToken?.toLowerCase() === address.toLowerCase())
 
     return [
-        tokenIdx !== -1 ? aliveGauges[tokenIdx] : constants.AddressZero,
+        tokenIdx !== -1 ? aliveGauges[tokenIdx] : ADDRESS_ZERO,
     ]
 }
 
@@ -88,7 +94,7 @@ const abiController = [
             }
         ]
     },
-]
+] as const
 const abiGauge = [
     {
         "stateMutability": "view",
@@ -114,4 +120,4 @@ const abiGauge = [
             }
         ]
     },
-]
+] as const

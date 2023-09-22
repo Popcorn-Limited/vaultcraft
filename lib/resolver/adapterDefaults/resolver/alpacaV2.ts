@@ -1,5 +1,5 @@
+import { ADDRESS_ZERO } from "@/lib/constants"
 import axios from "axios"
-import { constants } from "ethers";
 
 type MoneyMarketResponse = {
     moneyMarket: {
@@ -19,5 +19,5 @@ export async function alpacaV2({ chainId, address }: { chainId: number, address:
 
     const matchingMarket = moneyMarket.markets.find(market => market.token.toLowerCase() === address.toLowerCase())
 
-    return [ matchingMarket?.ibToken || constants.AddressZero ]
+    return [ matchingMarket?.ibToken || ADDRESS_ZERO ]
 }

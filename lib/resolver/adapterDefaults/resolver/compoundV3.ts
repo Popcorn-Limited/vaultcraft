@@ -1,4 +1,4 @@
-import { constants } from "ethers";
+import { ADDRESS_ZERO } from "@/lib/constants";
 
 const CTOKEN: { [key: number]: { [key: string]: string } } = {
   1: { "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": "0xc3d688B66703497DAA19211EEdff47f25384cdc3" },
@@ -7,5 +7,5 @@ const CTOKEN: { [key: number]: { [key: string]: string } } = {
 } // Just USDC on each chain at the moment
 
 export async function compoundV3({ chainId, address }: { chainId: number, address: string }): Promise<any[]> {
-  return Object.keys(CTOKEN).includes(String(chainId)) ? [(CTOKEN[chainId][address.toLowerCase()] || constants.AddressZero)] : [constants.AddressZero];
+  return Object.keys(CTOKEN).includes(String(chainId)) ? [(CTOKEN[chainId][address.toLowerCase()] || ADDRESS_ZERO)] : [ADDRESS_ZERO];
 }

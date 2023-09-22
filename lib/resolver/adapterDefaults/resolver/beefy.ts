@@ -1,6 +1,6 @@
-import { constants } from "ethers";
 import { transformNetwork } from "@/lib/helpers";
 import { SUPPORTED_NETWORKS } from "@/lib/connectors";
+import { ADDRESS_ZERO } from "@/lib/constants";
 
 interface Vault {
   tokenAddress: string;
@@ -22,5 +22,5 @@ export async function beefy({ chainId, address }: { chainId: number, address: st
   const vaultAddress = vaults.find(vault => vault.tokenAddress.toLowerCase() === address.toLowerCase())?.earnContractAddress;
   const boost = boosts.find(boost => boost.tokenAddress.toLowerCase() === vaultAddress?.toLowerCase());
 
-  return [vaultAddress, boost && boost.status === "active" ? boost.earnContractAddress : constants.AddressZero]
+  return [vaultAddress, boost && boost.status === "active" ? boost.earnContractAddress : ADDRESS_ZERO]
 }

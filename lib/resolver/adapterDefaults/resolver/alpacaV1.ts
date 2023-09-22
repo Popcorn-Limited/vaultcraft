@@ -1,5 +1,5 @@
+import { ADDRESS_ZERO } from "@/lib/constants";
 import axios from "axios";
-import { constants } from "ethers";
 
 type VaultsResponse = {
     Vaults: {
@@ -17,5 +17,5 @@ export async function alpacaV1({ chainId, address }: { chainId: number, address:
     const { data } = await axios.get(TOKEN_ADDRESS?.[chainId] || TOKEN_ADDRESS[56])
     const { Vaults: vaults } = JSON.parse(atob(data.content)) as VaultsResponse
 
-    return [ vaults.find(item => item.baseToken.toLowerCase() === address.toLowerCase())?.address || constants.AddressZero ]
+    return [vaults.find(item => item.baseToken.toLowerCase() === address.toLowerCase())?.address || ADDRESS_ZERO]
 }
