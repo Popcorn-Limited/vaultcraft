@@ -2,7 +2,7 @@ import { PRO_CREATION_STAGES } from "@/lib/stages";
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { useAtom } from "jotai";
-import { useAccount, useNetwork } from "wagmi";
+import { useAccount, useNetwork, usePublicClient, useWalletClient } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import Image from "next/image";
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
@@ -19,7 +19,9 @@ import { stringToHex } from "viem";
 
 export default function ReviewPage(): JSX.Element {
   const router = useRouter();
-  const { address: account, connector } = useAccount();
+  const publicClient = usePublicClient();
+  const { data: walletClient } = useWalletClient()
+  const { address: account } = useAccount();
   const { openConnectModal } = useConnectModal();
   const { chain } = useNetwork()
 
@@ -47,8 +49,7 @@ export default function ReviewPage(): JSX.Element {
     IpfsClient.add(metadata.name, { name: metadata.name }).then(res => {
       setMetadata((prefState) => { return { ...prefState, ipfsHash: res } });
       setIsLoading(true)
-      // TODO --> adjust input params
-      deployVault(chain, connector, fees, asset, limit, adapterData, strategyData, res).then(res => {
+      deployVault(chain, publicClient, walletClient, fees, asset, limit, adapterData, strategyData, res).then(res => {
         !!res ? setIsSuccess(true) : setIsError(true);
         setIsLoading(false)
       }

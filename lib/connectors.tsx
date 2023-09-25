@@ -57,7 +57,7 @@ export const supportedChainIds = [
     ChainId.ALL,
 ];
 
-export const networkMap = {
+export const networkMap: { [key: number]: string } = {
     [ChainId.Ethereum]: "Ethereum",
     [ChainId.Goerli]: "Goerli",
     [ChainId.Arbitrum]: "Arbitrum",
@@ -69,7 +69,7 @@ export const networkMap = {
     [ChainId.ALL]: "All Networks",
 };
 
-export const networkLogos = {
+export const networkLogos: { [key: number]: string } = {
     [ChainId.ALL]: "/images/icons/allIcon.svg",
     [ChainId.Ethereum]: "/images/icons/ethereum.svg",
     [ChainId.Goerli]: "/images/icons/testNetLogo.png",
@@ -80,7 +80,7 @@ export const networkLogos = {
     [ChainId.Optimism]: "/images/icons/optimism-op-logo.svg",
     [ChainId.BNB]: "/images/icons/bsc-logo.png",
 };
-export const RPC_URLS = {
+export const RPC_URLS: { [key: number]: string } = {
     [ChainId.Ethereum]: `https://eth-mainnet.alchemyapi.io/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`,
     [ChainId.Goerli]: "https://goerli.blockpi.network/v1/rpc/public",
     [ChainId.Arbitrum]: `https://arb-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`,
@@ -89,6 +89,6 @@ export const RPC_URLS = {
     [ChainId.BNB]: `https://bsc-dataseed1.binance.org`,
     [ChainId.Localhost]: `http://localhost:8545`,
     [ChainId.RemoteFork]: `http://localhost:8545`,
-  };
-  
+};
+
 export const SUPPORTED_NETWORKS = [mainnet, localhost];

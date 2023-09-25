@@ -1,5 +1,6 @@
 import { ADDRESS_ZERO } from "@/lib/constants";
 import { Address } from "viem";
+import { StrategyDefaultResolverParams } from "..";
 
 // @dev Make sure the keys here are correct checksum addresses
 const assetToCToken: { [key: number]: { [key: Address]: Address } } = {
@@ -27,6 +28,6 @@ const assetToCToken: { [key: number]: { [key: Address]: Address } } = {
   },
 };
 
-export async function compoundV3({ chainId, address }: { chainId: number, address: Address }): Promise<any[]> {
+export async function compoundV3({ chainId, client, address }: StrategyDefaultResolverParams): Promise<any[]> {
   return Object.keys(assetToCToken).includes(String(chainId)) ? [assetToCToken[chainId][address] || ADDRESS_ZERO] : [ADDRESS_ZERO];
 }

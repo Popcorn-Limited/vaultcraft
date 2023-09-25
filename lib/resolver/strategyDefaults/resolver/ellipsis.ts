@@ -1,17 +1,11 @@
-import { RPC_URLS } from "@/lib/connectors";
 import { ADDRESS_ZERO } from "@/lib/constants";
-import { Address, createPublicClient, http } from "viem";
-import { mainnet } from "wagmi";
+import { Address } from "viem";
+import { StrategyDefaultResolverParams } from "..";
 
 const STAKING_ADDRESS: Address = "0x5B74C99AA2356B4eAa7B85dC486843eDff8Dfdbe";
 
-export async function ellipsis({ chainId, address }: { chainId: number, address: Address }): Promise<any[]> {
-    // TODO -- temp solution, we should pass the client into the function
-    const client = createPublicClient({
-        chain: mainnet,
-        // @ts-ignore
-        transport: http(RPC_URLS[chainId])
-    })
+export async function ellipsis({ chainId, client, address }: StrategyDefaultResolverParams): Promise<any[]> {
+    
 
     const poolLength = await client.readContract({
         address: STAKING_ADDRESS,

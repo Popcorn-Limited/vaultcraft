@@ -1,10 +1,13 @@
 import { localhost, mainnet } from "wagmi/chains";
-import StrategyEncodingResolvers from ".";
+import StrategyEncodingResolvers, { StrategyEncodingResolverParams } from ".";
+import { getAddress } from "viem";
 
-export async function resolveStrategyEncoding({ chainId, address, params, resolver }: { chainId: number, address: string, params: any[], resolver?: string }): Promise<string> {
+export async function resolveStrategyEncoding({ chainId, client, address, params, resolver }: StrategyEncodingResolverParams & { resolver?: string }): Promise<string> {
   if (chainId === localhost.id) chainId = mainnet.id;
   try {
-    return resolver ? StrategyEncodingResolvers[resolver]({ chainId, address, params }) : StrategyEncodingResolvers.default({ chainId, address, params })
+    return resolver
+      ? StrategyEncodingResolvers[resolver]({ chainId, client, address: getAddress(address), params })
+      : StrategyEncodingResolvers.default({ chainId, client, address: getAddress(address), params })
   } catch (e) {
     console.log(`resolveStrategyEncoding-${chainId}-${address}-${resolver}`, e)
     return ""

@@ -1,18 +1,10 @@
-import { RPC_URLS } from "@/lib/connectors";
 import { ADDRESS_ZERO } from "@/lib/constants";
-import { Address, createPublicClient, getAddress, http } from "viem";
-import { mainnet } from "wagmi";
+import { Address,  getAddress} from "viem";
+import { StrategyDefaultResolverParams } from "..";
 
 const CONTROLLER_ADDRESS: Address = "0xC128468b7Ce63eA702C1f104D55A2566b13D3ABD";
 
-export async function balancer({ chainId, address }: { chainId: number, address: Address }): Promise<any[]> {
-    // TODO -- temp solution, we should pass the client into the function
-    const client = createPublicClient({
-        chain: mainnet,
-        // @ts-ignore
-        transport: http(RPC_URLS[chainId])
-    })
-
+export async function balancer({ chainId, client, address }: StrategyDefaultResolverParams): Promise<any[]> {
     const n_gauges = await client.readContract({
         address: CONTROLLER_ADDRESS,
         abi: abiController,

@@ -1,5 +1,5 @@
-import { Address } from "viem";
+import { StrategyDefaultResolverParams } from "..";
 
-export async function initDefault({ chainId, address }: { chainId: number, address: Address }): Promise<any[]> {
+export async function initDefault({ chainId, client, address }: StrategyDefaultResolverParams): Promise<any[]> {
   return []
 }

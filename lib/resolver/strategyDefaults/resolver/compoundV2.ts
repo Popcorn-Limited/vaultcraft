@@ -1,18 +1,10 @@
-import { RPC_URLS } from "@/lib/connectors";
 import { ADDRESS_ZERO } from "@/lib/constants";
-import { Address, createPublicClient, getAddress, http } from "viem";
-import { mainnet } from "wagmi";
+import { Address, getAddress } from "viem";
+import { StrategyDefaultResolverParams } from "..";
 
 const COMPTROLLER_ADDRESS: Address = "0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B";
 
-export async function compoundV2({ chainId, address }: { chainId: number, address: Address }): Promise<any[]> {
-    // TODO -- temp solution, we should pass the client into the function
-    const client = createPublicClient({
-        chain: mainnet,
-        // @ts-ignore
-        transport: http(RPC_URLS[chainId])
-    })
-
+export async function compoundV2({ chainId, client, address }: StrategyDefaultResolverParams): Promise<any[]> {
     const cTokens = await client.readContract({
         address: COMPTROLLER_ADDRESS,
         abi: abiComptroller,

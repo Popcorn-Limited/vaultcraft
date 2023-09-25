@@ -1,7 +1,8 @@
 import { transformNetwork } from "@/lib/helpers";
 import { SUPPORTED_NETWORKS } from "@/lib/connectors";
 import { ADDRESS_ZERO } from "@/lib/constants";
-import { Address, getAddress } from "viem";
+import { getAddress } from "viem";
+import { StrategyDefaultResolverParams } from "..";
 
 interface Vault {
   tokenAddress: string;
@@ -14,7 +15,7 @@ interface Boost {
   status: "active" | "eol"
 }
 
-export async function beefy({ chainId, address }: { chainId: number, address: Address }): Promise<any[]> {
+export async function beefy({ chainId, client, address }: StrategyDefaultResolverParams): Promise<any[]> {
   const network = transformNetwork(SUPPORTED_NETWORKS.find(chain => chain.id === chainId)?.network)
 
   const vaults = await (await fetch(`https://api.beefy.finance/vaults/${network}`)).json() as Vault[];

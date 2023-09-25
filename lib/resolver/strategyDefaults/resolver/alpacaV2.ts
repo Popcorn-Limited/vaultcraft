@@ -1,6 +1,7 @@
 import { ADDRESS_ZERO } from "@/lib/constants"
 import axios from "axios"
-import { Address, getAddress } from "viem";
+import { getAddress } from "viem";
+import { StrategyDefaultResolverParams } from "..";
 
 type MoneyMarketResponse = {
     moneyMarket: {
@@ -13,7 +14,7 @@ type MoneyMarketResponse = {
     }
 }
 
-export async function alpacaV2({ chainId, address }: { chainId: number, address: Address }): Promise<any[]> {
+export async function alpacaV2({ chainId, client, address }: StrategyDefaultResolverParams): Promise<any[]> {
     const { data } = await axios.get("https://api.github.com/repos/alpaca-finance/alpaca-v2-money-market/contents/.mainnet.json")
 
     const { moneyMarket } = JSON.parse(atob(data.content)) as MoneyMarketResponse

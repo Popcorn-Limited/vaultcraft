@@ -12,8 +12,9 @@ import { useEffect, useState } from "react";
 import AssetSelection from "@/components/sections/AssetSelection";
 import ProtocolSelection from "@/components/sections/ProtocolSelection";
 import { resolveStrategyDefaults } from "@/lib/resolver/strategyDefaults/strategyDefaults";
-import getSupportedAssetAddresses from "@/lib/getSupportedAssetAddresses";
 import { getAddress } from "viem";
+import { yieldOptionsAtom } from "@/lib/atoms/sdk";
+import { usePublicClient } from "wagmi";
 
 
 export const basicsAtom = atom(get => ({
@@ -32,22 +33,24 @@ export function isBasicsValid(basics: any): boolean {
 
 export default function Basics() {
   const router = useRouter();
+  const publicClient = usePublicClient();
+  const [yieldOptions] = useAtom(yieldOptionsAtom);
+
   const [basics] = useAtom(basicsAtom)
   const [strategy] = useAtom(strategyAtom);
   const [network] = useAtom(networkAtom);
   const [asset] = useAtom(assetAtom);
 
-  const protocols = useProtocols()
-
   const [loading, setLoading] = useState(false)
 
   const [, setStrategyConfig] = useAtom(strategyConfigAtom);
 
-  const [, setAvailableAssetAddresses] = useAtom(assetAddressesAtom);
+  const [availableAssetAddresses, setAvailableAssetAddresses] = useAtom(assetAddressesAtom);
 
-
-  // TODO - replace this with yieldOptions.getAssets(1)
-  useEffect(() => { getSupportedAssetAddresses(1, protocols).then((res: any) => setAvailableAssetAddresses({ 1: res })) }, [])
+  useEffect(() => {
+    if (!!yieldOptions && availableAssetAddresses)
+      yieldOptions?.getAssets(1).then((res: any) => setAvailableAssetAddresses({ 1: res }))
+  }, [yieldOptions])
 
   useEffect(() => {
     // @ts-ignore
@@ -60,6 +63,7 @@ export default function Basics() {
         if (strategy.initParams && strategy.initParams.length > 0) {
           strategyDefaults = await resolveStrategyDefaults({
             chainId: network.id,
+            client: publicClient,
             address: getAddress(asset.address[network.id]),
             resolver: strategy.resolver
           })
@@ -67,6 +71,7 @@ export default function Basics() {
       } else {
         strategyDefaults = await resolveStrategyDefaults({
           chainId: network.id,
+          client: publicClient,
           address: getAddress(asset.address[network.id]),
           resolver: strategy.resolver
         })

@@ -3,7 +3,8 @@ import { ADDRESS_ZERO, MAX_INT256, ZERO } from "@/lib/constants";
 import { balancerApiProxyCall } from "@/lib/external/balancer/router/call";
 import { BatchSwapStep } from "@/lib/external/balancer/router/interfaces";
 import { Address, createPublicClient, encodeAbiParameters, http, parseAbiParameters, parseUnits, stringToHex } from "viem";
-import { mainnet } from "wagmi";
+import { PublicClient, mainnet } from "wagmi";
+import { StrategyEncodingResolverParams } from "..";
 
 interface BalancerRoute {
   swaps: BatchSwapStep[];
@@ -32,14 +33,7 @@ const toAssetRoute = [
 
 const BALANCER_VAULT = { 1: "0xBA12222222228d8Ba445958a75a0704d566BF2C8" }
 
-async function createRouteWithTypes(sellToken: Address, buyToken: Address, chainId: number, gasPrice: string | null | undefined): Promise<RouteWithTypes> {
-  // TODO -- temp solution, we should pass the client into the function
-  const client = createPublicClient({
-    chain: mainnet,
-    // @ts-ignore
-    transport: http(RPC_URLS[chainId])
-  })
-
+async function createRouteWithTypes(sellToken: Address, buyToken: Address, chainId: number, client: PublicClient, gasPrice: string | null | undefined): Promise<RouteWithTypes> {
   const decimals = await client.readContract({
     address: sellToken,
     abi: tokenDecimalsAbi,
@@ -76,8 +70,8 @@ async function createRouteWithTypes(sellToken: Address, buyToken: Address, chain
   }
 }
 
-export async function balancerLpCompounder({ chainId, address, params }: { chainId: number, address: string, params: any[] }): Promise<string> {
-  const route1 = await createRouteWithTypes(params[0][0], params[2], chainId, parseUnits("1", 9).toString()) // TODO - fetch gas price dynamically
+export async function balancerLpCompounder({ chainId, client, address, params }: StrategyEncodingResolverParams): Promise<string> {
+  const route1 = await createRouteWithTypes(params[0][0], params[2], chainId, client, parseUnits("1", 9).toString()) // TODO - fetch gas price dynamically
 
   const values = [
     ...route1.route.swaps.map(swap => Object.entries(swap).map(([key, value]) => value)).flat(), // toBaseAssetRoutes1.swaps
@@ -91,7 +85,7 @@ export async function balancerLpCompounder({ chainId, address, params }: { chain
   ]
 
   if (params[0].length == 2) {
-    const route2 = await createRouteWithTypes(params[0][0], params[2], chainId, parseUnits("1", 9).toString()) // TODO - fetch gas price dynamically
+    const route2 = await createRouteWithTypes(params[0][0], params[2], chainId, client, parseUnits("1", 9).toString()) // TODO - fetch gas price dynamically
 
     values.push(...route2.route.swaps.map(swap => Object.entries(swap).map(([key, value]) => value)).flat())
     values.push(...route2.route.assets)

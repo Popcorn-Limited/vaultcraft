@@ -1,7 +1,8 @@
 import { getConvexPools } from "@/lib/external/convex";
-import { Address, getAddress } from "viem";
+import { getAddress } from "viem";
+import { StrategyDefaultResolverParams } from "..";
 
-export async function convex({ chainId, address }: { chainId: number, address: Address }): Promise<any[]> {
+export async function convex({ chainId, client, address }: StrategyDefaultResolverParams): Promise<any[]> {
     const pools = await getConvexPools({ chainId });
 
     return [pools.map(item => getAddress(item[0])).indexOf(address)];

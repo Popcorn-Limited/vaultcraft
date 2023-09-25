@@ -1,16 +1,11 @@
 import { ADDRESS_ZERO } from "@/lib/constants";
-import { Address, createPublicClient, getAddress, http } from "viem";
-import { mainnet } from "wagmi";
+import { Address, getAddress } from "viem";
+import { StrategyDefaultResolverParams } from "..";
 
 const VELODROME_LENSE_ADDRESS: Address = "0x8B70C5E53235AbBd1415957f7110FBFe5d0529d4";
 
-export async function velodrome({ chainId, address }: { chainId: number, address: Address }): Promise<any[]> {
-    // TODO -- temp solution, we should pass the client into the function
-    const client = createPublicClient({
-        chain: mainnet,
-        // @ts-ignore
-        transport: http(RPC_URLS[chainId])
-    })
+export async function velodrome({ chainId, client, address }: StrategyDefaultResolverParams): Promise<any[]> {
+
 
     const { gauge, gauge_alive } = await client.readContract({
         address: VELODROME_LENSE_ADDRESS,

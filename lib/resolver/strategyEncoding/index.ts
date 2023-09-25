@@ -1,22 +1,26 @@
 
+import { Address } from "viem";
 import {
-  curveStargateCompounder,
+  balancerLpCompounder,
   curveCompounder,
-  balancerLpCompounder
-} from "./resolver";
+  curveStargateCompounder
 
-export type StrategyEncodingResolver = (
+} from "./resolver";
+import { PublicClient } from "wagmi";
+
+export type StrategyEncodingResolverParams = {
   chainId: number,
-  address: string,
-  params: any[],
-) => Promise<string>;
+  client: PublicClient,
+  address: Address,
+  params: any[]
+}
 
 export type StrategyEncodingResolvers = typeof StrategyEncodingResolvers;
 
-export const StrategyEncodingResolvers: { [key: string]: ({ chainId, address, params }: { chainId: number, address: string, params: any[] }) => Promise<string> } = {
-  curveStargateCompounder,
+export const StrategyEncodingResolvers: { [key: string]: ({ chainId, client, address, params }: StrategyEncodingResolverParams) => Promise<string> } = {
+  balancerLpCompounder,
   curveCompounder,
-  balancerLpCompounder
+  curveStargateCompounder
 };
 
 export default StrategyEncodingResolvers;

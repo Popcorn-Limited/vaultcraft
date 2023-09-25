@@ -1,76 +1,69 @@
 import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import {
-  Adapter,
   adapterConfigAtom,
-  useAdapters,
   assetAtom,
   networkAtom,
   Protocol,
   protocolAtom,
   useProtocols,
-  adapterAtom,
-  DEFAULT_ADAPTER,
   assetAddressesAtom
 } from "@/lib/atoms";
-import { resolveProtocolAssets } from "@/lib/resolver/protocolAssets/protocolAssets";
 import Selector, { Option } from "@/components/inputs/Selector";
-import { resolveAdapterApy } from "@/lib/resolver/adapterApy/adapterApy";
-
-// TODO update this using the sdk
+import { yieldOptionsAtom } from "@/lib/atoms/sdk";
+import { YieldOptions } from "vaultcraft-sdk";
+import { Address, getAddress } from "viem";
 
 interface ProtocolOption extends Protocol {
   disabled: boolean;
   apy?: number;
 }
 
-async function assetSupported(protocol: Protocol, chainId: number, asset: string, availableAssets: any): Promise<boolean> {
-  if (!availableAssets?.[chainId] || Object.keys(availableAssets[chainId]).length === 0) {
-    const availableAssets = await resolveProtocolAssets({ chainId: chainId, resolver: protocol.key })
-
-    return availableAssets.flat().map(a => a?.toLowerCase()).filter((availableAsset) => availableAsset === asset).length > 0
-  }
-
-  return (
-    availableAssets[chainId][protocol.key]
-      ?.map((a: any) => a.toLowerCase())
-      ?.filter((availableAsset: any) => availableAsset === asset)
-      ?.length > 0
-  )
+const ProtocolIcons = {
+  aaveV2: "https://cryptologos.cc/logos/aave-aave-logo.png?v=024",
+  aaveV3: "https://cryptologos.cc/logos/aave-aave-logo.png?v=024",
+  aura: "https://app.aura.finance/assets/aura-362899d2.png",
+  balancer: "https://cryptologos.cc/logos/balancer-bal-logo.png?v=024",
+  beefy: "https://cryptologos.cc/logos/beefy-finance-bifi-logo.png?v=024",
+  compoundV2: "https://cdn.furucombo.app/assets/img/token/COMP.svg",
+  compoundV3: "https://cdn.furucombo.app/assets/img/token/COMP.svg",
+  convex: "https://cdn.furucombo.app/assets/img/token/CVX.png",
+  curve: "https://cryptologos.cc/logos/curve-dao-token-crv-logo.png?v=025",
+  flux: "https://icons.llamao.fi/icons/protocols/flux-finance",
+  idleJunior: "https://icons.llamao.fi/icons/protocols/idle",
+  idleSenior: "https://icons.llamao.fi/icons/protocols/idle",
+  origin: "https://icons.llamao.fi/icons/protocols/origin-defi",
+  yearn: "https://cryptologos.cc/logos/yearn-finance-yfi-logo.png?v=024"
 }
 
-async function getProtocolOptions(protocols: Protocol[], chainId: number, asset: string, availableAssets: any): Promise<ProtocolOption[]> {
-  return Promise.all(protocols.filter(
-    (p) => p.chains.includes(chainId)).map(
-      async (p) => {
-        const isAssetSupported = await assetSupported(p, chainId, asset, availableAssets)
-        console.log(p.name, isAssetSupported)
-        const protocolOption: ProtocolOption = { ...p, disabled: !isAssetSupported }
-        if (isAssetSupported) protocolOption.apy = await resolveAdapterApy({ chainId: chainId, address: asset, resolver: p.key })
-        console.log(p.name, protocolOption.apy)
-        return protocolOption
-      })
-  )
+async function getProtocolOptions(asset: Address, chainId: number, yieldOptions: YieldOptions): Promise<ProtocolOption[]> {
+  const protocolNames = await yieldOptions.getProtocolsByAsset(chainId, asset);
+  const apys = await Promise.all(protocolNames.map(async (protocol) => yieldOptions.getApy(chainId, protocol, asset)))
+  return protocolNames.map((name, i) => ({
+    name,
+    key: name,
+    chains: [chainId],
+    logoURI: ProtocolIcons[name],
+    apy: apys[i].total,
+    disabled: false
+  }))
 }
 
 function ProtocolSelection() {
+  const [yieldOptions] = useAtom(yieldOptionsAtom);
+
   const [network] = useAtom(networkAtom);
   const [protocol, setProtocol] = useAtom(protocolAtom);
-  const protocols = useProtocols();
+  const [asset] = useAtom(assetAtom);
+
   const [options, setOptions] = useState<ProtocolOption[]>([]);
 
   const [, setAdapterConfig] = useAtom(adapterConfigAtom);
-  const [availableAssets] = useAtom(assetAddressesAtom);
-  const [asset] = useAtom(assetAtom);
 
   useEffect(() => {
-    if (network && asset.symbol !== "none") {
+    if (network && asset.symbol !== "none" && yieldOptions) {
       setOptions([])
-      // TODO: update this using the sdk
-      // 1. First use getProtocolsByAsset() to find applicable protocols
-      // 2. Then loop over the protocols and call getApy()
-      // 3. Add both data together and set it as options
-      getProtocolOptions(protocols, network.id, asset.address[network.id].toLowerCase(), availableAssets[network.id]).then(res => setOptions(res));
+      getProtocolOptions(getAddress(asset.address[network.id]), 1, yieldOptions).then(res => setOptions(res));
     }
   }, [network, asset]);
 
@@ -80,8 +73,6 @@ function ProtocolSelection() {
     }
     setProtocol(newProtocol)
   }
-
-  console.log(options.filter(option => !option.disabled))
 
   if (asset.symbol === "none") return (
     <div className="border-2 border-[#353945] rounded-[4px] flex gap-2 w-full px-2 h-15 flex-row items-center">

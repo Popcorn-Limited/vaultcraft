@@ -15,7 +15,8 @@ const VAULT_CONTROLLER: { [key: number]: Address } = {
 // TODO --> adjust input params
 export async function deployVault(
   chain: any,
-  connector: any,
+  walletClient: any,
+  publicClient: any,
   fees: any,
   asset: any,
   limit: any,
@@ -24,26 +25,11 @@ export async function deployVault(
   ipfsHash: string
 ): Promise<boolean> {
   toast.loading("Deploying Vault...")
-
-  // TODO -- temp solution, we should pass the client into the function
-  const client = createPublicClient({
-    chain: chain,
-    // @ts-ignore
-    transport: http(RPC_URLS[chain.id])
-  })
-
-  // TODO -- temp solution, we should pass the client into the function
-  const walletClient = createWalletClient({
-    chain: mainnet,
-    // @ts-ignore // TODO --> we get a type error here
-    transport: custom(window.ethereum)
-  })
-
   // TODO -- weshould have this somewhere from rainbow or similar need to see how to pass it along
   const [account] = await walletClient.getAddresses()
 
   try {
-    const { request } = await client.simulateContract({
+    const { request } = await publicClient.simulateContract({
       account,
       address: VAULT_CONTROLLER[chain.id],
       abi,

@@ -7,19 +7,24 @@ import { mainnet } from 'viem/chains'
 // @ts-ignore
 import NoSSR from 'react-no-ssr';
 import axios from "axios";
+import { yieldOptionsAtom } from '@/lib/atoms/sdk';
+import { atom, useAtom } from 'jotai';
+import { assetAddressesAtom } from '@/lib/atoms';
+import { convexBoosterAbi, CONVEX_BOOSTER_ADDRESS } from "@/lib/external/convex";
 
 
-async function setUpYieldOptions() {
-  const ttl = 360_000;
-  // TODO figure out the type issues here
-  const provider = new CachedProvider();
-  await provider.initialize("https://raw.githubusercontent.com/Popcorn-Limited/apy-data/main/apy-data.json");
 
-  return new YieldOptions(provider, ttl);
-
-}
 
 function TestContainer() {
+  const client = createPublicClient({
+    chain: mainnet,
+    transport: http()
+  })
+  client.readContract({
+    address: CONVEX_BOOSTER_ADDRESS[1],
+    abi: convexBoosterAbi,
+    functionName: "poolLength"
+  }).then(res => console.log(res))
 
   return <></>
 }

@@ -1,21 +1,13 @@
-import { RPC_URLS } from "@/lib/connectors";
 import { balancer } from "./balancer";
-import { Address, createPublicClient, http } from "viem";
+import { Address } from "viem";
 import { ZERO } from "@/lib/constants";
-import { mainnet } from "wagmi";
+import { StrategyDefaultResolverParams } from "..";
 
 // @dev Make sure the addresses here are correct checksum addresses
 const BAL: { [key: number]: Address } = { 1: "0xba100000625a3754423978a60c9317c58a424e3D" }
 const BALANCER_VAULT: { [key: number]: Address } = { 1: "0xBA12222222228d8Ba445958a75a0704d566BF2C8" }
 
-export async function balancerLpCompounder({ chainId, address }: { chainId: number, address: Address }): Promise<any[]> {
-  // TODO -- temp solution, we should pass the client into the function
-  const client = createPublicClient({
-    chain: mainnet,
-    // @ts-ignore
-    transport: http(RPC_URLS[chainId])
-  })
-
+export async function balancerLpCompounder({ chainId, client, address }: StrategyDefaultResolverParams): Promise<any[]> {
   const poolId = await client.readContract({
     address: address,
     abi: poolAbi,
@@ -34,7 +26,7 @@ export async function balancerLpCompounder({ chainId, address }: { chainId: numb
   const minTradeAmounts = [ZERO.toString()];
   const optionalData = [poolId, 0];
 
-  const [gaugeAddress] = await balancer({ chainId, address })
+  const [gaugeAddress] = await balancer({ chainId, client, address })
 
   return [gaugeAddress, rewardTokens, minTradeAmounts, baseAsset, optionalData]
 }

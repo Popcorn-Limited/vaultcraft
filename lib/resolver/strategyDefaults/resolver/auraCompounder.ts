@@ -1,24 +1,15 @@
 
-import { Address, createPublicClient, http } from "viem";
+import { Address } from "viem";
 import { aura } from "./aura";
 import { ZERO } from "@/lib/constants";
-import { mainnet } from "wagmi";
-import { RPC_URLS } from "@/lib/connectors";
-
+import { StrategyDefaultResolverParams } from "..";
 
 // @dev Make sure the addresses here are correct checksum addresses
 const BAL: { [key: number]: Address } = { 1: "0xba100000625a3754423978a60c9317c58a424e3D" }
 const AURA: { [key: number]: Address } = { 1: "0xC0c293ce456fF0ED870ADd98a0828Dd4d2903DBF" }
 const BALANCER_VAULT: { [key: number]: Address } = { 1: "0xBA12222222228d8Ba445958a75a0704d566BF2C8" }
 
-export async function auraCompounder({ chainId, address }: { chainId: number, address: Address }): Promise<any[]> {
-  // TODO -- temp solution, we should pass the client into the function
-  const client = createPublicClient({
-    chain: mainnet,
-    // @ts-ignore
-    transport: http(RPC_URLS[chainId])
-  })
-
+export async function auraCompounder({ chainId, client, address }: StrategyDefaultResolverParams): Promise<any[]> {
   const poolId = await client.readContract({
     address: address,
     abi: poolAbi,
@@ -37,7 +28,7 @@ export async function auraCompounder({ chainId, address }: { chainId: number, ad
   const minTradeAmounts = [ZERO.toString(), ZERO.toString()];
   const optionalData = [poolId, 0];
 
-  const [auraPoolId] = await aura({ chainId, address })
+  const [auraPoolId] = await aura({ chainId, client, address })
 
   return [auraPoolId, rewardTokens, minTradeAmounts, baseAsset, optionalData]
 }

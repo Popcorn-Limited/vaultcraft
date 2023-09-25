@@ -1,18 +1,10 @@
-import { RPC_URLS } from "@/lib/connectors";
 import { ADDRESS_ZERO } from "@/lib/constants";
-import { Address, createPublicClient, getAddress, http } from "viem";
-import { mainnet } from "wagmi";
+import { Address, getAddress } from "viem";
+import { StrategyDefaultResolverParams } from "..";
 
 const STAKING_ADDRESS: Address = "0xB0D502E938ed5f4df2E681fE6E419ff29631d62b";
 
-export async function stargate({ chainId, address }: { chainId: number, address: Address }): Promise<any[]> {
-    // TODO -- temp solution, we should pass the client into the function
-    const client = createPublicClient({
-        chain: mainnet,
-        // @ts-ignore
-        transport: http(RPC_URLS[chainId])
-    })
-
+export async function stargate({ chainId, client, address }: StrategyDefaultResolverParams): Promise<any[]> {
     const poolLength = await client.readContract({
         address: STAKING_ADDRESS,
         abi,

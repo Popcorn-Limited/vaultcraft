@@ -30,8 +30,8 @@
     "tailwind-scrollbar-hide": "^1.1.7",
     "tailwindcss": "^3.2.6",
     "vaultcraft-sdk": "0.0.20",
-    "viem": "^1.11.1",
-    "wagmi": "^1.4.2"
+    "viem": "1.11.1",
+    "wagmi": "1.4.2"
   },
   "devDependencies": {
     "@types/node": "^17.0.35",
@@ -39,6 +39,6 @@
     "eslint": "^8.15.0",
     "eslint-config-next": "^13.3.4",
     "prettier": "^2.8.8",
-    "typescript": "^4.9.4"
+    "typescript": "5.0.4"
   }
 }

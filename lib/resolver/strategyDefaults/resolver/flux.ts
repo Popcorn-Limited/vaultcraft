@@ -1,5 +1,6 @@
 import { ADDRESS_ZERO } from "@/lib/constants";
 import { Address, mainnet } from "wagmi";
+import { StrategyDefaultResolverParams } from "..";
 
 // Flux is mainnet only.
 // @dev Make sure the keys here are correct checksum addresses
@@ -16,6 +17,6 @@ const assetToCToken: { [key: Address]: Address } = {
   "0x1B19C19393e2d034D8Ff31ff34c81252FcBbee92": "0x1dD7950c266fB1be96180a8FDb0591F70200E018",
 };
 
-export async function flux({ chainId, address }: { chainId: number, address: Address }): Promise<any[]> {
+export async function flux({ chainId, client, address }: StrategyDefaultResolverParams): Promise<any[]> {
   return chainId === mainnet.id ? [assetToCToken[address] || ADDRESS_ZERO] : [ADDRESS_ZERO];
 }

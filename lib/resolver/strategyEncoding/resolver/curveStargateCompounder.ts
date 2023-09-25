@@ -1,17 +1,9 @@
-import { RPC_URLS } from "@/lib/connectors";
 import { curveApiCallToBytes } from "@/lib/external/curve/router/call";
-import { Address, createPublicClient, encodeAbiParameters, http, parseAbiParameters } from "viem";
-import { mainnet } from "wagmi";
+import { encodeAbiParameters, parseAbiParameters } from "viem";
+import { StrategyEncodingResolverParams } from "..";
 
-export async function curveStargateCompounder({ chainId, address, params }: { chainId: number, address: Address, params: any[] }): Promise<string> {
-  // TODO -- temp solution, we should pass the client into the function
-  const client = createPublicClient({
-    chain: mainnet,
-    // @ts-ignore
-    transport: http(RPC_URLS[chainId])
-  })
-
-  const token = await client.readContract({
+export async function curveStargateCompounder({ chainId, client, address, params }: StrategyEncodingResolverParams): Promise<string> {
+const token = await client.readContract({
     address,
     abi: lpTokenAbi,
     functionName: "token"

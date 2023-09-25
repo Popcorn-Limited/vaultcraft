@@ -1,17 +1,10 @@
 import { ADDRESS_ZERO } from "@/lib/constants";
-import { Address, createPublicClient, http } from "viem";
-import { mainnet } from "wagmi";
+import { Address } from "viem";
+import { StrategyDefaultResolverParams } from "..";
 
 const REGISTER_ADDRESS = "0xA50d4E7D8946a7c90652339CDBd262c375d54D99";
 
-export async function gearbox({ chainId, address }: { chainId: number, address: Address }): Promise<any[]> {
-    // TODO -- temp solution, we should pass the client into the function
-    const client = createPublicClient({
-        chain: mainnet,
-        // @ts-ignore
-        transport: http(RPC_URLS[chainId])
-    })
-
+export async function gearbox({ chainId, client, address }: StrategyDefaultResolverParams): Promise<any[]> {
     const pools = await client.readContract({
         address: REGISTER_ADDRESS,
         abi: abiRegister,

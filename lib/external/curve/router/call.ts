@@ -146,6 +146,7 @@ export const curveApiCallToBytes = async ({
         ...new Array(curveData.minTradeAmounts.length).fill('uint256'),
         'bytes'
     ];
-
+    // @dev typescript cant infer the types of the encodeAbiParameters function since we are using a dynamic array of types
+    // @ts-ignore
     return encodeAbiParameters(parseAbiParameters(String(types)), values);
 }
