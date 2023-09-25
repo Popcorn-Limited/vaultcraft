@@ -17,33 +17,11 @@ interface ProtocolOption extends Protocol {
   apy?: number;
 }
 
-const ProtocolIcons = {
-  aaveV2: "https://cryptologos.cc/logos/aave-aave-logo.png?v=024",
-  aaveV3: "https://cryptologos.cc/logos/aave-aave-logo.png?v=024",
-  aura: "https://app.aura.finance/assets/aura-362899d2.png",
-  balancer: "https://cryptologos.cc/logos/balancer-bal-logo.png?v=024",
-  beefy: "https://cryptologos.cc/logos/beefy-finance-bifi-logo.png?v=024",
-  compoundV2: "https://cdn.furucombo.app/assets/img/token/COMP.svg",
-  compoundV3: "https://cdn.furucombo.app/assets/img/token/COMP.svg",
-  convex: "https://cdn.furucombo.app/assets/img/token/CVX.png",
-  curve: "https://cryptologos.cc/logos/curve-dao-token-crv-logo.png?v=025",
-  flux: "https://icons.llamao.fi/icons/protocols/flux-finance",
-  idleJunior: "https://icons.llamao.fi/icons/protocols/idle",
-  idleSenior: "https://icons.llamao.fi/icons/protocols/idle",
-  origin: "https://icons.llamao.fi/icons/protocols/origin-defi",
-  yearn: "https://cryptologos.cc/logos/yearn-finance-yfi-logo.png?v=024"
-}
-
 async function getProtocolOptions(asset: Address, chainId: number, yieldOptions: YieldOptions): Promise<ProtocolOption[]> {
-  console.log({ asset, chainId, yieldOptions })
-  const protocolNames = await yieldOptions?.getProtocolsByAsset(chainId, asset);
-  console.log({ protocolNames })
-  const apys = await Promise.all(protocolNames.map(async (protocol) => yieldOptions?.getApy(chainId, protocol, asset)))
-  return protocolNames.map((name, i) => ({
-    name,
-    key: name,
-    chains: [chainId],
-    logoURI: ProtocolIcons[name],
+  const protocols = await yieldOptions?.getProtocolsByAsset(chainId, getAddress(asset));
+  const apys = await Promise.all(protocols.map(async (protocol) => yieldOptions?.getApy(chainId, protocol.key, asset)))
+  return protocols.map((protocol, i) => ({
+    ...protocol,
     apy: apys[i].total,
     disabled: false
   }))

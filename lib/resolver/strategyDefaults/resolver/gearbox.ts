@@ -2,7 +2,7 @@ import { ADDRESS_ZERO } from "@/lib/constants";
 import { Address } from "viem";
 import { StrategyDefaultResolverParams } from "..";
 
-const REGISTER_ADDRESS = "0xA50d4E7D8946a7c90652339CDBd262c375d54D99";
+const REGISTER_ADDRESS: Address = "0xA50d4E7D8946a7c90652339CDBd262c375d54D99";
 
 export async function gearbox({ chainId, client, address }: StrategyDefaultResolverParams): Promise<any[]> {
     const pools = await client.readContract({

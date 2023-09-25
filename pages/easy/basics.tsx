@@ -1,7 +1,7 @@
 import { BASIC_CREATION_STAGES } from "@/lib/stages";
 import { useRouter } from "next/router";
 import { atom, useAtom } from "jotai";
-import { metadataAtom, assetAtom, protocolAtom, strategyAtom, assetAddressesAtom, networkAtom, strategyConfigAtom, useProtocols } from "@/lib/atoms";
+import { metadataAtom, assetAtom, protocolAtom, strategyAtom, assetAddressesAtom, networkAtom, strategyConfigAtom } from "@/lib/atoms";
 import MainActionButton from "@/components/buttons/MainActionButton";
 import SecondaryActionButton from "@/components/buttons/SecondaryActionButton";
 import MetadataConfiguration from "@/components/sections/MetadataConfiguration";
