@@ -1,7 +1,7 @@
 import { toast } from "react-hot-toast";
 import { extractRevertReason } from "../helpers";
 import { Address, createPublicClient, createWalletClient, custom, http, parseUnits } from "viem";
-import { mainnet } from "wagmi";
+import { PublicClient, WalletClient, mainnet } from "wagmi";
 import { RPC_URLS } from "../connectors";
 import { ADDRESS_ZERO, MAX_UINT256, ZERO } from "../constants";
 import { AdapterConfig } from "../atoms";
@@ -15,8 +15,8 @@ const VAULT_CONTROLLER: { [key: number]: Address } = {
 // TODO --> adjust input params
 export async function deployVault(
   chain: any,
-  walletClient: any,
-  publicClient: any,
+  walletClient: WalletClient,
+  publicClient: PublicClient,
   fees: any,
   asset: any,
   limit: any,
@@ -25,7 +25,7 @@ export async function deployVault(
   ipfsHash: string
 ): Promise<boolean> {
   toast.loading("Deploying Vault...")
-  // TODO -- weshould have this somewhere from rainbow or similar need to see how to pass it along
+  console.log({ chain, walletClient, publicClient, fees, asset, limit, adapterData, strategyData, ipfsHash })
   const [account] = await walletClient.getAddresses()
 
   try {
@@ -36,7 +36,7 @@ export async function deployVault(
       functionName: "deployVault",
       args: [
         {
-          asset: asset.address[chain?.id],
+          asset: asset.address[chain.id],
           adapter: ADDRESS_ZERO,
           fees: {
             deposit: parseUnits(String(Number(fees.deposit) / 100), 18),
@@ -77,16 +77,24 @@ export async function deployVault(
     });
     // TODO --> how do we get and interpret the error?
     // TODO --> only call write and all that stuff if the simulation didnt error
-
-    walletClient.writeContract(request);
+    try {
+      walletClient.writeContract(request);
+      toast.dismiss()
+      toast.success("Vault Deployed!");
+      return true
+    } catch (error) {
+      console.log({ error: error, cause: error.cause, shortMessage: error.shortMessage })
+      toast.dismiss()
+      return false
+    }
 
     //await tx.wait(1) // TODO --> how do we wait for the transaction
-    toast.dismiss()
-    toast.success("Vault Deployed!");
+
     return true
   } catch (error) {
+    console.log({ cause: error.cause, shortMessage: error.shortMessage })
     toast.dismiss()
-    toast.error(extractRevertReason(error));
+    //toast.error(extractRevertReason(error));
     return false
   }
 };
