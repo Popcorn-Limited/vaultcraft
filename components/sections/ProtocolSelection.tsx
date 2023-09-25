@@ -6,8 +6,6 @@ import {
   networkAtom,
   Protocol,
   protocolAtom,
-  useProtocols,
-  assetAddressesAtom
 } from "@/lib/atoms";
 import Selector, { Option } from "@/components/inputs/Selector";
 import { yieldOptionsAtom } from "@/lib/atoms/sdk";
@@ -37,8 +35,10 @@ const ProtocolIcons = {
 }
 
 async function getProtocolOptions(asset: Address, chainId: number, yieldOptions: YieldOptions): Promise<ProtocolOption[]> {
-  const protocolNames = await yieldOptions.getProtocolsByAsset(chainId, asset);
-  const apys = await Promise.all(protocolNames.map(async (protocol) => yieldOptions.getApy(chainId, protocol, asset)))
+  console.log({ asset, chainId, yieldOptions })
+  const protocolNames = await yieldOptions?.getProtocolsByAsset(chainId, asset);
+  console.log({ protocolNames })
+  const apys = await Promise.all(protocolNames.map(async (protocol) => yieldOptions?.getApy(chainId, protocol, asset)))
   return protocolNames.map((name, i) => ({
     name,
     key: name,

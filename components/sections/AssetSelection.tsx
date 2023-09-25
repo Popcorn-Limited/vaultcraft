@@ -55,13 +55,10 @@ function AssetSelection() {
   const [asset, setAsset] = useAtom(assetAtom);
 
   const [availableAssets, setAvailableAssets] = useState(assets);
-  const [availableAssetAddresses, setAvailableAssetsAddresses] = useAtom(assetAddressesAtom);
+  const [availableAssetAddresses] = useAtom(assetAddressesAtom);
 
   const [searchTerm, setSearchTerm] = useState<string>("")
 
-  // Only for reset
-  const [, setAdapter] = useAtom(adapterAtom);
-  const [, setAdapterConfig] = useAtom(adapterConfigAtom);
   const [, setStrategy] = useAtom(strategyAtom);
   const [protocol, setProtocol] = useAtom(protocolAtom);
 
