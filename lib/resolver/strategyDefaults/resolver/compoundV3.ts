@@ -28,6 +28,18 @@ const assetToCToken: { [key: number]: { [key: Address]: Address } } = {
   },
 };
 
+// @dev Make sure the keys here are correct checksum addresses
+const COMET_REWARDER: { [key: number]: Address } = {
+  1: "0x1B0e765F6224C21223AeA2af16c1C46E38885a40",
+  137: "0x45939657d1CA34A8FA39A924B71D28Fe8431e581",
+  42161: "0x88730d254A2f7e6AC8388c3198aFd694bA9f7fae",
+  84553: "0x123964802e6ABabBE1Bc9547D72Ef1B69B00A6b1"
+}
+
 export async function compoundV3({ chainId, client, address }: StrategyDefaultResolverParams): Promise<any[]> {
-  return Object.keys(assetToCToken).includes(String(chainId)) ? [assetToCToken[chainId][address] || ADDRESS_ZERO] : [ADDRESS_ZERO];
+  if (Object.keys(assetToCToken).includes(String(chainId)) && Object.keys(assetToCToken[chainId]).includes(address)) {
+    return [assetToCToken[chainId][address], COMET_REWARDER[chainId]];
+  } else {
+    return [ADDRESS_ZERO, ADDRESS_ZERO];
+  }
 }
