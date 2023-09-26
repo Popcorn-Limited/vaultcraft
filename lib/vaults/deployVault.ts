@@ -1,8 +1,6 @@
 import { toast } from "react-hot-toast";
-import { extractRevertReason } from "../helpers";
-import { Address, createPublicClient, createWalletClient, custom, http, parseUnits } from "viem";
-import { PublicClient, WalletClient, mainnet } from "wagmi";
-import { RPC_URLS } from "../connectors";
+import { Address, parseUnits } from "viem";
+import { PublicClient, WalletClient} from "wagmi";
 import { ADDRESS_ZERO, MAX_UINT256, ZERO } from "../constants";
 import { AdapterConfig } from "../atoms";
 
@@ -12,8 +10,7 @@ const VAULT_CONTROLLER: { [key: number]: Address } = {
   42161: "0xF40749d72Ab5422CC5d735A373E66d67f7cA9393",
 }
 
-// TODO --> adjust input params
-export async function deployVault(
+async function simulateDeployVault(
   chain: any,
   walletClient: WalletClient,
   publicClient: PublicClient,
@@ -23,9 +20,7 @@ export async function deployVault(
   adapterData: AdapterConfig,
   strategyData: AdapterConfig,
   ipfsHash: string
-): Promise<boolean> {
-  toast.loading("Deploying Vault...")
-  console.log({ chain, walletClient, publicClient, fees, asset, limit, adapterData, strategyData, ipfsHash })
+): Promise<{ request: any | null, success: boolean, error: string | null }> {
   const [account] = await walletClient.getAddresses()
 
   try {
@@ -75,27 +70,46 @@ export async function deployVault(
         ZERO
       ],
     });
-    // TODO --> how do we get and interpret the error?
-    // TODO --> only call write and all that stuff if the simulation didnt error
+    return { request: request, success: true, error: null }
+  } catch (error: any) {
+    return { request: null, success: false, error: error.shortMessage }
+  }
+}
+
+export async function deployVault(
+  chain: any,
+  walletClient: WalletClient,
+  publicClient: PublicClient,
+  fees: any,
+  asset: any,
+  limit: any,
+  adapterData: AdapterConfig,
+  strategyData: AdapterConfig,
+  ipfsHash: string
+): Promise<boolean> {
+  toast.loading("Deploying Vault...")
+
+  const { request, success, error: simulationError } = await simulateDeployVault(chain, walletClient, publicClient, fees, asset, limit, adapterData, strategyData, ipfsHash)
+  if (success) {
     try {
-      walletClient.writeContract(request);
+      const hash = await walletClient.writeContract(request)
+      const receipt = await publicClient.waitForTransactionReceipt({ hash })
+      console.log({ receipt })
       toast.dismiss()
       toast.success("Vault Deployed!");
-      return true
-    } catch (error) {
-      console.log({ error: error, cause: error.cause, shortMessage: error.shortMessage })
+
+      return true;
+    } catch (error: any) {
       toast.dismiss()
-      return false
+      toast.error(error.shortMessage)
+
+      return false;
     }
-
-    //await tx.wait(1) // TODO --> how do we wait for the transaction
-
-    return true
-  } catch (error) {
-    console.log({ cause: error.cause, shortMessage: error.shortMessage })
+  } else {
     toast.dismiss()
-    //toast.error(extractRevertReason(error));
-    return false
+    toast.error(simulationError)
+
+    return false;
   }
 };
 

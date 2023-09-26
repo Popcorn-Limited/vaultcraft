@@ -46,15 +46,14 @@ export default function ReviewPage(): JSX.Element {
   }
 
   function deploy() {
-    // IpfsClient.add(metadata.name, { name: metadata.name }).then(res => {
-    //   setMetadata((prefState) => { return { ...prefState, ipfsHash: res } });
-    //   setIsLoading(true)
-    //   deployVault(chain, publicClient, walletClient, fees, asset, limit, adapterData, strategyData, "res").then(res => {
-    //     !!res ? setIsSuccess(true) : setIsError(true);
-    //     setIsLoading(false)
-    //   })
-    // });
-    deployVault(chain, walletClient as WalletClient, publicClient, fees, asset, limit, adapterData, strategyData, "res")
+    IpfsClient.add(metadata.name, { name: metadata.name }).then(res => {
+      setMetadata((prefState) => { return { ...prefState, ipfsHash: res } });
+      setIsLoading(true)
+      deployVault(chain, walletClient as WalletClient, publicClient, fees, asset, limit, adapterData, strategyData, res).then(res => {
+        !!res ? setIsSuccess(true) : setIsError(true);
+        setIsLoading(false)
+      })
+    });
   }
 
   return (metadata && adapter ?

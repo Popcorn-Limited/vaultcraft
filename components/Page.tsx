@@ -6,7 +6,6 @@ import { CachedProvider, YieldOptions } from "vaultcraft-sdk";
 
 async function setUpYieldOptions() {
   const ttl = 360_000;
-  // TODO figure out the type issues here
   const provider = new CachedProvider();
   await provider.initialize("https://raw.githubusercontent.com/Popcorn-Limited/apy-data/main/apy-data.json");
 
