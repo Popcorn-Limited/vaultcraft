@@ -2,7 +2,7 @@ import { BASIC_CREATION_STAGES } from "@/lib/stages";
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { useAtom } from "jotai";
-import { WalletClient, useAccount, useNetwork, usePublicClient, useWalletClient } from "wagmi";
+import { WalletClient, mainnet, useAccount, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import Image from "next/image";
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
@@ -23,6 +23,7 @@ export default function ReviewPage(): JSX.Element {
   const { data: walletClient } = useWalletClient()
   const { address: account } = useAccount();
   const { openConnectModal } = useConnectModal();
+  const { switchNetwork } = useSwitchNetwork();
   const { chain } = useNetwork()
 
   const [adapter] = useAtom(adapterAtom);
@@ -46,10 +47,13 @@ export default function ReviewPage(): JSX.Element {
   }
 
   function deploy() {
+    // Deploy is currently only available on mainnet
+    if (chain?.id !== mainnet.id) switchNetwork?.(Number(mainnet.id));
+
     IpfsClient.add(metadata.name, { name: metadata.name }).then(res => {
       setMetadata((prefState) => { return { ...prefState, ipfsHash: res } });
       setIsLoading(true)
-      deployVault(chain, walletClient as WalletClient, publicClient, fees, asset, limit, adapterData, strategyData, res).then(res => {
+      deployVault(mainnet.id, walletClient as WalletClient, publicClient, fees, asset, limit, adapterData, strategyData, res).then(res => {
         !!res ? setIsSuccess(true) : setIsError(true);
         setIsLoading(false)
       })

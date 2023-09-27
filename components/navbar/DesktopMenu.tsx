@@ -12,10 +12,8 @@ export default function DesktopMenu(): JSX.Element {
     const { address } = useAccount();
     const { chain, chains } = useNetwork();
     
-    // @ts-ignore
     const logo = useMemo(() => (address && chain?.id ? networkLogos[chain.id] : networkLogos["1"]), [chain?.id, address]);
     const chainName = useMemo(() => (address && chain?.name ? chain.name : "Ethereum"), [chain?.id, address]);
-
 
     return (
         <div className="bg-transparent w-full">

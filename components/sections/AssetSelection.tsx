@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import { localhost, mainnet } from "wagmi/chains";
 import { RPC_URLS } from "@/lib/connectors";
-import { isAddress } from "viem";
+import { getAddress, isAddress } from "viem";
 
 async function fetchViaAlchemy(address: string, chainId: number, metadata: any) {
   const options = {
@@ -74,7 +74,7 @@ function AssetSelection() {
 
     if (avAssets.length === 0
       && isAddress(searchTerm)
-      && availableAssetAddresses[chainId].all.includes(searchTerm)) {
+      && availableAssetAddresses[chainId].includes(getAddress(searchTerm))) {
       getTokenMetadata(searchTerm, chainId, protocol.key).then(res => setAvailableAssets([res]))
     } else {
       setAvailableAssets(avAssets)

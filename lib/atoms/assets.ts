@@ -1,5 +1,6 @@
 import assetsJson from "@/lib/constants/assets.json";
 import { atom } from "jotai";
+import { Address } from "viem";
 
 export type Asset = {
   chains: number[];
@@ -13,10 +14,7 @@ export type Asset = {
 
 type AssetAddresses = {
   // Chain Id
-  [key: number]: {
-    // Resolver string
-    [key: string]: string[]
-  }
+  [key: number]: Address[]
 }
 
 export const assets = assetsJson as Asset[];
