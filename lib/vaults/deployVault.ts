@@ -1,6 +1,6 @@
 import { toast } from "react-hot-toast";
 import { Address, parseUnits } from "viem";
-import { PublicClient, WalletClient} from "wagmi";
+import { PublicClient, WalletClient } from "wagmi";
 import { ADDRESS_ZERO, MAX_UINT256, ZERO } from "../constants";
 import { AdapterConfig } from "../atoms";
 
@@ -22,6 +22,8 @@ async function simulateDeployVault(
   ipfsHash: string
 ): Promise<{ request: any | null, success: boolean, error: string | null }> {
   const [account] = await walletClient.getAddresses()
+
+  if (VAULT_CONTROLLER[chain.id] === undefined) return { request: null, success: false, error: "Connected to the wrong network" }
 
   try {
     const { request } = await publicClient.simulateContract({

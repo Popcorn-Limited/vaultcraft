@@ -15,6 +15,7 @@ import Modal from "@/components/Modal";
 import VaultCreationContainer from "@/components/VaultCreationContainer";
 import { deployVault } from "@/lib/vaults/deployVault";
 import { stringToHex } from "viem";
+import { SUPPORTED_NETWORKS } from "@/lib/connectors";
 
 
 export default function ReviewPage(): JSX.Element {
@@ -47,13 +48,15 @@ export default function ReviewPage(): JSX.Element {
   }
 
   function deploy() {
+    if (!chain) return
     // Deploy is currently only available on mainnet
-    if (chain?.id !== mainnet.id) switchNetwork?.(Number(mainnet.id));
+    // @ts-ignore
+    if (!SUPPORTED_NETWORKS.map(network => network.id).includes(chain.id)) switchNetwork?.(Number(mainnet.id));
 
     IpfsClient.add(metadata.name, { name: metadata.name }).then(res => {
       setMetadata((prefState) => { return { ...prefState, ipfsHash: res } });
       setIsLoading(true)
-      deployVault(mainnet.id, walletClient as WalletClient, publicClient, fees, asset, limit, adapterData, strategyData, res).then(res => {
+      deployVault(chain, walletClient as WalletClient, publicClient, fees, asset, limit, adapterData, strategyData, res).then(res => {
         !!res ? setIsSuccess(true) : setIsError(true);
         setIsLoading(false)
       })
