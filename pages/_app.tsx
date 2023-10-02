@@ -2,7 +2,7 @@ import "../styles/globals.css";
 import "@rainbow-me/rainbowkit/styles.css";
 import type { AppProps } from "next/app";
 import { Roboto } from "next/font/google";
-import { WagmiConfig, createClient, configureChains } from "wagmi";
+import { WagmiConfig, configureChains, createConfig } from "wagmi";
 import { publicProvider } from "wagmi/providers/public";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
@@ -15,7 +15,7 @@ import NoSSR from 'react-no-ssr';
 import Page from "@/components/Page";
 import { SUPPORTED_NETWORKS } from "@/lib/connectors";
 
-const { chains, provider } = configureChains(SUPPORTED_NETWORKS, [
+const { chains, publicClient } = configureChains(SUPPORTED_NETWORKS, [
   publicProvider(),
   alchemyProvider({
     apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY as string,
@@ -28,20 +28,22 @@ const { chains, provider } = configureChains(SUPPORTED_NETWORKS, [
 );
 
 const { connectors } = getDefaultWallets({
-  appName: "vaultcraft",
-  chains,
+  appName: 'vaultcraft',
+  projectId: 'b2f883ab9ae2fbb812cb8e0d83efea7b', // From Wallet Connect
+  chains
 });
 
-const client = createClient({
-  autoConnect: false,
-  provider,
+const config = createConfig({
+  autoConnect: true,
   connectors,
-});
+  publicClient
+})
 
 const nextFont = Roboto({
   weight: ["400", "700", "900"],
   subsets: [],
 });
+
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
@@ -66,7 +68,7 @@ export default function App({ Component, pageProps }: AppProps) {
           }}
         />
         <Toaster />
-        <WagmiConfig client={client}>
+        <WagmiConfig config={config}>
           <RainbowKitProvider chains={chains} modalSize="compact">
             <NoSSR>
               <Provider>

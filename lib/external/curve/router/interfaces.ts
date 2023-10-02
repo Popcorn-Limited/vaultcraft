@@ -1,5 +1,3 @@
-import { BigNumber } from "ethers";
-
 export type CHAIN_ID_TYPE = 1 | 10 | 100 | 137 | 250 | 1284 | 2222 | 42161 | 42220 | 43114 | 1313161554;
 export type REFERENCE_ASSET_TYPE = 'USD' | 'EUR' | 'BTC' | 'ETH' | 'LINK' | 'CRYPTO' | 'OTHER';
 
@@ -102,5 +100,5 @@ export interface INativeToken {
 
 export interface CurveRoute {
   route: string[];
-  swapParams: BigNumber[][]
+  swapParams: BigInt[][]
 }

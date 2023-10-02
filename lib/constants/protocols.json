@@ -24,13 +24,13 @@
     "logoURI": "https://cryptologos.cc/logos/aave-aave-logo.png?v=024"
   },
   {
-    "chains": [1],
+    "chains": [],
     "name": "Aura",
     "key": "aura",
     "logoURI": "https://app.aura.finance/assets/aura-362899d2.png"
   },
   {
-    "chains": [1],
+    "chains": [],
     "name": "Balancer",
     "key": "balancer",
     "logoURI": "https://cryptologos.cc/logos/balancer-bal-logo.png?v=024"
@@ -60,13 +60,13 @@
     "logoURI": "https://icons.llamao.fi/icons/protocols/flux-finance"
   },
   {
-    "chains": [1, 42161],
+    "chains": [],
     "name": "Convex",
     "key": "convex",
     "logoURI": "https://cdn.furucombo.app/assets/img/token/CVX.png"
   },
   {
-    "chains": [1],
+    "chains": [],
     "name": "Curve",
     "key": "curve",
     "logoURI": "https://cryptologos.cc/logos/curve-dao-token-crv-logo.png?v=025"
@@ -120,7 +120,7 @@
     "logoURI": "https://cdn.furucombo.app/assets/img/token/CVX.png"
   },
   {
-    "chains": [1, 1337],
+    "chains": [],
     "name": "Stargate",
     "key": "stargate",
     "logoURI": "https://icons.llama.fi/stargate.png"

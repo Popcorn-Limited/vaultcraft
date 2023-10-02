@@ -1,15 +1,15 @@
-import { constants } from "ethers";
-import { mainnet } from "wagmi";
+import { ADDRESS_ZERO } from "@/lib/constants";
+import { Address, mainnet } from "wagmi";
+import { StrategyDefaultResolverParams } from "..";
 
-// @dev dont forget to lowercase the keys when you add a new one
-const CDO: { [key: string]: string } = {
-  "0x6b175474e89094c44da98b954eedeac495271d0f": "0x5dcA0B3Ed7594A6613c1A2acd367d56E1f74F92D", // DAI
-  "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": "0x1329E8DB9Ed7a44726572D44729427F132Fa290D", // USDC
-  "0xdac17f958d2ee523a2206206994597c13d831ec7": "0xc4574C60a455655864aB80fa7638561A756C5E61", // USDT
-  "0xae7ab96520de3a18e5e111b5eaab095312d7fe84": "0x34dCd573C5dE4672C8248cd12A99f875Ca112Ad8", // stETH
-  "0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0": "0xF87ec7e1Ee467d7d78862089B92dd40497cBa5B8"  // Matic
+// @dev Make sure the keys here are correct checksum addresses
+const assetToCdo: { [key: Address]: Address } = {
+  "0x6B175474E89094C44Da98b954EedeAC495271d0F": "0x5dcA0B3Ed7594A6613c1A2acd367d56E1f74F92D", // dai clearpool portofino
+  "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48": "0xE7C6A4525492395d65e736C3593aC933F33ee46e", // usdc clearpool fasanara
+  "0xdAC17F958D2ee523a2206206994597C13D831ec7": "0xc4574C60a455655864aB80fa7638561A756C5E61", // usdt clearpool fasanara
+  "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84": "0x8E0A8A5c1e5B3ac0670Ea5a613bB15724D51Fc37", // stEth instadapp
 }
 
-export async function idle({ chainId, address }: { chainId: number, address: string }): Promise<any[]> {
-  return chainId === mainnet.id ? [(CDO[address.toLowerCase()] || constants.AddressZero)] : [constants.AddressZero];
+export async function idle({ chainId, client, address }: StrategyDefaultResolverParams): Promise<any[]> {
+  return chainId === mainnet.id ? [(assetToCdo[address] || ADDRESS_ZERO)] : [ADDRESS_ZERO];
 }

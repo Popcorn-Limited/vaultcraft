@@ -14,13 +14,13 @@
     "@curvefi/api": "^2.42.0",
     "@headlessui/react": "^1.7.10",
     "@heroicons/react": "^2.0.18",
-    "@rainbow-me/rainbowkit": "^0.12.9",
+    "@rainbow-me/rainbowkit": "^1.0.11",
     "autoprefixer": "^10.4.13",
+    "base58-js": "^2.0.0",
     "dotenv": "^16.0.3",
-    "ethers": "^5.7.2",
     "find-config": "^1.0.0",
     "jotai": "^2.0.1",
-    "next": "^13.3.4",
+    "next": "^13.5.2",
     "rc-tooltip": "^5.2.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -29,7 +29,9 @@
     "react-no-ssr": "^1.1.0",
     "tailwind-scrollbar-hide": "^1.1.7",
     "tailwindcss": "^3.2.6",
-    "wagmi": "^0.12.0"
+    "vaultcraft-sdk": "0.1.0",
+    "viem": "1.11.1",
+    "wagmi": "1.4.2"
   },
   "devDependencies": {
     "@types/node": "^17.0.35",
@@ -37,6 +39,6 @@
     "eslint": "^8.15.0",
     "eslint-config-next": "^13.3.4",
     "prettier": "^2.8.8",
-    "typescript": "^4.9.4"
+    "typescript": "5.0.4"
   }
 }

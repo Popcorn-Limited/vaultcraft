@@ -5,7 +5,7 @@
     "resolver": "curveStargateCompounder",
     "protocol": "stargate",
     "adapter": "StargateLpStakingAdapter",
-    "chains": [1],
+    "chains": [],
     "description": "description",
     "logoURI": "/images/icons/popLogo.svg",
     "initParams": [
@@ -49,7 +49,7 @@
     "resolver": "curveCompounder",
     "protocol": "curve",
     "adapter": "CurveGaugeAdapter",
-    "chains": [1],
+    "chains": [],
     "description": "description",
     "logoURI": "/images/icons/popLogo.svg",
     "initParams": [
@@ -87,7 +87,7 @@
     "resolver": "convexCompounder",
     "protocol": "convex",
     "adapter": "ConvexAdapter",
-    "chains": [1],
+    "chains": [],
     "description": "description",
     "logoURI": "/images/icons/popLogo.svg",
     "initParams": [
@@ -125,7 +125,7 @@
     "resolver": "balancerLpCompounder",
     "protocol": "balancer",
     "adapter": "BalancerGaugeAdapter",
-    "chains": [1],
+    "chains": [],
     "description": "description",
     "logoURI": "/images/icons/popLogo.svg",
     "initParams": [
@@ -170,7 +170,7 @@
     "resolver": "auraCompounder",
     "protocol": "aura",
     "adapter": "AuraAdapter",
-    "chains": [1],
+    "chains": [],
     "description": "description",
     "logoURI": "/images/icons/popLogo.svg",
     "initParams": [
@@ -275,7 +275,7 @@
         "description": "Pid of the Aura Pool"
       }
     ],
-    "chains": [1],
+    "chains": [],
     "resolver": "aura"
   },
   {
@@ -292,7 +292,7 @@
         "description": "Address of the Balancer Gauge to use"
       }
     ],
-    "chains": [1],
+    "chains": [],
     "resolver": "balancer"
   },
   {
@@ -388,7 +388,7 @@
         "description": "Pid of the Convex Pool"
       }
     ],
-    "chains": [1, 1337, 42161],
+    "chains": [],
     "resolver": "convex"
   },
   {
@@ -405,7 +405,7 @@
         "description": "Id of the Gauge to use"
       }
     ],
-    "chains": [1, 1337],
+    "chains": [],
     "resolver": "curve"
   },
   {
@@ -422,7 +422,7 @@
         "description": "Address of the CRV-Token on the specific network"
       }
     ],
-    "chains": [42161],
+    "chains": [],
     "resolver": "curve"
   },
   {

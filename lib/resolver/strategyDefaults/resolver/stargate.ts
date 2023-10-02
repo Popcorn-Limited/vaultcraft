@@ -1,38 +1,32 @@
-import { readContract } from "@wagmi/core";
-import { readContracts } from "wagmi";
-import { BigNumber, constants } from "ethers";
+import { ADDRESS_ZERO } from "@/lib/constants";
+import { Address, getAddress } from "viem";
+import { StrategyDefaultResolverParams } from "..";
 
-const STAKING_ADDRESS = "0xB0D502E938ed5f4df2E681fE6E419ff29631d62b";
+const STAKING_ADDRESS: Address = "0xB0D502E938ed5f4df2E681fE6E419ff29631d62b";
 
-export async function stargate({ chainId, address }: { chainId: number, address: string }) {
-    const poolLength = await readContract({
+export async function stargate({ chainId, client, address }: StrategyDefaultResolverParams): Promise<any[]> {
+    const poolLength = await client.readContract({
         address: STAKING_ADDRESS,
         abi,
         functionName: "poolLength",
-        chainId,
-        args: []
-    }) as BigNumber
+    }) as BigInt
 
-    const tokens = await readContracts({
-        contracts: Array(poolLength.toNumber()).fill(undefined).map((item, idx) => {
+    const tokenRes = await client.multicall({
+        contracts: Array(Number(poolLength)).fill(undefined).map((item, idx) => {
             return {
                 address: STAKING_ADDRESS,
                 abi,
                 functionName: "poolInfo",
-                chainId,
                 args: [idx]
             }
         })
-    }) as Array<{
-        lpToken: string,
-    }>
-
-    const lpTokens = tokens.map(item => item.lpToken.toLowerCase())
+    })
+    const lpTokens: Address[] = tokenRes.filter(token => token.status === "success").map((token: any) => getAddress(token.result[0]))
 
     return [
-        lpTokens.includes(address.toLowerCase())
-          ? lpTokens.indexOf(address.toLowerCase())
-          : constants.AddressZero
+        lpTokens.includes(getAddress(address))
+            ? lpTokens.indexOf(getAddress(address))
+            : ADDRESS_ZERO // TODO this should be a number we can clearly distinguish as wrong --> maybe undefined?
     ]
 }
 
@@ -84,4 +78,4 @@ const abi = [
         "stateMutability": "view",
         "type": "function"
     },
-]
+] as const

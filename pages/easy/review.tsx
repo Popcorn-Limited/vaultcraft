@@ -2,7 +2,7 @@ import { BASIC_CREATION_STAGES } from "@/lib/stages";
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { useAtom } from "jotai";
-import { useAccount, useNetwork } from "wagmi";
+import { WalletClient, mainnet, useAccount, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import Image from "next/image";
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
@@ -13,14 +13,18 @@ import MainActionButton from "@/components/buttons/MainActionButton";
 import SecondaryActionButton from "@/components/buttons/SecondaryActionButton";
 import Modal from "@/components/Modal";
 import VaultCreationContainer from "@/components/VaultCreationContainer";
-import { ethers } from "ethers";
 import { deployVault } from "@/lib/vaults/deployVault";
+import { stringToHex } from "viem";
+import { SUPPORTED_NETWORKS } from "@/lib/connectors";
 
 
 export default function ReviewPage(): JSX.Element {
   const router = useRouter();
-  const { address: account, connector } = useAccount();
+  const publicClient = usePublicClient();
+  const { data: walletClient } = useWalletClient()
+  const { address: account } = useAccount();
   const { openConnectModal } = useConnectModal();
+  const { switchNetwork } = useSwitchNetwork();
   const { chain } = useNetwork()
 
   const [adapter] = useAtom(adapterAtom);
@@ -44,14 +48,18 @@ export default function ReviewPage(): JSX.Element {
   }
 
   function deploy() {
+    if (!chain) return
+    // Deploy is currently only available on mainnet
+    // @ts-ignore
+    if (!SUPPORTED_NETWORKS.map(network => network.id).includes(chain.id)) switchNetwork?.(Number(mainnet.id));
+
     IpfsClient.add(metadata.name, { name: metadata.name }).then(res => {
       setMetadata((prefState) => { return { ...prefState, ipfsHash: res } });
       setIsLoading(true)
-      deployVault(chain, connector, fees, asset, limit, account, adapterData, strategyData, res).then(res => {
+      deployVault(chain, walletClient as WalletClient, publicClient, fees, asset, limit, adapterData, strategyData, res).then(res => {
         !!res ? setIsSuccess(true) : setIsError(true);
         setIsLoading(false)
-      }
-      )
+      })
     });
   }
 
@@ -129,7 +137,7 @@ export default function ReviewPage(): JSX.Element {
             <MainActionButton
               label="Done"
               handleClick={() => isSuccess ? router.push("https://app.pop.network/experimental/sweet-vaults") : setShowModal(false)}
-              disabled={metadata.ipfsHash === "" || isLoading || (strategyData.id !== ethers.utils.formatBytes32String("") && strategyData.data === "0x")}
+              disabled={metadata.ipfsHash === "" || isLoading || (strategyData.id !== stringToHex("", { size: 32 }) && strategyData.data === "0x")}
             />
           </div>
         </div>

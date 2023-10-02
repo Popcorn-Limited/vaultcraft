@@ -4,7 +4,6 @@ import { Switch } from '@headlessui/react'
 import Input from "@/components/inputs/Input";
 import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
 import { assetAtom, limitAtom } from "@/lib/atoms";
-import { parseUnits } from "ethers/lib/utils";
 import { validateInput } from "@/lib/helpers";
 
 

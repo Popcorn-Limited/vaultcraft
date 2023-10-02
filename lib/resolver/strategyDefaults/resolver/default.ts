@@ -1,3 +1,5 @@
-export async function initDefault({ chainId, address }: { chainId: number, address: string }): Promise<any[]> {
+import { StrategyDefaultResolverParams } from "..";
+
+export async function initDefault({ chainId, client, address }: StrategyDefaultResolverParams): Promise<any[]> {
   return []
 }

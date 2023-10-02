@@ -1,4 +1,4 @@
-import { MouseEventHandler, useState } from "react"
+import { useState } from "react"
 import Modal from "./Modal"
 
 export default function TooltipIcon({

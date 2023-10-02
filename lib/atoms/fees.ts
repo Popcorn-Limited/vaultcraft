@@ -1,4 +1,3 @@
-import { BigNumber } from "ethers";
 import { atom } from "jotai";
 
 export type VaultFees = {

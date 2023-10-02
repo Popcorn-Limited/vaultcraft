@@ -1,7 +1,7 @@
 <p>
   <h1 align="center">VaultCraft by Popcorn</h1>
   <p align="center">
-    <img alt="Loading..." src="./assets/vc-intro.gif">
+    <img alt="Loading..." src="./public/images/vc-intro.gif">
   </p>
   <p align="center">
     A no-code DeFi protocol for customizing vault strategies.

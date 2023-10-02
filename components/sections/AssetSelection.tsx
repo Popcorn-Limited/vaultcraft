@@ -1,11 +1,11 @@
-import { Asset, DEFAULT_ADAPTER, DEFAULT_PROTOCOL, DEFAULT_STRATEGY, adapterAtom, adapterConfigAtom, assetAddressesAtom, assetAtom, assets, networkAtom, protocolAtom, strategyAtom, useAdapters } from "@/lib/atoms";
+import { Asset, DEFAULT_PROTOCOL, DEFAULT_STRATEGY, adapterAtom, adapterConfigAtom, assetAddressesAtom, assetAtom, assets, networkAtom, protocolAtom, strategyAtom, useAdapters } from "@/lib/atoms";
 import Input from "../inputs/Input";
 import Selector, { Option } from "../inputs/Selector";
 import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import { localhost, mainnet } from "wagmi/chains";
-import { utils } from "ethers";
 import { RPC_URLS } from "@/lib/connectors";
+import { getAddress, isAddress } from "viem";
 
 async function fetchViaAlchemy(address: string, chainId: number, metadata: any) {
   const options = {
@@ -55,13 +55,10 @@ function AssetSelection() {
   const [asset, setAsset] = useAtom(assetAtom);
 
   const [availableAssets, setAvailableAssets] = useState(assets);
-  const [availableAssetAddresses, setAvailableAssetsAddresses] = useAtom(assetAddressesAtom);
+  const [availableAssetAddresses] = useAtom(assetAddressesAtom);
 
   const [searchTerm, setSearchTerm] = useState<string>("")
 
-  // Only for reset
-  const [, setAdapter] = useAtom(adapterAtom);
-  const [, setAdapterConfig] = useAtom(adapterConfigAtom);
   const [, setStrategy] = useAtom(strategyAtom);
   const [protocol, setProtocol] = useAtom(protocolAtom);
 
@@ -76,8 +73,8 @@ function AssetSelection() {
     )
 
     if (avAssets.length === 0
-      && utils.isAddress(searchTerm)
-      && availableAssetAddresses[chainId].all.includes(searchTerm)) {
+      && isAddress(searchTerm)
+      && availableAssetAddresses[chainId].includes(getAddress(searchTerm))) {
       getTokenMetadata(searchTerm, chainId, protocol.key).then(res => setAvailableAssets([res]))
     } else {
       setAvailableAssets(avAssets)

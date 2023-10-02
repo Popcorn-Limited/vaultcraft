@@ -1,5 +1,5 @@
 import { useAtom } from "jotai";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   adapterAtom,
   assetAtom,
@@ -7,7 +7,6 @@ import {
   strategyAtom,
   strategyConfigAtom
 } from "@/lib/atoms";
-import { resolveStrategyDefaults } from "@/lib/resolver/strategyDefaults/strategyDefaults";
 import { validateInput, verifyInitParamValidity } from "@/lib/helpers";
 import Fieldset from "@/components/inputs/Fieldset";
 import Input from "@/components/inputs/Input";

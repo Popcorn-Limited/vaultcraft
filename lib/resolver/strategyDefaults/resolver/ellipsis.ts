@@ -1,33 +1,33 @@
-import { readContract } from "@wagmi/core";
-import { readContracts } from "wagmi";
-import {BigNumber, constants} from "ethers";
+import { ADDRESS_ZERO } from "@/lib/constants";
+import { Address } from "viem";
+import { StrategyDefaultResolverParams } from "..";
 
-const STAKING_ADDRESS = "0x5B74C99AA2356B4eAa7B85dC486843eDff8Dfdbe";
+const STAKING_ADDRESS: Address = "0x5B74C99AA2356B4eAa7B85dC486843eDff8Dfdbe";
 
-export async function ellipsis({ chainId, address }: { chainId: number, address: string }): Promise<any[]> {
-    const poolLength = await readContract({
+export async function ellipsis({ chainId, client, address }: StrategyDefaultResolverParams): Promise<any[]> {
+    
+
+    const poolLength = await client.readContract({
         address: STAKING_ADDRESS,
         abi: abiStaking,
-        functionName: "poolLength",
-        chainId,
-        args: [],
-    }) as BigNumber;
+        functionName: "poolLength"
+    })
 
-    const registeredTokens = await readContracts({
-        contracts: Array(poolLength.toNumber()).fill(undefined).map((item, idx) => {
+    const registeredTokensRes = await client.multicall({
+        contracts: Array(Number(poolLength)).fill(undefined).map((item, idx) => {
             return {
                 address: STAKING_ADDRESS,
                 abi: abiStaking,
                 functionName: "registeredTokens",
-                chainId,
-                args: [idx],
+                args: [idx]
             }
         })
-    }) as string[]
+    })
+    const registeredTokens: Address[] = registeredTokensRes.filter(token => token.status === "success").map((token: any) => token.result)
 
     const assetIdx = registeredTokens.findIndex(item => item.toLowerCase() === address.toLowerCase())
 
-    return [ assetIdx !== -1 ? assetIdx : constants.AddressZero ];
+    return [assetIdx !== -1 ? assetIdx : ADDRESS_ZERO]; // TODO this should be a number we can clearly distinguish as wrong --> maybe undefined?
 }
 
 const abiStaking = [
@@ -63,4 +63,4 @@ const abiStaking = [
         "stateMutability": "view",
         "type": "function"
     },
-]
+] as const

@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { localhost } from "wagmi/chains";
-import { constants, ethers } from "ethers";
-import { formatUnits } from "ethers/lib/utils.js";
-import { mainnet, useAccount } from "wagmi";
+import { mainnet, useAccount, usePublicClient } from "wagmi";
 import { useAtom } from "jotai";
 import { Switch } from '@headlessui/react'
 import {
@@ -24,17 +22,15 @@ import {
 import ReviewSection from "./ReviewSection";
 import ReviewParam from "./ReviewParam";
 import { resolveStrategyEncoding } from "@/lib/resolver/strategyEncoding/strategyDefaults";
-
-import { balancerApiProxyCall } from "@/lib/external/balancer/router/call";
+import { encodeAbiParameters, getAddress, parseAbiParameters, stringToHex } from "viem";
 
 function shortenAddress(address: string): string {
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }
 
 export default function Review(): JSX.Element {
-  const { address: account } = useAccount();
+  const publicClient = usePublicClient();
   const [network] = useAtom(networkAtom);
-  const chainId = network.id === localhost.id ? mainnet.id : network.id;
   const [conditions, setConditions] = useAtom(conditionsAtom);
 
   const [asset] = useAtom(assetAtom);
@@ -43,13 +39,10 @@ export default function Review(): JSX.Element {
   const [fees] = useAtom(feeAtom);
   const [metadata] = useAtom(metadataAtom);
 
-  const [adapter] = useAtom(adapterAtom);
-  const [adapterConfig] = useAtom(adapterConfigAtom);
-  const [adapterData, setAdapterData] = useAtom(adapterDeploymentAtom);
-
   const [strategy] = useAtom(strategyAtom);
   const [strategyConfig] = useAtom(strategyConfigAtom);
-  const [strategyData, setStrategyData] = useAtom(strategyDeploymentAtom);
+  const [, setAdapterData] = useAtom(adapterDeploymentAtom);
+  const [, setStrategyData] = useAtom(strategyDeploymentAtom);
 
   const [loading, setLoading] = useState(false);
 
@@ -57,34 +50,32 @@ export default function Review(): JSX.Element {
     // @ts-ignore
     async function encodeStrategyData() {
       setLoading(true)
-      let adapterId = ethers.utils.formatBytes32String("")
+      let adapterId = stringToHex("", { size: 32 })
       let adapterInitParams = "0x"
 
-      let strategyId = ethers.utils.formatBytes32String("")
+      let strategyId = stringToHex("", { size: 32 })
       let strategyInitParams = "0x"
 
       if (strategy.name.includes("Depositor")) {
-        adapterId = ethers.utils.formatBytes32String(strategy.key)
+        adapterId = stringToHex(strategy.key, { size: 32 })
 
         if (strategy.initParams && strategy.initParams.length > 0) {
-          adapterInitParams = ethers.utils.defaultAbiCoder.encode(
-            strategy.initParams.map((param) => param.type),
-            strategyConfig
-          )
+          // @dev since the types here are dynamic we need to disable type-checking otherwise it checks for unknown types
+          // @ts-ignore 
+          adapterInitParams = encodeAbiParameters(parseAbiParameters(String(strategy.initParams.map((param) => param.type))), strategyConfig)
         }
       } else {
-        adapterId = ethers.utils.formatBytes32String((strategy.adapter as string))
-        strategyId = ethers.utils.formatBytes32String((strategy.key as string))
+        adapterId = stringToHex((strategy.adapter as string), { size: 32 })
+        strategyId = stringToHex((strategy.key as string), { size: 32 })
 
-        adapterInitParams = ethers.utils.defaultAbiCoder.encode(
-          // @ts-ignore
-          [strategy.initParams[0]],
-          [strategyConfig[0]]
-        )
+        // @dev since the types here are dynamic we need to disable type-checking otherwise it checks for unknown types
+        // @ts-ignore 
+        adapterInitParams = encodeAbiParameters(parseAbiParameters(strategy.initParams?.[0].type as string), [strategyConfig[0]])
 
         strategyInitParams = await resolveStrategyEncoding({
           chainId: network.id,
-          address: asset.address[network.id],
+          client: publicClient,
+          address: getAddress(asset.address[network.id]),
           params: strategyConfig.slice(1),
           resolver: strategy.resolver
         })

@@ -1,10 +1,9 @@
 import { BASIC_CREATION_STAGES } from "@/lib/stages";
 import { useRouter } from "next/router";
 import { atom, useAtom } from "jotai";
-import { metadataAtom, assetAtom, protocolAtom, adapterAtom, strategyAtom, Asset, assetAddressesAtom, availableAssetsAtom, networkAtom, adapterConfigAtom, strategyConfigAtom, adapterDeploymentAtom, strategyDeploymentAtom, useProtocols } from "@/lib/atoms";
+import { metadataAtom, assetAtom, protocolAtom, strategyAtom, assetAddressesAtom, networkAtom, strategyConfigAtom } from "@/lib/atoms";
 import MainActionButton from "@/components/buttons/MainActionButton";
 import SecondaryActionButton from "@/components/buttons/SecondaryActionButton";
-import AdapterSelection from "@/components/sections/AdapterSelection";
 import MetadataConfiguration from "@/components/sections/MetadataConfiguration";
 import VaultCreationContainer from "@/components/VaultCreationContainer";
 import DepositLimitConfiguration from "@/components/sections/DepositLimitConfiguration";
@@ -12,10 +11,10 @@ import StrategySelection from "@/components/sections/StrategySelection";
 import { useEffect, useState } from "react";
 import AssetSelection from "@/components/sections/AssetSelection";
 import ProtocolSelection from "@/components/sections/ProtocolSelection";
-import { ethers } from "ethers";
 import { resolveStrategyDefaults } from "@/lib/resolver/strategyDefaults/strategyDefaults";
-import { resolveStrategyEncoding } from "@/lib/resolver/strategyEncoding/strategyDefaults";
-import getSupportedAssetAddresses from "@/lib/getSupportedAssetAddresses";
+import { getAddress } from "viem";
+import { yieldOptionsAtom } from "@/lib/atoms/sdk";
+import { usePublicClient } from "wagmi";
 
 
 export const basicsAtom = atom(get => ({
@@ -34,20 +33,24 @@ export function isBasicsValid(basics: any): boolean {
 
 export default function Basics() {
   const router = useRouter();
+  const publicClient = usePublicClient();
+  const [yieldOptions] = useAtom(yieldOptionsAtom);
+
   const [basics] = useAtom(basicsAtom)
   const [strategy] = useAtom(strategyAtom);
   const [network] = useAtom(networkAtom);
   const [asset] = useAtom(assetAtom);
 
-  const protocols = useProtocols()
-
   const [loading, setLoading] = useState(false)
 
   const [, setStrategyConfig] = useAtom(strategyConfigAtom);
 
-  const [, setAvailableAssetAddresses] = useAtom(assetAddressesAtom);
+  const [availableAssetAddresses, setAvailableAssetAddresses] = useAtom(assetAddressesAtom);
 
-  useEffect(() => { getSupportedAssetAddresses(1, protocols).then((res: any) => setAvailableAssetAddresses({ 1: res })) }, [])
+  useEffect(() => {
+    if (!!yieldOptions && availableAssetAddresses)
+      yieldOptions?.getAssets(1).then((res: any) => setAvailableAssetAddresses({ 1: res }))
+  }, [yieldOptions])
 
   useEffect(() => {
     // @ts-ignore
@@ -60,14 +63,16 @@ export default function Basics() {
         if (strategy.initParams && strategy.initParams.length > 0) {
           strategyDefaults = await resolveStrategyDefaults({
             chainId: network.id,
-            address: asset.address[network.id].toLowerCase(),
+            client: publicClient,
+            address: getAddress(asset.address[network.id]),
             resolver: strategy.resolver
           })
         }
       } else {
         strategyDefaults = await resolveStrategyDefaults({
           chainId: network.id,
-          address: asset.address[network.id].toLowerCase(),
+          client: publicClient,
+          address: getAddress(asset.address[network.id]),
           resolver: strategy.resolver
         })
       }

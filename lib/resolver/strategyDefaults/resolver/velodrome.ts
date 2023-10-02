@@ -1,24 +1,26 @@
-import { readContract } from "@wagmi/core";
-import { constants } from "ethers";
+import { ADDRESS_ZERO } from "@/lib/constants";
+import { Address, getAddress } from "viem";
+import { StrategyDefaultResolverParams } from "..";
 
-const VELODROME_LENSE_ADDRESS = "0x8B70C5E53235AbBd1415957f7110FBFe5d0529d4";
+const VELODROME_LENSE_ADDRESS: Address = "0x8B70C5E53235AbBd1415957f7110FBFe5d0529d4";
 
-export async function velodrome({ chainId, address }: { chainId: number, address: string }): Promise<any[]> {
-    const { gauge, gauge_alive } = await readContract({
+export async function velodrome({ chainId, client, address }: StrategyDefaultResolverParams): Promise<any[]> {
+
+
+    const { gauge, gauge_alive } = await client.readContract({
         address: VELODROME_LENSE_ADDRESS,
         abi,
         functionName: "byAddress",
-        chainId,
         args: [
             address,
-            constants.AddressZero
+            ADDRESS_ZERO
         ]
     }) as {
         gauge: string,
         gauge_alive: boolean
     }
 
-    return gauge_alive && parseInt(gauge, 16) ? [gauge] : [constants.AddressZero];
+    return gauge_alive && parseInt(gauge, 16) ? [getAddress(gauge)] : [ADDRESS_ZERO];
 }
 
 const abi = [
@@ -133,4 +135,4 @@ const abi = [
             }
         ]
     },
-];
+] as const;
