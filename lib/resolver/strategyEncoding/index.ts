@@ -20,7 +20,8 @@ export type StrategyEncodingResolvers = typeof StrategyEncodingResolvers;
 export const StrategyEncodingResolvers: { [key: string]: ({ chainId, client, address, params }: StrategyEncodingResolverParams) => Promise<string> } = {
   balancerLpCompounder,
   curveCompounder,
-  curveStargateCompounder
+  curveStargateCompounder,
+  convexCompounder: curveCompounder
 };
 
 export default StrategyEncodingResolvers;

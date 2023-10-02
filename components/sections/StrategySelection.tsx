@@ -5,7 +5,7 @@ import Selector, { Option } from "@/components/inputs/Selector";
 
 
 const STRATEGY_NOT_AVAILABLE: Strategy = {
-  name: "No Strategy available",
+  name: "Strategy coming soon",
   key: "none",
   description: "none",
   logoURI: "",
