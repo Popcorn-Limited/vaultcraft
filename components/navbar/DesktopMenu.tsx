@@ -33,7 +33,7 @@ export default function DesktopMenu(): JSX.Element {
                     </div>
                 </div>
 
-                <div className="flex h-full flex-row justify-end w-2/3 gap-x-3">
+                <div className="flex h-full flex-row justify-end w-2/3 md:w gap-x-3">
                     <div className={`relative flex flex-row z-10`}>
                         <div
                             className={`cursor-pointer h-full py-3 px-4 flex md:flex-row flex-row-reverse items-center justify-between border border-[#d7d7d766] rounded-[4px] text-primary hover:border-white`}
@@ -55,7 +55,9 @@ export default function DesktopMenu(): JSX.Element {
                             </div>
                         </div>
                     ) : (
-                        <MainActionButton label="Connect Wallet" handleClick={openConnectModal} hidden={address ? true : false} />
+                        <div className="w-52">
+                            <MainActionButton label="Connect Wallet" handleClick={openConnectModal} hidden={address ? true : false} />
+                        </div>
                     )}
                 </div>
             </div>
