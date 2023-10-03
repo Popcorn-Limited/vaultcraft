@@ -71,7 +71,7 @@ export default function ReviewPage(): JSX.Element {
           Please review your configuration carefully.
           You can interact with vaults that you created on
           <a
-            href="https://app.pop.network/experimental/sweet-vaults"
+            href="https://app.pop.network/experimental/vaults"
             rel="noopener noreferrer"
             target="_blank"
             className="text-customPurple"
@@ -136,7 +136,7 @@ export default function ReviewPage(): JSX.Element {
           <div className="mt-8">
             <MainActionButton
               label="Done"
-              handleClick={() => isSuccess ? router.push("https://app.pop.network/experimental/sweet-vaults") : setShowModal(false)}
+              handleClick={() => isSuccess ? router.push("https://app.pop.network/experimental/vaults") : setShowModal(false)}
               disabled={metadata.ipfsHash === "" || isLoading || (strategyData.id !== stringToHex("", { size: 32 }) && strategyData.data === "0x")}
             />
           </div>

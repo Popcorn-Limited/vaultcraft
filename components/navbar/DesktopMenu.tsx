@@ -19,7 +19,7 @@ export default function DesktopMenu(): JSX.Element {
     const chainName = useMemo(() => (address && chain?.name ? chain.name : "Ethereum"), [chain?.id, address]);
 
     function directToVaults() {
-        router.push("https://app.pop.network/sweet-vaults")
+        router.push("https://app.pop.network/vaults")
     }
 
     return (
