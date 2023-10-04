@@ -124,29 +124,53 @@ export const curveApiCallToBytes = async ({
     const values = [
         curveData.baseAsset,
         curveData.router,
-        ...curveData.toBaseAssetRoutes.flatMap(route => [
-            ...route.route,
-            ...route.swapParams.flat()
-        ]),
-        ...curveData.toAssetRoute.route,
-        ...curveData.toAssetRoute.swapParams.flat(),
-        ...curveData.minTradeAmounts,
+        curveData.toBaseAssetRoutes,
+        curveData.toAssetRoute,
+        curveData.minTradeAmounts,
         curveData.optionalData
-    ];
-
-    const types = [
-        'address',
-        'address',
-        ...curveData.toBaseAssetRoutes.flatMap(() => [
-            ...new Array(9).fill('address'),
-            ...new Array(12).fill('uint256'),
-        ]),
-        ...new Array(9).fill('address'),
-        ...new Array(12).fill('uint256'),
-        ...new Array(curveData.minTradeAmounts.length).fill('uint256'),
-        'bytes'
     ];
     // @dev typescript cant infer the types of the encodeAbiParameters function since we are using a dynamic array of types
     // @ts-ignore
-    return encodeAbiParameters(parseAbiParameters(String(types)), values);
+    return encodeAbiParameters(encodeAbi, values);
 }
+
+const baseAssetAbi = { name: 'baseAsset', type: 'address' } as const
+const routerAbi = { name: 'router', type: 'address' } as const
+const toBaseAssetRoutesAbi = {
+    "components": [
+        {
+            "internalType": "address[9]",
+            "name": "route",
+            "type": "address[9]"
+        },
+        {
+            "internalType": "uint256[3][4]",
+            "name": "swapParams",
+            "type": "uint256[3][4]"
+        }
+    ],
+    "internalType": "struct CurveRoute[]",
+    "name": "_toBaseAssetRoutes",
+    "type": "tuple[]"
+} as const
+const toAssetRouteAbi = {
+    "internalType": "struct CurveRoute",
+    "name": "_toAssetRoute",
+    "type": "tuple",
+    "components": [
+        {
+            "internalType": "address[9]",
+            "name": "route",
+            "type": "address[9]"
+        },
+        {
+            "internalType": "uint256[3][4]",
+            "name": "swapParams",
+            "type": "uint256[3][4]"
+        }
+    ]
+} as const;
+const minAmountOutAbi = { name: 'numbers', type: 'uint256[]' } as const
+const optionalDataAbi = { name: 'optionalData', type: 'bytes' } as const
+
+const encodeAbi = [baseAssetAbi, routerAbi, toBaseAssetRoutesAbi, toAssetRouteAbi, minAmountOutAbi, optionalDataAbi] as const

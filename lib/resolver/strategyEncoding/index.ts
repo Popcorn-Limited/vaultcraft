@@ -21,7 +21,8 @@ export const StrategyEncodingResolvers: { [key: string]: ({ chainId, client, add
   balancerLpCompounder,
   curveCompounder,
   curveStargateCompounder,
-  convexCompounder: curveCompounder
+  convexCompounder: curveCompounder,
+  auraCompounder: balancerLpCompounder
 };
 
 export default StrategyEncodingResolvers;
