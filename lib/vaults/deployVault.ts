@@ -1,7 +1,7 @@
 import { toast } from "react-hot-toast";
 import { Address, parseUnits } from "viem";
 import { PublicClient, WalletClient } from "wagmi";
-import { ADDRESS_ZERO, MAX_UINT256, ZERO } from "../constants";
+import { ADDRESS_ZERO, EMPTY_BYTES, MAX_UINT256, ZERO } from "../constants";
 import { AdapterConfig } from "../atoms";
 
 const VAULT_CONTROLLER: { [key: number]: Address } = {
@@ -50,7 +50,7 @@ async function simulateDeployVault(
         // @ts-ignore // TODO --> for some reason viem interprets this as needing Address and Address instead of the actual types bytes32 and bytes
         strategyData,
         false,
-        "0x",
+        EMPTY_BYTES,
         {
           vault: ADDRESS_ZERO,
           staking: ADDRESS_ZERO,

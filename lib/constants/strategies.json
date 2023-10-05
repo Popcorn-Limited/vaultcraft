@@ -48,8 +48,8 @@
     "key": "CurveCompounder",
     "resolver": "curveCompounder",
     "protocol": "curve",
-    "adapter": "CurveGaugeAdapter",
-    "chains": [],
+    "adapter": "CurveGaugeAdapterV2",
+    "chains": [1],
     "description": "description",
     "logoURI": "/images/icons/popLogo.svg",
     "initParams": [
@@ -395,7 +395,7 @@
     "description": "description",
     "logoURI": "/images/icons/popLogo.svg",
     "name": "Curve Gauge Depositor",
-    "key": "CurveGaugeAdapter",
+    "key": "CurveGaugeAdapterV2",
     "protocol": "curve",
     "initParams": [
       {

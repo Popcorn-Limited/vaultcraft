@@ -53,18 +53,14 @@ export default function ReviewPage(): JSX.Element {
     // @ts-ignore
     if (!SUPPORTED_NETWORKS.map(network => network.id).includes(chain.id)) switchNetwork?.(Number(mainnet.id));
 
-    // IpfsClient.add(metadata.name, { name: metadata.name }).then(res => {
-    //   setMetadata((prefState) => { return { ...prefState, ipfsHash: res } });
-    //   setIsLoading(true)
-    //   deployVault(chain, walletClient as WalletClient, publicClient, fees, asset, limit, adapterData, strategyData, res).then(res => {
-    //     !!res ? setIsSuccess(true) : setIsError(true);
-    //     setIsLoading(false)
-    //   })
-    // });
-    deployVault(chain, walletClient as WalletClient, publicClient, fees, asset, limit, adapterData, strategyData, "res").then(res => {
-      !!res ? setIsSuccess(true) : setIsError(true);
-      setIsLoading(false)
-    })
+    IpfsClient.add(metadata.name, { name: metadata.name }).then(res => {
+      setMetadata((prefState) => { return { ...prefState, ipfsHash: res } });
+      setIsLoading(true)
+      deployVault(chain, walletClient as WalletClient, publicClient, fees, asset, limit, adapterData, strategyData, res).then(res => {
+        !!res ? setIsSuccess(true) : setIsError(true);
+        setIsLoading(false)
+      })
+    });
   }
 
   return (metadata && adapter ?
