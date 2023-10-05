@@ -86,7 +86,7 @@
     "key": "CurveCompounder",
     "resolver": "convexCompounder",
     "protocol": "convex",
-    "adapter": "ConvexAdapter",
+    "adapter": "ConvexAdapterV2",
     "chains": [1],
     "description": "description",
     "logoURI": "/images/icons/popLogo.svg",
@@ -472,7 +472,7 @@
     "description": "description",
     "logoURI": "/images/icons/popLogo.svg",
     "name": "Idle Junior Depositor",
-    "key": "IdleJuniorAdapter",
+    "key": "IdleJuniorAdapterV2",
     "protocol": "idleJunior",
     "initParams": [
       {
@@ -489,7 +489,7 @@
     "description": "description",
     "logoURI": "/images/icons/popLogo.svg",
     "name": "Idle Senior Depositor",
-    "key": "IdleSeniorAdapter",
+    "key": "IdleSeniorAdapterV2",
     "protocol": "idleSenior",
     "initParams": [
       {
