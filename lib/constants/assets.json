@@ -263,15 +263,14 @@
     "logoURI": "https://cdn.furucombo.app/assets/img/token/stETH.svg"
   },
   {
-    "chains": [],
+    "chains": [1],
     "address": {
-      "1": "0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0",
-      "1337": "0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0"
+      "1": "0x514910771AF9Ca656af840dff83E8264EcF986CA"
     },
-    "name": "Matic",
-    "symbol": "oETH",
+    "name": "Chainlink",
+    "symbol": "LINK",
     "decimals": 18,
-    "logoURI": "https://icons.llamao.fi/icons/chains/rsz_polygon"
+    "logoURI": "https://etherscan.io/token/images/chainlinktoken_32.png?v=6"
   },
   {
     "chains": [1, 1337],
