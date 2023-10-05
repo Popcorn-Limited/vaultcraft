@@ -125,7 +125,7 @@
     "resolver": "balancerLpCompounder",
     "protocol": "balancer",
     "adapter": "BalancerGaugeAdapter",
-    "chains": [],
+    "chains": [1],
     "description": "description",
     "logoURI": "/images/icons/popLogo.svg",
     "initParams": [
@@ -170,7 +170,7 @@
     "resolver": "auraCompounder",
     "protocol": "aura",
     "adapter": "AuraAdapter",
-    "chains": [],
+    "chains": [1],
     "description": "description",
     "logoURI": "/images/icons/popLogo.svg",
     "initParams": [
