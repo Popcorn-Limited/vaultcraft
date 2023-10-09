@@ -6,7 +6,7 @@ import { WagmiConfig, configureChains, createConfig } from "wagmi";
 import { publicProvider } from "wagmi/providers/public";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
-import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { Toaster } from "react-hot-toast";
 import Head from "next/head";
 import { Provider } from "jotai";
@@ -14,6 +14,15 @@ import { Provider } from "jotai";
 import NoSSR from 'react-no-ssr';
 import Page from "@/components/Page";
 import { SUPPORTED_NETWORKS } from "@/lib/connectors";
+import { connectorsForWallets } from '@rainbow-me/rainbowkit';
+import {
+  injectedWallet,
+  rainbowWallet,
+  metaMaskWallet,
+  coinbaseWallet,
+  walletConnectWallet,
+  coin98Wallet,
+} from '@rainbow-me/rainbowkit/wallets';
 
 const { chains, publicClient } = configureChains(SUPPORTED_NETWORKS, [
   publicProvider(),
@@ -27,11 +36,25 @@ const { chains, publicClient } = configureChains(SUPPORTED_NETWORKS, [
   }
 );
 
-const { connectors } = getDefaultWallets({
-  appName: 'vaultcraft',
-  projectId: 'b2f883ab9ae2fbb812cb8e0d83efea7b', // From Wallet Connect
-  chains
-});
+const connectors = connectorsForWallets([
+  {
+    groupName: 'Suggested',
+    wallets: [
+      injectedWallet({ chains }),
+      rainbowWallet({ projectId:'9b83e8f348c7515d3f94d83f95a05749', chains }),
+      metaMaskWallet({ projectId:'9b83e8f348c7515d3f94d83f95a05749', chains }),
+    ],
+  },
+  {
+    groupName: 'Others',
+    wallets: [
+      coinbaseWallet({ chains, appName: 'VaultCraft' }),
+      walletConnectWallet({ projectId:'9b83e8f348c7515d3f94d83f95a05749', chains }),
+      coin98Wallet({ projectId:'9b83e8f348c7515d3f94d83f95a05749', chains })
+    ]      
+
+  }
+]);
 
 const config = createConfig({
   autoConnect: true,
