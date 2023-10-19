@@ -24,7 +24,6 @@ async function simulateDeployVault(
   const [account] = await walletClient.getAddresses()
 
   if (VAULT_CONTROLLER[chain.id] === undefined) return { request: null, success: false, error: "Connected to the wrong network" }
-
   try {
     const { request } = await publicClient.simulateContract({
       account,
@@ -42,7 +41,7 @@ async function simulateDeployVault(
             performance: parseUnits(String(Number(fees.performance) / 100), 18),
           },
           feeRecipient: fees.recipient,
-          depositLimit: Number(limit.maximum) === 0 ? MAX_UINT256 : BigInt(String(Number(limit.maximum) * (10 ** asset.decimals))),
+          depositLimit: Number(limit.maximum) === 0 ? MAX_UINT256 : BigInt((Number(limit.maximum) * (10 ** asset.decimals)).toLocaleString('fullwide', { useGrouping: false })),
           owner: account,
         },
         // @ts-ignore // TODO --> for some reason viem interprets this as needing Address and Address instead of the actual types bytes32 and bytes
@@ -96,7 +95,6 @@ export async function deployVault(
     try {
       const hash = await walletClient.writeContract(request)
       const receipt = await publicClient.waitForTransactionReceipt({ hash })
-      console.log({ receipt })
       toast.dismiss()
       toast.success("Vault Deployed!");
 
