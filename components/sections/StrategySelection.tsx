@@ -17,7 +17,6 @@ export async function getStrategyOptions(strategies: Strategy[], chainId: number
   // First filter by network, than by required asset if given, than by adapter
   const options = strategies.filter(strategy => strategy.chains.includes(chainId))
     .filter((strategy) => strategy.protocol === protocol)
-
   return options.length > 0 ? options : [STRATEGY_NOT_AVAILABLE];
 }
 

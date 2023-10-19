@@ -22,3 +22,4 @@ export * from "./origin";
 export * from "./stargate";
 export * from "./velodrome";
 export * from "./yearn";
+export * from "./yearnFactory";

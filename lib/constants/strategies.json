@@ -640,5 +640,27 @@
     ],
     "chains": [1, 1337, 42161],
     "resolver": "yearn"
+  },
+  {
+    "description": "description",
+    "logoURI": "/images/icons/popLogo.svg",
+    "name": "Yearn Factory Depositor",
+    "key": "YearnFactoryAdapter",
+    "protocol": "yearnFactory",
+    "initParams": [
+      {
+        "name": "Gauge",
+        "type": "address",
+        "requirements": ["Required", "NotAddressZero"],
+        "description": "Address of the Balancer or Curve Gauge"
+      },
+      {
+        "name": "MaxLoss",
+        "type": "uint256",
+        "description": "Max Loss for the yVault"
+      }
+    ],
+    "chains": [1, 1337],
+    "resolver": "yearnFactory"
   }
 ]

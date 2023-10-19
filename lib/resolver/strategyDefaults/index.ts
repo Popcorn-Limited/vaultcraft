@@ -24,6 +24,7 @@ import {
   stargate,
   velodrome,
   yearn,
+  yearnFactory
 } from "./resolver";
 import { PublicClient } from "wagmi";
 
@@ -50,7 +51,6 @@ export const StrategyDefaultResolvers: { [key: string]: ({ chainId, client, addr
   curve,
   curveCompounder,
   curveStargateCompounder,
-  initDefault,
   ellipsis,
   flux,
   gearbox,
@@ -59,6 +59,8 @@ export const StrategyDefaultResolvers: { [key: string]: ({ chainId, client, addr
   stargate,
   velodrome,
   yearn,
+  yearnFactory,
+  default:initDefault,
 };
 
 export default StrategyDefaultResolvers;
