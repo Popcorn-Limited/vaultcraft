@@ -25,7 +25,7 @@ export default function DesktopMenu(): JSX.Element {
     return (
         <div className="bg-transparent w-full">
             <div className="flex flex-row items-center justify-between w-full md:p-[36px] p-6 z-30 border-b-[#353945] border-b-[1px]">
-                <div className="flex flex-row items-center">
+                <div className="w-1/3">
                     <div>
                         <Link href={`/`} passHref>
                             <img src="/images/icons/popLogo.svg" alt="Logo" className="w-10 h-10" />
@@ -33,7 +33,15 @@ export default function DesktopMenu(): JSX.Element {
                     </div>
                 </div>
 
-                <div className="flex h-full flex-row justify-end w-2/3 md:w gap-x-3">
+                <div className="w-1/3">
+                    <p className="text-white">
+                        VaultCraft uses novel technology and is experimental software.
+                        You might encounter some bugs. If you have questions text us here in {" "} 
+                        <a href="https://discord.gg/n46dDQ5G" className="text-blue-500">Discord</a>.
+                    </p>
+                </div>
+
+                <div className="flex flex-row justify-end h-full w-1/3 md:w gap-x-3">
                     <div className={`relative flex flex-row z-10`}>
                         <div
                             className={`cursor-pointer h-full py-3 px-4 flex md:flex-row flex-row-reverse items-center justify-between border border-[#d7d7d766] rounded-[4px] text-primary hover:border-white`}
