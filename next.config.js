@@ -10,7 +10,6 @@ const nextConfig = {
     NEXT_PUBLIC_ALCHEMY_API_KEY: process.env.ALCHEMY_API_KEY,
     PINATA_API_SECRET: process.env.PINATA_API_SECRET,
     PINATA_API_KEY: process.env.PINATA_API_KEY,
-    PINATA_JWT: process.env.PINATA_JWT,
     IPFS_URL: process.env.IPFS_URL,
   },
   async rewrites() {
