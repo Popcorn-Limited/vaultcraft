@@ -52,7 +52,7 @@ function StrategySelection({ isDisabled }: { isDisabled?: boolean }) {
         onSelect={(newStrategy) => setStrategy(newStrategy)}
         title="Select Strategy"
         description="Select a strategy to apply on your vault."
-        disabled={isDisabled ? isDisabled : strategy.key === "none"}
+        disabled={true}
       >
         {options.map((strategyIter) => (
           <Option

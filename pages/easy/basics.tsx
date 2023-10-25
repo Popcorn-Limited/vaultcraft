@@ -98,7 +98,10 @@ export default function Basics() {
           <AssetSelection />
           <ProtocolSelection />
         </div>
-        <StrategySelection isDisabled={basics.protocol.key === "none"} />
+        <div>
+          <StrategySelection isDisabled={basics.protocol.key === "none"} />
+          <p className="text-gray-500 text-sm mt-1" >To learn more click <a href="https://docs.pop.network/products/smart-vaults/strategies" className="text-blue-500">here</a></p>
+        </div>
         <DepositLimitConfiguration />
       </div>
 
