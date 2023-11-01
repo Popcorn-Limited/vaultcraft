@@ -1,36 +1,22 @@
 import React from "react";
 
 export interface ButtonProps {
-    label: string;
-    handleClick?: any;
-    disabled?: boolean;
-    type?: "button" | "submit" | "reset";
-    hidden?: boolean;
-    className?: string;
+  label: string;
+  handleClick?: (event: React.MouseEvent<HTMLElement>) => void;
+  disabled?: boolean;
+  hidden?: boolean;
 }
-const MainActionButton: React.FC<ButtonProps> = ({
-    label,
-    handleClick,
-    disabled = false,
-    type = "button",
-    hidden = false,
-    className = "",
-}) => {
-    return (
-        <button
-            className={`${className}
-            w-full px-8 py-3 rounded-[4px] bg-white border border-white font-semibold text-base text-black 
-            transition-all ease-in-out duration-500 hover:bg-[#DFFF1C] hover:border-[#DFFF1C] 
-            disabled:bg-[#D7D7D7] disabled:border-[#D7D7D7] disabled:text-white disabled:cursor-not-allowed 
-            disabled:hover:border-[#D7D7D7] disabled:hover:bg-[#D7D7D7] disabled:hover:text-white
-            ${hidden ? "hidden" : ""}`}
-            onClick={handleClick}
-            type={type}
-            disabled={disabled}
-        >
-            {label}
-        </button>
-    );
-};
 
-export default MainActionButton;
+export default function MainActionButton({ label, handleClick, disabled = false, hidden = false }: ButtonProps): JSX.Element {
+  return (
+    <button
+      className={`bg-warmGray border-ctaYellow text-black hover:bg-primary hover:border-primary hover:text-white active:bg-white active:border-primary active:text-primary rounded-4xl px-8 py-3 font-medium text-base transition-all ease-in-out duration-500 w-full disabled:bg-customLightGray disabled:border-customLightGray disabled:text-secondaryLight disabled:hover:border-customLightGray disabled:hover:bg-customLightGray disabled:hover:text-secondaryLight ${hidden ? "hidden" : ""
+        }`}
+      onClick={handleClick}
+      type="button"
+      disabled={disabled}
+    >
+      {label}
+    </button>
+  );
+};

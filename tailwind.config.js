@@ -120,9 +120,9 @@ module.exports = {
       },
       colors: {
         // New Design Colors
-        primary: "#645F4B",
+        primary: "#ffffff",
         primaryLight: "#A5A08C",
-        primaryDark: "#555555",
+        primaryDark: "#FFFFFFCC",
 
         secondary: "#B72E73",
         secondaryLight: "#AFAFAF",
