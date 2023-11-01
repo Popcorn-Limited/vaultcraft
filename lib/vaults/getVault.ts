@@ -6,10 +6,10 @@ import { resolvePrice } from "@/lib/resolver/price/price"
 import { Token, VaultData } from "@/lib/types"
 import { ADDRESS_ZERO, ERC20Abi, VaultRegistryByChain, VaultRegistyAbi } from "@/lib/constants"
 import { RPC_URLS, networkMap } from "@/lib/utils/connectors";
-import getVaultAddresses from "@/lib/vault/getVaultAddresses"
-import getAssetIcon from "@/lib/vault/getAssetIcon"
-import getVaultName from "@/lib/vault/getVaultName"
-import getOptionalMetadata from "@/lib/vault/getOptionalMetadata"
+import getVaultAddresses from "@/lib/vaults/getVaultAddresses"
+import getAssetIcon from "@/lib/vaults/getAssetIcon"
+import getVaultName from "@/lib/vaults/getVaultName"
+import getOptionalMetadata from "@/lib/vaults/getOptionalMetadata"
 
 function prepareVaultContract(vault: Address, account: Address): ReadContractParameters[] {
   const vaultContract = {

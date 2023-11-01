@@ -2,7 +2,7 @@ import axios from "axios";
 import { Address, PublicClient, mainnet } from "wagmi";
 import { ChainId, RPC_URLS, networkMap } from "@/lib/utils/connectors";
 import { VaultAbi } from "@/lib/constants";
-import getVaultAddresses from "@/lib/vault/getVaultAddresses";
+import getVaultAddresses from "@/lib/vaults/getVaultAddresses";
 import { Chain, createPublicClient, http } from "viem";
 import { arbitrum, optimism, polygon } from "viem/chains";
 

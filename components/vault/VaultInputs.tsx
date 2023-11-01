@@ -7,7 +7,7 @@ import TabSelector from "@/components/common/TabSelector";
 import { Token } from "@/lib/types";
 import { handleAllowance } from "@/lib/approve";
 import { WalletClient } from "viem";
-import { vaultDeposit, vaultDepositAndStake, vaultRedeem, vaultUnstakeAndWithdraw } from "@/lib/vault/interactions";
+import { vaultDeposit, vaultDepositAndStake, vaultRedeem, vaultUnstakeAndWithdraw } from "@/lib/vaults/interactions";
 import { ADDRESS_ZERO } from "@/lib/constants";
 
 const { VaultRouter: VAULT_ROUTER } = { VaultRouter: ADDRESS_ZERO as Address }

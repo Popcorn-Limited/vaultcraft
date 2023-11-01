@@ -1,7 +1,7 @@
 import NetworkSticker from "@/components/network/NetworkSticker";
 import TokenIcon from "@/components/common/TokenIcon";
 import { ChainId } from "@/lib/utils/connectors";
-import { Vault } from "@/lib/vault/getVault";
+import { Vault } from "@/lib/vaults/getVault";
 import { Token } from "@/lib/types";
 
 const protocolNameToLlamaProtocol: { [key: string]: string } = {
