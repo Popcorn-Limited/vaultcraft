@@ -32,10 +32,10 @@ export default function Modal({ visibility, children }: { visibility: [boolean, 
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
               <Dialog.Panel
-                className="relative transform overflow-hidden rounded-lg bg-[#FAF9F4] border border-[#F0EEE0] px-8 py-9 transition-all sm:w-full sm:max-w-lg"
+                className="relative transform overflow-hidden rounded-lg bg-black border border-[#F0EEE0] px-8 py-9 transition-all sm:w-full sm:max-w-lg"
               >
                 <div className="flex justify-end">
-                  <XMarkIcon className="w-10 h-10 text-black mb-10" onClick={() => setShowModal(false)} role="button" />
+                  <XMarkIcon className="w-10 h-10 text-white mb-10" onClick={() => setShowModal(false)} role="button" />
                 </div>
                 {children}
               </Dialog.Panel>

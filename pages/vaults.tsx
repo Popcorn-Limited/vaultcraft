@@ -139,7 +139,7 @@ const Vaults: NextPage = () => {
             />
           )
         })
-          : <p>Loading Vaults...</p>
+          : <p className="text-white">Loading Vaults...</p>
         }
       </section>
     </NoSSR >

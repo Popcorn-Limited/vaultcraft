@@ -33,7 +33,7 @@ export default function InputTokenWithError({
   return (
     <>
       {captionText && (
-        <p className="text-primary">
+        <p className="text-primary text-start">
           {captionText}
           {inputMoreThanBalance && <span className="text-red-500 ml-2">Input More than Balance</span>}
         </p>
