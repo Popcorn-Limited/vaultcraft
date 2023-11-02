@@ -12,6 +12,7 @@ import TokenIcon from "@/components/common/TokenIcon";
 import Title from "@/components/common/Title";
 import { Token, VaultData } from "@/lib/types";
 import Modal from "../modal/Modal";
+import VaultStats from "./VaultStats";
 
 
 function getBaseToken(vaultData: VaultData): Token[] {
@@ -58,9 +59,35 @@ export default function SmartVault({
     !vaultData.metadata.optionalMetadata.protocol?.name.toLowerCase().includes(searchString)) return <></>
   return (
     <>
-      <Modal visibility={[showModal, setShowModal]}>
-        <div className="flex flex-col w-full">
-          <div className="flex-grow rounded-lg border border-customLightGray w-full p-6">
+      <Modal visibility={[showModal, setShowModal]} classNames="md:w-1/2"
+        title={<AssetWithName vault={vaultData} />}
+      >
+        <div className="flex flex-row w-full">
+          <div className="w-1/2 text-start flex flex-col justify-between">
+
+            <div className="space-y-4">
+              <VaultStats vaultData={vaultData} account={account} apy={apy} />
+            </div>
+
+            <div>
+              <div className="w-10/12 border border-[#F0EEE0] rounded-lg p-4">
+                <p className="text-primary font-normal">Vault address:</p>
+                <p className="font-bold text-primary">
+                  {vault.address.slice(0, 6)}...{vault.address.slice(-4)}
+                </p>
+              </div>
+              {gauge &&
+                <div className="w-10/12 border border-[#F0EEE0] rounded-lg p-4">
+                  <p className="text-primary font-normal">Gauge address:</p>
+                  <p className="font-bold text-primary">
+                    {gauge.address.slice(0, 6)}...{gauge.address.slice(-4)}
+                  </p>
+                </div>
+              }
+            </div>
+
+          </div>
+          <div className="w-1/2 flex-grow rounded-lg border border-customLightGray p-6">
             <VaultInputs
               vault={vault}
               asset={asset}
@@ -78,56 +105,10 @@ export default function SmartVault({
             <AssetWithName vault={vaultData} />
           </div>
 
-          <div className="w-full flex justify-between gap-8 xs:gap-4">
-            <div className="w-full mt-6 xs:mt-0">
-              <p className="text-primary font-normal xs:text-[14px]">Your Wallet</p>
-              <p className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
-                <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
-                  {`${formatAndRoundNumber(asset.balance, asset.decimals)} %`}
-                </Title>
-              </p>
-            </div>
-
-            <div className="w-full mt-6 xs:mt-0">
-              <p className="text-primary font-normal xs:text-[14px]">Your Deposit</p>
-              <div className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
-                <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
-                  {account ? '$ ' + (!!gauge ?
-                    formatAndRoundNumber(gauge?.balance || 0, vault.decimals) :
-                    formatAndRoundNumber(vault.balance, vault.decimals)
-                  ) : "-"}
-                </Title>
-              </div>
-            </div>
-
-            <div className="w-full mt-6 xs:mt-0">
-              <p className="leading-6 text-primary xs:text-[14px]">TVL</p>
-              <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
-                $ {NumberFormatter.format(vaultData.tvl)}
-              </Title>
-            </div>
-          </div>
-
-          <div className="w-full flex justify-between gap-8 xs:gap-4">
-            <div className="w-full mt-6 xs:mt-0">
-              <p className="font-normal text-primary xs:text-[14px]">vAPY</p>
-              <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
-                {apy ? `${NumberFormatter.format(apy)} %` : "0 %"}
-              </Title>
-            </div>
-            <div className="w-full mt-6 xs:mt-0">
-              <p className="font-normal text-primary xs:text-[14px]">Boost APY</p>
-              <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
-                {'3 - 7%'}
-              </Title>
-            </div>
-            <div className="w-full h-fit mt-auto xs:opacity-0">
-              <p className="font-normal text-primary text-[15px] mb-1">⚡ Zap available</p>
-            </div>
-          </div>
+          <VaultStats vaultData={vaultData} account={account} apy={apy} />
 
         </div>
-      </Accordion>
+      </Accordion >
     </>
   )
 }
