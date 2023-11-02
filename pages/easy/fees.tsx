@@ -24,8 +24,8 @@ export default function Fees() {
       <FeeConfiguration />
 
       <div className="flex justify-end mt-8 gap-3">
-        <SecondaryActionButton label="Back" handleClick={() => router.push('/easy/basics')} className={`max-w-[100px]`} />
-        <MainActionButton label="Next" handleClick={() => router.push('/easy/review')} disabled={!isFeesValid(fees)} className={`max-w-[100px]`} />
+        <SecondaryActionButton label="Back" handleClick={() => router.push('/easy/basics')} />
+        <MainActionButton label="Next" handleClick={() => router.push('/easy/review')} disabled={!isFeesValid(fees)}/>
       </div>
     </VaultCreationContainer>
   )

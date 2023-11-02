@@ -1,8 +1,6 @@
 import NetworkSticker from "@/components/network/NetworkSticker";
 import TokenIcon from "@/components/common/TokenIcon";
-import { ChainId } from "@/lib/utils/connectors";
-import { Vault } from "@/lib/vaults/getVault";
-import { Token } from "@/lib/types";
+import { VaultData } from "@/lib/types";
 
 const protocolNameToLlamaProtocol: { [key: string]: string } = {
   "Aave": "aave",
@@ -19,7 +17,7 @@ const protocolNameToLlamaProtocol: { [key: string]: string } = {
   "Yearn": "yearn-finance",
 }
 
-export default function AssetWithName({ vault }: { vault: Vault }) {
+export default function AssetWithName({ vault }: { vault: VaultData }) {
   const protocolName = vault.metadata.optionalMetadata?.protocol?.name
   const protocolIcon = protocolName ? protocolNameToLlamaProtocol[protocolName] : "popcorn"
 
