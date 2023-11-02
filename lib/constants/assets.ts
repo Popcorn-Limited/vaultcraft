@@ -151,7 +151,7 @@ const assets: TokenConstant[] = [
     "name": "Origin Ether",
     "symbol": "oETH",
     "decimals": 18,
-    "logoURI": "https://icons.llamao.fi/icons/protocols/origin-ether"
+    "logoURI": "https://www.originprotocol.com/images/oeth.svg"
   },
   {
     "chains": [1, 1337],

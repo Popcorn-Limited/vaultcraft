@@ -40,16 +40,20 @@ export default function InputTokenWithError({
       )}
       <div className="mt-1 relative flex items-center w-full">
         <div
-          className={`w-full flex px-5 py-4 items-center rounded-lg border ${errorMessage ? "border-customRed" : "border-customLightGray"}`}
+          className={`w-full flex px-5 py-4 items-center justify-between rounded-lg border ${errorMessage ? "border-customRed" : "border-customLightGray"}`}
         >
-          <InputNumber {...props} />
-          <SelectToken
-            chainId={chainId}
-            allowSelection={allowSelection!}
-            selectedToken={selectedToken!}
-            options={tokenList}
-            selectToken={onSelectToken}
-          />
+          <div className="w-1/2">
+            <InputNumber {...props} />
+          </div>
+          <div className="w-1/2">
+            <SelectToken
+              chainId={chainId}
+              allowSelection={allowSelection!}
+              selectedToken={selectedToken!}
+              options={tokenList}
+              selectToken={onSelectToken}
+            />
+          </div>
         </div>
       </div>
       {errorMessage && <p className="text-customRed pt-2 leading-6">{errorMessage}</p>}
