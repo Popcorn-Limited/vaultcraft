@@ -295,17 +295,6 @@
     "logoURI": "https://etherscan.io/token/images/yearncrvnew_32.png"
   },
   {
-    "chains": [1, 1337],
-    "address": {
-      "1": "0x27B5739e22ad9033bcBf192059122d163b60349D",
-      "1337": "0x27B5739e22ad9033bcBf192059122d163b60349D"
-    },
-    "name": "Staked yCRV",
-    "symbol": "st-yCRV",
-    "decimals": 18,
-    "logoURI": "https://etherscan.io/token/images/styearncrv_32.png"
-  },
-  {
     "chains": [1],
     "address": {
       "1": "0x3175df0976dfa876431c2e9ee6bc45b65d3473cc"
