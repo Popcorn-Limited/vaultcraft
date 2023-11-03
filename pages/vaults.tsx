@@ -128,7 +128,7 @@ const Vaults: NextPage = () => {
         </div>
       </section>
 
-      <section className="flex flex-wrap max-w-[1600px] mx-auto justify-between gap-4 px-8">
+      <section className="flex flex-wrap max-w-[1600px] mx-auto justify-between gap-4 px-8 pb-9">
         {vaults.length > 0 ? vaults.filter(vault => selectedNetworks.includes(vault.chainId)).filter(vault => !HIDDEN_VAULTS.includes(vault.address)).map((vault) => {
           return (
             <SmartVault

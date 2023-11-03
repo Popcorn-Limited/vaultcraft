@@ -10,6 +10,10 @@ import getVaultAddresses from "@/lib/vaults/getVaultAddresses"
 import getAssetIcon from "@/lib/vaults/getAssetIcon"
 import getVaultName from "@/lib/vaults/getVaultName"
 import getOptionalMetadata from "@/lib/vaults/getOptionalMetadata"
+import { getVeAddresses } from "../utils/addresses"
+import getGauges, { Gauge } from "../gauges/getGauges"
+
+const { GaugeController: GAUGE_CONTROLLER } = getVeAddresses();
 
 function prepareVaultContract(vault: Address, account: Address): ReadContractParameters[] {
   const vaultContract = {
@@ -164,7 +168,7 @@ export async function getVaults({ vaults, account = ADDRESS_ZERO, client }: { va
       name: String(assetAndAdapterMeta[i + 3]),
       symbol: String(assetAndAdapterMeta[i + 4]),
       decimals: entry.vault.decimals,
-      logoURI: "",  // wont be used, just here for consistency
+      logoURI: "/images/tokens/pop.svg",  // wont be used, just here for consistency
       balance: 0,
       price: 0,
     }
@@ -198,8 +202,8 @@ export async function getVaults({ vaults, account = ADDRESS_ZERO, client }: { va
 
   // Add prices
   const { data } = await axios.get(`https://coins.llama.fi/prices/current/${String(metadata.map(
-    // @ts-ignore -- @dev ts still thinks entry.asset is just an `Address`
-    entry => `${networkMap[client.chain.id].toLowerCase()}:${entry.asset.address}`
+      // @ts-ignore -- @dev ts still thinks entry.asset is just an `Address`
+      entry => `${networkMap[client.chain.id].toLowerCase()}:${entry.asset.address}`
   ))}`)
   metadata = metadata.map((entry, i) => {
     const key = `${networkMap[client.chain.id].toLowerCase()}:${entry.asset.address}`
@@ -215,6 +219,27 @@ export async function getVaults({ vaults, account = ADDRESS_ZERO, client }: { va
       tvl: (entry.totalSupply * pricePerShare) / (10 ** entry.asset.decimals)
     }
   })
+  // Add gauges
+  if (client.chain.id === 1) {
+    const gauges = await getGauges({ address: GAUGE_CONTROLLER, account: account, publicClient: client })
+    metadata = metadata.map((entry, i) => {
+      const foundGauge = gauges.find((gauge: Gauge) => gauge.lpToken === entry.address)
+      const gauge = foundGauge ? {
+        address: foundGauge.address,
+        name: `${entry.vault.name}-gauge`,
+        symbol: `st-${entry.vault.name}`,
+        decimals: foundGauge.decimals,
+        logoURI: "/images/tokens/pop.svg",  // wont be used, just here for consistency
+        balance: foundGauge.balance,
+        price: entry.pricePerShare,
+      } : undefined
+
+      return {
+        ...entry,
+        gauge
+      }
+    })
+  }
 
   return metadata as unknown as VaultData[]
 }
@@ -254,11 +279,11 @@ export async function getVault({ vault, account = ADDRESS_ZERO, client }: { vaul
     name: String(assetAndAdapterMeta[3]),
     symbol: String(assetAndAdapterMeta[4]),
     decimals: Number(results[2]),
-    logoURI: "", // wont be used, just here for consistency,
+    logoURI: "/images/tokens/pop.svg", // wont be used, just here for consistency,
     balance: 0, // wont be used, just here for consistency,
     price: 0, // wont be used, just here for consistency,
   }
-  return {
+  const result = {
     address: getAddress(vault),
     vault: {
       address: getAddress(vault),
@@ -292,4 +317,24 @@ export async function getVault({ vault, account = ADDRESS_ZERO, client }: { vaul
     },
     chainId: client.chain.id
   }
+
+  // Add gauges
+  if (client.chain.id === 1) {
+    const {
+      GaugeController: GAUGE_CONTROLLER,
+    } = getVeAddresses();
+    const gauges = await getGauges({ address: GAUGE_CONTROLLER, publicClient: client })
+    const foundGauge = gauges.find((gauge: Gauge) => gauge.lpToken === result.address)
+    // @ts-ignore
+    result.gauge = foundGauge ? {
+      address: foundGauge.address,
+      name: `${result.vault.name}-gauge`,
+      symbol: `st-${result.vault.name}`,
+      decimals: foundGauge.decimals,
+      logoURI: "/images/tokens/pop.svg",  // wont be used, just here for consistency
+      balance: foundGauge.balance,
+      price: result.pricePerShare,
+    } : undefined
+  }
+  return result;
 }

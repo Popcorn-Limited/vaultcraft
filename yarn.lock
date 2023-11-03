@@ -33,7 +33,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.10.1, @babel/runtime@npm:^7.11.1, @babel/runtime@npm:^7.11.2, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.17.2, @babel/runtime@npm:^7.18.3, @babel/runtime@npm:^7.23.2":
+"@babel/runtime@npm:^7.10.1, @babel/runtime@npm:^7.11.1, @babel/runtime@npm:^7.11.2, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.17.2, @babel/runtime@npm:^7.18.3, @babel/runtime@npm:^7.21.0, @babel/runtime@npm:^7.23.2":
   version: 7.23.2
   resolution: "@babel/runtime@npm:7.23.2"
   dependencies:
@@ -2248,7 +2248,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"classnames@npm:2.x, classnames@npm:^2.2.1, classnames@npm:^2.2.6, classnames@npm:^2.3.1":
+"classnames@npm:2.x, classnames@npm:^2.2.1, classnames@npm:^2.2.5, classnames@npm:^2.2.6, classnames@npm:^2.3.1":
   version: 2.3.2
   resolution: "classnames@npm:2.3.2"
   checksum: cd50ead57b4f97436aaa9f9885c6926323efc7c2bea8e3d4eb10e4e972aa6a1cfca1c7a0e06f8a199ca7498d4339e30bb6002e589e61c9f21248cbf3e8b0b18d
@@ -2420,6 +2420,15 @@ __metadata:
   version: 1.0.8
   resolution: "damerau-levenshtein@npm:1.0.8"
   checksum: 4c2647e0f42acaee7d068756c1d396e296c3556f9c8314bac1ac63ffb236217ef0e7e58602b18bb2173deec7ec8e0cac8e27cccf8f5526666b4ff11a13ad54a3
+  languageName: node
+  linkType: hard
+
+"date-fns@npm:^2.30.0":
+  version: 2.30.0
+  resolution: "date-fns@npm:2.30.0"
+  dependencies:
+    "@babel/runtime": "npm:^7.21.0"
+  checksum: e4b521fbf22bc8c3db332bbfb7b094fd3e7627de0259a9d17c7551e2d2702608a7307a449206065916538e384f37b181565447ce2637ae09828427aed9cb5581
   languageName: node
   linkType: hard
 
@@ -5618,6 +5627,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"rc-slider@npm:^10.3.1":
+  version: 10.3.1
+  resolution: "rc-slider@npm:10.3.1"
+  dependencies:
+    "@babel/runtime": "npm:^7.10.1"
+    classnames: "npm:^2.2.5"
+    rc-util: "npm:^5.27.0"
+  peerDependencies:
+    react: ">=16.9.0"
+    react-dom: ">=16.9.0"
+  checksum: 6a2642de20a12afffc8549d9d0d8598b8dc20da3cf66bbf749448effadc0ab816aa68e8f8e9a526576a48c33b8b4caf4c90adcde94e88c63f1cbeb1029b39287
+  languageName: node
+  linkType: hard
+
 "rc-tooltip@npm:^5.2.2":
   version: 5.3.1
   resolution: "rc-tooltip@npm:5.3.1"
@@ -5648,7 +5671,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rc-util@npm:^5.19.2, rc-util@npm:^5.21.0, rc-util@npm:^5.26.0":
+"rc-util@npm:^5.19.2, rc-util@npm:^5.21.0, rc-util@npm:^5.26.0, rc-util@npm:^5.27.0":
   version: 5.38.0
   resolution: "rc-util@npm:5.38.0"
   dependencies:
@@ -6947,6 +6970,7 @@ __metadata:
     "@types/react-no-ssr": "npm:^1.1.5"
     autoprefixer: "npm:^10.4.13"
     base58-js: "npm:^2.0.0"
+    date-fns: "npm:^2.30.0"
     dotenv: "npm:^16.0.3"
     eslint: "npm:^8.15.0"
     eslint-config-next: "npm:^13.3.4"
@@ -6955,6 +6979,7 @@ __metadata:
     marked-react: "npm:^2.0.0"
     next: "npm:^13.5.2"
     prettier: "npm:^2.8.8"
+    rc-slider: "npm:^10.3.1"
     rc-tooltip: "npm:^5.2.2"
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"

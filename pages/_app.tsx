@@ -51,7 +51,7 @@ const connectors = connectorsForWallets([
       coinbaseWallet({ chains, appName: 'VaultCraft' }),
       walletConnectWallet({ projectId:'9b83e8f348c7515d3f94d83f95a05749', chains }),
       coin98Wallet({ projectId:'9b83e8f348c7515d3f94d83f95a05749', chains })
-    ]      
+    ]
 
   }
 ]);

@@ -28,7 +28,7 @@ export default function AssetWithName({ vault }: { vault: Vault }) {
       <NetworkSticker chainId={vault.chainId} />
       <TokenIcon token={vault.asset} icon={vault.asset.logoURI} chainId={vault.chainId} imageSize="w-8 h-8" />
     </div>
-    <h2 className="text-2xl font-bold text-primary mr-1 text-ellipsis overflow-hidden whitespace-nowrap smmd:flex-1 smmd:flex-nowrap xs:max-w-[80%] sssmd:max-w-fit ssmd:block">
+    <h2 className="text-2xl font-bold text-primary mr-1 text-ellipsis overflow-hidden whitespace-nowrap smmd:flex-1 smmd:flex-nowrap xs:max-w-[80%] smmd:max-w-fit smmd:block">
       {vault.metadata.vaultName || vault.asset.name}
     </h2>
     <div className="xs:flex xs:align-middle xs:justify-between xs:w-full smmd:block smmd:w-max">

@@ -1,5 +1,5 @@
 import { formatUnits, parseUnits } from "viem";
-import { ZERO } from '../constants';
+import { ZERO } from "@/lib/constants";
 
 const MILLION = 1e6;
 const THOUSAND = 1e3;
@@ -67,3 +67,8 @@ export const NumberFormatter = Intl.NumberFormat("en", {
   //@ts-ignore
   notation: "compact",
 });
+
+export function safeRound(bn: bigint, decimals = 18): bigint {
+  const roundingValue = parseUnits("1", decimals > 8 ? 8 : 2)
+  return (bn / roundingValue) * roundingValue
+}

@@ -11,7 +11,9 @@ export function getAssetsByChain(chainId: number): Token[] {
       symbol: asset.symbol,
       decimals: asset.decimals,
       logoURI: asset.logoURI,
-    } as Token
+      balance: 0,
+      price: 0
+    }
   });
 }
 
@@ -37,5 +39,3 @@ export const MAX_INT256 = BigInt(0x7ffffffffffffffffffffffffffffffffffffffffffff
 export const MAX_UINT256 = BigInt(0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff)
 export const MINUS_ONE = BigInt(-0x01)
 export const ZERO = BigInt(0)
-
-export const EMPTY_BYTES = '0x'
