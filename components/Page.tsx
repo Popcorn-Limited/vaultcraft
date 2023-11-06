@@ -27,11 +27,11 @@ export default function Page({
 
   return (
     <>
-      <div className="bg-[#141416] w-full min-h-screen">
+      <div className="bg-[#141416] w-full mx-auto min-h-screen h-full font-khTeka flex flex-col justify-between">
         <DesktopMenu />
-        <main>
+        <div>
           {children}
-        </main>
+        </div>
       </div>
     </>
   );

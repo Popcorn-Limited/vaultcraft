@@ -62,9 +62,11 @@ export default function OPopInterface({ setShowOPopModal }: OPopInterfaceProps):
         <p className="">My oPOP</p>
         <p className="font-bold">{`${oBal ? NumberFormatter.format(Number(oBal?.value) / 1e18) : "0"}`}</p>
       </span>
-      <span className="flex flex-row items-center justify-between mt-6 pb-6 border-b border-[#353945]">
+      <span className="flex flex-row items-center justify-between mt-6">
         <p className="">My WETH</p>
         <p className="font-bold">{`${oBal ? NumberFormatter.format(Number(wethBal?.value) / 1e18) : "0"}`}</p>
+      </span>
+      <span className="flex flex-row items-center justify-between mt-6 pb-6 border-b border-[#353945]">
       </span>
       <div className="lg:flex lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-8 mt-6">
           <div className="lg:max-w-fit">

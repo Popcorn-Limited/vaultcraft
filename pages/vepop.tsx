@@ -14,6 +14,7 @@ import LockModal from "@/components/vepop/modals/lock/LockModal";
 import ManageLockModal from "@/components/vepop/modals/manage/ManageLockModal";
 import OPopModal from "@/components/vepop/modals/oPop/OPopModal";
 import OPopInterface from "@/components/vepop/OPopInterface";
+import MainActionButton from "@/components/buttons/MainActionButton";
 
 const { VotingEscrow: VOTING_ESCROW } = getVeAddresses();
 
@@ -74,7 +75,7 @@ function VePopContainer() {
       <LockModal show={[showLockModal, setShowLockModal]} />
       <ManageLockModal show={[showMangementModal, setShowMangementModal]} />
       <OPopModal show={[showOPopModal, setShowOPopModal]} />
-      <div>
+      <div className="static">
         <section className="py-10 px-8 xs:border-t smmd:border-t-0 smmd:border-b border-[#353945] lg:flex lg:flex-row items-center justify-between text-primary">
           <div className="lg:w-[1050px]">
             <h1 className="xs:text-2xl smmd:text-3xl font-normal">
@@ -105,7 +106,7 @@ function VePopContainer() {
 
         <section className="flex flex-wrap max-w-[1600px] mx-auto justify-between gap-4 px-8 pb-9">
           {vaults?.length > 0 ? vaults.map((vault: VaultData, index: number) =>
-            <Gauge key={vault.address} vault={vault} index={index} votes={votes} handleVotes={handleVotes} canVote={canVote} />
+            <Gauge key={vault.address} vaultData={vault} index={index} votes={votes} handleVotes={handleVotes} canVote={canVote} />
           )
             : <p className="text-primary">Loading Gauges...</p>
           }
@@ -115,11 +116,11 @@ function VePopContainer() {
           <p className="text-primary">Gauge Voting not available on mobile.</p>
         </section>
 
-        <div className="hidden md:block absolute left-0 bottom-10 w-full ">
+        <div className="hidden md:block fixed left-0 bottom-10 w-full">
           {canVote && <>
-            <div className="z-10 mx-auto w-96 bg-white px-6 py-4 shadow-custom rounded-lg flex flex-row items-center justify-between">
+            <div className="z-50 mx-auto w-104 bg-[#23262F] px-6 py-4 rounded-lg flex flex-row items-center justify-between text-white border border-white">
               <p className="mt-1">
-                Voting power used: <span className="text-[#05BE64]">
+                Voting power used: <span className="font-bold">
                   {
                     veBal && veBal.value
                       ? (votes?.reduce((a, b) => a + b, 0) / 100).toFixed(2)
@@ -127,17 +128,17 @@ function VePopContainer() {
                   }%
                 </span>
               </p>
-              <button
-                className="bg-[#FEE25D] rounded-lg py-3 px-3 text-center font-medium text-black leading-none"
-                onClick={() => sendVotes({ vaults, votes, account: account as Address, clients: { publicClient, walletClient: walletClient as WalletClient } })}
-              >
-                Submit Votes
-              </button>
+              <div className="w-40">
+                <MainActionButton
+                  label="Cast Votes"
+                  handleClick={() => sendVotes({ vaults, votes, account: account as Address, clients: { publicClient, walletClient: walletClient as WalletClient } })}
+                />
+              </div>
             </div>
           </>}
         </div>
 
-      </div >
+      </div>
     </>
   )
 }
@@ -145,5 +146,3 @@ function VePopContainer() {
 export default function VePOP() {
   return <NoSSR><VePopContainer /></NoSSR>
 }
-
-function noOp() { }
