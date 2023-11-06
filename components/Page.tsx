@@ -27,7 +27,7 @@ export default function Page({
 
   return (
     <>
-      <div className="bg-[#141416] w-full mx-auto min-h-screen h-full font-khTeka flex flex-col justify-between">
+      <div className="bg-[#141416] w-full mx-auto min-h-screen h-full font-khTeka flex flex-col">
         <DesktopMenu />
         <div>
           {children}

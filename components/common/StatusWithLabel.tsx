@@ -25,7 +25,7 @@ export default function StatusWithLabel({
     <div className="flex flex-col">
       {infoIconProps ? (
         <span className="flex flex-row items-center">
-          <p className="text-primaryLight">{label}</p>
+          <p className="text-[#C8C8C8]">{label}</p>
           <InfoIconWithTooltip
             classExtras="mt-0 ml-2"
             id={infoIconProps.id}
@@ -34,18 +34,18 @@ export default function StatusWithLabel({
           />
         </span>
       ) : (
-        <p className="text-primaryLight">{label}</p>
+        <p className="text-[#C8C8C8]">{label}</p>
       )}
       {content == "Coming Soon" || typeof content !== "string" ? (
         <div
-          className={`md:mt-1 text-primary font-light text-2xl ${!isSmall && "md:text-3xl"} leading-6 ${!isSmall && "md:leading-8"
+          className={`mt-2 text-primary font-light text-2xl ${!isSmall && "md:text-3xl"} leading-6 ${!isSmall && "md:leading-8"
             }`}
         >
           {content}
         </div>
       ) : (
         <p
-          className={`md:mt-1 text-primary font-light text-2xl ${!isSmall && "md:text-3xl"} leading-6  ${!isSmall && "md:leading-8"
+          className={`mt-2 text-primary font-light text-2xl ${!isSmall && "md:text-3xl"} leading-6  ${!isSmall && "md:leading-8"
             } `}
         >
           {content.split(" ")[0]} <span className=" text-[#111827] text-xl"> {content.split(" ")[1]}</span>
