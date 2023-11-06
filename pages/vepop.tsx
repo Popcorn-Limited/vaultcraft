@@ -5,7 +5,7 @@ import { Address, WalletClient } from "viem";
 import { useEffect, useState } from "react";
 import { getVeAddresses } from "@/lib/utils/addresses";
 import { hasAlreadyVoted } from "@/lib/gauges/hasAlreadyVoted";
-import { VaultData } from "@/lib/types";
+import { Token, VaultData } from "@/lib/types";
 import { getVaultsByChain } from "@/lib/vaults/getVault";
 import StakingInterface from "@/components/vepop/StakingInterface";
 import { sendVotes } from "@/lib/gauges/interactions";
@@ -92,17 +92,8 @@ function VePopContainer() {
 
         <section className="xs:pb-12 smmd:py-10 px-8 md:flex md:flex-row md:justify-between space-y-4 md:space-y-0 md:space-x-8">
           <StakingInterface setShowLockModal={setShowLockModal} setShowMangementModal={setShowMangementModal} />
-          <OPopInterface setShowOPopModal={setShowOPopModal} />
+          <OPopInterface gauges={vaults?.length > 0 ? vaults.map((vault: VaultData) => vault.gauge as Token) : []} setShowOPopModal={setShowOPopModal} />
         </section >
-
-        <section className="px-8 xs:mb-12 xs:mt-0 smmd:mb-10 smmd:mt-[60px]">
-          <h4 className="text-primary text-3xl font-normal mb-2">
-            All vaults
-          </h4>
-          <span className="text-primary">
-            Zap any asset into Smart Vaults for the best yield for your crypto across DeFi
-          </span>
-        </section>
 
         <section className="flex flex-wrap max-w-[1600px] mx-auto justify-between gap-4 px-8 pb-9">
           {vaults?.length > 0 ? vaults.map((vault: VaultData, index: number) =>

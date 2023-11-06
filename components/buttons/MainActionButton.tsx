@@ -10,8 +10,11 @@ export interface ButtonProps {
 export default function MainActionButton({ label, handleClick, disabled = false, hidden = false }: ButtonProps): JSX.Element {
   return (
     <button
-      className={`bg-primary font-bold border-ctaYellow text-black hover:bg-primaryDark hover:border-primaryDark active:bg-primaryDark active:border-primaryDark rounded px-8 py-3 text-base transition-all ease-in-out duration-500 w-full disabled:bg-customLightGray disabled:border-customLightGray disabled:text-secondaryLight disabled:hover:border-customLightGray disabled:hover:bg-customLightGray disabled:hover:text-secondaryLight ${hidden ? "hidden" : ""
-        }`}
+      className={`w-full px-8 py-3 rounded-[4px] bg-white border border-white font-semibold text-base text-black 
+                  transition-all ease-in-out duration-500 hover:bg-[#DFFF1C] hover:border-[#DFFF1C] 
+                  disabled:bg-[#D7D7D7] disabled:border-[#D7D7D7] disabled:text-white disabled:cursor-not-allowed 
+                  disabled:hover:border-[#D7D7D7] disabled:hover:bg-[#D7D7D7] disabled:hover:text-white
+                  ${hidden ? "hidden" : ""}`}
       onClick={handleClick}
       type="button"
       disabled={disabled}

@@ -32,6 +32,7 @@ export default function Page({
         <div>
           {children}
         </div>
+        <div className="py-16"></div>
       </div>
     </>
   );

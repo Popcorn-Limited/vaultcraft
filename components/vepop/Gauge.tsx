@@ -10,7 +10,7 @@ import useGaugeWeights from "@/lib/gauges/useGaugeWeights";
 import calculateAPR from "@/lib/gauges/calculateGaugeAPR";
 import { yieldOptionsAtom } from "@/lib/atoms/sdk";
 import { useAtom } from "jotai";
-import { NumberFormatter } from "@/lib/utils/formatBigNumber";
+import { NumberFormatter, formatNumber } from "@/lib/utils/formatBigNumber";
 
 interface GaugeProps {
   vaultData: VaultData;
@@ -23,27 +23,17 @@ interface GaugeProps {
 export default function Gauge({ vaultData, index, votes, handleVotes, canVote }: GaugeProps): JSX.Element {
   const { address: account } = useAccount()
   const publicClient = usePublicClient();
-  const [yieldOptions] = useAtom(yieldOptionsAtom);
 
   const { data: weights } = useGaugeWeights({ address: vaultData.gauge?.address as Address, account: account as Address, chainId: vaultData.chainId })
   const [amount, setAmount] = useState(0);
 
-  // const [apy, setApy] = useState<number | undefined>(0);
+  const [gaugeApr, setGaugeApr] = useState<number[]>([]);
 
-  // useEffect(() => {
-  //   if (!apy) {
-  //     // @ts-ignore
-  //     yieldOptions?.getApy(vaultData.chainId, vaultData.metadata.optionalMetadata.resolver, vaultData.asset.address).then(res => setApy(!!res ? res.total : 0))
-  //   }
-  // }, [apy])
-
-  // const [gaugeApr, setGaugeApr] = useState<number[]>([]);
-
-  // useEffect(() => {
-  //   if (vaultData?.vault.price && gaugeApr.length === 0) {
-  //     calculateAPR({ vaultPrice: vaultData.vault.price, gauge: vaultData.gauge?.address as Address, publicClient }).then(res => setGaugeApr(res))
-  //   }
-  // }, [vaultData, gaugeApr])
+  useEffect(() => {
+    if (vaultData?.vault.price && gaugeApr.length === 0) {
+      calculateAPR({ vaultPrice: vaultData.vault.price, gauge: vaultData.gauge?.address as Address, publicClient }).then(res => setGaugeApr(res))
+    }
+  }, [vaultData, gaugeApr])
 
   function onChange(value: number) {
     const currentVoteForThisGauge = votes[index];
@@ -56,20 +46,20 @@ export default function Gauge({ vaultData, index, votes, handleVotes, canVote }:
   }
 
   return (
-    <Accordion
-      header={<>
+    <Accordion>
+      <>
         <div className="w-full flex flex-wrap items-center justify-between flex-col gap-4">
 
           <div className="flex items-center justify-between select-none w-full">
             <AssetWithName vault={vaultData} />
           </div>
 
-          <div className="grid xs:grid-cols-2 smmd:grid-cols-3 w-full gap-8 xs:gap-4 pb-4 border-b-[1px] border-[#353945]">
+          <div className="grid grid-cols-2 w-full gap-8 xs:gap-4 pb-4 border-b-[1px] border-[#353945]">
             <div>
               <p className="text-primary font-normal">APY</p>
               <p className="text-primary font-medium text-[22px]">
                 <Title level={2} fontWeight="font-medium" as="span" className="text-primary">
-                  {"7%"}
+                  {gaugeApr.length > 0 && `${formatNumber(gaugeApr[0])} % - ${formatNumber(gaugeApr[1])} %`}
                 </Title>
               </p>
             </div>
@@ -146,7 +136,7 @@ export default function Gauge({ vaultData, index, votes, handleVotes, canVote }:
                       opacity: 1,
                       borderColor: canVote ? '#C391FF' : "#AFAFAF",
                       backgroundColor: '#fff',
-                      zIndex:0
+                      zIndex: 0
                     }}
                     value={amount}
                     onChange={canVote ? (val: any) => onChange(Number(val)) : () => { }}
@@ -165,8 +155,7 @@ export default function Gauge({ vaultData, index, votes, handleVotes, canVote }:
           </div>
 
         </ div>
-      </>}
-    >
+      </>
     </Accordion>
   );
 }

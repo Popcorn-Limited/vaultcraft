@@ -8,6 +8,7 @@ import MainActionButton from "../buttons/MainActionButton";
 import SecondaryActionButton from "../buttons/SecondaryActionButton";
 import { claimOPop } from "@/lib/oPop/interactions";
 import { WalletClient } from "viem";
+import { Token } from "@/lib/types";
 
 const {
   GaugeController: GAUGE_CONTROLLER,
@@ -17,10 +18,11 @@ const {
 } = getVeAddresses();
 
 interface OPopInterfaceProps {
+  gauges: Token[];
   setShowOPopModal: Dispatch<SetStateAction<boolean>>;
 }
 
-export default function OPopInterface({ setShowOPopModal }: OPopInterfaceProps): JSX.Element {
+export default function OPopInterface({ gauges, setShowOPopModal }: OPopInterfaceProps): JSX.Element {
   const { address: account } = useAccount()
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient()
@@ -35,17 +37,15 @@ export default function OPopInterface({ setShowOPopModal }: OPopInterfaceProps):
   useEffect(() => {
     async function getValues() {
       setInitalLoad(true)
-      const gauges = await getGauges({ address: GAUGE_CONTROLLER, account: account, publicClient })
-
       const rewards = await getGaugeRewards({
-        gauges: gauges.filter(gauge => gauge.chainId === 1).map(gauge => gauge.address) as Address[],
+        gauges: gauges.map(gauge => gauge.address) as Address[],
         account: account as Address,
         publicClient
       })
       setGaugeRewards(rewards)
     }
-    if (account && !initalLoad) getValues()
-  }, [account])
+    if (account && gauges.length > 0 && !initalLoad) getValues()
+  }, [gauges, account])
 
   return (
     <div className="w-full lg:w-1/2 bg-transparent border border-[#353945] rounded-3xl p-8 text-primary md:h-fit">
@@ -69,21 +69,21 @@ export default function OPopInterface({ setShowOPopModal }: OPopInterfaceProps):
       <span className="flex flex-row items-center justify-between mt-6 pb-6 border-b border-[#353945]">
       </span>
       <div className="lg:flex lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-8 mt-6">
-          <div className="lg:max-w-fit">
-              <MainActionButton
-                  label="Claim oPOP"
-                  handleClick={() =>
-                      claimOPop({
-                          gauges: gaugeRewards?.amounts?.filter(gauge => Number(gauge.amount) > 0).map(gauge => gauge.address) as Address[],
-                          account: account as Address,
-                          clients: { publicClient, walletClient: walletClient as WalletClient }
-                      })}
-                  disabled={gaugeRewards ? Number(gaugeRewards?.total) === 0 : true}
-              />
-          </div>
-          <div className="ls:max-w-fit lg:w-60 h-12">
-              <SecondaryActionButton label="Exercise oPOP" handleClick={() => setShowOPopModal(true)} disabled={oBal ? Number(oBal?.value) === 0 : true} />
-          </div>
+        <div className="lg:max-w-fit">
+          <MainActionButton
+            label="Claim oPOP"
+            handleClick={() =>
+              claimOPop({
+                gauges: gaugeRewards?.amounts?.filter(gauge => Number(gauge.amount) > 0).map(gauge => gauge.address) as Address[],
+                account: account as Address,
+                clients: { publicClient, walletClient: walletClient as WalletClient }
+              })}
+            disabled={gaugeRewards ? Number(gaugeRewards?.total) === 0 : true}
+          />
+        </div>
+        <div className="ls:max-w-fit lg:w-60 h-12">
+          <SecondaryActionButton label="Exercise oPOP" handleClick={() => setShowOPopModal(true)} disabled={oBal ? Number(oBal?.value) === 0 : true} />
+        </div>
       </div>
     </div>
   )

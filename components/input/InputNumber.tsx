@@ -4,7 +4,7 @@ export default function InputNumber(props: HTMLProps<HTMLInputElement>): JSX.Ele
   return (
     <input
       {...props}
-      className="block w-full p-0 border-0 text-primaryDark text-lg bg-inherit"
+      className="block w-full p-0 border-none text-primaryDark text-lg bg-inherit focus:ring-0"
       inputMode="decimal"
       autoComplete="off"
       autoCorrect="off"

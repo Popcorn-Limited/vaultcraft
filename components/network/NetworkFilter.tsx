@@ -26,7 +26,6 @@ export default function NetworkFilter({ supportedNetworks, selectNetwork }: Netw
           label={<Image src={networkLogos[ChainId.ALL]} alt={"All"} height="24" width="24" />}
           handleClick={() => setActiveAndSelectedNetwork(ChainId.ALL)}
           isActive={activeNetwork == ChainId.ALL}
-          extraClasses="h-12 w-18 border border-customLightGray rounded-3xl text-primary flex justify-center items-center bg-[#35394526] bg-opacity-15 border-gray-300 border-opacity-40"
         />
         {supportedNetworks.map((network) => (
           <PseudoRadioButton
@@ -34,7 +33,6 @@ export default function NetworkFilter({ supportedNetworks, selectNetwork }: Netw
             label={<Image src={networkLogos[network]} alt={ChainId[network]} height="24" width="24" />}
             handleClick={() => setActiveAndSelectedNetwork(network)}
             isActive={activeNetwork == network}
-            extraClasses="h-12 w-18 border border-customLightGray rounded-3xl text-primary flex justify-center items-center bg-[#35394526] bg-opacity-15 border-gray-300 border-opacity-40"
           />
         ))}
       </div>

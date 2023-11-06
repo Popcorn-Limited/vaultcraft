@@ -25,7 +25,6 @@ import {
 } from '@rainbow-me/rainbowkit/wallets';
 
 const { chains, publicClient } = configureChains(SUPPORTED_NETWORKS, [
-  publicProvider(),
   alchemyProvider({
     apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY as string,
   }),
