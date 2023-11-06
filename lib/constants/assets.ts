@@ -1,6 +1,6 @@
-import { TokenConstant } from "../types";
+import { Asset } from "../types";
 
-const assets: TokenConstant[] = [
+const assets: Asset[] = [
   {
     "chains": [1, 1337, 42161],
     "address": {
