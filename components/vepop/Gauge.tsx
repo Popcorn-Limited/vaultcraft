@@ -146,6 +146,7 @@ export default function Gauge({ vaultData, index, votes, handleVotes, canVote }:
                       opacity: 1,
                       borderColor: canVote ? '#C391FF' : "#AFAFAF",
                       backgroundColor: '#fff',
+                      zIndex:0
                     }}
                     value={amount}
                     onChange={canVote ? (val: any) => onChange(Number(val)) : () => { }}

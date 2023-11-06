@@ -118,7 +118,7 @@ function VePopContainer() {
 
         <div className="hidden md:block fixed left-0 bottom-10 w-full">
           {canVote && <>
-            <div className="z-50 mx-auto w-104 bg-[#23262F] px-6 py-4 rounded-lg flex flex-row items-center justify-between text-white border border-white">
+            <div className="z-10 mx-auto w-104 bg-[#23262F] px-6 py-4 rounded-lg flex flex-row items-center justify-between text-white border border-[#353945]">
               <p className="mt-1">
                 Voting power used: <span className="font-bold">
                   {
