@@ -41,8 +41,8 @@ export default function Modal({ visibility, children, title, classNames = "" }: 
               <Dialog.Panel
                 className={`relative transform overflow-hidden rounded-lg bg-black border border-[#F0EEE0] px-8 py-9 transition-all sm:w-full ${classNames}`}
               >
-                <div className="flex flex-row justify-between items-center mb-10">
-                  <div>{title}</div>
+                <div className="flex flex-row justify-between md:items-center mb-10">
+                  <>{title}</>
                   <XMarkIcon className="w-10 h-10 text-white" onClick={() => setShowModal(false)} role="button" />
                 </div>
                 {children}

@@ -91,7 +91,7 @@ const Vaults: NextPage = () => {
               </div>
             </div>
 
-            <div className="w-[1px] h-[55px] bg-[#353945] xs:hidden smmd:block" />
+            <div className="w-[1px] h-[55px] bg-[#353945] hidden md:block" />
 
             <div>
               <p className="leading-6 text-base text-primaryDark smmd:text-primary">My oPOP</p>

@@ -103,13 +103,9 @@ function VePopContainer() {
           }
         </section>
 
-        <section className="md:hidden">
-          <p className="text-primary">Gauge Voting not available on mobile.</p>
-        </section>
-
-        <div className="hidden md:block fixed left-0 bottom-10 w-full">
+        <div className="fixed left-0 bottom-10 w-full">
           {canVote && <>
-            <div className="z-10 mx-auto w-104 bg-[#23262F] px-6 py-4 rounded-lg flex flex-row items-center justify-between text-white border border-[#353945]">
+            <div className="z-10 mx-auto w-60 md:w-104 bg-[#23262F] px-6 py-4 rounded-lg flex flex-col md:flex-row items-center justify-between text-white border border-[#353945]">
               <p className="mt-1">
                 Voting power used: <span className="font-bold">
                   {
@@ -119,7 +115,7 @@ function VePopContainer() {
                   }%
                 </span>
               </p>
-              <div className="w-40">
+              <div className="mt-4 md:mt-0 w-40">
                 <MainActionButton
                   label="Cast Votes"
                   handleClick={() => sendVotes({ vaults, votes, account: account as Address, clients: { publicClient, walletClient: walletClient as WalletClient } })}

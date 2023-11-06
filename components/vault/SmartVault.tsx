@@ -54,14 +54,14 @@ export default function SmartVault({
       <Modal visibility={[showModal, setShowModal]} classNames="md:w-1/2"
         title={<AssetWithName vault={vaultData} />}
       >
-        <div className="flex flex-row w-full">
-          <div className="w-1/2 text-start flex flex-col justify-between">
+        <div className="flex flex-col md:flex-row w-full">
+          <div className="w-full md:w-1/2 text-start flex flex-col justify-between">
 
             <div className="space-y-4">
               <VaultStats vaultData={vaultData} account={account} />
             </div>
 
-            <div className="space-y-4">
+            <div className="hidden md:block space-y-4">
               <div className="w-10/12 border border-[#F0EEE0] rounded-lg p-4">
                 <p className="text-primary font-normal">Vault address:</p>
                 <p className="font-bold text-primary">
@@ -79,7 +79,7 @@ export default function SmartVault({
             </div>
 
           </div>
-          <div className="w-1/2 flex-grow rounded-lg border border-customLightGray p-6">
+          <div className="w-full md:w-1/2 mt-4 md:mt-0 flex-grow rounded-lg border border-customLightGray p-6">
             <VaultInputs
               vault={vault}
               asset={asset}
