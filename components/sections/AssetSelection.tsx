@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import { localhost, mainnet } from "wagmi/chains";
 import { RPC_URLS } from "@/lib/connectors";
-import { getAddress, isAddress } from "viem";
+import { Address, getAddress, isAddress } from "viem";
 import { Asset } from "@/lib/types";
 import assets from "@/lib/constants/assets";
 
@@ -32,7 +32,7 @@ async function fetchViaAlchemy(address: string, chainId: number, metadata: any) 
   return metadata
 }
 
-async function getTokenMetadata(address: string, chainId: number, protocol: string): Promise<Asset> {
+async function getTokenMetadata(address: Address, chainId: number, protocol: string): Promise<Asset> {
   let metadata = {
     name: "",
     symbol: "",

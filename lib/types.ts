@@ -39,7 +39,7 @@ export type veAddresses = {
 
 export type Asset = {
   chains: number[];
-  address: { [key: string]: string };
+  address: { [key: string]: Address };
   name: string;
   symbol: string;
   decimals: number;
