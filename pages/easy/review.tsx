@@ -87,12 +87,10 @@ export default function ReviewPage(): JSX.Element {
         <SecondaryActionButton
           label="Back"
           handleClick={() => router.push('/easy/fees')}
-          className={`max-w-[150px]`}
         />
         <MainActionButton
           label={account ? "Deploy Vault" : "Connect Wallet"}
           handleClick={account ? handleSubmit : openConnectModal}
-          className={`max-w-[200px]`}
           disabled={account && !conditions}
         />
       </div>

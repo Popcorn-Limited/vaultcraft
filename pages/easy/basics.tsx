@@ -111,12 +111,10 @@ export default function Basics() {
         <SecondaryActionButton
           label="Back"
           handleClick={() => router.push('/')}
-          className={`max-w-[100px]`}
         />
         <MainActionButton
           label="Next"
           handleClick={() => router.push('/easy/fees')}
-          className={`max-w-[100px]`}
           disabled={!isBasicsValid(basics) || loading}
         />
       </div>

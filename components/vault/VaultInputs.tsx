@@ -71,7 +71,7 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
         if (outputToken?.address === vault.address) {
           console.log("out vault")
           await handleAllowance({
-            token: inputToken,
+            token: inputToken.address,
             inputAmount: (inputBalance * (10 ** inputToken?.decimals)),
             account: account as Address,
             spender: vault.address,
@@ -89,7 +89,7 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
         else if (outputToken?.address === gauge?.address) {
           console.log("out gauge")
           await handleAllowance({
-            token: inputToken,
+            token: inputToken.address,
             inputAmount: (inputBalance * (10 ** inputToken?.decimals)),
             account: account as Address,
             spender: VAULT_ROUTER,
@@ -127,7 +127,7 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
         else if (outputToken?.address === gauge?.address) {
           console.log("out gauge")
           await handleAllowance({
-            token: vault,
+            token: vault.address,
             inputAmount: (inputBalance * (10 ** vault?.decimals)),
             account: account as Address,
             spender: gauge?.address as Address,
@@ -147,7 +147,7 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
         if (outputToken?.address === asset.address) {
           console.log("out asset")
           await handleAllowance({
-            token: inputToken,
+            token: inputToken.address,
             inputAmount: (inputBalance * (10 ** vault?.decimals)),
             account: account as Address,
             spender: VAULT_ROUTER,

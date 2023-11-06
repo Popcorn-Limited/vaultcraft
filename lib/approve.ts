@@ -4,7 +4,7 @@ import { showErrorToast, showLoadingToast, showSuccessToast } from "@/lib/toasts
 import { SimulationResponse, Token } from "@/lib/types";
 
 interface HandleAllowanceProps {
-  token: Token;
+  token: Address;
   inputAmount: number;
   account: Address;
   spender: Address;
@@ -25,14 +25,14 @@ interface ApprovePops extends SimulateApproveProps {
 
 export async function handleAllowance({ token, inputAmount, account, spender, publicClient, walletClient }: HandleAllowanceProps): Promise<boolean> {
   const allowance = await publicClient.readContract({
-    address: token.address,
+    address: token,
     abi: ERC20Abi,
     functionName: "allowance",
     args: [account, spender]
   })
 
   if (Number(allowance) === 0 || Number(allowance) < inputAmount) {
-    return approve({ address: token.address, account, spender, publicClient, walletClient })
+    return approve({ address: token, account, spender, publicClient, walletClient })
   }
   return true
 }

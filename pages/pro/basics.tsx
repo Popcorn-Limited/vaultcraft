@@ -104,8 +104,8 @@ export default function Basics() {
             {strategy.key !== "none" && loading && <p className="text-white mt-6">Loading Configuration, please wait...</p>}
 
             <div className="flex justify-end mt-8 gap-3">
-                <SecondaryActionButton label="Back" handleClick={() => router.push('/')} className={`max-w-[100px]`} />
-                <MainActionButton label="Next" handleClick={() => router.push('/pro/strategy')} className={`max-w-[100px]`} disabled={!isBasicsValid(basics)} />
+                <SecondaryActionButton label="Back" handleClick={() => router.push('/')}  />
+                <MainActionButton label="Next" handleClick={() => router.push('/pro/strategy')} disabled={!isBasicsValid(basics)} />
             </div>
         </VaultCreationContainer>
     )

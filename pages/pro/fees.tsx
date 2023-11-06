@@ -31,8 +31,8 @@ export default function Fees() {
       <FeeConfiguration />
 
       <div className="flex justify-end mt-8 gap-3">
-        <SecondaryActionButton label="Back" handleClick={() => router.push('/pro/strategy')} className={`max-w-[100px]`} />
-        <MainActionButton label="Next" handleClick={() => router.push('/pro/review')} disabled={!isFeesValid(fees)} className={`max-w-[100px]`} />
+        <SecondaryActionButton label="Back" handleClick={() => router.push('/pro/strategy')} />
+        <MainActionButton label="Next" handleClick={() => router.push('/pro/review')} disabled={!isFeesValid(fees)} />
       </div>
     </VaultCreationContainer>
   )
