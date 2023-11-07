@@ -15,7 +15,7 @@ export default function Product({ title, description, stats, badge, customConten
   return (
     <Link
       href={route}
-      className="group border rounded w-full lg:max-w-[320px] h-[500px] relative flex flex-col bg-[#141416] border-[#353945] border-opacity-75 .smmd:items-center py-6 px-8 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:bg-[#23262f]"
+      className="group border rounded w-full lg:max-w-full h-[500px] relative flex flex-col bg-[#141416] border-[#353945] border-opacity-75 .smmd:items-center py-6 px-8 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:bg-[#23262f]"
     >
       {badge && (
         <img
