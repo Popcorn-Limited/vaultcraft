@@ -5,7 +5,7 @@ import { Address, WalletClient } from "viem";
 import { useEffect, useState } from "react";
 import { getVeAddresses } from "@/lib/utils/addresses";
 import { hasAlreadyVoted } from "@/lib/gauges/hasAlreadyVoted";
-import { VaultData } from "@/lib/types";
+import { Token, VaultData } from "@/lib/types";
 import { getVaultsByChain } from "@/lib/vaults/getVault";
 import StakingInterface from "@/components/vepop/StakingInterface";
 import { sendVotes } from "@/lib/gauges/interactions";
@@ -92,17 +92,8 @@ function VePopContainer() {
 
         <section className="xs:pb-12 smmd:py-10 px-8 md:flex md:flex-row md:justify-between space-y-4 md:space-y-0 md:space-x-8">
           <StakingInterface setShowLockModal={setShowLockModal} setShowMangementModal={setShowMangementModal} />
-          <OPopInterface setShowOPopModal={setShowOPopModal} />
+          <OPopInterface gauges={vaults?.length > 0 ? vaults.map((vault: VaultData) => vault.gauge as Token) : []} setShowOPopModal={setShowOPopModal} />
         </section >
-
-        <section className="px-8 xs:mb-12 xs:mt-0 smmd:mb-10 smmd:mt-[60px]">
-          <h4 className="text-primary text-3xl font-normal mb-2">
-            All vaults
-          </h4>
-          <span className="text-primary">
-            Zap any asset into Smart Vaults for the best yield for your crypto across DeFi
-          </span>
-        </section>
 
         <section className="flex flex-wrap max-w-[1600px] mx-auto justify-between gap-4 px-8 pb-9">
           {vaults?.length > 0 ? vaults.map((vault: VaultData, index: number) =>
@@ -112,13 +103,9 @@ function VePopContainer() {
           }
         </section>
 
-        <section className="md:hidden">
-          <p className="text-primary">Gauge Voting not available on mobile.</p>
-        </section>
-
-        <div className="hidden md:block fixed left-0 bottom-10 w-full">
+        <div className="fixed left-0 bottom-10 w-full">
           {canVote && <>
-            <div className="z-10 mx-auto w-104 bg-[#23262F] px-6 py-4 rounded-lg flex flex-row items-center justify-between text-white border border-[#353945]">
+            <div className="z-10 mx-auto w-60 md:w-104 bg-[#23262F] px-6 py-4 rounded-lg flex flex-col md:flex-row items-center justify-between text-white border border-[#353945]">
               <p className="mt-1">
                 Voting power used: <span className="font-bold">
                   {
@@ -128,7 +115,7 @@ function VePopContainer() {
                   }%
                 </span>
               </p>
-              <div className="w-40">
+              <div className="mt-4 md:mt-0 w-40">
                 <MainActionButton
                   label="Cast Votes"
                   handleClick={() => sendVotes({ vaults, votes, account: account as Address, clients: { publicClient, walletClient: walletClient as WalletClient } })}

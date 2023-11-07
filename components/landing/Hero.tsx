@@ -32,22 +32,8 @@ export default function Hero(): JSX.Element {
 
   return (
     <section className="pb-8 pt-4 sm:pb-6 border-b border-[#AFAFAF]">
-      <div className="max-w-[165px] mx-8 mb-2">
-        <QuaternaryActionButton label={'My portfolio'} />
-      </div>
-      <div className="flex flex-col gap-6 items-start lg:flex-row lg:items-center lg:justify-between mx-8">
+      <div className="flex flex-col gap-6 items-start lg:flex-row lg:items-center lg:justify-between mx-8 mt-8">
         <div className="grid xs:grid-cols-2 xs:gap-x-[40px] xs:gap-y-2 smmd:grid-cols-5 gap-6 sm:flex-row">
-          <StatusWithLabel
-              label={"Weekly P&L"}
-              content={
-                 <div className="flex w-fit content-between items-center gap-2 rounded-lg h-10 text-base leading-4 py-2 px-4 bg-[#05BE64]">
-                    <span className="font-bold leading-4 whitespace-nowrap">
-                      + 20%
-                    </span>
-                    <img src="/images/icons/arrow-up-icon.svg" alt="Arrow up" className="w-4" />
-                </div>
-              }
-          />
           <StatusWithLabel
             label={"Deposits"}
             content={<p className="text-3xl font-bold text-primary leading-[120%]">$ {loading ? "..." : NumberFormatter.format(networth.vault)}</p>}

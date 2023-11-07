@@ -203,7 +203,7 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
         <div className="w-full border-t border-customLightGray" />
       </div>
       <div className="relative flex justify-center">
-        <span className="bg-white px-4">
+        <span className="bg-black px-4">
           <ArrowDownIcon
             className="h-10 w-10 p-2 text-customLightGray border border-customLightGray rounded-full cursor-pointer hover:text-primary hover:border-primary"
             aria-hidden="true"

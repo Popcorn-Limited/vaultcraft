@@ -1,12 +1,12 @@
 export * from "./abi";
 import assets from "@/lib/constants/assets";
 import { Token } from "../types";
-import { Address } from "viem";
+import { Address, getAddress } from "viem";
 
 export function getAssetsByChain(chainId: number): Token[] {
   return assets.filter((asset) => asset.chains.includes(chainId)).map((asset) => {
     return {
-      address: asset.address[String(chainId)],
+      address: getAddress(asset.address[String(chainId)]),
       name: asset.name,
       symbol: asset.symbol,
       decimals: asset.decimals,

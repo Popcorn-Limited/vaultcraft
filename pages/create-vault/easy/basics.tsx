@@ -110,11 +110,11 @@ export default function Basics() {
       <div className="flex justify-end mt-8 gap-3">
         <SecondaryActionButton
           label="Back"
-          handleClick={() => router.push('/')}
+          handleClick={() => router.push('/create-vault')}
         />
         <MainActionButton
           label="Next"
-          handleClick={() => router.push('/easy/fees')}
+          handleClick={() => router.push('create-vault/easy/fees')}
           disabled={!isBasicsValid(basics) || loading}
         />
       </div>

@@ -31,8 +31,8 @@ export default function Strategy() {
       <StrategyConfiguration />
 
       <div className="flex justify-end gap-3 mt-6">
-        <SecondaryActionButton label="Back" handleClick={() => router.push('/pro/basics')} />
-        <MainActionButton label="Next" handleClick={() => router.push('/pro/fees')} disabled={!isConfigValid(adapter, adapterConfig)} />
+        <SecondaryActionButton label="Back" handleClick={() => router.push('/create-vault/pro/basics')} />
+        <MainActionButton label="Next" handleClick={() => router.push('/create-vault/pro/fees')} disabled={!isConfigValid(adapter, adapterConfig)} />
       </div>
     </VaultCreationContainer >
   )

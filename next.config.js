@@ -11,6 +11,7 @@ const nextConfig = {
     PINATA_API_SECRET: process.env.PINATA_API_SECRET,
     PINATA_API_KEY: process.env.PINATA_API_KEY,
     IPFS_URL: process.env.IPFS_URL,
+    DUNE_API_KEY:process.env.DUNE_API_KEY
   },
   async rewrites() {
     return [

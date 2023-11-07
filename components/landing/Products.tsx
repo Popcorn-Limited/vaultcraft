@@ -33,16 +33,7 @@ export default function Products(): JSX.Element {
                   content: "The total value of assets held by the underlying smart contracts.",
                   id: "sweet-vault-tvl",
                 },
-              },
-              {
-                  label: "vAPR",
-                  content: `${NumberFormatter.format(vaultTvl)}%`,
-                  infoIconProps: {
-                      title: "vAPR",
-                      content: "Example",
-                      id: "sweet-vault-vAPR",
-                  },
-              },
+              }
             ]}
             route="vaults"
           />
@@ -55,17 +46,7 @@ export default function Products(): JSX.Element {
             }
             customContent={<SmileyIcon size={"60"} color={"white"} className="group-hover:fill-[#C391FF]" />}
             description="Lock stake your POP LP to boost your rewards with call options on POP"
-            stats={[
-              {
-                label: "TVL",
-                content: <p>Coming soon</p>,
-                infoIconProps: {
-                    title: "TVL",
-                    content: "Example",
-                    id: "boost-vault-tvl",
-                },
-              },
-            ]}
+            stats={[]}
             route="vepop"
           />
           <Product
@@ -82,13 +63,13 @@ export default function Products(): JSX.Element {
           <Product
             title={
               <>
-                Staking
+                Stats
               </>
             }
             customContent={<PopIcon size={"60"} color={"white"} className="group-hover:fill-[#80FF77]" />}
             description="Find out our staking products & discontinued products here"
             stats={[]}
-            route="https://archive.pop.network"
+            route="stats"
           />
         </div>
       </section>

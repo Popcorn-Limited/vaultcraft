@@ -91,7 +91,7 @@ const Vaults: NextPage = () => {
               </div>
             </div>
 
-            <div className="w-[1px] h-[55px] bg-[#353945] xs:hidden smmd:block" />
+            <div className="w-[1px] h-[55px] bg-[#353945] hidden md:block" />
 
             <div>
               <p className="leading-6 text-base text-primaryDark smmd:text-primary">My oPOP</p>
@@ -114,7 +114,7 @@ const Vaults: NextPage = () => {
         </div>
       </section>
 
-      <section className="mt-8 mb-10 md:flex px-8 flex-row items-center justify-between xs:m-0 smmd:mt-12 smmd:mb-6 md:my-10">
+      <section className="mt-8 mb-10 xs:m-0 smmd:mb-6 md:my-10 md:flex px-8 flex-row items-center justify-between">
         <NetworkFilter supportedNetworks={SUPPORTED_NETWORKS.map(chain => chain.id)} selectNetwork={selectNetwork} />
         <div className="md:w-96 flex px-6 py-3 items-center rounded-lg border border-gray-300 border-opacity-40 gap-2 smmd:mt-6 xs:mt-12 xs:mb-6">
           <MagnifyingGlassIcon className="w-8 h-8 text-gray-400" />
@@ -128,7 +128,7 @@ const Vaults: NextPage = () => {
         </div>
       </section>
 
-      <section className="flex flex-wrap max-w-[1600px] mx-auto justify-between gap-4 px-8 pb-9">
+      <section className="flex flex-wrap mx-auto justify-between gap-4 px-8">
         {vaults.length > 0 ? vaults.filter(vault => selectedNetworks.includes(vault.chainId)).filter(vault => !HIDDEN_VAULTS.includes(vault.address)).map((vault) => {
           return (
             <SmartVault
@@ -139,7 +139,7 @@ const Vaults: NextPage = () => {
             />
           )
         })
-          : <p>Loading Vaults...</p>
+          : <p className="text-white">Loading Vaults...</p>
         }
       </section>
     </NoSSR >

@@ -37,7 +37,7 @@ async function getGaugeData(gauge: Address, publicClient: PublicClient): Promise
         functionName: 'working_supply',
       },
     ],
-    allowFailure: false
+    allowFailure: false,
   })
 
   return [data[0], Number(formatEther(data[1])), Number(formatEther(data[2])), Number(data[3]), Number(formatEther(data[4]))];
@@ -63,7 +63,7 @@ export default async function calculateAPR({ vaultPrice, gauge, publicClient }: 
       address: GAUGE_CONTROLLER,
       abi: GaugeControllerAbi,
       functionName: 'gauge_exists',
-      args: [gauge]
+      args: [gauge],
     })
 
     /// @dev the price of oPOP is determined by applying the discount factor to the POP price.
@@ -86,9 +86,6 @@ export default async function calculateAPR({ vaultPrice, gauge, publicClient }: 
     console.log('~~~~~ No Gauge Found ~~~~~');
     return [];
   }
-
-  console.log(`lowerAPR: ${Number(lowerAPR).toFixed(2)}%`);
-  console.log(`upperAPR: ${Number(upperAPR).toFixed(2)}%`);
 
   return [lowerAPR, upperAPR];
 }

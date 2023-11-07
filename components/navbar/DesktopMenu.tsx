@@ -19,21 +19,21 @@ export default function DesktopMenu(): JSX.Element {
     const chainName = useMemo(() => (address && chain?.name ? chain.name : "Ethereum"), [chain?.id, address]);
 
     function directToVaults() {
-        router.push("https://app.pop.network/vaults")
+        router.push("/vaults")
     }
 
     return (
         <div className="bg-transparent w-full">
-            <div className="flex flex-row items-center justify-between w-full md:p-[36px] p-6 z-30">
+            <div className="flex flex-row items-center justify-between w-full md:p-[36px] p-6 z-30 border-b-[#353945] border-b-[1px]">
                 <div className="w-1/3">
                     <div>
                         <Link href={`/`} passHref>
-                            <img src="/images/icons/popLogo.svg" alt="Logo" className="w-10 h-10" />
+                            <img src="/images/icons/popLogo.svg" alt="Logo" className="w-10 h-10 text-white" />
                         </Link>
                     </div>
                 </div>
 
-                <div className="w-1/3">
+                <div className="hidden md:block w-1/3">
                     <p className="text-white">
                         VaultCraft uses novel technology and is experimental software.
                         You might encounter some bugs. If you have questions text us here in {" "}
@@ -68,6 +68,13 @@ export default function DesktopMenu(): JSX.Element {
                         </div>
                     )}
                 </div>
+            </div>
+            <div className="w-full p-6 md:hidden">
+                <p className="text-white">
+                    VaultCraft uses novel technology and is experimental software.
+                    You might encounter some bugs. If you have questions text us here in {" "}
+                    <a href="https://discord.gg/n46dDQ5G" className="text-blue-500">Discord</a>.
+                </p>
             </div>
         </div>
     );

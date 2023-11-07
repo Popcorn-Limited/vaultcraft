@@ -1,4 +1,4 @@
-import { BASIC_CREATION_STAGES } from "@/lib/stages";
+import { PRO_CREATION_STAGES } from "@/lib/stages";
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { useAtom } from "jotai";
@@ -64,19 +64,19 @@ export default function ReviewPage(): JSX.Element {
   }
 
   return (metadata && adapter ?
-    <VaultCreationContainer activeStage={2} stages={BASIC_CREATION_STAGES} >
+    <VaultCreationContainer activeStage={3} stages={PRO_CREATION_STAGES} >
       <div>
         <h1 className="text-white text-2xl mb-2">Review</h1>
         <p className="text-white">
           Please review your configuration carefully.
-          You can interact with vaults that you created on
+          You can interact with vaults that you created
           <a
-            href="https://app.pop.network/experimental/vaults"
+            href="/vaults"
             rel="noopener noreferrer"
             target="_blank"
             className="text-customPurple"
           >
-            {" "} app.pop.network
+            {" "} here
           </a>.
         </p>
       </div>
@@ -86,7 +86,7 @@ export default function ReviewPage(): JSX.Element {
       <div className="flex justify-end mt-8 gap-3">
         <SecondaryActionButton
           label="Back"
-          handleClick={() => router.push('/easy/fees')}
+          handleClick={() => router.push('/create-vault/easy/fees')}
         />
         <MainActionButton
           label={account ? "Deploy Vault" : "Connect Wallet"}
@@ -134,7 +134,7 @@ export default function ReviewPage(): JSX.Element {
           <div className="mt-8">
             <MainActionButton
               label="Done"
-              handleClick={() => isSuccess ? router.push("https://app.pop.network/experimental/vaults") : setShowModal(false)}
+              handleClick={() => isSuccess ? router.push("/vaults") : setShowModal(false)}
               disabled={metadata.ipfsHash === "" || isLoading || (strategyData.id !== stringToHex("", { size: 32 }) && strategyData.data === "0x")}
             />
           </div>
