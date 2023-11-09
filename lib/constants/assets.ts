@@ -57,7 +57,7 @@ const assets: Asset[] = [
       "1337": "0x5f98805A4E8be255a32880FDeC7F6728C6568bA0",
       "42161": "0x93b346b6BC2548dA6A1E7d98E9a421B42541425b"
     },
-    "name": "LUSD Stablecoin",
+    "name": "LUSD",
     "symbol": "LUSD",
     "decimals": 18,
     "logoURI": "https://cdn.furucombo.app/assets/img/token/LUSD.png"

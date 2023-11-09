@@ -6,6 +6,7 @@ import { ChainId } from "@/lib/utils/connectors";
 import TokenIcon from "@/components/common/TokenIcon";
 import SearchToken from "@/components/SearchToken";
 import Modal from "@/components/modal/Modal";
+import PopUpModal from "./modal/PopUpModal";
 
 export interface SelectTokenProps {
   allowSelection: boolean;
@@ -27,9 +28,8 @@ export default function SelectToken({
   return (
     <>
       {/* Desktop Token Search */}
-      {/* TODO - style this */}
       <div className="hidden md:block">
-        <Modal visibility={[show, setShow]}>
+        <Modal visibility={[show, setShow]} classNames="hidden md:block md:w-1/4">
           <div>
             <Image src="/images/blackCircle.svg" width={88} height={88} alt="default token icon" />
             <h2>Select a token</h2>
@@ -69,25 +69,22 @@ export default function SelectToken({
         </span>
       </div>
       {/* Mobile Token Search */}
-      {/* TODO - add this */}
       <div className="fixed md:hidden z-100 left-0">
-        {/* <PopUpModal
-          visible={showPopUp}
-          onClosePopUpModal={() => {
-            setShowPopUp(false);
-          }}
+        <PopUpModal
+          visible={show}
+          onClosePopUpModal={() => setShow(false)}
         >
-          <p className="text-base text-black font-normal mb-2">Select a token</p>
+          <p className="text-base text-white font-normal mb-2">Select a token</p>
           <SearchToken
             chainId={chainId}
             options={options}
             selectToken={(token) => {
               selectToken(token);
-              setShowSelectTokenModal(false);
+              setShow(false);
             }}
             selectedToken={selectedToken}
           />
-        </PopUpModal> */}
+        </PopUpModal>
       </div>
     </>
   );

@@ -242,14 +242,14 @@ const Vaults: NextPage = () => {
       <section className="flex flex-wrap mx-auto justify-between gap-4 px-8 w-full">
         {vaults.length > 0 ? vaults.filter(vault => selectedNetworks.includes(vault.chainId)).filter(vault => !HIDDEN_VAULTS.includes(vault.address)).map((vault) => {
           return (
-              <SmartVault
+            <SmartVault
               key={`sv-${vault.address}-${vault.chainId}`}
-                vaultData={vault}
-                mutateTokenBalance={mutateTokenBalance}
-                searchString={searchString}
-                zapAssets={vault.chainId === 1 && availableZapAssets[1].includes(vault.asset.address) ? zapAssets[vault.chainId] : undefined}
-                deployer={"0x22f5413C075Ccd56D575A54763831C4c27A37Bdb"}
-              />
+              vaultData={vault}
+              mutateTokenBalance={mutateTokenBalance}
+              searchString={searchString}
+              zapAssets={vault.chainId === 1 && availableZapAssets[1].includes(vault.asset.address) ? zapAssets[vault.chainId] : undefined}
+              deployer={"0x22f5413C075Ccd56D575A54763831C4c27A37Bdb"}
+            />
           )
         })
           : <p className="text-white">Loading Vaults...</p>

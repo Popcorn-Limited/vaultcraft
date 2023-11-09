@@ -28,10 +28,10 @@ export default function SearchToken({ options, selectToken, selectedToken, chain
   };
 
   return (
-    <>
-      <div className="relative mb-4">
+    <div className="w-full flex flex-wrap">
+      {/* <div className="relative mb-4">
         <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-          <MagnifyingGlassIcon className="h-6 w-6 md:h-8 md:w-8 text-gray-400" aria-hidden="true" />
+          <MagnifyingGlassIcon className="h-6 w-6 md:h-8 md:w-8 text-white" aria-hidden="true" />
         </div>
         <input
           type="text"
@@ -39,16 +39,16 @@ export default function SearchToken({ options, selectToken, selectedToken, chain
           id="search"
           value={search}
           onChange={(e) => handleSearchChange(e.target.value)}
-          className="block w-full h-14 md:h-14 pb-0 border-customLightGray pl-14 focus:border-customLightGray focus:ring-customLightGray rounded-5xl text-base md:text-xl placeholder:text-base md:placeholder:text-xl pt-0"
+          className="block w-full h-14 md:h-14 pb-0 border-white pl-14 focus:border-white focus:ring-white rounded-5xl text-base md:text-xl placeholder:text-base md:placeholder:text-xl pt-0 bg-[#141416]"
           placeholder="Search"
         />
-      </div>
+      </div> */}
       {options
         .filter((option) => quickOptionsTokens.find((token) => token.address == option.address))
         .map((quickOption) => (
-          <div className="inline-flex mr-2 my-3" key={quickOption?.symbol}>
+          <div className="w-1/2 mb-4 pr-4" key={quickOption?.symbol}>
             <button
-              className="flex items-center rounded-lg border border-customLightGray font-medium text-gray-800 py-2 px-3 md:py-2.5 md:px-4 text-base md:text-lg hover:bg-customPaleGray"
+              className="w-full flex items-center rounded-lg border border-customLightGray font-medium text-white py-2 px-3 md:py-2.5 md:px-4 text-base md:text-lg"
               onClick={() => {
                 selectToken(quickOption);
               }}
@@ -60,7 +60,7 @@ export default function SearchToken({ options, selectToken, selectedToken, chain
             </button>
           </div>
         ))}
-      <div className="mt-4">
+      {/* <div className="mt-4">
         <ul className="scrollable__select py-6 overflow-y-auto shadow-scrollableSelect rounded-lg p-6 border border-customPaleGray">
           {filteredOptions.map((option) => (
             <li
@@ -72,7 +72,7 @@ export default function SearchToken({ options, selectToken, selectedToken, chain
             >
               <span
                 className={`flex items-center py-3 px-3 ${selectedToken.address === option.address
-                  ? "text-black font-semibold"
+                  ? "text-[#DFFF1C] font-semibold"
                   : "text-primary font-normal  cursor-pointer"
                   }`}
               >
@@ -84,7 +84,7 @@ export default function SearchToken({ options, selectToken, selectedToken, chain
             </li>
           ))}
         </ul>
-      </div>
-    </>
+      </div> */}
+    </div>
   );
 };
