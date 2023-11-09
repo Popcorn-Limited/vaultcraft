@@ -2,8 +2,8 @@ import { Address, useAccount, useNetwork, usePublicClient, useSwitchNetwork, use
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { WalletClient } from "viem";
 import Modal from "@/components/modal/Modal";
-import MainActionButton from "@/components/buttons/MainActionButton";
-import SecondaryActionButton from "@/components/buttons/SecondaryActionButton";
+import MainActionButton from "@/components/button/MainActionButton";
+import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import { getVeAddresses } from "@/lib/utils/addresses";
 import LockPopInfo from "@/components/vepop/modals/lock/LockPopInfo";
 import LockPopInterface from "@/components/vepop/modals/lock/LockPopInterface";

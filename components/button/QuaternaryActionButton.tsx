@@ -1,6 +1,6 @@
 import RightArrowIcon from "@/components/svg/RightArrowIcon";
 import React, { useState } from "react";
-import { ButtonProps } from "@/components/buttons/MainActionButton";
+import { ButtonProps } from "@/components/button/MainActionButton";
 
 export default function QuaternaryActionButton({ label, handleClick, hidden, disabled = false }: ButtonProps): JSX.Element {
     const [arrowColor, setArrowColor] = useState("FFFFFF");

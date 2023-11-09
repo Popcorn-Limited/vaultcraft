@@ -1,6 +1,6 @@
 import { ArrowDownIcon } from "@heroicons/react/24/outline";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
-import MainActionButton from "@/components/buttons/MainActionButton";
+import MainActionButton from "@/components/button/MainActionButton";
 import { useEffect, useState } from "react";
 import { Address, useAccount, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
 import TabSelector from "@/components/common/TabSelector";

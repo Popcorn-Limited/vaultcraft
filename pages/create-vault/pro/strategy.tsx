@@ -3,8 +3,8 @@ import { useAtom } from "jotai";
 import { useRouter } from "next/router";
 import { adapterAtom, adapterConfigAtom } from "@/lib/atoms";
 import { verifyInitParamValidity } from "@/lib/helpers";
-import MainActionButton from "@/components/buttons/MainActionButton";
-import SecondaryActionButton from "@/components/buttons/SecondaryActionButton";
+import MainActionButton from "@/components/button/MainActionButton";
+import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import VaultCreationContainer from "@/components/VaultCreationContainer";
 import StrategyConfiguration from "@/components/sections/StrategyConfiguration";
 

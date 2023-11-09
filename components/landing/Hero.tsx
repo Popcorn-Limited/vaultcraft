@@ -3,7 +3,7 @@ import { Networth, getTotalNetworth } from "@/lib/getNetworth";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
-import QuaternaryActionButton from "@/components/buttons/QuaternaryActionButton";
+import QuaternaryActionButton from "@/components/button/QuaternaryActionButton";
 
 export default function Hero(): JSX.Element {
   const { address: account } = useAccount();

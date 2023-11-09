@@ -5,7 +5,7 @@ import { ChevronDownIcon } from "@heroicons/react/24/solid";
 import { useNetwork, useAccount } from "wagmi";
 import { useChainModal, useConnectModal } from "@rainbow-me/rainbowkit";
 import { networkLogos } from "@/lib/utils/connectors";
-import MainActionButton from "@/components/buttons/MainActionButton";
+import MainActionButton from "@/components/button/MainActionButton";
 import SocialMediaLinks from "@/components/SocialMediaLinks";
 import NavbarLinks from "@/components/navbar/NavbarLinks";
 import { useRouter } from "next/router";
@@ -40,7 +40,7 @@ export default function DesktopMenu(): JSX.Element {
           {address ? (
             <div className={`relative flex flex-container flex-row z-10`}>
               <div
-                className={`w-fit cursor-pointer h-full xs: xs:py-2 xs:bg-white smmd:bg-transparent smmd:py-[10px] xs:px-4 smmd:px-6 flex flex-row items-center justify-between border border-customLightGray rounded-4xl text-primary`}
+                className={`w-fit cursor-pointer h-full xs: xs:py-2 xs:bg-[#141416] smmd:bg-transparent smmd:py-[10px] xs:px-4 smmd:px-6 flex flex-row items-center justify-between border border-customLightGray rounded-4xl text-primary`}
                 onClick={openChainModal}
               >
                 <img src={logo} alt={chainName} className="w-5 h-5 smmd:mr-2" />

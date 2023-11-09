@@ -1,4 +1,4 @@
-import TertiaryActionButton from "@/components/buttons/TertiaryActionButton";
+import TertiaryActionButton from "@/components/button/TertiaryActionButton";
 import { ManagementOption } from "@/components/vepop/modals/manage/ManageLockModal";
 
 export default function SelectManagementOption({ setStep, setManagementOption }: { setStep: Function, setManagementOption: Function }): JSX.Element {

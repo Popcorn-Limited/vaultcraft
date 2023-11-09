@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Address, formatEther } from "viem";
 import { goerli } from "viem/chains";
 import { useAccount } from "wagmi";
-import MainActionButton from "@/components/buttons/MainActionButton";
+import MainActionButton from "@/components/button/MainActionButton";
 import getClaimableVeReward from "@/lib/feeDistributor/getClaimableVeReward";
 import getVeApy from "@/lib/feeDistributor/getVeApy";
 import { useClaimTokens } from "@/lib/feeDistributor/useClaimToken";

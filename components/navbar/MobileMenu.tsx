@@ -7,9 +7,9 @@ import { useAccount, useDisconnect, useNetwork } from "wagmi";
 import SocialMediaLinks from "@/components/SocialMediaLinks";
 import { ChainId, networkLogos, networkMap } from "@/lib/utils/connectors";
 import NavbarLinks from "@/components/navbar/NavbarLinks";
-import PopUpModal from "../modal/PopUpModal";
-import MainActionButton from "../buttons/MainActionButton";
-import TertiaryActionButton from "../buttons/TertiaryActionButton";
+import PopUpModal from "@/components/modal/PopUpModal";
+import MainActionButton from "@/components/button/MainActionButton";
+import TertiaryActionButton from "@/components/button/TertiaryActionButton";
 
 const networkData = [
   {
@@ -77,18 +77,19 @@ export default function MobileMenu(): JSX.Element {
         <div className="flex items-center gap-4">
           <div className={`relative w-full ${!menuVisible ? "" : "hidden"}`}>
             <div
-              className={`w-full px-4 py-3 flex flex-row items-center justify-center border border-light rounded-3xl cursor-pointer relative gap-2 ${router.pathname === "/" ? "bg-[#FAF9F4]" : ""}`}
+              className={`w-full px-4 py-3 flex flex-row items-center justify-center border border-light rounded-3xl cursor-pointer relative gap-2 
+              ${router.pathname === "/" ? "bg-[#FAF9F4]" : ""}`}
               onClick={() => setShowPopUp(true)}
             >
               <img src={logo} alt={""} className="w-3 h-3 object-contain" />
               <span
-                className={`${address ? "border-green-400 bg-green-400" : "bg-white border-gray-300"
+                className={`${address ? "border-green-400 bg-green-400" : "border-gray-300"
                   } block h-2 w-2 rounded-full border`}
               ></span>
             </div>
           </div>
           <button
-            className="text-gray-500 w-10 relative focus:outline-none bg-white"
+            className="text-gray-500 w-10 relative focus:outline-none"
             onClick={() => toggleMenu(!menuVisible)}
           >
             <div className="block w-10">

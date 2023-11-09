@@ -1,5 +1,5 @@
 import React from "react";
-import { ButtonProps } from "@/components/buttons/MainActionButton";
+import { ButtonProps } from "@/components/button/MainActionButton";
 
 export default function SecondaryActionButton({ label, handleClick, hidden, disabled = false }: ButtonProps): JSX.Element {
   return (

@@ -14,7 +14,7 @@ import LockModal from "@/components/vepop/modals/lock/LockModal";
 import ManageLockModal from "@/components/vepop/modals/manage/ManageLockModal";
 import OPopModal from "@/components/vepop/modals/oPop/OPopModal";
 import OPopInterface from "@/components/vepop/OPopInterface";
-import MainActionButton from "@/components/buttons/MainActionButton";
+import MainActionButton from "@/components/button/MainActionButton";
 
 const { VotingEscrow: VOTING_ESCROW } = getVeAddresses();
 

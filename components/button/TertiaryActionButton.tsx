@@ -1,4 +1,4 @@
-import { ButtonProps } from "@/components/buttons/MainActionButton";
+import { ButtonProps } from "@/components/button/MainActionButton";
 
 export default function TertiaryActionButton({ label, handleClick, disabled = false, hidden = false }: ButtonProps): JSX.Element {
   return (
