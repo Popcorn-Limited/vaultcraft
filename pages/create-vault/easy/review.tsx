@@ -13,7 +13,7 @@ import MainActionButton from "@/components/buttons/MainActionButton";
 import SecondaryActionButton from "@/components/buttons/SecondaryActionButton";
 import Modal from "@/components/Modal";
 import VaultCreationContainer from "@/components/VaultCreationContainer";
-import { deployVault } from "@/lib/vaults/deployVault";
+import { deployVault } from "@/lib/vault/deployVault";
 import { stringToHex } from "viem";
 import { SUPPORTED_NETWORKS } from "@/lib/connectors";
 

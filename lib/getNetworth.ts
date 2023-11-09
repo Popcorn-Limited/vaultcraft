@@ -3,9 +3,9 @@ import { Chain, arbitrum, optimism, polygon } from "viem/chains";
 import { Address, mainnet } from "wagmi";
 import { ChainId, RPC_URLS } from "@/lib/utils/connectors";
 import { ERC20Abi, PopByChain, PopStakingByChain } from "@/lib/constants";
-import getVaultAddresses from "@/lib/vaults/getVaultAddresses";
+import getVaultAddresses from "@/lib/vault/getVaultAddresses";
 import { resolvePrice } from "@/lib/resolver/price/price";
-import { getVaultNetworthByChain } from "@/lib/vaults/getVaultNetworth";
+import { getVaultNetworthByChain } from "@/lib/vault/getVaultNetworth";
 
 const BaseAddressesByChain: { [key: number]: Address[] } = {
   1: [PopByChain[ChainId.Ethereum], PopStakingByChain[ChainId.Ethereum]],

@@ -40,3 +40,4 @@ export const MAX_UINT256 = BigInt(0xffffffffffffffffffffffffffffffffffffffffffff
 export const MINUS_ONE = BigInt(-0x01)
 export const ZERO = BigInt(0)
 export const EMPTY_BYTES = "0x"
+export const ROUNDING_VALUE = 10_000;

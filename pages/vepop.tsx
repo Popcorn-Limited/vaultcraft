@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { getVeAddresses } from "@/lib/utils/addresses";
 import { hasAlreadyVoted } from "@/lib/gauges/hasAlreadyVoted";
 import { Token, VaultData } from "@/lib/types";
-import { getVaultsByChain } from "@/lib/vaults/getVault";
+import { getVaultsByChain } from "@/lib/vault/getVault";
 import StakingInterface from "@/components/vepop/StakingInterface";
 import { sendVotes } from "@/lib/gauges/interactions";
 import Gauge from "@/components/vepop/Gauge";

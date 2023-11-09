@@ -1,4 +1,4 @@
-import getAssetAndValueByVault from "@/lib/vaults/getAssetAndAssetsPerShare";
+import getAssetAndValueByVault from "@/lib/vault/getAssetAndAssetsPerShare";
 import { PriceResolverParams } from "..";
 import { resolvePrice } from "../price";
 

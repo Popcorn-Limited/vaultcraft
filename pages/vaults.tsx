@@ -2,35 +2,61 @@
 import NoSSR from "react-no-ssr";
 import { useEffect, useState } from "react";
 import type { NextPage } from "next";
-import { useAccount } from "wagmi";
+import { Address, useAccount, useBalance, usePublicClient, useWalletClient } from "wagmi";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import useNetworkFilter from "@/lib/useNetworkFilter";
-import getVaultNetworth from "@/lib/vaults/getVaultNetworth";
+import getVaultNetworth from "@/lib/vault/getVaultNetworth";
 import useVaultTvl from "@/lib/useVaultTvl";
-import { getVaultsByChain } from "@/lib/vaults/getVault";
-import { VaultData } from "@/lib/types";
+import { getVaultsByChain } from "@/lib/vault/getVault";
+import { Token, VaultData } from "@/lib/types";
 import SmartVault from "@/components/vault/SmartVault";
 import NetworkFilter from "@/components/network/NetworkFilter";
+import { getVeAddresses } from "@/lib/utils/addresses";
+import getZapAssets, { getAvailableZapAssets } from "@/lib/utils/getZapAssets";
+import { ERC20Abi, VaultAbi } from "@/lib/constants";
+import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
 
 export const HIDDEN_VAULTS = ["0xb6cED1C0e5d26B815c3881038B88C829f39CE949", "0x2fD2C18f79F93eF299B20B681Ab2a61f5F28A6fF",
   "0xDFf04Efb38465369fd1A2E8B40C364c22FfEA340", "0xd4D442AC311d918272911691021E6073F620eb07", //@dev for some reason the live 3Crypto yVault isnt picked up by the yearnAdapter nor the yearnFactoryAdapter
   "0x8bd3D95Ec173380AD546a4Bd936B9e8eCb642de1", // Sample Stargate Vault
   "0xcBb5A4a829bC086d062e4af8Eba69138aa61d567", // yOhmFrax factory
   "0x9E237F8A3319b47934468e0b74F0D5219a967aB8", // yABoosted Balancer
-  "0x860b717B360378E44A241b23d8e8e171E0120fF0", // R/Dai
+  "0x860b717B360378E44A241b23d8e8e171E0120fF0", // R/Dai 
+  "0xBae30fBD558A35f147FDBaeDbFF011557d3C8bd2", // 50OHM - 50 DAI
+  "0x759281a408A48bfe2029D259c23D7E848A7EA1bC", // yCRV
 ]
+
+const { oPOP: OPOP } = getVeAddresses();
+
+const NETWORKS_SUPPORTING_ZAP = [1]
+
+export interface MutateTokenBalanceProps {
+  inputToken: Address;
+  outputToken: Address;
+  vault: Address;
+  chainId: number;
+  account: Address;
+}
 
 const Vaults: NextPage = () => {
   const { address: account } = useAccount();
+  const publicClient = usePublicClient()
+  const { data: walletClient } = useWalletClient()
 
   const [initalLoad, setInitalLoad] = useState<boolean>(false);
   const [accountLoad, setAccountLoad] = useState<boolean>(false);
 
   const [selectedNetworks, selectNetwork] = useNetworkFilter(SUPPORTED_NETWORKS.map(network => network.id));
   const [vaults, setVaults] = useState<VaultData[]>([]);
+  const [zapAssets, setZapAssets] = useState<{ [key: number]: Token[] }>({});
+  const [availableZapAssets, setAvailableZapAssets] = useState<{ [key: number]: Address[] }>({})
   const vaultTvl = useVaultTvl();
+  const [networth, setNetworth] = useState<number>(0);
+
+  const [gaugeRewards, setGaugeRewards] = useState<GaugeRewards>()
+  const { data: oBal } = useBalance({ chainId: 1, address: account, token: OPOP, watch: true })
 
   const [searchString, handleSearch] = useState("");
 
@@ -38,27 +64,112 @@ const Vaults: NextPage = () => {
     async function getVaults() {
       setInitalLoad(true)
       if (account) setAccountLoad(true)
-      const fetchedVaults = await Promise.all(
+      // get zap assets
+      const newZapAssets: { [key: number]: Token[] } = {}
+      SUPPORTED_NETWORKS.forEach(async (chain) => newZapAssets[chain.id] = await getZapAssets({ chain, account }))
+      setZapAssets(newZapAssets);
+
+      // get available zapAddresses
+      setAvailableZapAssets({ 1: await getAvailableZapAssets() })
+
+      // get vaults
+      const fetchedVaults = (await Promise.all(
         SUPPORTED_NETWORKS.map(async (chain) => getVaultsByChain({ chain, account }))
-      );
-      setVaults(fetchedVaults.flat());
+      )).flat();
+
+      // get gauge rewards
+      if (account) {
+        const rewards = await getGaugeRewards({
+          gauges: fetchedVaults.filter(vault => vault.gauge && vault.chainId === 1).map(vault => vault.gauge?.address) as Address[],
+          account: account as Address,
+          publicClient
+        })
+        setGaugeRewards(rewards)
+      }
+
+      const vaultValue = fetchedVaults.map(vaultData => (vaultData.vault.balance * vaultData.vault.price) / (10 ** vaultData.vault.decimals)).reduce((a, b) => a + b, 0)
+      const gaugeValue = fetchedVaults.filter(
+        vaultData => !!vaultData.gauge?.address)
+        .map(vaultData => ((vaultData.gauge?.balance || 0) * (vaultData.gauge?.price || 0)) / (10 ** (vaultData.gauge?.decimals || 0))).reduce((a, b) => a + b, 0)
+      setNetworth(vaultValue + gaugeValue);
+      setVaults(fetchedVaults);
     }
     if (!account && !initalLoad) getVaults();
     if (account && !accountLoad) getVaults()
   }, [account])
 
-  const [networth, setNetworth] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(true);
 
+  async function mutateTokenBalance({ inputToken, outputToken, vault, chainId, account }: MutateTokenBalanceProps) {
+    const data = await publicClient.multicall({
+      contracts: [
+        {
+          address: inputToken,
+          abi: ERC20Abi,
+          functionName: "balanceOf",
+          args: [account]
+        },
+        {
+          address: outputToken,
+          abi: ERC20Abi,
+          functionName: "balanceOf",
+          args: [account]
+        },
+        {
+          address: vault,
+          abi: VaultAbi,
+          functionName: 'totalAssets'
+        },
+        {
+          address: vault,
+          abi: VaultAbi,
+          functionName: 'totalSupply'
+        }],
+      allowFailure: false
+    })
 
-  useEffect(() => {
-    if (account && loading)
-      // fetch and set networth
-      getVaultNetworth({ account }).then(res => {
-        setNetworth(res.total);
-        setLoading(false);
-      });
-  }, [account]);
+    // Modify zap assets
+    if (NETWORKS_SUPPORTING_ZAP.includes(chainId)) {
+      const zapAssetFound = zapAssets[chainId].find(asset => asset.address === inputToken || asset.address === outputToken) // @dev -- might need to copy the state here already to avoid modifing a pointer
+      if (zapAssetFound) {
+        zapAssetFound.balance = zapAssetFound.address === inputToken ? Number(data[0]) : Number(data[1])
+        setZapAssets({ ...zapAssets, [chainId]: [...zapAssets[chainId], zapAssetFound] })
+      }
+    }
+
+    // Modify vaults, assets and gauges
+    const newVaultState: VaultData[] = [...vaults]
+    newVaultState.forEach(vaultData => {
+      if (vaultData.chainId === chainId) {
+        // Modify vault pricing and tvl
+        if (vaultData.address === vault) {
+          const assetsPerShare = Number(data[3]) > 0 ? Number(data[2]) / Number(data[3]) : Number(1e-9)
+          const pricePerShare = assetsPerShare * vaultData.assetPrice
+
+          vaultData.totalAssets = Number(data[2])
+          vaultData.totalSupply = Number(data[3])
+          vaultData.assetsPerShare = assetsPerShare
+          vaultData.pricePerShare = pricePerShare
+          vaultData.tvl = (Number(data[3]) * pricePerShare) / (10 ** vaultData.asset.decimals)
+          vaultData.vault.price = pricePerShare * 1e9
+
+          if (vaultData.gauge) vaultData.gauge.price = pricePerShare * 1e9
+        }
+        // Adjust vault balance
+        if (vaultData.vault.address === inputToken || vaultData.vault.address === outputToken) {
+          vaultData.vault.balance = vaultData.vault.address === inputToken ? Number(data[0]) : Number(data[1])
+        }
+        // Adjust asset balance
+        if (vaultData.asset.address === inputToken || vaultData.asset.address === outputToken) {
+          vaultData.asset.balance = vaultData.asset.address === inputToken ? Number(data[0]) : Number(data[1])
+        }
+        // Adjust gauge balance
+        if (vaultData.gauge?.address === inputToken || vaultData.gauge?.address === outputToken) {
+          vaultData.gauge.balance = vaultData.gauge.address === inputToken ? Number(data[0]) : Number(data[1])
+        }
+      }
+    })
+    setVaults(newVaultState)
+  }
 
   return (
     <NoSSR>
@@ -75,7 +186,7 @@ const Vaults: NextPage = () => {
 
         <div className="w-full md:w-3/4 md:max-w-3xl">
           <div
-              className="smmd:flex smmd:mt-4 md:mt-0 smmd:flex-row smmd:items-center justify-end smmd:justify-between smmd:gap-5 xs:grid xs:grid-cols-2 xs:grid-rows-3 xs:gap-4 xs:mt-4"
+            className="smmd:flex smmd:mt-4 md:mt-0 smmd:flex-row smmd:items-center justify-end smmd:justify-between smmd:gap-5 xs:grid xs:grid-cols-2 xs:grid-rows-3 xs:gap-4 xs:mt-4"
           >
             <div>
               <p className="leading-6 text-base text-primaryDark smmd:text-primary">TVL</p>
@@ -87,7 +198,7 @@ const Vaults: NextPage = () => {
             <div>
               <p className="leading-6 text-base text-primaryDark smmd:text-primary">Deposits</p>
               <div className="text-3xl font-bold whitespace-nowrap text-primary mt-2">
-                {`$${loading ? "..." : NumberFormatter.format(networth)}`}
+                {`$${NumberFormatter.format(networth)}`}
               </div>
             </div>
 
@@ -96,14 +207,14 @@ const Vaults: NextPage = () => {
             <div>
               <p className="leading-6 text-base text-primaryDark smmd:text-primary">My oPOP</p>
               <div className="text-3xl font-bold whitespace-nowrap text-primary mt-2">
-                {`$${NumberFormatter.format(vaultTvl)}`}
+                {`${oBal ? NumberFormatter.format(Number(oBal?.value) / 1e18) : "0"}`}
               </div>
             </div>
 
             <div>
               <p className="leading-6 text-base text-primaryDark smmd:text-primary">Claimable oPOP</p>
               <div className="text-3xl font-bold whitespace-nowrap text-primary mt-2">
-                {`$${loading ? "..." : NumberFormatter.format(networth)}`}
+                {`$${gaugeRewards ? NumberFormatter.format(Number(gaugeRewards?.total) / 1e18) : "0"}`}
               </div>
             </div>
             {/*TODO: ASK ABOUT MOVING TO COMPONENT*/}
@@ -134,7 +245,9 @@ const Vaults: NextPage = () => {
             <SmartVault
               key={`sv-${vault.address}-${vault.chainId}`}
               vaultData={vault}
+              mutateTokenBalance={mutateTokenBalance}
               searchString={searchString}
+              zapAssets={vault.chainId === 1 && availableZapAssets[1].includes(vault.asset.address) ? zapAssets[vault.chainId] : undefined}
               deployer={"0x22f5413C075Ccd56D575A54763831C4c27A37Bdb"}
             />
           )

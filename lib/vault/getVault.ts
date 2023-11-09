@@ -6,10 +6,10 @@ import { resolvePrice } from "@/lib/resolver/price/price"
 import { Token, VaultData } from "@/lib/types"
 import { ADDRESS_ZERO, ERC20Abi, VaultRegistryByChain, VaultRegistyAbi } from "@/lib/constants"
 import { RPC_URLS, networkMap } from "@/lib/utils/connectors";
-import getVaultAddresses from "@/lib/vaults/getVaultAddresses"
-import getAssetIcon from "@/lib/vaults/getAssetIcon"
-import getVaultName from "@/lib/vaults/getVaultName"
-import getOptionalMetadata from "@/lib/vaults/getOptionalMetadata"
+import getVaultAddresses from "@/lib/vault/getVaultAddresses"
+import getAssetIcon from "@/lib/vault/getAssetIcon"
+import getVaultName from "@/lib/vault/getVaultName"
+import getOptionalMetadata from "@/lib/vault/getOptionalMetadata"
 import { getVeAddresses } from "../utils/addresses"
 import getGauges, { Gauge } from "../gauges/getGauges"
 
@@ -202,8 +202,8 @@ export async function getVaults({ vaults, account = ADDRESS_ZERO, client }: { va
 
   // Add prices
   const { data } = await axios.get(`https://coins.llama.fi/prices/current/${String(metadata.map(
-      // @ts-ignore -- @dev ts still thinks entry.asset is just an `Address`
-      entry => `${networkMap[client.chain.id].toLowerCase()}:${entry.asset.address}`
+    // @ts-ignore -- @dev ts still thinks entry.asset is just an `Address`
+    entry => `${networkMap[client.chain.id].toLowerCase()}:${entry.asset.address}`
   ))}`)
   metadata = metadata.map((entry, i) => {
     const key = `${networkMap[client.chain.id].toLowerCase()}:${entry.asset.address}`
@@ -231,7 +231,7 @@ export async function getVaults({ vaults, account = ADDRESS_ZERO, client }: { va
         decimals: foundGauge.decimals,
         logoURI: "/images/tokens/pop.svg",  // wont be used, just here for consistency
         balance: foundGauge.balance,
-        price: entry.pricePerShare,
+        price: entry.pricePerShare * 1e9,
       } : undefined
 
       return {
@@ -256,7 +256,7 @@ export async function getVault({ vault, account = ADDRESS_ZERO, client }: { vaul
   const vaultName = await getVaultName({ address: getAddress(vault), cid: registryMetadata[3] })
 
   const price = await resolvePrice({ chainId: client.chain.id, client: client, address: results[3] as Address, resolver: 'llama' })
-  const assetsPerShare = Number(results[6]) > 0 ? Number(results[5]) / Number(results[6]) : Number(1)
+  const assetsPerShare = Number(results[6]) > 0 ? Number(results[5]) / Number(results[6]) : Number(1e-9)
   const pricePerShare = assetsPerShare * price
   const fees = results[7] as [BigInt, BigInt, BigInt, BigInt]
 
@@ -333,7 +333,7 @@ export async function getVault({ vault, account = ADDRESS_ZERO, client }: { vaul
       decimals: foundGauge.decimals,
       logoURI: "/images/tokens/pop.svg",  // wont be used, just here for consistency
       balance: foundGauge.balance,
-      price: result.pricePerShare,
+      price: result.pricePerShare * 1e9,
     } : undefined
   }
   return result;

@@ -228,7 +228,7 @@ interface GaugeInteractionProps {
   clients: Clients;
 }
 
-export async function gaugeDeposit({ address, amount, account, clients }: GaugeInteractionProps) {
+export async function gaugeDeposit({ address, amount, account, clients }: GaugeInteractionProps): Promise<boolean> {
   showLoadingToast("Staking into Gauge...")
 
   const { request, success, error: simulationError } = await simulateCall({
@@ -247,15 +247,18 @@ export async function gaugeDeposit({ address, amount, account, clients }: GaugeI
       const hash = await clients.walletClient.writeContract(request)
       const receipt = await clients.publicClient.waitForTransactionReceipt({ hash })
       showSuccessToast("Staked into Gauge successful!")
+      return true
     } catch (error: any) {
       showErrorToast(error.shortMessage)
+      return false;
     }
   } else {
     showErrorToast(simulationError)
+    return false;
   }
 }
 
-export async function gaugeWithdraw({ address, amount, account, clients }: GaugeInteractionProps) {
+export async function gaugeWithdraw({ address, amount, account, clients }: GaugeInteractionProps): Promise<boolean> {
   showLoadingToast("Unstaking from Gauge...")
 
   const { request, success, error: simulationError } = await simulateCall({
@@ -274,10 +277,13 @@ export async function gaugeWithdraw({ address, amount, account, clients }: Gauge
       const hash = await clients.walletClient.writeContract(request)
       const receipt = await clients.publicClient.waitForTransactionReceipt({ hash })
       showSuccessToast("Unstaked from Gauge successful!")
+      return true
     } catch (error: any) {
       showErrorToast(error.shortMessage)
+      return false;
     }
   } else {
     showErrorToast(simulationError)
+    return false;
   }
 }
