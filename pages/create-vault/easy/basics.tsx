@@ -114,7 +114,7 @@ export default function Basics() {
         />
         <MainActionButton
           label="Next"
-          handleClick={() => router.push('create-vault/easy/fees')}
+          handleClick={() => router.push('/create-vault/easy/fees')}
           disabled={!isBasicsValid(basics) || loading}
         />
       </div>
