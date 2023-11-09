@@ -1,3 +1,5 @@
+// @ts-ignore
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { useEffect, useState } from "react";
 import { Address, useAccount, usePublicClient, } from "wagmi";
 import { getAddress } from "viem";
@@ -15,6 +17,7 @@ import Modal from "../modal/Modal";
 import VaultStats from "./VaultStats";
 import calculateAPR from "@/lib/gauges/calculateGaugeAPR";
 import { MutateTokenBalanceProps } from "pages/vaults";
+import { Square2StackIcon } from "@heroicons/react/24/outline";
 
 
 function getTokenOptions(vaultData: VaultData, zapAssets?: Token[]): Token[] {
@@ -72,16 +75,30 @@ export default function SmartVault({
             <div className="hidden md:block space-y-4">
               <div className="w-10/12 border border-[#F0EEE0] rounded-lg p-4">
                 <p className="text-primary font-normal">Vault address:</p>
-                <p className="font-bold text-primary">
-                  {vault.address.slice(0, 6)}...{vault.address.slice(-4)}
-                </p>
+                <div className="flex flex-row items-center justify-between">
+                  <p className="font-bold text-primary">
+                    {vault.address.slice(0, 6)}...{vault.address.slice(-4)}
+                  </p>
+                  <div className='w-6 h-6 group/vaultAddress'>
+                    <CopyToClipboard text={vault.address}>
+                      <Square2StackIcon className="text-white group-hover/vaultAddress:text-[#DFFF1C]" />
+                    </CopyToClipboard>
+                  </div>
+                </div>
               </div>
               {gauge &&
                 <div className="w-10/12 border border-[#F0EEE0] rounded-lg p-4">
                   <p className="text-primary font-normal">Gauge address:</p>
-                  <p className="font-bold text-primary">
-                    {gauge.address.slice(0, 6)}...{gauge.address.slice(-4)}
-                  </p>
+                  <div className="flex flex-row items-center justify-between">
+                    <p className="font-bold text-primary">
+                      {gauge.address.slice(0, 6)}...{gauge.address.slice(-4)}
+                    </p>
+                    <div className='w-6 h-6 group/gaugeAddress'>
+                      <CopyToClipboard text={gauge.address}>
+                        <Square2StackIcon className="text-white group-hover/gaugeAddress:text-[#DFFF1C]" />
+                      </CopyToClipboard>
+                    </div>
+                  </div>
                 </div>
               }
             </div>
