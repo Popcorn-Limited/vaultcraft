@@ -17,6 +17,9 @@ import { getVeAddresses } from "@/lib/utils/addresses";
 import getZapAssets, { getAvailableZapAssets } from "@/lib/utils/getZapAssets";
 import { ERC20Abi, VaultAbi } from "@/lib/constants";
 import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
+import MainActionButton from "@/components/button/MainActionButton";
+import { claimOPop } from "@/lib/oPop/interactions";
+import { WalletClient } from "viem";
 
 export const HIDDEN_VAULTS = ["0xb6cED1C0e5d26B815c3881038B88C829f39CE949", "0x2fD2C18f79F93eF299B20B681Ab2a61f5F28A6fF",
   "0xDFf04Efb38465369fd1A2E8B40C364c22FfEA340", "0xd4D442AC311d918272911691021E6073F620eb07", //@dev for some reason the live 3Crypto yVault isnt picked up by the yearnAdapter nor the yearnFactoryAdapter
@@ -173,7 +176,7 @@ const Vaults: NextPage = () => {
 
   return (
     <NoSSR>
-      <section className="md:pb-10 md:border-b border-[#353945] md:flex md:flex-row items-center justify-between py-10 px-8 smmd:py-6 md:gap-4 xs:pb-0">
+      <section className="md:border-b border-[#353945] md:flex md:flex-row items-center justify-between py-10 px-8 smmd:py-6 md:gap-4">
 
         <div className="w-full md:w-max">
           <h1 className="text-5xl font-normal m-0 mb-4 md:mb-2 leading-0 text-primary xs:text-3xl xs:leading-none">
@@ -184,43 +187,60 @@ const Vaults: NextPage = () => {
           </p>
         </div>
 
-        <div className="w-full md:w-3/4 md:max-w-3xl">
-          <div
-            className="smmd:flex smmd:mt-4 md:mt-0 smmd:flex-row smmd:items-center justify-end smmd:justify-between smmd:gap-5 xs:grid xs:grid-cols-2 xs:grid-rows-3 xs:gap-4 xs:mt-4"
-          >
-            <div>
+        <div className="w-full md:w-8/12 md:divide-x md:flex md:flex-row space-y-4 md:space-y-0 mt-4 md:mt-0">
+          <div className="flex flex-row items-center md:w-4/12">
+            <div className="w-1/2">
               <p className="leading-6 text-base text-primaryDark smmd:text-primary">TVL</p>
-              <div className="text-3xl font-bold whitespace-nowrap text-primary mt-2">
+              <div className="text-3xl font-bold whitespace-nowrap text-primary">
                 {`$${NumberFormatter.format(vaultTvl)}`}
               </div>
             </div>
 
-            <div>
+            <div className="w-1/2">
               <p className="leading-6 text-base text-primaryDark smmd:text-primary">Deposits</p>
-              <div className="text-3xl font-bold whitespace-nowrap text-primary mt-2">
+              <div className="text-3xl font-bold whitespace-nowrap text-primary">
                 {`$${NumberFormatter.format(networth)}`}
               </div>
             </div>
+          </div>
 
-            <div className="w-[1px] h-[55px] bg-[#353945] hidden md:block" />
-
-            <div>
+          <div className="flex flex-row items-center md:w-8/12 md:pl-12">
+            <div className="w-1/2 md:w-1/3">
               <p className="leading-6 text-base text-primaryDark smmd:text-primary">My oPOP</p>
-              <div className="text-3xl font-bold whitespace-nowrap text-primary mt-2">
+              <div className="text-3xl font-bold whitespace-nowrap text-primary">
                 {`${oBal ? NumberFormatter.format(Number(oBal?.value) / 1e18) : "0"}`}
               </div>
             </div>
 
-            <div>
+            <div className="w-1/2 md:w-1/3">
               <p className="leading-6 text-base text-primaryDark smmd:text-primary">Claimable oPOP</p>
-              <div className="text-3xl font-bold whitespace-nowrap text-primary mt-2">
+              <div className="text-3xl font-bold whitespace-nowrap text-primary">
                 {`$${gaugeRewards ? NumberFormatter.format(Number(gaugeRewards?.total) / 1e18) : "0"}`}
               </div>
             </div>
-            {/*TODO: ASK ABOUT MOVING TO COMPONENT*/}
-            <button className="py-2.5 px-4 bg-primary rounded mt-auto font-bold xs:col-span-2 xs:mt-2 xs:max-h-12 smmd:mt-auto">
-              Claim oPOP
-            </button>
+
+            <div className="hidden md:block w-1/3">
+              <MainActionButton
+                label="Claim oPOP"
+                handleClick={() =>
+                  claimOPop({
+                    gauges: gaugeRewards?.amounts?.filter(gauge => Number(gauge.amount) > 0).map(gauge => gauge.address) as Address[],
+                    account: account as Address,
+                    clients: { publicClient, walletClient: walletClient as WalletClient }
+                  })}
+              />
+            </div>
+          </div>
+          <div className="md:hidden">
+            <MainActionButton
+              label="Claim oPOP"
+              handleClick={() =>
+                claimOPop({
+                  gauges: gaugeRewards?.amounts?.filter(gauge => Number(gauge.amount) > 0).map(gauge => gauge.address) as Address[],
+                  account: account as Address,
+                  clients: { publicClient, walletClient: walletClient as WalletClient }
+                })}
+            />
           </div>
         </div>
       </section>
