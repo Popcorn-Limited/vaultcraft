@@ -240,7 +240,7 @@ const assets: Asset[] = [
     "name": "Origin Ether",
     "symbol": "oETH",
     "decimals": 18,
-    "logoURI": "https://icons.llamao.fi/icons/protocols/origin-ether"
+    "logoURI": "/images/tokens/oEth.png"
   },
   {
     "chains": [1, 1337],
