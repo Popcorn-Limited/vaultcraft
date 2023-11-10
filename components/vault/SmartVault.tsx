@@ -62,9 +62,7 @@ export default function SmartVault({
     !vaultData.metadata.optionalMetadata.protocol?.name.toLowerCase().includes(searchString)) return <></>
   return (
     <>
-      <Modal visibility={[showModal, setShowModal]} classNames="md:w-1/2"
-        title={<AssetWithName vault={vaultData} />}
-      >
+      <Modal visibility={[showModal, setShowModal]} title={<AssetWithName vault={vaultData} />} >
         <div className="flex flex-col md:flex-row w-full">
           <div className="w-full md:w-1/2 text-start flex flex-col justify-between">
 

@@ -1,5 +1,5 @@
 import { Address } from "viem";
-import { NumberFormatter, formatAndRoundNumber, formatNumber } from "@/lib/utils/formatBigNumber";
+import { NumberFormatter, formatAndRoundNumber } from "@/lib/utils/formatBigNumber";
 import Title from "@/components/common/Title";
 import { VaultData } from "@/lib/types";
 import { usePublicClient } from "wagmi";
@@ -80,7 +80,7 @@ export default function VaultStats({ vaultData, account }: VaultStatProps): JSX.
             <>
               <p className="font-normal text-primary xs:text-[14px]">Boost APY</p>
               <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
-                {formatNumber(gaugeApr[0])} - {formatNumber(gaugeApr[1])} %
+                {NumberFormatter.format(gaugeApr[0])} - {NumberFormatter.format(gaugeApr[1])} %
               </Title>
             </>
           }
