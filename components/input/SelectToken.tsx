@@ -4,9 +4,9 @@ import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { Token } from "@/lib/types";
 import { ChainId } from "@/lib/utils/connectors";
 import TokenIcon from "@/components/common/TokenIcon";
-import SearchToken from "@/components/SearchToken";
+import SearchToken from "@/components/input/SearchToken";
 import Modal from "@/components/modal/Modal";
-import PopUpModal from "./modal/PopUpModal";
+import PopUpModal from "../modal/PopUpModal";
 
 export interface SelectTokenProps {
   allowSelection: boolean;

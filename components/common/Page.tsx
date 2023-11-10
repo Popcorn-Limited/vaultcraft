@@ -7,6 +7,7 @@ import { useAtom } from "jotai";
 import { useEffect } from "react";
 import { CachedProvider, YieldOptions } from "vaultcraft-sdk";
 import { useAccount } from "wagmi";
+import Footer from "@/components/common/Footer";
 
 async function setUpYieldOptions() {
   const ttl = 360_000;
@@ -49,7 +50,8 @@ export default function Page({
         <div>
           {children}
         </div>
-        <div className="py-16"></div>
+        <div className="py-8"></div>
+        <Footer />
       </div>
     </>
   );

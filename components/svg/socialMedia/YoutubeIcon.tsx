@@ -1,6 +1,6 @@
 import { IconProps } from "@/lib/types";
 
-const YoutubeIcon: React.FC<IconProps> = ({ color, size, className }) => {
+const YoutubeIcon: React.FC<IconProps> = ({ color, color2, size, className }) => {
   return (
     <svg width={size} height={size} viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
       <g clipPath="url(#clip0_1743_38969)">
@@ -10,7 +10,7 @@ const YoutubeIcon: React.FC<IconProps> = ({ color, size, className }) => {
         />
         <path
           d="M19.1499 9.12569C18.8499 8.20251 17.8572 7.64342 16.9435 7.51524C13.6573 7.16614 10.3434 7.16614 7.05715 7.51524C6.14352 7.64342 5.14806 8.19706 4.85079 9.12569C4.38307 11.5089 4.38307 13.9602 4.85079 16.3434C5.15079 17.2652 6.14352 17.8257 7.05715 17.9539C10.3434 18.303 13.6573 18.303 16.9435 17.9539C17.8572 17.8257 18.8526 17.2721 19.1499 16.3434C19.6176 13.9602 19.6176 11.5089 19.1499 9.12569ZM10.2058 15.6084V9.85933L14.8858 12.7339C13.3081 13.7034 11.7767 14.643 10.2058 15.6084Z"
-          fill="white"
+          fill={color2}
         />
       </g>
       <defs>

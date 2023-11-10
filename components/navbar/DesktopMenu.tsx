@@ -6,7 +6,7 @@ import { useNetwork, useAccount } from "wagmi";
 import { useChainModal, useConnectModal } from "@rainbow-me/rainbowkit";
 import { networkLogos } from "@/lib/utils/connectors";
 import MainActionButton from "@/components/button/MainActionButton";
-import SocialMediaLinks from "@/components/SocialMediaLinks";
+import SocialMediaLinks from "@/components/common/SocialMediaLinks";
 import NavbarLinks from "@/components/navbar/NavbarLinks";
 import { useRouter } from "next/router";
 
@@ -123,7 +123,7 @@ export default function DesktopMenu(): JSX.Element {
                       instantly zap your crypto from any chain into the highest yield-generating products across DeFi in 1 click.
                     </p>
                     <div className="flex justify-between pb-12 mt-12">
-                      <SocialMediaLinks />
+                      <SocialMediaLinks  color="#23262F" color2="#dfff1c" size="24"/>
                     </div>
                   </div>
                 </div>

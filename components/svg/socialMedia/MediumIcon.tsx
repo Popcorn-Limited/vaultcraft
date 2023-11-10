@@ -1,6 +1,6 @@
 import { IconProps } from "@/lib/types";
 
-const MediumIcon: React.FC<IconProps> = ({ color, size, className }) => {
+const MediumIcon: React.FC<IconProps> = ({ color, color2, size, className }) => {
   return (
     <svg width={size} height={size} viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
       <g clipPath="url(#clip0_1743_38959)">
@@ -10,15 +10,15 @@ const MediumIcon: React.FC<IconProps> = ({ color, size, className }) => {
         />
         <path
           d="M13.168 12.734C13.168 15.5937 10.8656 17.9119 8.02537 17.9119C5.18522 17.9119 2.88281 15.5937 2.88281 12.734C2.88281 9.87436 5.18522 7.55615 8.02542 7.55615C10.8656 7.55615 13.168 9.87436 13.168 12.734Z"
-          fill="white"
+          fill={color2}
         />
         <path
           d="M18.8086 12.7339C18.8086 15.4258 17.6574 17.608 16.2373 17.608C14.8172 17.608 13.666 15.4258 13.666 12.7339C13.666 10.042 14.8172 7.85986 16.2373 7.85986C17.6574 7.85986 18.8086 10.042 18.8086 12.7339Z"
-          fill="white"
+          fill={color2}
         />
         <path
           d="M21.1173 12.7342C21.1173 15.146 20.7124 17.1011 20.2129 17.1011C19.7135 17.1011 19.3086 15.146 19.3086 12.7342C19.3086 10.3223 19.7134 8.36719 20.2129 8.36719C20.7124 8.36719 21.1173 10.3223 21.1173 12.7342Z"
-          fill="white"
+          fill={color2}
         />
       </g>
       <defs>

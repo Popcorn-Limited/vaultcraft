@@ -1,7 +1,7 @@
 import type { HTMLProps } from "react";
 import { formatNumber } from "@/lib/utils/formatBigNumber";
 import { Token } from "@/lib/types";
-import SelectToken from "@/components/SelectToken";
+import SelectToken from "@/components/input/SelectToken";
 import InputNumber from "@/components/input/InputNumber";
 
 export default function InputTokenWithError({
