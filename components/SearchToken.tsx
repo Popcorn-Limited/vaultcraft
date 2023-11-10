@@ -48,7 +48,8 @@ export default function SearchToken({ options, selectToken, selectedToken, chain
         .map((quickOption) => (
           <div className="w-1/2 mb-4 pr-4" key={quickOption?.symbol}>
             <button
-              className="w-full flex items-center rounded-lg border border-customLightGray font-medium text-white py-2 px-3 md:py-2.5 md:px-4 text-base md:text-lg"
+              className="w-full flex items-center rounded-lg border border-customLightGray hover:border-white hover:bg-gray-500 
+              font-medium text-white py-2 px-3 md:py-2.5 md:px-4 text-base md:text-lg"
               onClick={() => {
                 selectToken(quickOption);
               }}

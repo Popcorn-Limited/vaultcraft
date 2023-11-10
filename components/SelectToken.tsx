@@ -29,21 +29,21 @@ export default function SelectToken({
     <>
       {/* Desktop Token Search */}
       <div className="hidden md:block">
-        <Modal visibility={[show, setShow]} classNames="hidden md:block md:w-1/4">
-          <div>
-            <Image src="/images/blackCircle.svg" width={88} height={88} alt="default token icon" />
-            <h2>Select a token</h2>
-            <div className="mt-8">
-              <SearchToken
-                chainId={chainId}
-                options={options}
-                selectToken={(token) => {
-                  selectToken(token);
-                  setShow(false);
-                }}
-                selectedToken={selectedToken}
-              />
-            </div>
+        <Modal
+          visibility={[show, setShow]}
+          classNames="hidden md:block md:w-1/4"
+          title={<h2 className="text-white text-2xl">Select a token</h2>}
+        >
+          <div className="mt-8">
+            <SearchToken
+              chainId={chainId}
+              options={options}
+              selectToken={(token) => {
+                selectToken(token);
+                setShow(false);
+              }}
+              selectedToken={selectedToken}
+            />
           </div>
         </Modal>
       </div>
@@ -69,7 +69,7 @@ export default function SelectToken({
         </span>
       </div>
       {/* Mobile Token Search */}
-      <div className="fixed md:hidden z-100 left-0">
+      <div className="fixed z-100 left-0">
         <PopUpModal
           visible={show}
           onClosePopUpModal={() => setShow(false)}
