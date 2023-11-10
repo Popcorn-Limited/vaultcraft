@@ -8,14 +8,13 @@ import MainActionButton from "@/components/button/MainActionButton";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import { showErrorToast } from "@/lib/toasts";
 import { handleAllowance } from "@/lib/approve";
-import { Token } from "@/lib/types";
 import { increaseLockAmount, increaseLockTime, withdrawLock } from "@/lib/gauges/interactions";
-import SelectManagementOption from "./SelectManagementOption";
-import IncreaseStakeInterface from "./IncreaseStakeInterface";
-import IncreaseStakePreview from "./IncreaseStakePreview";
-import IncreaseTimeInterface from "./IncreaseTimeInterface";
-import IncreaseTimePreview from "./IncreaseTimePreview";
-import UnstakePreview from "./UnstakePreview";
+import SelectManagementOption from "@/components/vepop/modals/manage/SelectManagementOption";
+import IncreaseStakeInterface from "@/components/vepop/modals/manage/IncreaseStakeInterface";
+import IncreaseStakePreview from "@/components/vepop/modals/manage/IncreaseStakePreview";
+import IncreaseTimeInterface from "@/components/vepop/modals/manage/IncreaseTimeInterface";
+import IncreaseTimePreview from "@/components/vepop/modals/manage/IncreaseTimePreview";
+import UnstakePreview from "@/components/vepop/modals/manage/UnstakePreview";
 
 const {
   BalancerPool: POP_LP,

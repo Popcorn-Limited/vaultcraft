@@ -21,6 +21,6 @@ export default function TokenIcon({
     return <img src={icon} alt="token icon" className={imageSize ? imageSize : "w-6 md:w-10 h-6 md:h-10"} />
   }
   return (
-    <img src={"/images/icons/POP.svg"} alt="token icon" className={imageSize ? imageSize : "w-6 md:w-10 h-6 md:h-10"} />
+    <img src={"/images/tokens/pop.svg"} alt="token icon" className={imageSize ? imageSize : "w-6 md:w-10 h-6 md:h-10"} />
   );
 }

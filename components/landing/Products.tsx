@@ -52,13 +52,14 @@ export default function Products(): JSX.Element {
           <Product
             title={
               <>
-                VaultCraft
-              </>
+              Create <br className="hidden md:inline" />
+              Vaults
+            </>
             }
             customContent={<HandIcon size={"60"} color={"white"} className="group-hover:fill-[#FFE650]" />}
             description="Create automated assets strategies within minutes"
             stats={[]}
-            route="https://vaultcraft.io/"
+            route="/create-vault"
           />
           <Product
             title={

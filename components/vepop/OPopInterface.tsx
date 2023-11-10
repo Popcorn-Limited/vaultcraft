@@ -1,11 +1,10 @@
 import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards"
-import getGauges from "@/lib/gauges/getGauges";
 import { getVeAddresses } from "@/lib/utils/addresses";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import { Address, useAccount, useBalance, usePublicClient, useWalletClient } from "wagmi"
-import MainActionButton from "../buttons/MainActionButton";
-import SecondaryActionButton from "../buttons/SecondaryActionButton";
+import MainActionButton from "@/components/button/MainActionButton";
+import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import { claimOPop } from "@/lib/oPop/interactions";
 import { WalletClient } from "viem";
 import { Token } from "@/lib/types";

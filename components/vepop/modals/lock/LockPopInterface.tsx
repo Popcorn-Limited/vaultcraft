@@ -14,7 +14,7 @@ const { BalancerPool: POP_LP } = getVeAddresses();
 function LockTimeButton({ label, isActive, handleClick }: { label: string, isActive: boolean, handleClick: Function }): JSX.Element {
   return (
     <button
-      className={`w-10 h-10 border border-[#C8C8C8] rounded-lg ${isActive ? "bg-[#D7D5BC] text-[#645F4B]" : "text-[#969696]"}`}
+      className={`w-10 h-10 border border-[#C8C8C8] hover:bg-[#23262f] rounded-lg ${isActive ? "bg-white text-black" : "text-white"}`}
       onClick={() => handleClick()}
     >
       {label}
@@ -112,7 +112,7 @@ export default function LockPopInterface({ amountState, daysState }: LockPopInte
 
       <div>
         <p className="text-primary font-semibold mb-1">Voting Power</p>
-        <div className="w-full bg-customLightGray border border-customLightGray rounded-lg p-4">
+        <div className="w-full border border-customLightGray rounded-lg p-4">
 
           <p className="text-primaryDark">{Number(amount) > 0 ? calculateVeOut(Number(amount), days).toFixed(2) : "Enter the amount to view your voting power"}</p>
         </div>

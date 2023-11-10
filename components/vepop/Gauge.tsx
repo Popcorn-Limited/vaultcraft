@@ -8,8 +8,6 @@ import Accordion from "@/components/common/Accordion";
 import Title from "@/components/common/Title";
 import useGaugeWeights from "@/lib/gauges/useGaugeWeights";
 import calculateAPR from "@/lib/gauges/calculateGaugeAPR";
-import { yieldOptionsAtom } from "@/lib/atoms/sdk";
-import { useAtom } from "jotai";
 import { NumberFormatter, formatNumber } from "@/lib/utils/formatBigNumber";
 
 interface GaugeProps {

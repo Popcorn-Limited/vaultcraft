@@ -6,7 +6,6 @@ import ExerciseOPopInterface from "@/components/vepop/modals/oPop/ExerciseOPopIn
 import MainActionButton from "@/components/button/MainActionButton";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import { getVeAddresses } from "@/lib/utils/addresses";
-import { Token } from "@/lib/types";
 import { handleAllowance } from "@/lib/approve";
 import { parseEther } from "viem";
 import { exerciseOPop } from "@/lib/oPop/interactions";
