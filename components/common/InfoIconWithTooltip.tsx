@@ -1,35 +1,41 @@
-import ReactTooltip from "rc-tooltip";
+import { Tooltip } from 'react-tooltip'
 import React from "react";
 
 export interface InfoIconWithTooltipProps {
   title?: string;
-  content: string | JSX.Element;
+  content: JSX.Element | React.ReactElement;
   id?: string;
   classExtras?: string;
 }
 
-export default function InfoIconWithTooltip({ title, content, id, classExtras }: InfoIconWithTooltipProps): JSX.Element{
+export default function InfoIconWithTooltip({ title, content, id, classExtras }: InfoIconWithTooltipProps): JSX.Element {
   return (
-    <ReactTooltip
-      id={id}
-      placement={"bottom"}
-      overlayClassName=" w-60"
-      data-html="true"
-      overlay={
-        <div className="text-black text-base leading-7">
-          <h6 className="mb-1">{title}:</h6>
-          <p className="text-primaryDark">{content}</p>
-        </div>
-      }
-    >
-      <div className="flex items-center">
+    <>
+      <div className="flex items-center" id={id}>
         <img
           src="/images/icons/tooltip.svg"
-          data-tip
-          data-for={id}
-          className={`cursor-pointer w-4 h-4 ${classExtras}`}
+          className={`cursor-pointer text-white w-4 h-4 ${classExtras}`}
         />
       </div>
-    </ReactTooltip>
+      <div className='hidden md:block'>
+        <Tooltip
+          anchorSelect={`#${id}`}
+          place="bottom"
+          style={{ backgroundColor: "#353945" }}
+        >
+          {content}
+        </Tooltip>
+      </div>
+      <div className='md:hidden'>
+        <Tooltip
+          anchorSelect={`#${id}`}
+          openOnClick
+          place="bottom"
+          style={{ backgroundColor: "#353945" }}
+        >
+          {content}
+        </Tooltip>
+      </div>
+    </>
   );
 };

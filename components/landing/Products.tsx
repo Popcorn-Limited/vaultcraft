@@ -30,7 +30,7 @@ export default function Products(): JSX.Element {
                 content: `$${NumberFormatter.format(vaultTvl)}`,
                 infoIconProps: {
                   title: "Total Value Locked",
-                  content: "The total value of assets held by the underlying smart contracts.",
+                  content: <p>The total value of assets held <br/> by the underlying smart contracts.</p>,
                   id: "sweet-vault-tvl",
                 },
               }

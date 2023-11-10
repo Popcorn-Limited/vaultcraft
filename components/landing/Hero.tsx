@@ -46,28 +46,28 @@ export default function Hero(): JSX.Element {
             content={<p className="text-3xl font-bold text-primary leading-[120%]">$ {loading ? "..." : NumberFormatter.format(networth.pop)}</p>}
           />
         </div>
-        <div>
-            <p className="uppercase smmd:hidden text-[#C8C8C8] text-sm mb-2">Platform</p>
-            <div className="flex flex-col gap-2 sm:gap-0 sm:flex-row sm:items-center sm:space-x-10">
-                <StatusWithLabel
-                    label={"Total Value Locked"}
-                    content={<p className="text-3xl font-bold text-primary leading-[120%]">$ {tvl}</p>}
-                    infoIconProps={{
-                        id: "tvl",
-                        title: "Total Value Locked",
-                        content: "Total value locked (TVL) is the amount of user funds deposited in popcorn products.",
-                    }}
-                />
-                <StatusWithLabel
-                    label={"My Net Worth"}
-                    content={<p className="text-3xl font-bold text-primary leading-[120%]">$ {loading ? "..." : NumberFormatter.format(networth.total)}</p>}
-                    infoIconProps={{
-                        id: "networth",
-                        title: "My Networth",
-                        content: "This value aggregates your Popcorn-related holdings across all blockchain networks.",
-                    }}
-                />
-            </div>
+        <div className="w-full md:w-fit-content">
+          <p className="uppercase smmd:hidden text-[#C8C8C8] text-sm mb-2">Platform</p>
+          <div className="flex flex-row items-center justify-between w-full md:space-x-10">
+            <StatusWithLabel
+              label={"Total Value Locked"}
+              content={<p className="text-3xl font-bold text-primary leading-[120%]">$ {tvl}</p>}
+              infoIconProps={{
+                id: "tvl",
+                title: "Total Value Locked",
+                content: <p>Total value locked (TVL) is the amount <br /> of user funds deposited in popcorn products.</p>,
+              }}
+            />
+            <StatusWithLabel
+              label={"My Net Worth"}
+              content={<p className="text-3xl font-bold text-primary leading-[120%]">$ {loading ? "..." : NumberFormatter.format(networth.total)}</p>}
+              infoIconProps={{
+                id: "networth",
+                title: "My Networth",
+                content: <p>This value aggregates your Popcorn-related <br /> holdings across all blockchain networks.</p>,
+              }}
+            />
+          </div>
         </div>
       </div>
       <div></div>
