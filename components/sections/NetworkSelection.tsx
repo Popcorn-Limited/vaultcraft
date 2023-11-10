@@ -5,7 +5,7 @@ import { useChainModal } from "@rainbow-me/rainbowkit";
 import Image from "next/image";
 import { networkAtom, assetAtom, protocolAtom, adapterAtom, adapterConfigAtom, strategyAtom } from "@/lib/atoms";
 import { SUPPORTED_NETWORKS } from "@/lib/connectors";
-import Selector, { Option } from "@/components/inputs/Selector";
+import Selector, { Option } from "@/components/input/Selector";
 
 
 const networkLogos = {

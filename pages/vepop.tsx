@@ -15,6 +15,8 @@ import ManageLockModal from "@/components/vepop/modals/manage/ManageLockModal";
 import OPopModal from "@/components/vepop/modals/oPop/OPopModal";
 import OPopInterface from "@/components/vepop/OPopInterface";
 import MainActionButton from "@/components/button/MainActionButton";
+import { useAtom } from "jotai";
+import { vaultsAtom } from "@/lib/atoms/vaults";
 
 const { VotingEscrow: VOTING_ESCROW } = getVeAddresses();
 
@@ -28,7 +30,7 @@ function VePopContainer() {
   const [initalLoad, setInitalLoad] = useState<boolean>(false);
   const [accountLoad, setAccountLoad] = useState<boolean>(false);
 
-  const [vaults, setVaults] = useState<VaultData[]>([]);
+  const [vaults, setVaults] = useAtom(vaultsAtom)
   const [votes, setVotes] = useState<number[]>([]);
   const [canVote, setCanVote] = useState<boolean>(false);
 
@@ -40,8 +42,8 @@ function VePopContainer() {
     async function initialSetup() {
       setInitalLoad(true)
       if (account) setAccountLoad(true)
-      const allVaults = await getVaultsByChain({ chain: mainnet, account })
-      const vaultsWithGauges = allVaults.filter(vault => !!vault.gauge)
+
+      const vaultsWithGauges = vaults.filter(vault => !!vault.gauge)
       setVaults(vaultsWithGauges);
       if (vaultsWithGauges.length > 0 && votes.length === 0 && publicClient.chain.id === 1) {
         setVotes(vaultsWithGauges.map(gauge => 0));
@@ -54,9 +56,9 @@ function VePopContainer() {
         setCanVote(!!account && Number(veBal?.value) > 0 && !hasVoted)
       }
     }
-    if (!account && !initalLoad) initialSetup();
-    if (account && !accountLoad) initialSetup()
-  }, [account])
+    if (!account && !initalLoad && vaults.length > 0) initialSetup();
+    if (account && !accountLoad && vaults.length > 0) initialSetup()
+  }, [account, initalLoad, accountLoad, vaults])
 
   function handleVotes(val: number, index: number) {
     const updatedVotes = [...votes];
@@ -92,11 +94,11 @@ function VePopContainer() {
 
         <section className="xs:pb-12 smmd:py-10 px-8 md:flex md:flex-row md:justify-between space-y-4 md:space-y-0 md:space-x-8">
           <StakingInterface setShowLockModal={setShowLockModal} setShowMangementModal={setShowMangementModal} />
-          <OPopInterface gauges={vaults?.length > 0 ? vaults.map((vault: VaultData) => vault.gauge as Token) : []} setShowOPopModal={setShowOPopModal} />
+          <OPopInterface gauges={vaults?.length > 0 ? vaults.filter(vault => !!vault.gauge?.address).map((vault: VaultData) => vault.gauge as Token) : []} setShowOPopModal={setShowOPopModal} />
         </section >
 
         <section className="flex flex-wrap max-w-[1600px] mx-auto justify-between gap-4 px-8 pb-9">
-          {vaults?.length > 0 ? vaults.map((vault: VaultData, index: number) =>
+          {vaults?.length > 0 ? vaults.filter(vault => !!vault.gauge?.address).map((vault: VaultData, index: number) =>
             <Gauge key={vault.address} vaultData={vault} index={index} votes={votes} handleVotes={handleVotes} canVote={canVote} />
           )
             : <p className="text-primary">Loading Gauges...</p>

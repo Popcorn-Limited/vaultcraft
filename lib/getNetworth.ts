@@ -3,9 +3,8 @@ import { Chain, arbitrum, optimism, polygon } from "viem/chains";
 import { Address, mainnet } from "wagmi";
 import { ChainId, RPC_URLS } from "@/lib/utils/connectors";
 import { ERC20Abi, PopByChain, PopStakingByChain } from "@/lib/constants";
-import getVaultAddresses from "@/lib/vault/getVaultAddresses";
 import { resolvePrice } from "@/lib/resolver/price/price";
-import { getVaultNetworthByChain } from "@/lib/vault/getVaultNetworth";
+import { VaultData } from "./types";
 
 const BaseAddressesByChain: { [key: number]: Address[] } = {
   1: [PopByChain[ChainId.Ethereum], PopStakingByChain[ChainId.Ethereum]],
@@ -24,6 +23,14 @@ export type Networth = {
   stake: number,
   vault: number,
   total: number
+}
+
+export function getVaultNetworthByChain({ vaults, chainId }: { vaults: VaultData[], chainId: number }): number {
+  const vaultValue = vaults.filter(vaultData => vaultData.chainId === chainId).map(vaultData => (vaultData.vault.balance * vaultData.vault.price) / (10 ** vaultData.vault.decimals)).reduce((a, b) => a + b, 0)
+  const gaugeValue = vaults.filter(
+    vaultData => vaultData.chainId === chainId && !!vaultData.gauge?.address)
+    .map(vaultData => ((vaultData.gauge?.balance || 0) * (vaultData.gauge?.price || 0)) / (10 ** (vaultData.gauge?.decimals || 0))).reduce((a, b) => a + b, 0)
+  return vaultValue + gaugeValue
 }
 
 async function getBalancesByChain({ account, client, addresses }: { account: Address, client: PublicClient, addresses: Address[] })
@@ -58,22 +65,16 @@ export async function getNetworthByChain({ account, chain }: { account: Address,
     chain,
     transport: http(RPC_URLS[chain.id])
   })
-  // Get addresses
-  const vaultAddresses = await getVaultAddresses({ client })
-  const addresses = [...BaseAddressesByChain[client.chain?.id as number], ...vaultAddresses]
 
   // Get balances
-  const balances = await getBalancesByChain({ account, client, addresses })
+  const balances = await getBalancesByChain({ account, client, addresses: BaseAddressesByChain[client.chain?.id as number] })
 
   // Get value of POP holdings
   const popPrice = await resolvePrice({ address: PopByChain[10], chainId: 10, client: undefined, resolver: 'llama' })
   const popNetworth = ((balances.find(entry => entry.address === PopByChain[chain.id])?.balance || 0) * popPrice) / (1e18);
   const stakeNetworth = ((balances.find(entry => entry.address === PopStakingByChain[chain.id])?.balance || 0) * popPrice) / (1e18);
 
-  // Get value of vault holdings
-  const vaultNetworth = await getVaultNetworthByChain({ account, chain })
-
-  return { pop: popNetworth, stake: stakeNetworth, vault: vaultNetworth, total: popNetworth + stakeNetworth + vaultNetworth }
+  return { pop: popNetworth, stake: stakeNetworth, vault: 0, total: popNetworth + stakeNetworth }
 }
 
 export async function getTotalNetworth({ account }: { account: Address }): Promise<TotalNetworth> {
@@ -90,7 +91,7 @@ export async function getTotalNetworth({ account }: { account: Address }): Promi
     total: {
       pop: ethereumNetworth.pop + polygonNetworth.pop + optimismNetworth.pop + arbitrumNetworth.pop,
       stake: ethereumNetworth.stake + polygonNetworth.stake + optimismNetworth.stake + arbitrumNetworth.stake,
-      vault: ethereumNetworth.vault + polygonNetworth.vault + optimismNetworth.vault + arbitrumNetworth.vault,
+      vault: 0,
       total: ethereumNetworth.total + polygonNetworth.total + optimismNetworth.total + arbitrumNetworth.total
     }
   }

@@ -1,7 +1,7 @@
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { Strategy, assetAtom, networkAtom, protocolAtom, strategyAtom, useStrategies } from "@/lib/atoms";
-import Selector, { Option } from "@/components/inputs/Selector";
+import Selector, { Option } from "@/components/input/Selector";
 
 
 const STRATEGY_NOT_AVAILABLE: Strategy = {

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import { metadataAtom } from "@/lib/atoms";
-import Input from "@/components/inputs/Input";
+import Input from "@/components/input/Input";
 
 interface Tags { [key: string]: boolean }
 

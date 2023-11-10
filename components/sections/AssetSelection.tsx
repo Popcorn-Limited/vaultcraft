@@ -1,6 +1,6 @@
-import { DEFAULT_PROTOCOL, DEFAULT_STRATEGY, adapterAtom, adapterConfigAtom, assetAddressesAtom, assetAtom, networkAtom, protocolAtom, strategyAtom, useAdapters } from "@/lib/atoms";
-import Input from "../inputs/Input";
-import Selector, { Option } from "../inputs/Selector";
+import { DEFAULT_PROTOCOL, DEFAULT_STRATEGY, assetAddressesAtom, assetAtom, networkAtom, protocolAtom, strategyAtom } from "@/lib/atoms";
+import Input from "@/components/input/Input";
+import Selector, { Option } from "@/components/input/Selector";
 import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import { localhost, mainnet } from "wagmi/chains";

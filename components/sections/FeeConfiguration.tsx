@@ -2,8 +2,8 @@ import { useAtom } from "jotai";
 import { useState } from "react";
 import { feeAtom } from "@/lib/atoms/fees";
 import { validateInput } from "@/lib/helpers";
-import Fieldset from "@/components/inputs/Fieldset";
-import Input from "@/components/inputs/Input";
+import Fieldset from "@/components/input/Fieldset";
+import Input from "@/components/input/Input";
 import { ADDRESS_ZERO } from "@/lib/constants";
 import { isAddress } from "viem";
 

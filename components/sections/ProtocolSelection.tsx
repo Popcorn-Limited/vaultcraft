@@ -7,7 +7,7 @@ import {
   Protocol,
   protocolAtom,
 } from "@/lib/atoms";
-import Selector, { Option } from "@/components/inputs/Selector";
+import Selector, { Option } from "@/components/input/Selector";
 import { yieldOptionsAtom } from "@/lib/atoms/sdk";
 import { YieldOptions } from "vaultcraft-sdk";
 import { Address, getAddress } from "viem";

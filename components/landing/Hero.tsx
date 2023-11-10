@@ -1,11 +1,15 @@
 import StatusWithLabel from "@/components/common/StatusWithLabel";
-import { Networth, getTotalNetworth } from "@/lib/getNetworth";
+import { vaultsAtom } from "@/lib/atoms/vaults";
+import { Networth, getTotalNetworth, getVaultNetworthByChain } from "@/lib/getNetworth";
+import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
+import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
-import { useAccount } from "wagmi";
+import { Address, useAccount } from "wagmi";
 
 export default function Hero(): JSX.Element {
   const { address: account } = useAccount();
+  const [vaults] = useAtom(vaultsAtom)
   const [networth, setNetworth] = useState<Networth>({ pop: 0, stake: 0, vault: 0, total: 0 });
   const [tvl, setTvl] = useState<string>("0");
   const [loading, setLoading] = useState<boolean>(true);
@@ -20,12 +24,13 @@ export default function Hero(): JSX.Element {
   }, [])
 
   useEffect(() => {
-    if (account && loading)
-      // fetch and set networth
-      getTotalNetworth({ account }).then(res => {
-        setNetworth(res.total);
-        setLoading(false);
-      });
+    async function fetchNetworth() {
+      const vaultNetworth = SUPPORTED_NETWORKS.map(chain => getVaultNetworthByChain({ vaults, chainId: chain.id })).reduce((a, b) => a + b, 0)
+      const totalNetworth = await getTotalNetworth({ account: account as Address })
+      setNetworth({ ...totalNetworth.total, vault: vaultNetworth, total: totalNetworth.total.total + vaultNetworth });
+      setLoading(false);
+    }
+    if (account && loading && vaults.length > 0) fetchNetworth()
   }, [account]);
 
 

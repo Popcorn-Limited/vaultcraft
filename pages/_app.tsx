@@ -12,7 +12,7 @@ import Head from "next/head";
 import { Provider } from "jotai";
 // @ts-ignore
 import NoSSR from 'react-no-ssr';
-import Page from "@/components/Page";
+import Page from "@/components/common/Page";
 import { SUPPORTED_NETWORKS } from "@/lib/connectors";
 import { connectorsForWallets } from '@rainbow-me/rainbowkit';
 import {

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAtom } from 'jotai';
 import { Switch } from '@headlessui/react'
-import Input from "@/components/inputs/Input";
+import Input from "@/components/input/Input";
 import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
 import { assetAtom, limitAtom } from "@/lib/atoms";
 import { validateInput } from "@/lib/helpers";

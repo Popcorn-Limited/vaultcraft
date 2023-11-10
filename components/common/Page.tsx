@@ -1,8 +1,12 @@
 import DesktopMenu from "@/components/navbar/DesktopMenu";
 import { yieldOptionsAtom } from "@/lib/atoms/sdk";
+import { vaultsAtom } from "@/lib/atoms/vaults";
+import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
+import { getVaultsByChain } from "@/lib/vault/getVault";
 import { useAtom } from "jotai";
 import { useEffect } from "react";
 import { CachedProvider, YieldOptions } from "vaultcraft-sdk";
+import { useAccount } from "wagmi";
 
 async function setUpYieldOptions() {
   const ttl = 360_000;
@@ -17,13 +21,26 @@ export default function Page({
 }: {
   children: JSX.Element;
 }): JSX.Element {
+  const { address: account } = useAccount()
   const [yieldOptions, setYieldOptions] = useAtom(yieldOptionsAtom)
+  const [, setVaults] = useAtom(vaultsAtom)
 
   useEffect(() => {
     if (!yieldOptions) {
       setUpYieldOptions().then((res: any) => setYieldOptions(res))
     }
   }, [])
+
+  useEffect(() => {
+    async function getVaults() {
+      // get vaults
+      const fetchedVaults = (await Promise.all(
+        SUPPORTED_NETWORKS.map(async (chain) => getVaultsByChain({ chain, account }))
+      )).flat();
+      setVaults(fetchedVaults)
+    }
+    getVaults()
+  }, [account])
 
   return (
     <>

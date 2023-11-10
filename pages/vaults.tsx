@@ -7,7 +7,6 @@ import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import useNetworkFilter from "@/lib/useNetworkFilter";
-import getVaultNetworth from "@/lib/vault/getVaultNetworth";
 import useVaultTvl from "@/lib/useVaultTvl";
 import { getVaultsByChain } from "@/lib/vault/getVault";
 import { Token, VaultData } from "@/lib/types";
@@ -20,6 +19,9 @@ import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
 import MainActionButton from "@/components/button/MainActionButton";
 import { claimOPop } from "@/lib/oPop/interactions";
 import { WalletClient } from "viem";
+import { useAtom } from "jotai";
+import { vaultsAtom } from "@/lib/atoms/vaults";
+import { getVaultNetworthByChain } from "@/lib/getNetworth";
 
 export const HIDDEN_VAULTS = ["0xb6cED1C0e5d26B815c3881038B88C829f39CE949", "0x2fD2C18f79F93eF299B20B681Ab2a61f5F28A6fF",
   "0xDFf04Efb38465369fd1A2E8B40C364c22FfEA340", "0xd4D442AC311d918272911691021E6073F620eb07", //@dev for some reason the live 3Crypto yVault isnt picked up by the yearnAdapter nor the yearnFactoryAdapter
@@ -52,7 +54,7 @@ const Vaults: NextPage = () => {
   const [accountLoad, setAccountLoad] = useState<boolean>(false);
 
   const [selectedNetworks, selectNetwork] = useNetworkFilter(SUPPORTED_NETWORKS.map(network => network.id));
-  const [vaults, setVaults] = useState<VaultData[]>([]);
+  const [vaults, setVaults] = useAtom(vaultsAtom)
   const [zapAssets, setZapAssets] = useState<{ [key: number]: Token[] }>({});
   const [availableZapAssets, setAvailableZapAssets] = useState<{ [key: number]: Address[] }>({})
   const vaultTvl = useVaultTvl();
@@ -75,31 +77,20 @@ const Vaults: NextPage = () => {
       // get available zapAddresses
       setAvailableZapAssets({ 1: await getAvailableZapAssets() })
 
-      // get vaults
-      const fetchedVaults = (await Promise.all(
-        SUPPORTED_NETWORKS.map(async (chain) => getVaultsByChain({ chain, account }))
-      )).flat();
-
       // get gauge rewards
       if (account) {
         const rewards = await getGaugeRewards({
-          gauges: fetchedVaults.filter(vault => vault.gauge && vault.chainId === 1).map(vault => vault.gauge?.address) as Address[],
+          gauges: vaults.filter(vault => vault.gauge && vault.chainId === 1).map(vault => vault.gauge?.address) as Address[],
           account: account as Address,
           publicClient
         })
         setGaugeRewards(rewards)
       }
-
-      const vaultValue = fetchedVaults.map(vaultData => (vaultData.vault.balance * vaultData.vault.price) / (10 ** vaultData.vault.decimals)).reduce((a, b) => a + b, 0)
-      const gaugeValue = fetchedVaults.filter(
-        vaultData => !!vaultData.gauge?.address)
-        .map(vaultData => ((vaultData.gauge?.balance || 0) * (vaultData.gauge?.price || 0)) / (10 ** (vaultData.gauge?.decimals || 0))).reduce((a, b) => a + b, 0)
-      setNetworth(vaultValue + gaugeValue);
-      setVaults(fetchedVaults);
+      setNetworth(SUPPORTED_NETWORKS.map(chain => getVaultNetworthByChain({ vaults, chainId: chain.id })).reduce((a, b) => a + b, 0));
     }
-    if (!account && !initalLoad) getVaults();
-    if (account && !accountLoad) getVaults()
-  }, [account])
+    if (!account && !initalLoad && vaults.length > 0) getVaults();
+    if (account && !accountLoad && vaults.length > 0) getVaults()
+  }, [account, initalLoad, accountLoad, vaults])
 
 
   async function mutateTokenBalance({ inputToken, outputToken, vault, chainId, account }: MutateTokenBalanceProps) {
