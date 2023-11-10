@@ -247,10 +247,10 @@ const Vaults: NextPage = () => {
 
       <section className="mt-8 mb-10 xs:m-0 smmd:mb-6 md:my-10 md:flex px-8 flex-row items-center justify-between">
         <NetworkFilter supportedNetworks={SUPPORTED_NETWORKS.map(chain => chain.id)} selectNetwork={selectNetwork} />
-        <div className="md:w-96 flex px-6 py-3 items-center rounded-lg border border-gray-300 border-opacity-40 gap-2 smmd:mt-6 xs:mt-12 xs:mb-6">
-          <MagnifyingGlassIcon className="w-8 h-8 text-gray-400" />
+        <div className="md:w-96 flex px-6 py-3 items-center rounded-lg border border-gray-300 border-opacity-40 group/search hover:border-opacity-80 gap-2 smmd:mt-6 xs:mt-12 xs:mb-6">
+          <MagnifyingGlassIcon className="w-8 h-8 text-gray-400 group-hover/search:text-gray-200" />
           <input
-            className="w-10/12 md:w-80 focus:outline-none border-0 text-gray-500 leading-none bg-transparent"
+            className="w-10/12 md:w-80 focus:outline-none border-0 text-gray-500 focus:text-gray-200 leading-none bg-transparent"
             type="text"
             placeholder="Search..."
             onChange={(e) => handleSearch(e.target.value.toLowerCase())}
