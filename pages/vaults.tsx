@@ -28,7 +28,7 @@ export const HIDDEN_VAULTS = ["0xb6cED1C0e5d26B815c3881038B88C829f39CE949", "0x2
   "0x8bd3D95Ec173380AD546a4Bd936B9e8eCb642de1", // Sample Stargate Vault
   "0xcBb5A4a829bC086d062e4af8Eba69138aa61d567", // yOhmFrax factory
   "0x9E237F8A3319b47934468e0b74F0D5219a967aB8", // yABoosted Balancer
-  "0x860b717B360378E44A241b23d8e8e171E0120fF0", // R/Dai 
+  "0x860b717B360378E44A241b23d8e8e171E0120fF0", // R/Dai
   "0xBae30fBD558A35f147FDBaeDbFF011557d3C8bd2", // 50OHM - 50 DAI
   "0x759281a408A48bfe2029D259c23D7E848A7EA1bC", // yCRV
 ]
@@ -258,7 +258,7 @@ const Vaults: NextPage = () => {
               vaultData={vault}
               mutateTokenBalance={mutateTokenBalance}
               searchString={searchString}
-              zapAssets={vault.chainId === 1 && availableZapAssets[1].includes(vault.asset.address) ? zapAssets[vault.chainId] : undefined}
+              zapAssets={vault.chainId === 1 && availableZapAssets[1]?.includes(vault.asset.address) ? zapAssets[vault.chainId] : undefined}
               deployer={"0x22f5413C075Ccd56D575A54763831C4c27A37Bdb"}
             />
           )

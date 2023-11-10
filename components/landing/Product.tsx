@@ -24,7 +24,7 @@ export default function Product({ title, description, stats, badge, customConten
           className="hidden w-16 md:inline-block absolute top-0 right-0 translate-x-1/2 -translate-y-1/2"
         />
       )}
-      <div className="col-span-12 md:col-span-4">
+      <div className="col-span-12 md:col-span-4 xs:self-start">
         <div className="relative flex flex-row">
           <h2 className="text-primary text-4xl leading-9 md:leading-10 mb-2">{title}</h2>
         </div>

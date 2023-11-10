@@ -37,23 +37,26 @@ export default function Hero(): JSX.Element {
   return (
     <section className="pb-8 pt-4 sm:pb-6 border-b border-[#AFAFAF]">
       <div className="flex flex-col gap-6 items-start lg:flex-row lg:items-center lg:justify-between mx-8 mt-8">
-        <div className="grid xs:grid-cols-2 xs:gap-x-[40px] xs:gap-y-2 smmd:grid-cols-5 gap-6 sm:flex-row">
+        <div className="grid xs:grid-cols-2 xs:gap-x-[40px] xs:gap-y-2 smmd:grid-cols-3 gap-6 sm:flex-row">
           <StatusWithLabel
             label={"Deposits"}
             content={<p className="text-3xl font-bold text-primary leading-[120%]">$ {loading ? "..." : NumberFormatter.format(networth.vault)}</p>}
+            className="xs:min-w-0 smmd:min-w-[159px] lg:min-w-0"
           />
           <StatusWithLabel
             label={"Staked"}
             content={<p className="text-3xl font-bold text-primary leading-[120%]">$ {loading ? "..." : NumberFormatter.format(networth.stake)}</p>}
+            className="xs:min-w-0 smmd:min-w-[159px] lg:min-w-0"
           />
           <StatusWithLabel
             label={"POP in Wallet"}
             content={<p className="text-3xl font-bold text-primary leading-[120%]">$ {loading ? "..." : NumberFormatter.format(networth.pop)}</p>}
+            className="xs:min-w-0 smmd:min-w-[159px] lg:min-w-0"
           />
         </div>
         <div className="w-full md:w-fit-content">
           <p className="uppercase smmd:hidden text-[#C8C8C8] text-sm mb-2">Platform</p>
-          <div className="flex flex-row items-center justify-between w-full md:space-x-10">
+          <div className="flex flex-row items-center w-full space-x-10">
             <StatusWithLabel
               label={"Total Value Locked"}
               content={<p className="text-3xl font-bold text-primary leading-[120%]">$ {tvl}</p>}

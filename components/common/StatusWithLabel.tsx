@@ -12,6 +12,7 @@ export interface StatusWithLabelProps {
   infoIconProps?: InfoIconProps | null;
   green?: boolean;
   isSmall?: boolean;
+  className?: string
 }
 
 export default function StatusWithLabel({
@@ -20,9 +21,10 @@ export default function StatusWithLabel({
   green = false,
   infoIconProps = null,
   isSmall = false,
+  className = ''
 }: StatusWithLabelProps): JSX.Element {
   return (
-    <div className="flex flex-col">
+    <div className={`flex flex-col ${className}`}>
       {infoIconProps ? (
         <span className="flex flex-row items-center">
           <p className="text-white">{label}</p>
