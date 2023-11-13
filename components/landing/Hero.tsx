@@ -35,8 +35,8 @@ export default function Hero(): JSX.Element {
 
 
   return (
-    <section className="pb-8 pt-4 sm:pb-6 border-b border-[#AFAFAF]">
-      <div className="flex flex-col gap-6 items-start lg:flex-row lg:items-center lg:justify-between mx-8 mt-8">
+    <section className="pb-8 pt-8 sm:pb-6 border-b border-[#AFAFAF]">
+      <div className="flex flex-col gap-6 items-start lg:flex-row lg:items-center lg:justify-between mx-8">
         <div className="grid xs:grid-cols-2 xs:gap-x-[40px] xs:gap-y-2 smmd:grid-cols-3 gap-6 sm:flex-row">
           <StatusWithLabel
             label={"Deposits"}

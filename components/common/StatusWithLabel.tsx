@@ -27,30 +27,32 @@ export default function StatusWithLabel({
     <div className={`flex flex-col ${className}`}>
       {infoIconProps ? (
         <span className="flex flex-row items-center">
-          <p className="text-white">{label}</p>
-          <InfoIconWithTooltip
-            classExtras="mt-0 ml-2"
-            id={infoIconProps.id}
-            title={infoIconProps.title}
-            content={infoIconProps.content}
-          />
+          <p className="text-[#C8C8C8]">{label}</p>
+          <div className="ml-2 mt-0">
+            <InfoIconWithTooltip
+                classExtras="text-[#969696]"
+                id={infoIconProps.id}
+                title={infoIconProps.title}
+                content={infoIconProps.content}
+            />
+          </div>
         </span>
       ) : (
-        <p className="text-white">{label}</p>
+        <p className="text-[#C8C8C8]">{label}</p>
       )}
       {content == "Coming Soon" || typeof content !== "string" ? (
         <div
-          className={`mt-2 text-white font-light text-2xl ${!isSmall && "md:text-3xl"} leading-6 ${!isSmall && "md:leading-8"
+          className={`mt-2 text-primary font-normal text-2xl ${!isSmall && "md:text-3xl"} leading-6 ${!isSmall && "md:leading-8"
             }`}
         >
           {content}
         </div>
       ) : (
         <p
-          className={`mt-2 text-white font-light text-2xl ${!isSmall && "md:text-3xl"} leading-6  ${!isSmall && "md:leading-8"
+          className={`mt-2 text-primary font-normal text-2xl ${!isSmall && "md:text-3xl"} leading-6  ${!isSmall && "md:leading-8"
             } `}
         >
-          {content.split(" ")[0]} <span className=" text-white text-xl"> {content.split(" ")[1]}</span>
+          {content.split(" ")[0]} <span className=" text-[#C8C8C8] text-xl"> {content.split(" ")[1]}</span>
         </p>
       )}
     </div>

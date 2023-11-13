@@ -178,16 +178,16 @@ const Vaults: NextPage = () => {
           </p>
         </div>
 
-        <div className="w-full md:w-8/12 md:divide-x md:flex md:flex-row space-y-4 md:space-y-0 mt-4 md:mt-0">
-          <div className="flex flex-row items-center md:w-4/12">
-            <div className="w-1/2">
+        <div className="w-full md:justify-end md:w-8/12 md:divide-x md:flex md:flex-row space-y-4 md:space-y-0 mt-4 md:mt-0">
+          <div className="flex flex-row items-center md:pr-10 gap-10 md:w-fit">
+            <div className="xs:w-[120px] md:w-max">
               <p className="leading-6 text-base text-primaryDark smmd:text-primary">TVL</p>
               <div className="text-3xl font-bold whitespace-nowrap text-primary">
                 {`$${NumberFormatter.format(vaultTvl)}`}
               </div>
             </div>
 
-            <div className="w-1/2">
+            <div className="xs:w-[120px] md:w-max">
               <p className="leading-6 text-base text-primaryDark smmd:text-primary">Deposits</p>
               <div className="text-3xl font-bold whitespace-nowrap text-primary">
                 {`$${NumberFormatter.format(networth)}`}
@@ -195,22 +195,24 @@ const Vaults: NextPage = () => {
             </div>
           </div>
 
-          <div className="flex flex-row items-center md:w-8/12 md:pl-12">
-            <div className="w-1/2 md:w-1/3">
-              <p className="leading-6 text-base text-primaryDark smmd:text-primary">My oPOP</p>
-              <div className="text-3xl font-bold whitespace-nowrap text-primary">
-                {`${oBal ? NumberFormatter.format(Number(oBal?.value) / 1e18) : "0"}`}
+          <div className="flex flex-row items-center md:gap-6 md:w-fit md:pl-12">
+            <div className="flex gap-10 w-fit">
+              <div className="xs:w-[120px] md:w-max">
+                <p className="w-max leading-6 text-base text-primaryDark smmd:text-primary">My oPOP</p>
+                <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
+                  {`${oBal ? NumberFormatter.format(Number(oBal?.value) / 1e18) : "0"}`}
+                </div>
+              </div>
+
+              <div className="xs:w-[120px] md:w-max">
+                <p className="w-max leading-6 text-base text-primaryDark smmd:text-primary">Claimable oPOP</p>
+                <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
+                  {`$${gaugeRewards ? NumberFormatter.format(Number(gaugeRewards?.total) / 1e18) : "0"}`}
+                </div>
               </div>
             </div>
 
-            <div className="w-1/2 md:w-1/3">
-              <p className="leading-6 text-base text-primaryDark smmd:text-primary">Claimable oPOP</p>
-              <div className="text-3xl font-bold whitespace-nowrap text-primary">
-                {`$${gaugeRewards ? NumberFormatter.format(Number(gaugeRewards?.total) / 1e18) : "0"}`}
-              </div>
-            </div>
-
-            <div className="hidden md:block w-1/3">
+            <div className="align-bottom md:block md:mt-auto w-fit">
               <MainActionButton
                 label="Claim oPOP"
                 handleClick={() =>
@@ -238,7 +240,7 @@ const Vaults: NextPage = () => {
 
       <section className="mt-8 mb-10 xs:m-0 smmd:mb-6 md:my-10 md:flex px-8 flex-row items-center justify-between">
         <NetworkFilter supportedNetworks={SUPPORTED_NETWORKS.map(chain => chain.id)} selectNetwork={selectNetwork} />
-        <div className="md:w-96 flex px-6 py-3 items-center rounded-lg border border-gray-300 border-opacity-40 group/search hover:border-opacity-80 gap-2 smmd:mt-6 xs:mt-12 xs:mb-6">
+        <div className="md:w-96 flex px-6 py-3 items-center rounded-lg border border-gray-300 border-opacity-40 group/search hover:border-opacity-80 gap-2 smmd:mt-6 xs:mt-12 xs:mb-6 md:my-0">
           <MagnifyingGlassIcon className="w-8 h-8 text-gray-400 group-hover/search:text-gray-200" />
           <input
             className="w-10/12 md:w-80 focus:outline-none border-0 text-gray-500 focus:text-gray-200 leading-none bg-transparent"

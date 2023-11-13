@@ -1,7 +1,7 @@
 import "../styles/globals.css";
 import "@rainbow-me/rainbowkit/styles.css";
 import type { AppProps } from "next/app";
-import { Roboto } from "next/font/google";
+import localFont from 'next/font/local'
 import { WagmiConfig, configureChains, createConfig } from "wagmi";
 import { publicProvider } from "wagmi/providers/public";
 import { alchemyProvider } from "wagmi/providers/alchemy";
@@ -61,9 +61,59 @@ const config = createConfig({
   publicClient
 })
 
-const nextFont = Roboto({
-  weight: ["400", "700", "900"],
-  subsets: [],
+const nextFont = localFont({
+  src: [
+    {
+      path: '../public/KH_Teka/KHTeka-Black.woff',
+      weight: '900',
+      style: 'normal'
+    },
+    {
+      path: '../public/KH_Teka/KHTeka-BlackItalic.woff',
+      weight: '900',
+      style: 'italic'
+    },
+    {
+      path: '../public/KH_Teka/KHTeka-Bold.woff',
+      weight: '700',
+      style: 'normal'
+    },
+    {
+      path: '../public/KH_Teka/KHTeka-BoldItalic.woff',
+      weight: '700',
+      style: 'italic'
+    },
+    {
+      path: '../public/KH_Teka/KHTeka-Medium.woff',
+      weight: '500',
+      style: 'normal'
+    },
+    {
+      path: '../public/KH_Teka/KHTeka-MediumItalic.woff',
+      weight: '500',
+      style: 'italic'
+    },
+    {
+      path: '../public/KH_Teka/KHTeka-RegularItalic.woff',
+      weight: '400',
+      style: 'italic'
+    },
+    {
+      path: '../public/KH_Teka/KHTeka-Regular.woff',
+      weight: '400',
+      style: 'normal'
+    },
+    {
+      path: '../public/KH_Teka/KHTeka-Light.woff',
+      weight: '300',
+      style: 'normal'
+    },
+    {
+      path: '../public/KH_Teka/KHTeka-LightItalic.woff',
+      weight: '300',
+      style: 'italic'
+    },
+  ]
 });
 
 

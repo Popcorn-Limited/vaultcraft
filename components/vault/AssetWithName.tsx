@@ -35,7 +35,7 @@ export default function AssetWithName({ vault }: { vault: VaultData }) {
             src={protocolIcon ? `https://icons.llamao.fi/icons/protocols/${protocolIcon}?w=48&h=48` : "/images/icons/POP.svg"}
             className="w-6 h-6 mr-1 rounded-full border border-[#ebe7d4cc]"
         />
-        <p className="text-primary font-medium">{protocolName}</p>
+        <p className="text-primary">{protocolName}</p>
       </div>
       <div className="h-fit mt-auto smmd:hidden">
         <p className="font-normal text-primary text-[15px] mb-1">⚡ Zap available</p>
