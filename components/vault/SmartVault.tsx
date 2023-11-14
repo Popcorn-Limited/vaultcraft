@@ -3,19 +3,12 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { useEffect, useState } from "react";
 import { Address, useAccount, usePublicClient, } from "wagmi";
 import { getAddress } from "viem";
-import { useAtom } from "jotai";
-import { yieldOptionsAtom } from "@/lib/atoms/sdk";
-import { NumberFormatter, formatAndRoundNumber, formatNumber } from "@/lib/utils/formatBigNumber";
-import MarkdownRenderer from "@/components/vault/MarkdownRenderer";
 import AssetWithName from "@/components/vault/AssetWithName";
 import VaultInputs from "@/components/vault/VaultInputs";
 import Accordion from "@/components/common/Accordion";
-import TokenIcon from "@/components/common/TokenIcon";
-import Title from "@/components/common/Title";
 import { Token, VaultData } from "@/lib/types";
 import Modal from "../modal/Modal";
 import VaultStats from "./VaultStats";
-import calculateAPR from "@/lib/gauges/calculateGaugeAPR";
 import { MutateTokenBalanceProps } from "pages/vaults";
 import { Square2StackIcon } from "@heroicons/react/24/outline";
 
@@ -67,7 +60,7 @@ export default function SmartVault({
           <div className="w-full md:w-1/2 text-start flex flex-col justify-between">
 
             <div className="space-y-4">
-              <VaultStats vaultData={vaultData} account={account} />
+              <VaultStats vaultData={vaultData} account={account} zapAvailable={zapAssets && zapAssets?.length > 0} />
             </div>
 
             <div className="hidden md:block space-y-4">
@@ -121,7 +114,7 @@ export default function SmartVault({
             <AssetWithName vault={vaultData} />
           </div>
 
-          <VaultStats vaultData={vaultData} account={account} />
+          <VaultStats vaultData={vaultData} account={account} zapAvailable={zapAssets && zapAssets?.length > 0} />
 
         </div>
       </Accordion >

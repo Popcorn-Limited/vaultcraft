@@ -75,7 +75,7 @@ const Vaults: NextPage = () => {
       setZapAssets(newZapAssets);
 
       // get available zapAddresses
-      setAvailableZapAssets({ 1: await getAvailableZapAssets() })
+      setAvailableZapAssets({ 1: await getAvailableZapAssets(1) })
 
       // get gauge rewards
       if (account) {

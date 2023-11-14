@@ -11,9 +11,10 @@ import calculateAPR from "@/lib/gauges/calculateGaugeAPR";
 interface VaultStatProps {
   vaultData: VaultData
   account?: Address
+  zapAvailable?: boolean
 }
 
-export default function VaultStats({ vaultData, account }: VaultStatProps): JSX.Element {
+export default function VaultStats({ vaultData, account, zapAvailable }: VaultStatProps): JSX.Element {
   const publicClient = usePublicClient()
   const [yieldOptions] = useAtom(yieldOptionsAtom);
 
@@ -96,9 +97,11 @@ export default function VaultStats({ vaultData, account }: VaultStatProps): JSX.
           }
         </div>
       </div>
-      <div className="w-full h-fit mt-auto">
-        <p className="font-normal text-primary text-[15px] mb-1">⚡ Zap available</p>
-      </div>
+      {zapAvailable && (
+        <div className="w-full h-fit mt-auto">
+          <p className="font-normal text-primary text-[15px] mb-1">⚡ Zap available</p>
+        </div>
+      )}
     </>
   )
 }

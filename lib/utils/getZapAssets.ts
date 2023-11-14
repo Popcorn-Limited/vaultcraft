@@ -45,39 +45,10 @@ export default async function getZapAssets({ chain, account }: { chain: Chain, a
   })
 }
 
-export async function getAvailableZapAssets() {
-  const numTokens = Number((await axios({
-    url: "https://api.thegraph.com/subgraphs/name/cowprotocol/cow",
-    method: 'post',
-    headers: { 'Content-Type': 'application/json' },
-    data: JSON.stringify({
-      query: `
-      query getNumTokens {
-        totals {
-          tokens
-        }
-      }`,
-    })
-  })).data.data.totals[0].tokens);
-
-  let addresses = []
-  for (let i = 0; i < numTokens;) {
-    const tokens = (await axios({
-      url: "https://api.thegraph.com/subgraphs/name/cowprotocol/cow",
-      method: 'post',
-      headers: { 'Content-Type': 'application/json' },
-      data: JSON.stringify({
-        query: `
-        query MyQuery {
-          tokens(first: 1000, skip:${i}) {
-            address
-          }
-        }`,
-      })
-    })).data.data.tokens;
-    addresses.push(...tokens.map((token: any) => getAddress(token.address)))
-    i += 1000
-  }
-  addresses = addresses.flat()
-  return addresses
+export async function getAvailableZapAssets(chainId: number) {
+  const defiTokens = (await axios.get('https://enso-scrape.s3.us-east-2.amazonaws.com/output/backend/defiTokens.json')).data
+    .filter((entry: any) => entry.chainId === chainId).map((entry: any) => getAddress(entry.tokenAddress))
+  const baseTokens = (await axios.get('https://enso-scrape.s3.us-east-2.amazonaws.com/output/backend/baseTokens.json')).data
+    .filter((entry: any) => entry.chainId === chainId).map((entry: any) => getAddress(entry.address))
+  return [...baseTokens, ...defiTokens]
 }
