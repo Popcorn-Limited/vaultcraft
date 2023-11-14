@@ -63,7 +63,7 @@ export default function VaultStats({ vaultData, account }: VaultStatProps): JSX.
         <div className="w-full mt-6 xs:mt-0">
           <p className="leading-6 text-primary xs:text-[14px]">TVL</p>
           <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
-            $ {NumberFormatter.format(vaultData.tvl)}
+            $ {vaultData.tvl < 1 ? "0" : NumberFormatter.format(vaultData.tvl)}
           </Title>
         </div>
       </div>
@@ -78,16 +78,26 @@ export default function VaultStats({ vaultData, account }: VaultStatProps): JSX.
         <div className="w-full mt-6 xs:mt-0">
           {gaugeApr.length > 0 &&
             <>
-              <p className="font-normal text-primary xs:text-[14px]">Boost APY</p>
+              <p className="font-normal text-primary xs:text-[14px]">Min Boost</p>
               <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
-                {NumberFormatter.format(gaugeApr[0])} - {NumberFormatter.format(gaugeApr[1])} %
+                {NumberFormatter.format(gaugeApr[0])} %
               </Title>
             </>
           }
         </div>
-        <div className="w-full h-fit mt-auto xs:opacity-0">
-          <p className="font-normal text-primary text-[15px] mb-1">⚡ Zap available</p>
+        <div className="w-full mt-6 xs:mt-0">
+          {gaugeApr.length > 0 &&
+            <>
+              <p className="font-normal text-primary xs:text-[14px]">Max Boost</p>
+              <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
+                {NumberFormatter.format(gaugeApr[1])} %
+              </Title>
+            </>
+          }
         </div>
+      </div>
+      <div className="w-full h-fit mt-auto">
+        <p className="font-normal text-primary text-[15px] mb-1">⚡ Zap available</p>
       </div>
     </>
   )
