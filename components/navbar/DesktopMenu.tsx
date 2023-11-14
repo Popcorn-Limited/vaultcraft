@@ -32,7 +32,7 @@ export default function DesktopMenu(): JSX.Element {
           </div>
           <div className="xs:hidden smmd:block ml-8 py-2 px-4 bg-[#dfff1c26] rounded">
             <span className="text-[#DFFF1C]">
-                 Beta
+              Beta
             </span>
           </div>
         </div>
@@ -114,7 +114,7 @@ export default function DesktopMenu(): JSX.Element {
                       <img src="/images/icons/popLogoBlack.svg" alt="Logo" className="xs:w-12 xs:h-12 smmd:w-10 smmd:h-10" />
                     </Link>
                   </div>
-                  <div className="flex flex-col space-y-6 flex-1">
+                  <div className="flex flex-col space-y-6 flex-1" onClick={() => toggleMenu(false)}>
                     <NavbarLinks />
                   </div>
                   <div className="">
@@ -123,7 +123,7 @@ export default function DesktopMenu(): JSX.Element {
                       instantly zap your crypto from any chain into the highest yield-generating products across DeFi in 1 click.
                     </p>
                     <div className="flex justify-between pb-12 mt-12">
-                      <SocialMediaLinks  color="#23262F" color2="#dfff1c" size="24"/>
+                      <SocialMediaLinks color="#23262F" color2="#dfff1c" size="24" />
                     </div>
                   </div>
                 </div>
