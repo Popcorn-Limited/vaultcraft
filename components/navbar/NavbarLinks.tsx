@@ -11,17 +11,13 @@ const links: { label: string, url: string, onClick?: Function }[] = [
     url: "/vepop",
   },
   {
+    label: "Create Vaults",
+    url: "/create-vault",
+  },
+  {
     label: "Stats",
     url: "/stats"
   },
-  {
-    label: "VaultCraft",
-    url: "https://vaultcraft.io/",
-  },
-  {
-    label: "Archive",
-    url: "https://archive.pop.network/",
-  }
 ]
 
 

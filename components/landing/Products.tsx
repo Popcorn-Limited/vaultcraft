@@ -12,7 +12,7 @@ export default function Products(): JSX.Element {
   return (
     <>
       {/* @dev Product.tsx has `md:mx-2` so with `md:mx-6` that adds up to consistent mx-8*/}
-      <section className="py-12 smmd:py-10 mx-8 md:mx-6">
+      <section className="py-12 md:py-10 mx-4 md:mx-6">
           <p className="text-2xl mb-6 text-primary smmd:hidden"> Our products </p>
         <div className="flex flex-col gap-6 smmd:flex-wrap lg:flex-nowrap space-y-4 md:space-y-0 md:flex-row md:justify-between">
           <Product

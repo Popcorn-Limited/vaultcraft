@@ -438,7 +438,7 @@ export default function Vaults() {
 
     return (
         <NoSSR>
-            <div className={`text-white px-8`}>
+            <div className={`text-white px-4 md:px-8`}>
                 <h1 className={`font-bold text-[2rem]`}>Popcorn Statistics</h1>
                 <p className={`text-[1.125rem] mb-8`}>Total Stats start from 23 June 2023.</p>
                 <div className={`grid md:grid-cols-2 gap-[2rem]`}>
