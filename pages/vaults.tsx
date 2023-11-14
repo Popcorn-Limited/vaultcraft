@@ -167,7 +167,7 @@ const Vaults: NextPage = () => {
 
   return (
     <NoSSR>
-      <section className="md:border-b border-[#353945] md:flex md:flex-row items-center justify-between py-10 px-8 smmd:py-6 md:gap-4">
+      <section className="md:border-b border-[#353945] md:flex md:flex-row items-center justify-between py-10 px-4 md:px-8 md:gap-4">
 
         <div className="w-full md:w-max">
           <h1 className="text-5xl font-normal m-0 mb-4 md:mb-2 leading-0 text-primary xs:text-3xl xs:leading-none">
@@ -212,7 +212,7 @@ const Vaults: NextPage = () => {
               </div>
             </div>
 
-            <div className="align-bottom md:block md:mt-auto w-fit">
+            <div className="hidden align-bottom md:block md:mt-auto w-fit">
               <MainActionButton
                 label="Claim oPOP"
                 handleClick={() =>
@@ -238,7 +238,7 @@ const Vaults: NextPage = () => {
         </div>
       </section>
 
-      <section className="mt-8 mb-10 xs:m-0 smmd:mb-6 md:my-10 md:flex px-8 flex-row items-center justify-between">
+      <section className="mt-8 mb-10 md:mb-6 md:my-10 md:flex px-4 md:px-8 flex-row items-center justify-between">
         <NetworkFilter supportedNetworks={SUPPORTED_NETWORKS.map(chain => chain.id)} selectNetwork={selectNetwork} />
         <div className="md:w-96 flex px-6 py-3 items-center rounded-lg border border-gray-300 border-opacity-40 group/search hover:border-opacity-80 gap-2 smmd:mt-6 xs:mt-12 xs:mb-6 md:my-0">
           <MagnifyingGlassIcon className="w-8 h-8 text-gray-400 group-hover/search:text-gray-200" />
@@ -252,7 +252,7 @@ const Vaults: NextPage = () => {
         </div>
       </section>
 
-      <section className="flex flex-wrap mx-auto justify-between gap-4 px-8 w-full">
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-4 px-4 md:px-8">
         {vaults.length > 0 ? vaults.filter(vault => selectedNetworks.includes(vault.chainId)).filter(vault => !HIDDEN_VAULTS.includes(vault.address)).map((vault) => {
           return (
             <SmartVault

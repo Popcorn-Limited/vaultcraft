@@ -78,10 +78,10 @@ function VePopContainer() {
       <ManageLockModal show={[showMangementModal, setShowMangementModal]} />
       <OPopModal show={[showOPopModal, setShowOPopModal]} />
       <div className="static">
-        <section className="py-10 px-8 xs:border-t smmd:border-t-0 smmd:border-b border-[#353945] lg:flex lg:flex-row items-center justify-between text-primary">
+        <section className="py-10 px-4 md:px-8 border-t md:border-t-0 md:border-b border-[#353945] lg:flex lg:flex-row items-center justify-between text-primary">
           <div className="lg:w-[1050px]">
-            <h1 className="xs:text-2xl smmd:text-3xl font-normal">
-              Lock <span className="text-[#DFFF1C] xs:font-bold smmd:font-normal smmd:underline smmd:decoration-solid">20WETH-80POP</span> for vePOP, Rewards, and Voting Power
+            <h1 className="text-2xl md:text-3xl font-normal">
+              Lock <span className="text-[#DFFF1C] font-bold md:font-normal md:underline md:decoration-solid">20WETH-80POP</span> for vePOP, Rewards, and Voting Power
             </h1>
             <p className="text-base text-primary opacity-80 mt-4">
               Vote with your vePOP below to influence how much $oPOP each pool will receive.
@@ -92,12 +92,15 @@ function VePopContainer() {
           </div>
         </section>
 
-        <section className="xs:pb-12 smmd:py-10 px-8 md:flex md:flex-row md:justify-between space-y-4 md:space-y-0 md:space-x-8">
+        <section className="pb-12 md:py-10 px-4 md:px-8 md:flex md:flex-row md:justify-between space-y-4 md:space-y-0 md:space-x-8">
           <StakingInterface setShowLockModal={setShowLockModal} setShowMangementModal={setShowMangementModal} />
-          <OPopInterface gauges={vaults?.length > 0 ? vaults.filter(vault => !!vault.gauge?.address).map((vault: VaultData) => vault.gauge as Token) : []} setShowOPopModal={setShowOPopModal} />
+          <OPopInterface
+            gauges={vaults?.length > 0 ? vaults.filter(vault => !!vault.gauge?.address).map((vault: VaultData) => vault.gauge as Token) : []}
+            setShowOPopModal={setShowOPopModal}
+          />
         </section >
 
-        <section className="flex flex-wrap max-w-[1600px] mx-auto justify-between gap-4 px-8 pb-9">
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-4 px-4 md:px-8">
           {vaults?.length > 0 ? vaults.filter(vault => !!vault.gauge?.address).map((vault: VaultData, index: number) =>
             <Gauge key={vault.address} vaultData={vault} index={index} votes={votes} handleVotes={handleVotes} canVote={canVote} />
           )

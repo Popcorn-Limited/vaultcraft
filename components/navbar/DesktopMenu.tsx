@@ -23,7 +23,7 @@ export default function DesktopMenu(): JSX.Element {
 
   return (
     <>
-      <div className="flex flex-row items-center justify-between w-full py-8 px-8 z-30">
+      <div className="flex flex-row items-center justify-between w-full py-8 px-4 md:px-8 z-30">
         <div className="flex flex-row items-center">
           <div>
             <Link href={`/`} passHref>
@@ -40,16 +40,14 @@ export default function DesktopMenu(): JSX.Element {
           {address ? (
             <div className={`relative flex flex-container flex-row z-10`}>
               <div
-                className={`w-fit cursor-pointer h-full xs: xs:py-2 xs:bg-[#141416] smmd:bg-transparent smmd:py-[10px] xs:px-4 smmd:px-6 flex flex-row items-center justify-between border border-customLightGray rounded-4xl text-primary`}
+                className={`w-fit cursor-pointer h-full py-2 bg-[#141416] md:bg-transparent md:py-[10px] px-4 md:px-6 flex flex-row items-center justify-between border border-customLightGray rounded-4xl text-primary`}
                 onClick={openChainModal}
               >
-                <img src={logo} alt={chainName} className="w-5 h-5 smmd:mr-2" />
-                <div className="smmd:hidden w-2 h-2 bg-[#50C56E] ml-2 rounded-full"></div>
-                <span className="xs:hidden smmd:inline">
-                  |
-                </span>
-                <p className="ml-2 leading-none xs:hidden smmd:block">{address?.substring(0, 5)}...</p>
-                <ChevronDownIcon className="w-5 h-5 ml-3 text-primary xs:hidden smmd:block" aria-hidden="true" />
+                <img src={logo} alt={chainName} className="w-5 h-5 md:mr-2" />
+                <div className="hidden w-2 h-2 bg-[#50C56E] ml-2 rounded-full"></div>
+                <span className="hidden md:inline">|</span>
+                <p className="ml-2 leading-none hidden md:block">{address?.substring(0, 5)}...</p>
+                <ChevronDownIcon className="w-5 h-5 ml-3 text-primary hidden md:block" aria-hidden="true" />
               </div>
             </div>
           ) : (

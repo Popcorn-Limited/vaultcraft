@@ -67,11 +67,11 @@ export default function StakingInterface({ setShowLockModal, setShowMangementMod
           </span>
         </div>
         <div className="lg:flex lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-8 mt-6 lg:max-h-12">
-          <div className="smmd:w-53">
-            <MainActionButton label="Lock VCX" handleClick={() => setShowLockModal(true)} disabled={Number(veBal?.value) > 0} />
-          </div>
-          <div className="smmd:w-30 h-12">
-            <SecondaryActionButton label="Manage Stake" handleClick={() => setShowMangementModal(true)} disabled={Number(veBal?.value) === 0} />
+          <div className="w-full md:w-60">
+            {Number(veBal?.value) === 0 ?
+              <MainActionButton label="Lock VCX" handleClick={() => setShowLockModal(true)} /> :
+              <MainActionButton label="Manage Stake" handleClick={() => setShowMangementModal(true)} />
+            }
           </div>
         </div>
       </div>

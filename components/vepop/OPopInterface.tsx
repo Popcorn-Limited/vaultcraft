@@ -68,7 +68,7 @@ export default function OPopInterface({ gauges, setShowOPopModal }: OPopInterfac
       <span className="flex flex-row items-center justify-between mt-6 pb-6 border-b border-[#353945]">
       </span>
       <div className="lg:flex lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-8 mt-6">
-        <div className="lg:max-w-fit">
+        <div className="w-full md:w-60">
           <MainActionButton
             label="Claim oPOP"
             handleClick={() =>
@@ -80,7 +80,7 @@ export default function OPopInterface({ gauges, setShowOPopModal }: OPopInterfac
             disabled={gaugeRewards ? Number(gaugeRewards?.total) === 0 : true}
           />
         </div>
-        <div className="ls:max-w-fit lg:w-60 h-12">
+        <div className="w-full md:w-60">
           <SecondaryActionButton label="Exercise oPOP" handleClick={() => setShowOPopModal(true)} disabled={oBal ? Number(oBal?.value) === 0 : true} />
         </div>
       </div>
