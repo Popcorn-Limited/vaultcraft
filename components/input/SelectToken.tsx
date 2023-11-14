@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { Token } from "@/lib/types";
@@ -7,6 +7,7 @@ import TokenIcon from "@/components/common/TokenIcon";
 import SearchToken from "@/components/input/SearchToken";
 import Modal from "@/components/modal/Modal";
 import PopUpModal from "../modal/PopUpModal";
+import {Tooltip} from "react-tooltip";
 
 export interface SelectTokenProps {
   allowSelection: boolean;
@@ -24,14 +25,14 @@ export default function SelectToken({
   chainId,
 }: SelectTokenProps): JSX.Element {
   const [show, setShow] = useState(false);
-
+  const selectTokenId = selectedToken?.symbol.split(' ').join('');
   return (
     <>
       {/* Desktop Token Search */}
       <div className="hidden md:block">
         <Modal
           visibility={[show, setShow]}
-          classNames="hidden md:block md:w-1/4"
+          classNames="hidden md:block md:w-fit md:min-w-fit"
           title={<h2 className="text-white text-2xl">Select a token</h2>}
         >
           <div className="mt-8">
@@ -54,12 +55,31 @@ export default function SelectToken({
             allowSelection && setShow(true);
           }}
         >
-          <div className="md:mr-2 relative">
+          <div className="md:mr-2 relative flex-none w-5 h-5">
             <TokenIcon token={selectedToken} icon={selectedToken?.logoURI} imageSize="w-5 h-5" chainId={chainId} />
           </div>
-          <p className="font-medium text-lg leading-none hidden md:block text-white group-hover:text-primary">
+          <p id={selectTokenId} className="font-medium text-lg leading-none hidden md:block text-white group-hover:text-primary truncate cursor-pointer">
             {selectedToken?.symbol}
           </p>
+          <div className='hidden md:block'>
+            <Tooltip
+                anchorSelect={`#${selectTokenId}`}
+                place="bottom"
+                style={{ backgroundColor: "#353945" }}
+            >
+              {selectedToken?.symbol}
+            </Tooltip>
+          </div>
+      <div className='md:hidden'>
+        <Tooltip
+            anchorSelect={`#${selectedToken?.symbol}`}
+            openOnClick
+            place="bottom"
+            style={{ backgroundColor: "#353945" }}
+        >
+          {selectedToken?.symbol}
+        </Tooltip>
+      </div>
           {allowSelection && (
             <ChevronDownIcon
               className={`w-6 h-6 ml-2 text-secondaryLight group-hover:text-primary 
@@ -73,6 +93,7 @@ export default function SelectToken({
         <PopUpModal
           visible={show}
           onClosePopUpModal={() => setShow(false)}
+          classNames="w-fit max-w-fit min-w-fit"
         >
           <p className="text-base text-white font-normal mb-2">Select a token</p>
           <SearchToken

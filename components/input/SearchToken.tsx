@@ -28,7 +28,7 @@ export default function SearchToken({ options, selectToken, selectedToken, chain
   };
 
   return (
-    <div className="w-full flex flex-wrap">
+    <div className="flex flex-col gap-4">
       {/* <div className="relative mb-4">
         <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
           <MagnifyingGlassIcon className="h-6 w-6 md:h-8 md:w-8 text-white" aria-hidden="true" />
@@ -45,21 +45,25 @@ export default function SearchToken({ options, selectToken, selectedToken, chain
       </div> */}
       {options
         .filter((option) => quickOptionsTokens.find((token) => token.address == option.address))
+          .reduce((acc: Token[][] , _, i, arr: Token[],) => (i % 2 === 0 ? acc.push(arr.slice(i, i + 2)) : acc, acc), [])
         .map((quickOption) => (
-          <div className="w-1/2 mb-4 pr-4" key={quickOption?.symbol}>
-            <button
-              className="w-full flex items-center rounded-lg border border-customLightGray hover:border-white hover:bg-gray-500 
-              font-medium text-white py-2 px-3 md:py-2.5 md:px-4 text-base md:text-lg"
-              onClick={() => {
-                selectToken(quickOption);
-              }}
-            >
-              <span className="relative mr-2">
-                <TokenIcon token={quickOption} imageSize="w-5 h-5" chainId={chainId} />
-              </span>
-              <span>{quickOption.name}</span>
-            </button>
-          </div>
+            <div className="flex gap-6">
+              { quickOption.map((option) => (
+                  <div className="w-fit" key={option?.symbol}>
+                    <button
+                        className="w-full flex items-center rounded-[14px] border border-[#353945cc] hover:bg-[#353945] transition ease-in-out duration-250 font-medium text-white py-2 px-3 md:py-2.5 md:px-4 text-base md:text-lg active:bg-[#3d4318] active:border-[#DFFF1C] active:text-[#DFFF1C]"
+                        onClick={() => {
+                          selectToken(option);
+                        }}
+                    >
+                      <span className="relative mr-2">
+                        <TokenIcon token={option} imageSize="w-5 h-5" chainId={chainId} />
+                      </span>
+                      <span>{option.name}</span>
+                    </button>
+                  </div>
+              )) }
+            </div>
         ))}
       {/* <div className="mt-4">
         <ul className="scrollable__select py-6 overflow-y-auto shadow-scrollableSelect rounded-lg p-6 border border-customPaleGray">

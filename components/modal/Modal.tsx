@@ -28,7 +28,7 @@ export default function Modal({ visibility, children, title, classNames = "" }: 
         </Transition.Child>
 
         <div className="fixed inset-0 z-10 overflow-y-auto">
-          <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+          <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center md:p-0">
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
@@ -39,9 +39,9 @@ export default function Modal({ visibility, children, title, classNames = "" }: 
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
               <Dialog.Panel
-                className={`md:w-1/2 relative transform overflow-hidden rounded-lg bg-[#23262f] border border-[#353945] px-4 md:px-8 py-9 transition-all text-white ${classNames}`}
+                className={`md:min-w-[907px] md:w-1/2 relative transform overflow-hidden rounded-lg bg-[#23262f] border border-[#353945] px-8 py-9 transition-all text-white ${classNames}`}
               >
-                <div className="flex flex-row justify-between md:items-center mb-10">
+                <div className="flex flex-row justify-between font-medium md:items-center mb-8">
                   <>{title}</>
                   <XMarkIcon className="w-10 h-10 text-white" onClick={() => setShowModal(false)} role="button" />
                 </div>

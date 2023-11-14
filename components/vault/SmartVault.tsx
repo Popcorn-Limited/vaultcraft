@@ -56,7 +56,7 @@ export default function SmartVault({
   return (
     <>
       <Modal visibility={[showModal, setShowModal]} title={<AssetWithName vault={vaultData} />} >
-        <div className="flex flex-col md:flex-row w-full">
+        <div className="flex flex-col md:flex-row w-full md:gap-8">
           <div className="w-full md:w-1/2 text-start flex flex-col justify-between">
 
             <div className="space-y-4">
