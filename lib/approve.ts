@@ -1,15 +1,14 @@
 import { Address, PublicClient, WalletClient } from "viem"
 import { ERC20Abi } from "@/lib/constants"
 import { showErrorToast, showLoadingToast, showSuccessToast } from "@/lib/toasts"
-import { SimulationResponse, Token } from "@/lib/types";
+import { Clients, SimulationResponse, Token } from "@/lib/types";
 
 interface HandleAllowanceProps {
   token: Address;
-  inputAmount: number;
+  amount: number;
   account: Address;
   spender: Address;
-  publicClient: PublicClient;
-  walletClient: WalletClient;
+  clients: Clients;
 }
 
 interface SimulateApproveProps {
@@ -19,25 +18,25 @@ interface SimulateApproveProps {
   publicClient: PublicClient;
 }
 
-interface ApprovePops extends SimulateApproveProps {
+interface ApproveProps extends SimulateApproveProps {
   walletClient: WalletClient;
 }
 
-export async function handleAllowance({ token, inputAmount, account, spender, publicClient, walletClient }: HandleAllowanceProps): Promise<boolean> {
-  const allowance = await publicClient.readContract({
+export async function handleAllowance({ token, amount, account, spender, clients }: HandleAllowanceProps): Promise<boolean> {
+  const allowance = await clients.publicClient.readContract({
     address: token,
     abi: ERC20Abi,
     functionName: "allowance",
     args: [account, spender]
   })
 
-  if (Number(allowance) === 0 || Number(allowance) < inputAmount) {
-    return approve({ address: token, account, spender, publicClient, walletClient })
+  if (Number(allowance) === 0 || Number(allowance) < amount) {
+    return approve({ address: token, account, spender, publicClient: clients.publicClient, walletClient: clients.walletClient })
   }
   return true
 }
 
-export default async function approve({ address, account, spender, publicClient, walletClient }: ApprovePops): Promise<boolean> {
+export default async function approve({ address, account, spender, publicClient, walletClient }: ApproveProps): Promise<boolean> {
   showLoadingToast("Approving assets for deposit...")
 
   const { request, success, error: simulationError } = await simulateApprove({ address, account, spender, publicClient })

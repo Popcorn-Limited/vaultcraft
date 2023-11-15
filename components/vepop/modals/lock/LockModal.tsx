@@ -48,11 +48,13 @@ export default function LockModal({ show }: { show: [boolean, Dispatch<SetStateA
 
     await handleAllowance({
       token: POP_LP,
-      inputAmount: (val * (10 ** 18) || 0),
+      amount: (val * (10 ** 18) || 0),
       account: account as Address,
       spender: VOTING_ESCROW,
-      publicClient,
-      walletClient: walletClient as WalletClient
+      clients: {
+        publicClient,
+        walletClient: walletClient as WalletClient
+      }
     })
     // When approved continue to deposit
     createLock(({ amount: (val || 0), days, account: account as Address, clients: { publicClient, walletClient: walletClient as WalletClient } }));

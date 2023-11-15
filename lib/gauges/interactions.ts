@@ -4,6 +4,7 @@ import { showErrorToast, showLoadingToast, showSuccessToast } from "@/lib/toasts
 import { SimulationResponse } from "@/lib/types";
 import { getVeAddresses } from "@/lib/utils/addresses";
 import { GaugeAbi, GaugeControllerAbi, VotingEscrowAbi } from "@/lib/constants";
+import { handleCallResult } from "../utils/helpers";
 
 type SimulationContract = {
   address: Address;
@@ -48,7 +49,7 @@ interface SendVotesProps {
   clients: Clients;
 }
 
-export async function sendVotes({ vaults, votes, account, clients }: SendVotesProps) {
+export async function sendVotes({ vaults, votes, account, clients }: SendVotesProps): Promise<boolean> {
   showLoadingToast("Sending votes...")
 
   let addr = new Array<string>(8);
@@ -65,29 +66,23 @@ export async function sendVotes({ vaults, votes, account, clients }: SendVotesPr
 
     }
 
-    const { request, success, error: simulationError } = await simulateCall({
-      account,
-      contract: {
-        address: GAUGE_CONTROLLER,
-        abi: GaugeControllerAbi,
-      },
-      functionName: "vote_for_many_gauge_weights",
-      publicClient: clients.publicClient,
-      args: [addr, v]
+    const success = await handleCallResult({
+      successMessage: "Voted for gauges!",
+      simulationResponse: await simulateCall({
+        account,
+        contract: {
+          address: GAUGE_CONTROLLER,
+          abi: GaugeControllerAbi,
+        },
+        functionName: "vote_for_many_gauge_weights",
+        publicClient: clients.publicClient,
+        args: [addr, v]
+      }),
+      clients
     })
-
-    if (success) {
-      try {
-        const hash = await clients.walletClient.writeContract(request)
-        const receipt = await clients.publicClient.waitForTransactionReceipt({ hash })
-        showSuccessToast("Voted for gauges!")
-      } catch (error: any) {
-        showErrorToast(error.shortMessage)
-      }
-    } else {
-      showErrorToast(simulationError)
-    }
+    if (!success) return false
   }
+  return true
 }
 
 interface CreateLockProps {
@@ -97,31 +92,23 @@ interface CreateLockProps {
   clients: Clients;
 }
 
-export async function createLock({ amount, days, account, clients }: CreateLockProps) {
+export async function createLock({ amount, days, account, clients }: CreateLockProps): Promise<boolean> {
   showLoadingToast("Creating lock...")
 
-  const { request, success, error: simulationError } = await simulateCall({
-    account,
-    contract: {
-      address: VOTING_ESCROW,
-      abi: VotingEscrowAbi,
-    },
-    functionName: "create_lock",
-    publicClient: clients.publicClient,
-    args: [parseEther(Number(amount).toLocaleString("fullwide", { useGrouping: false })), BigInt(Math.floor(Date.now() / 1000) + (86400 * days))]
+  return handleCallResult({
+    successMessage: "Lock created successfully!",
+    simulationResponse: await simulateCall({
+      account,
+      contract: {
+        address: VOTING_ESCROW,
+        abi: VotingEscrowAbi,
+      },
+      functionName: "create_lock",
+      publicClient: clients.publicClient,
+      args: [parseEther(Number(amount).toLocaleString("fullwide", { useGrouping: false })), BigInt(Math.floor(Date.now() / 1000) + (86400 * days))]
+    }),
+    clients
   })
-
-  if (success) {
-    try {
-      const hash = await clients.walletClient.writeContract(request)
-      const receipt = await clients.publicClient.waitForTransactionReceipt({ hash })
-      showSuccessToast("Lock created successfully!")
-    } catch (error: any) {
-      showErrorToast(error.shortMessage)
-    }
-  } else {
-    showErrorToast(simulationError)
-  }
 }
 
 interface IncreaseLockAmountProps {
@@ -130,31 +117,23 @@ interface IncreaseLockAmountProps {
   clients: Clients;
 }
 
-export async function increaseLockAmount({ amount, account, clients }: IncreaseLockAmountProps) {
+export async function increaseLockAmount({ amount, account, clients }: IncreaseLockAmountProps): Promise<boolean> {
   showLoadingToast("Increasing lock amount...")
 
-  const { request, success, error: simulationError } = await simulateCall({
-    account,
-    contract: {
-      address: VOTING_ESCROW,
-      abi: VotingEscrowAbi,
-    },
-    functionName: "increase_amount",
-    publicClient: clients.publicClient,
-    args: [parseEther(Number(amount).toLocaleString("fullwide", { useGrouping: false }))]
+  return handleCallResult({
+    successMessage: "Lock amount increased successfully!",
+    simulationResponse: await simulateCall({
+      account,
+      contract: {
+        address: VOTING_ESCROW,
+        abi: VotingEscrowAbi,
+      },
+      functionName: "increase_amount",
+      publicClient: clients.publicClient,
+      args: [parseEther(Number(amount).toLocaleString("fullwide", { useGrouping: false }))]
+    }),
+    clients
   })
-
-  if (success) {
-    try {
-      const hash = await clients.walletClient.writeContract(request)
-      const receipt = await clients.publicClient.waitForTransactionReceipt({ hash })
-      showSuccessToast("Lock amount increased successfully!")
-    } catch (error: any) {
-      showErrorToast(error.shortMessage)
-    }
-  } else {
-    showErrorToast(simulationError)
-  }
 }
 
 interface IncreaseLockTimeProps {
@@ -163,31 +142,23 @@ interface IncreaseLockTimeProps {
   clients: Clients;
 }
 
-export async function increaseLockTime({ unlockTime, account, clients }: IncreaseLockTimeProps) {
+export async function increaseLockTime({ unlockTime, account, clients }: IncreaseLockTimeProps): Promise<boolean> {
   showLoadingToast("Increasing lock time...")
 
-  const { request, success, error: simulationError } = await simulateCall({
-    account,
-    contract: {
-      address: VOTING_ESCROW,
-      abi: VotingEscrowAbi,
-    },
-    functionName: "increase_unlock_time",
-    publicClient: clients.publicClient,
-    args: [BigInt(unlockTime)]
+  return handleCallResult({
+    successMessage: "Lock amount increased successfully!",
+    simulationResponse: await simulateCall({
+      account,
+      contract: {
+        address: VOTING_ESCROW,
+        abi: VotingEscrowAbi,
+      },
+      functionName: "increase_unlock_time",
+      publicClient: clients.publicClient,
+      args: [BigInt(unlockTime)]
+    }),
+    clients
   })
-
-  if (success) {
-    try {
-      const hash = await clients.walletClient.writeContract(request)
-      const receipt = await clients.publicClient.waitForTransactionReceipt({ hash })
-      showSuccessToast("Lock time increased successfully!")
-    } catch (error: any) {
-      showErrorToast(error.shortMessage)
-    }
-  } else {
-    showErrorToast(simulationError)
-  }
 }
 
 interface WithdrawLockProps {
@@ -195,95 +166,66 @@ interface WithdrawLockProps {
   clients: Clients;
 }
 
-export async function withdrawLock({ account, clients }: WithdrawLockProps) {
+export async function withdrawLock({ account, clients }: WithdrawLockProps): Promise<boolean> {
   showLoadingToast("Withdrawing lock...")
 
-  const { request, success, error: simulationError } = await simulateCall({
-    account,
-    contract: {
-      address: VOTING_ESCROW,
-      abi: VotingEscrowAbi,
-    },
-    functionName: "withdraw",
-    publicClient: clients.publicClient,
+  return handleCallResult({
+    successMessage: "Withdrawal successful!",
+    simulationResponse: await simulateCall({
+      account,
+      contract: {
+        address: VOTING_ESCROW,
+        abi: VotingEscrowAbi,
+      },
+      functionName: "withdraw",
+      publicClient: clients.publicClient,
+    }),
+    clients
   })
-
-  if (success) {
-    try {
-      const hash = await clients.walletClient.writeContract(request)
-      const receipt = await clients.publicClient.waitForTransactionReceipt({ hash })
-      showSuccessToast("Withdrawal successful!")
-    } catch (error: any) {
-      showErrorToast(error.shortMessage)
-    }
-  } else {
-    showErrorToast(simulationError)
-  }
 }
 
 interface GaugeInteractionProps {
+  chainId: number;
   address: Address;
   amount: number;
   account: Address;
   clients: Clients;
 }
 
-export async function gaugeDeposit({ address, amount, account, clients }: GaugeInteractionProps): Promise<boolean> {
+export async function gaugeDeposit({ chainId, address, amount, account, clients }: GaugeInteractionProps): Promise<boolean> {
   showLoadingToast("Staking into Gauge...")
 
-  const { request, success, error: simulationError } = await simulateCall({
-    account,
-    contract: {
-      address,
-      abi: GaugeAbi,
-    },
-    functionName: "deposit",
-    publicClient: clients.publicClient,
-    args: [amount]
+  return handleCallResult({
+    successMessage: "Staked into Gauge successful!",
+    simulationResponse: await simulateCall({
+      account,
+      contract: {
+        address,
+        abi: GaugeAbi,
+      },
+      functionName: "deposit",
+      publicClient: clients.publicClient,
+      args: [amount]
+    }),
+    clients
   })
-
-  if (success) {
-    try {
-      const hash = await clients.walletClient.writeContract(request)
-      const receipt = await clients.publicClient.waitForTransactionReceipt({ hash })
-      showSuccessToast("Staked into Gauge successful!")
-      return true
-    } catch (error: any) {
-      showErrorToast(error.shortMessage)
-      return false;
-    }
-  } else {
-    showErrorToast(simulationError)
-    return false;
-  }
 }
 
-export async function gaugeWithdraw({ address, amount, account, clients }: GaugeInteractionProps): Promise<boolean> {
+export async function gaugeWithdraw({ chainId, address, amount, account, clients }: GaugeInteractionProps): Promise<boolean> {
   showLoadingToast("Unstaking from Gauge...")
 
-  const { request, success, error: simulationError } = await simulateCall({
-    account,
-    contract: {
-      address,
-      abi: GaugeAbi,
-    },
-    functionName: "withdraw",
-    publicClient: clients.publicClient,
-    args: [amount]
+  return handleCallResult({
+    successMessage: "Unstaked from Gauge successful!",
+    simulationResponse: await simulateCall({
+      account,
+      contract: {
+        address,
+        abi: GaugeAbi,
+      },
+      functionName: "withdraw",
+      publicClient: clients.publicClient,
+      args: [amount]
+    }),
+    clients
   })
-
-  if (success) {
-    try {
-      const hash = await clients.walletClient.writeContract(request)
-      const receipt = await clients.publicClient.waitForTransactionReceipt({ hash })
-      showSuccessToast("Unstaked from Gauge successful!")
-      return true
-    } catch (error: any) {
-      showErrorToast(error.shortMessage)
-      return false;
-    }
-  } else {
-    showErrorToast(simulationError)
-    return false;
-  }
 }

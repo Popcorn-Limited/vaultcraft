@@ -11,7 +11,6 @@ import NavbarLinks from "@/components/navbar/NavbarLinks";
 import { useRouter } from "next/router";
 
 export default function DesktopMenu(): JSX.Element {
-  const { pathname } = useRouter();
   const { openConnectModal } = useConnectModal();
   const { openChainModal } = useChainModal();
   const { address } = useAccount();

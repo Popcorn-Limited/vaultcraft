@@ -102,6 +102,7 @@ export default function SmartVault({
               gauge={gauge}
               tokenOptions={tokenOptions}
               chainId={vaultData.chainId}
+              hideModal={() => setShowModal(false)}
               mutateTokenBalance={mutateTokenBalance}
             />
           </div>

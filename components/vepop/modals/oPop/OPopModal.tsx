@@ -41,11 +41,13 @@ export default function OPopModal({ show }: { show: [boolean, Dispatch<SetStateA
 
     await handleAllowance({
       token: WETH,
-      inputAmount: (Number(amount) * (10 ** 18) || 0),
+      amount: (Number(amount) * (10 ** 18) || 0),
       account: account as Address,
       spender: OPOP,
-      publicClient,
-      walletClient: walletClient as WalletClient
+      clients: {
+        publicClient,
+        walletClient: walletClient as WalletClient
+      }
     })
 
     exerciseOPop({

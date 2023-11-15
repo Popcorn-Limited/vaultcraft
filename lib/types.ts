@@ -1,5 +1,5 @@
 import { ProtocolName } from "vaultcraft-sdk";
-import { Address } from "viem";
+import { Address, PublicClient, WalletClient } from "viem";
 
 export type Token = {
   address: Address;
@@ -105,4 +105,23 @@ export interface IconProps {
   color2?:string;
   size: string;
   className?: string;
+}
+
+export interface Clients {
+  publicClient: PublicClient;
+  walletClient: WalletClient;
+}
+
+
+export enum ActionType {
+  Deposit,
+  Withdrawal,
+  Stake,
+  Unstake,
+  DepositAndStake,
+  UnstakeAndWithdraw,
+  ZapDeposit,
+  ZapWithdrawal,
+  ZapDepositAndStake,
+  ZapUnstakeAndWithdraw
 }

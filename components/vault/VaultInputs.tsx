@@ -2,22 +2,19 @@ import { ArrowDownIcon, Cog6ToothIcon } from "@heroicons/react/24/outline";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import MainActionButton from "@/components/button/MainActionButton";
 import { useEffect, useState } from "react";
-import { Address, useAccount, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
+import { useAccount, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
 import TabSelector from "@/components/common/TabSelector";
-import { Token } from "@/lib/types";
-import { handleAllowance } from "@/lib/approve";
-import { vaultDeposit, vaultDepositAndStake, vaultRedeem, vaultUnstakeAndWithdraw, zapIntoGauge, zapIntoVault, zapOutOfGauge, zapOutOfVault } from "@/lib/vault/interactions";
+import { ActionType, Token } from "@/lib/types";
 import { validateInput } from "@/lib/utils/helpers";
-import { getVeAddresses } from "@/lib/utils/addresses";
-import { gaugeDeposit, gaugeWithdraw } from "@/lib/gauges/interactions";
-import { ROUNDING_VALUE } from "@/lib/constants";
 import Modal from "../modal/Modal";
 import InputNumber from "../input/InputNumber";
 import { MutateTokenBalanceProps } from "pages/vaults";
 import { safeRound } from "@/lib/utils/formatBigNumber";
 import { formatUnits, parseUnits } from "viem";
-
-const { VaultRouter: VAULT_ROUTER } = getVeAddresses()
+import getActionSteps, { ActionStep } from "@/lib/vault/getActionSteps";
+import handleVaultInteraction from "@/lib/vault/handleVaultInteraction";
+import ActionSteps from "./ActionSteps";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
 
 interface VaultInputsProps {
   vault: Token;
@@ -25,18 +22,24 @@ interface VaultInputsProps {
   gauge?: Token;
   tokenOptions: Token[];
   chainId: number;
+  hideModal: () => void;
   mutateTokenBalance: (props: MutateTokenBalanceProps) => void;
 }
 
-export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId, mutateTokenBalance }: VaultInputsProps): JSX.Element {
+export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId, hideModal, mutateTokenBalance }: VaultInputsProps): JSX.Element {
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient()
   const { address: account } = useAccount();
   const { chain } = useNetwork();
   const { switchNetwork } = useSwitchNetwork();
+  const { openConnectModal } = useConnectModal();
 
   const [inputToken, setInputToken] = useState<Token>()
   const [outputToken, setOutputToken] = useState<Token>()
+
+  const [stepCounter, setStepCounter] = useState<number>(0)
+  const [steps, setSteps] = useState<ActionStep[]>([])
+  const [action, setAction] = useState<ActionType>(ActionType.Deposit)
 
   const [inputBalance, setInputBalance] = useState<string>("0");
 
@@ -51,6 +54,9 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
     // set default input/output tokens
     setInputToken(asset)
     setOutputToken(!!gauge ? gauge : vault)
+    const actionType = !!gauge ? ActionType.DepositAndStake : ActionType.Deposit
+    setAction(actionType)
+    setSteps(getActionSteps(actionType))
   }, [])
 
   function handleChangeInput(e: any) {
@@ -58,19 +64,88 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
     setInputBalance(validateInput(value).isValid ? value : "0");
   };
 
-
   function switchTokens() {
+    setStepCounter(0)
     if (isDeposit) {
       // Switch to Withdraw
       setInputToken(!!gauge ? gauge : vault);
       setOutputToken(asset)
       setIsDeposit(false)
+      setAction(!!gauge ? ActionType.UnstakeAndWithdraw : ActionType.Withdrawal)
     } else {
       // Switch to Deposit
       setInputToken(asset);
       setOutputToken(!!gauge ? gauge : vault)
       setIsDeposit(true)
+      setAction(!!gauge ? ActionType.DepositAndStake : ActionType.Deposit)
     }
+  }
+
+  function handleTokenSelect(input: Token, output: Token): void {
+    switch (input.address) {
+      case asset.address:
+        switch (output.address) {
+          case asset.address:
+            // error
+            break
+          case vault.address:
+            setAction(ActionType.Deposit)
+            setSteps(getActionSteps(ActionType.Deposit))
+          case gauge?.address:
+            setAction(ActionType.DepositAndStake)
+            setSteps(getActionSteps(ActionType.DepositAndStake))
+          default:
+            // error
+            break
+        }
+      case vault.address:
+        switch (output.address) {
+          case asset.address:
+            setAction(ActionType.Withdrawal)
+            setSteps(getActionSteps(ActionType.Withdrawal))
+          case vault.address:
+            // error
+            break
+          case gauge?.address:
+            setAction(ActionType.Stake)
+            setSteps(getActionSteps(ActionType.Stake))
+          default:
+            setAction(ActionType.ZapWithdrawal)
+            setSteps(getActionSteps(ActionType.ZapWithdrawal))
+        }
+      case gauge?.address:
+        switch (output.address) {
+          case asset.address:
+            setAction(ActionType.UnstakeAndWithdraw)
+            setSteps(getActionSteps(ActionType.UnstakeAndWithdraw))
+          case vault.address:
+            setAction(ActionType.Unstake)
+            setSteps(getActionSteps(ActionType.Unstake))
+          case gauge?.address:
+            // error
+            break
+          default:
+            setAction(ActionType.ZapUnstakeAndWithdraw)
+            setSteps(getActionSteps(ActionType.ZapUnstakeAndWithdraw))
+        }
+      default:
+        switch (output.address) {
+          case asset.address:
+            // error
+            break
+          case vault.address:
+            setAction(ActionType.ZapDeposit)
+            setSteps(getActionSteps(ActionType.ZapDeposit))
+          case gauge?.address:
+            setAction(ActionType.ZapDepositAndStake)
+            setSteps(getActionSteps(ActionType.ZapDepositAndStake))
+          default:
+            // error
+            break
+        }
+    }
+    setInputToken(input);
+    setOutputToken(output)
   }
 
   async function handleMainAction() {
@@ -79,215 +154,35 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
 
     if (chain?.id !== Number(chainId)) switchNetwork?.(Number(chainId));
 
-    switch (inputToken.address) {
-      case asset.address:
-        console.log("in asset")
-        if (outputToken.address === vault.address) {
-          console.log("out vault")
-          await handleAllowance({
-            token: inputToken.address,
-            inputAmount: (val * (10 ** inputToken.decimals)),
-            account,
-            spender: vault.address,
-            publicClient,
-            walletClient
-          })
-          const success = await vaultDeposit({
-            address: vault.address,
-            account,
-            amount: (val * (10 ** inputToken.decimals)),
-            publicClient,
-            walletClient
-          })
-          if (success) mutateTokenBalance({ inputToken: inputToken.address, outputToken: outputToken.address, vault: vault.address, chainId, account })
-        }
-        else if (outputToken.address === gauge?.address) {
-          console.log("out gauge")
-          await handleAllowance({
-            token: inputToken.address,
-            inputAmount: (val * (10 ** inputToken.decimals)),
-            account,
-            spender: VAULT_ROUTER,
-            publicClient,
-            walletClient
-          })
-          const success = await vaultDepositAndStake({
-            address: VAULT_ROUTER,
-            account,
-            amount: (val * (10 ** inputToken.decimals)),
-            vault: vault?.address as Address,
-            gauge: gauge?.address as Address,
-            publicClient,
-            walletClient
-          })
-          if (success) mutateTokenBalance({ inputToken: inputToken.address, outputToken: outputToken.address, vault: vault.address, chainId, account })
-        }
-        else {
-          console.log("out error")
-          // wrong output token
-          return
-        }
-        break;
-      case vault.address:
-        console.log("in vault")
-        if (outputToken.address === asset.address) {
-          console.log("out asset")
-          const success = await vaultRedeem({
-            address: vault.address,
-            account,
-            amount: (val * (10 ** inputToken.decimals)),
-            publicClient,
-            walletClient
-          })
-          if (success) mutateTokenBalance({ inputToken: inputToken.address, outputToken: outputToken.address, vault: vault.address, chainId, account })
-        }
-        else if (outputToken.address === gauge?.address) {
-          console.log("out gauge")
-          await handleAllowance({
-            token: inputToken.address,
-            inputAmount: (val * (10 ** inputToken.decimals)),
-            account,
-            spender: gauge.address,
-            publicClient,
-            walletClient
-          })
-          const success = await gaugeDeposit({
-            address: gauge.address,
-            amount: (val * (10 ** inputToken.decimals)),
-            account,
-            clients: {
-              publicClient,
-              walletClient
-            }
-          })
-          if (success) mutateTokenBalance({ inputToken: inputToken.address, outputToken: outputToken.address, vault: vault.address, chainId, account })
-        }
-        else if (outputToken.address === vault.address) {
-          console.log("out error")
-          // wrong output token
-          return
-        }
-        else {
-          console.log("out zap")
-          const success = await zapOutOfVault({
-            buyToken: outputToken.address,
-            asset: asset.address,
-            vault: vault.address,
-            account,
-            amount: (val * (10 ** inputToken.decimals)),
-            assetBal: asset.balance,
-            walletClient: walletClient,
-            publicClient: publicClient,
-            slippage,
-            tradeTimeout
-          })
-          if (success) mutateTokenBalance({ inputToken: inputToken.address, outputToken: outputToken.address, vault: vault.address, chainId, account })
-        }
-        break;
-      case gauge?.address:
-        console.log("in gauge")
-        if (outputToken.address === asset.address) {
-          console.log("out asset")
-          await handleAllowance({
-            token: inputToken.address,
-            inputAmount: (val * (10 ** inputToken.decimals)),
-            account,
-            spender: VAULT_ROUTER,
-            publicClient,
-            walletClient
-          })
-          const success = await vaultUnstakeAndWithdraw({
-            address: VAULT_ROUTER,
-            account,
-            amount: (val * (10 ** inputToken.decimals)),
-            vault: vault.address,
-            gauge: gauge?.address as Address,
-            publicClient,
-            walletClient
-          })
-          if (success) mutateTokenBalance({ inputToken: inputToken.address, outputToken: outputToken.address, vault: vault.address, chainId, account })
-        }
-        else if (outputToken.address === vault.address) {
-          console.log("out vault")
-          const success = await gaugeWithdraw({
-            address: gauge?.address as Address,
-            amount: (val * (10 ** inputToken.decimals)),
-            account,
-            clients: {
-              publicClient,
-              walletClient
-            }
-          })
-          if (success) mutateTokenBalance({ inputToken: inputToken.address, outputToken: outputToken.address, vault: vault.address, chainId, account })
-        }
-        else if (outputToken.address === gauge?.address) {
-          console.log("out error")
-          // wrong output token
-          return
-        }
-        else {
-          console.log("out zap")
-          console.log({ gaugeBal: gauge?.balance, amount: (val * (10 ** inputToken.decimals)) })
-          const success = await zapOutOfGauge({
-            buyToken: outputToken.address,
-            asset: asset.address,
-            router: VAULT_ROUTER,
-            vault: vault.address,
-            gauge: gauge?.address as Address,
-            account,
-            amount: (val * (10 ** inputToken.decimals)),
-            assetBal: asset.balance,
-            walletClient: walletClient,
-            publicClient: publicClient,
-            slippage,
-            tradeTimeout
-          })
-          if (success) mutateTokenBalance({ inputToken: inputToken.address, outputToken: outputToken.address, vault: vault.address, chainId, account })
-        }
-        break;
-      default:
-        console.log("in zap asset")
-        if (outputToken.address === vault.address) {
-          console.log("out vault")
-          const success = await zapIntoVault({
-            sellToken: inputToken.address,
-            asset: asset.address,
-            vault: vault.address,
-            account,
-            amount: (val * (10 ** inputToken.decimals)),
-            assetBal: asset.balance,
-            slippage,
-            tradeTimeout,
-            publicClient,
-            walletClient
-          })
-          if (success) mutateTokenBalance({ inputToken: inputToken.address, outputToken: outputToken.address, vault: vault.address, chainId, account })
-        }
-        else if (outputToken.address === gauge?.address) {
-          console.log("out gauge")
-          const success = await zapIntoGauge({
-            sellToken: inputToken.address,
-            router: VAULT_ROUTER,
-            asset: asset.address,
-            vault: vault.address,
-            gauge: gauge.address,
-            account,
-            amount: (val * (10 ** inputToken.decimals)),
-            assetBal: asset.balance,
-            slippage,
-            tradeTimeout,
-            publicClient,
-            walletClient
-          })
-          if (success) mutateTokenBalance({ inputToken: inputToken.address, outputToken: outputToken.address, vault: vault.address, chainId, account })
-        }
-        else {
-          console.log("out error")
-          // wrong output token
-          return
-        }
-        break;
-    }
+    const stepsCopy = [...steps]
+    const currentStep = stepsCopy[stepCounter]
+    currentStep.loading = true
+    setSteps(stepsCopy)
+
+    const vaultInteraction = await handleVaultInteraction({
+      action,
+      stepCounter,
+      chainId,
+      amount: (val * (10 ** inputToken.decimals)),
+      inputToken,
+      outputToken,
+      asset,
+      vault,
+      gauge,
+      account,
+      slippage,
+      tradeTimeout,
+      clients: { publicClient, walletClient }
+    })
+    const success = await vaultInteraction()
+
+    currentStep.loading = false
+    currentStep.success = success;
+    currentStep.error = !success;
+    setSteps(stepsCopy)
+    setStepCounter(stepCounter + 1)
+
+    if (stepCounter === steps.length) mutateTokenBalance({ inputToken: inputToken.address, outputToken: outputToken.address, vault: vault.address, chainId, account })
   }
 
   if (!inputToken || !outputToken) return <></>
@@ -311,7 +206,7 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
     />
     <InputTokenWithError
       captionText={isDeposit ? "Deposit Amount" : "Withdraw Amount"}
-      onSelectToken={option => setInputToken(option)}
+      onSelectToken={option => handleTokenSelect(option, !!gauge ? gauge : vault)}
       onMaxClick={() => handleChangeInput(
         {
           currentTarget: {
@@ -349,7 +244,7 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
     </div>
     <InputTokenWithError
       captionText={"Output Amount"}
-      onSelectToken={option => setOutputToken(option)}
+      onSelectToken={option => handleTokenSelect(!!gauge ? gauge : vault, option)}
       onMaxClick={() => { }}
       chainId={chainId}
       value={(Number(inputBalance) * (Number(inputToken?.price)) / Number(outputToken?.price)) || 0}
@@ -371,8 +266,16 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
         <p className="text-secondaryLight group-hover/zap:text-primary">Zap Settings</p>
       </div >
     }
-    <div className="mt-8">
-      <MainActionButton label={isDeposit ? "Deposit" : "Withdraw"} handleClick={handleMainAction} />
+    <div className="w-full flex justify-center mt-4">
+      <ActionSteps steps={steps} />
+    </div>
+    <div className="mt-4">
+      {account &&
+        (stepCounter === steps.length || steps.some(step => !step.loading && step.error)) ?
+        <MainActionButton label={"Close Modal"} handleClick={hideModal} /> :
+        <MainActionButton label={steps[stepCounter].label} handleClick={handleMainAction} disabled={inputBalance === "0" || steps[stepCounter].loading} />
+      }
+      {!account && <MainActionButton label={"Connect Wallet"} handleClick={openConnectModal} />}
     </div>
   </>
 }

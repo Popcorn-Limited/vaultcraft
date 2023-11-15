@@ -2,44 +2,27 @@ import axios from "axios"
 import { Address, PublicClient, WalletClient, getAddress } from "viem";
 import { showErrorToast, showSuccessToast } from "@/lib/toasts";
 import { handleAllowance } from "@/lib/approve";
+import { Clients } from "../types";
 
 interface ZapProps {
+  chainId: number;
   sellToken: Address;
   buyToken: Address;
   amount: number;
   account: Address;
-  publicClient: PublicClient;
-  walletClient: WalletClient;
   slippage?: number; // slippage allowance in BPS 
   tradeTimeout?: number; // in s
+  clients: Clients;
 }
 
-export default async function zap({ sellToken, buyToken, amount, account, publicClient, walletClient, slippage = 100, tradeTimeout = 60 }: ZapProps): Promise<boolean> {
-  const ensoWallet = (await axios.get(
-    `https://api.enso.finance/api/v1/wallet?chainId=1&fromAddress=${account}`,
-    { headers: { Authorization: `Bearer ${process.env.ENSO_API_KEY}` } })
-  ).data
-  console.log({ ensoWallet: ensoWallet })
-  const success = await handleAllowance({
-    token: sellToken,
-    inputAmount: amount,
-    account,
-    spender: getAddress(ensoWallet.address),
-    publicClient,
-    walletClient
-  })
-  if (!success) return false
-
-  console.log({ qouteUrl: `https://api.enso.finance/api/v1/shortcuts/route?chainId=1&fromAddress=${account}&spender=${account}&receiver=${account}&amountIn=${amount.toLocaleString("fullwide", { useGrouping: false })}&slippage=${slippage}&tokenIn=${sellToken}&tokenOut=${buyToken}` })
+export default async function zap({ chainId, sellToken, buyToken, amount, account, slippage = 100, tradeTimeout = 60, clients }: ZapProps): Promise<boolean> {
   const quote = (await axios.get(
-    `https://api.enso.finance/api/v1/shortcuts/route?chainId=1&fromAddress=${account}&spender=${account}&receiver=${account}&amountIn=${amount.toLocaleString("fullwide", { useGrouping: false })}&slippage=${slippage}&tokenIn=${sellToken}&tokenOut=${buyToken}`,
+    `https://api.enso.finance/api/v1/shortcuts/route?chainId=${chainId}&fromAddress=${account}&spender=${account}&receiver=${account}&amountIn=${amount.toLocaleString("fullwide", { useGrouping: false })}&slippage=${slippage}&tokenIn=${sellToken}&tokenOut=${buyToken}`,
     { headers: { Authorization: `Bearer ${process.env.ENSO_API_KEY}` } }
   )).data
-  console.log({ quote })
-
   try {
-    const hash = await walletClient.sendTransaction(quote.tx)
-    const receipt = await publicClient.waitForTransactionReceipt({ hash })
+    const hash = await clients.walletClient.sendTransaction(quote.tx)
+    const receipt = await clients.publicClient.waitForTransactionReceipt({ hash })
     showSuccessToast("Zapped successfully")
     return true;
   } catch (error: any) {

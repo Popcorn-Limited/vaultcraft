@@ -47,9 +47,9 @@ export default function SearchToken({ options, selectToken, selectedToken, chain
         .filter((option) => quickOptionsTokens.find((token) => token.address == option.address))
           .reduce((acc: Token[][] , _, i, arr: Token[],) => (i % 2 === 0 ? acc.push(arr.slice(i, i + 2)) : acc, acc), [])
         .map((quickOption) => (
-            <div className="flex gap-6">
+            <div className="flex gap-6" key={`quickOption-${quickOption[0].address}`}>
               { quickOption.map((option) => (
-                  <div className="w-fit" key={option?.symbol}>
+                  <div className="w-fit" key={option?.address}>
                     <button
                         className="w-full flex items-center rounded-[14px] border border-[#353945cc] hover:bg-[#353945] transition ease-in-out duration-250 font-medium text-white py-2 px-3 md:py-2.5 md:px-4 text-base md:text-lg active:bg-[#3d4318] active:border-[#DFFF1C] active:text-[#DFFF1C]"
                         onClick={() => {

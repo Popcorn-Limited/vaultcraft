@@ -66,11 +66,13 @@ export default function ManageLockModal({ show }: { show: [boolean, Dispatch<Set
       if ((val || 0) == 0) return;
       await handleAllowance({
         token: POP_LP,
-        inputAmount: (val * (10 ** 18) || 0),
+        amount: (val * (10 ** 18) || 0),
         account: account as Address,
         spender: VOTING_ESCROW,
-        publicClient,
-        walletClient: walletClient as WalletClient
+        clients: {
+          publicClient,
+          walletClient: walletClient as WalletClient
+        }
       })
       increaseLockAmount({ amount: val, account: account as Address, clients })
     }
