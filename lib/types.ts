@@ -12,6 +12,7 @@ export type Token = {
 };
 
 export type veAddresses = {
+  VCX: Address;
   POP: Address;
   WETH: Address;
   USDC: Address;

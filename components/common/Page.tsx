@@ -50,7 +50,7 @@ export default function Page({
         <div>
           {children}
         </div>
-        <div className="py-8"></div>
+        <div className="py-10"></div>
         <Footer />
       </div>
     </>

@@ -7,3 +7,4 @@ export * from "./VotingEscrow";
 export * from "./BalancerOracle";
 export * from "./OPop";
 export * from "./Minter";
+export * from "./VCX";
