@@ -270,12 +270,16 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
       <ActionSteps steps={steps} stepCounter={stepCounter} />
     </div>
     <div className="mt-4">
-      {account &&
-        (stepCounter === steps.length || steps.some(step => !step.loading && step.error)) ?
-        <MainActionButton label={"Close Modal"} handleClick={hideModal} /> :
-        <MainActionButton label={steps[stepCounter].label} handleClick={handleMainAction} disabled={inputBalance === "0" || steps[stepCounter].loading} />
+      {account ? (
+        <>
+          {(stepCounter === steps.length || steps.some(step => !step.loading && step.error)) ?
+            <MainActionButton label={"Close Modal"} handleClick={hideModal} /> :
+            <MainActionButton label={steps[stepCounter].label} handleClick={handleMainAction} disabled={inputBalance === "0" || steps[stepCounter].loading} />
+          }
+        </>
+      )
+        : < MainActionButton label={"Connect Wallet"} handleClick={openConnectModal} />
       }
-      {!account && <MainActionButton label={"Connect Wallet"} handleClick={openConnectModal} />}
     </div>
   </>
 }
