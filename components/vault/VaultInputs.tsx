@@ -267,7 +267,7 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
       </div >
     }
     <div className="w-full flex justify-center mt-4">
-      <ActionSteps steps={steps} />
+      <ActionSteps steps={steps} stepCounter={stepCounter} />
     </div>
     <div className="mt-4">
       {account &&
