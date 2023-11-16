@@ -91,11 +91,13 @@ export default function Migration(): JSX.Element {
 
         await handleAllowance({
             token: POP,
-            inputAmount: (val * (10 ** 18)),
+            amount: (val * (10 ** 18)),
             account,
             spender: VCX,
-            publicClient,
-            walletClient
+            clients: {
+                publicClient,
+                walletClient
+            }
         })
         migrate({
             address: VCX,
