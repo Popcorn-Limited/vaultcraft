@@ -12,19 +12,19 @@ export default function IncreaseTimePreview({ days, lockedBal }: { days: number,
       <div className="space-y-2">
         <div className="flex flex-row items-center justify-between text-secondaryLight">
           <p>Lock Time</p>
-          <p className="text-[#141416]">{days} Days</p>
+          <p >{days} Days</p>
         </div>
         <div className="flex flex-row items-center justify-between text-secondaryLight">
           <p>Unlock Date</p>
-          <p className="text-[#141416]">{new Date(calcUnlockTime(totalDays)).toLocaleDateString()}</p>
+          <p >{new Date(calcUnlockTime(totalDays)).toLocaleDateString()}</p>
         </div>
         <div className="flex flex-row items-center justify-between text-secondaryLight">
           <p>Lock Amount</p>
-          <p className="text-[#141416]">{lockedBal && amount.toFixed(2)}</p>
+          <p >{lockedBal && amount.toFixed(2)}</p>
         </div>
         <div className="flex flex-row items-center justify-between text-secondaryLight">
           <p>New Voting Power</p>
-          <p className="text-[#141416]">{amount > 0 ? calculateVeOut(amount, totalDays).toFixed(2) : "0"} vePOP</p>
+          <p >{amount > 0 ? calculateVeOut(amount, totalDays).toFixed(2) : "0"} vePOP</p>
         </div>
       </div>
 

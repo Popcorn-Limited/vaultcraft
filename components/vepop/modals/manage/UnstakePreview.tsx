@@ -7,19 +7,19 @@ export default function UnstakePreview({ amount }: { amount: number }): JSX.Elem
       <div className="space-y-2">
         <div className="flex flex-row items-center justify-between text-secondaryLight">
           <p>Unlock Amount</p>
-          <p className="text-[#141416]">{amount > 0 ? amount.toFixed(2) : "0"} POP LP</p>
+          <p >{amount > 0 ? amount.toFixed(2) : "0"} POP LP</p>
         </div>
         <div className="flex flex-row items-center justify-between text-secondaryLight">
           <p>Unlock Penalty</p>
-          <p className="text-[#141416]">25%</p>
+          <p >25%</p>
         </div>
         <div className="flex flex-row items-center justify-between text-secondaryLight">
           <p>Returned Amount</p>
-          <p className="text-[#141416]">{amount > 0 ? (amount * 0.75).toFixed(2) : "0"} POP LP</p>
+          <p >{amount > 0 ? (amount * 0.75).toFixed(2) : "0"} POP LP</p>
         </div>
         <div className="flex flex-row items-center justify-between text-secondaryLight">
           <p>New Voting Power</p>
-          <p className="text-[#141416]">0</p>
+          <p >0</p>
         </div>
       </div>
 

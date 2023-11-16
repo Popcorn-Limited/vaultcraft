@@ -11,9 +11,9 @@ export default function ProgressBar({ stages, activeStage }: { stages: string[],
                                 ${activeStage >= index ? 'bg-[#DFFF1C66] border-[#DFFF1C]' : ' border-[#d7d7d766] bg-[#35394599]'}`}>
                                     {
                                         index < activeStage ? (
-                                          <img src="/images/icons/checkIconYellow.svg" className={`h-4 w-4`} />
+                                            <img src="/images/icons/checkIconYellow.svg" className={`h-4 w-4`} />
                                         ) : (
-                                          <div className={`rounded-full h-2 w-2 ${activeStage >= index ? 'bg-[#DFFF1C]' : 'bg-[#d7d7d766]'}`} />
+                                            <div className={`rounded-full h-2 w-2 ${activeStage >= index ? 'bg-[#DFFF1C]' : 'bg-[#d7d7d766]'}`} />
                                         )
                                     }
                                 </div>

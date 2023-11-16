@@ -124,6 +124,8 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
           selectedToken={
             {
               ...oPop,
+              symbol: "oPOP",
+              name: "oPOP",
               logoURI: "/images/tokens/oPop.svg",
               balance: oPopBal?.value || ZERO,
             } as any
@@ -132,7 +134,7 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
           tokenList={[]}
         />
         <div className="flex justify-center -mt-2 mb-4">
-          <PlusIcon className="w-8 h-8 text-primaryLight" />
+          <PlusIcon className="w-8 h-8 text-gray-500" />
         </div>
 
         <InputTokenWithError
@@ -146,6 +148,8 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
           selectedToken={
             {
               ...weth,
+              symbol: "WETH",
+              name: "WETH",
               decimals: 18,
               logoURI: "https://etherscan.io/token/images/weth_28.png",
               balance: wethBal?.value || ZERO,
@@ -158,15 +162,15 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
 
       <div className="relative -mt-10 -mb-10">
         <div className="absolute inset-0 flex items-center" aria-hidden="true">
-          <div className="w-full border-t border-primaryLight" />
+          <div className="w-full border-t border-gray-500" />
         </div>
         <div className={`relative flex justify-center my-12`}>
-          <div className="w-20 bg-[#FAF9F4]">
+          <div className="w-20 bg-[#23262f]">
             <div
               className="flex items-center w-14 h-14 mx-auto justify-center"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
-                <path d="M19 14.1699L12 21.1699M12 21.1699L5 14.1699M12 21.1699L12 3.16992" stroke="#A5A08C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M19 14.1699L12 21.1699M12 21.1699L5 14.1699M12 21.1699L12 3.16992" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
             </div>
           </div>
@@ -176,7 +180,7 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
       <div className="mt-4">
         <p className="text-primary">Received POP</p>
         <div
-          className={`w-full flex flex-row px-5 py-4 items-center justify-between rounded-lg border border-customLightGray`}
+          className={`w-full flex flex-row px-5 py-4 items-center justify-between rounded-lg border border-gray-500`}
         >
           <p>{amount}</p>
           <span
@@ -185,7 +189,7 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
             <div className="md:mr-2 relative">
               <TokenIcon token={{ logoURI: "/images/tokens/pop.svg" } as Token} imageSize="w-5 h-5" chainId={1} />
             </div>
-            <p className="font-medium text-lg leading-none hidden md:block text-black group-hover:text-primary">
+            <p className="font-medium text-lg leading-none hidden md:block text-white group-hover:text-[#DFFF1C]">
               {pop?.symbol}
             </p>
           </span>

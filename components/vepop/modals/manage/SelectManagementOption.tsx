@@ -17,7 +17,7 @@ export default function SelectManagementOption({ setStep, setManagementOption }:
         </p>
       </div>
       <div className="space-y-4">
-        <div className="w-full px-4 py-4 border border-customGrayLight rounded-lg">
+        <div className="w-full px-4 py-4 border border-gray-500 rounded-lg">
           <TertiaryActionButton
             label="Increase Lock Amount"
             handleClick={() => {
@@ -26,7 +26,7 @@ export default function SelectManagementOption({ setStep, setManagementOption }:
             }}
           />
         </div>
-        <div className="w-full px-4 py-4 border border-customGrayLight rounded-lg">
+        <div className="w-full px-4 py-4 border border-gray-500 rounded-lg">
           <TertiaryActionButton
             label="Increase Lock Time"
             handleClick={() => {
@@ -35,7 +35,7 @@ export default function SelectManagementOption({ setStep, setManagementOption }:
             }}
           />
         </div>
-        <div className="w-full px-4 py-4 border border-customGrayLight rounded-lg">
+        <div className="w-full px-4 py-4 border border-gray-500 rounded-lg">
           <TertiaryActionButton
             label="Unlock POP"
             handleClick={() => {

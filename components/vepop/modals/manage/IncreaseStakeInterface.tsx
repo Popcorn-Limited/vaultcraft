@@ -49,6 +49,8 @@ export default function IncreaseStakeInterface({ amountState, lockedBal }: Incre
           selectedToken={
             {
               ...popLp,
+              symbol:"POP LP",
+              name:"POP LP",
               balance: Number(popLpBal?.value || 0) || 0,
             } as any
           }
@@ -62,11 +64,11 @@ export default function IncreaseStakeInterface({ amountState, lockedBal }: Incre
       <div className="space-y-2">
         <div className="flex flex-row items-center justify-between text-secondaryLight">
           <p>Current Lock Amount</p>
-          <p className="text-[#141416]">{lockedBal ? formatAndRoundBigNumber(lockedBal?.amount, 18) : ""} POP</p>
+          <p>{lockedBal ? formatAndRoundBigNumber(lockedBal?.amount, 18) : ""} POP</p>
         </div>
         <div className="flex flex-row items-center justify-between text-secondaryLight">
           <p>Unlock Date</p>
-          <p className="text-[#141416]">{lockedBal && lockedBal?.end.toString() !== "0" ? new Date(Number(lockedBal?.end) * 1000).toLocaleDateString() : "-"}</p>
+          <p>{lockedBal && lockedBal?.end.toString() !== "0" ? new Date(Number(lockedBal?.end) * 1000).toLocaleDateString() : "-"}</p>
         </div>
       </div>
 
