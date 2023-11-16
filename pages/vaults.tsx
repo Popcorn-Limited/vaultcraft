@@ -75,7 +75,13 @@ const Vaults: NextPage = () => {
       setZapAssets(newZapAssets);
 
       // get available zapAddresses
-      setAvailableZapAssets({ 1: await getAvailableZapAssets(1) })
+      setAvailableZapAssets({
+        1: await getAvailableZapAssets(1),
+        137: await getAvailableZapAssets(137),
+        10: await getAvailableZapAssets(10),
+        42161: await getAvailableZapAssets(42161),
+        56: await getAvailableZapAssets(56)
+      })
 
       // get gauge rewards
       if (account) {
@@ -253,14 +259,14 @@ const Vaults: NextPage = () => {
       </section>
 
       <section className="grid grid-cols-1 md:grid-cols-3 gap-4 px-4 md:px-8">
-        {vaults.length > 0 ? vaults.filter(vault => selectedNetworks.includes(vault.chainId)).filter(vault => !HIDDEN_VAULTS.includes(vault.address)).map((vault) => {
+        {(vaults.length > 0 && Object.keys(availableZapAssets).length > 0) ? vaults.filter(vault => selectedNetworks.includes(vault.chainId)).filter(vault => !HIDDEN_VAULTS.includes(vault.address)).map((vault) => {
           return (
             <SmartVault
               key={`sv-${vault.address}-${vault.chainId}`}
               vaultData={vault}
               mutateTokenBalance={mutateTokenBalance}
               searchString={searchString}
-              zapAssets={vault.chainId === 1 && availableZapAssets[1]?.includes(vault.asset.address) ? zapAssets[vault.chainId] : undefined}
+              zapAssets={availableZapAssets[vault.chainId].includes(vault.asset.address) ? zapAssets[vault.chainId] : undefined}
               deployer={"0x22f5413C075Ccd56D575A54763831C4c27A37Bdb"}
             />
           )
