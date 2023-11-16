@@ -47,7 +47,7 @@ export default function Page({
     <>
       <div className="bg-[#141416] w-full mx-auto min-h-screen h-full font-khTeka flex flex-col">
         <DesktopMenu />
-        <div>
+        <div className="flex-1">
           {children}
         </div>
         <div className="py-10"></div>

@@ -9,6 +9,7 @@ import Title from "@/components/common/Title";
 import useGaugeWeights from "@/lib/gauges/useGaugeWeights";
 import calculateAPR from "@/lib/gauges/calculateGaugeAPR";
 import { NumberFormatter, formatNumber } from "@/lib/utils/formatBigNumber";
+import {roundToTwoDecimalPlaces} from '@/lib/utils/helpers'
 
 interface GaugeProps {
   vaultData: VaultData;
@@ -66,7 +67,7 @@ export default function Gauge({ vaultData, index, votes, handleVotes, canVote }:
                 <>
                   <p className="font-normal text-primary xs:text-[14px]">Min Boost</p>
                   <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
-                    {NumberFormatter.format(gaugeApr[0])} %
+                    {NumberFormatter.format(roundToTwoDecimalPlaces(gaugeApr[0]))} %
                   </Title>
                 </>
               }
@@ -76,7 +77,7 @@ export default function Gauge({ vaultData, index, votes, handleVotes, canVote }:
                 <>
                   <p className="font-normal text-primary xs:text-[14px]">Max Boost</p>
                   <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
-                    {NumberFormatter.format(gaugeApr[1])} %
+                    {NumberFormatter.format(roundToTwoDecimalPlaces(gaugeApr[1]))} %
                   </Title>
                 </>
               }

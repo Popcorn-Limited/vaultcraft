@@ -7,6 +7,7 @@ import { useAtom } from "jotai";
 import { yieldOptionsAtom } from "@/lib/atoms/sdk";
 import { useEffect, useState } from "react";
 import calculateAPR from "@/lib/gauges/calculateGaugeAPR";
+import {roundToTwoDecimalPlaces} from "@/lib/utils/helpers";
 
 interface VaultStatProps {
   vaultData: VaultData
@@ -73,7 +74,7 @@ export default function VaultStats({ vaultData, account, zapAvailable }: VaultSt
         <div className="w-full mt-6 xs:mt-0">
           <p className="font-normal text-primary xs:text-[14px]">vAPY</p>
           <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
-            {apy ? `${NumberFormatter.format(apy)} %` : "0 %"}
+            {apy ? `${NumberFormatter.format(roundToTwoDecimalPlaces(apy))} %` : "0 %"}
           </Title>
         </div>
         <div className="w-full mt-6 xs:mt-0">
@@ -81,7 +82,7 @@ export default function VaultStats({ vaultData, account, zapAvailable }: VaultSt
             <>
               <p className="font-normal text-primary xs:text-[14px]">Min Boost</p>
               <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
-                {NumberFormatter.format(gaugeApr[0])} %
+                {NumberFormatter.format(roundToTwoDecimalPlaces(gaugeApr[0]))} %
               </Title>
             </>
           }
@@ -91,7 +92,7 @@ export default function VaultStats({ vaultData, account, zapAvailable }: VaultSt
             <>
               <p className="font-normal text-primary xs:text-[14px]">Max Boost</p>
               <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
-                {NumberFormatter.format(gaugeApr[1])} %
+                {NumberFormatter.format(roundToTwoDecimalPlaces(gaugeApr[1]))} %
               </Title>
             </>
           }
