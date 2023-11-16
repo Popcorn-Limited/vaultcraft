@@ -110,17 +110,17 @@ export default function Migration(): JSX.Element {
 
     return (
         <>
-            <div className="w-full xs:pt-6 xs:px-6 smmd:pt-0 xs:border-t xs:border-[#353945] smmd:border-none smmd:mt-20">
-                <h1 className="xs:text-[32px] leading-none smmd:text-center smmd:text-[56px] font-normal m-0 xs:mb-2 smmd:mb-4 md:mb-6 leading-0 text-primary">
+            <div className="w-full pt-6 px-6 md:pt-0 border-t border-[#353945] md:border-none md:mt-10">
+                <h1 className="text-[32px] leading-none md:text-center md:text-[56px] font-normal m-0 mb-2 md:mb-6 leading-0 text-primary">
                     POP Migration
                 </h1>
-                <p className="xs:text-[18px] leading-none smmd:text-4 xs:text-left smmd:text-center text-base text-primary">
+                <p className="leading-none md:text-4 text-left md:text-center text-xl text-primary">
                     Migrate your POP to VCX
                 </p>
             </div>
-            <div className="xs:px-6 smmd:px-8 py-10 border-t border-b border-[#353945] xs:mt-6 smmd:mt-10 w-full">
+            <div className="px-6 md:px-8 py-10 border-t border-b border-[#353945] mt-6 md:mt-10 w-full">
                 {(vcxBal && popBal) ?
-                    <div className="rounded-lg xs:w-full md:w-1/3 md:min-w-[870px] bg-[#23262F] md:ml-auto md:mr-auto md:p-8 px-8 pt-6 pb-5 md:pl-11 border border-[#353945] [&_summary::-webkit-details-marker]:hidden">
+                    <div className="rounded-lg w-full md:w-1/3 md:min-w-[870px] bg-[#23262F] md:ml-auto md:mr-auto md:p-8 px-8 pt-6 pb-5 md:pl-11 border border-[#353945] [&_summary::-webkit-details-marker]:hidden">
                         <InputTokenWithError
                             onSelectToken={() => { }}
                             onMaxClick={() => handleChangeInput({ currentTarget: { value: Math.round(Number(formatEther(popBal.value)) * ROUNDING_VALUE) / ROUNDING_VALUE } })}
@@ -166,7 +166,7 @@ export default function Migration(): JSX.Element {
                             allowSelection={false}
                             allowInput
                         />
-                        <MainActionButton className="xs:mt-10 smmd:mt-8" label="Convert POP" handleClick={handleMainAction} />
+                        <MainActionButton className="mt-10 md:mt-8" label="Convert POP" handleClick={handleMainAction} />
                     </div>
                     : <p>Loading...</p>
                 }
