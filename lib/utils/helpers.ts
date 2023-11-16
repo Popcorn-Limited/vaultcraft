@@ -31,3 +31,5 @@ export async function handleCallResult({ successMessage, simulationResponse, cli
     return false;
   }
 }
+
+export const roundToTwoDecimalPlaces = (numberToRound: number, decimals = 2): number => Number((Math.round(numberToRound * Math.pow(10, decimals)) / Math.pow(10, decimals)).toFixed(decimals));
