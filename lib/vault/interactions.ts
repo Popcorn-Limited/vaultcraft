@@ -30,19 +30,6 @@ interface VaultRouterSimulateProps extends VaultSimulateProps {
   gauge: Address;
 }
 
-export enum ActionType {
-  Deposit,
-  Withdrawal,
-  Stake,
-  Unstake,
-  DepositAndStake,
-  UnstakeAndWithdraw,
-  ZapDeposit,
-  ZapWithdrawal,
-  ZapDepositAndStake,
-  ZapUnstakeAndWithdraw
-}
-
 async function simulateVaultCall({ address, account, amount, functionName, publicClient }: VaultSimulateProps): Promise<SimulationResponse> {
   try {
     const { request } = await publicClient.simulateContract({
