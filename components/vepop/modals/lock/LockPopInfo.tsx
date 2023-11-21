@@ -19,7 +19,7 @@ export default function LockPopInfo(): JSX.Element {
       </div>
       <div className="flex flex-row items-center justify-center space-x-4">
         <div className="h-2 w-20 rounded-2xl bg-white"></div>
-        <div className="h-2 w-20 rounded-2xl bg-[#23262f]"></div>
+        <div className="h-2 w-20 rounded-2xl bg-[#353945]"></div>
       </div>
     </div>
   )

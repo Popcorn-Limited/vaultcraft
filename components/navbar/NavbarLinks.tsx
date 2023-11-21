@@ -18,6 +18,10 @@ const links: { label: string, url: string, onClick?: Function }[] = [
     label: "Stats",
     url: "/stats"
   },
+  {
+    label: "Pop to VCX Migration",
+    url: "/migration"
+  },
 ]
 
 
