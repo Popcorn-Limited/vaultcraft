@@ -22,6 +22,7 @@ import { WalletClient } from "viem";
 import { useAtom } from "jotai";
 import { vaultsAtom } from "@/lib/atoms/vaults";
 import { getVaultNetworthByChain } from "@/lib/getNetworth";
+import VaultsSorting from "@/components/vault/VaultsSorting";
 
 export const HIDDEN_VAULTS = ["0xb6cED1C0e5d26B815c3881038B88C829f39CE949", "0x2fD2C18f79F93eF299B20B681Ab2a61f5F28A6fF",
   "0xDFf04Efb38465369fd1A2E8B40C364c22FfEA340", "0xd4D442AC311d918272911691021E6073F620eb07", //@dev for some reason the live 3Crypto yVault isnt picked up by the yearnAdapter nor the yearnFactoryAdapter
@@ -246,15 +247,18 @@ const Vaults: NextPage = () => {
 
       <section className="mt-8 mb-10 md:mb-6 md:my-10 md:flex px-4 md:px-8 flex-row items-center justify-between">
         <NetworkFilter supportedNetworks={SUPPORTED_NETWORKS.map(chain => chain.id)} selectNetwork={selectNetwork} />
-        <div className="md:w-96 flex px-6 py-3 items-center rounded-lg border border-gray-300 border-opacity-40 group/search hover:border-opacity-80 gap-2 smmd:mt-6 xs:mt-12 xs:mb-6 md:my-0">
-          <MagnifyingGlassIcon className="w-8 h-8 text-gray-400 group-hover/search:text-gray-200" />
-          <input
-            className="w-10/12 md:w-80 focus:outline-none border-0 text-gray-500 focus:text-gray-200 leading-none bg-transparent"
-            type="text"
-            placeholder="Search..."
-            onChange={(e) => handleSearch(e.target.value.toLowerCase())}
-            defaultValue={searchString}
-          />
+        <div className="flex gap-4 xs:justify-between md:justify-end">
+          <div className="md:w-96 flex px-6 py-3 items-center rounded-lg border border-gray-300 border-opacity-40 group/search hover:border-opacity-80 gap-2 smmd:mt-6 xs:mt-12 xs:mb-6 md:my-0">
+            <MagnifyingGlassIcon className="w-8 h-8 text-gray-400 group-hover/search:text-gray-200" />
+            <input
+                className="w-10/12 md:w-80 focus:outline-none border-0 text-gray-500 focus:text-gray-200 leading-none bg-transparent"
+                type="text"
+                placeholder="Search..."
+                onChange={(e) => handleSearch(e.target.value.toLowerCase())}
+                defaultValue={searchString}
+            />
+          </div>
+          <VaultsSorting className="smmd:mt-6 xs:mt-12 xs:mb-6 md:my-0" />
         </div>
       </section>
 
