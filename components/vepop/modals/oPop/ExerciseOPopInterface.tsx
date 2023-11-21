@@ -13,9 +13,9 @@ import { useEthToUsd } from "@/lib/oPop/ethToUsd";
 import { formatEther } from "viem";
 
 const {
-  POP: POP,
-  oPOP: OPOP,
-  BalancerOracle: OPOP_ORACLE,
+  VCX,
+  oVCX: OVCX,
+  BalancerOracle: OVCX_ORACLE,
   WETH: WETH
 } = getVeAddresses();
 
@@ -33,16 +33,16 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
   const [amount, setAmount] = amountState;
   const [maxPaymentAmount, setMaxPaymentAmount] = maxPaymentAmountState;
 
-  const { data: oPopBal } = useBalance({ chainId: 1, address: account, token: OPOP })
+  const { data: oVcxBal } = useBalance({ chainId: 1, address: account, token: OVCX })
   const { data: wethBal } = useBalance({ chainId: 1, address: account, token: WETH })
 
-  const { data: oPop } = useToken({ chainId: 1, address: OPOP });
-  const { data: pop } = useToken({ chainId: 1, address: POP });
+  const { data: oVcx } = useToken({ chainId: 1, address: OVCX });
+  const { data: vcx } = useToken({ chainId: 1, address: VCX });
   const { data: weth } = useToken({ chainId: 1, address: WETH });
 
-  const [oPopPrice, setOPopPrice] = useState<bigint>(ZERO); // oPOP price in ETH (needs to be multiplied with the eth price to arrive at USD prices)
-  const [oPopDiscount, setOPopDiscount] = useState<number>(0);
-  const [popPrice, setPopPrice] = useState<number>(0);
+  const [oVcxPrice, setOVcxPrice] = useState<bigint>(ZERO); // oVCX price in ETH (needs to be multiplied with the eth price to arrive at USD prices)
+  const [oVcxDiscount, setOVcxDiscount] = useState<number>(0);
+  const [vcxPrice, setVCXPrice] = useState<number>(0);
   const [wethPrice, setWethPrice] = useState<number>(0);
 
   const [initialLoad, setInitialLoad] = useState<boolean>(false)
@@ -51,18 +51,21 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
     function setUpPrices() {
       setInitialLoad(true)
 
-      llama({ address: "0x6F0fecBC276de8fC69257065fE47C5a03d986394", chainId: 10 }).then(res => setPopPrice(res))
+      //llama({ address: "0x6F0fecBC276de8fC69257065fE47C5a03d986394", chainId: 10 }).then(res => setVCXPrice(res))
+      // TODO -- actually fetch VCX price
+      setVCXPrice(0.0001)
+
       llama({ address: WETH, chainId: 1 }).then(res => setWethPrice(res))
       publicClient.readContract({
-        address: OPOP_ORACLE,
+        address: OVCX_ORACLE,
         abi: BalancerOracleAbi,
         functionName: 'getPrice',
-      }).then(res => setOPopPrice(res))
+      }).then(res => setOVcxPrice(res))
       publicClient.readContract({
-        address: OPOP_ORACLE,
+        address: OVCX_ORACLE,
         abi: BalancerOracleAbi,
         functionName: 'multiplier',
-      }).then(res => setOPopDiscount(res))
+      }).then(res => setOVcxDiscount(res))
     }
     if (!initialLoad) setUpPrices()
   }, [initialLoad])
@@ -75,22 +78,22 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
   };
 
   function handleMaxOPop() {
-    const maxOPop = formatEther(safeRound(oPopBal?.value || ZERO, 18));
+    const maxOPop = formatEther(safeRound(oVcxBal?.value || ZERO, 18));
 
     setMaxPaymentAmount(getMaxPaymentAmount(Number(maxOPop)));
     setAmount(maxOPop)
   };
 
-  function getMaxPaymentAmount(oPopAmount: number) {
-    const oPopValue = oPopAmount * ((Number(oPopPrice) / 1e18) * wethPrice);
+  function getMaxPaymentAmount(oVcxAmount: number) {
+    const oVcxValue = oVcxAmount * ((Number(oVcxPrice) / 1e18) * wethPrice);
 
-    return String((oPopValue / wethPrice) * (1 + SLIPPAGE));
+    return String((oVcxValue / wethPrice) * (1 + SLIPPAGE));
   }
 
   function getOPopAmount(paymentAmount: number) {
     const ethValue = paymentAmount * wethPrice;
 
-    return String(ethValue / (((Number(oPopPrice) / 1e18) * wethPrice) * (1 - SLIPPAGE)));
+    return String(ethValue / (((Number(oVcxPrice) / 1e18) * wethPrice) * (1 - SLIPPAGE)));
   }
 
   const handleOPopInput: FormEventHandler<HTMLInputElement> = ({ currentTarget: { value } }) => {
@@ -107,14 +110,14 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
 
   return (
     <div className="mb-8 text-start">
-      <h2 className="text-start text-5xl">Exercise oPOP</h2>
+      <h2 className="text-start text-5xl">Exercise oVCX</h2>
       <p className="text-primary font-semibold">
-        Strike Price: $ {formatAndRoundBigNumber(useEthToUsd(oPopPrice) || ZERO, 18)}
-        | POP Price: $ {popPrice}
-        | Discount: {(Number(oPopDiscount) / 100).toFixed(2)} %</p>
+        Strike Price: $ {formatAndRoundBigNumber(useEthToUsd(oVcxPrice) || ZERO, 18)}
+        | VCX Price: $ {vcxPrice}
+        | Discount: {(Number(oVcxDiscount) / 100).toFixed(2)} %</p>
       <div className="mt-8">
         <InputTokenWithError
-          captionText={"Amount oPOP"}
+          captionText={"Amount oVCX"}
           onSelectToken={() => { }}
           onMaxClick={handleMaxOPop}
           chainId={1}
@@ -123,14 +126,12 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
           allowInput={true}
           selectedToken={
             {
-              ...oPop,
-              symbol: "oPOP",
-              name: "oPOP",
-              logoURI: "/images/tokens/oPop.svg",
-              balance: oPopBal?.value || ZERO,
+              ...oVcx,
+              logoURI: "/images/tokens/oVcx.svg",
+              balance: oVcxBal?.value || ZERO,
             } as any
           }
-          errorMessage={Number(amount) > (Number(oPopBal?.value) / 1e18) ? "Insufficient Balance" : ""}
+          errorMessage={Number(amount) > (Number(oVcxBal?.value) / 1e18) ? "Insufficient Balance" : ""}
           tokenList={[]}
         />
         <div className="flex justify-center -mt-2 mb-4">
@@ -148,8 +149,6 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
           selectedToken={
             {
               ...weth,
-              symbol: "WETH",
-              name: "WETH",
               decimals: 18,
               logoURI: "https://etherscan.io/token/images/weth_28.png",
               balance: wethBal?.value || ZERO,
@@ -178,7 +177,7 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
       </div>
 
       <div className="mt-4">
-        <p className="text-primary">Received POP</p>
+        <p className="text-primary">Received VCX</p>
         <div
           className={`w-full flex flex-row px-5 py-4 items-center justify-between rounded-lg border border-gray-500`}
         >
@@ -190,7 +189,7 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
               <TokenIcon token={{ logoURI: "/images/tokens/pop.svg" } as Token} imageSize="w-5 h-5" chainId={1} />
             </div>
             <p className="font-medium text-lg leading-none hidden md:block text-white group-hover:text-[#DFFF1C]">
-              {pop?.symbol}
+              {vcx?.symbol}
             </p>
           </span>
         </div>

@@ -7,10 +7,10 @@ export default function OptionInfo(): JSX.Element {
       </svg>
 
       <div>
-        <h2 className="text-start text-5xl">Exercise oPOP</h2>
+        <h2 className="text-start text-5xl">Exercise oVCX</h2>
         <p className="text-start">
-          Exercise your oPOP to buy discounted POP.
-          You need to burn oPOP and pay with WETH to get cheap POP directly from the DAO.
+          Exercise your oVCX to buy discounted VCX.
+          You need to burn oVCX and pay with WETH to get cheap VCX directly from the DAO.
         </p>
       </div>
     </div>

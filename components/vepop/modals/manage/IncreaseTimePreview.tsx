@@ -12,24 +12,24 @@ export default function IncreaseTimePreview({ days, lockedBal }: { days: number,
       <div className="space-y-2">
         <div className="flex flex-row items-center justify-between text-secondaryLight">
           <p>Lock Time</p>
-          <p >{days} Days</p>
+          <p>{days} Days</p>
         </div>
         <div className="flex flex-row items-center justify-between text-secondaryLight">
           <p>Unlock Date</p>
-          <p >{new Date(calcUnlockTime(totalDays)).toLocaleDateString()}</p>
+          <p>{new Date(calcUnlockTime(totalDays)).toLocaleDateString()}</p>
         </div>
         <div className="flex flex-row items-center justify-between text-secondaryLight">
           <p>Lock Amount</p>
-          <p >{lockedBal && amount.toFixed(2)}</p>
+          <p>{lockedBal && amount.toFixed(2)}</p>
         </div>
         <div className="flex flex-row items-center justify-between text-secondaryLight">
           <p>New Voting Power</p>
-          <p >{amount > 0 ? calculateVeOut(amount, totalDays).toFixed(2) : "0"} vePOP</p>
+          <p>{amount > 0 ? calculateVeOut(amount, totalDays).toFixed(2) : "0"} veVCX</p>
         </div>
       </div>
 
       <div className="w-full bg-[#d7d7d726] border border-customLightGray rounded-lg p-4">
-        <p className="text-primaryDark">Important: vePOP is not transferrable and unlocking POP LP early results in a penalty of up to 75% of your POP LP</p>
+        <p className="text-primaryDark">Important: veVCX is not transferrable and unlocking VCX LP early results in a penalty of up to 75% of your VCX LP</p>
       </div>
 
     </div >

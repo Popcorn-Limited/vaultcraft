@@ -33,7 +33,7 @@ export const HIDDEN_VAULTS = ["0xb6cED1C0e5d26B815c3881038B88C829f39CE949", "0x2
   "0x759281a408A48bfe2029D259c23D7E848A7EA1bC", // yCRV
 ]
 
-const { oPOP: OPOP } = getVeAddresses();
+const { oVCX: OVCX } = getVeAddresses();
 
 const NETWORKS_SUPPORTING_ZAP = [1]
 
@@ -61,7 +61,7 @@ const Vaults: NextPage = () => {
   const [networth, setNetworth] = useState<number>(0);
 
   const [gaugeRewards, setGaugeRewards] = useState<GaugeRewards>()
-  const { data: oBal } = useBalance({ chainId: 1, address: account, token: OPOP, watch: true })
+  const { data: oBal } = useBalance({ chainId: 1, address: account, token: OVCX, watch: true })
 
   const [searchString, handleSearch] = useState("");
 
@@ -204,14 +204,14 @@ const Vaults: NextPage = () => {
           <div className="flex flex-row items-center md:gap-6 md:w-fit md:pl-12">
             <div className="flex gap-10 w-fit">
               <div className="xs:w-[120px] md:w-max">
-                <p className="w-max leading-6 text-base text-primaryDark smmd:text-primary">My oPOP</p>
+                <p className="w-max leading-6 text-base text-primaryDark smmd:text-primary">My oVCX</p>
                 <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
                   {`${oBal ? NumberFormatter.format(Number(oBal?.value) / 1e18) : "0"}`}
                 </div>
               </div>
 
               <div className="xs:w-[120px] md:w-max">
-                <p className="w-max leading-6 text-base text-primaryDark smmd:text-primary">Claimable oPOP</p>
+                <p className="w-max leading-6 text-base text-primaryDark smmd:text-primary">Claimable oVCX</p>
                 <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
                   {`$${gaugeRewards ? NumberFormatter.format(Number(gaugeRewards?.total) / 1e18) : "0"}`}
                 </div>
@@ -220,7 +220,7 @@ const Vaults: NextPage = () => {
 
             <div className="hidden align-bottom md:block md:mt-auto w-fit">
               <MainActionButton
-                label="Claim oPOP"
+                label="Claim oVCX"
                 handleClick={() =>
                   claimOPop({
                     gauges: gaugeRewards?.amounts?.filter(gauge => Number(gauge.amount) > 0).map(gauge => gauge.address) as Address[],
@@ -232,7 +232,7 @@ const Vaults: NextPage = () => {
           </div>
           <div className="md:hidden">
             <MainActionButton
-              label="Claim oPOP"
+              label="Claim oVCX"
               handleClick={() =>
                 claimOPop({
                   gauges: gaugeRewards?.amounts?.filter(gauge => Number(gauge.amount) > 0).map(gauge => gauge.address) as Address[],

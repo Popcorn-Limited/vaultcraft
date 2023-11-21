@@ -10,10 +10,11 @@ import LockPopInterface from "@/components/vepop/modals/lock/LockPopInterface";
 import LockPreview from "@/components/vepop/modals/lock/LockPreview";
 import VotingPowerInfo from "@/components/vepop/modals/lock/VotingPowerInfo";
 import { handleAllowance } from "@/lib/approve";
+import { Token } from "@/lib/types";
 import { createLock } from "@/lib/gauges/interactions";
 
 const {
-  BalancerPool: POP_LP,
+  BalancerPool: VCX_LP,
   VotingEscrow: VOTING_ESCROW
 } = getVeAddresses()
 
@@ -47,7 +48,7 @@ export default function LockModal({ show }: { show: [boolean, Dispatch<SetStateA
     if (chain?.id as number !== Number(1)) switchNetwork?.(Number(1));
 
     await handleAllowance({
-      token: POP_LP,
+      token: VCX_LP,
       amount: (val * (10 ** 18) || 0),
       account: account as Address,
       spender: VOTING_ESCROW,
@@ -72,7 +73,7 @@ export default function LockModal({ show }: { show: [boolean, Dispatch<SetStateA
 
         <div className="space-y-4">
           {step < 3 && <MainActionButton label="Next" handleClick={() => setStep(step + 1)} />}
-          {step === 3 && <MainActionButton label={"Lock POP LP"} handleClick={handleLock} />}
+          {step === 3 && <MainActionButton label={"Lock VCX LP"} handleClick={handleLock} />}
           {step === 0 && <SecondaryActionButton label="Skip" handleClick={() => setStep(2)} />}
           {step === 1 || step === 3 && <SecondaryActionButton label="Back" handleClick={() => setStep(step - 1)} />}
         </div>

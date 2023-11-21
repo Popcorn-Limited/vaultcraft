@@ -12,8 +12,8 @@ export default function SelectManagementOption({ setStep, setManagementOption }:
       <div>
         <h2 className="text-start text-5xl">Update your Lock</h2>
         <p className="text-start text-primaryDark">
-          Increase your vePOP by locking more POP LP or increasing the lock time for your locked POP LP balance.
-          Alternatively Unlock your locked POP LP.
+          Increase your veVCX by locking more VCX LP or increasing the lock time for your locked VCX LP balance.
+          Alternatively Unlock your locked VCX LP.
         </p>
       </div>
       <div className="space-y-4">
@@ -37,7 +37,7 @@ export default function SelectManagementOption({ setStep, setManagementOption }:
         </div>
         <div className="w-full px-4 py-4 border border-gray-500 rounded-lg">
           <TertiaryActionButton
-            label="Unlock POP"
+            label="Unlock VCX"
             handleClick={() => {
               setManagementOption(ManagementOption.Unlock);
               setStep(1)

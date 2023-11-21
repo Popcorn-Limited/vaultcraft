@@ -17,7 +17,7 @@ interface SimulateProps {
   args?: any[]
 }
 
-const { oPOP: OPOP, Minter: OPOP_MINTER } = getVeAddresses()
+const { oVCX, Minter: OVCX_MINTER } = getVeAddresses()
 
 async function simulateCall({ account, contract, functionName, publicClient, args }: SimulateProps): Promise<SimulationResponse> {
   try {
@@ -51,7 +51,7 @@ export async function exerciseOPop({ amount, maxPaymentAmount, account, clients 
   const { request, success, error: simulationError } = await simulateCall({
     account,
     contract: {
-      address: OPOP,
+      address: oVCX,
       abi: OPopAbi,
     },
     functionName: "exercise",
@@ -63,7 +63,7 @@ export async function exerciseOPop({ amount, maxPaymentAmount, account, clients 
     try {
       const hash = await clients.walletClient.writeContract(request)
       const receipt = await clients.publicClient.waitForTransactionReceipt({ hash })
-      showSuccessToast("oPOP exercised successfully!")
+      showSuccessToast("oVCX exercised successfully!")
     } catch (error: any) {
       showErrorToast(error.shortMessage)
     }
@@ -83,7 +83,7 @@ export async function claimOPop({ gauges, account, clients }: ClaimOPopProps) {
   const { request, success, error: simulationError } = await simulateCall({
     account,
     contract: {
-      address: OPOP_MINTER,
+      address: OVCX_MINTER,
       abi: MinterAbi,
     },
     functionName: "mintMany",
@@ -95,7 +95,7 @@ export async function claimOPop({ gauges, account, clients }: ClaimOPopProps) {
     try {
       const hash = await clients.walletClient.writeContract(request)
       const receipt = await clients.publicClient.waitForTransactionReceipt({ hash })
-      showSuccessToast("oPOP Succesfully Claimed!")
+      showSuccessToast("oVCX Succesfully Claimed!")
     } catch (error: any) {
       showErrorToast(error.shortMessage)
     }

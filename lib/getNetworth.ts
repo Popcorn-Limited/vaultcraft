@@ -69,7 +69,7 @@ export async function getNetworthByChain({ account, chain }: { account: Address,
   // Get balances
   const balances = await getBalancesByChain({ account, client, addresses: BaseAddressesByChain[client.chain?.id as number] })
 
-  // Get value of POP holdings
+  // Get value of VCX holdings
   const popPrice = await resolvePrice({ address: PopByChain[10], chainId: 10, client: undefined, resolver: 'llama' })
   const popNetworth = ((balances.find(entry => entry.address === PopByChain[chain.id])?.balance || 0) * popPrice) / (1e18);
   const stakeNetworth = ((balances.find(entry => entry.address === PopStakingByChain[chain.id])?.balance || 0) * popPrice) / (1e18);

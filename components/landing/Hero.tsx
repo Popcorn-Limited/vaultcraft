@@ -50,7 +50,7 @@ export default function Hero(): JSX.Element {
               className="md:min-w-[160px] lg:min-w-0"
             />
             <StatusWithLabel
-              label={"POP in Wallet"}
+              label={"VCX in Wallet"}
               content={<p className="text-3xl font-bold text-primary leading-[120%]">$ {loading ? "..." : NumberFormatter.format(networth.pop)}</p>}
               className="md:min-w-[160px] lg:min-w-0"
             />

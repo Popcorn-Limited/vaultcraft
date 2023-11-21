@@ -400,7 +400,7 @@ export default function Vaults() {
                     color: "#9B55FF"
                 },
                 {
-                    name: "POP in 80/20 BAL pool, USD",
+                    name: "VCX in 80/20 BAL pool, USD",
                     y: 80, //Number(popInBalPool?.token?.latestUSDPrice) * Number(popInBalPool?.balance),
                     color: "#7AFB79"
                 },
@@ -460,11 +460,11 @@ export default function Vaults() {
                             <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>${statistics.marketCap.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 })}</h2>
                         </div>
                         <div className={`flex flex-col`}>
-                            <p className={`text-[1rem]`}>POP Price</p>
+                            <p className={`text-[1rem]`}>VCX Price</p>
                             <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>${statistics.popPrice.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 })}</h2>
                         </div>
                         <div className={`flex flex-col`}>
-                            <p className={`text-[1rem]`}>Burned POP</p>
+                            <p className={`text-[1rem]`}>Burned VCX</p>
                             <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>Coming Soon</h2>
                         </div>
                     </div>
@@ -472,14 +472,14 @@ export default function Vaults() {
                         <div className={`h-[4rem] flex gap-2 border-b border-[#353945] px-[1.5rem]`}>
                             <img src="/images/icons/popLogo.svg" alt="Logo" className={`w-8 h-8 self-center`} />
                             <div className={`flex flex-col justify-center`}>
-                                <p className={`text-[1rem]`}>POPCORN</p>
-                                <p className={`text-[0.625rem]`}>Liquid POP market (Mainnet only)</p>
+                                <p className={`text-[1rem]`}>VCXCORN</p>
+                                <p className={`text-[0.625rem]`}>Liquid VCX market (Mainnet only)</p>
                             </div>
                         </div>
                         <div className={`py-4 px-6 flex flex-col md:flex-row gap-[3.5rem]`}>
                             <div className={`flex flex-col grow-[1]`}>
                                 <div className={`flex justify-between`}>
-                                    <p>POP in 80/20 BAL pool</p>
+                                    <p>VCX in 80/20 BAL pool</p>
                                     <p className={`font-bold text-right`}>Coming Soon {/*statistics.popInBalPool.toLocaleString()*/}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
@@ -491,15 +491,15 @@ export default function Vaults() {
                                     <p className={`font-bold text-right`}>Coming Soon {/*statistics.balLp.toLocaleString()*/}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
-                                    <p>vePOP (staked LPs)</p>
+                                    <p>veVCX (staked LPs)</p>
                                     <p className={`font-bold text-right`}>Coming Soon {/*statistics.vePop.toLocaleString()*/}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
-                                    <p>cPOP emissions</p>
+                                    <p>cVCX emissions</p>
                                     <p className={`font-bold text-right`}>Coming Soon {/*statistics.cPopEmissions.toLocaleString()*/}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
-                                    <p>cPOP exercised</p>
+                                    <p>cVCX exercised</p>
                                     <p className={`font-bold text-right`}>Coming Soon {/*(statistics.cPopExercised * 100).toLocaleString() %*/}</p>
                                 </div>
                             </div>
@@ -540,7 +540,7 @@ export default function Vaults() {
                                     <p className={`font-bold text-right`}>Coming Soon</p>
                                 </div>
                                 <div className={`flex justify-between`}>
-                                    <p>cPOP Revenue</p>
+                                    <p>cVCX Revenue</p>
                                     <p className={`font-bold text-right`}>Coming Soon {/*statistics.cPopRevenue.toLocaleString()*/}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
@@ -560,19 +560,19 @@ export default function Vaults() {
                                     <p className={`font-bold text-right`}>${statistics.weekDexVolume.toLocaleString()}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
-                                    <p>{'Wallets with POP > 100'}</p>
+                                    <p>{'Wallets with VCX > 100'}</p>
                                     <p className={`font-bold text-right`}>{statistics.walletsPopMoreHundred.toLocaleString()}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
-                                    <p>{'Wallets with POP > 1,000'}</p>
+                                    <p>{'Wallets with VCX > 1,000'}</p>
                                     <p className={`font-bold text-right`}>{statistics.walletsPopMoreThousand.toLocaleString()}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
-                                    <p>{'Wallets with POP > 100,000'}</p>
+                                    <p>{'Wallets with VCX > 100,000'}</p>
                                     <p className={`font-bold text-right`}>{statistics.walletsPopMoreHundredThousand.toLocaleString()}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
-                                    <p>{'Wallets with POP > 1,000,000'}</p>
+                                    <p>{'Wallets with VCX > 1,000,000'}</p>
                                     <p className={`font-bold text-right`}>{statistics.walletsPopMoreMillion.toLocaleString()}</p>
                                 </div>
                             </div>

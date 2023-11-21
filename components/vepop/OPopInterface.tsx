@@ -10,9 +10,8 @@ import { WalletClient } from "viem";
 import { Token } from "@/lib/types";
 
 const {
-  GaugeController: GAUGE_CONTROLLER,
-  oPOP: OPOP,
-  POP,
+  oVCX: OVCX,
+  VCX,
   WETH
 } = getVeAddresses();
 
@@ -27,8 +26,8 @@ export default function OPopInterface({ gauges, setShowOPopModal }: OPopInterfac
   const { data: walletClient } = useWalletClient()
 
   const [gaugeRewards, setGaugeRewards] = useState<GaugeRewards>()
-  const { data: popBal } = useBalance({ chainId: 1, address: account, token: POP, watch: true })
-  const { data: oBal } = useBalance({ chainId: 1, address: account, token: OPOP, watch: true })
+  const { data: vcxBal } = useBalance({ chainId: 1, address: account, token: VCX, watch: true })
+  const { data: oBal } = useBalance({ chainId: 1, address: account, token: OVCX, watch: true })
   const { data: wethBal } = useBalance({ chainId: 1, address: account, token: WETH, watch: true })
 
   const [initalLoad, setInitalLoad] = useState<boolean>(false);
@@ -48,17 +47,17 @@ export default function OPopInterface({ gauges, setShowOPopModal }: OPopInterfac
 
   return (
     <div className="w-full lg:w-1/2 bg-transparent border border-[#353945] rounded-3xl p-8 text-primary md:h-fit">
-      <h3 className="text-2xl pb-6 border-b border-[#353945]">oPOP</h3>
+      <h3 className="text-2xl pb-6 border-b border-[#353945]">oVCX</h3>
       <span className="flex flex-row items-center justify-between mt-6">
-        <p className="">Claimable oPOP</p>
+        <p className="">Claimable oVCX</p>
         <p className="font-bold">{`${gaugeRewards ? NumberFormatter.format(Number(gaugeRewards?.total) / 1e18) : "0"}`}</p>
       </span>
       <span className="flex flex-row items-center justify-between mt-6">
-        <p className="">My POP</p>
-        <p className="font-bold">{`${popBal ? NumberFormatter.format(Number(popBal?.value) / 1e18) : "0"}`}</p>
+        <p className="">My VCX</p>
+        <p className="font-bold">{`${vcxBal ? NumberFormatter.format(Number(vcxBal?.value) / 1e18) : "0"}`}</p>
       </span>
       <span className="flex flex-row items-center justify-between mt-6">
-        <p className="">My oPOP</p>
+        <p className="">My oVCX</p>
         <p className="font-bold">{`${oBal ? NumberFormatter.format(Number(oBal?.value) / 1e18) : "0"}`}</p>
       </span>
       <span className="flex flex-row items-center justify-between mt-6">
@@ -70,7 +69,7 @@ export default function OPopInterface({ gauges, setShowOPopModal }: OPopInterfac
       <div className="lg:flex lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-8 mt-6">
         <div className="w-full md:w-60">
           <MainActionButton
-            label="Claim oPOP"
+            label="Claim oVCX"
             handleClick={() =>
               claimOPop({
                 gauges: gaugeRewards?.amounts?.filter(gauge => Number(gauge.amount) > 0).map(gauge => gauge.address) as Address[],
@@ -81,7 +80,7 @@ export default function OPopInterface({ gauges, setShowOPopModal }: OPopInterfac
           />
         </div>
         <div className="w-full md:w-60">
-          <SecondaryActionButton label="Exercise oPOP" handleClick={() => setShowOPopModal(true)} disabled={oBal ? Number(oBal?.value) === 0 : true} />
+          <SecondaryActionButton label="Exercise oVCX" handleClick={() => setShowOPopModal(true)} disabled={oBal ? Number(oBal?.value) === 0 : true} />
         </div>
       </div>
     </div>

@@ -13,17 +13,15 @@ export type Token = {
 
 export type veAddresses = {
   VCX: Address;
+  WETH_VCX_LP:Address;
+  VE_VCX:Address;
   POP: Address;
   WETH: Address;
-  USDC: Address;
-  DAI: Address
   BalancerPool: Address;
   BalancerOracle: Address;
-  oPOP: Address;
+  oVCX: Address;
   VaultRegistry: Address;
-  Vault1DAI: Address;
-  Vault2USDC: Address;
-  Vault3OUSD: Address;
+  BoostV2:Address;
   Minter: Address;
   TokenAdmin: Address;
   VotingEscrow: Address;
@@ -31,9 +29,6 @@ export type veAddresses = {
   GaugeFactory: Address;
   SmartWalletChecker: Address;
   VotingEscrowDelegation: Address;
-  Vault1DAIGauge: Address;
-  Vault2USDCGauge: Address;
-  Vault3OUSDGauge: Address;
   VaultRouter: Address;
   FeeDistributor: Address;
 };

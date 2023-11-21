@@ -66,15 +66,15 @@ export default async function calculateAPR({ vaultPrice, gauge, publicClient }: 
       args: [gauge]
     })
 
-    /// @dev the price of oPOP is determined by applying the discount factor to the POP price.
+    /// @dev the price of oVCX is determined by applying the discount factor to the VCX price.
     /// as of this writing, the discount factor of 50% but is subject to change. Additional dev
     /// work is needed to programmatically apply the discount factor at any given point in time.
-    const oPopPriceUSD = popPriceUSD * 0.5;
+    const oVcxPriceUSD = popPriceUSD * 0.5;
 
     if (gauge_exists == true && is_killed == false) {
       const relative_inflation = inflation_rate * relative_weight;
       if (relative_inflation > 0) {
-        const annualRewardUSD = relative_inflation * 86400 * 365 * oPopPriceUSD;
+        const annualRewardUSD = relative_inflation * 86400 * 365 * oVcxPriceUSD;
         const effectiveSupply = working_supply > 0 ? working_supply : 1;
         const workingSupplyUSD = effectiveSupply * vaultPrice;
 

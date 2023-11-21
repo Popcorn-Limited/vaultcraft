@@ -8,7 +8,7 @@ import { calcDaysToUnlock, calculateVeOut } from "@/lib/gauges/utils";
 import { validateInput } from "@/lib/utils/helpers";
 import { formatEther } from "viem";
 
-const { BalancerPool: POP_LP } = getVeAddresses();
+const {WETH_VCX_LP } = getVeAddresses();
 
 interface IncreaseStakeInterfaceProps {
   amountState: [string, Dispatch<SetStateAction<string>>];
@@ -17,16 +17,16 @@ interface IncreaseStakeInterfaceProps {
 
 export default function IncreaseStakeInterface({ amountState, lockedBal }: IncreaseStakeInterfaceProps): JSX.Element {
   const { address: account } = useAccount()
-  const { data: popLp } = useToken({ chainId: 1, address: POP_LP as Address });
-  const { data: popLpBal } = useBalance({ chainId: 1, address: account, token: POP_LP })
+  const { data: lpToken } = useToken({ chainId: 1, address: WETH_VCX_LP as Address });
+  const { data: lpBal } = useBalance({ chainId: 1, address: account, token: WETH_VCX_LP })
 
   const [amount, setAmount] = amountState
 
   const errorMessage = useMemo(() => {
-    return (Number(amount) || 0) > Number(popLpBal?.formatted) ? "* Balance not available" : "";
-  }, [amount, popLpBal?.formatted]);
+    return (Number(amount) || 0) > Number(lpBal?.formatted) ? "* Balance not available" : "";
+  }, [amount, lpBal?.formatted]);
 
-  const handleMaxClick = () => setAmount(formatEther(safeRound(popLpBal?.value || ZERO, 18)));
+  const handleMaxClick = () => setAmount(formatEther(safeRound(lpBal?.value || ZERO, 18)));
 
   const handleChangeInput: FormEventHandler<HTMLInputElement> = ({ currentTarget: { value } }) => {
     setAmount(validateInput(value).isValid ? value : "0");
@@ -35,10 +35,10 @@ export default function IncreaseStakeInterface({ amountState, lockedBal }: Incre
   return (
     <div className="space-y-8 mb-8 text-start">
 
-      <h2 className="text-start text-5xl">Lock your POP</h2>
+      <h2 className="text-start text-5xl">Lock your VCX</h2>
 
       <div>
-        <p className="text-primary font-semibold">Amount POP</p>
+        <p className="text-primary font-semibold">Amount VCX</p>
         <InputTokenWithError
           captionText={``}
           onSelectToken={() => { }}
@@ -48,23 +48,21 @@ export default function IncreaseStakeInterface({ amountState, lockedBal }: Incre
           onChange={handleChangeInput}
           selectedToken={
             {
-              ...popLp,
-              symbol:"POP LP",
-              name:"POP LP",
-              balance: Number(popLpBal?.value || 0) || 0,
+              ...lpToken,
+              balance: Number(lpBal?.value || 0) || 0,
             } as any
           }
           errorMessage={errorMessage}
           allowInput
           tokenList={[]}
-          getTokenUrl="https://app.balancer.fi/#/ethereum/pool/0xd5a44704befd1cfcca67f7bc498a7654cc092959000200000000000000000609" // temp link
+          getTokenUrl="https://app.balancer.fi/#/ethereum/pool/0xce8d4ad8cce1240ecbc49385baf4c399a7f353f9000200000000000000000628"
         />
       </div>
 
       <div className="space-y-2">
         <div className="flex flex-row items-center justify-between text-secondaryLight">
           <p>Current Lock Amount</p>
-          <p>{lockedBal ? formatAndRoundBigNumber(lockedBal?.amount, 18) : ""} POP</p>
+          <p>{lockedBal ? formatAndRoundBigNumber(lockedBal?.amount, 18) : ""} VCX</p>
         </div>
         <div className="flex flex-row items-center justify-between text-secondaryLight">
           <p>Unlock Date</p>

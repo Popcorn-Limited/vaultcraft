@@ -8,7 +8,7 @@ const links: { label: string, url: string, onClick?: Function }[] = [
   },
   {
     label: "Boost Vaults",
-    url: "/vepop",
+    url: "/boost",
   },
   {
     label: "Create Vaults",

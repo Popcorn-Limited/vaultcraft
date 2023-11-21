@@ -14,7 +14,7 @@ const ProductLinks = [
   },
   {
     label: "Boost Vaults",
-    href: "/vepop",
+    href: "/boost",
   },
   {
     label: "Create Vaults",

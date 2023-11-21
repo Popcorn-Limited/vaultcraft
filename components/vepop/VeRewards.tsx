@@ -44,7 +44,7 @@ export default function VeRewards(): JSX.Element {
 
   return (
     <div className="lg:w-1/2 bg-[#FAF9F4] border border-[#353945] rounded-3xl p-8 text-primary">
-      <h3 className="text-2xl pb-6 border-b border-[#353945]">Total vePOP Rewards</h3>
+      <h3 className="text-2xl pb-6 border-b border-[#353945]">Total veVCX Rewards</h3>
       <span className="flex flex-row items-center justify-between mt-6">
         <p className="">APR</p>
         <p className="font-bold">{apy} %</p>

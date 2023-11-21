@@ -81,10 +81,10 @@ function VePopContainer() {
         <section className="py-10 px-4 md:px-8 border-t md:border-t-0 md:border-b border-[#353945] lg:flex lg:flex-row items-center justify-between text-primary">
           <div className="lg:w-[1050px]">
             <h1 className="text-2xl md:text-3xl font-normal">
-              Lock <span className="text-[#DFFF1C] font-bold md:font-normal md:underline md:decoration-solid">20WETH-80POP</span> for vePOP, Rewards, and Voting Power
+              Lock <span className="text-[#DFFF1C] font-bold md:font-normal md:underline md:decoration-solid">20WETH-80VCX</span> for veVCX, Rewards, and Voting Power
             </h1>
             <p className="text-base text-primary opacity-80 mt-4">
-              Vote with your vePOP below to influence how much $oPOP each pool will receive.
+              Vote with your veVCX below to influence how much $oVCX each pool will receive.
             </p>
             <p className="text-base text-primary opacity-80">
               Your vote will persist until you change it and editing a pool can only be done once every 10 days.
@@ -135,6 +135,6 @@ function VePopContainer() {
   )
 }
 
-export default function VePOP() {
+export default function VeVCX() {
   return <NoSSR><VePopContainer /></NoSSR>
 }

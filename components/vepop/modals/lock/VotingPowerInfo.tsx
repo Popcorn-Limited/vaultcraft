@@ -10,8 +10,8 @@ export default function VotingPowerInfo(): JSX.Element {
       <div>
         <h2 className="text-start text-5xl">Voting Power</h2>
         <p className="text-start">
-          Lock your POP LP longer for more vePOP.
-          Your vePOP balance represents your voting power which decreases linearly until expiry.
+          Lock your VCX LP longer for more veVCX.
+          Your veVCX balance represents your voting power which decreases linearly until expiry.
         </p>
       </div>
       <div className="flex flex-row items-center justify-center space-x-4">

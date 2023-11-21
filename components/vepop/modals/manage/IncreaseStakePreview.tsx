@@ -12,24 +12,24 @@ export default function IncreaseStakePreview({ amount, lockedBal }: { amount: st
       <div className="space-y-2">
         <div className="flex flex-row items-center justify-between text-secondaryLight">
           <p>Lock Amount</p>
-          <p >{val > 0 ? val.toFixed(2) : "0"} POP LP</p>
+          <p>{val > 0 ? val.toFixed(2) : "0"} VCX LP</p>
         </div>
         <div className="flex flex-row items-center justify-between text-secondaryLight">
           <p>Total Locked</p>
-          <p >{lockedBal ? totalLocked.toFixed(2) : ""} POP LP</p>
+          <p>{lockedBal ? totalLocked.toFixed(2) : ""} VCX LP</p>
         </div>
         <div className="flex flex-row items-center justify-between text-secondaryLight">
           <p>Unlock Date</p>
-          <p >{lockedBal && lockedBal?.end.toString() !== "0" ? new Date(Number(lockedBal?.end) * 1000).toLocaleDateString() : "-"}</p>
+          <p>{lockedBal && lockedBal?.end.toString() !== "0" ? new Date(Number(lockedBal?.end) * 1000).toLocaleDateString() : "-"}</p>
         </div>
         <div className="flex flex-row items-center justify-between text-secondaryLight">
           <p>New Voting Power</p>
-          <p >{val > 0 ? calculateVeOut((Number(lockedBal?.amount) / 1e18) + val, calcDaysToUnlock(Number(lockedBal?.end))).toFixed(2) : "0"} vePOP</p>
+          <p>{val > 0 ? calculateVeOut((Number(lockedBal?.amount) / 1e18) + val, calcDaysToUnlock(Number(lockedBal?.end))).toFixed(2) : "0"} veVCX</p>
         </div>
       </div>
 
       <div className="w-full bg-[#d7d7d726] border border-customLightGray rounded-lg p-4">
-        <p className="text-primaryDark">Important: vePOP is not transferrable and unlocking POP LP early results in a penalty of up to 75% of your POP LP</p>
+        <p className="text-primaryDark">Important: veVCX is not transferrable and unlocking VCX LP early results in a penalty of up to 75% of your VCX LP</p>
       </div>
 
     </div >

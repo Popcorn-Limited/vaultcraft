@@ -7,14 +7,14 @@ export default function LockPopInfo(): JSX.Element {
       </svg>
 
       <div>
-        <h2 className="text-start text-5xl">Locking POP</h2>
+        <h2 className="text-start text-5xl">Locking VCX</h2>
         <p className="text-start">
-          Lock your POP LP to receive vote-escrowed vePOP.
-          vePOP has many purposes.
-          It allows you to boost your vault yield by earning POP call options (oPOP).
-          You can use vePOP to vote on vault gauge incentives,
+          Lock your VCX LP to receive vote-escrowed veVCX.
+          veVCX has many purposes.
+          It allows you to boost your vault yield by earning VCX call options (oVCX).
+          You can use veVCX to vote on vault gauge incentives,
           participate in governance and earn protocol fees.
-          Unlocking POP early results in a penalty of up to 75% of your POP.
+          Unlocking VCX early results in a penalty of up to 75% of your VCX.
         </p>
       </div>
       <div className="flex flex-row items-center justify-center space-x-4">

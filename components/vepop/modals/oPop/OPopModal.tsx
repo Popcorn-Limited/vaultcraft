@@ -10,7 +10,7 @@ import { handleAllowance } from "@/lib/approve";
 import { parseEther } from "viem";
 import { exerciseOPop } from "@/lib/oPop/interactions";
 
-const { BalancerOracle: OPOP_ORACLE, WETH: WETH, oPOP: OPOP } = getVeAddresses();
+const { WETH, oVCX } = getVeAddresses();
 
 export default function OPopModal({ show }: { show: [boolean, Dispatch<SetStateAction<boolean>>] }): JSX.Element {
   const { chain } = useNetwork();
@@ -43,7 +43,7 @@ export default function OPopModal({ show }: { show: [boolean, Dispatch<SetStateA
       token: WETH,
       amount: (Number(amount) * (10 ** 18) || 0),
       account: account as Address,
-      spender: OPOP,
+      spender: oVCX,
       clients: {
         publicClient,
         walletClient: walletClient as WalletClient
@@ -67,7 +67,7 @@ export default function OPopModal({ show }: { show: [boolean, Dispatch<SetStateA
 
         <div className="space-y-4">
           {step === 0 && <MainActionButton label="Next" handleClick={() => setStep(step + 1)} />}
-          {step === 1 && <MainActionButton label={"Exercise oPOP"} handleClick={handleExerciseOPop} />}
+          {step === 1 && <MainActionButton label={"Exercise oVCX"} handleClick={handleExerciseOPop} />}
           {step === 1 && <SecondaryActionButton label="Back" handleClick={() => setStep(step - 1)} />}
         </div>
       </>
