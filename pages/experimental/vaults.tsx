@@ -8,6 +8,7 @@ import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import useNetworkFilter from "@/lib/useNetworkFilter";
 import useVaultTvl from "@/lib/useVaultTvl";
+import { getVaultsByChain } from "@/lib/vault/getVault";
 import { Token, VaultData } from "@/lib/types";
 import SmartVault from "@/components/vault/SmartVault";
 import NetworkFilter from "@/components/network/NetworkFilter";
@@ -251,11 +252,11 @@ const Vaults: NextPage = () => {
           <div className="md:w-96 flex px-6 py-3 items-center rounded-lg border border-gray-300 border-opacity-40 group/search hover:border-opacity-80 gap-2 md:mt-6 mt-12 mb-6 md:my-0">
             <MagnifyingGlassIcon className="w-8 h-8 text-gray-400 group-hover/search:text-gray-200" />
             <input
-              className="w-10/12 md:w-80 focus:outline-none border-0 text-gray-500 focus:text-gray-200 leading-none bg-transparent"
-              type="text"
-              placeholder="Search..."
-              onChange={(e) => handleSearch(e.target.value.toLowerCase())}
-              defaultValue={searchString}
+                className="w-10/12 md:w-80 focus:outline-none border-0 text-gray-500 focus:text-gray-200 leading-none bg-transparent"
+                type="text"
+                placeholder="Search..."
+                onChange={(e) => handleSearch(e.target.value.toLowerCase())}
+                defaultValue={searchString}
             />
           </div>
           <VaultsSorting className="md:mt-6 mt-12 mb-6 md:my-0" />
