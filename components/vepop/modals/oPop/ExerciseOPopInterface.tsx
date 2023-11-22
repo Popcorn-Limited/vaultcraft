@@ -127,6 +127,9 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
           selectedToken={
             {
               ...oVcx,
+              name:"oVCX",
+              symbol:"oVCX",
+              decimals:18,
               logoURI: "/images/tokens/oVcx.svg",
               balance: oVcxBal?.value || ZERO,
             } as any
@@ -149,7 +152,9 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
           selectedToken={
             {
               ...weth,
-              decimals: 18,
+              name:"WETH",
+              symbol:"WETH",
+              decimals:18,
               logoURI: "https://etherscan.io/token/images/weth_28.png",
               balance: wethBal?.value || ZERO,
             } as any

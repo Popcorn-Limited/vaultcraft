@@ -8,7 +8,7 @@ import { calcDaysToUnlock, calculateVeOut } from "@/lib/gauges/utils";
 import { validateInput } from "@/lib/utils/helpers";
 import { formatEther } from "viem";
 
-const {WETH_VCX_LP } = getVeAddresses();
+const { WETH_VCX_LP } = getVeAddresses();
 
 interface IncreaseStakeInterfaceProps {
   amountState: [string, Dispatch<SetStateAction<string>>];
@@ -49,7 +49,11 @@ export default function IncreaseStakeInterface({ amountState, lockedBal }: Incre
           selectedToken={
             {
               ...lpToken,
-              balance: Number(lpBal?.value || 0) || 0,
+              name: "VCX LP",
+              symbol: "VCX LP",
+              decimals: 18,
+              price: 1,
+              balance: Number(lpBal?.value || 0),
             } as any
           }
           errorMessage={errorMessage}

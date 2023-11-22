@@ -66,6 +66,10 @@ export default function LockPopInterface({ amountState, daysState }: LockPopInte
           selectedToken={
             {
               ...lpToken,
+              name: "VCX LP",
+              symbol: "VCX LP",
+              decimals: 18,
+              price: 1,
               balance: Number(lpBal?.value || 0),
             } as any
           }

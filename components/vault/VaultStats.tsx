@@ -26,7 +26,8 @@ export default function VaultStats({ vaultData, account, zapAvailable }: VaultSt
   useEffect(() => {
     if (!apy) {
       // @ts-ignore
-      yieldOptions?.getApy(vaultData.chainId, vaultData.metadata.optionalMetadata.resolver, vaultData.asset.address).then(res => setApy(!!res ? res.total : 0))
+      console.log(vaultData)
+      //yieldOptions?.getApy(vaultData.chainId, vaultData.metadata.optionalMetadata.resolver, vaultData.asset.address).then(res => setApy(!!res ? res.total : 0))
     }
   }, [apy])
 
