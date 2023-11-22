@@ -369,6 +369,24 @@ function getOriginMetadata(adapter: Token, asset: Token): OptionalMetadata {
   }
 }
 
+function getPirexMetadata(adapter: Token, asset: Token): OptionalMetadata {
+  return {
+    protocol: ProtocolMetadata.pirex,
+    token: { name: asset.symbol, description: "None available" },
+    strategy: { name: "Pirex Vault", description: addGenericStrategyDescription("automatedAssetStrategy", "Pirex") },
+    resolver: "pirex"
+  }
+}
+
+function getSommelierMetadata(adapter: Token, asset: Token): OptionalMetadata {
+  return {
+    protocol: ProtocolMetadata.sommelier,
+    token: { name: asset.symbol, description: "None available" },
+    strategy: { name: "Sommelier Vault", description: addGenericStrategyDescription("automatedAssetStrategy", "Sommelier") },
+    resolver: "sommelier"
+  }
+}
+
 function getEmptyMetadata(adapter: Token, asset: Token): OptionalMetadata {
   return {
     token: { name: "Token", description: "Not found" },
@@ -401,8 +419,10 @@ function getFactoryMetadata({ adapter, asset }: { adapter: Token, asset: Token }
     return getYearnMetadata(adapter, asset)
   } else if (adapter?.name?.includes("Idle")) {
     return getIdleMetadata(adapter, asset)
-  } else if (adapter?.name?.includes("Origin")) {
-    return getOriginMetadata(adapter, asset)
+  } else if (asset?.name?.includes("Pirex")) {
+    return getPirexMetadata(adapter, asset)
+  } else if (adapter?.name?.includes("Sommelier")) {
+    return getSommelierMetadata(adapter, asset)
   }
   return getEmptyMetadata(adapter, asset)
 }
