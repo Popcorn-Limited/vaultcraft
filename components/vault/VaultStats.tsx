@@ -7,7 +7,8 @@ import { useAtom } from "jotai";
 import { yieldOptionsAtom } from "@/lib/atoms/sdk";
 import { useEffect, useState } from "react";
 import calculateAPR from "@/lib/gauges/calculateGaugeAPR";
-import {roundToTwoDecimalPlaces} from "@/lib/utils/helpers";
+import { roundToTwoDecimalPlaces } from "@/lib/utils/helpers";
+import { ProtocolName } from "vaultcraft-sdk";
 
 interface VaultStatProps {
   vaultData: VaultData
@@ -24,12 +25,17 @@ export default function VaultStats({ vaultData, account, zapAvailable }: VaultSt
   const [apy, setApy] = useState<number | undefined>(0);
 
   useEffect(() => {
-    if (!apy) {
+    if (!apy && yieldOptions) {
       // @ts-ignore
-      console.log(vaultData)
-      //yieldOptions?.getApy(vaultData.chainId, vaultData.metadata.optionalMetadata.resolver, vaultData.asset.address).then(res => setApy(!!res ? res.total : 0))
+      yieldOptions.getApy({
+        chainId: vaultData.chainId,
+        protocol: vaultData.metadata.optionalMetadata.resolver as ProtocolName,
+        asset: vaultData.asset.address
+      })
+        .then(res => setApy(!!res ? res.total : 0))
+        .catch(e => setApy(0))
     }
-  }, [apy])
+  }, [apy, yieldOptions])
 
   const [gaugeApr, setGaugeApr] = useState<number[]>([]);
 

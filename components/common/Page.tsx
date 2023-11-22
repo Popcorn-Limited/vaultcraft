@@ -14,7 +14,7 @@ async function setUpYieldOptions() {
   const provider = new CachedProvider();
   await provider.initialize("https://raw.githubusercontent.com/Popcorn-Limited/apy-data/main/apy-data.json");
 
-  return new YieldOptions(provider, ttl);
+  return new YieldOptions({ provider, ttl });
 }
 
 export default function Page({

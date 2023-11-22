@@ -12,6 +12,7 @@ import getVaultName from "@/lib/vault/getVaultName"
 import getOptionalMetadata from "@/lib/vault/getOptionalMetadata"
 import { getVeAddresses } from "../utils/addresses"
 import getGauges, { Gauge } from "../gauges/getGauges"
+import { cleanTokenName, cleanTokenSymbol } from "../utils/helpers"
 
 const { GaugeController: GAUGE_CONTROLLER } = getVeAddresses();
 
@@ -176,6 +177,8 @@ export async function getVaults({ vaults, account = ADDRESS_ZERO, client }: { va
       ...entry,
       asset: {
         ...asset,
+        name: cleanTokenName(asset),
+        symbol: cleanTokenSymbol(asset),
         logoURI: getAssetIcon({ asset, adapter, chainId: client.chain.id })
       },
       adapter
