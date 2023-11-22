@@ -421,7 +421,7 @@ function getFactoryMetadata({ adapter, asset }: { adapter: Token, asset: Token }
     return getIdleMetadata(adapter, asset)
   } else if (asset?.name?.includes("Pirex")) {
     return getPirexMetadata(adapter, asset)
-  } else if (adapter?.name?.includes("Sommelier")) {
+  } else if (adapter?.symbol?.includes("WETH")) {
     return getSommelierMetadata(adapter, asset)
   }
   return getEmptyMetadata(adapter, asset)
