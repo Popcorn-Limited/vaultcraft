@@ -121,16 +121,18 @@ export async function getVaults({ vaults, account = ADDRESS_ZERO, client }: { va
     if (i > 0) i = i * 10
     const assetsPerShare = Number(results[i + 6]) > 0 ? Number(results[i + 5]) / Number(results[i + 6]) : Number(1e-9)
     const fees = results[i + 7] as [BigInt, BigInt, BigInt, BigInt]
+    const vaultToken: Token = {
+      address: getAddress(vault),
+      name: String(results[i + 0]),
+      symbol: String(results[i + 1]),
+      decimals: Number(results[i + 2]),
+      logoURI: "/images/tokens/pop.svg",
+      balance: hasAccount ? Number(results[i + 9]) : 0,
+      price: 0 // @dev will be added in a later step
+    }
     return {
       address: getAddress(vault),
-      vault: {
-        address: getAddress(vault),
-        name: String(results[i + 0]),
-        symbol: String(results[i + 1]),
-        decimals: Number(results[i + 2]),
-        logoURI: "/images/tokens/pop.svg",
-        balance: hasAccount ? Number(results[i + 9]) : 0
-      },
+      vault: { ...vaultToken, symbol: cleanTokenSymbol(vaultToken) },
       assetAddress: getAddress(results[i + 3] as string),
       adapterAddress: getAddress(results[i + 4] as string),
       totalAssets: Number(results[i + 5]),
