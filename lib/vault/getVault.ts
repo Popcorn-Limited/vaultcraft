@@ -13,6 +13,8 @@ import getOptionalMetadata from "@/lib/vault/getOptionalMetadata"
 import { getVeAddresses } from "../utils/addresses"
 import getGauges, { Gauge } from "../gauges/getGauges"
 import { cleanTokenName, cleanTokenSymbol } from "../utils/helpers"
+import { ProtocolName, YieldOptions } from "vaultcraft-sdk"
+import calculateAPR from "../gauges/calculateGaugeAPR"
 
 const { GaugeController: GAUGE_CONTROLLER } = getVeAddresses();
 
@@ -102,13 +104,26 @@ function prepareTokenContracts(address: Address, account: Address): ReadContract
   ]
 }
 
-export async function getVaultsByChain({ chain, account }: { chain: Chain, account?: Address }): Promise<VaultData[]> {
-  const client = createPublicClient({ chain, transport: http(RPC_URLS[chain.id]) })
-  const vaults = await getVaultAddresses({ client })
-  return getVaults({ vaults, account, client })
+interface GetVaultsByChainProps {
+  chain: Chain;
+  account?: Address;
+  yieldOptions: YieldOptions
 }
 
-export async function getVaults({ vaults, account = ADDRESS_ZERO, client }: { vaults: Address[], account?: Address, client: PublicClient }): Promise<VaultData[]> {
+export async function getVaultsByChain({ chain, account, yieldOptions }: GetVaultsByChainProps): Promise<VaultData[]> {
+  const client = createPublicClient({ chain, transport: http(RPC_URLS[chain.id]) })
+  const vaults = await getVaultAddresses({ client })
+  return getVaults({ vaults, account, client, yieldOptions })
+}
+
+interface GetVaultsProps {
+  vaults: Address[];
+  account?: Address;
+  client: PublicClient;
+  yieldOptions: YieldOptions
+}
+
+export async function getVaults({ vaults, account = ADDRESS_ZERO, client, yieldOptions }: GetVaultsProps): Promise<VaultData[]> {
   const hasAccount = account !== ADDRESS_ZERO
   // Get vault addresses
   const results = await client.multicall({
@@ -224,10 +239,26 @@ export async function getVaults({ vaults, account = ADDRESS_ZERO, client }: { va
       tvl: (entry.totalSupply * pricePerShare) / (10 ** entry.asset.decimals)
     }
   })
+
+  // Add apy
+  metadata = await Promise.all(metadata.map(async (entry, i) => {
+    let apy = 0;
+    try {
+      const vaultYield = await yieldOptions.getApy({
+        chainId: entry.chainId,
+        protocol: entry.metadata.optionalMetadata.resolver as ProtocolName,
+        asset: entry.asset.address
+      })
+      apy = vaultYield.total
+    } catch (e) { }
+    return { ...entry, apy, totalApy: apy }
+  }))
+
+
   // Add gauges
   if (client.chain.id === 1) {
     const gauges = await getGauges({ address: GAUGE_CONTROLLER, account: account, publicClient: client })
-    metadata = metadata.map((entry, i) => {
+    metadata = await Promise.all(metadata.map(async (entry, i) => {
       const foundGauge = gauges.find((gauge: Gauge) => gauge.lpToken === entry.address)
       const gauge = foundGauge ? {
         address: foundGauge.address,
@@ -239,107 +270,25 @@ export async function getVaults({ vaults, account = ADDRESS_ZERO, client }: { va
         price: entry.pricePerShare * 1e9,
       } : undefined
 
+      let gaugeMinApy;
+      let gaugeMaxApy;
+      let totalApy = entry.totalApy;
+      if (!!gauge) {
+        const gaugeApr = await calculateAPR({ vaultPrice: entry.vault.price, gauge: gauge.address, publicClient: client })
+        gaugeMinApy = gaugeApr[0];
+        gaugeMaxApy = gaugeApr[1];
+        totalApy += gaugeApr[1];
+      }
+
       return {
         ...entry,
-        gauge
+        gauge,
+        gaugeMinApy,
+        gaugeMaxApy,
+        totalApy
       }
-    })
+    }))
   }
 
   return metadata as unknown as VaultData[]
-}
-
-
-export async function getVault({ vault, account = ADDRESS_ZERO, client }: { vault: Address, account?: Address, client: PublicClient }): Promise<VaultData> {
-  const hasAccount = account !== ADDRESS_ZERO
-
-  const results = await client.multicall({
-    contracts: prepareVaultContract(vault, account),
-    allowFailure: false
-  })
-  const registryMetadata = await client.readContract(prepareRegistryContract(VaultRegistryByChain[client.chain.id], vault)) as unknown as string[]
-  const vaultName = await getVaultName({ address: getAddress(vault), cid: registryMetadata[3] })
-
-  const price = await resolvePrice({ chainId: client.chain.id, client: client, address: results[3] as Address, resolver: 'llama' })
-  const assetsPerShare = Number(results[6]) > 0 ? Number(results[5]) / Number(results[6]) : Number(1e-9)
-  const pricePerShare = assetsPerShare * price
-  const fees = results[7] as [BigInt, BigInt, BigInt, BigInt]
-
-  // Add token and adapter metadata
-  const assetAndAdapterMeta = await client.multicall({
-    contracts: [...prepareTokenContracts(results[3] as Address, account), ...prepareTokenContracts(results[4] as Address, account)].flat(),
-    allowFailure: false
-  })
-  const asset = {
-    address: getAddress(results[3] as string),
-    name: String(assetAndAdapterMeta[0]),
-    symbol: String(assetAndAdapterMeta[1]),
-    decimals: Number(results[2]) - 9,
-    logoURI: "",
-    balance: hasAccount ? Number(assetAndAdapterMeta[2]) : 0,
-    price: price
-  }
-  const adapter = {
-    address: getAddress(results[4] as string),
-    name: String(assetAndAdapterMeta[3]),
-    symbol: String(assetAndAdapterMeta[4]),
-    decimals: Number(results[2]),
-    logoURI: "/images/tokens/pop.svg", // wont be used, just here for consistency,
-    balance: 0, // wont be used, just here for consistency,
-    price: 0, // wont be used, just here for consistency,
-  }
-  const result = {
-    address: getAddress(vault),
-    vault: {
-      address: getAddress(vault),
-      name: String(results[0]),
-      symbol: String(results[1]),
-      decimals: Number(results[2]),
-      logoURI: "/images/tokens/pop.svg",
-      balance: hasAccount ? Number(results[9]) : 0,
-      price: pricePerShare * 1e9,  // @dev -- normalize vault price for previews (watch this if errors occur)
-    },
-    asset: { ...asset, logoURI: getAssetIcon({ asset, adapter, chainId: client.chain.id }) },
-    adapter,
-    totalAssets: Number(results[5]),
-    totalSupply: Number(results[6]),
-    assetsPerShare: assetsPerShare,
-    assetPrice: price,
-    pricePerShare: pricePerShare,
-    tvl: (Number(results[6]) * pricePerShare) / (10 ** (Number(results[2]) - 9)),
-    fees: {
-      deposit: Number(fees[0]),
-      withdrawal: Number(fees[1]),
-      management: Number(fees[2]),
-      performance: Number(fees[3]),
-    },
-    depositLimit: Number(results[8]),
-    metadata: {
-      creator: registryMetadata[2] as Address,
-      cid: registryMetadata[3] as string,
-      vaultName: vaultName,
-      optionalMetadata: getOptionalMetadata({ vaultAddress: getAddress(vault), asset: asset, adapter: adapter })
-    },
-    chainId: client.chain.id
-  }
-
-  // Add gauges
-  if (client.chain.id === 1) {
-    const {
-      GaugeController: GAUGE_CONTROLLER,
-    } = getVeAddresses();
-    const gauges = await getGauges({ address: GAUGE_CONTROLLER, publicClient: client })
-    const foundGauge = gauges.find((gauge: Gauge) => gauge.lpToken === result.address)
-    // @ts-ignore
-    result.gauge = foundGauge ? {
-      address: foundGauge.address,
-      name: `${result.vault.name}-gauge`,
-      symbol: `st-${result.vault.name}`,
-      decimals: foundGauge.decimals,
-      logoURI: "/images/tokens/pop.svg",  // wont be used, just here for consistency
-      balance: foundGauge.balance,
-      price: result.pricePerShare * 1e9,
-    } : undefined
-  }
-  return result;
 }

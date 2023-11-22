@@ -17,33 +17,7 @@ interface VaultStatProps {
 }
 
 export default function VaultStats({ vaultData, account, zapAvailable }: VaultStatProps): JSX.Element {
-  const publicClient = usePublicClient()
-  const [yieldOptions] = useAtom(yieldOptionsAtom);
-
-  const { asset, vault, gauge } = vaultData
-
-  const [apy, setApy] = useState<number | undefined>(0);
-
-  useEffect(() => {
-    if (!apy && yieldOptions) {
-      // @ts-ignore
-      yieldOptions.getApy({
-        chainId: vaultData.chainId,
-        protocol: vaultData.metadata.optionalMetadata.resolver as ProtocolName,
-        asset: vaultData.asset.address
-      })
-        .then(res => setApy(!!res ? res.total : 0))
-        .catch(e => setApy(0))
-    }
-  }, [apy, yieldOptions])
-
-  const [gaugeApr, setGaugeApr] = useState<number[]>([]);
-
-  useEffect(() => {
-    if (vault?.price && gaugeApr.length === 0 && !!gauge) {
-      calculateAPR({ vaultPrice: vault?.price, gauge: gauge?.address, publicClient }).then(res => setGaugeApr(res))
-    }
-  }, [vault, gaugeApr])
+  const { asset, vault, gauge, apy, gaugeMinApy, gaugeMaxApy } = vaultData
 
   return (
     <>
@@ -85,21 +59,21 @@ export default function VaultStats({ vaultData, account, zapAvailable }: VaultSt
           </Title>
         </div>
         <div className="w-full mt-6 xs:mt-0">
-          {gaugeApr.length > 0 &&
+          {gaugeMinApy &&
             <>
               <p className="font-normal text-primary xs:text-[14px]">Min Boost</p>
               <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
-                {NumberFormatter.format(roundToTwoDecimalPlaces(gaugeApr[0]))} %
+                {NumberFormatter.format(roundToTwoDecimalPlaces(gaugeMinApy))} %
               </Title>
             </>
           }
         </div>
         <div className="w-full mt-6 xs:mt-0">
-          {gaugeApr.length > 0 &&
+          {gaugeMaxApy &&
             <>
               <p className="font-normal text-primary xs:text-[14px]">Max Boost</p>
               <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
-                {NumberFormatter.format(roundToTwoDecimalPlaces(gaugeApr[1]))} %
+                {NumberFormatter.format(roundToTwoDecimalPlaces(gaugeMaxApy))} %
               </Title>
             </>
           }

@@ -36,12 +36,12 @@ export default function Page({
     async function getVaults() {
       // get vaults
       const fetchedVaults = (await Promise.all(
-        SUPPORTED_NETWORKS.map(async (chain) => getVaultsByChain({ chain, account }))
+        SUPPORTED_NETWORKS.map(async (chain) => getVaultsByChain({ chain, account, yieldOptions: yieldOptions as YieldOptions }))
       )).flat();
       setVaults(fetchedVaults)
     }
-    getVaults()
-  }, [account])
+    if (yieldOptions) getVaults()
+  }, [account, yieldOptions])
 
   return (
     <>

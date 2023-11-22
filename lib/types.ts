@@ -13,15 +13,15 @@ export type Token = {
 
 export type veAddresses = {
   VCX: Address;
-  WETH_VCX_LP:Address;
-  VE_VCX:Address;
+  WETH_VCX_LP: Address;
+  VE_VCX: Address;
   POP: Address;
   WETH: Address;
   BalancerPool: Address;
   BalancerOracle: Address;
   oVCX: Address;
   VaultRegistry: Address;
-  BoostV2:Address;
+  BoostV2: Address;
   Minter: Address;
   TokenAdmin: Address;
   VotingEscrow: Address;
@@ -64,6 +64,10 @@ export type VaultData = {
   depositLimit: number;
   metadata: VaultMetadata;
   chainId: number;
+  apy: number;
+  gaugeMinApy?: number;
+  gaugeMaxApy?: number;
+  totalApy:number;
 }
 
 export type VaultMetadata = {
@@ -98,7 +102,7 @@ export type SimulationResponse = {
 
 export interface IconProps {
   color: string;
-  color2?:string;
+  color2?: string;
   size: string;
   className?: string;
 }
