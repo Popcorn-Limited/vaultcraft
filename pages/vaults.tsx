@@ -172,6 +172,16 @@ const Vaults: NextPage = () => {
     setVaults(newVaultState)
   }
 
+  const sortByAscendingTvl = () => {
+    const sortedVaults = [...vaults].sort((a, b) => b.tvl - a.tvl);
+    setVaults(sortedVaults)
+  }
+
+  const sortByDescendingTvl = () => {
+    const sortedVaults = [...vaults].sort((a, b) => a.tvl - b.tvl);
+    setVaults(sortedVaults)
+  }
+
   return (
     <NoSSR>
       <section className="md:border-b border-[#353945] md:flex md:flex-row items-center justify-between py-10 px-4 md:px-8 md:gap-4">
@@ -258,7 +268,7 @@ const Vaults: NextPage = () => {
               defaultValue={searchString}
             />
           </div>
-          <VaultsSorting className="md:mt-6 mt-12 mb-6 md:my-0" />
+          <VaultsSorting className="md:mt-6 mt-12 mb-6 md:my-0" sortByLessTvl={sortByDescendingTvl} sortByMostTvl={sortByAscendingTvl}/>
         </div>
       </section>
 

@@ -4,18 +4,34 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ChainId, networkLogos, networkMap } from "@/lib/utils/connectors";
 import PopUpModal from "../modal/PopUpModal";
 import SwitchIcon from "@/components/svg/SwitchIcon";
-interface NetworkFilterProps {
-    supportedNetworks: ChainId[];
-    selectNetwork: (chainId: ChainId) => void;
+interface VaultSortingProps {
+    className?: string,
+    sortByMostTvl: () => void,
+    sortByLessTvl: () => void
 }
 
-export default function VaultsSorting({ className }: { className?: string }): JSX.Element {
+export default function VaultsSorting(
+    {
+        className,
+        sortByMostTvl,
+        sortByLessTvl
+    }: VaultSortingProps): JSX.Element {
     const [openFilter, setOpenSorting] = useState(false);
-    const [activeNetwork, setActiveNetwork] = useState(ChainId.ALL);
 
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     const isLessThenMdScreenSize = useMemo(() => window.innerWidth < 1024, [window.innerWidth])
+
+    const sortingLessTvl = ()  => {
+        sortByLessTvl()
+        toggleDropdown()
+    }
+
+    const sortingMostTvl = ()  => {
+        sortByMostTvl()
+        toggleDropdown()
+    }
+
 
     const toggleDropdown = () => {
         setOpenSorting(prevState => !prevState)
@@ -37,10 +53,10 @@ export default function VaultsSorting({ className }: { className?: string }): JS
             </button>
             {openFilter && !isLessThenMdScreenSize && (
                 <div ref={dropdownRef} className="hidden md:block absolute w-[180px] p-[10px] border border-[#626263] top-16 bg-[#141416] rounded-lg right-0">
-                    <button className="py-2 w-full cursor-pointer text-primary rounded-lg hover:bg-[#23262F] transition ease-in-out duration-250" onClick={toggleDropdown}>
+                    <button className="py-2 w-full cursor-pointer text-primary rounded-lg hover:bg-[#23262F] transition ease-in-out duration-250" onClick={sortingMostTvl}>
                         Most TVL
                     </button>
-                    <button className="py-2 w-full text-primary rounded-lg hover:bg-[#23262F] transition ease-in-out duration-250" onClick={toggleDropdown}>
+                    <button className="py-2 w-full text-primary rounded-lg hover:bg-[#23262F] transition ease-in-out duration-250" onClick={sortingLessTvl}>
                         Less TVL
                     </button>
                     <button className="py-2 w-full text-primary rounded-lg hover:bg-[#23262F] transition ease-in-out duration-250" onClick={toggleDropdown}>
