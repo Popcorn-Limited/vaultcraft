@@ -4,17 +4,25 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ChainId, networkLogos, networkMap } from "@/lib/utils/connectors";
 import PopUpModal from "../modal/PopUpModal";
 import SwitchIcon from "@/components/svg/SwitchIcon";
+import {VAULT_SORTING_TYPE} from "../../pages/vaults";
+
 interface VaultSortingProps {
     className?: string,
+    currentSortingType: VAULT_SORTING_TYPE,
     sortByMostTvl: () => void,
     sortByLessTvl: () => void
+    sortByMostApy: () => void,
+    sortByLessApy: () => void
 }
 
 export default function VaultsSorting(
     {
         className,
+        currentSortingType,
         sortByMostTvl,
-        sortByLessTvl
+        sortByLessTvl,
+        sortByMostApy,
+        sortByLessApy,
     }: VaultSortingProps): JSX.Element {
     const [openFilter, setOpenSorting] = useState(false);
 
@@ -32,6 +40,15 @@ export default function VaultsSorting(
         toggleDropdown()
     }
 
+    const sortingLessApy = ()  => {
+        sortByLessApy()
+        toggleDropdown()
+    }
+
+    const sortingMostApy = ()  => {
+        sortByMostApy()
+        toggleDropdown()
+    }
 
     const toggleDropdown = () => {
         setOpenSorting(prevState => !prevState)
@@ -53,16 +70,66 @@ export default function VaultsSorting(
             </button>
             {openFilter && !isLessThenMdScreenSize && (
                 <div ref={dropdownRef} className="hidden md:block absolute w-[180px] p-[10px] border border-[#626263] top-16 bg-[#141416] rounded-lg right-0">
-                    <button className="py-2 w-full cursor-pointer text-primary rounded-lg hover:bg-[#23262F] transition ease-in-out duration-250" onClick={sortingMostTvl}>
+                    <button
+                        className={`
+                            py-2 w-full 
+                            cursor-pointer
+                            text-primary 
+                            rounded-lg 
+                            hover:bg-[#23262F] 
+                            transition 
+                            ease-in-out 
+                            duration-250 
+                            ${currentSortingType === VAULT_SORTING_TYPE.mostTvl ? 'bg-[#353945]': 'bg-[#141416]'}
+                        `}
+                        onClick={sortingMostTvl}
+                    >
                         Most TVL
                     </button>
-                    <button className="py-2 w-full text-primary rounded-lg hover:bg-[#23262F] transition ease-in-out duration-250" onClick={sortingLessTvl}>
+                    <button
+                        className={`
+                            py-2 w-full
+                            text-primary 
+                            rounded-lg 
+                            hover:bg-[#23262F] 
+                            transition 
+                            ease-in-out 
+                            duration-250
+                            ${currentSortingType === VAULT_SORTING_TYPE.lessTvl ? 'bg-[#353945]': 'bg-[#141416]'}
+                        `}
+                        onClick={sortingLessTvl}
+                    >
                         Less TVL
                     </button>
-                    <button className="py-2 w-full text-primary rounded-lg hover:bg-[#23262F] transition ease-in-out duration-250" onClick={toggleDropdown}>
+                    <button
+                        className={`
+                            py-2 w-full 
+                            text-primary 
+                            rounded-lg 
+                            hover:bg-[#23262F] 
+                            transition 
+                            ease-in-out 
+                            duration-250
+                            ${currentSortingType === VAULT_SORTING_TYPE.mostvAPR ? 'bg-[#353945]': 'bg-[#141416]'}
+                        `}
+                        onClick={sortingMostApy}
+                    >
                         Most vAPR
                     </button>
-                    <button className="py-2 w-full text-primary rounded-lg hover:bg-[#23262F] transition ease-in-out duration-250" onClick={toggleDropdown}>
+                    <button
+                        className={`
+                            py-2 
+                            w-full 
+                            text-primary 
+                            rounded-lg 
+                            hover:bg-[#23262F] 
+                            transition 
+                            ease-in-out 
+                            duration-250
+                            ${currentSortingType === VAULT_SORTING_TYPE.lessvAPR ? 'bg-[#353945]': 'bg-[#141416]'}
+                        `}
+                        onClick={sortingLessApy}
+                    >
                         Less vAPR
                     </button>
                 </div>
@@ -73,10 +140,10 @@ export default function VaultsSorting(
                         <>
                             <p className="text-white mb-3 text-center">Select a sorting type</p>
                             <div className="space-y-4 w-full">
-                                <PseudoRadioButton label="Most TVL" handleClick={sortingMostTvl} isActive />
-                                <PseudoRadioButton label="Less TVL" handleClick={sortingLessTvl} isActive={false} />
-                                <PseudoRadioButton label="Most vAPR" handleClick={toggleDropdown} isActive={false} />
-                                <PseudoRadioButton label="Less vAPR" handleClick={toggleDropdown} isActive={false} />
+                                <PseudoRadioButton label="Most TVL" handleClick={sortingMostTvl} isActive={currentSortingType === VAULT_SORTING_TYPE.mostTvl} />
+                                <PseudoRadioButton label="Less TVL" handleClick={sortingLessTvl} isActive={currentSortingType === VAULT_SORTING_TYPE.lessTvl} />
+                                <PseudoRadioButton label="Most vAPR" handleClick={sortingMostApy} isActive={currentSortingType === VAULT_SORTING_TYPE.mostvAPR} />
+                                <PseudoRadioButton label="Less vAPR" handleClick={sortingLessApy} isActive={currentSortingType === VAULT_SORTING_TYPE.lessvAPR} />
                             </div>
                         </>
                     </PopUpModal>

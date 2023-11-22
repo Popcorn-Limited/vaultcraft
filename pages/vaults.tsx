@@ -34,6 +34,14 @@ export const HIDDEN_VAULTS = ["0xb6cED1C0e5d26B815c3881038B88C829f39CE949", "0x2
   "0xa6fcC7813d9D394775601aD99874c9f8e95BAd78", // Automated Pool Token - Oracle Vault 3
 ]
 
+export enum VAULT_SORTING_TYPE {
+  none = 'none',
+  mostTvl = 'most-tvl',
+  lessTvl = 'less-tvl',
+  mostvAPR = 'most-apr',
+  lessvAPR = 'less-apr'
+}
+
 const { oVCX: OVCX } = getVeAddresses();
 
 const NETWORKS_SUPPORTING_ZAP = [1, 137, 10, 42161, 56]
@@ -65,6 +73,8 @@ const Vaults: NextPage = () => {
   const { data: oBal } = useBalance({ chainId: 1, address: account, token: OVCX, watch: true })
 
   const [searchString, handleSearch] = useState("");
+
+  const [sortingType, setSortingType] = useState(VAULT_SORTING_TYPE.none)
 
   useEffect(() => {
     async function getVaults() {
@@ -174,11 +184,25 @@ const Vaults: NextPage = () => {
 
   const sortByAscendingTvl = () => {
     const sortedVaults = [...vaults].sort((a, b) => b.tvl - a.tvl);
+    setSortingType(VAULT_SORTING_TYPE.mostTvl)
     setVaults(sortedVaults)
   }
 
   const sortByDescendingTvl = () => {
     const sortedVaults = [...vaults].sort((a, b) => a.tvl - b.tvl);
+    setSortingType(VAULT_SORTING_TYPE.lessTvl)
+    setVaults(sortedVaults)
+  }
+
+  const sortByAscendingApy = () => {
+    const sortedVaults = [...vaults].sort((a, b) => b.apy - a.apy);
+    setSortingType(VAULT_SORTING_TYPE.mostvAPR)
+    setVaults(sortedVaults)
+  }
+
+  const sortByDescendingApy = () => {
+    const sortedVaults = [...vaults].sort((a, b) => a.apy - b.apy);
+    setSortingType(VAULT_SORTING_TYPE.lessvAPR)
     setVaults(sortedVaults)
   }
 
@@ -268,7 +292,7 @@ const Vaults: NextPage = () => {
               defaultValue={searchString}
             />
           </div>
-          <VaultsSorting className="md:mt-6 mt-12 mb-6 md:my-0" sortByLessTvl={sortByDescendingTvl} sortByMostTvl={sortByAscendingTvl}/>
+          <VaultsSorting className="md:mt-6 mt-12 mb-6 md:my-0" currentSortingType={sortingType} sortByLessTvl={sortByDescendingTvl} sortByMostTvl={sortByAscendingTvl} sortByLessApy={sortByDescendingApy} sortByMostApy={sortByAscendingApy}/>
         </div>
       </section>
 
