@@ -26,10 +26,10 @@ export default function DesktopMenu(): JSX.Element {
         <div className="flex flex-row items-center">
           <div>
             <Link href={`/`} passHref>
-              <img src="/images/icons/popLogo.svg" alt="Logo" className="xs:w-12 xs:h-12 w-10 h-10" />
+              <img src="/images/icons/popLogo.svg" alt="Logo" className="w-12 h-12 md:w-10 md:h-10 text-white" />
             </Link>
           </div>
-          <div className="xs:hidden smmd:block ml-8 py-2 px-4 bg-[#dfff1c26] rounded">
+          <div className="hidden md:block ml-8 py-2 px-4 bg-[#dfff1c26] rounded">
             <span className="text-[#DFFF1C]">
               Beta
             </span>
@@ -108,7 +108,7 @@ export default function DesktopMenu(): JSX.Element {
                 <div className="flex flex-1 flex-col w-full space-y-4">
                   <div className="mb-6">
                     <Link href={`/`} passHref>
-                      <img src="/images/icons/popLogoBlack.svg" alt="Logo" className="xs:w-12 xs:h-12 smmd:w-10 smmd:h-10" />
+                      <img src="/images/icons/popLogoBlack.svg" alt="Logo" className="w-12 h-12 md:w-10 md:h-10 text-white" />
                     </Link>
                   </div>
                   <div className="flex flex-col space-y-6 flex-1" onClick={() => toggleMenu(false)}>
@@ -116,7 +116,7 @@ export default function DesktopMenu(): JSX.Element {
                   </div>
                   <div className="">
                     <p className="text-[#23262F]">
-                      Popcorn is a DeFi yield-optimizing protocol with customizable asset strategies that
+                      VaultCraft is a DeFi yield-optimizing protocol with customizable asset strategies that
                       instantly zap your crypto from any chain into the highest yield-generating products across DeFi in 1 click.
                     </p>
                     <div className="flex justify-between pb-12 mt-12">

@@ -29,7 +29,7 @@ const GeneralLinks = [
   },
   {
     label: "Gitbook",
-    href: "https://popcorn-dao.gitbook.io/popcorndao-gitbook/about-popcorn/welcome-to-popcorn",
+    href: "https://docs.vaultcraft.io/welcome-to-vaultcraft/introduction",
   },
   {
     label: "Disclaimer",
@@ -54,7 +54,7 @@ const Footer = () => {
             <img src="/images/icons/popLogo.svg" alt="Logo" className="hidden md:block w-10 h-10" />
           </Link>
           <p className="text-primaryDark leading-6 mt-8 smmd:mt-0 ml-10 w-11/12">
-            Popcorn is a DeFi yield-optimizing protocol with customizable asset strategies that instantly zap your crypto from any chain into the highest yield-generating products across DeFi in 1 click.
+            VaultCraft is a DeFi yield-optimizing protocol with customizable asset strategies that instantly zap your crypto from any chain into the highest yield-generating products across DeFi in 1 click.
           </p>
         </div>
         <div className="flex flex-row space-x-6 mt-12">

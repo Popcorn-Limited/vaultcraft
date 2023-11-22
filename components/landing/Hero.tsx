@@ -65,7 +65,7 @@ export default function Hero(): JSX.Element {
               infoIconProps={{
                 id: "tvl",
                 title: "Total Value Locked",
-                content: <p>Total value locked (TVL) is the amount <br /> of user funds deposited in popcorn products.</p>,
+                content: <p>Total value locked (TVL) is the amount <br /> of user funds deposited in VaultCraft products.</p>,
               }}
             />
             <StatusWithLabel
@@ -74,7 +74,7 @@ export default function Hero(): JSX.Element {
               infoIconProps={{
                 id: "networth",
                 title: "My Networth",
-                content: <p>This value aggregates your Popcorn-related <br /> holdings across all blockchain networks.</p>,
+                content: <p>This value aggregates your VaultCraft-related <br /> holdings across all blockchain networks.</p>,
               }}
             />
           </div>
