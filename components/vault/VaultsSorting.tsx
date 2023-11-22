@@ -73,8 +73,8 @@ export default function VaultsSorting(
                         <>
                             <p className="text-white mb-3 text-center">Select a sorting type</p>
                             <div className="space-y-4 w-full">
-                                <PseudoRadioButton label="Most TVL" handleClick={toggleDropdown} isActive />
-                                <PseudoRadioButton label="Less TVL" handleClick={toggleDropdown} isActive={false} />
+                                <PseudoRadioButton label="Most TVL" handleClick={sortingMostTvl} isActive />
+                                <PseudoRadioButton label="Less TVL" handleClick={sortingLessTvl} isActive={false} />
                                 <PseudoRadioButton label="Most vAPR" handleClick={toggleDropdown} isActive={false} />
                                 <PseudoRadioButton label="Less vAPR" handleClick={toggleDropdown} isActive={false} />
                             </div>
