@@ -8,7 +8,6 @@ import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import useNetworkFilter from "@/lib/useNetworkFilter";
 import useVaultTvl from "@/lib/useVaultTvl";
-import { getVaultsByChain } from "@/lib/vault/getVault";
 import { Token, VaultData } from "@/lib/types";
 import SmartVault from "@/components/vault/SmartVault";
 import NetworkFilter from "@/components/network/NetworkFilter";
@@ -22,30 +21,12 @@ import { WalletClient } from "viem";
 import { useAtom } from "jotai";
 import { vaultsAtom } from "@/lib/atoms/vaults";
 import { getVaultNetworthByChain } from "@/lib/getNetworth";
-import VaultsSorting from "@/components/vault/VaultsSorting";
-
-export const HIDDEN_VAULTS = ["0xb6cED1C0e5d26B815c3881038B88C829f39CE949", "0x2fD2C18f79F93eF299B20B681Ab2a61f5F28A6fF",
-  "0xDFf04Efb38465369fd1A2E8B40C364c22FfEA340", "0xd4D442AC311d918272911691021E6073F620eb07", //@dev for some reason the live 3Crypto yVault isnt picked up by the yearnAdapter nor the yearnFactoryAdapter
-  "0x8bd3D95Ec173380AD546a4Bd936B9e8eCb642de1", // Sample Stargate Vault
-  "0xcBb5A4a829bC086d062e4af8Eba69138aa61d567", // yOhmFrax factory
-  "0x9E237F8A3319b47934468e0b74F0D5219a967aB8", // yABoosted Balancer
-  "0x860b717B360378E44A241b23d8e8e171E0120fF0", // R/Dai
-  "0xBae30fBD558A35f147FDBaeDbFF011557d3C8bd2", // 50OHM - 50 DAI
-  "0x759281a408A48bfe2029D259c23D7E848A7EA1bC", // yCRV
-  "0xa6fcC7813d9D394775601aD99874c9f8e95BAd78", // Automated Pool Token - Oracle Vault 3
-]
+import VaultsSorting, { VAULT_SORTING_TYPE } from "@/components/vault/VaultsSorting";
+import { HIDDEN_VAULTS, MutateTokenBalanceProps } from "pages/vaults";
 
 const { oVCX: OVCX } = getVeAddresses();
 
 const NETWORKS_SUPPORTING_ZAP = [1, 137, 10, 42161, 56]
-
-export interface MutateTokenBalanceProps {
-  inputToken: Address;
-  outputToken: Address;
-  vault: Address;
-  chainId: number;
-  account: Address;
-}
 
 const Vaults: NextPage = () => {
   const { address: account } = useAccount();
@@ -66,6 +47,8 @@ const Vaults: NextPage = () => {
   const { data: oBal } = useBalance({ chainId: 1, address: account, token: OVCX, watch: true })
 
   const [searchString, handleSearch] = useState("");
+
+  const [sortingType, setSortingType] = useState(VAULT_SORTING_TYPE.none)
 
   useEffect(() => {
     async function getVaults() {
@@ -173,6 +156,30 @@ const Vaults: NextPage = () => {
     setVaults(newVaultState)
   }
 
+  const sortByAscendingTvl = () => {
+    const sortedVaults = [...vaults].sort((a, b) => b.tvl - a.tvl);
+    setSortingType(VAULT_SORTING_TYPE.mostTvl)
+    setVaults(sortedVaults)
+  }
+
+  const sortByDescendingTvl = () => {
+    const sortedVaults = [...vaults].sort((a, b) => a.tvl - b.tvl);
+    setSortingType(VAULT_SORTING_TYPE.lessTvl)
+    setVaults(sortedVaults)
+  }
+
+  const sortByAscendingApy = () => {
+    const sortedVaults = [...vaults].sort((a, b) => b.apy - a.apy);
+    setSortingType(VAULT_SORTING_TYPE.mostvAPR)
+    setVaults(sortedVaults)
+  }
+
+  const sortByDescendingApy = () => {
+    const sortedVaults = [...vaults].sort((a, b) => a.apy - b.apy);
+    setSortingType(VAULT_SORTING_TYPE.lessvAPR)
+    setVaults(sortedVaults)
+  }
+
   return (
     <NoSSR>
       <section className="md:border-b border-[#353945] md:flex md:flex-row items-center justify-between py-10 px-4 md:px-8 md:gap-4">
@@ -252,30 +259,32 @@ const Vaults: NextPage = () => {
           <div className="md:w-96 flex px-6 py-3 items-center rounded-lg border border-gray-300 border-opacity-40 group/search hover:border-opacity-80 gap-2 md:mt-6 mt-12 mb-6 md:my-0">
             <MagnifyingGlassIcon className="w-8 h-8 text-gray-400 group-hover/search:text-gray-200" />
             <input
-                className="w-10/12 md:w-80 focus:outline-none border-0 text-gray-500 focus:text-gray-200 leading-none bg-transparent"
-                type="text"
-                placeholder="Search..."
-                onChange={(e) => handleSearch(e.target.value.toLowerCase())}
-                defaultValue={searchString}
+              className="w-10/12 md:w-80 focus:outline-none border-0 text-gray-500 focus:text-gray-200 leading-none bg-transparent"
+              type="text"
+              placeholder="Search..."
+              onChange={(e) => handleSearch(e.target.value.toLowerCase())}
+              defaultValue={searchString}
             />
           </div>
-          <VaultsSorting className="md:mt-6 mt-12 mb-6 md:my-0" />
+          <VaultsSorting className="md:mt-6 mt-12 mb-6 md:my-0" currentSortingType={sortingType} sortByLessTvl={sortByDescendingTvl} sortByMostTvl={sortByAscendingTvl} sortByLessApy={sortByDescendingApy} sortByMostApy={sortByAscendingApy} />
         </div>
       </section>
 
       <section className="grid grid-cols-1 md:grid-cols-3 gap-4 px-4 md:px-8">
-        {(vaults.length > 0 && Object.keys(availableZapAssets).length > 0) ? vaults.filter(vault => selectedNetworks.includes(vault.chainId)).filter(vault => !HIDDEN_VAULTS.includes(vault.address)).map((vault) => {
-          return (
-            <SmartVault
-              key={`sv-${vault.address}-${vault.chainId}`}
-              vaultData={vault}
-              mutateTokenBalance={mutateTokenBalance}
-              searchString={searchString}
-              zapAssets={availableZapAssets[vault.chainId].includes(vault.asset.address) ? zapAssets[vault.chainId] : undefined}
-              deployer={"0x22f5413C075Ccd56D575A54763831C4c27A37Bdb"}
-            />
-          )
-        })
+        {(vaults.length > 0 && Object.keys(availableZapAssets).length > 0) ?
+          vaults.filter(vault => selectedNetworks.includes(vault.chainId))
+            .filter(vault => !HIDDEN_VAULTS.includes(vault.address)).map((vault) => {
+              return (
+                <SmartVault
+                  key={`sv-${vault.address}-${vault.chainId}`}
+                  vaultData={vault}
+                  mutateTokenBalance={mutateTokenBalance}
+                  searchString={searchString}
+                  zapAssets={availableZapAssets[vault.chainId].includes(vault.asset.address) ? zapAssets[vault.chainId] : undefined}
+                  deployer={"0x22f5413C075Ccd56D575A54763831C4c27A37Bdb"}
+                />
+              )
+            })
           : <p className="text-white">Loading Vaults...</p>
         }
       </section>

@@ -1,10 +1,15 @@
 import PseudoRadioButton from "@/components/button/PseudoRadioButton";
-import Image from "next/image";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { ChainId, networkLogos, networkMap } from "@/lib/utils/connectors";
+import {useMemo, useRef, useState } from "react";
 import PopUpModal from "../modal/PopUpModal";
 import SwitchIcon from "@/components/svg/SwitchIcon";
-import {VAULT_SORTING_TYPE} from "../../pages/vaults";
+
+export enum VAULT_SORTING_TYPE {
+    none = 'none',
+    mostTvl = 'most-tvl',
+    lessTvl = 'less-tvl',
+    mostvAPR = 'most-apr',
+    lessvAPR = 'less-apr'
+  }
 
 interface VaultSortingProps {
     className?: string,

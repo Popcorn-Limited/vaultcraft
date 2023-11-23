@@ -88,10 +88,6 @@ function getProtocolIcon(asset: Token, adapter: Token, chainId: number): string 
   else if (asset?.name?.includes("HOP") || asset?.symbol?.includes("HOP-LP")) {
     return getIconFromTokenListBySymbol(asset?.symbol?.includes("HOP-LP") ? asset?.symbol?.split("HOP-LP-")[1] : asset?.symbol?.split(" ")[1], chainId);
   }
-  else if (asset?.name?.includes("Pirex")) {
-    // TODO fill this with curve lp icon
-    return "https://pirex.io/assets/images/tokens/CVX.png";
-  }
 }
 
 function getIconFromAssetListByAddress(address: Address, chainId: number) {

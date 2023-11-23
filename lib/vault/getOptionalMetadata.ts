@@ -419,6 +419,8 @@ function getFactoryMetadata({ adapter, asset }: { adapter: Token, asset: Token }
     return getYearnMetadata(adapter, asset)
   } else if (adapter?.name?.includes("Idle")) {
     return getIdleMetadata(adapter, asset)
+  } else if (adapter?.name?.includes("Origin")) {
+    return getOriginMetadata(adapter, asset)
   } else if (asset?.name?.includes("Pirex")) {
     return getPirexMetadata(adapter, asset)
   } else if (adapter?.symbol?.includes("WETH")) {

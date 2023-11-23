@@ -21,7 +21,7 @@ import { WalletClient } from "viem";
 import { useAtom } from "jotai";
 import { vaultsAtom } from "@/lib/atoms/vaults";
 import { getVaultNetworthByChain } from "@/lib/getNetworth";
-import VaultsSorting from "@/components/vault/VaultsSorting";
+import VaultsSorting, { VAULT_SORTING_TYPE } from "@/components/vault/VaultsSorting";
 
 export const HIDDEN_VAULTS = ["0xb6cED1C0e5d26B815c3881038B88C829f39CE949", "0x2fD2C18f79F93eF299B20B681Ab2a61f5F28A6fF",
   "0xDFf04Efb38465369fd1A2E8B40C364c22FfEA340", "0xd4D442AC311d918272911691021E6073F620eb07", //@dev for some reason the live 3Crypto yVault isnt picked up by the yearnAdapter nor the yearnFactoryAdapter
@@ -33,14 +33,6 @@ export const HIDDEN_VAULTS = ["0xb6cED1C0e5d26B815c3881038B88C829f39CE949", "0x2
   "0x759281a408A48bfe2029D259c23D7E848A7EA1bC", // yCRV
   "0xa6fcC7813d9D394775601aD99874c9f8e95BAd78", // Automated Pool Token - Oracle Vault 3
 ]
-
-export enum VAULT_SORTING_TYPE {
-  none = 'none',
-  mostTvl = 'most-tvl',
-  lessTvl = 'less-tvl',
-  mostvAPR = 'most-apr',
-  lessvAPR = 'less-apr'
-}
 
 const { oVCX: OVCX } = getVeAddresses();
 
