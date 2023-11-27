@@ -87,7 +87,6 @@ export default function Vaults() {
         }[]
         totalRevenue: number
         cPopRevenue: number
-        publicGoodFunding: number
         weekCexVolume: number
         weekDexVolume: number
         walletsPopMoreZero: number
@@ -121,7 +120,6 @@ export default function Vaults() {
         tvlMonthByMonth: [],
         totalRevenue: 0,
         cPopRevenue: 0,
-        publicGoodFunding: 0,
         weekCexVolume: 0,
         weekDexVolume: 0,
         walletsPopMoreZero: 0,
@@ -495,11 +493,11 @@ export default function Vaults() {
                                     <p className={`font-bold text-right`}>Coming Soon {/*statistics.vePop.toLocaleString()*/}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
-                                    <p>cVCX emissions</p>
+                                    <p>oVCX emissions</p>
                                     <p className={`font-bold text-right`}>Coming Soon {/*statistics.cPopEmissions.toLocaleString()*/}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
-                                    <p>cVCX exercised</p>
+                                    <p>oVCX exercised</p>
                                     <p className={`font-bold text-right`}>Coming Soon {/*(statistics.cPopExercised * 100).toLocaleString() %*/}</p>
                                 </div>
                             </div>
@@ -540,16 +538,12 @@ export default function Vaults() {
                                     <p className={`font-bold text-right`}>Coming Soon</p>
                                 </div>
                                 <div className={`flex justify-between`}>
-                                    <p>cVCX Revenue</p>
+                                    <p>oVCX Revenue</p>
                                     <p className={`font-bold text-right`}>Coming Soon {/*statistics.cPopRevenue.toLocaleString()*/}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
                                     <p>Total Users</p>
                                     <p className={`font-bold text-right`}>{statistics.walletsPopMoreZero.toLocaleString()}</p>
-                                </div>
-                                <div className={`flex justify-between`}>
-                                    <p>Public Good Funding</p>
-                                    <p className={`font-bold text-right`}>${statistics.publicGoodFunding.toLocaleString()}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
                                     <p>7 Day Cex Volume</p>
