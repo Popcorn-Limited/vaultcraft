@@ -14,6 +14,7 @@
     "@curvefi/api": "2.44.0",
     "@headlessui/react": "^1.7.10",
     "@heroicons/react": "^2.0.18",
+    "@masa-finance/analytics-react": "^0.12.9",
     "@rainbow-me/rainbowkit": "^1.0.11",
     "autoprefixer": "^10.4.13",
     "base58-js": "^2.0.0",
