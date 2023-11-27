@@ -69,6 +69,16 @@ export const NumberFormatter = Intl.NumberFormat("en", {
 });
 
 export function safeRound(bn: bigint, decimals = 18): bigint {
-  const roundingValue = parseUnits("1", decimals > 8 ? 8 : 2)
+  let roundingDecimals = 1;
+  if (decimals < 2) {
+    roundingDecimals = 1;
+  } else if (decimals <= 8) {
+    roundingDecimals = 2;
+  } else if (decimals <= 18) {
+    roundingDecimals = 10
+  } else if (decimals === 27) {
+    roundingDecimals = 20
+  }
+  const roundingValue = parseUnits("1", roundingDecimals)
   return (bn / roundingValue) * roundingValue
 }

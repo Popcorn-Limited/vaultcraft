@@ -23,15 +23,34 @@ import { vaultsAtom } from "@/lib/atoms/vaults";
 import { getVaultNetworthByChain } from "@/lib/getNetworth";
 import VaultsSorting, { VAULT_SORTING_TYPE } from "@/components/vault/VaultsSorting";
 
-export const HIDDEN_VAULTS = ["0xb6cED1C0e5d26B815c3881038B88C829f39CE949", "0x2fD2C18f79F93eF299B20B681Ab2a61f5F28A6fF",
-  "0xDFf04Efb38465369fd1A2E8B40C364c22FfEA340", "0xd4D442AC311d918272911691021E6073F620eb07", //@dev for some reason the live 3Crypto yVault isnt picked up by the yearnAdapter nor the yearnFactoryAdapter
-  "0x8bd3D95Ec173380AD546a4Bd936B9e8eCb642de1", // Sample Stargate Vault
-  "0xcBb5A4a829bC086d062e4af8Eba69138aa61d567", // yOhmFrax factory
-  "0x9E237F8A3319b47934468e0b74F0D5219a967aB8", // yABoosted Balancer
-  "0x860b717B360378E44A241b23d8e8e171E0120fF0", // R/Dai
-  "0xBae30fBD558A35f147FDBaeDbFF011557d3C8bd2", // 50OHM - 50 DAI
-  "0x759281a408A48bfe2029D259c23D7E848A7EA1bC", // yCRV
-  "0xa6fcC7813d9D394775601aD99874c9f8e95BAd78", // Automated Pool Token - Oracle Vault 3
+
+const FLAGSHIP_VAULTS = [
+  // eth
+  "0x6cE9c05E159F8C4910490D8e8F7a63e95E6CEcAF", // DAI IdleJunior
+  "0x52Aef3ea0D3F93766D255A1bb0aA7F1C4885E622", // USDC IdleJunior
+  "0x3D04Aade5388962C9A4f83B636a3a8ED63ea5b4D", // USDT IdleJunior
+  "0xdC266B3D2c62Ce094ff4E12DC52399c430283417", // pCVX Pirex
+  "0x6B2c5ef7FB59e6A1Ad79a4dB65234fb7bDDcaD6b", // oETH-LP Beefy
+  "0xD211486ed1A04A176E588b67dd3A30a7dE164C0B", // WETH-AURA Beefy
+  "0x61f313C98ebAd818442CBEE2A196720C8986Cdf4", // MIM-LP Beefy
+  "0xe1489Af32c45c51f94Acdb3F36B7032A82F6f55D", // WETH Sommelier
+  "0x759281a408A48bfe2029D259c23D7E848A7EA1bC", // yCRV Yearn
+  // op
+  "0x5Df527eb4cE7dE09f8e966F9bbc9bc4Edbc7f458", // USDT IdleSenior
+  "0x78C44B3A63b94d2EFc98c2Cc9701F9BEE1b6a56A", // USDT IdleJunior
+  "0x5372c5AF5f078f2d4B5dbBE4377b2f0225f2863A", // USDC IdleSenior
+  "0x4E564bC61Cf97737cE110c7929b17963E9232aE9", // USDC IdleJunior
+  "0x400a838eeA2ec6Daf6fA30d7Bc60505f0CecCec1", // wstETH/WETH Beefy
+  "0x5D45accb18A88895aCac95F13a2882C273E22e3A", // USDC/VELO Beefy
+  "0x740dc6c1eA74BbbadCCA0aB6253319e200c421a5", // STG/USDC Beefy
+  "0x48b2Bc0C40F4483EC982408F06Dc0E1e111D966b", // USDC/DOLA Beefy
+  "0x1F01c6bFDE973be1573AbFC1B6b1dFb1D8F22A86", // wstETH/OP Beefy
+  "0x0825bb2F6Ce26af1652584F1Da9e55e54015904A", // OP/USDC Beefy
+  // arb
+  "0x36EC2111A68350dBb722B872963F05992dd08E42", // Hop USDC Beefy
+  "0xfC2193ac4E8145E192bC3d9Db9407A4aE0Dc4DF8", // Hop DAI Beefy
+  "0x54d921B6397731222aB0b898bAE58c948d187Cd1", // StakedGlp Beefy
+  "0x1225354B00372c531e1c39ECe1cec548358926bb", // pGMX Pirex
 ]
 
 const { oVCX: OVCX } = getVeAddresses();
@@ -284,12 +303,12 @@ const Vaults: NextPage = () => {
               defaultValue={searchString}
             />
           </div>
-          <VaultsSorting className="md:mt-6 mt-12 mb-6 md:my-0" currentSortingType={sortingType} sortByLessTvl={sortByDescendingTvl} sortByMostTvl={sortByAscendingTvl} sortByLessApy={sortByDescendingApy} sortByMostApy={sortByAscendingApy}/>
+          <VaultsSorting className="md:mt-6 mt-12 mb-6 md:my-0" currentSortingType={sortingType} sortByLessTvl={sortByDescendingTvl} sortByMostTvl={sortByAscendingTvl} sortByLessApy={sortByDescendingApy} sortByMostApy={sortByAscendingApy} />
         </div>
       </section>
 
       <section className="grid grid-cols-1 md:grid-cols-3 gap-4 px-4 md:px-8">
-        {(vaults.length > 0 && Object.keys(availableZapAssets).length > 0) ? vaults.filter(vault => selectedNetworks.includes(vault.chainId)).filter(vault => !HIDDEN_VAULTS.includes(vault.address)).map((vault) => {
+        {(vaults.length > 0 && Object.keys(availableZapAssets).length > 0) ? vaults.filter(vault => selectedNetworks.includes(vault.chainId)).filter(vault => FLAGSHIP_VAULTS.includes(vault.address)).map((vault) => {
           return (
             <SmartVault
               key={`sv-${vault.address}-${vault.chainId}`}

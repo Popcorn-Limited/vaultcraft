@@ -2,14 +2,14 @@ import { ToastOptions, ToastPosition } from 'react-hot-toast';
 
 export const loadingStyle: ToastOptions = {
     style: {
-        border: '1px solid #A5A08C',
+        border: '1px solid #353945',
         padding: '16px',
-        color: '#A5A08C',
+        color: '#FFFFFF',
         fontSize: '18px',
-        backgroundColor: '#FFFFFF'
+        backgroundColor: '#23262f'
     },
     iconTheme: {
-        primary: '#A5A08C',
+        primary: '#23262f',
         secondary: '#FFFFFF'
     },
     position: 'top-center' as ToastPosition
@@ -21,11 +21,11 @@ export const successStyle: ToastOptions = {
         padding: '16px',
         color: '#34C759',
         fontSize: '18px',
-        backgroundColor: '#FFFFFF'
+        backgroundColor: '#23262f'
     },
     iconTheme: {
-        primary: '#34C759',
-        secondary: '#FFFFFF'
+        primary: '#23262f',
+        secondary: '#34C759'
     },
     position: 'top-center' as ToastPosition
 };
@@ -36,7 +36,7 @@ export const errorStyle: ToastOptions = {
         padding: '16px',
         color: '#D43D44',
         fontSize: '18px',
-        backgroundColor: '#FFFFFF'
+        backgroundColor: '#23262f'
     },
     iconTheme: {
         primary: '#D43D44',

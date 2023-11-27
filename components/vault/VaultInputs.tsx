@@ -10,7 +10,7 @@ import Modal from "../modal/Modal";
 import InputNumber from "../input/InputNumber";
 import { MutateTokenBalanceProps } from "pages/vaults";
 import { safeRound } from "@/lib/utils/formatBigNumber";
-import { formatUnits, parseUnits } from "viem";
+import { formatUnits, getAddress } from "viem";
 import getActionSteps, { ActionStep } from "@/lib/vault/getActionSteps";
 import handleVaultInteraction from "@/lib/vault/handleVaultInteraction";
 import ActionSteps from "./ActionSteps";
@@ -27,7 +27,7 @@ interface VaultInputsProps {
 }
 
 export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId, hideModal, mutateTokenBalance }: VaultInputsProps): JSX.Element {
-  const publicClient = usePublicClient();
+  const publicClient = usePublicClient({ chainId });
   const { data: walletClient } = useWalletClient()
   const { address: account } = useAccount();
   const { chain } = useNetwork();
@@ -71,81 +71,96 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
       setInputToken(!!gauge ? gauge : vault);
       setOutputToken(asset)
       setIsDeposit(false)
-      setAction(!!gauge ? ActionType.UnstakeAndWithdraw : ActionType.Withdrawal)
+      const newAction = !!gauge ? ActionType.UnstakeAndWithdraw : ActionType.Withdrawal
+      setAction(newAction)
+      setSteps(getActionSteps(newAction))
     } else {
       // Switch to Deposit
       setInputToken(asset);
       setOutputToken(!!gauge ? gauge : vault)
       setIsDeposit(true)
-      setAction(!!gauge ? ActionType.DepositAndStake : ActionType.Deposit)
+      const newAction = !!gauge ? ActionType.DepositAndStake : ActionType.Deposit
+      setAction(newAction)
+      setSteps(getActionSteps(newAction))
     }
   }
 
   function handleTokenSelect(input: Token, output: Token): void {
+    setInputToken(input);
+    setOutputToken(output)
+
     switch (input.address) {
       case asset.address:
         switch (output.address) {
           case asset.address:
             // error
-            break
+            return
           case vault.address:
             setAction(ActionType.Deposit)
             setSteps(getActionSteps(ActionType.Deposit))
+            return
           case gauge?.address:
             setAction(ActionType.DepositAndStake)
             setSteps(getActionSteps(ActionType.DepositAndStake))
+            return
           default:
             // error
-            break
+            return
         }
       case vault.address:
         switch (output.address) {
           case asset.address:
             setAction(ActionType.Withdrawal)
             setSteps(getActionSteps(ActionType.Withdrawal))
+            return
           case vault.address:
             // error
-            break
+            return
           case gauge?.address:
             setAction(ActionType.Stake)
             setSteps(getActionSteps(ActionType.Stake))
+            return
           default:
             setAction(ActionType.ZapWithdrawal)
             setSteps(getActionSteps(ActionType.ZapWithdrawal))
+            return
         }
       case gauge?.address:
         switch (output.address) {
           case asset.address:
             setAction(ActionType.UnstakeAndWithdraw)
             setSteps(getActionSteps(ActionType.UnstakeAndWithdraw))
+            return
           case vault.address:
             setAction(ActionType.Unstake)
             setSteps(getActionSteps(ActionType.Unstake))
+            return
           case gauge?.address:
             // error
-            break
+            return
           default:
             setAction(ActionType.ZapUnstakeAndWithdraw)
             setSteps(getActionSteps(ActionType.ZapUnstakeAndWithdraw))
+            return
         }
       default:
         switch (output.address) {
           case asset.address:
             // error
-            break
+            return
           case vault.address:
             setAction(ActionType.ZapDeposit)
             setSteps(getActionSteps(ActionType.ZapDeposit))
+            return
           case gauge?.address:
             setAction(ActionType.ZapDepositAndStake)
             setSteps(getActionSteps(ActionType.ZapDepositAndStake))
+            return
           default:
             // error
-            break
+            return
         }
     }
-    setInputToken(input);
-    setOutputToken(output)
   }
 
   async function handleMainAction() {
@@ -179,10 +194,11 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
     currentStep.loading = false
     currentStep.success = success;
     currentStep.error = !success;
+    const newStepCounter = stepCounter + 1
     setSteps(stepsCopy)
-    setStepCounter(stepCounter + 1)
+    setStepCounter(newStepCounter)
 
-    if (stepCounter === steps.length) mutateTokenBalance({ inputToken: inputToken.address, outputToken: outputToken.address, vault: vault.address, chainId, account })
+    if (newStepCounter === steps.length) mutateTokenBalance({ inputToken: inputToken.address, outputToken: outputToken.address, vault: vault.address, chainId, account })
   }
 
   if (!inputToken || !outputToken) return <></>

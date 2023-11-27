@@ -2,13 +2,7 @@ import { Address } from "viem";
 import { NumberFormatter, formatAndRoundNumber } from "@/lib/utils/formatBigNumber";
 import Title from "@/components/common/Title";
 import { VaultData } from "@/lib/types";
-import { usePublicClient } from "wagmi";
-import { useAtom } from "jotai";
-import { yieldOptionsAtom } from "@/lib/atoms/sdk";
-import { useEffect, useState } from "react";
-import calculateAPR from "@/lib/gauges/calculateGaugeAPR";
 import { roundToTwoDecimalPlaces } from "@/lib/utils/helpers";
-import { ProtocolName } from "vaultcraft-sdk";
 
 interface VaultStatProps {
   vaultData: VaultData
@@ -18,8 +12,7 @@ interface VaultStatProps {
 
 export default function VaultStats({ vaultData, account, zapAvailable }: VaultStatProps): JSX.Element {
   const { asset, vault, gauge, apy, gaugeMinApy, gaugeMaxApy } = vaultData
-
-  return (
+  return (  
     <>
       <div className="w-full flex justify-between gap-8 xs:gap-4">
         <div className="w-full mt-6 xs:mt-0">

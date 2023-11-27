@@ -1,4 +1,4 @@
-import { arbitrum, bsc, localhost, mainnet, polygon } from "wagmi/chains";
+import { arbitrum, bsc, localhost, mainnet, optimism, polygon } from "wagmi/chains";
 
 export enum ChainId {
     Ethereum = 1,
@@ -91,4 +91,4 @@ export const RPC_URLS: { [key: number]: string } = {
     [ChainId.RemoteFork]: `http://localhost:8545`,
 };
 
-export const SUPPORTED_NETWORKS = [mainnet, localhost];
+export const SUPPORTED_NETWORKS = [mainnet, polygon, arbitrum, optimism, bsc, localhost];
