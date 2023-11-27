@@ -3,7 +3,6 @@ import { Dispatch, SetStateAction } from "react";
 import { Address, useAccount, useBalance } from "wagmi";
 import { getVotePeriodEndTime } from "@/lib/gauges/utils";
 import MainActionButton from "@/components/button/MainActionButton";
-import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import useLockedBalanceOf from "@/lib/gauges/useLockedBalanceOf";
 import { getVeAddresses } from "@/lib/utils/addresses";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";

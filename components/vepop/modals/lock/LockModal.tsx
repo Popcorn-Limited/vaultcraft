@@ -10,7 +10,6 @@ import LockPopInterface from "@/components/vepop/modals/lock/LockPopInterface";
 import LockPreview from "@/components/vepop/modals/lock/LockPreview";
 import VotingPowerInfo from "@/components/vepop/modals/lock/VotingPowerInfo";
 import { handleAllowance } from "@/lib/approve";
-import { Token } from "@/lib/types";
 import { createLock } from "@/lib/gauges/interactions";
 
 const {

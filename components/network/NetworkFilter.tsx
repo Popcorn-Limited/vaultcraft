@@ -2,8 +2,8 @@ import { ChevronDownIcon } from "@heroicons/react/24/solid";
 import PseudoRadioButton from "@/components/button/PseudoRadioButton";
 import Image from "next/image";
 import { useState } from "react";
-import { ChainId, networkLogos, networkMap } from "@/lib/utils/connectors";
-import PopUpModal from "../modal/PopUpModal";
+import { ChainId, networkLogos } from "@/lib/utils/connectors";
+import PopUpModal from "@/components/modal/PopUpModal";
 
 interface NetworkFilterProps {
   supportedNetworks: ChainId[];

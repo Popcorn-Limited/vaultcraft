@@ -8,7 +8,6 @@ import { networkLogos } from "@/lib/utils/connectors";
 import MainActionButton from "@/components/button/MainActionButton";
 import SocialMediaLinks from "@/components/common/SocialMediaLinks";
 import NavbarLinks from "@/components/navbar/NavbarLinks";
-import { useRouter } from "next/router";
 
 export default function DesktopMenu(): JSX.Element {
   const { openConnectModal } = useConnectModal();

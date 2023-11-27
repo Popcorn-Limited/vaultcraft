@@ -8,7 +8,7 @@ import Accordion from "@/components/common/Accordion";
 import Title from "@/components/common/Title";
 import useGaugeWeights from "@/lib/gauges/useGaugeWeights";
 import calculateAPR from "@/lib/gauges/calculateGaugeAPR";
-import { NumberFormatter, formatNumber } from "@/lib/utils/formatBigNumber";
+import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import {roundToTwoDecimalPlaces} from '@/lib/utils/helpers'
 
 interface GaugeProps {

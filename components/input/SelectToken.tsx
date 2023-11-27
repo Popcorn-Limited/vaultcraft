@@ -1,12 +1,11 @@
 import React, { useState } from "react";
-import Image from "next/image";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { Token } from "@/lib/types";
 import { ChainId } from "@/lib/utils/connectors";
 import TokenIcon from "@/components/common/TokenIcon";
 import SearchToken from "@/components/input/SearchToken";
 import Modal from "@/components/modal/Modal";
-import PopUpModal from "../modal/PopUpModal";
+import PopUpModal from "@/components/modal/PopUpModal";
 import {Tooltip} from "react-tooltip";
 
 export interface SelectTokenProps {

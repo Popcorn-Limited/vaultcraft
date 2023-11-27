@@ -1,5 +1,5 @@
 import { ButtonProps } from "@/components/button/MainActionButton";
-import RightArrowIcon from "../svg/RightArrowIcon";
+import RightArrowIcon from "@/components/svg/RightArrowIcon";
 import { useState } from "react";
 
 export default function TertiaryActionButton({ label, handleClick, disabled = false, hidden = false }: ButtonProps): JSX.Element {

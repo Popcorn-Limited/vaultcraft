@@ -1,12 +1,11 @@
 // @ts-ignore
 import NoSSR from "react-no-ssr";
-import { mainnet, useAccount, useBalance, usePublicClient, useWalletClient } from "wagmi";
+import { useAccount, useBalance, usePublicClient, useWalletClient } from "wagmi";
 import { Address, WalletClient } from "viem";
 import { useEffect, useState } from "react";
 import { getVeAddresses } from "@/lib/utils/addresses";
 import { hasAlreadyVoted } from "@/lib/gauges/hasAlreadyVoted";
 import { Token, VaultData } from "@/lib/types";
-import { getVaultsByChain } from "@/lib/vault/getVault";
 import StakingInterface from "@/components/vepop/StakingInterface";
 import { sendVotes } from "@/lib/gauges/interactions";
 import Gauge from "@/components/vepop/Gauge";

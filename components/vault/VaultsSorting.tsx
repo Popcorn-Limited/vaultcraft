@@ -1,6 +1,6 @@
 import PseudoRadioButton from "@/components/button/PseudoRadioButton";
 import {useMemo, useRef, useState } from "react";
-import PopUpModal from "../modal/PopUpModal";
+import PopUpModal from "@/components/modal/PopUpModal";
 import SwitchIcon from "@/components/svg/SwitchIcon";
 
 export enum VAULT_SORTING_TYPE {

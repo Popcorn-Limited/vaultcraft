@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { ChainId } from "@/lib/utils/connectors";
 import { Token } from "@/lib/types";
 import TokenIcon from "@/components/common/TokenIcon";
