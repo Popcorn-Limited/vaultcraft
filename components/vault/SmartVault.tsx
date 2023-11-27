@@ -11,6 +11,7 @@ import Modal from "../modal/Modal";
 import VaultStats from "./VaultStats";
 import { MutateTokenBalanceProps } from "pages/vaults";
 import { Square2StackIcon } from "@heroicons/react/24/outline";
+import { showSuccessToast } from '@/lib/toasts';
 
 
 function getTokenOptions(vaultData: VaultData, zapAssets?: Token[]): Token[] {
@@ -71,7 +72,7 @@ export default function SmartVault({
                     {vault.address.slice(0, 6)}...{vault.address.slice(-4)}
                   </p>
                   <div className='w-6 h-6 group/vaultAddress'>
-                    <CopyToClipboard text={vault.address}>
+                    <CopyToClipboard text={vault.address} onCopy={()=>showSuccessToast("Vault Address copied!")}>
                       <Square2StackIcon className="text-white group-hover/vaultAddress:text-[#DFFF1C]" />
                     </CopyToClipboard>
                   </div>
@@ -85,7 +86,7 @@ export default function SmartVault({
                       {gauge.address.slice(0, 6)}...{gauge.address.slice(-4)}
                     </p>
                     <div className='w-6 h-6 group/gaugeAddress'>
-                      <CopyToClipboard text={gauge.address}>
+                      <CopyToClipboard text={gauge.address} onCopy={()=>showSuccessToast("Gauge Address copied!")}>
                         <Square2StackIcon className="text-white group-hover/gaugeAddress:text-[#DFFF1C]" />
                       </CopyToClipboard>
                     </div>
