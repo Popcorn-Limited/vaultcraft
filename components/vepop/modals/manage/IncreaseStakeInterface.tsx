@@ -59,7 +59,7 @@ export default function IncreaseStakeInterface({ amountState, lockedBal }: Incre
           errorMessage={errorMessage}
           allowInput
           tokenList={[]}
-          getTokenUrl="https://app.balancer.fi/#/ethereum/pool/0xce8d4ad8cce1240ecbc49385baf4c399a7f353f9000200000000000000000628"
+          getTokenUrl="https://app.balancer.fi/#/ethereum/pool/0x577a7f7ee659aa14dc16fd384b3f8078e23f1920000200000000000000000633 "
         />
       </div>
 
