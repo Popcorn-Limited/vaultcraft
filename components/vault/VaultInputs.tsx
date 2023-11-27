@@ -6,15 +6,15 @@ import { useAccount, useNetwork, usePublicClient, useSwitchNetwork, useWalletCli
 import TabSelector from "@/components/common/TabSelector";
 import { ActionType, Token } from "@/lib/types";
 import { validateInput } from "@/lib/utils/helpers";
-import Modal from "../modal/Modal";
-import InputNumber from "../input/InputNumber";
-import { MutateTokenBalanceProps } from "pages/vaults";
+import Modal from "@/components/modal/Modal";
+import InputNumber from "@/components/input/InputNumber";
 import { safeRound } from "@/lib/utils/formatBigNumber";
-import { formatUnits, getAddress } from "viem";
+import { formatUnits } from "viem";
 import getActionSteps, { ActionStep } from "@/lib/vault/getActionSteps";
 import handleVaultInteraction from "@/lib/vault/handleVaultInteraction";
-import ActionSteps from "./ActionSteps";
+import ActionSteps from "@/components/vault/ActionSteps";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { MutateTokenBalanceProps } from "@/components/vault/VaultsContainer";
 
 interface VaultInputsProps {
   vault: Token;

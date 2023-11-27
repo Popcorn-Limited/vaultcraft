@@ -1,17 +1,17 @@
 // @ts-ignore
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { useEffect, useState } from "react";
-import { Address, useAccount, usePublicClient, } from "wagmi";
+import { useState } from "react";
+import { Address, useAccount } from "wagmi";
 import { getAddress } from "viem";
 import AssetWithName from "@/components/vault/AssetWithName";
 import VaultInputs from "@/components/vault/VaultInputs";
 import Accordion from "@/components/common/Accordion";
 import { Token, VaultData } from "@/lib/types";
-import Modal from "../modal/Modal";
-import VaultStats from "./VaultStats";
-import { MutateTokenBalanceProps } from "pages/vaults";
+import Modal from "@/components/modal/Modal";
+import VaultStats from "@/components/vault/VaultStats";
 import { Square2StackIcon } from "@heroicons/react/24/outline";
 import { showSuccessToast } from '@/lib/toasts';
+import { MutateTokenBalanceProps } from '@/components/vault/VaultsContainer';
 
 
 function getTokenOptions(vaultData: VaultData, zapAssets?: Token[]): Token[] {

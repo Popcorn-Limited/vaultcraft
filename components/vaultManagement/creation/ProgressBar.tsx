@@ -1,4 +1,10 @@
-export default function ProgressBar({ stages, activeStage }: { stages: string[], activeStage: number }) {
+
+export interface ProgressBarProps {
+    stages: string[];
+    activeStage: number;
+}
+
+export default function ProgressBar({ stages, activeStage }: ProgressBarProps) {
     return (
         <div className="flex flex-col">
             <div className="flex flex-row items-center justify-center w-full py-4 h-fit bg-transparent relative">

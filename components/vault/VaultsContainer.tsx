@@ -1,7 +1,6 @@
 // @ts-ignore
 import NoSSR from "react-no-ssr";
 import { useEffect, useState } from "react";
-import type { NextPage } from "next";
 import { Address, useAccount, useBalance, usePublicClient, useWalletClient } from "wagmi";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";

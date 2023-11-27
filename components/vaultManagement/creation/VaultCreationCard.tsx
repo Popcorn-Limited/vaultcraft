@@ -1,6 +1,10 @@
-import ProgressBar from "./ProgressBar";
+import ProgressBar, { ProgressBarProps } from "@/components/vaultManagement/creation/ProgressBar";
 
-export default function VaultCreationContainer({ activeStage, children, stages }: { activeStage: number, children: any, stages: string[] }): JSX.Element {
+interface VaultCreationCardProps extends ProgressBarProps {
+  children: any
+}
+
+export default function VaultCreationCard({ activeStage, children, stages }: VaultCreationCardProps): JSX.Element {
   return (
     <div className="bg-[#141416] md:max-w-[800px] w-full h-full flex flex-col justify-center mx-auto md:px-8 px-6">
       <ProgressBar stages={stages} activeStage={activeStage} />
