@@ -470,7 +470,7 @@ export default function Vaults() {
                         <div className={`h-[4rem] flex gap-2 border-b border-[#353945] px-[1.5rem]`}>
                             <img src="/images/icons/popLogo.svg" alt="Logo" className={`w-8 h-8 self-center`} />
                             <div className={`flex flex-col justify-center`}>
-                                <p className={`text-[1rem]`}>VCXCORN</p>
+                                <p className={`text-[1rem]`}>VCX</p>
                                 <p className={`text-[0.625rem]`}>Liquid VCX market (Mainnet only)</p>
                             </div>
                         </div>
