@@ -2,10 +2,11 @@ import { Asset } from "../types";
 
 const assets: Asset[] = [
   {
-    "chains": [1, 1337, 42161],
+    "chains": [1, 1337, 10, 42161],
     "address": {
       "1": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
       "1337": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+      "10": "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1",
       "42161": "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1"
     },
     "name": "Dai Stablecoin",
@@ -14,11 +15,12 @@ const assets: Asset[] = [
     "logoURI": "https://cdn.furucombo.app/assets/img/token/DAI.png"
   },
   {
-    "chains": [1, 1337, 42161, 137],
+    "chains": [1, 1337, 10, 42161, 137],
     "address": {
       "1": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
       "1337": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
       "42161": "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8",
+      "10": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
       "137": "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174"
     },
     "name": "USD Coin",
@@ -27,10 +29,11 @@ const assets: Asset[] = [
     "logoURI": "https://cdn.furucombo.app/assets/img/token/USDC.png"
   },
   {
-    "chains": [1, 1337, 42161],
+    "chains": [1, 1337, 10, 42161],
     "address": {
       "1": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
       "1337": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+      "10": "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58",
       "42161": "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8"
     },
     "name": "Tether USD",
@@ -51,10 +54,11 @@ const assets: Asset[] = [
     "logoURI": "https://cdn.furucombo.app/assets/img/token/FRAX.png"
   },
   {
-    "chains": [1, 1337, 42161],
+    "chains": [1, 1337, 10, 42161],
     "address": {
       "1": "0x5f98805A4E8be255a32880FDeC7F6728C6568bA0",
       "1337": "0x5f98805A4E8be255a32880FDeC7F6728C6568bA0",
+      "10": "0xc40F949F8a4e094D1b49a23ea9241D289B7b2819",
       "42161": "0x93b346b6BC2548dA6A1E7d98E9a421B42541425b"
     },
     "name": "LUSD",
@@ -75,10 +79,11 @@ const assets: Asset[] = [
     "logoURI": "https://cdn.furucombo.app/assets/img/token/MIM.png"
   },
   {
-    "chains": [1, 1337, 42161],
+    "chains": [1, 1337, 10, 42161],
     "address": {
       "1": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
       "1337": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+      "10": "0x68f180fcCe6836688e9084f035309E29Bf0A2095",
       "42161": "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f"
     },
     "name": "Wrapped BTC",
@@ -87,10 +92,11 @@ const assets: Asset[] = [
     "logoURI": "https://cdn.furucombo.app/assets/img/token/WBTC.png"
   },
   {
-    "chains": [1, 1337, 42161],
+    "chains": [1, 1337, 10, 42161],
     "address": {
       "1": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
       "1337": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+      "10": "0x4200000000000000000000000000000000000006",
       "42161": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"
     },
     "name": "Wrapped Ether",

@@ -69,17 +69,16 @@ function getProtocolIcon(asset: Token, adapter: Token, chainId: number): string 
     // TODO fill this with curve lp icon
     return undefined;
   }
-  else if (adapter?.name?.includes("Stargate") || asset?.name?.includes("STG") || asset?.symbol?.includes("STG") || asset?.symbol?.includes("S*")) {
+  else if (adapter?.name?.includes("Velodrome") || asset?.symbol?.includes("vAMM")) {
     // TODO fill this with curve lp icon
+    return "/images/tokens/velodrome-lp.svg";
+  }
+  else if (adapter?.name?.includes("Stargate") || asset?.name?.includes("STG") || asset?.symbol?.includes("STG") || asset?.symbol?.includes("S*")) {
     return getIconFromTokenListBySymbol(asset?.symbol?.includes("*") ? asset?.symbol?.split("*")[1] : asset?.symbol?.split(" ")[1], chainId);
   }
   else if (adapter?.name?.includes("Sushi")) {
     // TODO fill this with curve lp icon
     return undefined;
-  }
-  else if (adapter?.name?.includes("Velodrome")) {
-    // TODO fill this with curve lp icon
-    return "/images/tokens/velodrome-lp.svg";
   }
   else if (adapter?.name?.includes("Yearn")) {
     // TODO fill this with curve lp icon
