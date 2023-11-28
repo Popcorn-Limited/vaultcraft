@@ -5,7 +5,7 @@ import axios from "axios";
 import { RPC_URLS, networkMap } from "@/lib/utils/connectors";
 import { ERC20Abi } from "@/lib/constants";
 
-const symbolsToSelect = ["DAI", "USDC", "USDT", "LUSD", "WETH", "WBTC"]
+const symbolsToSelect = ["DAI", "USDC", "USDC.e", "USDT", "LUSD", "WETH", "WBTC"]
 
 export default async function getZapAssets({ chain, account }: { chain: Chain, account?: Address }): Promise<Token[]> {
   const selected = assets.filter(asset => asset.chains.includes(chain.id)).filter(asset => symbolsToSelect.includes(asset.symbol))
