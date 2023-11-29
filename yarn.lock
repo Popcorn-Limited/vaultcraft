@@ -547,10 +547,10 @@
   dependencies:
     "@lit-labs/ssr-dom-shim" "^1.0.0"
 
-"@masa-finance/analytics-react@^0.12.9":
-  version "0.12.9"
-  resolved "https://registry.yarnpkg.com/@masa-finance/analytics-react/-/analytics-react-0.12.9.tgz#d49e394b53a496ac6aa946471b41518c75908295"
-  integrity sha512-JJG+SGwiOObk4gZcqQwVv/y8kzZeQAci8Ll7kRHV/rbnGgEo9aMA1yB3p/Rq6wtqzUDvvnqRdmYcxAMZ2CKgSA==
+"@masa-finance/analytics-react@0.12.10":
+  version "0.12.10"
+  resolved "https://registry.yarnpkg.com/@masa-finance/analytics-react/-/analytics-react-0.12.10.tgz#34b1674fe00a4278c1286a32da5fc51ea3581596"
+  integrity sha512-a4SHJUOtRKWJy0yWfsw2u+hl/UyioB9vOdAcMHdPWf3wyfZjbVyQSCVeU6SNYa+uqOx2VFVEPi9OWTBBBLtG3A==
   dependencies:
     "@masa-finance/analytics-sdk" "^0.2.6"
     react "^18.2.0"
