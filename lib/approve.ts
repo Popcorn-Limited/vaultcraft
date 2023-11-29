@@ -1,7 +1,8 @@
-import { Address, PublicClient, WalletClient } from "viem"
+import { Address, PublicClient, WalletClient, getAddress } from "viem"
 import { ERC20Abi } from "@/lib/constants"
 import { showErrorToast, showLoadingToast, showSuccessToast } from "@/lib/toasts"
 import { Clients, SimulationResponse, Token } from "@/lib/types";
+import { UsdtAbi } from "./constants/abi/USDT";
 
 interface HandleAllowanceProps {
   token: Address;
@@ -61,7 +62,8 @@ async function simulateApprove({ address, account, spender, publicClient }: Simu
     const { request } = await publicClient.simulateContract({
       account,
       address,
-      abi: ERC20Abi,
+      // @ts-ignore -- for some reason viem is not happy when the two abis are slightly different
+      abi: address === "0xdAC17F958D2ee523a2206206994597C13D831ec7" ? UsdtAbi : ERC20Abi, // USDT doesnt return a bool on approval
       functionName: 'approve',
       args: [spender, BigInt("115792089237316195423570985008687907853269984665640")]
     })
