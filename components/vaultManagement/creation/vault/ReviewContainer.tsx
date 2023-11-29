@@ -70,7 +70,7 @@ export default function ReviewContainer({ route, stages, activeStage }: VaultCre
           Please review your configuration carefully.
           You can interact with vaults that you created
           <a
-            href="/vaults"
+            href="/experimental/vaults"
             rel="noopener noreferrer"
             target="_blank"
             className="text-customPurple"
