@@ -19,7 +19,6 @@ const VeAddresses = {
     SmartWalletChecker: "0x8427155770f7e6b973249E2f9D140a495aBE4f90",
     VotingEscrowDelegation: "0x9B12C90BAd388B7e417271eb20678D1a7759507c",
     VaultRouter: "0x8aed8Ea73044910760E8957B6c5b28Ac51f8f809",
-    FeeDistributor: "0x2661cdddb673DDcF2e0bc0dD7Fd432fCF1fe9e74"
 };
 
 export function getVeAddresses(): veAddresses {
