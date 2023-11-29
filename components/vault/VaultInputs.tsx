@@ -4,35 +4,39 @@ import MainActionButton from "@/components/button/MainActionButton";
 import { useEffect, useState } from "react";
 import { useAccount, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
 import TabSelector from "@/components/common/TabSelector";
-import { ActionType, Token } from "@/lib/types";
+import { ActionType, Token, VaultData } from "@/lib/types";
 import { validateInput } from "@/lib/utils/helpers";
 import Modal from "@/components/modal/Modal";
 import InputNumber from "@/components/input/InputNumber";
 import { safeRound } from "@/lib/utils/formatBigNumber";
-import { formatUnits } from "viem";
+import { formatUnits, getAddress, isAddress } from "viem";
 import getActionSteps, { ActionStep } from "@/lib/vault/getActionSteps";
 import handleVaultInteraction from "@/lib/vault/handleVaultInteraction";
 import ActionSteps from "@/components/vault/ActionSteps";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { MutateTokenBalanceProps } from "@/components/vault/VaultsContainer";
+import { useAtom } from "jotai";
+import { masaAtom } from "@/lib/atoms/sdk";
+import { useRouter } from "next/router";
 
 interface VaultInputsProps {
-  vault: Token;
-  asset: Token;
-  gauge?: Token;
+  vaultData: VaultData;
   tokenOptions: Token[];
   chainId: number;
   hideModal: () => void;
   mutateTokenBalance: (props: MutateTokenBalanceProps) => void;
 }
 
-export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId, hideModal, mutateTokenBalance }: VaultInputsProps): JSX.Element {
+export default function VaultInputs({ vaultData, tokenOptions, chainId, hideModal, mutateTokenBalance }: VaultInputsProps): JSX.Element {
+  const { asset, vault, gauge } = vaultData;
+  const { query } = useRouter()
   const publicClient = usePublicClient({ chainId });
   const { data: walletClient } = useWalletClient()
   const { address: account } = useAccount();
   const { chain } = useNetwork();
   const { switchNetwork } = useSwitchNetwork();
   const { openConnectModal } = useConnectModal();
+  const [masaSdk,] = useAtom(masaAtom)
 
   const [inputToken, setInputToken] = useState<Token>()
   const [outputToken, setOutputToken] = useState<Token>()
@@ -49,6 +53,8 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
   const [showModal, setShowModal] = useState<boolean>(false)
   const [tradeTimeout, setTradeTimeout] = useState<number>(300); // number of seconds a cow order is valid for
   const [slippage, setSlippage] = useState<number>(100); // In BPS 0 - 10_000
+
+  console.log({ query })
 
   useEffect(() => {
     // set default input/output tokens
@@ -181,13 +187,13 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
       amount: (val * (10 ** inputToken.decimals)),
       inputToken,
       outputToken,
-      asset,
-      vault,
-      gauge,
+      vaultData,
       account,
       slippage,
       tradeTimeout,
-      clients: { publicClient, walletClient }
+      clients: { publicClient, walletClient },
+      fireEvent: masaSdk?.fireEvent,
+      referral: !!query?.ref && isAddress(query.ref as string) ? getAddress(query.ref as string) : undefined
     })
     const success = await vaultInteraction()
 

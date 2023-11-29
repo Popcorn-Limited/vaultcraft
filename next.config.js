@@ -13,6 +13,7 @@ const nextConfig = {
     IPFS_URL: process.env.IPFS_URL,
     DUNE_API_KEY:process.env.DUNE_API_KEY,
     ENSO_API_KEY:process.env.ENSO_API_KEY,
+    MASA_CLIENT_ID:process.env.MASA_CLIENT_ID,
   },
   async rewrites() {
     return [

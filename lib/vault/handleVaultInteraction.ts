@@ -1,12 +1,13 @@
 import axios from "axios"
 import { Address, getAddress } from "viem";
 import { handleAllowance } from "../approve";
-import { ActionType, Clients, Token } from "../types";
+import { ActionType, Clients, Token, VaultData } from "../types";
 import { vaultDeposit, vaultDepositAndStake, vaultRedeem, vaultUnstakeAndWithdraw } from "./interactions";
 import zap from "./zap";
 import { getVeAddresses } from "../utils/addresses";
 import { gaugeDeposit, gaugeWithdraw } from "../gauges/interactions";
 import { erc20ABI } from "wagmi";
+import { FireEventArgs } from "@masa-finance/analytics-sdk";
 
 const { VaultRouter: VAULT_ROUTER } = getVeAddresses()
 
@@ -17,13 +18,13 @@ interface HandleVaultInteractionProps {
   amount: number;
   inputToken: Token;
   outputToken: Token;
-  asset: Token,
-  vault: Token,
-  gauge?: Token,
-  account: Address,
+  vaultData: VaultData;
+  account: Address;
   slippage: number;
-  tradeTimeout: number,
-  clients: Clients,
+  tradeTimeout: number;
+  clients: Clients;
+  fireEvent?: (type: string, { user_address, network, contract_address, asset_amount, asset_ticker, additionalEventData }: FireEventArgs) => Promise<void>;
+  referral?:Address;
 }
 
 export default async function handleVaultInteraction({
@@ -33,13 +34,13 @@ export default async function handleVaultInteraction({
   amount,
   inputToken,
   outputToken,
-  asset,
-  vault,
-  gauge,
+  vaultData,
   account,
   slippage,
   tradeTimeout,
   clients,
+  fireEvent,
+  referral
 }: HandleVaultInteractionProps): Promise<() => Promise<boolean>> {
   let postBal = 0;
   switch (action) {
@@ -48,32 +49,32 @@ export default async function handleVaultInteraction({
         case 0:
           return () => handleAllowance({ token: inputToken.address, amount, account, spender: outputToken.address, clients })
         case 1:
-          return () => vaultDeposit({ chainId, vault: vault.address, account, amount, clients })
+          return () => vaultDeposit({ chainId, vaultData, account, amount, clients, fireEvent, referral })
       }
     case ActionType.Withdrawal:
-      return () => vaultRedeem({ chainId, vault: vault.address, account, amount, clients })
+      return () => vaultRedeem({ chainId, vaultData, account, amount, clients })
     case ActionType.Stake:
       switch (stepCounter) {
         case 0:
-          return () => handleAllowance({ token: inputToken.address, amount, account, spender: gauge?.address as Address, clients })
+          return () => handleAllowance({ token: inputToken.address, amount, account, spender: vaultData.gauge?.address as Address, clients })
         case 1:
-          return () => gaugeDeposit({ chainId, address: gauge?.address as Address, account, amount, clients })
+          return () => gaugeDeposit({ chainId, address: vaultData.gauge?.address as Address, account, amount, clients })
       }
     case ActionType.Unstake:
-      return () => gaugeWithdraw({ chainId, address: gauge?.address as Address, account, amount, clients })
+      return () => gaugeWithdraw({ chainId, address: vaultData.gauge?.address as Address, account, amount, clients })
     case ActionType.DepositAndStake:
       switch (stepCounter) {
         case 0:
           return () => handleAllowance({ token: inputToken.address, amount, account, spender: VAULT_ROUTER, clients })
         case 1:
-          return () => vaultDepositAndStake({ chainId, router: VAULT_ROUTER, vault: vault.address, gauge: gauge?.address as Address, account, amount, clients })
+          return () => vaultDepositAndStake({ chainId, router: VAULT_ROUTER, vaultData, account, amount, clients, fireEvent, referral })
       }
     case ActionType.UnstakeAndWithdraw:
       switch (stepCounter) {
         case 0:
           return () => handleAllowance({ token: inputToken.address, amount, account, spender: VAULT_ROUTER, clients })
         case 1:
-          return () => vaultUnstakeAndWithdraw({ chainId, router: VAULT_ROUTER, vault: vault.address, gauge: gauge?.address as Address, account, amount, clients })
+          return () => vaultUnstakeAndWithdraw({ chainId, router: VAULT_ROUTER, vaultData, account, amount, clients, fireEvent, referral })
       }
     case ActionType.ZapDeposit:
       switch (stepCounter) {
@@ -84,27 +85,27 @@ export default async function handleVaultInteraction({
           ).data
           return () => handleAllowance({ token: inputToken.address, amount, account, spender: getAddress(ensoWallet.address), clients })
         case 1:
-          return () => zap({ chainId, sellToken: inputToken.address, buyToken: asset.address, amount, account, slippage, tradeTimeout, clients })
+          return () => zap({ chainId, sellToken: inputToken.address, buyToken: vaultData.asset.address, amount, account, slippage, tradeTimeout, clients })
         case 2:
-          postBal = Number(await clients.publicClient.readContract({ address: asset.address, abi: erc20ABI, functionName: "balanceOf", args: [account] }))
-          return () => handleAllowance({ token: asset.address, amount: postBal - asset.balance, account, spender: vault.address, clients })
+          postBal = Number(await clients.publicClient.readContract({ address: vaultData.asset.address, abi: erc20ABI, functionName: "balanceOf", args: [account] }))
+          return () => handleAllowance({ token: vaultData.asset.address, amount: postBal - vaultData.asset.balance, account, spender: vaultData.vault.address, clients })
         case 3:
-          postBal = Number(await clients.publicClient.readContract({ address: asset.address, abi: erc20ABI, functionName: "balanceOf", args: [account] }))
-          return () => vaultDeposit({ chainId, vault: vault.address, account, amount: postBal - asset.balance, clients })
+          postBal = Number(await clients.publicClient.readContract({ address: vaultData.asset.address, abi: erc20ABI, functionName: "balanceOf", args: [account] }))
+          return () => vaultDeposit({ chainId, vaultData, account, amount: postBal - vaultData.asset.balance, clients })
       }
     case ActionType.ZapWithdrawal:
       switch (stepCounter) {
         case 0:
-          return () => vaultRedeem({ chainId, vault: vault.address, account, amount, clients })
+          return () => vaultRedeem({ chainId, vaultData, account, amount, clients })
         case 1:
           const ensoWallet = (await axios.get(
             `https://api.enso.finance/api/v1/wallet?chainId=${chainId}&fromAddress=${account}`,
             { headers: { Authorization: `Bearer ${process.env.ENSO_API_KEY}` } })
           ).data
-          return () => handleAllowance({ token: asset.address, amount, account, spender: getAddress(ensoWallet.address), clients })
+          return () => handleAllowance({ token: vaultData.asset.address, amount, account, spender: getAddress(ensoWallet.address), clients })
         case 2:
-          postBal = Number(await clients.publicClient.readContract({ address: asset.address, abi: erc20ABI, functionName: "balanceOf", args: [account] }))
-          return () => zap({ chainId, sellToken: asset.address, buyToken: outputToken.address, amount: postBal - asset.balance, account, slippage, tradeTimeout, clients })
+          postBal = Number(await clients.publicClient.readContract({ address: vaultData.asset.address, abi: erc20ABI, functionName: "balanceOf", args: [account] }))
+          return () => zap({ chainId, sellToken: vaultData.asset.address, buyToken: outputToken.address, amount: postBal - vaultData.asset.balance, account, slippage, tradeTimeout, clients })
       }
     case ActionType.ZapDepositAndStake:
       switch (stepCounter) {
@@ -115,28 +116,28 @@ export default async function handleVaultInteraction({
           ).data
           return () => handleAllowance({ token: inputToken.address, amount, account, spender: getAddress(ensoWallet.address), clients })
         case 1:
-          return () => zap({ chainId, sellToken: inputToken.address, buyToken: asset.address, amount, account, slippage, tradeTimeout, clients })
+          return () => zap({ chainId, sellToken: inputToken.address, buyToken: vaultData.asset.address, amount, account, slippage, tradeTimeout, clients })
         case 2:
-          postBal = Number(await clients.publicClient.readContract({ address: asset.address, abi: erc20ABI, functionName: "balanceOf", args: [account] }))
-          return () => handleAllowance({ token: asset.address, amount: postBal - asset.balance, account, spender: VAULT_ROUTER, clients })
+          postBal = Number(await clients.publicClient.readContract({ address: vaultData.asset.address, abi: erc20ABI, functionName: "balanceOf", args: [account] }))
+          return () => handleAllowance({ token: vaultData.asset.address, amount: postBal - vaultData.asset.balance, account, spender: VAULT_ROUTER, clients })
         case 3:
-          postBal = Number(await clients.publicClient.readContract({ address: asset.address, abi: erc20ABI, functionName: "balanceOf", args: [account] }))
-          return () => vaultDepositAndStake({ chainId, router: VAULT_ROUTER, vault: vault.address, gauge: gauge?.address as Address, account, amount: postBal - asset.balance, clients })
+          postBal = Number(await clients.publicClient.readContract({ address: vaultData.asset.address, abi: erc20ABI, functionName: "balanceOf", args: [account] }))
+          return () => vaultDepositAndStake({ chainId, router: VAULT_ROUTER, vaultData, account, amount: postBal - vaultData.asset.balance, clients })
       }
     case ActionType.ZapUnstakeAndWithdraw:
       switch (stepCounter) {
         case 0:
           return () => handleAllowance({ token: inputToken.address, amount, account, spender: VAULT_ROUTER, clients })
         case 1:
-          return () => vaultUnstakeAndWithdraw({ chainId, router: VAULT_ROUTER, vault: vault.address, gauge: gauge?.address as Address, account, amount, clients })
+          return () => vaultUnstakeAndWithdraw({ chainId, router: VAULT_ROUTER, vaultData, account, amount, clients })
         case 2:
           const ensoWallet = (await axios.get(
             `https://api.enso.finance/api/v1/wallet?chainId=${chainId}&fromAddress=${account}`,
             { headers: { Authorization: `Bearer ${process.env.ENSO_API_KEY}` } })
           ).data
-          return () => handleAllowance({ token: asset.address, amount, account, spender: getAddress(ensoWallet.address), clients })
+          return () => handleAllowance({ token: vaultData.asset.address, amount, account, spender: getAddress(ensoWallet.address), clients })
         case 3:
-          return () => zap({ chainId, sellToken: asset.address, buyToken: outputToken.address, amount, account, slippage, tradeTimeout, clients })
+          return () => zap({ chainId, sellToken: vaultData.asset.address, buyToken: outputToken.address, amount, account, slippage, tradeTimeout, clients })
       }
     default:
       // We should never reach this code. This is here just to make ts happy

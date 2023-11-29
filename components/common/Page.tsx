@@ -1,5 +1,5 @@
 import DesktopMenu from "@/components/navbar/DesktopMenu";
-import { yieldOptionsAtom } from "@/lib/atoms/sdk";
+import { masaAtom, yieldOptionsAtom } from "@/lib/atoms/sdk";
 import { vaultsAtom } from "@/lib/atoms/vaults";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { getVaultsByChain } from "@/lib/vault/getVault";
@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import { CachedProvider, YieldOptions } from "vaultcraft-sdk";
 import { useAccount } from "wagmi";
 import Footer from "@/components/common/Footer";
+import { useMasaAnalyticsReact } from "@masa-finance/analytics-react";
 
 async function setUpYieldOptions() {
   const ttl = 360_000;
@@ -24,11 +25,23 @@ export default function Page({
 }): JSX.Element {
   const { address: account } = useAccount()
   const [yieldOptions, setYieldOptions] = useAtom(yieldOptionsAtom)
+  const [masaSdk, setMasaSdk] = useAtom(masaAtom)
   const [, setVaults] = useAtom(vaultsAtom)
+
+  const { fireEvent, fireLoginEvent, firePageViewEvent, fireConnectWalletEvent } = useMasaAnalyticsReact({
+    clientApp: "VaultCraft",
+    clientName: "VaultCraft",
+    clientId: process.env.MASA_CLIENT_ID as string
+  });
 
   useEffect(() => {
     if (!yieldOptions) {
       setUpYieldOptions().then((res: any) => setYieldOptions(res))
+    }
+    if (!masaSdk) {
+      setMasaSdk({
+        fireEvent, fireLoginEvent, firePageViewEvent, fireConnectWalletEvent
+      })
     }
   }, [])
 

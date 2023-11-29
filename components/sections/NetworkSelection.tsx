@@ -4,7 +4,7 @@ import { useNetwork } from "wagmi";
 import { useChainModal } from "@rainbow-me/rainbowkit";
 import Image from "next/image";
 import { networkAtom, assetAtom, protocolAtom, adapterAtom, adapterConfigAtom, strategyAtom } from "@/lib/atoms";
-import { SUPPORTED_NETWORKS } from "@/lib/connectors";
+import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import Selector, { Option } from "@/components/input/Selector";
 
 

@@ -4,10 +4,10 @@ import Selector, { Option } from "@/components/input/Selector";
 import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import { localhost, mainnet } from "wagmi/chains";
-import { RPC_URLS } from "@/lib/connectors";
 import { Address, getAddress, isAddress } from "viem";
 import { Asset } from "@/lib/types";
 import assets from "@/lib/constants/assets";
+import { RPC_URLS } from "@/lib/utils/connectors";
 
 async function fetchViaAlchemy(address: string, chainId: number, metadata: any) {
   const options = {

@@ -13,7 +13,7 @@ import { Provider } from "jotai";
 // @ts-ignore
 import NoSSR from 'react-no-ssr';
 import Page from "@/components/common/Page";
-import { SUPPORTED_NETWORKS } from "@/lib/connectors";
+import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { connectorsForWallets } from '@rainbow-me/rainbowkit';
 import {
   injectedWallet,
@@ -40,16 +40,16 @@ const connectors = connectorsForWallets([
     groupName: 'Suggested',
     wallets: [
       injectedWallet({ chains }),
-      rainbowWallet({ projectId:'9b83e8f348c7515d3f94d83f95a05749', chains }),
-      metaMaskWallet({ projectId:'9b83e8f348c7515d3f94d83f95a05749', chains }),
+      rainbowWallet({ projectId: '9b83e8f348c7515d3f94d83f95a05749', chains }),
+      metaMaskWallet({ projectId: '9b83e8f348c7515d3f94d83f95a05749', chains }),
     ],
   },
   {
     groupName: 'Others',
     wallets: [
       coinbaseWallet({ chains, appName: 'VaultCraft' }),
-      walletConnectWallet({ projectId:'9b83e8f348c7515d3f94d83f95a05749', chains }),
-      coin98Wallet({ projectId:'9b83e8f348c7515d3f94d83f95a05749', chains })
+      walletConnectWallet({ projectId: '9b83e8f348c7515d3f94d83f95a05749', chains }),
+      coin98Wallet({ projectId: '9b83e8f348c7515d3f94d83f95a05749', chains })
     ]
 
   }
@@ -115,7 +115,6 @@ const nextFont = localFont({
     },
   ]
 });
-
 
 export default function App({ Component, pageProps }: AppProps) {
   return (

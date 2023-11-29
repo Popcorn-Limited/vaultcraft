@@ -13,7 +13,7 @@ import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import Modal from "@/components/Modal";
 import { deployVault } from "@/lib/vault/deployVault";
 import { stringToHex } from "viem";
-import { SUPPORTED_NETWORKS } from "@/lib/connectors";
+import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { VaultCreationContainerProps } from ".";
 import VaultCreationCard from "@/components/vaultManagement/creation/VaultCreationCard";
 

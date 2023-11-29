@@ -39,7 +39,6 @@ export default function SmartVault({
   const { address: account } = useAccount();
 
   const vault = vaultData.vault;
-  const asset = vaultData.asset;
   const gauge = vaultData.gauge;
   const tokenOptions = getTokenOptions(vaultData, zapAssets);
 
@@ -98,9 +97,7 @@ export default function SmartVault({
           </div>
           <div className="w-full md:w-1/2 mt-4 md:mt-0 flex-grow rounded-lg border border-[#353945] bg-[#141416] p-6">
             <VaultInputs
-              vault={vault}
-              asset={asset}
-              gauge={gauge}
+              vaultData={vaultData}
               tokenOptions={tokenOptions}
               chainId={vaultData.chainId}
               hideModal={() => setShowModal(false)}
