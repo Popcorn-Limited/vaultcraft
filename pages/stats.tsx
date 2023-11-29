@@ -438,7 +438,7 @@ export default function Vaults() {
         <NoSSR>
             <div className={`text-white px-4 md:px-8`}>
                 <h1 className={`font-bold text-[2rem]`}>VaultCraft Statistics</h1>
-                <p className={`text-[1.125rem] mb-8`}>Total Stats start from 23 June 2023.</p>
+                <p className={`text-[1.125rem] mb-8`}>Total Stats start from 30 November 2023</p>
                 <div className={`grid md:grid-cols-2 gap-[2rem]`}>
                     <div className={`border border-[#353945] rounded-[1rem] bg-[#23262f] p-6 grid col-span-full md:grid-cols-6 gap-6`}>
                         <div className={`flex flex-col`}>
