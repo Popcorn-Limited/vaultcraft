@@ -320,7 +320,7 @@ const assets: Asset[] = [
     "name": "FRAX / USDC LP",
     "symbol": "crvFRAX",
     "decimals": 18,
-    "logoURI": "/images/icons/curve-lp.png"
+    "logoURI": "/images/tokens/curve-lp.png"
   }, {
     "chains": [1],
     "address": {
@@ -329,7 +329,7 @@ const assets: Asset[] = [
     "name": "ETH / stETH LP",
     "symbol": "steCRV",
     "decimals": 18,
-    "logoURI": "/images/icons/curve-lp.png"
+    "logoURI": "/images/tokens/curve-lp.png"
   }, {
     "chains": [1],
     "address": {
@@ -347,7 +347,7 @@ const assets: Asset[] = [
     "name": "ETH / frxETH LP ",
     "symbol": "crvFrxETH",
     "decimals": 18,
-    "logoURI": "/images/icons/curve-lp.png"
+    "logoURI": "/images/tokens/curve-lp.png"
   },
   {
     "chains": [1],
@@ -357,7 +357,7 @@ const assets: Asset[] = [
     "name": "TryCripto2",
     "symbol": "crv3crypto",
     "decimals": 18,
-    "logoURI": "/images/icons/curve-lp.png"
+    "logoURI": "/images/tokens/curve-lp.png"
   },
   {
     "chains": [1],
@@ -367,7 +367,7 @@ const assets: Asset[] = [
     "name": "ETH / OETH LP",
     "symbol": "crvOETH",
     "decimals": 18,
-    "logoURI": "/images/icons/curve-lp.png"
+    "logoURI": "/images/tokens/curve-lp.png"
   },
   {
     "chains": [1],
@@ -377,7 +377,7 @@ const assets: Asset[] = [
     "name": "stETH-ng",
     "symbol": "crvStETH-ng",
     "decimals": 18,
-    "logoURI": "/images/icons/curve-lp.png"
+    "logoURI": "/images/tokens/curve-lp.png"
   },
   {
     "chains": [1],
@@ -387,7 +387,7 @@ const assets: Asset[] = [
     "name": "alUSDFRAXBP",
     "symbol": "alUSD FRAX USDC",
     "decimals": 18,
-    "logoURI": "/images/icons/curve-lp.png"
+    "logoURI": "/images/tokens/curve-lp.png"
   },
   {
     "chains": [1],
@@ -397,7 +397,7 @@ const assets: Asset[] = [
     "name": "crvUSD/USDC",
     "symbol": "USDC crvUSD",
     "decimals": 18,
-    "logoURI": "/images/icons/curve-lp.png"
+    "logoURI": "/images/tokens/curve-lp.png"
   },
   {
     "chains": [1],
@@ -407,7 +407,7 @@ const assets: Asset[] = [
     "name": "crvUSD/USDT",
     "symbol": "USDT crvUSD",
     "decimals": 18,
-    "logoURI": "/images/icons/curve-lp.png"
+    "logoURI": "/images/tokens/curve-lp.png"
   },
   {
     "chains": [1],
@@ -417,7 +417,7 @@ const assets: Asset[] = [
     "name": "TricryptoUSDT",
     "symbol": "USDT WBTC ETH",
     "decimals": 18,
-    "logoURI": "/images/icons/curve-lp.png"
+    "logoURI": "/images/tokens/curve-lp.png"
   },
   {
     "chains": [1],
@@ -427,7 +427,7 @@ const assets: Asset[] = [
     "name": "TricryptoUSDC",
     "symbol": "USDC WBTC ETH",
     "decimals": 18,
-    "logoURI": "/images/icons/curve-lp.png"
+    "logoURI": "/images/tokens/curve-lp.png"
   },
   {
     "chains": [1],
@@ -437,7 +437,7 @@ const assets: Asset[] = [
     "name": "cvxCrv/Crv",
     "symbol": "CRV cvxCRV",
     "decimals": 18,
-    "logoURI": "/images/icons/curve-lp.png"
+    "logoURI": "/images/tokens/curve-lp.png"
   },
   {
     "chains": [1],
@@ -447,7 +447,7 @@ const assets: Asset[] = [
     "name": "FPI2Pool",
     "symbol": "FRAX FPI",
     "decimals": 18,
-    "logoURI": "/images/icons/curve-lp.png"
+    "logoURI": "/images/tokens/curve-lp.png"
   },
   {
     "chains": [1],
@@ -457,7 +457,7 @@ const assets: Asset[] = [
     "name": "mim",
     "symbol": "MIM DAI USDC USDT",
     "decimals": 18,
-    "logoURI": "/images/icons/curve-lp.png"
+    "logoURI": "/images/tokens/curve-lp.png"
   },
   {
     "chains": [1],
@@ -477,7 +477,7 @@ const assets: Asset[] = [
     "name": "lusd",
     "symbol": "LUSD DAI USDC USDT",
     "decimals": 18,
-    "logoURI": "/images/icons/curve-lp.png"
+    "logoURI": "/images/tokens/curve-lp.png"
   },
   {
     "chains": [1],
@@ -497,7 +497,7 @@ const assets: Asset[] = [
     "name": "aave",
     "symbol": "DAI USDC USDT",
     "decimals": 18,
-    "logoURI": "/images/icons/curve-lp.png"
+    "logoURI": "/images/tokens/curve-lp.png"
   },
   {
     "chains": [1],
@@ -507,7 +507,7 @@ const assets: Asset[] = [
     "name": "DOLA/FRAXBP",
     "symbol": "DOLA FRAX USDC",
     "decimals": 18,
-    "logoURI": "/images/icons/curve-lp.png"
+    "logoURI": "/images/tokens/curve-lp.png"
   },
   {
     "chains": [1],
@@ -517,7 +517,7 @@ const assets: Asset[] = [
     "name": "alusd",
     "symbol": "alUSD DAI USDC USDT",
     "decimals": 18,
-    "logoURI": "/images/icons/curve-lp.png"
+    "logoURI": "/images/tokens/curve-lp.png"
   },
   {
     "chains": [1],
@@ -527,7 +527,7 @@ const assets: Asset[] = [
     "name": "Bal 80 Eth 20",
     "symbol": "BAL WETH",
     "decimals": 18,
-    "logoURI": "/images/icons/balancer-lp.png"
+    "logoURI": "/images/tokens/balancer-lp.png"
   },
   {
     "chains": [1],
@@ -537,7 +537,7 @@ const assets: Asset[] = [
     "name": "rETH wETH",
     "symbol": "rETH WETH",
     "decimals": 18,
-    "logoURI": "/images/icons/balancer-lp.png"
+    "logoURI": "/images/tokens/balancer-lp.png"
   },
   {
     "chains": [1],
@@ -547,7 +547,7 @@ const assets: Asset[] = [
     "name": "R DAI",
     "symbol": "R DAI",
     "decimals": 18,
-    "logoURI": "/images/icons/balancer-lp.png"
+    "logoURI": "/images/tokens/balancer-lp.png"
   },
   {
     "chains": [1],
@@ -557,7 +557,7 @@ const assets: Asset[] = [
     "name": "wstETH sfrxETH rETH",
     "symbol": "wstETH sfrxETH rETH",
     "decimals": 18,
-    "logoURI": "/images/icons/balancer-lp.png"
+    "logoURI": "/images/tokens/balancer-lp.png"
   },
   {
     "chains": [1],
@@ -567,7 +567,7 @@ const assets: Asset[] = [
     "name": "BADGER 50 rETH 50",
     "symbol": "BADGER rETH",
     "decimals": 18,
-    "logoURI": "/images/icons/balancer-lp.png"
+    "logoURI": "/images/tokens/balancer-lp.png"
   },
   {
     "chains": [1],
@@ -577,7 +577,7 @@ const assets: Asset[] = [
     "name": "wstETH 50 COMP 50",
     "symbol": "wstETH COMP",
     "decimals": 18,
-    "logoURI": "/images/icons/balancer-lp.png"
+    "logoURI": "/images/tokens/balancer-lp.png"
   },
   {
     "chains": [1],
@@ -587,7 +587,7 @@ const assets: Asset[] = [
     "name": "USDC 50 STG 50",
     "symbol": "USDC STG",
     "decimals": 18,
-    "logoURI": "/images/icons/balancer-lp.png"
+    "logoURI": "/images/tokens/balancer-lp.png"
   },
   {
     "chains": [1],
@@ -597,7 +597,7 @@ const assets: Asset[] = [
     "name": "AuraBAL Stable Pool",
     "symbol": "B-80BAL-20WETH auraBAL",
     "decimals": 18,
-    "logoURI": "/images/icons/balancer-lp.png"
+    "logoURI": "/images/tokens/balancer-lp.png"
   },
   {
     "chains": [1],
@@ -607,7 +607,7 @@ const assets: Asset[] = [
     "name": "WETH swETH",
     "symbol": "WETH swETH",
     "decimals": 18,
-    "logoURI": "/images/icons/balancer-lp.png"
+    "logoURI": "/images/tokens/balancer-lp.png"
   },
   {
     "chains": [1],
@@ -617,7 +617,7 @@ const assets: Asset[] = [
     "name": "wstETH WETH",
     "symbol": "wstETH WETH",
     "decimals": 18,
-    "logoURI": "/images/icons/balancer-lp.png"
+    "logoURI": "/images/tokens/balancer-lp.png"
   }
 ]
 export default assets;
