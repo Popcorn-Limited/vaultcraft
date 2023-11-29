@@ -1,7 +1,7 @@
 export * from "./abi";
 import assets from "@/lib/constants/assets";
 import { Token } from "../types";
-import { Address, getAddress } from "viem";
+import { Address, getAddress, maxInt256, maxUint256, zeroAddress } from "viem";
 
 export function getAssetsByChain(chainId: number): Token[] {
   return assets.filter((asset) => asset.chains.includes(chainId)).map((asset) => {
@@ -34,9 +34,9 @@ export const PopStakingByChain: { [key: number]: Address } = {
   10: "0x3Fcc4eA703054453D8697b58C5CB2585F8883C05"
 }
 
-export const ADDRESS_ZERO: Address = "0x0000000000000000000000000000000000000000"
-export const MAX_INT256 = BigInt(0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff)
-export const MAX_UINT256 = BigInt(0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff)
+export const ADDRESS_ZERO = zeroAddress
+export const MAX_INT256 = maxInt256
+export const MAX_UINT256 = maxUint256
 export const MINUS_ONE = BigInt(-0x01)
 export const ZERO = BigInt(0)
 export const EMPTY_BYTES = "0x"
