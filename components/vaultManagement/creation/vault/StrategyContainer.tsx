@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import { useAtom } from "jotai";
 import { adapterAtom, adapterConfigAtom } from "@/lib/atoms";
 import { verifyInitParamValidity } from "@/lib/helpers";
-import StrategyConfiguration from "@/components/sections/StrategyConfiguration";
+import StrategyConfiguration from "@/components/deploymentSections/StrategyConfiguration";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import MainActionButton from "@/components/button/MainActionButton";
 

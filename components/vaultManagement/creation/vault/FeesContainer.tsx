@@ -1,6 +1,6 @@
 import MainActionButton from "@/components/button/MainActionButton";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
-import FeeConfiguration from "@/components/sections/FeeConfiguration";
+import FeeConfiguration from "@/components/deploymentSections/FeeConfiguration";
 import { VaultCreationContainerProps } from ".";
 import VaultCreationCard from "@/components/vaultManagement/creation/VaultCreationCard";
 import { feeAtom } from "@/lib/atoms";
