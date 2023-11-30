@@ -156,7 +156,7 @@ function FeeConfiguration() {
                           }
                         }
                         // @ts-ignore
-                        value={fees[input.key] === "0" ? "" : fees[input.key]}
+                        value={fees[input.key] === "0" ? "0" : fees[input.key]}
                         placeholder="0%"
                         onBlur={verifyFees}
                         errors={errors?.[input.key]}
