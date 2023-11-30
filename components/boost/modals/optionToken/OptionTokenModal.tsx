@@ -106,7 +106,7 @@ export default function OptionTokenModal({ show }: { show: [boolean, Dispatch<Se
           {modalStep === 1 &&
             <>
               {stepCounter < 2 ?
-                < MainActionButton label={steps[stepCounter].label} handleClick={handleExerciseOptionToken} /> :
+                < MainActionButton label={steps[stepCounter].label} handleClick={handleExerciseOptionToken} disabled={amount === "0" || maxPaymentAmount === "0"} /> :
                 < MainActionButton label={"Close Modal"} handleClick={() => setShowModal(false)} />
               }
             </>
