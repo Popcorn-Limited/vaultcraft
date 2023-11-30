@@ -23,7 +23,8 @@ export default function FeesContainer({ route, stages, activeStage }: VaultCreat
       <div className={`mb-6`}>
         <h1 className="text-white text-2xl mb-2">Fee Configuration</h1>
         <p className="text-white">
-          Vault managers can charge several types of fees, all of which are paid out in shares of the vault. Fees can be changed at any time after vault creation.
+          Vault managers can charge several types of fees, all of which are paid out in shares of the vault. Fees can be changed at any time after vault creation. 
+          (Use . for fees with decimals)
         </p>
       </div>
 
