@@ -158,7 +158,6 @@ function FeeConfiguration() {
                         // @ts-ignore
                         value={fees[input.key] === "0" ? "" : fees[input.key]}
                         placeholder="0%"
-                        className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         onBlur={verifyFees}
                         errors={errors?.[input.key]}
                       />
