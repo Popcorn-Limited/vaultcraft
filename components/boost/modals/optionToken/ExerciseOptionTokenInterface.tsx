@@ -9,7 +9,7 @@ import { formatAndRoundBigNumber, safeRound } from "@/lib/utils/formatBigNumber"
 import { validateInput } from "@/lib/utils/helpers";
 import { Token } from "@/lib/types";
 import { llama } from "@/lib/resolver/price/resolver";
-import { useEthToUsd } from "@/lib/oPop/ethToUsd";
+import { useEthToUsd } from "@/lib/optionToken/ethToUsd";
 import { formatEther } from "viem";
 
 const {
@@ -21,12 +21,12 @@ const {
 
 const SLIPPAGE = 0.01 // @dev adding some slippage to the call -- TODO -> we should later allow users to change that
 
-interface ExerciseOPopInterfaceProps {
+interface ExerciseOptionTokenInterfaceProps {
   amountState: [string, Dispatch<SetStateAction<string>>];
   maxPaymentAmountState: [string, Dispatch<SetStateAction<string>>];
 }
 
-export default function ExerciseOPopInterface({ amountState, maxPaymentAmountState }: ExerciseOPopInterfaceProps): JSX.Element {
+export default function ExerciseOptionTokenInterface({ amountState, maxPaymentAmountState }: ExerciseOptionTokenInterfaceProps): JSX.Element {
   const { address: account } = useAccount();
   const publicClient = usePublicClient();
 

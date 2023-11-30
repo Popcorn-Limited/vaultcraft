@@ -9,12 +9,12 @@ import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import { showErrorToast } from "@/lib/toasts";
 import { handleAllowance } from "@/lib/approve";
 import { increaseLockAmount, increaseLockTime, withdrawLock } from "@/lib/gauges/interactions";
-import SelectManagementOption from "@/components/vepop/modals/manage/SelectManagementOption";
-import IncreaseStakeInterface from "@/components/vepop/modals/manage/IncreaseStakeInterface";
-import IncreaseStakePreview from "@/components/vepop/modals/manage/IncreaseStakePreview";
-import IncreaseTimeInterface from "@/components/vepop/modals/manage/IncreaseTimeInterface";
-import IncreaseTimePreview from "@/components/vepop/modals/manage/IncreaseTimePreview";
-import UnstakePreview from "@/components/vepop/modals/manage/UnstakePreview";
+import SelectManagementOption from "@/components/boost/modals/manage/SelectManagementOption";
+import IncreaseStakeInterface from "@/components/boost/modals/manage/IncreaseStakeInterface";
+import IncreaseStakePreview from "@/components/boost/modals/manage/IncreaseStakePreview";
+import IncreaseTimeInterface from "@/components/boost/modals/manage/IncreaseTimeInterface";
+import IncreaseTimePreview from "@/components/boost/modals/manage/IncreaseTimePreview";
+import UnstakePreview from "@/components/boost/modals/manage/UnstakePreview";
 
 const {
   BalancerPool: VCX_LP,
@@ -27,7 +27,7 @@ export enum ManagementOption {
   Unlock
 }
 
-export default function ManageLockModal({ show }: { show: [boolean, Dispatch<SetStateAction<boolean>>] }): JSX.Element {
+export default function ManageLockModal({ show, setShowLpModal }: { show: [boolean, Dispatch<SetStateAction<boolean>>], setShowLpModal: Dispatch<SetStateAction<boolean>> }): JSX.Element {
   const { chain } = useNetwork();
   const { switchNetwork } = useSwitchNetwork();
   const { address: account } = useAccount();
@@ -69,8 +69,10 @@ export default function ManageLockModal({ show }: { show: [boolean, Dispatch<Set
         amount: (val * (10 ** 18) || 0),
         account: account as Address,
         spender: VOTING_ESCROW,
-        clients:{publicClient,
-        walletClient: walletClient as WalletClient}
+        clients: {
+          publicClient,
+          walletClient: walletClient as WalletClient
+        }
       })
       increaseLockAmount({ amount: val, account: account as Address, clients })
     }
@@ -79,6 +81,11 @@ export default function ManageLockModal({ show }: { show: [boolean, Dispatch<Set
     if (mangementOption === ManagementOption.Unlock) withdrawLock({ account: account as Address, clients })
 
     setShowModal(false);
+  }
+
+  function showLpModal(): void {
+    setShowModal(false);
+    setShowLpModal(true)
   }
 
   return (
@@ -90,7 +97,7 @@ export default function ManageLockModal({ show }: { show: [boolean, Dispatch<Set
           <>
             {step === 1 &&
               <>
-                <IncreaseStakeInterface amountState={[amount, setAmount]} lockedBal={lockedBal} />
+                <IncreaseStakeInterface amountState={[amount, setAmount]} lockedBal={lockedBal} showLpModal={showLpModal} />
                 <MainActionButton label="Next" handleClick={() => setStep(step + 1)} />
               </>
             }

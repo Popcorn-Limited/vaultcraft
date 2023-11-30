@@ -26,7 +26,6 @@ export default async function zap({ chainId, sellToken, buyToken, amount, accoun
     showSuccessToast("Zapped successfully")
     return true;
   } catch (error: any) {
-    console.log(error)
     showErrorToast(error.shortMessage)
     return false;
   }

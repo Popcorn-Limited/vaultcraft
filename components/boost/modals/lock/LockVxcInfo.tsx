@@ -1,4 +1,4 @@
-export default function LockPopInfo(): JSX.Element {
+export default function LockVxcInfo(): JSX.Element {
   return (
     <div className="space-y-8 mb-8">
 

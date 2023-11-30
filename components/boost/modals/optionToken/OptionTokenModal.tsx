@@ -1,18 +1,18 @@
 import Modal from "@/components/modal/Modal";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Address, WalletClient, useAccount, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
-import OptionInfo from "@/components/vepop/modals/oPop/OptionInfo";
-import ExerciseOPopInterface from "@/components/vepop/modals/oPop/ExerciseOPopInterface";
+import OptionInfo from "@/components/boost/modals/optionToken/OptionInfo";
+import ExerciseOptionTokenInterface from "@/components/boost/modals/optionToken/ExerciseOptionTokenInterface";
 import MainActionButton from "@/components/button/MainActionButton";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import { getVeAddresses } from "@/lib/utils/addresses";
 import { handleAllowance } from "@/lib/approve";
 import { parseEther } from "viem";
-import { exerciseOPop } from "@/lib/oPop/interactions";
+import { exerciseOPop } from "@/lib/optionToken/interactions";
 
 const { WETH, oVCX } = getVeAddresses();
 
-export default function OPopModal({ show }: { show: [boolean, Dispatch<SetStateAction<boolean>>] }): JSX.Element {
+export default function OptionTokenModal({ show }: { show: [boolean, Dispatch<SetStateAction<boolean>>] }): JSX.Element {
   const { chain } = useNetwork();
   const { switchNetwork } = useSwitchNetwork();
   const { address: account } = useAccount();
@@ -63,7 +63,7 @@ export default function OPopModal({ show }: { show: [boolean, Dispatch<SetStateA
     <Modal visibility={[showModal, setShowModal]}>
       <>
         {step === 0 && <OptionInfo />}
-        {step === 1 && <ExerciseOPopInterface amountState={[amount, setAmount]} maxPaymentAmountState={[maxPaymentAmount, setMaxPaymentAmount]} />}
+        {step === 1 && <ExerciseOptionTokenInterface amountState={[amount, setAmount]} maxPaymentAmountState={[maxPaymentAmount, setMaxPaymentAmount]} />}
 
         <div className="space-y-4">
           {step === 0 && <MainActionButton label="Next" handleClick={() => setStep(step + 1)} />}

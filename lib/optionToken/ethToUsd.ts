@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { formatEther, parseEther, parseUnits } from 'viem';
+import { formatEther, parseEther } from 'viem';
 
 async function getEthToUsdPrice(): Promise<number> {
     try {

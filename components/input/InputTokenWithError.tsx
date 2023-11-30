@@ -13,7 +13,7 @@ export default function InputTokenWithError({
   allowSelection,
   onSelectToken,
   captionText,
-  getTokenUrl,
+  getToken,
   allowInput,
   inputMoreThanBalance,
   ...props
@@ -26,7 +26,7 @@ export default function InputTokenWithError({
   allowSelection?: boolean;
   chainId: any;
   captionText?: string;
-  getTokenUrl?: string;
+  getToken?: Function;
   allowInput?: boolean;
   inputMoreThanBalance?: boolean;
 } & HTMLProps<HTMLInputElement>): JSX.Element {
@@ -40,7 +40,7 @@ export default function InputTokenWithError({
       )}
       <div className="relative flex items-center w-full">
         <div
-          className={`xs:h-14 smmd:h-24 w-full flex px-5 py-4 items-center justify-between rounded-lg border ${errorMessage ? "border-customRed" : "border-customLightGray"}`}
+          className={`h-14 w-full flex px-5 py-4 items-center justify-between rounded-lg border ${errorMessage ? "border-customRed" : "border-customLightGray"}`}
         >
           <div className="xs:w-full xs:border-r xs:border-[#7D7E83] xs:pr-4 smmd:p-0 smmd:border-none smmd:w-1/2">
             <InputNumber {...props} />
@@ -53,9 +53,6 @@ export default function InputTokenWithError({
               options={tokenList}
               selectToken={onSelectToken}
             />
-            <p className="xs:hidden smmd:block text-primary text-right leading-none mt-2">
-              Balance: 0.00
-            </p>
           </div>
         </div>
       </div>
@@ -73,13 +70,13 @@ export default function InputTokenWithError({
             </p>
           </>}
         </div>
-        {getTokenUrl && (
+        {getToken && (
           <button
-            className="w-40 h-9 flex items-center justify-center py-2 px-6 text-base text-primary font-medium border border-warmGray rounded-lg cursor-pointer hover:bg-primary hover:text-white transition-all leading-none"
-            onClick={() => window.open(getTokenUrl, "_blank")}
+            className="w-40 h-9 flex items-center justify-center py-2 px-6 text-base text-primary font-medium border border-warmGray rounded-lg cursor-pointer hover:bg-primary hover:text-black transition-all leading-none"
+            onClick={() => getToken()}
           >
             <p className="mb-0.5">Get Token </p>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 ml-4">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4 ml-2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
             </svg>
           </button>)

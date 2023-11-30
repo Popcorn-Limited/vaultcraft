@@ -6,16 +6,17 @@ import { useEffect, useState } from "react";
 import { getVeAddresses } from "@/lib/utils/addresses";
 import { hasAlreadyVoted } from "@/lib/gauges/hasAlreadyVoted";
 import { Token, VaultData } from "@/lib/types";
-import StakingInterface from "@/components/vepop/StakingInterface";
+import StakingInterface from "@/components/boost/StakingInterface";
 import { sendVotes } from "@/lib/gauges/interactions";
-import Gauge from "@/components/vepop/Gauge";
-import LockModal from "@/components/vepop/modals/lock/LockModal";
-import ManageLockModal from "@/components/vepop/modals/manage/ManageLockModal";
-import OPopModal from "@/components/vepop/modals/oPop/OPopModal";
-import OPopInterface from "@/components/vepop/OPopInterface";
+import Gauge from "@/components/boost/Gauge";
+import LockModal from "@/components/boost/modals/lock/LockModal";
+import ManageLockModal from "@/components/boost/modals/manage/ManageLockModal";
+import OptionTokenModal from "@/components/boost/modals/optionToken/OptionTokenModal";
 import MainActionButton from "@/components/button/MainActionButton";
 import { useAtom } from "jotai";
 import { vaultsAtom } from "@/lib/atoms/vaults";
+import OptionTokenInterface from "@/components/boost/OptionTokenInterface";
+import LpModal from "@/components/boost/modals/lp/LpModal";
 
 const { VotingEscrow: VOTING_ESCROW } = getVeAddresses();
 
@@ -35,7 +36,8 @@ function VePopContainer() {
 
   const [showLockModal, setShowLockModal] = useState(false);
   const [showMangementModal, setShowMangementModal] = useState(false);
-  const [showOPopModal, setShowOPopModal] = useState(false);
+  const [showOptionTokenModal, setShowOptionTokenModal] = useState(false);
+  const [showLpModal, setShowLpModal] = useState(false);
 
   useEffect(() => {
     async function initialSetup() {
@@ -73,9 +75,10 @@ function VePopContainer() {
 
   return (
     <>
-      <LockModal show={[showLockModal, setShowLockModal]} />
-      <ManageLockModal show={[showMangementModal, setShowMangementModal]} />
-      <OPopModal show={[showOPopModal, setShowOPopModal]} />
+      <LockModal show={[showLockModal, setShowLockModal]} setShowLpModal={setShowLpModal}/>
+      <ManageLockModal show={[showMangementModal, setShowMangementModal]} setShowLpModal={setShowLpModal}/>
+      <OptionTokenModal show={[showOptionTokenModal, setShowOptionTokenModal]} />
+      <LpModal show={[showLpModal, setShowLpModal]} />
       <div className="static">
         <section className="py-10 px-4 md:px-8 border-t md:border-t-0 md:border-b border-[#353945] lg:flex lg:flex-row items-center justify-between text-primary">
           <div className="lg:w-[1050px]">
@@ -92,10 +95,10 @@ function VePopContainer() {
         </section>
 
         <section className="pb-12 md:py-10 px-4 md:px-8 md:flex md:flex-row md:justify-between space-y-4 md:space-y-0 md:space-x-8">
-          <StakingInterface setShowLockModal={setShowLockModal} setShowMangementModal={setShowMangementModal} />
-          <OPopInterface
+          <StakingInterface setShowLockModal={setShowLockModal} setShowMangementModal={setShowMangementModal} setShowLpModal={setShowLpModal}/>
+          <OptionTokenInterface
             gauges={vaults?.length > 0 ? vaults.filter(vault => !!vault.gauge?.address).map((vault: VaultData) => vault.gauge as Token) : []}
-            setShowOPopModal={setShowOPopModal}
+            setShowOptionTokenModal={setShowOptionTokenModal}
           />
         </section >
 

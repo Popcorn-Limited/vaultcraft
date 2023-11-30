@@ -26,6 +26,7 @@ export default function Page({
   const { address: account } = useAccount()
   const [yieldOptions, setYieldOptions] = useAtom(yieldOptionsAtom)
   const [masaSdk, setMasaSdk] = useAtom(masaAtom)
+
   const [, setVaults] = useAtom(vaultsAtom)
 
   const { fireEvent, fireLoginEvent, firePageViewEvent, fireConnectWalletEvent } = useMasaAnalyticsReact({

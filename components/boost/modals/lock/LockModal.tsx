@@ -5,10 +5,10 @@ import Modal from "@/components/modal/Modal";
 import MainActionButton from "@/components/button/MainActionButton";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import { getVeAddresses } from "@/lib/utils/addresses";
-import LockPopInfo from "@/components/vepop/modals/lock/LockPopInfo";
-import LockPopInterface from "@/components/vepop/modals/lock/LockPopInterface";
-import LockPreview from "@/components/vepop/modals/lock/LockPreview";
-import VotingPowerInfo from "@/components/vepop/modals/lock/VotingPowerInfo";
+import LockVxcInfo from "@/components/boost/modals/lock/LockVxcInfo";
+import LockVcxInterface from "@/components/boost/modals/lock/LockVcxInterface";
+import LockPreview from "@/components/boost/modals/lock/LockPreview";
+import VotingPowerInfo from "@/components/boost/modals/lock/VotingPowerInfo";
 import { handleAllowance } from "@/lib/approve";
 import { createLock } from "@/lib/gauges/interactions";
 
@@ -17,7 +17,12 @@ const {
   VotingEscrow: VOTING_ESCROW
 } = getVeAddresses()
 
-export default function LockModal({ show }: { show: [boolean, Dispatch<SetStateAction<boolean>>] }): JSX.Element {
+interface LockModalProps {
+  show: [boolean, Dispatch<SetStateAction<boolean>>];
+  setShowLpModal: Dispatch<SetStateAction<boolean>>;
+}
+
+export default function LockModal({ show, setShowLpModal }: LockModalProps): JSX.Element {
   const { address: account } = useAccount();
   const { chain } = useNetwork();
   const { switchNetwork } = useSwitchNetwork();
@@ -61,13 +66,18 @@ export default function LockModal({ show }: { show: [boolean, Dispatch<SetStateA
     setShowModal(false);
   }
 
+  function showLpModal(): void {
+    setShowModal(false);
+    setShowLpModal(true)
+  }
+
 
   return (
     <Modal visibility={[showModal, setShowModal]}>
       <>
-        {step === 0 && <LockPopInfo />}
+        {step === 0 && <LockVxcInfo />}
         {step === 1 && <VotingPowerInfo />}
-        {step === 2 && <LockPopInterface amountState={[amount, setAmount]} daysState={[days, setDays]} />}
+        {step === 2 && <LockVcxInterface amountState={[amount, setAmount]} daysState={[days, setDays]} showLpModal={showLpModal} />}
         {step === 3 && <LockPreview amount={amount} days={days} />}
 
         <div className="space-y-4">

@@ -15,7 +15,7 @@ import getZapAssets, { getAvailableZapAssets } from "@/lib/utils/getZapAssets";
 import { ERC20Abi, VaultAbi } from "@/lib/constants";
 import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
 import MainActionButton from "@/components/button/MainActionButton";
-import { claimOPop } from "@/lib/oPop/interactions";
+import { claimOPop } from "@/lib/optionToken/interactions";
 import { WalletClient } from "viem";
 import { useAtom } from "jotai";
 import { vaultsAtom } from "@/lib/atoms/vaults";

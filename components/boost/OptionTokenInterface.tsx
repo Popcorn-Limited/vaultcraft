@@ -5,7 +5,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import { Address, useAccount, useBalance, usePublicClient, useWalletClient } from "wagmi"
 import MainActionButton from "@/components/button/MainActionButton";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
-import { claimOPop } from "@/lib/oPop/interactions";
+import { claimOPop } from "@/lib/optionToken/interactions";
 import { WalletClient } from "viem";
 import { Token } from "@/lib/types";
 
@@ -15,12 +15,12 @@ const {
   WETH
 } = getVeAddresses();
 
-interface OPopInterfaceProps {
+interface OptionTokenInterfaceProps {
   gauges: Token[];
-  setShowOPopModal: Dispatch<SetStateAction<boolean>>;
+  setShowOptionTokenModal: Dispatch<SetStateAction<boolean>>;
 }
 
-export default function OPopInterface({ gauges, setShowOPopModal }: OPopInterfaceProps): JSX.Element {
+export default function OptionTokenInterface({ gauges, setShowOptionTokenModal }: OptionTokenInterfaceProps): JSX.Element {
   const { address: account } = useAccount()
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient()
@@ -80,7 +80,7 @@ export default function OPopInterface({ gauges, setShowOPopModal }: OPopInterfac
           />
         </div>
         <div className="w-full md:w-60">
-          <SecondaryActionButton label="Exercise oVCX" handleClick={() => setShowOPopModal(true)} disabled={oBal ? Number(oBal?.value) === 0 : true} />
+          <SecondaryActionButton label="Exercise oVCX" handleClick={() => setShowOptionTokenModal(true)} disabled={oBal ? Number(oBal?.value) === 0 : true} />
         </div>
       </div>
     </div>

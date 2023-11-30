@@ -142,3 +142,20 @@ export default function getActionSteps(action: ActionType): ActionStep[] {
       }]
   }
 }
+
+export const POOL_DEPOSIT_STEPS = [
+  {
+    step: 1,
+    label: "Handle VCX Allowance",
+    ...BaseStepInfo
+  },
+  {
+    step: 2,
+    label: "Handle WETH Allowance",
+    ...BaseStepInfo
+  },
+  {
+    step: 3,
+    label: "Deposit into Pool",
+    ...BaseStepInfo
+  }]

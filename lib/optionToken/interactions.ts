@@ -1,8 +1,8 @@
-import { Abi, Address, PublicClient, WalletClient, parseEther } from "viem";
+import { Abi, Address, PublicClient, WalletClient } from "viem";
 import { showErrorToast, showSuccessToast } from "@/lib/toasts";
-import { MinterAbi, OPopAbi } from "@/lib/constants";
+import { MinterAbi, OptionTokenAbi } from "@/lib/constants";
 import { getVeAddresses } from "@/lib/utils/addresses";
-import { SimulationResponse } from "@/lib/types";
+import { Clients, SimulationResponse } from "@/lib/types";
 
 type SimulationContract = {
   address: Address;
@@ -34,12 +34,6 @@ async function simulateCall({ account, contract, functionName, publicClient, arg
     return { request: null, success: false, error: error.shortMessage }
   }
 }
-
-type Clients = {
-  publicClient: PublicClient;
-  walletClient: WalletClient;
-}
-
 interface ExerciseOPopProps {
   amount: bigint;
   maxPaymentAmount: bigint;
@@ -52,7 +46,7 @@ export async function exerciseOPop({ amount, maxPaymentAmount, account, clients 
     account,
     contract: {
       address: oVCX,
-      abi: OPopAbi,
+      abi: OptionTokenAbi,
     },
     functionName: "exercise",
     publicClient: clients.publicClient,

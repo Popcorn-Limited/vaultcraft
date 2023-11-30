@@ -12,10 +12,11 @@ const { WETH_VCX_LP } = getVeAddresses();
 
 interface IncreaseStakeInterfaceProps {
   amountState: [string, Dispatch<SetStateAction<string>>];
-  lockedBal: { amount: bigint, end: bigint }
+  lockedBal: { amount: bigint, end: bigint };
+  showLpModal: () => void;
 }
 
-export default function IncreaseStakeInterface({ amountState, lockedBal }: IncreaseStakeInterfaceProps): JSX.Element {
+export default function IncreaseStakeInterface({ amountState, lockedBal, showLpModal }: IncreaseStakeInterfaceProps): JSX.Element {
   const { address: account } = useAccount()
   const { data: lpToken } = useToken({ chainId: 1, address: WETH_VCX_LP as Address });
   const { data: lpBal } = useBalance({ chainId: 1, address: account, token: WETH_VCX_LP })
@@ -59,7 +60,7 @@ export default function IncreaseStakeInterface({ amountState, lockedBal }: Incre
           errorMessage={errorMessage}
           allowInput
           tokenList={[]}
-          getTokenUrl="https://app.balancer.fi/#/ethereum/pool/0x577a7f7ee659aa14dc16fd384b3f8078e23f1920000200000000000000000633 "
+          getToken={showLpModal}
         />
       </div>
 

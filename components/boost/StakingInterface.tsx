@@ -8,6 +8,7 @@ import { getVeAddresses } from "@/lib/utils/addresses";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import { formatEther } from "viem";
 import { ZERO } from "@/lib/constants";
+import SecondaryActionButton from "../button/SecondaryActionButton";
 
 function votingPeriodEnd(): number[] {
   const periodEnd = getVotePeriodEndTime();
@@ -30,9 +31,10 @@ const {
 interface StakingInterfaceProps {
   setShowLockModal: Dispatch<SetStateAction<boolean>>;
   setShowMangementModal: Dispatch<SetStateAction<boolean>>;
+  setShowLpModal: Dispatch<SetStateAction<boolean>>;
 }
 
-export default function StakingInterface({ setShowLockModal, setShowMangementModal }: StakingInterfaceProps): JSX.Element {
+export default function StakingInterface({ setShowLockModal, setShowMangementModal, setShowLpModal }: StakingInterfaceProps): JSX.Element {
   const { address: account } = useAccount()
 
   const { data: lockedBal } = useLockedBalanceOf({ chainId: 1, address: VOTING_ESCROW, account: account as Address })
@@ -66,12 +68,11 @@ export default function StakingInterface({ setShowLockModal, setShowMangementMod
           </span>
         </div>
         <div className="lg:flex lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-8 mt-6 lg:max-h-12">
-          <div className="w-full md:w-60">
-            {Number(veBal?.value) === 0 ?
-              <MainActionButton label="Lock VCX LP" handleClick={() => setShowLockModal(true)} /> :
-              <MainActionButton label="Manage Stake" handleClick={() => setShowMangementModal(true)} />
-            }
-          </div>
+          {Number(veBal?.value) === 0 ?
+            <MainActionButton label="Lock VCX LP" handleClick={() => setShowLockModal(true)} /> :
+            <MainActionButton label="Manage Stake" handleClick={() => setShowMangementModal(true)} />
+          }
+          <SecondaryActionButton label="Get VCX LP" handleClick={() => setShowLpModal(true)} />
         </div>
       </div>
     </>

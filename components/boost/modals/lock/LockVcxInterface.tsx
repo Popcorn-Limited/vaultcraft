@@ -22,12 +22,13 @@ function LockTimeButton({ label, isActive, handleClick }: { label: string, isAct
   )
 }
 
-interface LockPopInterfaceProps {
+interface LockVcxInterfaceProps {
   amountState: [string, Dispatch<SetStateAction<string>>];
   daysState: [number, Dispatch<SetStateAction<number>>];
+  showLpModal: () => void
 }
 
-export default function LockPopInterface({ amountState, daysState }: LockPopInterfaceProps): JSX.Element {
+export default function LockVcxInterface({ amountState, daysState, showLpModal }: LockVcxInterfaceProps): JSX.Element {
   const { address: account } = useAccount()
   const { data: lpToken } = useToken({ chainId: 1, address: VCX_LP });
   const { data: lpBal } = useBalance({ chainId: 1, address: account, token: VCX_LP })
@@ -52,10 +53,10 @@ export default function LockPopInterface({ amountState, daysState }: LockPopInte
   return (
     <div className="space-y-8 mb-8 text-start">
 
-      <h2 className="text-start text-5xl">Lock your VCX</h2>
+      <h2 className="text-start text-5xl">Lock your VCX LP</h2>
 
       <div>
-        <p className="text-primary font-semibold">Amount VCX</p>
+        <p className="text-primary font-semibold">Amount VCX LP</p>
         <InputTokenWithError
           captionText={``}
           onSelectToken={() => { }}
@@ -76,7 +77,7 @@ export default function LockPopInterface({ amountState, daysState }: LockPopInte
           errorMessage={errorMessage}
           allowInput
           tokenList={[]}
-          getTokenUrl="https://app.balancer.fi/#/ethereum/pool/0x577a7f7ee659aa14dc16fd384b3f8078e23f1920000200000000000000000633"
+          getToken={showLpModal}
         />
       </div>
 

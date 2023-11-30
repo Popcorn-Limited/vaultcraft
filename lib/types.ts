@@ -19,6 +19,7 @@ export type veAddresses = {
   WETH: Address;
   BalancerPool: Address;
   BalancerOracle: Address;
+  BalancerVault: Address;
   oVCX: Address;
   VaultRegistry: Address;
   BoostV2: Address;
@@ -67,7 +68,7 @@ export type VaultData = {
   apy: number;
   gaugeMinApy?: number;
   gaugeMaxApy?: number;
-  totalApy:number;
+  totalApy: number;
 }
 
 export type VaultMetadata = {
