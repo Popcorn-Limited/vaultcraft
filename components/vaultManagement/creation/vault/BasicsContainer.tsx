@@ -47,8 +47,9 @@ export default function BasicsContainer({ route, stages, activeStage }: VaultCre
   const [availableAssetAddresses, setAvailableAssetAddresses] = useAtom(assetAddressesAtom);
 
   useEffect(() => {
-    if (!!yieldOptions && availableAssetAddresses)
-      yieldOptions?.getAssets(1).then((res: any) => setAvailableAssetAddresses({ 1: res }))
+    if (!!yieldOptions && availableAssetAddresses) {
+      yieldOptions.getAssets(1).then((res: any) => setAvailableAssetAddresses({ 1: res }))
+    }
   }, [yieldOptions])
 
   useEffect(() => {

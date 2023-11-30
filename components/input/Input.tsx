@@ -7,7 +7,7 @@ function Input({ errors, info, className, ...props }: InputProps) {
     <>
       <div className={`border-2 ${errors ? "border-red-500" : "border-[#353945]"} rounded-[4px] h-full`}>
         <input
-          className={`${className || ""} flex flex-row justify-between w-full px-2 py-4 mt-1 h-full bg-[#23262F] text-white leading-none`}
+          className={`${className || ""} flex flex-row justify-between w-full px-2 py-4 h-full bg-[#23262F] text-white leading-none`}
           autoComplete="off"
           autoCorrect="off"
           // text-specific options
