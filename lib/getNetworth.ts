@@ -2,16 +2,12 @@ import { PublicClient, createPublicClient, http } from "viem";
 import { Chain, arbitrum, optimism, polygon } from "viem/chains";
 import { Address, mainnet } from "wagmi";
 import { ChainId, RPC_URLS } from "@/lib/utils/connectors";
-import { ERC20Abi, PopByChain, PopStakingByChain } from "@/lib/constants";
+import { BalancerOracleAbi, ERC20Abi } from "@/lib/constants";
 import { resolvePrice } from "@/lib/resolver/price/price";
 import { VaultData } from "./types";
+import { getVeAddresses } from "./utils/addresses";
 
-const BaseAddressesByChain: { [key: number]: Address[] } = {
-  1: [PopByChain[ChainId.Ethereum], PopStakingByChain[ChainId.Ethereum]],
-  137: [PopByChain[ChainId.Polygon], PopStakingByChain[ChainId.Polygon]],
-  10: [PopByChain[ChainId.Optimism], PopStakingByChain[ChainId.Optimism]],
-  42161: []
-}
+const { BalancerOracle, WETH, VCX, VE_VCX } = getVeAddresses()
 
 type TotalNetworth = {
   [key: number]: Networth,
@@ -19,7 +15,7 @@ type TotalNetworth = {
 }
 
 export type Networth = {
-  pop: number,
+  vcx: number,
   stake: number,
   vault: number,
   total: number
@@ -65,16 +61,29 @@ export async function getNetworthByChain({ account, chain }: { account: Address,
     chain,
     transport: http(RPC_URLS[chain.id])
   })
+  if (chain.id === 1) {
+    // Get balances
+    const balances = await getBalancesByChain({ account, client, addresses: [VCX] })
 
-  // Get balances
-  const balances = await getBalancesByChain({ account, client, addresses: BaseAddressesByChain[client.chain?.id as number] })
-
-  // Get value of VCX holdings
-  const popPrice = await resolvePrice({ address: PopByChain[10], chainId: 10, client: undefined, resolver: 'llama' })
-  const popNetworth = ((balances.find(entry => entry.address === PopByChain[chain.id])?.balance || 0) * popPrice) / (1e18);
-  const stakeNetworth = ((balances.find(entry => entry.address === PopStakingByChain[chain.id])?.balance || 0) * popPrice) / (1e18);
-
-  return { pop: popNetworth, stake: stakeNetworth, vault: 0, total: popNetworth + stakeNetworth }
+    // Get value of VCX holdings
+    const ethPrice = await resolvePrice({ address: WETH, chainId: 1, client: undefined, resolver: 'llama' })
+    const vcxPriceInEth = await client.readContract({
+      address: BalancerOracle,
+      abi: BalancerOracleAbi,
+      functionName: "getPrice"
+    })
+    const multiplier = await client.readContract({
+      address: BalancerOracle,
+      abi: BalancerOracleAbi,
+      functionName: "multiplier"
+    })
+    const vcxPriceInUsd = 0.001
+    const vcxNetworth = ((balances.find(entry => entry.address === VCX)?.balance || 0) * vcxPriceInUsd) / 1e18;
+    const stakeNetworth = 0
+    return { vcx: vcxNetworth, stake: stakeNetworth, vault: 0, total: vcxNetworth + stakeNetworth }
+  } else {
+    return { vcx: 0, stake: 0, vault: 0, total: 0 }
+  }
 }
 
 export async function getTotalNetworth({ account }: { account: Address }): Promise<TotalNetworth> {
@@ -89,7 +98,7 @@ export async function getTotalNetworth({ account }: { account: Address }): Promi
     [ChainId.Optimism]: optimismNetworth,
     [ChainId.Arbitrum]: arbitrumNetworth,
     total: {
-      pop: ethereumNetworth.pop + polygonNetworth.pop + optimismNetworth.pop + arbitrumNetworth.pop,
+      vcx: ethereumNetworth.vcx + polygonNetworth.vcx + optimismNetworth.vcx + arbitrumNetworth.vcx,
       stake: ethereumNetworth.stake + polygonNetworth.stake + optimismNetworth.stake + arbitrumNetworth.stake,
       vault: 0,
       total: ethereumNetworth.total + polygonNetworth.total + optimismNetworth.total + arbitrumNetworth.total

@@ -10,7 +10,7 @@ import { Address, useAccount } from "wagmi";
 export default function Hero(): JSX.Element {
   const { address: account } = useAccount();
   const [vaults] = useAtom(vaultsAtom)
-  const [networth, setNetworth] = useState<Networth>({ pop: 0, stake: 0, vault: 0, total: 0 });
+  const [networth, setNetworth] = useState<Networth>({ vcx: 0, stake: 0, vault: 0, total: 0 });
   const [tvl, setTvl] = useState<string>("0");
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -30,7 +30,7 @@ export default function Hero(): JSX.Element {
       setNetworth({ ...totalNetworth.total, vault: vaultNetworth, total: totalNetworth.total.total + vaultNetworth });
       setLoading(false);
     }
-    if (account && loading && vaults.length > 0) fetchNetworth()
+    if (account && vaults.length > 0) fetchNetworth()
   }, [account]);
 
 
@@ -51,7 +51,7 @@ export default function Hero(): JSX.Element {
             />
             <StatusWithLabel
               label={"VCX in Wallet"}
-              content={<p className="text-3xl font-bold text-primary leading-[120%]">$ {loading ? "..." : NumberFormatter.format(networth.pop)}</p>}
+              content={<p className="text-3xl font-bold text-primary leading-[120%]">$ {loading ? "..." : NumberFormatter.format(networth.vcx)}</p>}
               className="md:min-w-[160px] lg:min-w-0"
             />
           </div>
