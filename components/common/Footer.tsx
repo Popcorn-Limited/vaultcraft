@@ -18,7 +18,7 @@ const ProductLinks = [
   },
   {
     label: "Create Vaults",
-    href: "/create-vaults",
+    href: "/create-vault",
   },
 ];
 
@@ -40,7 +40,7 @@ const GeneralLinks = [
 const BugBountyLinks = [
   {
     label: "Immunefi",
-    href: "https://immunefi.com/bounty/popcorn",
+    href: "https://immunefi.com/bounty/vaultcraft/",
   },
 ];
 
@@ -71,7 +71,6 @@ const Footer = () => {
                 key={link.label}
                 href={link.href}
                 passHref
-                target="_blank"
                 className=" text-primaryDark hover:text-[#DFFF1C] leading-6 mt-4"
               >
                 {link.label}

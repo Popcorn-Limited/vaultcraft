@@ -1,4 +1,4 @@
-import { useMemo, Fragment, useState } from "react";
+import { useMemo, Fragment, useState, useEffect } from "react";
 import Link from "next/link";
 import { Dialog, Transition } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
@@ -14,10 +14,17 @@ export default function DesktopMenu(): JSX.Element {
   const { openChainModal } = useChainModal();
   const { address } = useAccount();
   const { chain } = useNetwork();
-  const logo = useMemo(() => (address && chain?.id ? networkLogos[chain.id] : networkLogos[1]), [chain?.id, address]);
-  const chainName = useMemo(() => (address && chain?.name ? chain.name : "Ethereum"), [chain?.id, address]);
-
   const [menuVisible, toggleMenu] = useState<boolean>(false);
+  const [logo, setLogo] = useState<string>(networkLogos[1])
+  const [chainName, setChainName] = useState<string>("Ethereum")
+
+  useEffect(() => {
+    if (address && chain?.id) {
+      setLogo(networkLogos[chain.id])
+      setChainName(chain.name)
+    }
+  }, [chain?.id, address])
+
 
   return (
     <>
