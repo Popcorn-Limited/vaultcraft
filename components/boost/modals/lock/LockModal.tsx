@@ -11,6 +11,8 @@ import LockPreview from "@/components/boost/modals/lock/LockPreview";
 import VotingPowerInfo from "@/components/boost/modals/lock/VotingPowerInfo";
 import { handleAllowance } from "@/lib/approve";
 import { createLock } from "@/lib/gauges/interactions";
+import ActionSteps from "@/components/vault/ActionSteps";
+import { ActionStep, LOCK_VCX_LP_STEPS } from "@/lib/vault/getActionSteps";
 
 const {
   BalancerPool: VCX_LP,
@@ -30,40 +32,73 @@ export default function LockModal({ show, setShowLpModal }: LockModalProps): JSX
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient()
 
-  const [step, setStep] = useState(0);
+  const [modalStep, setModalStep] = useState(0);
   const [showModal, setShowModal] = show;
 
   const [amount, setAmount] = useState<string>("0");
   const [days, setDays] = useState(7);
 
+  const [stepCounter, setStepCounter] = useState<number>(0)
+  const [steps, setSteps] = useState<ActionStep[]>(LOCK_VCX_LP_STEPS)
+
   useEffect(() => {
-    if (!showModal) setStep(0)
+    if (!showModal) {
+      setModalStep(0)
+      setStepCounter(0)
+      setSteps(LOCK_VCX_LP_STEPS)
+      setAmount("0")
+      setDays(7)
+    }
   },
     [showModal]
   )
 
+  useEffect(() => {
+    if (modalStep < 3) {
+      setStepCounter(0)
+      setSteps(LOCK_VCX_LP_STEPS)
+    }
+  }, [modalStep])
+
   async function handleLock() {
-    const val = Number(amount)
+    const val = Number(amount) * 1e18
 
-    if ((val || 0) == 0) return;
     // Early exit if value is ZERO
-
+    if (val == 0) return;
 
     if (chain?.id as number !== Number(1)) switchNetwork?.(Number(1));
 
-    await handleAllowance({
-      token: VCX_LP,
-      amount: (val * (10 ** 18) || 0),
-      account: account as Address,
-      spender: VOTING_ESCROW,
-      clients: {
-        publicClient,
-        walletClient: walletClient as WalletClient
-      }
-    })
-    // When approved continue to deposit
-    createLock(({ amount: (val || 0), days, account: account as Address, clients: { publicClient, walletClient: walletClient as WalletClient } }));
-    setShowModal(false);
+    const stepsCopy = [...steps]
+    const currentStep = stepsCopy[stepCounter]
+    currentStep.loading = true
+    setSteps(stepsCopy)
+
+    let success = false;
+    switch (stepCounter) {
+      case 0:
+        success = await handleAllowance({
+          token: VCX_LP,
+          amount: val,
+          account: account as Address,
+          spender: VOTING_ESCROW,
+          clients: {
+            publicClient,
+            walletClient: walletClient as WalletClient
+          }
+        })
+        break;
+      case 1:
+        // When approved continue to deposit
+        success = await createLock(({ amount: val, days, account: account as Address, clients: { publicClient, walletClient: walletClient as WalletClient } }));
+        break;
+    }
+
+    currentStep.loading = false
+    currentStep.success = success;
+    currentStep.error = !success;
+    const newStepCounter = stepCounter + 1
+    setSteps(stepsCopy)
+    setStepCounter(newStepCounter)
   }
 
   function showLpModal(): void {
@@ -71,20 +106,33 @@ export default function LockModal({ show, setShowLpModal }: LockModalProps): JSX
     setShowLpModal(true)
   }
 
-
   return (
     <Modal visibility={[showModal, setShowModal]}>
       <>
-        {step === 0 && <LockVxcInfo />}
-        {step === 1 && <VotingPowerInfo />}
-        {step === 2 && <LockVcxInterface amountState={[amount, setAmount]} daysState={[days, setDays]} showLpModal={showLpModal} />}
-        {step === 3 && <LockPreview amount={amount} days={days} />}
+        {modalStep === 0 && <LockVxcInfo />}
+        {modalStep === 1 && <VotingPowerInfo />}
+        {modalStep === 2 && <LockVcxInterface amountState={[amount, setAmount]} daysState={[days, setDays]} showLpModal={showLpModal} />}
+        {modalStep === 3 && <LockPreview amount={amount} days={days} />}
+
+        {
+          modalStep === 3 &&
+          <div className="w-full flex justify-center mt-2 mb-4">
+            <ActionSteps steps={LOCK_VCX_LP_STEPS} stepCounter={stepCounter} />
+          </div>
+        }
 
         <div className="space-y-4">
-          {step < 3 && <MainActionButton label="Next" handleClick={() => setStep(step + 1)} />}
-          {step === 3 && <MainActionButton label={"Lock VCX LP"} handleClick={handleLock} />}
-          {step === 0 && <SecondaryActionButton label="Skip" handleClick={() => setStep(2)} />}
-          {step === 1 || step === 3 && <SecondaryActionButton label="Back" handleClick={() => setStep(step - 1)} />}
+          {modalStep < 3 && <MainActionButton label="Next" handleClick={() => setModalStep(modalStep + 1)} disabled={amount === "0" || days === 0} />}
+          {modalStep === 3 &&
+            <>
+              {stepCounter < 2 ?
+                < MainActionButton label={steps[stepCounter].label} handleClick={handleLock} /> :
+                < MainActionButton label={"Close Modal"} handleClick={() => setShowModal(false)} />
+              }
+            </>
+          }
+          {modalStep === 0 && <SecondaryActionButton label="Skip" handleClick={() => setModalStep(2)} />}
+          {modalStep === 1 || modalStep === 3 && <SecondaryActionButton label="Back" handleClick={() => setModalStep(modalStep - 1)} />}
         </div>
       </>
     </Modal >

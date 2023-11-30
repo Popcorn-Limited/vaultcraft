@@ -108,7 +108,7 @@ export default function LpInterface({ vcxAmountState, wethAmountState }: LpInter
 
   return (
     <div className="text-start">
-      <h2 className="text-start text-5xl">Get VCX LP</h2>
+      <h2 className="text-start text-5xl">Get VCX-LP</h2>
       <div className="mt-8">
         <InputTokenWithError
           captionText={"Amount VCX"}

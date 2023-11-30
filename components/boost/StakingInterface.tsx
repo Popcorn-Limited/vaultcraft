@@ -47,11 +47,11 @@ export default function StakingInterface({ setShowLockModal, setShowMangementMod
         <h3 className="text-2xl pb-6 border-b border-[#353945]">veVCX</h3>
         <div className="flex flex-col mt-6 gap-4">
           <span className="flex flex-row items-center justify-between">
-            <p className="">My VCX LP</p>
+            <p className="">My VCX-LP</p>
             <p className="font-bold">{NumberFormatter.format(Number(formatEther(LpBal?.value || ZERO))) || "0"}</p>
           </span>
           <span className="flex flex-row items-center justify-between">
-            <p className="">My Locked VCX LP</p>
+            <p className="">My Locked VCX-LP</p>
             <p className="font-bold">{lockedBal ? NumberFormatter.format(Number(formatEther(lockedBal?.amount))) : "0"}</p>
           </span>
           <span className="flex flex-row items-center justify-between">
@@ -69,10 +69,10 @@ export default function StakingInterface({ setShowLockModal, setShowMangementMod
         </div>
         <div className="lg:flex lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-8 mt-6 lg:max-h-12">
           {Number(veBal?.value) === 0 ?
-            <MainActionButton label="Lock VCX LP" handleClick={() => setShowLockModal(true)} /> :
+            <MainActionButton label="Lock VCX-LP" handleClick={() => setShowLockModal(true)} /> :
             <MainActionButton label="Manage Stake" handleClick={() => setShowMangementModal(true)} />
           }
-          <SecondaryActionButton label="Get VCX LP" handleClick={() => setShowLpModal(true)} />
+          <SecondaryActionButton label="Get VCX-LP" handleClick={() => setShowLpModal(true)} />
         </div>
       </div>
     </>

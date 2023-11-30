@@ -86,7 +86,7 @@ export async function sendVotes({ vaults, votes, account, clients }: SendVotesPr
 }
 
 interface CreateLockProps {
-  amount: number | string;
+  amount: number;
   days: number;
   account: Address;
   clients: Clients;
@@ -105,7 +105,7 @@ export async function createLock({ amount, days, account, clients }: CreateLockP
       },
       functionName: "create_lock",
       publicClient: clients.publicClient,
-      args: [parseEther(Number(amount).toLocaleString("fullwide", { useGrouping: false })), BigInt(Math.floor(Date.now() / 1000) + (86400 * days))]
+      args: [BigInt(amount.toLocaleString("fullwide", { useGrouping: false })), BigInt(Math.floor(Date.now() / 1000) + (86400 * days))]
     }),
     clients
   })

@@ -158,4 +158,32 @@ export const POOL_DEPOSIT_STEPS = [
     step: 3,
     label: "Deposit into Pool",
     ...BaseStepInfo
-  }]
+  }
+]
+
+export const LOCK_VCX_LP_STEPS = [
+  {
+    step: 1,
+    label: "Handle VCX-LP Allowance",
+    ...BaseStepInfo
+  },
+  {
+    step: 2,
+    label: "Lock VCX-LP",
+    ...BaseStepInfo
+  }
+]
+
+
+export const EXERCISE_OVCX_STEPS = [
+  {
+    step: 1,
+    label: "Handle WETH Allowance",
+    ...BaseStepInfo
+  },
+  {
+    step: 2,
+    label: "Exercise oVCX",
+    ...BaseStepInfo
+  }
+]

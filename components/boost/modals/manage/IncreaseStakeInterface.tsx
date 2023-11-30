@@ -50,8 +50,8 @@ export default function IncreaseStakeInterface({ amountState, lockedBal, showLpM
           selectedToken={
             {
               ...lpToken,
-              name: "VCX LP",
-              symbol: "VCX LP",
+              name: "VCX-LP",
+              symbol: "VCX-LP",
               decimals: 18,
               price: 1,
               balance: Number(lpBal?.value || 0),

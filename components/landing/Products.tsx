@@ -45,7 +45,7 @@ export default function Products(): JSX.Element {
               </>
             }
             customContent={<SmileyIcon size={"60"} color={"white"} className="group-hover:fill-[#C391FF]" />}
-            description="Lock stake your VCX LP to boost your rewards with call options on VCX"
+            description="Lock stake your VCX-LP to boost your rewards with call options on VCX"
             stats={[]}
             route="boost"
           />

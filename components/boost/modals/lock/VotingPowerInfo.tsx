@@ -10,7 +10,7 @@ export default function VotingPowerInfo(): JSX.Element {
       <div>
         <h2 className="text-start text-5xl">Voting Power</h2>
         <p className="text-start">
-          Lock your VCX LP longer for more veVCX.
+          Lock your VCX-LP longer for more veVCX.
           Your veVCX balance represents your voting power which decreases linearly until expiry.
         </p>
       </div>

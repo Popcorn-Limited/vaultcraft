@@ -3,6 +3,7 @@ import { showErrorToast, showSuccessToast } from "@/lib/toasts";
 import { MinterAbi, OptionTokenAbi } from "@/lib/constants";
 import { getVeAddresses } from "@/lib/utils/addresses";
 import { Clients, SimulationResponse } from "@/lib/types";
+import { handleCallResult } from "../utils/helpers";
 
 type SimulationContract = {
   address: Address;
@@ -41,29 +42,21 @@ interface ExerciseOPopProps {
   clients: Clients
 }
 
-export async function exerciseOPop({ amount, maxPaymentAmount, account, clients }: ExerciseOPopProps) {
-  const { request, success, error: simulationError } = await simulateCall({
-    account,
-    contract: {
-      address: oVCX,
-      abi: OptionTokenAbi,
-    },
-    functionName: "exercise",
-    publicClient: clients.publicClient,
-    args: [amount, maxPaymentAmount, account]
-  })
-
-  if (success) {
-    try {
-      const hash = await clients.walletClient.writeContract(request)
-      const receipt = await clients.publicClient.waitForTransactionReceipt({ hash })
-      showSuccessToast("oVCX exercised successfully!")
-    } catch (error: any) {
-      showErrorToast(error.shortMessage)
-    }
-  } else {
-    showErrorToast(simulationError)
-  }
+export async function exerciseOPop({ amount, maxPaymentAmount, account, clients }: ExerciseOPopProps): Promise<boolean> {
+  return handleCallResult({
+    successMessage: "oVCX exercised successfully!",
+    simulationResponse: await simulateCall({
+      account,
+      contract: {
+        address: oVCX,
+        abi: OptionTokenAbi,
+      },
+      functionName: "exercise",
+      publicClient: clients.publicClient,
+      args: [amount, maxPaymentAmount, account]
+    }),
+    clients
+  });
 }
 
 
@@ -73,27 +66,19 @@ interface ClaimOPopProps {
   clients: Clients
 }
 
-export async function claimOPop({ gauges, account, clients }: ClaimOPopProps) {
-  const { request, success, error: simulationError } = await simulateCall({
-    account,
-    contract: {
-      address: OVCX_MINTER,
-      abi: MinterAbi,
-    },
-    functionName: "mintMany",
-    publicClient: clients.publicClient,
-    args: [gauges]
+export async function claimOPop({ gauges, account, clients }: ClaimOPopProps): Promise<boolean> {
+  return handleCallResult({
+    successMessage: "oVCX Succesfully Claimed!",
+    simulationResponse: await simulateCall({
+      account,
+      contract: {
+        address: OVCX_MINTER,
+        abi: MinterAbi,
+      },
+      functionName: "mintMany",
+      publicClient: clients.publicClient,
+      args: [gauges]
+    }),
+    clients
   })
-
-  if (success) {
-    try {
-      const hash = await clients.walletClient.writeContract(request)
-      const receipt = await clients.publicClient.waitForTransactionReceipt({ hash })
-      showSuccessToast("oVCX Succesfully Claimed!")
-    } catch (error: any) {
-      showErrorToast(error.shortMessage)
-    }
-  } else {
-    showErrorToast(simulationError)
-  }
 }

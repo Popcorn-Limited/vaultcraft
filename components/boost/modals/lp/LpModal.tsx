@@ -36,7 +36,6 @@ export default function LpModal({ show }: { show: [boolean, Dispatch<SetStateAct
   const [stepCounter, setStepCounter] = useState<number>(0)
   const [steps, setSteps] = useState<ActionStep[]>(POOL_DEPOSIT_STEPS)
 
-
   useEffect(() => {
     if (!showModal) {
       setModalStep(0)
@@ -119,16 +118,19 @@ export default function LpModal({ show }: { show: [boolean, Dispatch<SetStateAct
         {modalStep === 0 && <LpInfo />}
         {modalStep === 1 && <LpInterface vcxAmountState={[vcxAmount, setVcxAmount]} wethAmountState={[wethAmount, setWethAmount]} />}
 
-        {modalStep === 1 && <div className="w-full flex justify-center mt-2 mb-4">
-          <ActionSteps steps={POOL_DEPOSIT_STEPS} stepCounter={stepCounter} />
-        </div>}
+        {
+          modalStep === 1 &&
+          <div className="w-full flex justify-center mt-2 mb-4">
+            <ActionSteps steps={POOL_DEPOSIT_STEPS} stepCounter={stepCounter} />
+          </div>
+        }
 
         <div className="space-y-4">
           {modalStep === 0 && <MainActionButton label="Next" handleClick={() => setModalStep(modalStep + 1)} />}
           {modalStep === 1 &&
             <>
               {stepCounter < 3 ?
-                < MainActionButton label={steps[stepCounter].label} handleClick={handlePoolDeposit} /> :
+                < MainActionButton label={steps[stepCounter].label} handleClick={handlePoolDeposit} disabled={vcxAmount === "0" || wethAmount === "0"} /> :
                 < MainActionButton label={"Close Modal"} handleClick={() => setShowModal(false)} />
               }
             </>

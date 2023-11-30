@@ -12,8 +12,8 @@ export default function SelectManagementOption({ setStep, setManagementOption }:
       <div>
         <h2 className="text-start text-5xl">Update your Lock</h2>
         <p className="text-start text-primaryDark">
-          Increase your veVCX by locking more VCX LP or increasing the lock time for your locked VCX LP balance.
-          Alternatively Unlock your locked VCX LP.
+          Increase your veVCX by locking more VCX-LP or increasing the lock time for your locked VCX-LP balance.
+          Alternatively Unlock your locked VCX-LP.
         </p>
       </div>
       <div className="space-y-4">

@@ -53,10 +53,10 @@ export default function LockVcxInterface({ amountState, daysState, showLpModal }
   return (
     <div className="space-y-8 mb-8 text-start">
 
-      <h2 className="text-start text-5xl">Lock your VCX LP</h2>
+      <h2 className="text-start text-5xl">Lock your VCX-LP</h2>
 
       <div>
-        <p className="text-primary font-semibold">Amount VCX LP</p>
+        <p className="text-primary font-semibold">Amount VCX-LP</p>
         <InputTokenWithError
           captionText={``}
           onSelectToken={() => { }}
@@ -67,8 +67,8 @@ export default function LockVcxInterface({ amountState, daysState, showLpModal }
           selectedToken={
             {
               ...lpToken,
-              name: "VCX LP",
-              symbol: "VCX LP",
+              name: "VCX-LP",
+              symbol: "VCX-LP",
               decimals: 18,
               price: 1,
               balance: Number(lpBal?.value || 0),

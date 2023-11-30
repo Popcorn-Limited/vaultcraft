@@ -9,6 +9,8 @@ import { getVeAddresses } from "@/lib/utils/addresses";
 import { handleAllowance } from "@/lib/approve";
 import { parseEther } from "viem";
 import { exerciseOPop } from "@/lib/optionToken/interactions";
+import { ActionStep, EXERCISE_OVCX_STEPS } from "@/lib/vault/getActionSteps";
+import ActionSteps from "@/components/vault/ActionSteps";
 
 const { WETH, oVCX } = getVeAddresses();
 
@@ -19,56 +21,97 @@ export default function OptionTokenModal({ show }: { show: [boolean, Dispatch<Se
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient()
 
-  const [step, setStep] = useState(0);
+  const [modalStep, setModalStep] = useState(0);
   const [showModal, setShowModal] = show;
 
   const [amount, setAmount] = useState<string>("0");
   const [maxPaymentAmount, setMaxPaymentAmount] = useState<string>("0");
 
+  const [stepCounter, setStepCounter] = useState<number>(0)
+  const [steps, setSteps] = useState<ActionStep[]>(EXERCISE_OVCX_STEPS)
+
+
   useEffect(() => {
-    if (!showModal) setStep(0)
-    setAmount("0");
-    setMaxPaymentAmount("0");
+    if (!showModal) {
+      setModalStep(0)
+      setAmount("0");
+      setMaxPaymentAmount("0");
+      setStepCounter(0)
+      setSteps(EXERCISE_OVCX_STEPS)
+    }
   },
     [showModal]
   )
 
-  async function handleExerciseOPop() {
-    if ((Number(amount) || 0) == 0) return;
+  async function handleExerciseOptionToken() {
     // Early exit if value is ZERO
+    if ((Number(amount) || 0) == 0) return;
 
     if (chain?.id as number !== Number(1)) switchNetwork?.(Number(1));
 
-    await handleAllowance({
-      token: WETH,
-      amount: (Number(amount) * (10 ** 18) || 0),
-      account: account as Address,
-      spender: oVCX,
-      clients: {
-        publicClient,
-        walletClient: walletClient as WalletClient
-      }
-    })
+    const stepsCopy = [...steps]
+    const currentStep = stepsCopy[stepCounter]
+    currentStep.loading = true
+    setSteps(stepsCopy)
 
-    exerciseOPop({
-      account: account as Address,
-      amount: parseEther(Number(amount).toLocaleString("fullwide", { useGrouping: false })),
-      maxPaymentAmount: parseEther(maxPaymentAmount),
-      clients: { publicClient, walletClient: walletClient as WalletClient }
-    });
-    setShowModal(false);
+
+    let success = false;
+    switch (stepCounter) {
+      case 0:
+        success = await handleAllowance({
+          token: WETH,
+          amount: (Number(amount) * (10 ** 18) || 0),
+          account: account as Address,
+          spender: oVCX,
+          clients: {
+            publicClient,
+            walletClient: walletClient as WalletClient
+          }
+        })
+        break;
+      case 1:
+        success = await exerciseOPop({
+          account: account as Address,
+          amount: parseEther(Number(amount).toLocaleString("fullwide", { useGrouping: false })),
+          maxPaymentAmount: parseEther(maxPaymentAmount),
+          clients: { publicClient, walletClient: walletClient as WalletClient }
+        });
+        break;
+    }
+
+    currentStep.loading = false
+    currentStep.success = success;
+    currentStep.error = !success;
+    const newStepCounter = stepCounter + 1
+    setSteps(stepsCopy)
+    setStepCounter(newStepCounter)
   }
 
   return (
     <Modal visibility={[showModal, setShowModal]}>
       <>
-        {step === 0 && <OptionInfo />}
-        {step === 1 && <ExerciseOptionTokenInterface amountState={[amount, setAmount]} maxPaymentAmountState={[maxPaymentAmount, setMaxPaymentAmount]} />}
+        {modalStep === 0 && <OptionInfo />}
+        {modalStep === 1 && <ExerciseOptionTokenInterface amountState={[amount, setAmount]} maxPaymentAmountState={[maxPaymentAmount, setMaxPaymentAmount]} />}
+
+        {
+          modalStep === 1 &&
+          <div className="w-full flex justify-center mt-2 mb-4">
+            <ActionSteps steps={EXERCISE_OVCX_STEPS} stepCounter={stepCounter} />
+          </div>
+        }
+
 
         <div className="space-y-4">
-          {step === 0 && <MainActionButton label="Next" handleClick={() => setStep(step + 1)} />}
-          {step === 1 && <MainActionButton label={"Exercise oVCX"} handleClick={handleExerciseOPop} />}
-          {step === 1 && <SecondaryActionButton label="Back" handleClick={() => setStep(step - 1)} />}
+          {modalStep === 0 && <MainActionButton label="Next" handleClick={() => setModalStep(modalStep + 1)} />}
+          {modalStep === 1 &&
+            <>
+              {stepCounter < 2 ?
+                < MainActionButton label={steps[stepCounter].label} handleClick={handleExerciseOptionToken} /> :
+                < MainActionButton label={"Close Modal"} handleClick={() => setShowModal(false)} />
+              }
+            </>
+          }
+          {modalStep === 1 && <SecondaryActionButton label="Back" handleClick={() => setModalStep(modalStep - 1)} />}
         </div>
       </>
     </Modal >

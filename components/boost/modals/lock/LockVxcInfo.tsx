@@ -9,7 +9,7 @@ export default function LockVxcInfo(): JSX.Element {
       <div>
         <h2 className="text-start text-5xl">Locking VCX</h2>
         <p className="text-start">
-          Lock your VCX LP to receive vote-escrowed veVCX.
+          Lock your VCX-LP to receive vote-escrowed veVCX.
           veVCX has many purposes.
           It allows you to boost your vault yield by earning VCX call options (oVCX).
           You can use veVCX to vote on vault gauge incentives,
