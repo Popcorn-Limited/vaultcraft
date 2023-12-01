@@ -146,12 +146,12 @@ export default function getActionSteps(action: ActionType): ActionStep[] {
 export const POOL_DEPOSIT_STEPS = [
   {
     step: 1,
-    label: "Handle VCX Allowance",
+    label: "Handle WETH Allowance",
     ...BaseStepInfo
   },
   {
     step: 2,
-    label: "Handle WETH Allowance",
+    label: "Handle VCX Allowance",
     ...BaseStepInfo
   },
   {
