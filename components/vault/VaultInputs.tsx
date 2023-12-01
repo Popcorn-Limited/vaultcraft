@@ -34,7 +34,7 @@ export default function VaultInputs({ vaultData, tokenOptions, chainId, hideModa
   const { data: walletClient } = useWalletClient()
   const { address: account } = useAccount();
   const { chain } = useNetwork();
-  const { switchNetwork } = useSwitchNetwork();
+  const { switchNetworkAsync } = useSwitchNetwork();
   const { openConnectModal } = useConnectModal();
   const [masaSdk,] = useAtom(masaAtom)
 
@@ -171,7 +171,14 @@ export default function VaultInputs({ vaultData, tokenOptions, chainId, hideModa
     const val = Number(inputBalance)
     if (val === 0 || !inputToken || !outputToken || !account || !walletClient) return;
 
-    if (chain?.id !== Number(chainId)) switchNetwork?.(Number(chainId));
+    if (chain?.id !== Number(chainId)) {
+      try {
+        await switchNetworkAsync?.(Number(chainId));
+      } catch (error) {
+        return
+      }
+    }
+
 
     const stepsCopy = [...steps]
     const currentStep = stepsCopy[stepCounter]

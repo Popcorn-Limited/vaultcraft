@@ -76,8 +76,6 @@ function VePopContainer() {
     setVotes((prevVotes) => updatedVotes);
   }
 
-  console.log({ votes, entries: Object.values(votes).reduce((a, b) => a + b, 0) })
-
   return (
     <>
       <LockModal show={[showLockModal, setShowLockModal]} setShowLpModal={setShowLpModal} />

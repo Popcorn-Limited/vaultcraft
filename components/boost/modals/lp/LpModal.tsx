@@ -22,7 +22,7 @@ const {
 export default function LpModal({ show }: { show: [boolean, Dispatch<SetStateAction<boolean>>] }): JSX.Element {
   const { address: account } = useAccount();
   const { chain } = useNetwork();
-  const { switchNetwork } = useSwitchNetwork();
+  const { switchNetworkAsync } = useSwitchNetwork();
 
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient()
@@ -55,7 +55,13 @@ export default function LpModal({ show }: { show: [boolean, Dispatch<SetStateAct
     // Early exit if values are ZERO
     if (wethVal === 0 || vcxVal === 0) return;
 
-    if (chain?.id as number !== Number(1)) switchNetwork?.(Number(1));
+    if (chain?.id !== Number(1)) {
+      try {
+        await switchNetworkAsync?.(Number(1));
+      } catch (error) {
+        return
+      }
+    }
 
     const stepsCopy = [...steps]
     const currentStep = stepsCopy[stepCounter]

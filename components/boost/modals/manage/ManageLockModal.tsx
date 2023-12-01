@@ -29,7 +29,7 @@ export enum ManagementOption {
 
 export default function ManageLockModal({ show, setShowLpModal }: { show: [boolean, Dispatch<SetStateAction<boolean>>], setShowLpModal: Dispatch<SetStateAction<boolean>> }): JSX.Element {
   const { chain } = useNetwork();
-  const { switchNetwork } = useSwitchNetwork();
+  const { switchNetworkAsync } = useSwitchNetwork();
   const { address: account } = useAccount();
 
   const publicClient = usePublicClient();
@@ -57,7 +57,13 @@ export default function ManageLockModal({ show, setShowLpModal }: { show: [boole
   )
 
   async function handleMainAction() {
-    if (chain?.id as number !== Number(1)) switchNetwork?.(Number(1));
+    if (chain?.id !== Number(1)) {
+      try {
+        await switchNetworkAsync?.(Number(1));
+      } catch (error) {
+        return
+      }
+    }
     const val = Number(amount)
 
     const clients = { publicClient, walletClient: walletClient as WalletClient }

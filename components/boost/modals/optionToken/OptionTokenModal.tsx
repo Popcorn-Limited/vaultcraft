@@ -16,7 +16,7 @@ const { WETH, oVCX } = getVeAddresses();
 
 export default function OptionTokenModal({ show }: { show: [boolean, Dispatch<SetStateAction<boolean>>] }): JSX.Element {
   const { chain } = useNetwork();
-  const { switchNetwork } = useSwitchNetwork();
+  const { switchNetworkAsync } = useSwitchNetwork();
   const { address: account } = useAccount();
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient()
@@ -47,7 +47,13 @@ export default function OptionTokenModal({ show }: { show: [boolean, Dispatch<Se
     // Early exit if value is ZERO
     if ((Number(amount) || 0) == 0) return;
 
-    if (chain?.id as number !== Number(1)) switchNetwork?.(Number(1));
+    if (chain?.id !== Number(1)) {
+      try {
+        await switchNetworkAsync?.(Number(1));
+      } catch (error) {
+        return
+      }
+    }
 
     const stepsCopy = [...steps]
     const currentStep = stepsCopy[stepCounter]

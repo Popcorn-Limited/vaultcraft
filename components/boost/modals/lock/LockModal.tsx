@@ -27,7 +27,7 @@ interface LockModalProps {
 export default function LockModal({ show, setShowLpModal }: LockModalProps): JSX.Element {
   const { address: account } = useAccount();
   const { chain } = useNetwork();
-  const { switchNetwork } = useSwitchNetwork();
+  const { switchNetworkAsync } = useSwitchNetwork();
 
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient()
@@ -66,7 +66,13 @@ export default function LockModal({ show, setShowLpModal }: LockModalProps): JSX
     // Early exit if value is ZERO
     if (val == 0) return;
 
-    if (chain?.id as number !== Number(1)) switchNetwork?.(Number(1));
+    if (chain?.id !== Number(1)) {
+      try {
+        await switchNetworkAsync?.(Number(1));
+      } catch (error) {
+        return
+      }
+    }
 
     const stepsCopy = [...steps]
     const currentStep = stepsCopy[stepCounter]
