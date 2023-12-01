@@ -1,11 +1,8 @@
 import { useEffect, useState } from "react";
-import { localhost } from "wagmi/chains";
-import { mainnet, useAccount, usePublicClient } from "wagmi";
+import { usePublicClient } from "wagmi";
 import { useAtom } from "jotai";
 import { Switch } from '@headlessui/react'
 import {
-  adapterAtom,
-  adapterConfigAtom,
   adapterDeploymentAtom,
   protocolAtom,
   assetAtom,
@@ -19,8 +16,8 @@ import {
   conditionsAtom,
   DEFAULT_STRATEGY
 } from "@/lib/atoms";
-import ReviewSection from "./ReviewSection";
-import ReviewParam from "./ReviewParam";
+import ReviewSection from "@/components/review/ReviewSection";
+import ReviewParam from "@/components/review/ReviewParam";
 import { resolveStrategyEncoding } from "@/lib/resolver/strategyEncoding/strategyDefaults";
 import { encodeAbiParameters, getAddress, parseAbiParameters, stringToHex } from "viem";
 

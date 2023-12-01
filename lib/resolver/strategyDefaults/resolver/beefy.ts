@@ -1,5 +1,5 @@
 import { transformNetwork } from "@/lib/helpers";
-import { SUPPORTED_NETWORKS } from "@/lib/connectors";
+import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { ADDRESS_ZERO } from "@/lib/constants";
 import { getAddress } from "viem";
 import { StrategyDefaultResolverParams } from "..";

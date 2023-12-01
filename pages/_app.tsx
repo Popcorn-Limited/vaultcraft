@@ -1,9 +1,8 @@
 import "../styles/globals.css";
 import "@rainbow-me/rainbowkit/styles.css";
 import type { AppProps } from "next/app";
-import { Roboto } from "next/font/google";
+import localFont from 'next/font/local'
 import { WagmiConfig, configureChains, createConfig } from "wagmi";
-import { publicProvider } from "wagmi/providers/public";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
@@ -12,8 +11,8 @@ import Head from "next/head";
 import { Provider } from "jotai";
 // @ts-ignore
 import NoSSR from 'react-no-ssr';
-import Page from "@/components/Page";
-import { SUPPORTED_NETWORKS } from "@/lib/connectors";
+import Page from "@/components/common/Page";
+import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { connectorsForWallets } from '@rainbow-me/rainbowkit';
 import {
   injectedWallet,
@@ -25,7 +24,6 @@ import {
 } from '@rainbow-me/rainbowkit/wallets';
 
 const { chains, publicClient } = configureChains(SUPPORTED_NETWORKS, [
-  publicProvider(),
   alchemyProvider({
     apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY as string,
   }),
@@ -41,17 +39,17 @@ const connectors = connectorsForWallets([
     groupName: 'Suggested',
     wallets: [
       injectedWallet({ chains }),
-      rainbowWallet({ projectId:'9b83e8f348c7515d3f94d83f95a05749', chains }),
-      metaMaskWallet({ projectId:'9b83e8f348c7515d3f94d83f95a05749', chains }),
+      rainbowWallet({ projectId: '9b83e8f348c7515d3f94d83f95a05749', chains }),
+      metaMaskWallet({ projectId: '9b83e8f348c7515d3f94d83f95a05749', chains }),
     ],
   },
   {
     groupName: 'Others',
     wallets: [
       coinbaseWallet({ chains, appName: 'VaultCraft' }),
-      walletConnectWallet({ projectId:'9b83e8f348c7515d3f94d83f95a05749', chains }),
-      coin98Wallet({ projectId:'9b83e8f348c7515d3f94d83f95a05749', chains })
-    ]      
+      walletConnectWallet({ projectId: '9b83e8f348c7515d3f94d83f95a05749', chains }),
+      coin98Wallet({ projectId: '9b83e8f348c7515d3f94d83f95a05749', chains })
+    ]
 
   }
 ]);
@@ -62,11 +60,60 @@ const config = createConfig({
   publicClient
 })
 
-const nextFont = Roboto({
-  weight: ["400", "700", "900"],
-  subsets: [],
+const nextFont = localFont({
+  src: [
+    {
+      path: '../public/KH_Teka/KHTeka-Black.woff',
+      weight: '900',
+      style: 'normal'
+    },
+    {
+      path: '../public/KH_Teka/KHTeka-BlackItalic.woff',
+      weight: '900',
+      style: 'italic'
+    },
+    {
+      path: '../public/KH_Teka/KHTeka-Bold.woff',
+      weight: '700',
+      style: 'normal'
+    },
+    {
+      path: '../public/KH_Teka/KHTeka-BoldItalic.woff',
+      weight: '700',
+      style: 'italic'
+    },
+    {
+      path: '../public/KH_Teka/KHTeka-Medium.woff',
+      weight: '500',
+      style: 'normal'
+    },
+    {
+      path: '../public/KH_Teka/KHTeka-MediumItalic.woff',
+      weight: '500',
+      style: 'italic'
+    },
+    {
+      path: '../public/KH_Teka/KHTeka-RegularItalic.woff',
+      weight: '400',
+      style: 'italic'
+    },
+    {
+      path: '../public/KH_Teka/KHTeka-Regular.woff',
+      weight: '400',
+      style: 'normal'
+    },
+    {
+      path: '../public/KH_Teka/KHTeka-Light.woff',
+      weight: '300',
+      style: 'normal'
+    },
+    {
+      path: '../public/KH_Teka/KHTeka-LightItalic.woff',
+      weight: '300',
+      style: 'italic'
+    },
+  ]
 });
-
 
 export default function App({ Component, pageProps }: AppProps) {
   return (

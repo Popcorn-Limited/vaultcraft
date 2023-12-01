@@ -1,0 +1,26 @@
+.animateWords {
+  animation: do-rotate 10s infinite;
+  animation-delay: 0.5s;
+}
+
+.animateWords li {
+  padding: 1rem 0;
+}
+
+@keyframes do-rotate {
+  0% {
+    transform: translateY(100%);
+  }
+  25% {
+    transform: translateY(75%);
+  }
+  50% {
+    transform: translateY(50%);
+  }
+  75% {
+    transform: translateY(25%);
+  }
+  100% {
+    transform: translateY(0%);
+  }
+}
