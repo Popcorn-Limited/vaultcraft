@@ -44,7 +44,7 @@ type Clients = {
 
 interface SendVotesProps {
   vaults: VaultData[];
-  votes: number[];
+  votes: { [key: Address]: number };
   account: Address;
   clients: Clients;
 }
@@ -52,18 +52,25 @@ interface SendVotesProps {
 export async function sendVotes({ vaults, votes, account, clients }: SendVotesProps): Promise<boolean> {
   showLoadingToast("Sending votes...")
 
+  const votesCleaned = Object.entries(votes).filter(v => v[1] > 0)
+
   let addr = new Array<string>(8);
   let v = new Array<number>(8);
 
-  for (let i = 0; i < Math.ceil(vaults.length / 8); i++) {
+
+  for (let i = 0; i < Math.ceil(votesCleaned.length / 8); i++) {
     addr = [];
     v = [];
 
     for (let n = 0; n < 8; n++) {
       const l = i * 8;
-      v[n] = votes[n + l] === undefined ? 0 : votes[n + l];
-      addr[n] = vaults[n + l] === undefined || votes[n + l] === 0 ? zeroAddress : vaults[n + l].gauge?.address as Address;
-
+      if (votesCleaned[n + l] === undefined) {
+        addr[n] = zeroAddress
+        v[n] = 0;
+      } else {
+        addr[n] = votesCleaned[n + l][0]
+        v[n] = votesCleaned[n + l][1];
+      }
     }
 
     const success = await handleCallResult({

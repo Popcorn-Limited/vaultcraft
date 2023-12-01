@@ -9,12 +9,13 @@ import Title from "@/components/common/Title";
 import useGaugeWeights from "@/lib/gauges/useGaugeWeights";
 import calculateAPR from "@/lib/gauges/calculateGaugeAPR";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
-import {roundToTwoDecimalPlaces} from '@/lib/utils/helpers'
+import { roundToTwoDecimalPlaces } from '@/lib/utils/helpers'
+import { getVotePeriodEndTime } from "@/lib/gauges/utils";
 
 interface GaugeProps {
   vaultData: VaultData;
-  index: number;
-  votes: number[];
+  index: Address;
+  votes: { [key: Address]: number };
   handleVotes: Function;
   canVote: boolean;
 }
@@ -36,8 +37,7 @@ export default function Gauge({ vaultData, index, votes, handleVotes, canVote }:
 
   function onChange(value: number) {
     const currentVoteForThisGauge = votes[index];
-    const potentialNewTotalVotes = votes.reduce((a, b) => a + b, 0) - currentVoteForThisGauge + Number(value);
-
+    const potentialNewTotalVotes = Object.values(votes).reduce((a, b) => a + b, 0) - currentVoteForThisGauge + Number(value);
     if (potentialNewTotalVotes <= 10000) {
       handleVotes(value, index);
       setAmount(value);
@@ -100,7 +100,7 @@ export default function Gauge({ vaultData, index, votes, handleVotes, canVote }:
             <div className="w-full mt-6 xs:mt-0">
               <p className="font-normal text-primary xs:text-[14px]">My Votes</p>
               <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
-              {(Number(weights?.[2].power) / 100).toFixed()} %
+                {(Number(weights?.[2].power) / 100).toFixed()} %
               </Title>
             </div>
           </div>

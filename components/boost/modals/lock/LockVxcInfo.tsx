@@ -14,7 +14,7 @@ export default function LockVxcInfo(): JSX.Element {
           It allows you to boost your vault yield by earning VCX call options (oVCX).
           You can use veVCX to vote on vault gauge incentives,
           participate in governance and earn protocol fees.
-          Unlocking VCX early results in a penalty of up to 75% of your VCX.
+          Unlocking VCX early results in a penalty of up to 25% of your VCX.
         </p>
       </div>
       <div className="flex flex-row items-center justify-center space-x-4">

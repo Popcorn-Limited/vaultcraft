@@ -31,7 +31,7 @@ function VePopContainer() {
   const [accountLoad, setAccountLoad] = useState<boolean>(false);
 
   const [vaults, setVaults] = useAtom(vaultsAtom)
-  const [votes, setVotes] = useState<number[]>([]);
+  const [votes, setVotes] = useState<{ [key: Address]: number }>({});
   const [canVote, setCanVote] = useState<boolean>(false);
 
   const [showLockModal, setShowLockModal] = useState(false);
@@ -46,8 +46,11 @@ function VePopContainer() {
 
       const vaultsWithGauges = vaults.filter(vault => !!vault.gauge)
       setVaults(vaultsWithGauges);
-      if (vaultsWithGauges.length > 0 && votes.length === 0 && publicClient.chain.id === 1) {
-        setVotes(vaultsWithGauges.map(gauge => 0));
+      if (vaultsWithGauges.length > 0 && Object.keys(votes).length === 0 && publicClient.chain.id === 1) {
+        const emptyVotes: { [key: Address]: number } = {}
+        // @ts-ignore
+        vaultsWithGauges.forEach(vault => emptyVotes[vault.gauge.address] = 0)
+        setVotes(emptyVotes);
 
         const hasVoted = await hasAlreadyVoted({
           addresses: vaultsWithGauges?.map((vault: VaultData) => vault.gauge?.address as Address),
@@ -61,9 +64,9 @@ function VePopContainer() {
     if (account && !accountLoad && vaults.length > 0) initialSetup()
   }, [account, initalLoad, accountLoad, vaults])
 
-  function handleVotes(val: number, index: number) {
-    const updatedVotes = [...votes];
-    const updatedTotalVotes = updatedVotes.reduce((a, b) => a + b, 0) - updatedVotes[index] + val;
+  function handleVotes(val: number, index: Address) {
+    const updatedVotes = { ...votes };
+    const updatedTotalVotes = Object.values(updatedVotes).reduce((a, b) => a + b, 0) - updatedVotes[index] + val;
 
     if (updatedTotalVotes <= 10000) {
       // TODO should we adjust the val to the max possible value if it exceeds 10000?
@@ -73,10 +76,12 @@ function VePopContainer() {
     setVotes((prevVotes) => updatedVotes);
   }
 
+  console.log({ votes, entries: Object.values(votes).reduce((a, b) => a + b, 0) })
+
   return (
     <>
-      <LockModal show={[showLockModal, setShowLockModal]} setShowLpModal={setShowLpModal}/>
-      <ManageLockModal show={[showMangementModal, setShowMangementModal]} setShowLpModal={setShowLpModal}/>
+      <LockModal show={[showLockModal, setShowLockModal]} setShowLpModal={setShowLpModal} />
+      <ManageLockModal show={[showMangementModal, setShowMangementModal]} setShowLpModal={setShowLpModal} />
       <OptionTokenModal show={[showOptionTokenModal, setShowOptionTokenModal]} />
       <LpModal show={[showLpModal, setShowLpModal]} />
       <div className="static">
@@ -95,7 +100,7 @@ function VePopContainer() {
         </section>
 
         <section className="pb-12 md:py-10 px-4 md:px-8 md:flex md:flex-row md:justify-between space-y-4 md:space-y-0 md:space-x-8">
-          <StakingInterface setShowLockModal={setShowLockModal} setShowMangementModal={setShowMangementModal} setShowLpModal={setShowLpModal}/>
+          <StakingInterface setShowLockModal={setShowLockModal} setShowMangementModal={setShowMangementModal} setShowLpModal={setShowLpModal} />
           <OptionTokenInterface
             gauges={vaults?.length > 0 ? vaults.filter(vault => !!vault.gauge?.address).map((vault: VaultData) => vault.gauge as Token) : []}
             setShowOptionTokenModal={setShowOptionTokenModal}
@@ -104,7 +109,7 @@ function VePopContainer() {
 
         <section className="grid grid-cols-1 md:grid-cols-3 gap-4 px-4 md:px-8">
           {vaults?.length > 0 ? vaults.filter(vault => !!vault.gauge?.address).map((vault: VaultData, index: number) =>
-            <Gauge key={vault.address} vaultData={vault} index={index} votes={votes} handleVotes={handleVotes} canVote={canVote} />
+            <Gauge key={vault.address} vaultData={vault} index={vault.gauge?.address as Address} votes={votes} handleVotes={handleVotes} canVote={canVote} />
           )
             : <p className="text-primary">Loading Gauges...</p>
           }
@@ -116,8 +121,8 @@ function VePopContainer() {
               <p className="mt-1">
                 Voting power used: <span className="font-bold">
                   {
-                    veBal && veBal.value
-                      ? (votes?.reduce((a, b) => a + b, 0) / 100).toFixed(2)
+                    veBal && veBal.value && Object.keys(votes).length > 0
+                      ? (Object.values(votes).reduce((a, b) => a + b, 0) / 100).toFixed(2)
                       : "0"
                   }%
                 </span>

@@ -122,11 +122,11 @@ export default function LockModal({ show, setShowLpModal }: LockModalProps): JSX
         }
 
         <div className="space-y-4">
-          {modalStep < 3 && <MainActionButton label="Next" handleClick={() => setModalStep(modalStep + 1)} disabled={amount === "0" || days === 0} />}
+          {modalStep < 3 && <MainActionButton label="Next" handleClick={() => setModalStep(modalStep + 1)} />}
           {modalStep === 3 &&
             <>
               {stepCounter < 2 ?
-                < MainActionButton label={steps[stepCounter].label} handleClick={handleLock} /> :
+                < MainActionButton label={steps[stepCounter].label} handleClick={handleLock} disabled={amount === "0" || days === 0} /> :
                 < MainActionButton label={"Close Modal"} handleClick={() => setShowModal(false)} />
               }
             </>

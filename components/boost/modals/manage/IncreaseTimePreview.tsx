@@ -29,7 +29,7 @@ export default function IncreaseTimePreview({ days, lockedBal }: { days: number,
       </div>
 
       <div className="w-full bg-[#d7d7d726] border border-customLightGray rounded-lg p-4">
-        <p className="text-primaryDark">Important: veVCX is not transferrable and unlocking VCX-LP early results in a penalty of up to 75% of your VCX-LP</p>
+        <p className="text-primaryDark">Important: veVCX is not transferrable and unlocking VCX-LP early results in a penalty of up to 25% of your VCX-LP</p>
       </div>
 
     </div >
