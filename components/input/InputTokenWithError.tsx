@@ -30,6 +30,7 @@ export default function InputTokenWithError({
   allowInput?: boolean;
   inputMoreThanBalance?: boolean;
 } & HTMLProps<HTMLInputElement>): JSX.Element {
+  const balance = Number(selectedToken?.balance) / (10 ** (selectedToken?.decimals as number))
   return (
     <>
       {captionText && (
@@ -66,7 +67,7 @@ export default function InputTokenWithError({
               </svg>
             </div>
             <p className="text-[#D7D7D7] group-hover/max:text-primary">
-              {`${formatNumber(Number(selectedToken?.balance) / (10 ** (selectedToken?.decimals as number)))}`}
+              {balance < 0.001 ? "<0.001" : `${formatNumber(balance)}`}
             </p>
           </>}
         </div>

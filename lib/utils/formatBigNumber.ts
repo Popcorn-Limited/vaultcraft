@@ -75,9 +75,9 @@ export function safeRound(bn: bigint, decimals = 18): bigint {
   } else if (decimals <= 8) {
     roundingDecimals = 2;
   } else if (decimals <= 18) {
-    roundingDecimals = 10
+    roundingDecimals = 8
   } else if (decimals === 27) {
-    roundingDecimals = 20
+    roundingDecimals = 12
   }
   const roundingValue = parseUnits("1", roundingDecimals)
   return (bn / roundingValue) * roundingValue

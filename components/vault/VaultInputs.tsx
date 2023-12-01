@@ -18,6 +18,7 @@ import { MutateTokenBalanceProps } from "@/components/vault/VaultsContainer";
 import { useAtom } from "jotai";
 import { masaAtom } from "@/lib/atoms/sdk";
 import { useRouter } from "next/router";
+import { fi } from "date-fns/locale";
 
 interface VaultInputsProps {
   vaultData: VaultData;
@@ -212,6 +213,15 @@ export default function VaultInputs({ vaultData, tokenOptions, chainId, hideModa
     if (newStepCounter === steps.length) mutateTokenBalance({ inputToken: inputToken.address, outputToken: outputToken.address, vault: vault.address, chainId, account })
   }
 
+  function handleMaxClick() {
+    if (!inputToken) return
+    const stringBal = inputToken.balance.toLocaleString("fullwide", { useGrouping: false })
+    const rounded = safeRound(BigInt(stringBal), inputToken.decimals)
+    const formatted = formatUnits(rounded, inputToken.decimals)
+    console.log({ stringBal, rounded, formatted })
+    handleChangeInput({ currentTarget: { value: formatted } })
+  }
+
   if (!inputToken || !outputToken) return <></>
   return <>
     <Modal visibility={[showModal, setShowModal]}>
@@ -234,14 +244,7 @@ export default function VaultInputs({ vaultData, tokenOptions, chainId, hideModa
     <InputTokenWithError
       captionText={isDeposit ? "Deposit Amount" : "Withdraw Amount"}
       onSelectToken={option => handleTokenSelect(option, !!gauge ? gauge : vault)}
-      onMaxClick={() => handleChangeInput(
-        {
-          currentTarget: {
-            value: formatUnits(safeRound(
-              BigInt(inputToken.balance.toLocaleString("fullwide", { useGrouping: false })),
-              inputToken.decimals), inputToken.decimals)
-          }
-        })}
+      onMaxClick={handleMaxClick}
       chainId={chainId}
       value={inputBalance}
       onChange={handleChangeInput}

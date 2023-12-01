@@ -96,6 +96,20 @@ export async function vaultDeposit({ chainId, vaultData, account, amount, client
 export async function vaultRedeem({ chainId, vaultData, account, amount, clients, fireEvent, referral }: VaultWriteProps): Promise<boolean> {
   showLoadingToast("Withdrawing from the vault...")
 
+  const maxRedeem = await clients.publicClient.readContract({
+    address: vaultData.address,
+    abi: VaultAbi,
+    functionName: 'maxRedeem',
+    args: [account]
+  });
+
+  if (maxRedeem < BigInt(Number(amount).toLocaleString("fullwide", { useGrouping: false }))) {
+    console.log("MAX REDEEM")
+    console.log(amount)
+    amount = Number(maxRedeem)
+    console.log(amount)
+  }
+
   const success = await handleCallResult({
     successMessage: "Withdrawn from the vault!",
     simulationResponse: await simulateVaultCall({ address: vaultData.address, account, amount, functionName: "redeem", publicClient: clients.publicClient }),
