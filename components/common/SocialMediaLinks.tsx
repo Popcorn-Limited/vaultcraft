@@ -1,8 +1,8 @@
 import DiscordIcon from "@/components/svg/socialMedia/DiscordIcon";
 import MediumIcon from "@/components/svg/socialMedia/MediumIcon";
-import RedditIcon from "@/components/svg/socialMedia/RedditIcon";
 import TwitterIcon from "@/components/svg/socialMedia/TwitterIcon";
 import YoutubeIcon from "@/components/svg/socialMedia/YoutubeIcon";
+import TelegramIcon from "../svg/socialMedia/TelegramIcon";
 
 interface SocialMediaLinksProps {
   color: string;
@@ -15,14 +15,14 @@ export default function SocialMediaLinks({ color, color2, size }: SocialMediaLin
     <a href="https://twitter.com/VaultCraft_io" target="_blank">
       <TwitterIcon color={color} size={size} />
     </a>
-    <a href="https://discord.gg/ujxSKu2H" target="_blank">
+    <a href="https://discord.com/invite/3xBnfxeEj5" target="_blank">
       <DiscordIcon color={color} size={size} />
     </a>
-    <a href="https://medium.com/popcorndao" target="_blank">
-      <MediumIcon color={color} color2={color2} size={size} />
+    <a href="https://t.me/vaultcraft" target="_blank">
+      <TelegramIcon color={color} size={size} />
     </a>
-    <a href="https://www.reddit.com/r/popcorndao/" target="_blank">
-      <RedditIcon color={color} size={size} />
+    <a href="https://medium.com/vaultcraft" target="_blank">
+      <MediumIcon color={color} color2={color2} size={size} />
     </a>
     <a href="https://www.youtube.com/channel/UCe8n8mGG4JR7nhFT4v9APyA" target="_blank">
       <YoutubeIcon color={color} color2={color2} size={size} />

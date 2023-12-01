@@ -44,6 +44,18 @@ const BugBountyLinks = [
   },
 ];
 
+const GovernanceLinks = [
+  {
+    label: "Forum",
+    href: "https://forum.pop.network/",
+  },
+  {
+    label: "Snapshot",
+    href: "https://snapshot.org/#/popcorn-snapshot.eth",
+  },
+];
+
+
 
 const Footer = () => {
   return (
@@ -58,7 +70,7 @@ const Footer = () => {
           </p>
         </div>
         <div className="flex flex-row space-x-6 mt-12">
-          <SocialMediaLinks color="#fff" color2="#23262F" size="24"/>
+          <SocialMediaLinks color="#fff" color2="#23262F" size="24" />
         </div>
       </div>
 
@@ -100,6 +112,23 @@ const Footer = () => {
           <p className="text-white font-medium leading-6 tracking-1">Bug Bounty</p>
           <div className="flex flex-col">
             {BugBountyLinks.map((link: FooterLink) =>
+              <Link
+                key={link.label}
+                href={link.href}
+                passHref
+                target="_blank"
+                className=" text-primaryDark hover:text-[#DFFF1C] leading-6 mt-4"
+              >
+                {link.label}
+              </Link>
+            )}
+          </div>
+        </div>
+
+        <div>
+          <p className="text-white font-medium leading-6 tracking-1">Governance</p>
+          <div className="flex flex-col">
+            {GovernanceLinks.map((link: FooterLink) =>
               <Link
                 key={link.label}
                 href={link.href}
