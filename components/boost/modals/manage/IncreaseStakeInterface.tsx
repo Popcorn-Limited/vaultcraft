@@ -60,7 +60,7 @@ export default function IncreaseStakeInterface({ amountState, lockedBal, showLpM
           errorMessage={errorMessage}
           allowInput
           tokenList={[]}
-          getToken={showLpModal}
+          getToken={() => window.open("https://app.balancer.fi/#/ethereum/pool/0x577a7f7ee659aa14dc16fd384b3f8078e23f1920000200000000000000000633/add-liquidity", "_blank")}
         />
       </div>
 

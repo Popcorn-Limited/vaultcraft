@@ -46,12 +46,12 @@ export default function Hero(): JSX.Element {
           <div className="flex flex-row space-x-28 smmd:space-x-10 items-center mt-4 sm:mt-0">
             <StatusWithLabel
               label={"Staked"}
-              content={<p className="text-3xl font-bold text-primary leading-[120%]">$ {loading ? "..." : NumberFormatter.format(networth.stake)}</p>}
+              content={<p className="text-3xl font-bold text-primary leading-[120%]">Coming Soon</p>}
               className="md:min-w-[160px] lg:min-w-0"
             />
             <StatusWithLabel
               label={"VCX in Wallet"}
-              content={<p className="text-3xl font-bold text-primary leading-[120%]">$ {loading ? "..." : NumberFormatter.format(networth.vcx)}</p>}
+              content={<p className="text-3xl font-bold text-primary leading-[120%]">Coming Soon</p>}
               className="md:min-w-[160px] lg:min-w-0"
             />
           </div>

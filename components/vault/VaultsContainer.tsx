@@ -73,10 +73,14 @@ export default function VaultsContainer({ hiddenVaults, displayVaults }: VaultsC
       // get available zapAddresses
       setAvailableZapAssets({
         1: await getAvailableZapAssets(1),
-        137: await getAvailableZapAssets(137),
-        10: await getAvailableZapAssets(10),
-        42161: await getAvailableZapAssets(42161),
-        56: await getAvailableZapAssets(56)
+        137: [],
+        10: [],
+        42161: [],
+        56: []
+        // 137: await getAvailableZapAssets(137),
+        // 10: await getAvailableZapAssets(10),
+        // 42161: await getAvailableZapAssets(42161),
+        // 56: await getAvailableZapAssets(56)
       })
 
       // get gauge rewards
