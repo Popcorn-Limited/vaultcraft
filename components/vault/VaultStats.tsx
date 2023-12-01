@@ -28,10 +28,9 @@ export default function VaultStats({ vaultData, account, zapAvailable }: VaultSt
           <p className="text-primary font-normal md:text-[14px]">Your Deposit</p>
           <div className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
             <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
-              {account ? '$ ' + (!!gauge ?
-                formatAndRoundNumber(gauge?.balance || 0, vault.decimals) :
-                formatAndRoundNumber(vault.balance, vault.decimals)
-              ) : "-"}
+              {account ? '$ ' +
+                Number(formatAndRoundNumber((!!gauge ? gauge.balance : vault.balance) * vault.price, vault.decimals))
+                : "-"}
             </Title>
           </div>
         </div>

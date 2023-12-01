@@ -29,9 +29,10 @@ const assets: Asset[] = [
     "logoURI": "https://cdn.furucombo.app/assets/img/token/USDC.png"
   },
   {
-    "chains": [10],
+    "chains": [10, 42161],
     "address": {
       "10": "0x7F5c764cBc14f9669B88837ca1490cCa17c31607",
+      "42161": "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8"
     },
     "name": "USD Coin Bridged",
     "symbol": "USDC.e",

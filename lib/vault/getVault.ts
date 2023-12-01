@@ -134,7 +134,9 @@ export async function getVaults({ vaults, account = ADDRESS_ZERO, client, yieldO
   // Add core metadata
   let metadata = vaults.map((vault, i) => {
     if (i > 0) i = i * 10
-    const assetsPerShare = Number(results[i + 6]) > 0 ? Number(results[i + 5]) / Number(results[i + 6]) : Number(1e-9)
+    const totalAssets = Number(results[i + 5]);
+    const totalSupply = Number(results[i + 6])
+    const assetsPerShare = Number(results[i + 6]) > 0 ? (totalAssets + 1) / (totalSupply + (1e9)) : Number(1e-9)
     const fees = results[i + 7] as [BigInt, BigInt, BigInt, BigInt]
     const vaultToken: Token = {
       address: getAddress(vault),
@@ -150,8 +152,8 @@ export async function getVaults({ vaults, account = ADDRESS_ZERO, client, yieldO
       vault: { ...vaultToken, symbol: cleanTokenSymbol(vaultToken) },
       assetAddress: getAddress(results[i + 3] as string),
       adapterAddress: getAddress(results[i + 4] as string),
-      totalAssets: Number(results[i + 5]),
-      totalSupply: Number(results[i + 6]),
+      totalAssets: totalAssets,
+      totalSupply: totalSupply,
       assetsPerShare: assetsPerShare,
       fees: {
         deposit: Number(fees[0]),
@@ -233,15 +235,15 @@ export async function getVaults({ vaults, account = ADDRESS_ZERO, client, yieldO
 
   const { data: beefyTokens } = await axios.get("https://api.beefy.finance/tokens")
   const { data: beefyPrices } = await axios.get("https://api.beefy.finance/lps")
-  console.log(Object.entries(beefyTokens["optimism"]).map(entry => entry[1]))
 
   metadata = metadata.map((entry, i) => {
     const key = `${networkMap[client.chain.id].toLowerCase()}:${entry.asset.address}`
     let assetPrice = Number(priceData.coins[key]?.price || 10)
     if (assetPrice === 10 && client.chain.id === 10) {
-      const lpFound = Object.entries(beefyTokens["optimism"]).map(entry => entry[1]).find((token: any) => getAddress(token.address) === getAddress(entry.asset.address))
+      const lpFound: any | undefined = Object.entries(beefyTokens["optimism"]).map(entry => entry[1]).find((token: any) => getAddress(token.address) === getAddress(entry.asset.address))
       if (!lpFound) assetPrice = 1;
       const beefyKey = Object.keys(beefyPrices).find(key => key === lpFound.oracleId)
+      // @ts-ignore
       assetPrice = beefyPrices[beefyKey]
     }
     const pricePerShare = entry.assetsPerShare * assetPrice

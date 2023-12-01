@@ -10,8 +10,8 @@ export default function LpInfo(): JSX.Element {
         <h2 className="text-start text-5xl">Get VCX-LP</h2>
         <p className="text-start">
           Deposit VCX and WETH into the 20WETH-80VCX Balancer Pool for the VCX LP token, 
-          improving VCX's liquidity and facilitating easier trading for all users. 
-          By contributing assets, you'll earn trading fees proportional to your deposit. 
+          improving VCX`&apos;s liquidity and facilitating easier trading for all users. 
+          By contributing assets, you`&apos;ll earn trading fees proportional to your deposit. 
           Additionally, max lock your VCX LP for veVCX, 
           granting you voting rights in VaultCraft Governance and increasing your Smart Vault returns.
         </p>

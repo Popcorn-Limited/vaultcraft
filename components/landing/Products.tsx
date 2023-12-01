@@ -68,7 +68,7 @@ export default function Products(): JSX.Element {
               </>
             }
             customContent={<PopIcon size={"60"} color={"white"} className="group-hover:fill-[#80FF77]" />}
-            description="Find out our staking products & discontinued products here"
+            description="Monitor the market performance of VCX, veVCX, and oVCX"
             stats={[]}
             route="stats"
           />
