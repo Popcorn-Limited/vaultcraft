@@ -19,7 +19,7 @@ const VeAddresses = {
     GaugeFactory: "0x3bd6418e90653945f781e3717D8F9404565444F6",
     SmartWalletChecker: "0x8427155770f7e6b973249E2f9D140a495aBE4f90",
     VotingEscrowDelegation: "0xafE32869CAf311585647ADcD79050B83DbCF94C8",
-    VaultRouter: "0x8aed8Ea73044910760E8957B6c5b28Ac51f8f809",
+    VaultRouter: "0x4995F3bb85E1381D02699e2164bC1C6c6Fa243cd",
 };
 
 export function getVeAddresses(): veAddresses {
