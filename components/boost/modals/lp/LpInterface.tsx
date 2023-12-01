@@ -85,13 +85,14 @@ export default function LpInterface({ vcxAmountState, wethAmountState }: LpInter
 
   function getWethAmount(oVcxAmount: number) {
     const vcxValue = oVcxAmount * vcxPrice;
-    return String(vcxValue / wethPrice);
+
+    return String((vcxValue * 0.25) / wethPrice);
   }
 
   function getVcxAmount(paymentAmount: number) {
     const wethValue = paymentAmount * wethPrice;
 
-    return String(wethValue / vcxPrice);
+    return String((wethValue * 4) / vcxPrice);
   }
 
   const handleVcxInput: FormEventHandler<HTMLInputElement> = ({ currentTarget: { value } }) => {

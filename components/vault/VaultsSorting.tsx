@@ -119,7 +119,7 @@ export default function VaultsSorting(
                         `}
                         onClick={sortingMostApy}
                     >
-                        Most vAPR
+                        Most vAPY
                     </button>
                     <button
                         className={`
@@ -135,7 +135,7 @@ export default function VaultsSorting(
                         `}
                         onClick={sortingLessApy}
                     >
-                        Less vAPR
+                        Less vAPY
                     </button>
                 </div>
             )}
