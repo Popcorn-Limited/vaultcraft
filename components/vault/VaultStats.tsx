@@ -12,11 +12,11 @@ interface VaultStatProps {
 
 export default function VaultStats({ vaultData, account, zapAvailable }: VaultStatProps): JSX.Element {
   const { asset, vault, gauge, apy, gaugeMinApy, gaugeMaxApy } = vaultData
-  return (  
+  return (
     <>
-      <div className="w-full flex justify-between gap-8 xs:gap-4">
-        <div className="w-full mt-6 xs:mt-0">
-          <p className="text-primary font-normal xs:text-[14px]">Your Wallet</p>
+      <div className="w-full flex justify-between gap-8 md:gap-4">
+        <div className="w-full mt-6 md:mt-0">
+          <p className="text-primary font-normal md:text-[14px]">Your Wallet</p>
           <p className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
             <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
               {`${formatAndRoundNumber(asset.balance, asset.decimals)}`}
@@ -24,8 +24,8 @@ export default function VaultStats({ vaultData, account, zapAvailable }: VaultSt
           </p>
         </div>
 
-        <div className="w-full mt-6 xs:mt-0">
-          <p className="text-primary font-normal xs:text-[14px]">Your Deposit</p>
+        <div className="w-full mt-6 md:mt-0">
+          <p className="text-primary font-normal md:text-[14px]">Your Deposit</p>
           <div className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
             <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
               {account ? '$ ' + (!!gauge ?
@@ -36,39 +36,39 @@ export default function VaultStats({ vaultData, account, zapAvailable }: VaultSt
           </div>
         </div>
 
-        <div className="w-full mt-6 xs:mt-0">
-          <p className="leading-6 text-primary xs:text-[14px]">TVL</p>
+        <div className="w-full mt-6 md:mt-0">
+          <p className="leading-6 text-primary md:text-[14px]">TVL</p>
           <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
             $ {vaultData.tvl < 1 ? "0" : NumberFormatter.format(vaultData.tvl)}
           </Title>
         </div>
       </div>
 
-      <div className="w-full flex justify-between gap-8 xs:gap-4">
-        <div className="w-full mt-6 xs:mt-0">
-          <p className="font-normal text-primary xs:text-[14px]">vAPY</p>
+      <div className="w-full flex justify-between gap-8 md:gap-4">
+        <div className="w-full mt-6 md:mt-0">
+          <p className="font-normal text-primary md:text-[14px]">vAPY</p>
           <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
             {apy ? `${NumberFormatter.format(roundToTwoDecimalPlaces(apy))} %` : "0 %"}
           </Title>
         </div>
-        <div className="w-full mt-6 xs:mt-0">
-          {gaugeMinApy &&
+        <div className="w-full mt-6 md:mt-0">
+          {gaugeMinApy ? (
             <>
-              <p className="font-normal text-primary xs:text-[14px]">Min Boost</p>
+              <p className="font-normal text-primary md:text-[14px]">Min Boost</p>
               <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
                 {NumberFormatter.format(roundToTwoDecimalPlaces(gaugeMinApy))} %
               </Title>
-            </>
+            </>) : <></>
           }
         </div>
-        <div className="w-full mt-6 xs:mt-0">
-          {gaugeMaxApy &&
+        <div className="w-full mt-6 md:mt-0">
+          {gaugeMaxApy ?
             <>
-              <p className="font-normal text-primary xs:text-[14px]">Max Boost</p>
+              <p className="font-normal text-primary md:text-[14px]">Max Boost</p>
               <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
                 {NumberFormatter.format(roundToTwoDecimalPlaces(gaugeMaxApy))} %
               </Title>
-            </>
+            </> : <></>
           }
         </div>
       </div>
