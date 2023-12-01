@@ -158,6 +158,10 @@ export default function LpInterface({ vcxAmountState, wethAmountState }: LpInter
           errorMessage={Number(wethAmount) > (Number(wethBal?.value) / 1e18) ? "Insufficient Balance" : ""}
         />
       </div>
+      <p className="mt-1">
+        Or Deposit via the {" "}
+        <a className="text-blue-500" href="https://app.balancer.fi/#/ethereum/pool/0x577a7f7ee659aa14dc16fd384b3f8078e23f1920000200000000000000000633" target="_blank">balancer app</a>
+      </p>
     </div>
   )
 }

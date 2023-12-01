@@ -54,8 +54,6 @@ export default function VaultInputs({ vaultData, tokenOptions, chainId, hideModa
   const [tradeTimeout, setTradeTimeout] = useState<number>(300); // number of seconds a cow order is valid for
   const [slippage, setSlippage] = useState<number>(100); // In BPS 0 - 10_000
 
-  console.log({ query })
-
   useEffect(() => {
     // set default input/output tokens
     setInputToken(asset)

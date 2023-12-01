@@ -220,14 +220,30 @@ export async function getVaults({ vaults, account = ADDRESS_ZERO, client, yieldO
     }
   })
 
-  // Add prices
-  const { data } = await axios.get(`https://coins.llama.fi/prices/current/${String(metadata.map(
+  console.log(`https://coins.llama.fi/prices/current/${String(metadata.map(
     // @ts-ignore -- @dev ts still thinks entry.asset is just an `Address`
     entry => `${networkMap[client.chain.id].toLowerCase()}:${entry.asset.address}`
   ))}`)
+
+  // Add prices
+  const { data: priceData } = await axios.get(`https://coins.llama.fi/prices/current/${String(metadata.map(
+    // @ts-ignore -- @dev ts still thinks entry.asset is just an `Address`
+    entry => `${networkMap[client.chain.id].toLowerCase()}:${entry.asset.address}`
+  ))}`)
+
+  const { data: beefyTokens } = await axios.get("https://api.beefy.finance/tokens")
+  const { data: beefyPrices } = await axios.get("https://api.beefy.finance/lps")
+  console.log(Object.entries(beefyTokens["optimism"]).map(entry => entry[1]))
+
   metadata = metadata.map((entry, i) => {
     const key = `${networkMap[client.chain.id].toLowerCase()}:${entry.asset.address}`
-    const assetPrice = Number(data.coins[key]?.price || 0)
+    let assetPrice = Number(priceData.coins[key]?.price || 10)
+    if (assetPrice === 10 && client.chain.id === 10) {
+      const lpFound = Object.entries(beefyTokens["optimism"]).map(entry => entry[1]).find((token: any) => getAddress(token.address) === getAddress(entry.asset.address))
+      if (!lpFound) assetPrice = 1;
+      const beefyKey = Object.keys(beefyPrices).find(key => key === lpFound.oracleId)
+      assetPrice = beefyPrices[beefyKey]
+    }
     const pricePerShare = entry.assetsPerShare * assetPrice
     return {
       ...entry,

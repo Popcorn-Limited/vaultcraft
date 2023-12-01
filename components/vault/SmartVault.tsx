@@ -38,6 +38,7 @@ export default function SmartVault({
 }: SmartVaultsProps) {
   const { address: account } = useAccount();
 
+  const asset = vaultData.asset;
   const vault = vaultData.vault;
   const gauge = vaultData.gauge;
   const tokenOptions = getTokenOptions(vaultData, zapAssets);
@@ -64,6 +65,19 @@ export default function SmartVault({
             </div>
 
             <div className="hidden md:block space-y-4">
+            <div className="w-10/12 border border-[#353945] rounded-lg p-4">
+                <p className="text-primary font-normal">Asset address:</p>
+                <div className="flex flex-row items-center justify-between">
+                  <p className="font-bold text-primary">
+                    {asset.address.slice(0, 6)}...{asset.address.slice(-4)}
+                  </p>
+                  <div className='w-6 h-6 group/vaultAddress'>
+                    <CopyToClipboard text={vault.address} onCopy={()=>showSuccessToast("Vault Address copied!")}>
+                      <Square2StackIcon className="text-white group-hover/vaultAddress:text-[#DFFF1C]" />
+                    </CopyToClipboard>
+                  </div>
+                </div>
+              </div>
               <div className="w-10/12 border border-[#353945] rounded-lg p-4">
                 <p className="text-primary font-normal">Vault address:</p>
                 <div className="flex flex-row items-center justify-between">

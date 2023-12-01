@@ -23,10 +23,12 @@ export default async function getGaugeRewards({ gauges, account, publicClient }:
         args: [account]
       }
     }),
-    allowFailure: false
+    allowFailure: true
   })
+  const successfullCalls = data.filter(d => d.status !== "failure")
+  if (successfullCalls.length === 0) return { total: ZERO, amounts: [] }
 
-  const total = data?.reduce((acc: bigint, curr: bigint) => acc + (curr || ZERO), ZERO);
-  const amounts = data?.map((amount, i) => { return { amount: amount, address: gauges[i] } });
+  const total = successfullCalls.map(entry => (entry.result as bigint)).reduce((acc: bigint, curr: bigint) => acc + (curr || ZERO), ZERO);
+  const amounts = successfullCalls.map(entry => (entry.result as bigint)).map((amount, i) => { return { amount: amount, address: gauges[i] } });
   return { total, amounts }
 }
