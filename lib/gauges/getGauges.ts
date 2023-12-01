@@ -21,7 +21,7 @@ export default async function getGauges({ address, account = ADDRESS_ZERO, publi
     abi: GaugeControllerAbi
   } as const
 
-  const gauges = await publicClient.multicall({
+  let gauges = await publicClient.multicall({
     contracts: Array(Number(nGauges)).fill(undefined).map((item, idx) => {
       return {
         ...gaugeController,
@@ -31,6 +31,8 @@ export default async function getGauges({ address, account = ADDRESS_ZERO, publi
     }),
     allowFailure: false
   }) as Address[]
+  // @dev Deployment script ran out of gas and somehow added a random address into the gauges which now breaks these calls
+  gauges = gauges.filter(gauge => gauge !== "0x38098e3600665168eBE4d827D24D0416efC24799");
 
   const areGaugesKilled = await publicClient.multicall({
     contracts: gauges.map((gauge: Address) => {
