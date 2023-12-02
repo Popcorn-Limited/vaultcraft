@@ -67,7 +67,7 @@ export default function InputTokenWithError({
               </svg>
             </div>
             <p className="text-[#D7D7D7] group-hover/max:text-primary">
-              {balance < 0.001 ? "<0.001" : `${formatNumber(balance)}`}
+              {balance < 0.001 && balance > 0 ? "<0.001" : `${formatNumber(balance)}`}
             </p>
           </>}
         </div>

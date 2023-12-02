@@ -103,7 +103,7 @@ export default function Migration(): JSX.Element {
                     "type": "function"
                 }],
                 functionName: "spendableBalanceOf",
-                args: [account]
+                args: [account || zeroAddress]
             }).then(res => setPopBal(res))
         }
     }, [])
@@ -155,7 +155,7 @@ export default function Migration(): JSX.Element {
                 </p>
             </div>
             <div className="px-6 md:px-8 py-10 border-t border-b border-[#353945] mt-6 md:mt-10 w-full">
-                {(vcxBal && popBal) ?
+                {vcxBal  ?
                     <div className="rounded-lg w-full md:w-1/3 md:min-w-[870px] bg-[#23262F] md:ml-auto md:mr-auto md:p-8 px-8 pt-6 pb-5 md:pl-11 border border-[#353945] [&_summary::-webkit-details-marker]:hidden">
                         <InputTokenWithError
                             onSelectToken={() => { }}

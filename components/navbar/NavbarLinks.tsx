@@ -22,6 +22,10 @@ const links: { label: string, url: string, onClick?: Function }[] = [
     label: "Pop to VCX Migration",
     url: "/migration"
   },
+  {
+    label: "Archive",
+    url: "https://archive.pop.network/"
+  }
 ]
 
 
