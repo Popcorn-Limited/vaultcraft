@@ -218,7 +218,6 @@ export default function VaultInputs({ vaultData, tokenOptions, chainId, hideModa
     const stringBal = inputToken.balance.toLocaleString("fullwide", { useGrouping: false })
     const rounded = safeRound(BigInt(stringBal), inputToken.decimals)
     const formatted = formatUnits(rounded, inputToken.decimals)
-    console.log({ stringBal, rounded, formatted })
     handleChangeInput({ currentTarget: { value: formatted } })
   }
 

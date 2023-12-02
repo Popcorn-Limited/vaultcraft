@@ -1,14 +1,14 @@
 import MainActionButton from "@/components/button/MainActionButton";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import { handleAllowance } from "@/lib/approve";
-import { ROUNDING_VALUE, VCXAbi } from "@/lib/constants";
+import { ROUNDING_VALUE, VCXAbi, ZERO } from "@/lib/constants";
 import { showErrorToast, showLoadingToast, showSuccessToast } from "@/lib/toasts";
 import { SimulationResponse } from "@/lib/types";
 import { getVeAddresses } from "@/lib/utils/addresses";
 import { validateInput } from "@/lib/utils/helpers";
 import { ArrowDownIcon } from "@heroicons/react/24/outline";
-import { useState } from "react";
-import { Address, WalletClient, formatEther, zeroAddress } from "viem";
+import { useEffect, useState } from "react";
+import { Address, WalletClient, formatEther, parseEther, zeroAddress } from "viem";
 import { PublicClient, useAccount, useBalance, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
 
 const { VCX, POP } = getVeAddresses();
@@ -68,15 +68,45 @@ async function migrate({ address, account, amount, publicClient, walletClient }:
 
 export default function Migration(): JSX.Element {
     const { address: account } = useAccount();
-    const publicClient = usePublicClient()
+    const publicClient = usePublicClient({ chainId: 1 })
     const { data: walletClient } = useWalletClient()
     const { chain } = useNetwork();
-    const { switchNetwork } = useSwitchNetwork();
+    const { switchNetworkAsync } = useSwitchNetwork();
 
     const { data: vcxBal } = useBalance({ chainId: 1, address: account || zeroAddress, token: VCX, watch: true })
-    const { data: popBal } = useBalance({ chainId: 1, address: account || zeroAddress, token: POP, watch: true })
+    const [popBal, setPopBal] = useState<bigint>(ZERO)
 
     const [inputBalance, setInputBalance] = useState<string>("0");
+
+
+    useEffect(() => {
+        if (account) {
+            publicClient.readContract({
+                address: "0x50a7c5a2aA566eB8AAFc80ffC62E984bFeCe334F",
+                abi: [{
+                    "inputs": [
+                        {
+                            "internalType": "address",
+                            "name": "account",
+                            "type": "address"
+                        }
+                    ],
+                    "name": "spendableBalanceOf",
+                    "outputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                }],
+                functionName: "spendableBalanceOf",
+                args: [account]
+            }).then(res => setPopBal(res))
+        }
+    }, [])
 
     function handleChangeInput(e: any) {
         const value = e.currentTarget.value
@@ -84,14 +114,19 @@ export default function Migration(): JSX.Element {
     };
 
     async function handleMainAction() {
-        const val = Number(inputBalance)
+        const val = Number(inputBalance) * 1e18
         if (val === 0 || !account || !walletClient) return;
 
-        if (chain?.id !== 1) switchNetwork?.(1);
-
-        await handleAllowance({
+        if (chain?.id !== 1) {
+            try {
+                await switchNetworkAsync?.(1);
+            } catch (error) {
+                return
+            }
+        }
+        let success = await handleAllowance({
             token: POP,
-            amount: (val * (10 ** 18)),
+            amount: val,
             account,
             spender: VCX,
             clients: {
@@ -99,13 +134,14 @@ export default function Migration(): JSX.Element {
                 walletClient
             }
         })
-        migrate({
+        if (success) success = await migrate({
             address: VCX,
             account,
-            amount: (val * (10 ** 18)),
+            amount: val,
             publicClient,
             walletClient
         })
+        setPopBal(prevState => prevState - BigInt(val.toLocaleString("fullwide", { useGrouping: false })))
     }
 
     return (
@@ -123,7 +159,7 @@ export default function Migration(): JSX.Element {
                     <div className="rounded-lg w-full md:w-1/3 md:min-w-[870px] bg-[#23262F] md:ml-auto md:mr-auto md:p-8 px-8 pt-6 pb-5 md:pl-11 border border-[#353945] [&_summary::-webkit-details-marker]:hidden">
                         <InputTokenWithError
                             onSelectToken={() => { }}
-                            onMaxClick={() => handleChangeInput({ currentTarget: { value: Math.round(Number(formatEther(popBal.value)) * ROUNDING_VALUE) / ROUNDING_VALUE } })}
+                            onMaxClick={() => handleChangeInput({ currentTarget: { value: Math.round(Number(formatEther(popBal)) * ROUNDING_VALUE) / ROUNDING_VALUE } })}
                             chainId={1}
                             value={inputBalance}
                             onChange={handleChangeInput}
@@ -133,7 +169,7 @@ export default function Migration(): JSX.Element {
                                 symbol: "POP",
                                 decimals: 18,
                                 logoURI: "",
-                                balance: Number(popBal.value),
+                                balance: Number(popBal),
                                 price: 1,
                             }}
                             errorMessage={""}
