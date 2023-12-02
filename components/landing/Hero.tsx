@@ -14,20 +14,12 @@ export default function Hero(): JSX.Element {
   const [tvl, setTvl] = useState<string>("0");
   const [loading, setLoading] = useState<boolean>(true);
 
-
-  useEffect(() => {
-    // fetch and set tvl
-    fetch("https://api.llama.fi/protocol/popcorn").then(
-      res => res.json().then(
-        res => setTvl(NumberFormatter.format(res.currentChainTvls.Ethereum + res.currentChainTvls.staking))
-      ))
-  }, [])
-
   useEffect(() => {
     async function fetchNetworth() {
       const vaultNetworth = SUPPORTED_NETWORKS.map(chain => getVaultNetworthByChain({ vaults, chainId: chain.id })).reduce((a, b) => a + b, 0)
       const totalNetworth = await getTotalNetworth({ account: account as Address })
       setNetworth({ ...totalNetworth.total, vault: vaultNetworth, total: totalNetworth.total.total + vaultNetworth });
+      setTvl(NumberFormatter.format((vaults.reduce((a, b) => a + b.tvl, 0))))
       setLoading(false);
     }
     if (account && vaults.length > 0) fetchNetworth()

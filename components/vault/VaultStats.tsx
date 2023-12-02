@@ -29,7 +29,7 @@ export default function VaultStats({ vaultData, account, zapAvailable }: VaultSt
           <div className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
             <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
               {account ? '$ ' +
-                Number(formatAndRoundNumber((!!gauge ? gauge.balance : vault.balance) * vault.price, vault.decimals))
+                formatAndRoundNumber((!!gauge ? gauge.balance : vault.balance) * vault.price, vault.decimals)
                 : "-"}
             </Title>
           </div>

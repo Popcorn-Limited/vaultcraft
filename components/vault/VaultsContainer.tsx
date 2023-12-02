@@ -51,7 +51,7 @@ export default function VaultsContainer({ hiddenVaults, displayVaults }: VaultsC
   const [vaults, setVaults] = useAtom(vaultsAtom)
   const [zapAssets, setZapAssets] = useState<{ [key: number]: Token[] }>({});
   const [availableZapAssets, setAvailableZapAssets] = useState<{ [key: number]: Address[] }>({})
-  const vaultTvl = useVaultTvl();
+  const [tvl, setTvl] = useState<number>(0);
   const [networth, setNetworth] = useState<number>(0);
 
   const [gaugeRewards, setGaugeRewards] = useState<GaugeRewards>()
@@ -93,6 +93,7 @@ export default function VaultsContainer({ hiddenVaults, displayVaults }: VaultsC
         setGaugeRewards(rewards)
       }
       setNetworth(SUPPORTED_NETWORKS.map(chain => getVaultNetworthByChain({ vaults, chainId: chain.id })).reduce((a, b) => a + b, 0));
+      setTvl(vaults.reduce((a, b) => a + b.tvl, 0))
     }
     if (!account && !initalLoad && vaults.length > 0) getVaults();
     if (account && !accountLoad && vaults.length > 0) getVaults()
@@ -213,7 +214,7 @@ export default function VaultsContainer({ hiddenVaults, displayVaults }: VaultsC
             <div className="w-[120px] md:w-max">
               <p className="leading-6 text-base text-primaryDark md:text-primary">TVL</p>
               <div className="text-3xl font-bold whitespace-nowrap text-primary">
-                {`$${NumberFormatter.format(vaultTvl)}`}
+                {`$${NumberFormatter.format(tvl)}`}
               </div>
             </div>
 
