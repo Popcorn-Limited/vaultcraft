@@ -4,11 +4,12 @@ import { vaultsAtom } from "@/lib/atoms/vaults";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { getVaultsByChain } from "@/lib/vault/getVault";
 import { useAtom } from "jotai";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { CachedProvider, YieldOptions } from "vaultcraft-sdk";
 import { useAccount } from "wagmi";
 import Footer from "@/components/common/Footer";
 import { useMasaAnalyticsReact } from "@masa-finance/analytics-react";
+import { useRouter } from "next/router";
 
 async function setUpYieldOptions() {
   const ttl = 360_000;
@@ -23,6 +24,7 @@ export default function Page({
 }: {
   children: JSX.Element;
 }): JSX.Element {
+  const { asPath } = useRouter()
   const { address: account } = useAccount()
   const [yieldOptions, setYieldOptions] = useAtom(yieldOptionsAtom)
   const [masaSdk, setMasaSdk] = useAtom(masaAtom)
@@ -34,6 +36,10 @@ export default function Page({
     clientName: "VaultCraft",
     clientId: process.env.MASA_CLIENT_ID as string
   });
+
+  useEffect(() => {
+    if (account) void firePageViewEvent({ page: `https://app.vaultcraft.io${asPath}`, user_address: account });
+  }, [account])
 
   useEffect(() => {
     if (!yieldOptions) {

@@ -72,7 +72,7 @@ export default function SmartVault({
                     {asset.address.slice(0, 6)}...{asset.address.slice(-4)}
                   </p>
                   <div className='w-6 h-6 group/vaultAddress'>
-                    <CopyToClipboard text={vault.address} onCopy={()=>showSuccessToast("Vault Address copied!")}>
+                    <CopyToClipboard text={asset.address} onCopy={()=>showSuccessToast("Asset address copied!")}>
                       <Square2StackIcon className="text-white group-hover/vaultAddress:text-[#DFFF1C]" />
                     </CopyToClipboard>
                   </div>
@@ -85,7 +85,7 @@ export default function SmartVault({
                     {vault.address.slice(0, 6)}...{vault.address.slice(-4)}
                   </p>
                   <div className='w-6 h-6 group/vaultAddress'>
-                    <CopyToClipboard text={vault.address} onCopy={()=>showSuccessToast("Vault Address copied!")}>
+                    <CopyToClipboard text={vault.address} onCopy={()=>showSuccessToast("Vault address copied!")}>
                       <Square2StackIcon className="text-white group-hover/vaultAddress:text-[#DFFF1C]" />
                     </CopyToClipboard>
                   </div>
@@ -99,7 +99,7 @@ export default function SmartVault({
                       {gauge.address.slice(0, 6)}...{gauge.address.slice(-4)}
                     </p>
                     <div className='w-6 h-6 group/gaugeAddress'>
-                      <CopyToClipboard text={gauge.address} onCopy={()=>showSuccessToast("Gauge Address copied!")}>
+                      <CopyToClipboard text={gauge.address} onCopy={()=>showSuccessToast("Gauge address copied!")}>
                         <Square2StackIcon className="text-white group-hover/gaugeAddress:text-[#DFFF1C]" />
                       </CopyToClipboard>
                     </div>
