@@ -10,7 +10,7 @@ import { Address, useAccount } from "wagmi";
 export default function Hero(): JSX.Element {
   const { address: account } = useAccount();
   const [vaults] = useAtom(vaultsAtom)
-  const [networth, setNetworth] = useState<Networth>({ vcx: 0, stake: 0, vault: 0, total: 0 });
+  const [networth, setNetworth] = useState<Networth>({ wallet: 0, stake: 0, vault: 0, total: 0 });
   const [tvl, setTvl] = useState<string>("0");
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -19,11 +19,14 @@ export default function Hero(): JSX.Element {
       const vaultNetworth = SUPPORTED_NETWORKS.map(chain => getVaultNetworthByChain({ vaults, chainId: chain.id })).reduce((a, b) => a + b, 0)
       const totalNetworth = await getTotalNetworth({ account: account as Address })
       setNetworth({ ...totalNetworth.total, vault: vaultNetworth, total: totalNetworth.total.total + vaultNetworth });
-      setTvl(NumberFormatter.format((vaults.reduce((a, b) => a + b.tvl, 0))))
       setLoading(false);
     }
     if (account && vaults.length > 0) fetchNetworth()
   }, [account]);
+
+  useEffect(() => {
+    setTvl(NumberFormatter.format((vaults.reduce((a, b) => a + b.tvl, 0))))
+  }, [vaults])
 
 
   return (
@@ -38,12 +41,12 @@ export default function Hero(): JSX.Element {
           <div className="flex flex-row space-x-28 smmd:space-x-10 items-center mt-4 sm:mt-0">
             <StatusWithLabel
               label={"Staked"}
-              content={<p className="text-3xl font-bold text-primary leading-[120%]">Coming Soon</p>}
+              content={<p className="text-3xl font-bold text-primary leading-[120%]">$ {loading ? "..." : NumberFormatter.format(networth.stake)}</p>}
               className="md:min-w-[160px] lg:min-w-0"
             />
             <StatusWithLabel
               label={"VCX in Wallet"}
-              content={<p className="text-3xl font-bold text-primary leading-[120%]">Coming Soon</p>}
+              content={<p className="text-3xl font-bold text-primary leading-[120%]">$ {loading ? "..." : NumberFormatter.format(networth.wallet)}</p>}
               className="md:min-w-[160px] lg:min-w-0"
             />
           </div>

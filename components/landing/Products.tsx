@@ -1,19 +1,28 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Product from "@/components/landing/Product";
-import usetVaultTvl from "@/lib/useVaultTvl";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import PopSmileyIcon from "@/components/svg/popcorn/PopSmileyIcon";
 import SmileyIcon from "@/components/svg/popcorn/SmileyIcon";
 import HandIcon from "@/components/svg/popcorn/HandIcon";
 import PopIcon from "@/components/svg/popcorn/PopIcon";
+import { useAtom } from "jotai";
+import { vaultsAtom } from "@/lib/atoms/vaults";
 
 export default function Products(): JSX.Element {
-  const vaultTvl = usetVaultTvl();
+  const [vaults] = useAtom(vaultsAtom)
+  const [vaultTvl, setVaultTvl] = useState<number>(0);
+
+  useEffect(() => {
+    if (vaults) {
+      setVaultTvl((vaults.reduce((a, b) => a + b.tvl, 0)))
+    }
+  }, [vaults])
+
   return (
     <>
       {/* @dev Product.tsx has `md:mx-2` so with `md:mx-6` that adds up to consistent mx-8*/}
       <section className="py-12 md:py-10 mx-4 md:mx-6">
-          <p className="text-2xl mb-6 text-primary smmd:hidden"> Our products </p>
+        <p className="text-2xl mb-6 text-primary smmd:hidden"> Our products </p>
         <div className="flex flex-col gap-6 smmd:flex-wrap lg:flex-nowrap space-y-4 md:space-y-0 md:flex-row md:justify-between">
           <Product
             title={
@@ -30,7 +39,7 @@ export default function Products(): JSX.Element {
                 content: `$${NumberFormatter.format(vaultTvl)}`,
                 infoIconProps: {
                   title: "Total Value Locked",
-                  content: <p>The total value of assets held <br/> by the underlying smart contracts.</p>,
+                  content: <p>The total value of assets held <br /> by the underlying smart contracts.</p>,
                   id: "sweet-vault-tvl",
                 },
               }
@@ -52,9 +61,9 @@ export default function Products(): JSX.Element {
           <Product
             title={
               <>
-              Create <br className="hidden md:inline" />
-              Vaults
-            </>
+                Create <br className="hidden md:inline" />
+                Vaults
+              </>
             }
             customContent={<HandIcon size={"60"} color={"white"} className="group-hover:fill-[#FFE650]" />}
             description="Create automated assets strategies within minutes"

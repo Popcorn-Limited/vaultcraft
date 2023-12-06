@@ -6,7 +6,6 @@ import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import useNetworkFilter from "@/lib/useNetworkFilter";
-import useVaultTvl from "@/lib/useVaultTvl";
 import { Token, VaultData } from "@/lib/types";
 import SmartVault from "@/components/vault/SmartVault";
 import NetworkFilter from "@/components/network/NetworkFilter";
