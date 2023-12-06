@@ -50,21 +50,10 @@ export default function LpInterface({ vcxAmountState, wethAmountState }: LpInter
     async function setUpPrices() {
       setInitialLoad(true)
 
-      const wethPrice = await llama({ address: WETH, chainId: 1 })
-      // TODO -- calc proper price
-      // const price = await publicClient.readContract({
-      //   address: BalancerOracle,
-      //   abi: BalancerOracleAbi,
-      //   functionName: 'getPrice'
-      // });
-      // const multiplier = await publicClient.readContract({
-      //   address: BalancerOracle,
-      //   abi: BalancerOracleAbi,
-      //   functionName: 'multiplier'
-      // });
-      // const vcxInUsd = (Number(price) * multiplier / ROUNDING_VALUE) * wethPrice
-      setVCXPrice(0.001);
-      setWethPrice(wethPrice);
+      const wethInUsd = await llama({ address: WETH, chainId: 1 })
+      const vcxInUsd = await llama({ address: VCX, chainId: 1 })
+      setWethPrice(wethInUsd);
+      setVCXPrice(vcxInUsd);
     }
     if (!initialLoad) setUpPrices()
   }, [initialLoad])

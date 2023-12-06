@@ -51,11 +51,9 @@ export default function ExerciseOptionTokenInterface({ amountState, maxPaymentAm
     function setUpPrices() {
       setInitialLoad(true)
 
-      //llama({ address: "0x6F0fecBC276de8fC69257065fE47C5a03d986394", chainId: 10 }).then(res => setVCXPrice(res))
-      // TODO -- actually fetch VCX price
-      setVCXPrice(0.0001)
-
+      llama({ address: VCX, chainId: 1 }).then(res => setVCXPrice(res))
       llama({ address: WETH, chainId: 1 }).then(res => setWethPrice(res))
+
       publicClient.readContract({
         address: OVCX_ORACLE,
         abi: BalancerOracleAbi,
@@ -127,9 +125,9 @@ export default function ExerciseOptionTokenInterface({ amountState, maxPaymentAm
           selectedToken={
             {
               ...oVcx,
-              name:"oVCX",
-              symbol:"oVCX",
-              decimals:18,
+              name: "oVCX",
+              symbol: "oVCX",
+              decimals: 18,
               logoURI: "/images/tokens/oVcx.svg",
               balance: oVcxBal?.value || ZERO,
             } as any
@@ -152,9 +150,9 @@ export default function ExerciseOptionTokenInterface({ amountState, maxPaymentAm
           selectedToken={
             {
               ...weth,
-              name:"WETH",
-              symbol:"WETH",
-              decimals:18,
+              name: "WETH",
+              symbol: "WETH",
+              decimals: 18,
               logoURI: "https://etherscan.io/token/images/weth_28.png",
               balance: wethBal?.value || ZERO,
             } as any

@@ -72,7 +72,7 @@ export default function StakingInterface({ setShowLockModal, setShowMangementMod
             <MainActionButton label="Lock VCX-LP" handleClick={() => setShowLockModal(true)} /> :
             <MainActionButton label="Manage Stake" handleClick={() => setShowMangementModal(true)} />
           }
-          <SecondaryActionButton label="Get VCX-LP" handleClick={() => window.open("https://app.balancer.fi/#/ethereum/pool/0x577a7f7ee659aa14dc16fd384b3f8078e23f1920000200000000000000000633/add-liquidity", "_blank")} />
+          <SecondaryActionButton label="Get VCX-LP" handleClick={() => setShowLpModal(true)} />
         </div>
       </div>
     </>
