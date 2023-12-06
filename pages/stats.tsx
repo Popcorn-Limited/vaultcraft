@@ -7,9 +7,9 @@ import Highcharts from "highcharts";
 import SelectField from "@/components/input/SelectField";
 import { erc20ABI, usePublicClient } from "wagmi";
 import { getVeAddresses } from "@/lib/utils/addresses";
-import { BalancerVaultAbi, VCX_POOL_ID } from "@/lib/constants";
+import { BalancerVaultAbi, VCX_POOL_ID, VotingEscrowAbi } from "@/lib/constants";
 
-const { VCX, WETH, WETH_VCX_LP, oVCX, BalancerVault } = getVeAddresses()
+const { VCX, VotingEscrow, WETH, WETH_VCX_LP, oVCX, BalancerVault } = getVeAddresses()
 
 type DuneQueryResult<T> = {
     result: {
@@ -90,11 +90,12 @@ export default function Vaults() {
         totalRevenue: number
         oVcxRevenue: number
         weekDexVolume: number
-        walletsVcxMoreZero: number
-        walletsVcxMoreHundred: number
-        walletsVcxMoreThousand: number
-        walletsVcxMoreHundredThousand: number
-        walletsVcxMoreMillion: number
+        holderTotal: number
+        holderPlankton: number
+        holderShrimp: number
+        holderFish: number
+        holderDolphin: number
+        holderWhale: number
         tvl: number
         snapshotPips: {
             created: number
@@ -122,11 +123,12 @@ export default function Vaults() {
         totalRevenue: 0,
         oVcxRevenue: 0,
         weekDexVolume: 0,
-        walletsVcxMoreZero: 0,
-        walletsVcxMoreHundred: 0,
-        walletsVcxMoreThousand: 0,
-        walletsVcxMoreHundredThousand: 0,
-        walletsVcxMoreMillion: 0,
+        holderTotal: 0,
+        holderPlankton: 0,
+        holderShrimp: 0,
+        holderFish: 0,
+        holderDolphin: 0,
+        holderWhale: 0,
         tvl: 0,
         snapshotPips: [],
         leaderboard: [],
@@ -297,7 +299,9 @@ export default function Vaults() {
             prices,
             poolTokens,
             tvlByTime,
-            holder
+            holder,
+            veLocked,
+            volume
         ] = await Promise.all([
             axios.get<DuneQueryResult<{
                 created: number
@@ -309,7 +313,7 @@ export default function Vaults() {
                 cumulativeexercisedvcx: number
                 circulatingsupply: number
             }>>('https://api.dune.com/api/v1/query/3238349/results', duneOpts),
-            axios.get(`https://coins.llama.fi/prices/current/ethereum:0xcE246eEa10988C495B4A90a905Ee9237a0f91543,ethereum:0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2`),
+            axios.get(`https://coins.llama.fi/prices/current/ethereum:0xcE246eEa10988C495B4A90a905Ee9237a0f91543,ethereum:0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2,ethereum:0x577A7f7EE659Aa14Dc16FD384B3F8078E23F1920`),
             publicClient.readContract({
                 address: BalancerVault,
                 abi: BalancerVaultAbi,
@@ -336,11 +340,23 @@ export default function Vaults() {
                 shrimps_number: number
                 plankton_balance: number
                 plankton_number: number
+                total_balance: number
+                total_number: number
             }>>('https://api.dune.com/api/v1/query/3237039/results', duneOpts),
+            publicClient.readContract({
+                address: VotingEscrow,
+                abi: VotingEscrowAbi,
+                functionName: "supply"
+            }),
+            axios.get<DuneQueryResult<{
+                'USD Volume': number
+                blockchain: string
+            }>>('https://api.dune.com/api/v1/query/2490697/results', duneOpts),
         ])
 
         const vcxInUsd = prices.data.coins["ethereum:0xcE246eEa10988C495B4A90a905Ee9237a0f91543"].price
         const wethInUsd = prices.data.coins["ethereum:0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"].price
+        const lpInUsd = prices.data.coins["ethereum:0x577A7f7EE659Aa14Dc16FD384B3F8078E23F1920"].price
         const tvlByTokens = Object.keys(tvlByTime.data.tokensInUsd.slice(-1)[0].tokens)
 
         setStatistics({
@@ -350,13 +366,14 @@ export default function Vaults() {
             vcxPrice: vcxInUsd,
             liquidSupply: duneTokenResult.data.result.rows[0].circulatingsupply,
             marketCap: duneTokenResult.data.result.rows[0].circulatingsupply * vcxInUsd,
-            walletsVcxMoreZero: 0,
-            walletsVcxMoreHundred: 0,
-            walletsVcxMoreThousand: 0,
-            walletsVcxMoreHundredThousand: 0,
-            walletsVcxMoreMillion: 0,
+            holderTotal: holder.data.result.rows[0].total_number,
+            holderPlankton: holder.data.result.rows[0].plankton_number,
+            holderShrimp: holder.data.result.rows[0].shrimps_number,
+            holderFish: holder.data.result.rows[0].fish_number,
+            holderDolphin: holder.data.result.rows[0].dolphins_number,
+            holderWhale: holder.data.result.rows[0].whales_number,
             snapshotPips: snapshotPips.data.result.rows,
-            weekDexVolume: 0,
+            weekDexVolume: volume.data.result.rows[0]['USD Volume'],
             tvlMonthByMonth: tvlByTime.data.tokensInUsd,
             tvl: tvlByTokens.reduce((acc, key) => acc + tvlByTime.data.tokensInUsd.slice(-1)[0].tokens[key], 0),
             vaultTvl: tvlByTokens.map(item => {
@@ -367,7 +384,8 @@ export default function Vaults() {
             }),
             balLp: ((Number(poolTokens[1][1]) / 1e18) * vcxInUsd) + ((Number(poolTokens[1][0]) / 1e18) * wethInUsd),
             vcxInBalPool: (Number(poolTokens[1][1]) / 1e18) * vcxInUsd,
-            wethInBalPool: (Number(poolTokens[1][0]) / 1e18) * wethInUsd
+            wethInBalPool: (Number(poolTokens[1][0]) / 1e18) * wethInUsd,
+            veVcx: (Number(veLocked) / 1e18) * lpInUsd
         })
 
         initDonutChart(liquidVcxMarketChartElem.current,
@@ -470,7 +488,7 @@ export default function Vaults() {
                                 </div>
                                 <div className={`flex justify-between`}>
                                     <p>veVCX (staked LPs)</p>
-                                    <p className={`font-bold text-right`}>Coming Soon {/*statistics.veVcx.toLocaleString()*/}</p>
+                                    <p className={`font-bold text-right`}>${statistics.veVcx.toLocaleString()}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
                                     <p>oVCX emissions</p>
@@ -522,28 +540,32 @@ export default function Vaults() {
                                     <p className={`font-bold text-right`}>Coming Soon {/*statistics.oVcxRevenue.toLocaleString()*/}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
-                                    <p>Total Users</p>
-                                    <p className={`font-bold text-right`}>{statistics.walletsVcxMoreZero.toLocaleString()}</p>
-                                </div>
-                                <div className={`flex justify-between`}>
                                     <p>7 Day Dex Volume</p>
                                     <p className={`font-bold text-right`}>${statistics.weekDexVolume.toLocaleString()}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
-                                    <p>{'Wallets with VCX > 100'}</p>
-                                    <p className={`font-bold text-right`}>{statistics.walletsVcxMoreHundred.toLocaleString()}</p>
+                                    <p>Total Holder</p>
+                                    <p className={`font-bold text-right`}>{statistics.holderTotal.toLocaleString()}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
-                                    <p>{'Wallets with VCX > 1,000'}</p>
-                                    <p className={`font-bold text-right`}>{statistics.walletsVcxMoreThousand.toLocaleString()}</p>
+                                    <p>{'Wallets with VCX >= 100'}</p>
+                                    <p className={`font-bold text-right`}>{statistics.holderPlankton.toLocaleString()}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
-                                    <p>{'Wallets with VCX > 100,000'}</p>
-                                    <p className={`font-bold text-right`}>{statistics.walletsVcxMoreHundredThousand.toLocaleString()}</p>
+                                    <p>{'Wallets with VCX >= 1,000'}</p>
+                                    <p className={`font-bold text-right`}>{statistics.holderShrimp.toLocaleString()}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
-                                    <p>{'Wallets with VCX > 1,000,000'}</p>
-                                    <p className={`font-bold text-right`}>{statistics.walletsVcxMoreMillion.toLocaleString()}</p>
+                                    <p>{'Wallets with VCX >= 100,000'}</p>
+                                    <p className={`font-bold text-right`}>{statistics.holderFish.toLocaleString()}</p>
+                                </div>
+                                <div className={`flex justify-between`}>
+                                    <p>{'Wallets with VCX >= 1,000,000'}</p>
+                                    <p className={`font-bold text-right`}>{statistics.holderDolphin.toLocaleString()}</p>
+                                </div>
+                                <div className={`flex justify-between`}>
+                                    <p>{'Wallets with VCX >= 10,000,000'}</p>
+                                    <p className={`font-bold text-right`}>{statistics.holderWhale.toLocaleString()}</p>
                                 </div>
                             </div>
                         </div>
