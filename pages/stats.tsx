@@ -548,23 +548,23 @@ export default function Vaults() {
                                     <p className={`font-bold text-right`}>{statistics.holderTotal.toLocaleString()}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
-                                    <p>{'Wallets with VCX >= 100'}</p>
+                                    <p>Wallets with 100-1K VCX</p>
                                     <p className={`font-bold text-right`}>{statistics.holderPlankton.toLocaleString()}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
-                                    <p>{'Wallets with VCX >= 1,000'}</p>
+                                    <p>Wallets with 1K - 100K VCX</p>
                                     <p className={`font-bold text-right`}>{statistics.holderShrimp.toLocaleString()}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
-                                    <p>{'Wallets with VCX >= 100,000'}</p>
+                                    <p>Wallets with 100K-1M VCX</p>
                                     <p className={`font-bold text-right`}>{statistics.holderFish.toLocaleString()}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
-                                    <p>{'Wallets with VCX >= 1,000,000'}</p>
+                                    <p>Wallets with 1M-10M VCX</p>
                                     <p className={`font-bold text-right`}>{statistics.holderDolphin.toLocaleString()}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
-                                    <p>{'Wallets with VCX >= 10,000,000'}</p>
+                                    <p>Wallets with 10M+ VCX</p>
                                     <p className={`font-bold text-right`}>{statistics.holderWhale.toLocaleString()}</p>
                                 </div>
                             </div>
