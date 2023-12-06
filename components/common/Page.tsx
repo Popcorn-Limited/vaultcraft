@@ -38,8 +38,8 @@ export default function Page({
   });
 
   useEffect(() => {
-    if (account) void firePageViewEvent({ page: `https://app.vaultcraft.io${asPath}`, user_address: account });
-  }, [account])
+    void firePageViewEvent({ page: `https://app.vaultcraft.io${asPath}`, user_address: account, });
+  }, [])
 
   useEffect(() => {
     if (!yieldOptions) {
