@@ -295,10 +295,10 @@ export default function VaultInputs({ vaultData, tokenOptions, chainId, hideModa
         <p className="text-secondaryLight group-hover/zap:text-primary">Zap Settings</p>
       </div >
     }
-    <div className="w-full flex justify-center mt-4">
+    <div className="w-full flex justify-center my-6">
       <ActionSteps steps={steps} stepCounter={stepCounter} />
     </div>
-    <div className="mt-4">
+    <div className="">
       {account ? (
         <>
           {(stepCounter === steps.length || steps.some(step => !step.loading && step.error)) ?

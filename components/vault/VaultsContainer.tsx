@@ -11,7 +11,7 @@ import SmartVault from "@/components/vault/SmartVault";
 import NetworkFilter from "@/components/network/NetworkFilter";
 import { getVeAddresses } from "@/lib/utils/addresses";
 import getZapAssets, { getAvailableZapAssets } from "@/lib/utils/getZapAssets";
-import { ERC20Abi, VaultAbi } from "@/lib/constants";
+import { ERC20Abi, VCXAbi, VaultAbi } from "@/lib/constants";
 import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
 import MainActionButton from "@/components/button/MainActionButton";
 import { claimOPop } from "@/lib/optionToken/interactions";
@@ -20,6 +20,7 @@ import { useAtom } from "jotai";
 import { vaultsAtom } from "@/lib/atoms/vaults";
 import { getVaultNetworthByChain } from "@/lib/getNetworth";
 import VaultsSorting, { VAULT_SORTING_TYPE } from "@/components/vault/VaultsSorting";
+import { llama } from "@/lib/resolver/price/resolver";
 
 interface VaultsContainerProps {
   hiddenVaults: Address[];
@@ -34,7 +35,7 @@ export interface MutateTokenBalanceProps {
   account: Address;
 }
 
-const { oVCX: OVCX } = getVeAddresses();
+const { oVCX: OVCX,VCX } = getVeAddresses();
 
 const NETWORKS_SUPPORTING_ZAP = [1, 137, 10, 42161, 56]
 
@@ -55,6 +56,7 @@ export default function VaultsContainer({ hiddenVaults, displayVaults }: VaultsC
 
   const [gaugeRewards, setGaugeRewards] = useState<GaugeRewards>()
   const { data: oBal } = useBalance({ chainId: 1, address: account, token: OVCX, watch: true })
+  const [vcxPrice, setVcxPrice] = useState<number>(0)
 
   const [searchString, handleSearch] = useState("");
 
@@ -90,6 +92,8 @@ export default function VaultsContainer({ hiddenVaults, displayVaults }: VaultsC
           publicClient
         })
         setGaugeRewards(rewards)
+        const vcxPriceInUsd = await llama({ address: VCX, chainId: 1 })
+        setVcxPrice(vcxPriceInUsd)
       }
       setNetworth(SUPPORTED_NETWORKS.map(chain => getVaultNetworthByChain({ vaults, chainId: chain.id })).reduce((a, b) => a + b, 0));
       setTvl(vaults.reduce((a, b) => a + b.tvl, 0))
@@ -230,14 +234,14 @@ export default function VaultsContainer({ hiddenVaults, displayVaults }: VaultsC
               <div className="w-[120px] md:w-max">
                 <p className="w-max leading-6 text-base text-primaryDark md:text-primary">My oVCX</p>
                 <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
-                  {`${oBal ? NumberFormatter.format(Number(oBal?.value) / 1e18) : "0"}`}
+                  {`$${oBal && vcxPrice ? NumberFormatter.format((Number(oBal?.value) / 1e18) * (vcxPrice / 2)) : "0"}`}
                 </div>
               </div>
 
               <div className="w-[120px] md:w-max">
                 <p className="w-max leading-6 text-base text-primaryDark md:text-primary">Claimable oVCX</p>
                 <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
-                  {`$${gaugeRewards ? NumberFormatter.format(Number(gaugeRewards?.total) / 1e18) : "0"}`}
+                  {`$${gaugeRewards && vcxPrice ? NumberFormatter.format((Number(gaugeRewards?.total) / 1e18) * (vcxPrice / 2)) : "0"}`}
                 </div>
               </div>
             </div>

@@ -27,7 +27,7 @@ export default function ActionSteps({ steps, stepCounter }: ActionStepsProps): J
             {!step.loading && step.success && <img src="/images/icons/checkIconYellow.svg" className={`h-4 w-4`} />}
             {!step.loading && !step.error && !step.success && <div className={`rounded-full h-3 w-3 ${i === stepCounter ? "bg-[#DFFF1C]" : getStepColor("bg", step)}`} />}
           </div>
-          {step.step < steps.length && <p className={`mb-4 ${getStepColor("text", step)}`}>________</p>}
+          {step.step < steps.length && <p key={`${step.label}-connector`} className={`mb-4 ${getStepColor("text", step)}`}>________</p>}
         </>)
       }
     </div>

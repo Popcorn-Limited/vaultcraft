@@ -51,7 +51,7 @@ export default function Hero(): JSX.Element {
             />
           </div>
         </div>
-        <div className="w-full md:w-fit-content mt-12">
+        <div className="w-full md:w-fit-content">
           <p className="uppercase md:hidden text-[#C8C8C8] text-sm mb-2">Platform</p>
           <div className="flex flex-row items-center w-full space-x-10">
             <StatusWithLabel
