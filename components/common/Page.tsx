@@ -38,7 +38,7 @@ export default function Page({
   });
 
   useEffect(() => {
-    void firePageViewEvent({ page: `https://app.vaultcraft.io${asPath}`, user_address: account, });
+    void firePageViewEvent({ page: `https://app.vaultcraft.io${asPath}`, user_address: account });
   }, [])
 
   useEffect(() => {
