@@ -4,7 +4,7 @@ require("./lib/env/envLoader");
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ["cdn.furucombo.app", "cryptologos.cc", "forum.popcorn.network"],
+    domains: ["cdn.furucombo.app", "cryptologos.cc", "forum.vaultcraft.io"],
   },
   env: {
     NEXT_PUBLIC_ALCHEMY_API_KEY: process.env.ALCHEMY_API_KEY,
