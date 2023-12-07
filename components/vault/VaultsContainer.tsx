@@ -35,7 +35,7 @@ export interface MutateTokenBalanceProps {
   account: Address;
 }
 
-const { oVCX: OVCX,VCX } = getVeAddresses();
+const { oVCX: OVCX, VCX } = getVeAddresses();
 
 const NETWORKS_SUPPORTING_ZAP = [1, 137, 10, 42161, 56]
 
@@ -234,14 +234,14 @@ export default function VaultsContainer({ hiddenVaults, displayVaults }: VaultsC
               <div className="w-[120px] md:w-max">
                 <p className="w-max leading-6 text-base text-primaryDark md:text-primary">My oVCX</p>
                 <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
-                  {`$${oBal && vcxPrice ? NumberFormatter.format((Number(oBal?.value) / 1e18) * (vcxPrice / 2)) : "0"}`}
+                  {`$${oBal && vcxPrice ? NumberFormatter.format((Number(oBal?.value) / 1e18) * (vcxPrice * 0.25)) : "0"}`}
                 </div>
               </div>
 
               <div className="w-[120px] md:w-max">
                 <p className="w-max leading-6 text-base text-primaryDark md:text-primary">Claimable oVCX</p>
                 <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
-                  {`$${gaugeRewards && vcxPrice ? NumberFormatter.format((Number(gaugeRewards?.total) / 1e18) * (vcxPrice / 2)) : "0"}`}
+                  {`$${gaugeRewards && vcxPrice ? NumberFormatter.format((Number(gaugeRewards?.total) / 1e18) * (vcxPrice * 0.25)) : "0"}`}
                 </div>
               </div>
             </div>

@@ -29,7 +29,6 @@ interface LpInterfaceInterfaceProps {
 
 export default function LpInterface({ vcxAmountState, wethAmountState }: LpInterfaceInterfaceProps): JSX.Element {
   const { address: account } = useAccount()
-  const publicClient = usePublicClient({ chainId: 1 });
 
   const [vcxAmount, setVcxAmount] = vcxAmountState;
   const [wethAmount, setWethAmount] = wethAmountState;

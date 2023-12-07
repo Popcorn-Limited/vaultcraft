@@ -67,7 +67,7 @@ export default async function calculateAPR({ vaultData, publicClient }: Calculat
     /// @dev the price of oVCX is determined by applying the discount factor to the VCX price.
     /// as of this writing, the discount factor of 50% but is subject to change. Additional dev
     /// work is needed to programmatically apply the discount factor at any given point in time.
-    const oVcxPriceUSD = vcxPriceInUSD * 0.5;
+    const oVcxPriceUSD = vcxPriceInUSD * 0.25;
 
     if (gauge_exists == true && is_killed == false) {
       const relative_inflation = inflation_rate * relative_weight;
