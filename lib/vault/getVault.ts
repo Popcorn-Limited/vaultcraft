@@ -292,7 +292,7 @@ export async function getVaults({ vaults, account = ADDRESS_ZERO, client, yieldO
       let gaugeMaxApy;
       let totalApy = entry.totalApy;
       if (!!gauge) {
-        const gaugeApr = await calculateAPR({ vaultPrice: entry.vault.price, gauge: gauge.address, publicClient: client })
+        const gaugeApr = await calculateAPR({ vaultData: { ...entry, gauge: gauge }, publicClient: client })
         gaugeMinApy = gaugeApr[0];
         gaugeMaxApy = gaugeApr[1];
         totalApy += gaugeApr[1];

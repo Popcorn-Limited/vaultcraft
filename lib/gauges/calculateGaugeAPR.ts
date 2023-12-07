@@ -1,11 +1,10 @@
 import { thisPeriodTimestamp } from "@/lib/gauges/utils";
-import { Address, PublicClient, formatEther } from "viem";
+import { Address, PublicClient, formatEther, formatUnits } from "viem";
 import { getVeAddresses } from "@/lib/utils/addresses";
 import { llama } from "@/lib/resolver/price/resolver";
 import { GaugeAbi, GaugeControllerAbi } from "@/lib/constants";
 
 const { GaugeController: GAUGE_CONTROLLER } = getVeAddresses()
-
 
 async function getGaugeData(gauge: Address, publicClient: PublicClient): Promise<[boolean, number, number, number, number]> {
   const gaugeContract = {
@@ -44,41 +43,40 @@ async function getGaugeData(gauge: Address, publicClient: PublicClient): Promise
 }
 
 interface CalculateAPRProps {
-  vaultPrice: number;
-  gauge: Address;
+  vaultData: any
   publicClient: PublicClient;
 }
 
-export default async function calculateAPR({ vaultPrice, gauge, publicClient }: CalculateAPRProps): Promise<number[]> {
+export default async function calculateAPR({ vaultData, publicClient }: CalculateAPRProps): Promise<number[]> {
   /// fetch the price of token0, token1 and LIT in USD
-  const popPriceUSD = await llama({ address: "0x6F0fecBC276de8fC69257065fE47C5a03d986394", chainId: 10 })
+  const vcxPriceInUSD = await llama({ address: "0xcE246eEa10988C495B4A90a905Ee9237a0f91543", chainId: 1 })
 
   /// calculate the lowerAPR and upperAPR
   let lowerAPR = 0;
   let upperAPR = 0;
 
-  if (gauge) {
-    const [is_killed, inflation_rate, relative_weight, tokenless_production, working_supply] = await getGaugeData(gauge, publicClient);
+  if (vaultData.gauge) {
+    const [is_killed, inflation_rate, relative_weight, tokenless_production, working_supply] = await getGaugeData(vaultData.gauge.address, publicClient);
     const gauge_exists = await publicClient.readContract({
       address: GAUGE_CONTROLLER,
       abi: GaugeControllerAbi,
       functionName: 'gauge_exists',
-      args: [gauge]
+      args: [vaultData.gauge.address]
     })
 
     /// @dev the price of oVCX is determined by applying the discount factor to the VCX price.
     /// as of this writing, the discount factor of 50% but is subject to change. Additional dev
     /// work is needed to programmatically apply the discount factor at any given point in time.
-    const oVcxPriceUSD = popPriceUSD * 0.5;
+    const oVcxPriceUSD = vcxPriceInUSD * 0.5;
 
     if (gauge_exists == true && is_killed == false) {
       const relative_inflation = inflation_rate * relative_weight;
       if (relative_inflation > 0) {
         const annualRewardUSD = relative_inflation * 86400 * 365 * oVcxPriceUSD;
-        const effectiveSupply = working_supply > 0 ? working_supply : 1;
-        const workingSupplyUSD = effectiveSupply * vaultPrice;
+        const effectiveSupply = vaultData.totalSupply > 0 ? (vaultData.totalSupply / (10 ** vaultData.vault.decimals)) : 1;
+        const workingSupplyUSD = effectiveSupply * vaultData.vault.price;
 
-        lowerAPR = (((annualRewardUSD * tokenless_production) / 100) / workingSupplyUSD) * 100;
+        lowerAPR = ((annualRewardUSD / workingSupplyUSD) * 100) / 5;
         upperAPR = (annualRewardUSD / workingSupplyUSD) * 100;
       }
     }

@@ -31,7 +31,7 @@ export default function Gauge({ vaultData, index, votes, handleVotes, canVote }:
 
   useEffect(() => {
     if (vaultData?.vault.price && gaugeApr.length === 0) {
-      calculateAPR({ vaultPrice: vaultData.vault.price, gauge: vaultData.gauge?.address as Address, publicClient }).then(res => setGaugeApr(res))
+      calculateAPR({ vaultData, publicClient }).then(res => setGaugeApr(res))
     }
   }, [vaultData, gaugeApr])
 
@@ -88,19 +88,19 @@ export default function Gauge({ vaultData, index, votes, handleVotes, canVote }:
             <div className="w-full mt-6 xs:mt-0">
               <p className="font-normal text-primary xs:text-[14px]">Current Weight</p>
               <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
-                {(Number(weights?.[0]) / 1e16).toFixed() || 0} %
+                {(Number(weights?.[0]) / 1e16).toFixed(2) || 0} %
               </Title>
             </div>
             <div className="w-full mt-6 xs:mt-0">
               <p className="font-normal text-primary xs:text-[14px]">Upcoming Weight</p>
               <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
-                {(Number(weights?.[1]) / 1e16).toFixed() || 0} %
+                {(Number(weights?.[1]) / 1e16).toFixed(2) || 0} %
               </Title>
             </div>
             <div className="w-full mt-6 xs:mt-0">
               <p className="font-normal text-primary xs:text-[14px]">My Votes</p>
               <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
-                {(Number(weights?.[2].power) / 100).toFixed()} %
+                {(Number(weights?.[2].power) / 100).toFixed(2)} %
               </Title>
             </div>
           </div>
