@@ -4,7 +4,7 @@ import axios from "axios"
 import { VaultAbi } from "@/lib/constants/abi/Vault"
 import { resolvePrice } from "@/lib/resolver/price/price"
 import { Token, VaultData } from "@/lib/types"
-import { ADDRESS_ZERO, ERC20Abi, VaultRegistryByChain, VaultRegistyAbi } from "@/lib/constants"
+import { ADDRESS_ZERO, ERC20Abi, VaultRegistryByChain, VaultRegistryAbi } from "@/lib/constants"
 import { RPC_URLS, networkMap } from "@/lib/utils/connectors";
 import getVaultAddresses from "@/lib/vault/getVaultAddresses"
 import getAssetIcon from "@/lib/vault/getAssetIcon"
@@ -72,7 +72,7 @@ function prepareVaultContract(vault: Address, account: Address): ReadContractPar
 function prepareRegistryContract(address: Address, vault: Address): ReadContractParameters {
   const vaultRegisty = {
     address,
-    abi: VaultRegistyAbi
+    abi: VaultRegistryAbi
   }
 
   return {
@@ -221,11 +221,6 @@ export async function getVaults({ vaults, account = ADDRESS_ZERO, client, yieldO
       }
     }
   })
-
-  console.log(`https://coins.llama.fi/prices/current/${String(metadata.map(
-    // @ts-ignore -- @dev ts still thinks entry.asset is just an `Address`
-    entry => `${networkMap[client.chain.id].toLowerCase()}:${entry.asset.address}`
-  ))}`)
 
   // Add prices
   const { data: priceData } = await axios.get(`https://coins.llama.fi/prices/current/${String(metadata.map(

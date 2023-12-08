@@ -276,7 +276,6 @@ function getAaveV2Metadata(adapter: Token, asset: Token): OptionalMetadata {
     token: { name: asset.symbol, description: "None available" },
     strategy: { name: "Aave Lending", description: addGenericStrategyDescription("lending", "Aave") },
     resolver: "aaveV3",
-
   }
 }
 
@@ -286,7 +285,6 @@ function getAaveV3Metadata(adapter: Token, asset: Token): OptionalMetadata {
     token: { name: asset.symbol, description: "None available" },
     strategy: { name: "Aave Lending", description: addGenericStrategyDescription("lending", "Aave") },
     resolver: "aaveV3",
-
   }
 }
 
@@ -296,7 +294,6 @@ function getAuraMetadata(adapter: Token, asset: Token): OptionalMetadata {
     token: { name: asset.symbol, description: "None available" },
     strategy: { name: "Aura Compounding", description: addGenericStrategyDescription("lpCompounding", "Aura") },
     resolver: "aura",
-
   }
 }
 
@@ -315,7 +312,6 @@ function getCompoundV3Metadata(adapter: Token, asset: Token): OptionalMetadata {
     token: { name: asset.symbol, description: "None available" },
     strategy: { name: "Compound Lending", description: addGenericStrategyDescription("lending", "Compound") },
     resolver: "compoundV3",
-
   }
 }
 
@@ -325,7 +321,6 @@ function getFluxMetadata(adapter: Token, asset: Token): OptionalMetadata {
     token: { name: asset.symbol, description: "None available" },
     strategy: StrategyMetadata.fluxLending,
     resolver: "flux",
-
   }
 }
 
@@ -335,7 +330,6 @@ function getBeefyMetadata(adapter: Token, asset: Token): OptionalMetadata {
     token: { name: asset.symbol, description: "None available" },
     strategy: { name: "Beefy Vault", description: addGenericStrategyDescription("automatedAssetStrategy", "Beefy") },
     resolver: "beefy",
-
   }
 }
 
@@ -345,7 +339,6 @@ function getYearnMetadata(adapter: Token, asset: Token): OptionalMetadata {
     token: { name: asset.symbol, description: "None available" },
     strategy: { name: "Yearn Vault", description: addGenericStrategyDescription("automatedAssetStrategy", "Yearn") },
     resolver: "yearn",
-
   }
 }
 
