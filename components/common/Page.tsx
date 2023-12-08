@@ -24,7 +24,7 @@ export default function Page({
 }: {
   children: JSX.Element;
 }): JSX.Element {
-  const { asPath } = useRouter()
+  const { asPath, query } = useRouter()
   const { address: account } = useAccount()
   const [yieldOptions, setYieldOptions] = useAtom(yieldOptionsAtom)
   const [masaSdk, setMasaSdk] = useAtom(masaAtom)
@@ -38,8 +38,8 @@ export default function Page({
   });
 
   useEffect(() => {
-    void firePageViewEvent({ page: `https://app.vaultcraft.io${asPath}`, user_address: account });
-  }, [])
+    void firePageViewEvent({ page: `https://app.vaultcraft.io${asPath}`, user_address: account, additionalEventData: { referral: query.ref } });
+  }, [asPath])
 
   useEffect(() => {
     if (!yieldOptions) {
