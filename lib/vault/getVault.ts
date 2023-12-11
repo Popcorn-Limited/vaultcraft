@@ -209,14 +209,13 @@ export async function getVaults({ vaults, account = ADDRESS_ZERO, client, yieldO
     contracts: vaults.map(vault => prepareRegistryContract(VaultRegistryByChain[client.chain.id], vault)).flat(),
     allowFailure: false
   }) as unknown as string[][]
-  const vaultNames = await Promise.all(registryMetadata.map(async (data) => getVaultName({ address: getAddress(data[0]), cid: data[3] })))
+
   metadata = metadata.map((entry, i) => {
     return {
       ...entry,
       metadata: {
         creator: getAddress(registryMetadata[i][2]),
         cid: registryMetadata[i][3] as string,
-        vaultName: vaultNames[i],
         optionalMetadata: getOptionalMetadata({ vaultAddress: entry.address, asset: entry.asset as Token, adapter: entry.adapter as Token })
       }
     }

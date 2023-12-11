@@ -1,4 +1,3 @@
-// @ts-ignore
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { useState } from "react";
 import { Address, useAccount } from "wagmi";
@@ -12,7 +11,6 @@ import VaultStats from "@/components/vault/VaultStats";
 import { Square2StackIcon } from "@heroicons/react/24/outline";
 import { showSuccessToast } from '@/lib/toasts';
 import { MutateTokenBalanceProps } from '@/components/vault/VaultsContainer';
-
 
 function getTokenOptions(vaultData: VaultData, zapAssets?: Token[]): Token[] {
   const tokenOptions = [vaultData.vault, vaultData.asset]
