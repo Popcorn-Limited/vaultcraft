@@ -5,7 +5,7 @@ import TokenIcon from "@/components/common/TokenIcon";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import { BalancerOracleAbi, ZERO } from "@/lib/constants";
 import { getVeAddresses } from "@/lib/utils/addresses";
-import { formatAndRoundBigNumber, safeRound } from "@/lib/utils/formatBigNumber";
+import { formatNumber, safeRound } from "@/lib/utils/formatBigNumber";
 import { validateInput } from "@/lib/utils/helpers";
 import { Token } from "@/lib/types";
 import { llama } from "@/lib/resolver/price/resolver";
@@ -40,7 +40,7 @@ export default function ExerciseOptionTokenInterface({ amountState, maxPaymentAm
   const { data: vcx } = useToken({ chainId: 1, address: VCX });
   const { data: weth } = useToken({ chainId: 1, address: WETH });
 
-  const [oVcxPrice, setOVcxPrice] = useState<bigint>(ZERO); // oVCX price in ETH (needs to be multiplied with the eth price to arrive at USD prices)
+  const [oVcxPrice, setOVcxPrice] = useState<number>(0);
   const [oVcxDiscount, setOVcxDiscount] = useState<number>(0);
   const [vcxPrice, setVCXPrice] = useState<number>(0);
   const [wethPrice, setWethPrice] = useState<number>(0);
@@ -48,22 +48,21 @@ export default function ExerciseOptionTokenInterface({ amountState, maxPaymentAm
   const [initialLoad, setInitialLoad] = useState<boolean>(false)
 
   useEffect(() => {
-    function setUpPrices() {
+    async function setUpPrices() {
       setInitialLoad(true)
 
-      llama({ address: VCX, chainId: 1 }).then(res => setVCXPrice(res))
-      llama({ address: WETH, chainId: 1 }).then(res => setWethPrice(res))
-
-      publicClient.readContract({
-        address: OVCX_ORACLE,
-        abi: BalancerOracleAbi,
-        functionName: 'getPrice',
-      }).then(res => setOVcxPrice(res))
-      publicClient.readContract({
+      const vcxInUsd = await llama({ address: VCX, chainId: 1 })
+      const wethInUsd = await llama({ address: WETH, chainId: 1 })
+      const multiplier = await publicClient.readContract({
         address: OVCX_ORACLE,
         abi: BalancerOracleAbi,
         functionName: 'multiplier',
-      }).then(res => setOVcxDiscount(res))
+      })
+
+      setWethPrice(wethInUsd)
+      setVCXPrice(vcxInUsd)
+      setOVcxPrice(vcxInUsd * (10_000 - multiplier) / 10_000)
+      setOVcxDiscount(multiplier)
     }
     if (!initialLoad) setUpPrices()
   }, [initialLoad])
@@ -77,13 +76,13 @@ export default function ExerciseOptionTokenInterface({ amountState, maxPaymentAm
 
   function handleMaxOPop() {
     const maxOPop = formatEther(safeRound(oVcxBal?.value || ZERO, 18));
-
+    
     setMaxPaymentAmount(getMaxPaymentAmount(Number(maxOPop)));
     setAmount(maxOPop)
   };
 
   function getMaxPaymentAmount(oVcxAmount: number) {
-    const oVcxValue = oVcxAmount * ((Number(oVcxPrice) / 1e18) * wethPrice);
+    const oVcxValue = oVcxAmount * oVcxPrice;
 
     return String((oVcxValue / wethPrice) * (1 + SLIPPAGE));
   }
@@ -91,7 +90,7 @@ export default function ExerciseOptionTokenInterface({ amountState, maxPaymentAm
   function getOPopAmount(paymentAmount: number) {
     const ethValue = paymentAmount * wethPrice;
 
-    return String(ethValue / (((Number(oVcxPrice) / 1e18) * wethPrice) * (1 - SLIPPAGE)));
+    return String((ethValue / oVcxPrice) * (1 - SLIPPAGE));
   }
 
   const handleOPopInput: FormEventHandler<HTMLInputElement> = ({ currentTarget: { value } }) => {
@@ -110,9 +109,10 @@ export default function ExerciseOptionTokenInterface({ amountState, maxPaymentAm
     <div className="mb-8 text-start">
       <h2 className="text-start text-5xl">Exercise oVCX</h2>
       <p className="text-primary font-semibold">
-        Strike Price: $ {formatAndRoundBigNumber(useEthToUsd(oVcxPrice) || ZERO, 18)}
-        | VCX Price: $ {vcxPrice}
-        | Discount: {(Number(oVcxDiscount) / 100).toFixed(2)} %</p>
+        Strike Price: $ {formatNumber(vcxPrice - oVcxPrice)}
+        {" "}| oVCX Price: $ {oVcxPrice}
+        {" "}| VCX Price: $ {vcxPrice}
+        {" "}| Discount: {((10_000 - oVcxDiscount) / 100).toFixed(2)} %</p>
       <div className="mt-8">
         <InputTokenWithError
           captionText={"Amount oVCX"}
