@@ -1,15 +1,12 @@
 import Title from "@/components/common/Title";
 import { LockVaultData } from "@/lib/types";
 import { NumberFormatter, formatAndRoundNumber } from "@/lib/utils/formatBigNumber";
-import { useAccount } from "wagmi";
 
 interface VaultStatsProps {
   vaultData: LockVaultData;
 }
 
 export default function VaultStats({ vaultData }: VaultStatsProps): JSX.Element {
-  const { address: account } = useAccount()
-
   return (
     <>
       <div className="w-full flex justify-between gap-8 md:gap-4">
@@ -26,9 +23,7 @@ export default function VaultStats({ vaultData }: VaultStatsProps): JSX.Element 
           <p className="text-primary font-normal md:text-[14px]">Your Deposit</p>
           <div className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
             <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
-              {account ? '$ ' +
-                formatAndRoundNumber(vaultData.vault.balance * vaultData.vault.price, vaultData.vault.decimals)
-                : "-"}
+              {`${formatAndRoundNumber(vaultData.vault.balance * vaultData.vault.price, vaultData.vault.decimals)}`}
             </Title>
           </div>
         </div>

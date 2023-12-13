@@ -9,7 +9,7 @@ export default function Claim({ vaultData }: { vaultData: LockVaultData }): JSX.
         onSelectToken={option => { }}
         onMaxClick={() => { }}
         chainId={vaultData.chainId}
-        value={vaultData.rewardBalance / (10 ** vaultData.reward.decimals)}
+        value={vaultData.rewardBalance > 0 ? vaultData.rewardBalance / (10 ** vaultData.reward.decimals) : 0}
         onChange={() => { }}
         selectedToken={vaultData.reward}
         errorMessage={""}
