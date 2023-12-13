@@ -1,5 +1,5 @@
 import StatusWithLabel from "@/components/common/StatusWithLabel";
-import { vaultsAtom } from "@/lib/atoms/vaults";
+import { lockvaultsAtom, vaultsAtom } from "@/lib/atoms/vaults";
 import { Networth, getTotalNetworth, getVaultNetworthByChain } from "@/lib/getNetworth";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
@@ -10,6 +10,8 @@ import { Address, useAccount } from "wagmi";
 export default function Hero(): JSX.Element {
   const { address: account } = useAccount();
   const [vaults] = useAtom(vaultsAtom)
+  const [lockVaults] = useAtom(lockvaultsAtom)
+
   const [networth, setNetworth] = useState<Networth>({ wallet: 0, stake: 0, vault: 0, total: 0 });
   const [tvl, setTvl] = useState<string>("0");
   const [loading, setLoading] = useState<boolean>(true);
@@ -17,15 +19,18 @@ export default function Hero(): JSX.Element {
   useEffect(() => {
     async function fetchNetworth() {
       const vaultNetworth = SUPPORTED_NETWORKS.map(chain => getVaultNetworthByChain({ vaults, chainId: chain.id })).reduce((a, b) => a + b, 0)
+      const lockVaultNetworth = lockVaults.reduce((a, b) => a + (b.vault.balance * b.vault.price / (10 ** b.vault.decimals)), 0)
       const totalNetworth = await getTotalNetworth({ account: account as Address })
-      setNetworth({ ...totalNetworth.total, vault: vaultNetworth, total: totalNetworth.total.total + vaultNetworth });
+      setNetworth({ ...totalNetworth.total, vault: vaultNetworth + lockVaultNetworth, total: totalNetworth.total.total + vaultNetworth + lockVaultNetworth });
       setLoading(false);
     }
-    if (account && vaults.length > 0) fetchNetworth()
+    if (account && vaults.length > 0 && lockVaults.length > 0) fetchNetworth()
   }, [account]);
 
   useEffect(() => {
-    setTvl(NumberFormatter.format((vaults.reduce((a, b) => a + b.tvl, 0))))
+    const vaultTvl = vaults.reduce((a, b) => a + b.tvl, 0)
+    const lockVaultTvl = lockVaults.reduce((a, b) => a + b.tvl, 0)
+    setTvl(NumberFormatter.format(vaultTvl + lockVaultTvl))
   }, [vaults])
 
 
