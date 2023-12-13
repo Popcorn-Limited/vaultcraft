@@ -93,7 +93,7 @@ async function getVaults({ account, publicClient }: { account: Address, publicCl
     vaultData.strategyShares = res1[i + 1]
     vaultData.rewardAddress = res1[i + 2]
 
-    vaultData.reward = assets[res1[i + 2]] as Token
+    vaultData.reward = { ...assets[res1[i + 2]] as Token, balance: 0 }
     vaultData.rewardIndex = Number(res1[i + 3]);
 
     const apy = (Number(res1[i + 4][3]) * 31557600) / 1e16 // (borrowRate per second * seconds per year) / 1e18 * 100
