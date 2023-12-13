@@ -58,10 +58,17 @@ export default function ExerciseOptionTokenInterface({ amountState, maxPaymentAm
         abi: BalancerOracleAbi,
         functionName: 'multiplier',
       })
+      const minPrice = await publicClient.readContract({
+        address: OVCX_ORACLE,
+        abi: BalancerOracleAbi,
+        functionName: 'minPrice',
+      })
+      const minPriceInUsd = ((Number(minPrice) * 10_000 / multiplier) / 1e18) * wethInUsd
+      const oVcxInUsd = vcxInUsd * (10_000 - multiplier) / 10_000
 
       setWethPrice(wethInUsd)
       setVCXPrice(vcxInUsd)
-      setOVcxPrice(vcxInUsd * (10_000 - multiplier) / 10_000)
+      setOVcxPrice(oVcxInUsd > minPriceInUsd ? oVcxInUsd : minPriceInUsd)
       setOVcxDiscount(multiplier)
     }
     if (!initialLoad) setUpPrices()
@@ -76,7 +83,7 @@ export default function ExerciseOptionTokenInterface({ amountState, maxPaymentAm
 
   function handleMaxOPop() {
     const maxOPop = formatEther(safeRound(oVcxBal?.value || ZERO, 18));
-    
+
     setMaxPaymentAmount(getMaxPaymentAmount(Number(maxOPop)));
     setAmount(maxOPop)
   };
