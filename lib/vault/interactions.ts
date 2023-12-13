@@ -28,6 +28,7 @@ interface VaultSimulateProps {
   functionName: string;
   publicClient: PublicClient;
 }
+
 interface VaultRouterSimulateProps extends VaultSimulateProps {
   vault: Address;
   gauge: Address;
@@ -104,10 +105,7 @@ export async function vaultRedeem({ chainId, vaultData, account, amount, clients
   });
 
   if (maxRedeem < BigInt(Number(amount).toLocaleString("fullwide", { useGrouping: false }))) {
-    console.log("MAX REDEEM")
-    console.log(amount)
     amount = Number(maxRedeem)
-    console.log(amount)
   }
 
   const success = await handleCallResult({

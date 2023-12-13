@@ -71,6 +71,24 @@ export type VaultData = {
   totalApy: number;
 }
 
+type LockVaultLock = {
+  unlockTime: number;
+  rewardIndex: number;
+  amount: number;
+  rewardShares: number;
+  daysToUnlock: number;
+}
+
+export type LockVaultData = {
+  strategyShares: bigint;
+  rewardAddress: Address;
+  reward: Token;
+  rewardBalance: number;
+  rewardIndex: number;
+  rewardApy: number;
+  lock: LockVaultLock;
+} & VaultData
+
 export type VaultMetadata = {
   creator: Address;
   cid: string;
@@ -113,8 +131,7 @@ export interface Clients {
   walletClient: WalletClient;
 }
 
-
-export enum ActionType {
+export enum SmartVaultActionType {
   Deposit,
   Withdrawal,
   Stake,
@@ -125,4 +142,11 @@ export enum ActionType {
   ZapWithdrawal,
   ZapDepositAndStake,
   ZapUnstakeAndWithdraw
+}
+
+export enum LockVaultActionType {
+  Deposit,
+  IncreaseAmount,
+  Withdrawal,
+  Claim
 }

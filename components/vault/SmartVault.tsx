@@ -69,9 +69,9 @@ export default function SmartVault({
                   <p className="font-bold text-primary">
                     {asset.address.slice(0, 6)}...{asset.address.slice(-4)}
                   </p>
-                  <div className='w-6 h-6 group/vaultAddress'>
+                  <div className='w-6 h-6 group/assetAddress'>
                     <CopyToClipboard text={asset.address} onCopy={()=>showSuccessToast("Asset address copied!")}>
-                      <Square2StackIcon className="text-white group-hover/vaultAddress:text-[#DFFF1C]" />
+                      <Square2StackIcon className="text-white group-hover/assetAddress:text-[#DFFF1C]" />
                     </CopyToClipboard>
                   </div>
                 </div>

@@ -11,6 +11,7 @@ import { MagnifyingGlassIcon } from "@heroicons/react/24/outline"
 import VaultsSorting, { VAULT_SORTING_TYPE } from "@/components/vault/VaultsSorting"
 import { useEffect, useState } from "react"
 import { NumberFormatter } from "@/lib/utils/formatBigNumber"
+import FundVault from "@/components/vault/lockVault/FundVault"
 
 
 export default function Index(): JSX.Element {
@@ -18,12 +19,10 @@ export default function Index(): JSX.Element {
   const [vaults, setVaults] = useAtom(lockvaultsAtom)
 
   const [tvl, setTvl] = useState<number>(0);
-  const [networth, setNetworth] = useState<number>(0);
 
   useEffect(() => {
     if (vaults.length > 0) {
       setTvl(vaults.reduce((a, b) => a + b.tvl, 0))
-      setNetworth(vaults.reduce((a, b) => a + (b.vault.balance * b.vault.price / (10 ** b.vault.decimals)), 0));
     }
   }, [vaults])
 
@@ -65,10 +64,10 @@ export default function Index(): JSX.Element {
 
         <div className="w-full md:w-max">
           <h1 className="text-5xl font-normal m-0 mb-4 md:mb-2 leading-0 text-primary md:text-3xl leading-none">
-            Lock Vaults
+            Distribute Rewards
           </h1>
           <p className="text-primaryDark md:text-primary md:opacity-80">
-            Lock your assets in yield strategies and earn additional rewards on top!
+            Distribute rewards to lock vaults.
           </p>
         </div>
 
@@ -78,13 +77,6 @@ export default function Index(): JSX.Element {
               <p className="leading-6 text-base text-primaryDark md:text-primary">TVL</p>
               <div className="text-3xl font-bold whitespace-nowrap text-primary">
                 {`$${NumberFormatter.format(tvl)}`}
-              </div>
-            </div>
-
-            <div className="w-[120px] md:w-max">
-              <p className="leading-6 text-base text-primaryDark md:text-primary">Deposits</p>
-              <div className="text-3xl font-bold whitespace-nowrap text-primary">
-                {`$${NumberFormatter.format(networth)}`}
               </div>
             </div>
           </div>
@@ -110,7 +102,7 @@ export default function Index(): JSX.Element {
 
       <section className="grid grid-cols-1 md:grid-cols-3 gap-4 px-4 md:px-8">
         {vaults.length > 0 ?
-          vaults.map(vault => <LockVault
+          vaults.map(vault => <FundVault
             key={vault.address}
             vaultData={vault}
             mutateTokenBalance={mutateTokenBalance}
