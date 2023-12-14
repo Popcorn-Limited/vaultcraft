@@ -68,7 +68,7 @@ export default function StakingInterface({ setShowLockModal, setShowMangementMod
           </span>
         </div>
         <div className="lg:flex lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-8 mt-6 lg:max-h-12">
-          {Number(veBal?.value) === 0 ?
+        {Number(lockedBal?.amount) === 0 ?
             <MainActionButton label="Lock VCX-LP" handleClick={() => setShowLockModal(true)} /> :
             <MainActionButton label="Manage Stake" handleClick={() => setShowMangementModal(true)} />
           }
