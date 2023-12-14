@@ -11,7 +11,7 @@ import Footer from "@/components/common/Footer";
 import { useMasaAnalyticsReact } from "@masa-finance/analytics-react";
 import { useRouter } from "next/router";
 import getLockVaultsByChain from "@/lib/vault/lockVault/getVaults";
-import { zeroAddress } from "viem";
+import { Address, zeroAddress } from "viem";
 import { arbitrum } from "viem/chains";
 
 async function setUpYieldOptions() {
@@ -29,6 +29,7 @@ export default function Page({
 }): JSX.Element {
   const { asPath, query } = useRouter()
   const { address: account } = useAccount()
+
   const [yieldOptions, setYieldOptions] = useAtom(yieldOptionsAtom)
   const [masaSdk, setMasaSdk] = useAtom(masaAtom)
 
@@ -60,15 +61,15 @@ export default function Page({
     async function getVaults() {
       // get vaults
       const fetchedVaults = (await Promise.all(
-        SUPPORTED_NETWORKS.map(async (chain) => getVaultsByChain({ chain, account, yieldOptions: yieldOptions as YieldOptions }))
+        SUPPORTED_NETWORKS.map(async (chain) => getVaultsByChain({ chain, account: account || zeroAddress, yieldOptions: yieldOptions as YieldOptions }))
       )).flat();
       setVaults(fetchedVaults)
 
       const fetchedLockVaults = await getLockVaultsByChain({ chain: arbitrum, account: account || zeroAddress })
       setLockVaults(fetchedLockVaults)
     }
-    if (account && yieldOptions && vaults.length === 0) getVaults()
-  }, [account, yieldOptions])
+    if (yieldOptions) getVaults()
+  }, [yieldOptions, account])
 
   return (
     <>

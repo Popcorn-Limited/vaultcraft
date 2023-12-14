@@ -64,8 +64,6 @@ export default function VaultsContainer({ hiddenVaults, displayVaults }: VaultsC
 
   useEffect(() => {
     async function getVaults() {
-      setInitalLoad(true)
-      if (account) setAccountLoad(true)
       // get zap assets
       const newZapAssets: { [key: number]: Token[] } = {}
       SUPPORTED_NETWORKS.forEach(async (chain) => newZapAssets[chain.id] = await getZapAssets({ chain, account }))
@@ -98,9 +96,8 @@ export default function VaultsContainer({ hiddenVaults, displayVaults }: VaultsC
       setNetworth(SUPPORTED_NETWORKS.map(chain => getVaultNetworthByChain({ vaults, chainId: chain.id })).reduce((a, b) => a + b, 0));
       setTvl(vaults.reduce((a, b) => a + b.tvl, 0))
     }
-    if (!account && !initalLoad && vaults.length > 0) getVaults();
-    if (account && !accountLoad && vaults.length > 0) getVaults()
-  }, [account, initalLoad, accountLoad, vaults])
+    getVaults()
+  }, [account])
 
 
   async function mutateTokenBalance({ inputToken, outputToken, vault, chainId, account }: MutateTokenBalanceProps) {

@@ -30,11 +30,8 @@ export default function OptionTokenInterface({ gauges, setShowOptionTokenModal }
   const { data: oBal } = useBalance({ chainId: 1, address: account, token: OVCX, watch: true })
   const { data: wethBal } = useBalance({ chainId: 1, address: account, token: WETH, watch: true })
 
-  const [initalLoad, setInitalLoad] = useState<boolean>(false);
-
   useEffect(() => {
     async function getValues() {
-      setInitalLoad(true)
       const rewards = await getGaugeRewards({
         gauges: gauges.map(gauge => gauge.address) as Address[],
         account: account as Address,
@@ -42,7 +39,7 @@ export default function OptionTokenInterface({ gauges, setShowOptionTokenModal }
       })
       setGaugeRewards(rewards)
     }
-    if (account && gauges.length > 0 && !initalLoad) getValues()
+    if (account && gauges.length > 0) getValues()
   }, [gauges, account])
 
   return (
