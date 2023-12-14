@@ -61,7 +61,7 @@ function VePopContainer() {
       }
     }
     if (!account && !initalLoad && vaults.length > 0) initialSetup();
-    if (account && !accountLoad && vaults.length > 0) initialSetup()
+    if (account && !accountLoad && !!veBal && vaults.length > 0) initialSetup()
   }, [account, initalLoad, accountLoad, vaults])
 
   function handleVotes(val: number, index: Address) {
