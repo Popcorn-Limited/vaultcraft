@@ -1,5 +1,5 @@
 <p>
-  <h1 align="center">VaultCraft by Popcorn</h1>
+  <h1 align="center">VaultCraft</h1>
   <p align="center">
     <img alt="Loading..." src="./public/images/vc-intro.gif">
   </p>
