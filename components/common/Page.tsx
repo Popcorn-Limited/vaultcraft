@@ -32,7 +32,7 @@ export default function Page({
   const [yieldOptions, setYieldOptions] = useAtom(yieldOptionsAtom)
   const [masaSdk, setMasaSdk] = useAtom(masaAtom)
 
-  const [, setVaults] = useAtom(vaultsAtom)
+  const [vaults, setVaults] = useAtom(vaultsAtom)
   const [, setLockVaults] = useAtom(lockvaultsAtom)
 
   const { fireEvent, fireLoginEvent, firePageViewEvent, fireConnectWalletEvent } = useMasaAnalyticsReact({
@@ -67,7 +67,7 @@ export default function Page({
       const fetchedLockVaults = await getLockVaultsByChain({ chain: arbitrum, account: account || zeroAddress })
       setLockVaults(fetchedLockVaults)
     }
-    if (yieldOptions) getVaults()
+    if (account && yieldOptions && vaults.length === 0) getVaults()
   }, [account, yieldOptions])
 
   return (

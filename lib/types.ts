@@ -48,7 +48,6 @@ export type VaultData = {
   address: Address;
   vault: Token;
   asset: Token;
-  adapter: Token;
   gauge?: Token;
   totalAssets: number;
   totalSupply: number;
