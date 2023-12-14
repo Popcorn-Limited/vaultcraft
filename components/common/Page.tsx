@@ -1,6 +1,6 @@
 import DesktopMenu from "@/components/navbar/DesktopMenu";
 import { masaAtom, yieldOptionsAtom } from "@/lib/atoms/sdk";
-import { vaultsAtom } from "@/lib/atoms/vaults";
+import { lockvaultsAtom, vaultsAtom } from "@/lib/atoms/vaults";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { getVaultsByChain } from "@/lib/vault/getVault";
 import { useAtom } from "jotai";
@@ -10,6 +10,9 @@ import { useAccount } from "wagmi";
 import Footer from "@/components/common/Footer";
 import { useMasaAnalyticsReact } from "@masa-finance/analytics-react";
 import { useRouter } from "next/router";
+import getLockVaultsByChain from "@/lib/vault/lockVault/getVaults";
+import { zeroAddress } from "viem";
+import { arbitrum } from "viem/chains";
 
 async function setUpYieldOptions() {
   const ttl = 360_000;
@@ -30,6 +33,7 @@ export default function Page({
   const [masaSdk, setMasaSdk] = useAtom(masaAtom)
 
   const [, setVaults] = useAtom(vaultsAtom)
+  const [, setLockVaults] = useAtom(lockvaultsAtom)
 
   const { fireEvent, fireLoginEvent, firePageViewEvent, fireConnectWalletEvent } = useMasaAnalyticsReact({
     clientApp: "VaultCraft",
@@ -59,6 +63,9 @@ export default function Page({
         SUPPORTED_NETWORKS.map(async (chain) => getVaultsByChain({ chain, account, yieldOptions: yieldOptions as YieldOptions }))
       )).flat();
       setVaults(fetchedVaults)
+
+      const fetchedLockVaults = await getLockVaultsByChain({ chain: arbitrum, account: account || zeroAddress })
+      setLockVaults(fetchedLockVaults)
     }
     if (yieldOptions) getVaults()
   }, [account, yieldOptions])

@@ -12,3 +12,5 @@ export * from "./VaultRegistry";
 export * from "./VaultRouter";
 export * from "./VCX";
 export * from "./VotingEscrow";
+export * from "./StakingVault";
+export * from "./FraxLend";

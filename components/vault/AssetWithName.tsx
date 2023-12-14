@@ -16,7 +16,8 @@ const protocolNameToLlamaProtocol: { [key: string]: string } = {
   "Stargate": "stargate",
   "Yearn": "yearn-finance",
   "Pirex": "pirex",
-  "Sommelier": "sommelier"
+  "Sommelier": "sommelier",
+  "Frax": "frax"
 }
 
 export default function AssetWithName({ vault }: { vault: VaultData }) {
