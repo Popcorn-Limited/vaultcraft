@@ -8,6 +8,7 @@ import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import { claimOPop } from "@/lib/optionToken/interactions";
 import { WalletClient } from "viem";
 import { Token } from "@/lib/types";
+import { llama } from "@/lib/resolver/price/resolver";
 
 const {
   oVCX: OVCX,
@@ -25,10 +26,19 @@ export default function OptionTokenInterface({ gauges, setShowOptionTokenModal }
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient()
 
-  const [gaugeRewards, setGaugeRewards] = useState<GaugeRewards>()
   const { data: vcxBal } = useBalance({ chainId: 1, address: account, token: VCX, watch: true })
   const { data: oBal } = useBalance({ chainId: 1, address: account, token: OVCX, watch: true })
   const { data: wethBal } = useBalance({ chainId: 1, address: account, token: WETH, watch: true })
+
+  const [vcxPrice, setVcxPrice] = useState<number>(0)
+  const [wethPrice, setWethPrice] = useState<number>(0)
+
+  useEffect(() => {
+    llama({ address: VCX, chainId: 1 }).then((res: number) => setVcxPrice(res))
+    llama({ address: WETH, chainId: 1 }).then((res: number) => setWethPrice(res))
+  }, [])
+
+  const [gaugeRewards, setGaugeRewards] = useState<GaugeRewards>()
 
   useEffect(() => {
     async function getValues() {
@@ -47,19 +57,19 @@ export default function OptionTokenInterface({ gauges, setShowOptionTokenModal }
       <h3 className="text-2xl pb-6 border-b border-[#353945]">oVCX</h3>
       <span className="flex flex-row items-center justify-between mt-6">
         <p className="">Claimable oVCX</p>
-        <p className="font-bold">{`${gaugeRewards ? NumberFormatter.format(Number(gaugeRewards?.total) / 1e18) : "0"}`}</p>
+        <p className="font-bold">{`$${gaugeRewards && vcxPrice > 0 ? NumberFormatter.format(Number(gaugeRewards?.total) * (vcxPrice * 0.25) / 1e18) : "0"}`}</p>
       </span>
       <span className="flex flex-row items-center justify-between mt-6">
         <p className="">My VCX</p>
-        <p className="font-bold">{`${vcxBal ? NumberFormatter.format(Number(vcxBal?.value) / 1e18) : "0"}`}</p>
+        <p className="font-bold">{`$${vcxBal && vcxPrice > 0 ? NumberFormatter.format(Number(vcxBal?.value) * vcxPrice / 1e18) : "0"}`}</p>
       </span>
       <span className="flex flex-row items-center justify-between mt-6">
         <p className="">My oVCX</p>
-        <p className="font-bold">{`${oBal ? NumberFormatter.format(Number(oBal?.value) / 1e18) : "0"}`}</p>
+        <p className="font-bold">{`$${oBal && vcxPrice > 0 ? NumberFormatter.format(Number(oBal?.value) * (vcxPrice * 0.25) / 1e18) : "0"}`}</p>
       </span>
       <span className="flex flex-row items-center justify-between mt-6">
         <p className="">My WETH</p>
-        <p className="font-bold">{`${oBal ? NumberFormatter.format(Number(wethBal?.value) / 1e18) : "0"}`}</p>
+        <p className="font-bold">{`$${wethBal && wethPrice > 0 ? NumberFormatter.format(Number(wethBal?.value) * wethPrice / 1e18) : "0"}`}</p>
       </span>
       <span className="flex flex-row items-center justify-between mt-6 pb-6 border-b border-[#353945]">
       </span>

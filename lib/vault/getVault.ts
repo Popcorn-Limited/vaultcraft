@@ -103,7 +103,6 @@ export async function getVaults({ account = ADDRESS_ZERO, client, yieldOptions }
         }
       }
     })
-  console.log({ result })
 
   const uniqueAssetAdresses: Address[] = []
   result.forEach(vault => {
@@ -111,7 +110,6 @@ export async function getVaults({ account = ADDRESS_ZERO, client, yieldOptions }
       uniqueAssetAdresses.push(vault.asset.address)
     }
   })
-  console.log({ uniqueAssetAdresses })
 
   const { data: priceData } = await axios.get(`https://coins.llama.fi/prices/current/${String(uniqueAssetAdresses.map(
     // @ts-ignore -- @dev ts still thinks entry.asset is just an `Address`
