@@ -4,15 +4,17 @@ import { lockvaultsAtom, vaultsAtom } from "@/lib/atoms/vaults";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { getVaultsByChain } from "@/lib/vault/getVault";
 import { useAtom } from "jotai";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { CachedProvider, YieldOptions } from "vaultcraft-sdk";
 import { useAccount } from "wagmi";
 import Footer from "@/components/common/Footer";
 import { useMasaAnalyticsReact } from "@masa-finance/analytics-react";
 import { useRouter } from "next/router";
 import getLockVaultsByChain from "@/lib/vault/lockVault/getVaults";
-import { Address, zeroAddress } from "viem";
+import { zeroAddress } from "viem";
 import { arbitrum } from "viem/chains";
+import Modal from "@/components/modal/Modal";
+import MainActionButton from "../button/MainActionButton";
 
 async function setUpYieldOptions() {
   const ttl = 360_000;
@@ -20,6 +22,71 @@ async function setUpYieldOptions() {
   await provider.initialize("https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/apy-data.json");
 
   return new YieldOptions({ provider, ttl });
+}
+
+interface TermsModalProps {
+  showModal: boolean;
+  setShowModal: Dispatch<SetStateAction<boolean>>;
+  setTermsSigned: Dispatch<SetStateAction<boolean>>;
+}
+
+function TermsModal({ showModal, setShowModal, setTermsSigned }: TermsModalProps): JSX.Element {
+  function handleAccept() {
+    setTermsSigned(true)
+    setShowModal(false)
+  }
+  return (
+    <Modal visibility={[showModal, setShowModal]} title={<h2 className="text-xl">VaultCraft Terms of Service</h2>}>
+      <div className="text-start">
+        <p className="mb-4">By clicking “I Agree” below, you agree to be bound by the terms of this Agreement. As such, you fully understand that:</p>
+        <ul className="list-outside list-disc text-gray-500 text-sm mb-4">
+          <li>
+            VaultCraft is a blockchain-based decentralized finance project. You are participating at your own risk.
+          </li>
+          <li>
+            VaultCraft is offered for use “as is” and without any guarantees regarding security. The protocol is made up of immutable code and can be accessed through a variety of user interfaces.
+          </li>
+          <li>
+            No central entity operates the VaultCraft protocol. Decisions related to the protocol are governed by a dispersed group of participants who collectively govern and maintain the protocol.
+          </li>
+          <li>
+            VaultCraftDAO does not unilaterally offer, maintain, operate, administer, or control any trading interfaces. The only user interfaces maintained by VaultCraftDAO are the governance and staking interfaces herein.
+          </li>
+          <li>
+            You can participate in the governance process by staking tokens in accordance with the rules and parameters summarized
+            <a className="text-blue-500" href="https://docs.vaultcraft.io/welcome-to-vaultcraft/introduction" target="_blank"> here</a>,
+            and/or joining the VaultCraft forum and contributing to the conversation.
+          </li>
+          <li>
+            The rules and parameters associated with the VaultCraft protocol and VaultCraftDAO governance are subject to change at any time.
+          </li>
+          <li>
+            Your use of VaultCraft is conditioned upon your acceptance to be bound by the VaultCraft Terms and Conditions, which can be found
+            <a className="text-blue-500" href="https://app.vaultcraft.io/disclaimer" target="_blank"> here</a>.
+          </li>
+          <li>
+            The laws that apply to your use of VaultCraft may vary based upon the jurisdiction in which you are located. We strongly encourage you to speak with legal counsel in your jurisdiction if you have any questions regarding your use of VaultCraft.
+          </li>
+          <li>
+            By entering into this agreement, you are not agreeing to enter into a partnership. You understand that VaultCraft is a decentralized protocol provided on an “as is” basis.
+          </li>
+          <li>
+            You hereby release all present and future claims against VaultCraftDAO related to your use of the protocol, the tokens, VaultCraftDAO governance, and any other facet of the protocol.
+          </li>
+          <li>
+            You agree to indemnify and hold harmless VaultCraftDAO and its affiliates for any costs arising out of or relating to your use of the VaultCraft protocol.
+          </li>
+          <li>
+            You are not accessing the protocol from Burma (Myanmar), Cuba, Iran, Sudan, Syria, the Western Balkans, Belarus, Côte d’Ivoire, Democratic Republic of the Congo, Iraq, Lebanon, Liberia, Libya, North Korea, Russia, certain sanctioned areas of Ukraine, Somalia, Venezuela, Yemen, Zimbabwe, or the United States of America (collectively, “Prohibited Jurisdictions”), or any other jurisdiction listed as a Specially Designated National by the United States Office of Foreign Asset Control (“OFAC”).
+          </li>
+          <li>
+            Important Notice: Residents of the USA are expressly prohibited from using the app.vaultcraft.io interface. Accessing or using this service from the United States of America violates these Terms of Service.
+          </li>
+        </ul>
+        <MainActionButton label="I agree" handleClick={handleAccept} />
+      </div>
+    </Modal>
+  )
 }
 
 export default function Page({
@@ -33,7 +100,7 @@ export default function Page({
   const [yieldOptions, setYieldOptions] = useAtom(yieldOptionsAtom)
   const [masaSdk, setMasaSdk] = useAtom(masaAtom)
 
-  const [vaults, setVaults] = useAtom(vaultsAtom)
+  const [, setVaults] = useAtom(vaultsAtom)
   const [, setLockVaults] = useAtom(lockvaultsAtom)
 
   const { fireEvent, fireLoginEvent, firePageViewEvent, fireConnectWalletEvent } = useMasaAnalyticsReact({
@@ -71,11 +138,19 @@ export default function Page({
     if (yieldOptions) getVaults()
   }, [yieldOptions, account])
 
+  const [showTermsModal, setShowTermsModal] = useState<boolean>(false)
+  const [termsSigned, setTermsSigned] = useState<boolean>(false)
+
+  useEffect(() => {
+    if (!termsSigned) setShowTermsModal(true)
+  }, [termsSigned])
+
   return (
     <>
       <div className="bg-[#141416] w-full mx-auto min-h-screen h-full font-khTeka flex flex-col">
         <DesktopMenu />
         <div className="flex-1">
+          <TermsModal showModal={showTermsModal} setShowModal={setShowTermsModal} setTermsSigned={setTermsSigned} />
           {children}
         </div>
         <div className="py-10"></div>
