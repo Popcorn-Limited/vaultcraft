@@ -37,7 +37,7 @@ export default function VaultInteraction({ vaultData, hideModal, mutateTokenBala
   const { openConnectModal } = useConnectModal();
 
   const [inputBalance, setInputBalance] = useState<string>("0");
-  const [days, setDays] = useState<string>(String(vaultData.lock.daysToUnlock));
+  const [days, setDays] = useState<string>(String(vaultData.lock.daysToUnlock > 0 ? vaultData.lock.daysToUnlock : "7"));
 
   const isDeposit = vaultData.lock.unlockTime === 0 || vaultData.lock.daysToUnlock > 0
 

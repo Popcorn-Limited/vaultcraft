@@ -37,8 +37,11 @@ export default function Deposit({ vaultData, inputBalState, daysState }: Deposit
   };
 
   const handleSetDays: FormEventHandler<HTMLInputElement> = ({ currentTarget: { value } }) => {
-    const newDays = validateInput(value).isValid ? value : "0"
-    setDays(Number(newDays) > 180 ? "180" : newDays);
+    let newDays = validateInput(value).isValid ? value : "0"
+    if (Number(newDays) > 180) newDays = "180"
+    if (Number(newDays) < 7) newDays = "7"
+
+    setDays(newDays);
   };
 
   function handleMaxClick() {
@@ -148,7 +151,7 @@ export default function Deposit({ vaultData, inputBalState, daysState }: Deposit
       onSelectToken={option => { }}
       onMaxClick={() => { }}
       chainId={vaultData.chainId}
-      value={(Number(inputBalance) * (Number(vaultData.asset?.price)) / Number(vaultData.vault?.price)) * (days / 365) || 0}
+      value={(Number(inputBalance) * (Number(vaultData.asset?.price)) / Number(vaultData.vault?.price)) * (Number(days) / 180) || 0}
       onChange={() => { }}
       selectedToken={vaultData.vault}
       errorMessage={""}
