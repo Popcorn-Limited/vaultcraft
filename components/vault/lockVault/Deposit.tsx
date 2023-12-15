@@ -23,7 +23,7 @@ function LockTimeButton({ label, isActive, handleClick }: { label: string, isAct
 interface DepositProps {
   vaultData: LockVaultData;
   inputBalState: [string, Dispatch<SetStateAction<string>>]
-  daysState: [number, Dispatch<SetStateAction<number>>]
+  daysState: [string, Dispatch<SetStateAction<string>>]
 }
 
 export default function Deposit({ vaultData, inputBalState, daysState }: DepositProps): JSX.Element {
@@ -37,8 +37,8 @@ export default function Deposit({ vaultData, inputBalState, daysState }: Deposit
   };
 
   const handleSetDays: FormEventHandler<HTMLInputElement> = ({ currentTarget: { value } }) => {
-    const newDays = Number(value)
-    setDays(newDays > 180 ? 180 : newDays);
+    const newDays = validateInput(value).isValid ? value : "0"
+    setDays(Number(newDays) > 180 ? "180" : newDays);
   };
 
   function handleMaxClick() {
@@ -70,10 +70,10 @@ export default function Deposit({ vaultData, inputBalState, daysState }: Deposit
       </div>
       {account ? <>{vaultData.lock.daysToUnlock === 0 && (
         <div className="flex flex-row items-center justify-between">
-          <LockTimeButton label="1W" isActive={days === 7} handleClick={() => setDays(7)} />
-          <LockTimeButton label="1M" isActive={days === 30} handleClick={() => setDays(30)} />
-          <LockTimeButton label="3M" isActive={days === 90} handleClick={() => setDays(90)} />
-          <LockTimeButton label="6M" isActive={days === 180} handleClick={() => setDays(180)} />
+          <LockTimeButton label="1W" isActive={days === "7"} handleClick={() => setDays("7")} />
+          <LockTimeButton label="1M" isActive={days === "30"} handleClick={() => setDays("30")} />
+          <LockTimeButton label="3M" isActive={days === "90"} handleClick={() => setDays("90")} />
+          <LockTimeButton label="6M" isActive={days === "180"} handleClick={() => setDays("180")} />
           <div className="w-32 flex px-5 py-2 items-center rounded-lg border border-customLightGray">
             <InputNumber
               onChange={handleSetDays}
@@ -91,10 +91,10 @@ export default function Deposit({ vaultData, inputBalState, daysState }: Deposit
         </div>)}
       </>
         : <div className="flex flex-row items-center justify-between">
-          <LockTimeButton label="1W" isActive={days === 7} handleClick={() => setDays(7)} />
-          <LockTimeButton label="1M" isActive={days === 30} handleClick={() => setDays(30)} />
-          <LockTimeButton label="3M" isActive={days === 90} handleClick={() => setDays(90)} />
-          <LockTimeButton label="6M" isActive={days === 180} handleClick={() => setDays(180)} />
+          <LockTimeButton label="1W" isActive={days === "7"} handleClick={() => setDays("7")} />
+          <LockTimeButton label="1M" isActive={days === "30"} handleClick={() => setDays("30")} />
+          <LockTimeButton label="3M" isActive={days === "90"} handleClick={() => setDays("90")} />
+          <LockTimeButton label="6M" isActive={days === "180"} handleClick={() => setDays("180")} />
           <div className="w-32 flex px-5 py-2 items-center rounded-lg border border-customLightGray">
             <InputNumber
               onChange={handleSetDays}
@@ -113,7 +113,7 @@ export default function Deposit({ vaultData, inputBalState, daysState }: Deposit
       }
       <div className="flex flex-row items-center justify-between text-secondaryLight">
         <p>Unlocks at:</p>
-        <p>{days > 0 ? new Date(calcUnlockTime(days)).toLocaleDateString() : "DD.MM.YYYY"}</p>
+        <p>{Number(days) > 0 ? new Date(Number(new Date()) + (Number(days) * 86400000)).toLocaleDateString() : "DD.MM.YYYY"}</p>
       </div>
     </div>
     <div className="relative py-4">

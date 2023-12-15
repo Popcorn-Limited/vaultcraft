@@ -37,7 +37,7 @@ export default function VaultInteraction({ vaultData, hideModal, mutateTokenBala
   const { openConnectModal } = useConnectModal();
 
   const [inputBalance, setInputBalance] = useState<string>("0");
-  const [days, setDays] = useState<number>(vaultData.lock.daysToUnlock);
+  const [days, setDays] = useState<string>(String(vaultData.lock.daysToUnlock));
 
   const isDeposit = vaultData.lock.unlockTime === 0 || vaultData.lock.daysToUnlock > 0
 
@@ -88,7 +88,7 @@ export default function VaultInteraction({ vaultData, hideModal, mutateTokenBala
   async function handleMainAction() {
     const val = Number(inputBalance)
     if (val === 0 || !vaultData || !account || !walletClient) return;
-    if (action === LockVaultActionType.Deposit && days === 0) return;
+    if (action === LockVaultActionType.Deposit && Number(days) === 0) return;
 
     if (chain?.id !== vaultData.chainId) {
       try {
@@ -129,7 +129,7 @@ export default function VaultInteraction({ vaultData, hideModal, mutateTokenBala
             vaultData,
             account,
             amount: (val * (10 ** vaultData.asset.decimals)),
-            days,
+            days: Number(days),
             clients,
             ...ref
           })
@@ -208,7 +208,7 @@ export default function VaultInteraction({ vaultData, hideModal, mutateTokenBala
             <MainActionButton
               label={steps[stepCounter].label}
               handleClick={handleMainAction}
-              disabled={inputBalance === "0" || steps[stepCounter].loading || (action === LockVaultActionType.Deposit && days === 0)}
+              disabled={inputBalance === "0" || steps[stepCounter].loading || (action === LockVaultActionType.Deposit && Number(days) === 0)}
             />
           }
         </>
