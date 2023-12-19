@@ -1,4 +1,4 @@
-import { Address, Chain, ReadContractParameters, createPublicClient, getAddress, http } from "viem"
+import { Address, Chain, ReadContractParameters, createPublicClient, getAddress, http, zeroAddress } from "viem"
 import { PublicClient } from "wagmi"
 import axios from "axios"
 import { VaultAbi } from "@/lib/constants/abi/Vault"
@@ -136,8 +136,10 @@ export async function getVaults({ account = ADDRESS_ZERO, client, yieldOptions }
     vault.assetsPerShare = assetsPerShare;
     vault.depositLimit = Number(res1[i + 2]);
 
-    vault.vault.balance = Number(res1[i + 3]);
-    vault.asset.balance = Number(res1[i + 4]);
+    if (account !== zeroAddress) {
+      vault.vault.balance = Number(res1[i + 3]);
+      vault.asset.balance = Number(res1[i + 4]);
+    }
 
     const key = `${networkMap[chainId].toLowerCase()}:${vault.asset.address}`
     let assetPrice = Number(priceData.coins[key]?.price || 10)
@@ -188,7 +190,7 @@ export async function getVaults({ account = ADDRESS_ZERO, client, yieldOptions }
         symbol: `st-${vault.vault.name}`,
         decimals: foundGauge.decimals,
         logoURI: "/images/tokens/vcx.svg",  // wont be used, just here for consistency
-        balance: foundGauge.balance,
+        balance: account === zeroAddress ? 0 : foundGauge.balance,
         price: vault.pricePerShare * 1e9,
       } : undefined
 
