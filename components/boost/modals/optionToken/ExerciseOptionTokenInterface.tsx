@@ -196,7 +196,7 @@ export default function ExerciseOptionTokenInterface({ amountState, maxPaymentAm
             className={`flex flex-row items-center justify-end`}
           >
             <div className="md:mr-2 relative">
-              <TokenIcon token={{ logoURI: "/images/tokens/pop.svg" } as Token} imageSize="w-5 h-5" chainId={1} />
+              <TokenIcon token={{ logoURI: "/images/tokens/vcx.svg" } as Token} imageSize="w-5 h-5" chainId={1} />
             </div>
             <p className="font-medium text-lg leading-none hidden md:block text-white group-hover:text-[#DFFF1C]">
               {vcx?.symbol}

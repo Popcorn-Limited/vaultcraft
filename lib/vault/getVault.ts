@@ -187,7 +187,7 @@ export async function getVaults({ account = ADDRESS_ZERO, client, yieldOptions }
         name: `${vault.vault.name}-gauge`,
         symbol: `st-${vault.vault.name}`,
         decimals: foundGauge.decimals,
-        logoURI: "/images/tokens/pop.svg",  // wont be used, just here for consistency
+        logoURI: "/images/tokens/vcx.svg",  // wont be used, just here for consistency
         balance: foundGauge.balance,
         price: vault.pricePerShare * 1e9,
       } : undefined

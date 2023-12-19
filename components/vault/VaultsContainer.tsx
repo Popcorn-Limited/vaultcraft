@@ -44,9 +44,6 @@ export default function VaultsContainer({ hiddenVaults, displayVaults }: VaultsC
   const publicClient = usePublicClient()
   const { data: walletClient } = useWalletClient()
 
-  const [initalLoad, setInitalLoad] = useState<boolean>(false);
-  const [accountLoad, setAccountLoad] = useState<boolean>(false);
-
   const [selectedNetworks, selectNetwork] = useNetworkFilter(SUPPORTED_NETWORKS.map(network => network.id));
   const [vaults, setVaults] = useAtom(vaultsAtom)
   const [zapAssets, setZapAssets] = useState<{ [key: number]: Token[] }>({});
