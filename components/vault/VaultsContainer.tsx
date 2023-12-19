@@ -295,8 +295,6 @@ export default function VaultsContainer({ hiddenVaults, displayVaults }: VaultsC
                   vaultData={vault}
                   mutateTokenBalance={mutateTokenBalance}
                   searchString={searchString}
-                  zapAssets={availableZapAssets[vault.chainId].includes(vault.asset.address) ? zapAssets[vault.chainId] : undefined}
-                  deployer={"0x22f5413C075Ccd56D575A54763831C4c27A37Bdb"}
                 />
               )
             })

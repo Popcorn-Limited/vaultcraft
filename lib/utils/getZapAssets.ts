@@ -46,9 +46,6 @@ export default async function getZapAssets({ chain, account }: { chain: Chain, a
 }
 
 export async function getAvailableZapAssets(chainId: number) {
-  const defiTokens = (await axios.get('https://enso-scrape.s3.us-east-2.amazonaws.com/output/backend/defiTokens.json')).data
-    .filter((entry: any) => entry.chainId === chainId).map((entry: any) => getAddress(entry.tokenAddress))
-  const baseTokens = (await axios.get('https://enso-scrape.s3.us-east-2.amazonaws.com/output/backend/baseTokens.json')).data
-    .filter((entry: any) => entry.chainId === chainId).map((entry: any) => getAddress(entry.address))
-  return [...baseTokens, ...defiTokens]
+  const { data } = await axios.get(`https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/assets/zapAddresses/${chainId}.json`)
+  return data
 }
