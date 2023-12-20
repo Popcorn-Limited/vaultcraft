@@ -46,13 +46,13 @@ export default function VaultStats({ vaultData }: VaultStatsProps): JSX.Element 
         <div className="w-full mt-6 md:mt-0">
           <p className="font-normal text-primary md:text-[14px]">Min Rewards</p>
           <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
-            {vaultData.rewardApy ? (vaultData.rewardApy / 4).toFixed(2) : "-"} %
+            {vaultData.totalApy ? (vaultData.totalApy / 4).toFixed(2) : "-"} %
           </Title>
         </div>
         <div className="w-full mt-6 md:mt-0">
           <p className="font-normal text-primary md:text-[14px]">Max Rewards</p>
           <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
-            {vaultData.rewardApy ? vaultData.rewardApy.toFixed(2) : "-"} %
+            {vaultData.totalApy ? vaultData.totalApy.toFixed(2) : "-"} %
           </Title>
         </div>
       </div>

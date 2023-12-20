@@ -4,12 +4,20 @@ import axios from "axios"
 import { LockVaultData, Token } from "@/lib/types";
 import { RPC_URLS } from "@/lib/utils/connectors";
 
-function calcRewards({ lock, accruedRewards, rewardIndex, decimals }: any) {
-  if (lock.rewardShares == 0) return 0;
+interface CalcRewardProps {
+  accruedRewards: number;
+  rewardShares: number;
+  userIndex: number;
+  globalIndex: number;
+  decimals: number;
+}
 
-  const delta = rewardIndex - lock.rewardIndex;
+function calcRewards({ accruedRewards, rewardShares, userIndex, globalIndex, decimals }: CalcRewardProps) {
+  if (rewardShares == 0) return 0;
 
-  return accruedRewards + ((lock.rewardShares * delta) / (10 ** decimals));
+  const delta = globalIndex - userIndex;
+
+  return accruedRewards + ((rewardShares * delta) / (10 ** decimals));
 }
 
 export default async function getLockVaultsByChain({ chain, account }: { chain: Chain, account: Address }): Promise<LockVaultData[]> {
@@ -19,7 +27,7 @@ export default async function getLockVaultsByChain({ chain, account }: { chain: 
 
 async function getVaults({ account, publicClient }: { account: Address, publicClient: PublicClient }): Promise<LockVaultData[]> {
   const addresses = await publicClient.readContract({
-    address: "0x504f828886aB10D09ca1c116d6E1C5b8963cB109",
+    address: "0x25172C73958064f9ABc757ffc63EB859D7dc2219",
     abi: VaultRegistryAbi,
     functionName: "getRegisteredAddresses",
   }) as Address[];
@@ -72,12 +80,12 @@ async function getVaults({ account, publicClient }: { account: Address, publicCl
       {
         address: vaultData.address,
         abi: StakingVaultAbi,
-        functionName: 'rewardToken'
+        functionName: 'getRewardTokens'
       },
       {
         address: vaultData.address,
         abi: StakingVaultAbi,
-        functionName: 'currIndex'
+        functionName: 'getCurrIndices'
       },
       {
         address: vaultData.strategies[0],
@@ -91,18 +99,25 @@ async function getVaults({ account, publicClient }: { account: Address, publicCl
     if (i > 0) i = i * 5
     vaultData.totalSupply = res1[i]
     vaultData.strategyShares = res1[i + 1]
-    vaultData.rewardAddress = res1[i + 2]
 
-    vaultData.reward = { ...assets[res1[i + 2]] as Token, balance: 0 }
-    vaultData.rewardIndex = Number(res1[i + 3]);
+    const rewardAddresses = res1[i + 2];
+    vaultData.rewardAddresses = rewardAddresses
+
+    vaultData.rewards = rewardAddresses.map((address: Address, i: number) => {
+      return {
+        ...assets[address] as Token,
+        balance: 0,
+        globalIndex: Number(res1[i + 3][i])
+      }
+    })
+
+    rewardAddresses.forEach((address: Address) => {
+      if (!uniqueAssetAdresses.includes(address)) uniqueAssetAdresses.push(address);
+    })
 
     const apy = (Number(res1[i + 4][3]) * 31557600) / 1e16 // (borrowRate per second * seconds per year) / 1e18 * 100
     vaultData.apy = apy
     vaultData.totalApy = apy
-
-    if (!uniqueAssetAdresses.includes(res1[i + 2])) {
-      uniqueAssetAdresses.push(res1[i + 2])
-    }
   })
 
   const res2 = await publicClient.multicall({
@@ -125,81 +140,87 @@ async function getVaults({ account, publicClient }: { account: Address, publicCl
     const totalAssets = res2[i]
     const assetsPerShare = Number(vaultData.totalSupply) > 0 ? Number(totalAssets) / Number(vaultData.totalSupply) : 1
     const assetPrice = priceData.coins[`arbitrum:${vaultData.assetAddress}`].price
-    const rewardPrice = priceData.coins[`arbitrum:${vaultData.rewardAddress}`].price
     const pricePerShare = assetsPerShare * assetPrice
 
     vaultData.totalAssets = totalAssets;
     vaultData.assetsPerShare = assetsPerShare;
     vaultData.assetPrice = assetPrice;
-    vaultData.rewardPrice = rewardPrice;
     vaultData.pricePerShare = pricePerShare;
     vaultData.tvl = Number(totalAssets) > 0 ? Number(totalAssets) * assetPrice / (10 ** vaultData.asset.decimals) : 0;
 
     vaultData.vault.price = pricePerShare;
     vaultData.asset.price = assetPrice;
-    vaultData.reward.price = rewardPrice;
 
-    const rewardValuePerShare = (vaultData.rewardIndex / (10 ** vaultData.reward.decimals)) * rewardPrice / 2
-    const rewardApy = (rewardValuePerShare / pricePerShare) * 100
-    vaultData.rewardApy = rewardApy;
-    vaultData.totalApy += rewardApy;
+    vaultData.rewards.forEach((reward: any) => {
+      const rewardPrice = priceData.coins[`arbitrum:${reward.address}`].price
+      const rewardValuePerShare = (reward.globalIndex / (10 ** reward.decimals)) * rewardPrice / 2
+      const rewardApy = (rewardValuePerShare / pricePerShare) * 100
+
+      reward.price = rewardPrice;
+      reward.rewardApy = rewardApy;
+      vaultData.totalApy += rewardApy;
+    })
   })
 
   if (account !== zeroAddress) {
     const res3 = await publicClient.multicall({
       contracts: result.map((vaultData, i) => {
-        return [{
-          address: vaultData.address,
-          abi: StakingVaultAbi,
-          functionName: 'locks',
-          args: [account]
-        },
-        {
-          address: vaultData.address,
-          abi: StakingVaultAbi,
-          functionName: 'accruedRewards',
-          args: [account]
-        },
-        {
-          address: vaultData.address,
-          abi: StakingVaultAbi,
-          functionName: 'balanceOf',
-          args: [account]
-        },
-        {
-          address: vaultData.assetAddress,
-          abi: StakingVaultAbi,
-          functionName: 'balanceOf',
-          args: [account]
-        },
-        {
-          address: vaultData.rewardAddress,
-          abi: StakingVaultAbi,
-          functionName: 'balanceOf',
-          args: [account]
-        }]
+        return [
+          {
+            address: vaultData.address,
+            abi: StakingVaultAbi,
+            functionName: 'balanceOf',
+            args: [account]
+          },
+          {
+            address: vaultData.assetAddress,
+            abi: StakingVaultAbi,
+            functionName: 'balanceOf',
+            args: [account]
+          },
+          {
+            address: vaultData.address,
+            abi: StakingVaultAbi,
+            functionName: 'locks',
+            args: [account]
+          },
+          {
+            address: vaultData.address,
+            abi: StakingVaultAbi,
+            functionName: 'getAccruedRewards',
+            args: [account]
+          },
+          {
+            address: vaultData.address,
+            abi: StakingVaultAbi,
+            functionName: 'getUserIndices',
+            args: [account]
+          },
+        ]
       }).flat(),
       allowFailure: false
     }) as any[]
-    result.forEach((vaultData, i) => {
-      if (i > 0) i = i * 5
-      vaultData.vault.balance = Number(res3[i + 2])
-      vaultData.asset.balance = Number(res3[i + 3])
-      vaultData.reward.balance = Number(res3[i + 4])
+    result.forEach(async (vaultData, i) => {
+      if (i > 0) i = i * 4
+      vaultData.vault.balance = Number(res3[i])
+      vaultData.asset.balance = Number(res3[i + 1])
 
-      const unlockTime = Number(res3[i][0]) * 1000
-      const lock = {
+      const unlockTime = Number(res3[i + 2][0]) * 1000
+      const rewardShares = Number(res3[i + 2][2]);
+      vaultData.lock = {
         unlockTime: unlockTime,
-        rewardIndex: Number(res3[i][1]),
-        amount: Number(res3[i][2]),
-        rewardShares: Number(res3[i][3]),
+        amount: Number(res3[i + 2][1]),
+        rewardShares: rewardShares,
         daysToUnlock: unlockTime > 0 ? (unlockTime - Number(new Date())) / 86400000 : 0 // timeDiff / secondsPerDay * 1000 (ms)
       }
 
-      vaultData.lock = lock
-      vaultData.rewardBalance = calcRewards({ lock, accruedRewards: Number(res3[i + 1]), rewardIndex: vaultData.rewardIndex, decimals: vaultData.vault.decimals })
+      vaultData.rewards.forEach(async (reward: any, n: number) => {
+        const accruedRewards = res3[i + 3].length === 0 ? 0 : Number(res3[i + 3][n]);
+        const userIndex = res3[i + 4].length === 0 ? 0 : Number(res3[i + 4][n]);
+        reward.rewardBalance = calcRewards({ accruedRewards, rewardShares, userIndex, globalIndex: reward.globalIndex, decimals: reward.decimals })
+        reward.balance = Number(await publicClient.readContract({ address: reward.address, abi: VaultAbi, functionName: "balanceOf", args: [account] }))
+      })
     })
   }
-
   return result
 }

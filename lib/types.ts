@@ -72,21 +72,24 @@ export type VaultData = {
 
 type LockVaultLock = {
   unlockTime: number;
-  rewardIndex: number;
   amount: number;
   rewardShares: number;
   daysToUnlock: number;
 }
 
-export type LockVaultData = {
+export type LockVaultData = VaultData & {
   strategyShares: bigint;
-  rewardAddress: Address;
-  reward: Token;
-  rewardBalance: number;
-  rewardIndex: number;
-  rewardApy: number;
+  rewardAddresses: Address[];
+  rewards: RewardToken[];
   lock: LockVaultLock;
-} & VaultData
+}
+
+export type RewardToken = Token & {
+  rewardBalance: number;
+  userIndex: number;
+  globalIndex: number;
+  rewardApy: number;
+}
 
 export type VaultMetadata = {
   creator: Address;

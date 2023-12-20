@@ -7,19 +7,19 @@ export const StakingVaultAbi = [
         "type": "address"
       },
       {
-        "internalType": "uint256",
-        "name": "_maxLockTime",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "_rewardToken",
-        "type": "address"
+        "internalType": "address[]",
+        "name": "_rewardTokens",
+        "type": "address[]"
       },
       {
         "internalType": "address",
         "name": "_strategy",
         "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_maxLockTime",
+        "type": "uint256"
       },
       {
         "internalType": "string",
@@ -71,6 +71,12 @@ export const StakingVaultAbi = [
       },
       {
         "indexed": false,
+        "internalType": "contract ERC20",
+        "name": "rewardToken",
+        "type": "address"
+      },
+      {
+        "indexed": false,
         "internalType": "uint256",
         "name": "amount",
         "type": "uint256"
@@ -86,6 +92,12 @@ export const StakingVaultAbi = [
         "indexed": true,
         "internalType": "address",
         "name": "distributor",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "contract ERC20",
+        "name": "rewardToken",
         "type": "address"
       },
       {
@@ -276,6 +288,11 @@ export const StakingVaultAbi = [
         "internalType": "address",
         "name": "",
         "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "name": "accruedRewards",
@@ -390,8 +407,14 @@ export const StakingVaultAbi = [
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "currIndex",
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "currIndices",
     "outputs": [
       {
         "internalType": "uint256",
@@ -437,7 +460,7 @@ export const StakingVaultAbi = [
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "shares",
+        "name": "",
         "type": "uint256"
       }
     ],
@@ -447,14 +470,104 @@ export const StakingVaultAbi = [
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
+        "internalType": "uint256[]",
+        "name": "amounts",
+        "type": "uint256[]"
       }
     ],
     "name": "distributeRewards",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      }
+    ],
+    "name": "getAccruedRewards",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getCurrIndices",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getProtocolFees",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getRewardLength",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getRewardTokens",
+    "outputs": [
+      {
+        "internalType": "contract ERC20[]",
+        "name": "",
+        "type": "address[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      }
+    ],
+    "name": "getUserIndices",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -488,11 +601,6 @@ export const StakingVaultAbi = [
       {
         "internalType": "uint256",
         "name": "unlockTime",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "rewardIndex",
         "type": "uint256"
       },
       {
@@ -585,8 +693,57 @@ export const StakingVaultAbi = [
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "rewardToken",
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "protocolFees",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "rewardIndices",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "rewardTokens",
     "outputs": [
       {
         "internalType": "contract ERC20",

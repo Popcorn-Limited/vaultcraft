@@ -41,7 +41,7 @@ export default function Deposit({ vaultData, inputBalState, daysState }: Deposit
     if (Number(newDays) > 180) newDays = "180"
     if (Number(newDays) < 7) newDays = "7"
 
-    setDays(newDays);
+    setDays("0.01");
   };
 
   function handleMaxClick() {

@@ -1,18 +1,23 @@
-import { StakingVaultAbi } from "@/lib/constants"
+import { StakingVaultAbi, ZERO } from "@/lib/constants"
 import { showLoadingToast } from "@/lib/toasts"
-import { Clients, SimulationResponse, VaultData } from "@/lib/types"
+import { Clients, SimulationResponse, LockVaultData } from "@/lib/types"
 import { networkMap } from "@/lib/utils/connectors"
 import { handleCallResult } from "@/lib/utils/helpers"
 import { FireEventArgs } from "@masa-finance/analytics-sdk";
 import { Address, PublicClient } from "viem"
 
 interface BaseWriteProps {
-  vaultData: VaultData;
+  vaultData: LockVaultData;
   account: Address;
   clients: Clients;
 }
 
 interface IncreaseAmountWrite extends BaseWriteProps {
+  amount: number;
+}
+
+interface DistributeRewardsWrite extends BaseWriteProps {
+  token: Address;
   amount: number;
 }
 
@@ -27,7 +32,7 @@ interface WithdrawWrite extends WritePropsWithRef {
 
 interface DepositWrite extends WritePropsWithRef {
   amount: number;
-  days:number;
+  days: number;
 }
 
 interface VaultSimulateProps {
@@ -151,15 +156,16 @@ export async function handleWithdraw({ vaultData, account, amount, clients, fire
   return success
 }
 
-export async function handleDistributeRewards({ vaultData, account, amount, clients }: IncreaseAmountWrite): Promise<boolean> {
+export async function handleDistributeRewards({ vaultData, token, account, amount, clients }: DistributeRewardsWrite): Promise<boolean> {
   showLoadingToast("Distributing rewards...")
 
+  const args = [vaultData.rewards.map(reward => reward.address === token ? BigInt(Number(amount).toLocaleString("fullwide", { useGrouping: false })) : ZERO)]
   const success = await handleCallResult({
     successMessage: "Distributed rewards!",
     simulationResponse: await simulateCall({
       address: vaultData.address,
       account,
-      args: [BigInt(Number(amount).toLocaleString("fullwide", { useGrouping: false }))],
+      args,
       functionName: "distributeRewards",
       publicClient: clients.publicClient
     }),

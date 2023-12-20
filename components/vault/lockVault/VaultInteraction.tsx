@@ -81,7 +81,7 @@ export default function VaultInteraction({ vaultData, hideModal, mutateTokenBala
       setActiveTab("Claim")
       setAction(LockVaultActionType.Claim)
       setSteps(getActionSteps(LockVaultActionType.Claim))
-      setInputBalance(String(vaultData.reward.balance / (10 ** vaultData.reward.decimals)))
+      setInputBalance(String("1"))
     }
   }
 
