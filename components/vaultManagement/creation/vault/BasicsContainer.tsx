@@ -119,7 +119,7 @@ export default function BasicsContainer({ route, stages, activeStage }: VaultCre
         />
         <MainActionButton
           label="Next"
-          handleClick={() => router.push(`/create-vault/${route}/fees`)}
+          handleClick={() => router.push(`/create-vault/${route}`)}
           disabled={!isBasicsValid(basics) || loading}
         />
       </div>
