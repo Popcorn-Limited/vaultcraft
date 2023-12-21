@@ -15,8 +15,8 @@ const links: { label: string, url: string, onClick?: Function }[] = [
     url: "/create-vault",
   },
   {
-    label: "Stake Vaults",
-    url: "/stake-vaults",
+    label: "Lock Vaults",
+    url: "/lock-vaults",
   },
   {
     label: "Stats",
