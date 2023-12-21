@@ -7,6 +7,7 @@ interface VaultStatsProps {
 }
 
 export default function VaultStats({ vaultData }: VaultStatsProps): JSX.Element {
+  const totalRewardApy = vaultData.rewards.reduce((a, b) => a + b.rewardApy, 0)
   return (
     <>
       <div className="w-full flex justify-between gap-8 md:gap-4">
@@ -46,13 +47,13 @@ export default function VaultStats({ vaultData }: VaultStatsProps): JSX.Element 
         <div className="w-full mt-6 md:mt-0">
           <p className="font-normal text-primary md:text-[14px]">Min Rewards</p>
           <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
-            {vaultData.totalApy ? (vaultData.totalApy / 4).toFixed(2) : "-"} %
+            {totalRewardApy ? (totalRewardApy / 4).toFixed(2) : "-"} %
           </Title>
         </div>
         <div className="w-full mt-6 md:mt-0">
           <p className="font-normal text-primary md:text-[14px]">Max Rewards</p>
           <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
-            {vaultData.totalApy ? vaultData.totalApy.toFixed(2) : "-"} %
+            {totalRewardApy ? totalRewardApy.toFixed(2) : "-"} %
           </Title>
         </div>
       </div>

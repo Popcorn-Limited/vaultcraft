@@ -26,11 +26,14 @@ export default async function getLockVaultsByChain({ chain, account }: { chain: 
 }
 
 async function getVaults({ account, publicClient }: { account: Address, publicClient: PublicClient }): Promise<LockVaultData[]> {
-  const addresses = await publicClient.readContract({
+  let addresses = await publicClient.readContract({
     address: "0x25172C73958064f9ABc757ffc63EB859D7dc2219",
     abi: VaultRegistryAbi,
     functionName: "getRegisteredAddresses",
   }) as Address[];
+
+  // @dev -- remove test vault
+  addresses = addresses.filter(address => address !== "0x355d6ee7a1386d0659495d249E3cC085eC90Ba18")
 
   const { data: vaults } = await axios.get(`https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/vaults/42161.json`)
   const { data: vaultTokens } = await axios.get(`https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/vaults/tokens/42161.json`)
@@ -103,11 +106,11 @@ async function getVaults({ account, publicClient }: { account: Address, publicCl
     const rewardAddresses = res1[i + 2];
     vaultData.rewardAddresses = rewardAddresses
 
-    vaultData.rewards = rewardAddresses.map((address: Address, i: number) => {
+    vaultData.rewards = rewardAddresses.map((address: Address, n: number) => {
       return {
         ...assets[address] as Token,
         balance: 0,
-        globalIndex: Number(res1[i + 3][i])
+        globalIndex: Number(res1[i + 3][n])
       }
     })
 
@@ -139,7 +142,15 @@ async function getVaults({ account, publicClient }: { account: Address, publicCl
   result.forEach((vaultData, i) => {
     const totalAssets = res2[i]
     const assetsPerShare = Number(vaultData.totalSupply) > 0 ? Number(totalAssets) / Number(vaultData.totalSupply) : 1
-    const assetPrice = priceData.coins[`arbitrum:${vaultData.assetAddress}`].price
+
+    let assetPrice
+    // @dev -- manual override for ibFRAX
+    if (vaultData.assetAddress === "0x2D0483FefAbA4325c7521539a3DFaCf94A19C472") {
+      assetPrice = 1.0149
+    } else {
+      assetPrice = priceData.coins[`arbitrum:${vaultData.assetAddress}`].price
+    }
+
     const pricePerShare = assetsPerShare * assetPrice
 
     vaultData.totalAssets = totalAssets;
@@ -201,7 +212,7 @@ async function getVaults({ account, publicClient }: { account: Address, publicCl
       allowFailure: false
     }) as any[]
     result.forEach(async (vaultData, i) => {
-      if (i > 0) i = i * 4
+      if (i > 0) i = i * 5
       vaultData.vault.balance = Number(res3[i])
       vaultData.asset.balance = Number(res3[i + 1])
 
