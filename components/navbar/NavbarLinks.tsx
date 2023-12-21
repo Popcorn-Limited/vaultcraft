@@ -7,16 +7,16 @@ const links: { label: string, url: string, onClick?: Function }[] = [
     url: "/vaults",
   },
   {
+    label: "Lock Vaults",
+    url: "/lock-vaults",
+  },
+  {
     label: "Boost Vaults",
     url: "/boost",
   },
   {
     label: "Create Vaults",
     url: "/create-vault",
-  },
-  {
-    label: "Lock Vaults",
-    url: "/lock-vaults",
   },
   {
     label: "Stats",
