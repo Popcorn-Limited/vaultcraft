@@ -19,6 +19,10 @@ export default function DesktopMenu(): JSX.Element {
   const [logo, setLogo] = useState<string>(networkLogos[1])
   const [chainName, setChainName] = useState<string>("Ethereum")
 
+  const handleWalletDisconnect = () => {
+    disconnect();
+  };
+
   useEffect(() => {
     if (address && chain?.id) {
       setLogo(networkLogos[chain.id])
@@ -54,7 +58,7 @@ export default function DesktopMenu(): JSX.Element {
                 <span className="hidden md:inline">|</span>
                 <p className="ml-2 leading-none hidden md:block">{address?.substring(0, 5)}...</p>
                 <span className="hidden md:inline">|</span>
-                <PowerIcon className="w-5 h-5 ml-3 text-primary hidden md:block" aria-hidden="true" onClick={disconnect} />
+                <PowerIcon className="w-5 h-5 ml-3 text-primary hidden md:block" aria-hidden="true" onClick={handleWalletDisconnect}  />
               </div>
             </div>
           ) : (
