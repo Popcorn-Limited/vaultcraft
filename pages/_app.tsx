@@ -122,7 +122,7 @@ export default function App({ Component, pageProps }: AppProps) {
         <title>VaultCraft</title>
         <meta name="description" content="VaultCraft is a DeFi yield-optimizing protocol with customizable asset strategies that instantly zap your crypto from any chain into the highest yield-generating products across DeFi in 1 click." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" type={"image/png"} href="/images/icons/favicon.ico" />
       </Head>
       <main className={nextFont.className}>
         <style
