@@ -63,8 +63,8 @@ export default function ExerciseOptionTokenInterface({ amountState, maxPaymentAm
         abi: BalancerOracleAbi,
         functionName: 'minPrice',
       })
-      const minPriceInUsd = ((Number(minPrice) * 10_000 / multiplier) / 1e18) * wethInUsd
       const oVcxInUsd = vcxInUsd * (10_000 - multiplier) / 10_000
+      const minPriceInUsd = vcxInUsd - ((Number(minPrice) / 1e18) * wethInUsd)
 
       setWethPrice(wethInUsd)
       setVCXPrice(vcxInUsd)
