@@ -40,7 +40,7 @@ export default function ExerciseOptionTokenInterface({ amountState, maxPaymentAm
   const { data: vcx } = useToken({ chainId: 1, address: VCX });
   const { data: weth } = useToken({ chainId: 1, address: WETH });
 
-  const [oVcxPrice, setOVcxPrice] = useState<number>(0);
+  const [strikePrice, setStrikePrice] = useState<number>(0);
   const [oVcxDiscount, setOVcxDiscount] = useState<number>(0);
   const [vcxPrice, setVCXPrice] = useState<number>(0);
   const [wethPrice, setWethPrice] = useState<number>(0);
@@ -58,17 +58,17 @@ export default function ExerciseOptionTokenInterface({ amountState, maxPaymentAm
         abi: BalancerOracleAbi,
         functionName: 'multiplier',
       })
-      const minPrice = await publicClient.readContract({
+      const strikePriceRes = await publicClient.readContract({
         address: OVCX_ORACLE,
         abi: BalancerOracleAbi,
-        functionName: 'minPrice',
+        functionName: 'getPrice',
       })
       const oVcxInUsd = vcxInUsd * (10_000 - multiplier) / 10_000
-      const minPriceInUsd = vcxInUsd - ((Number(minPrice) / 1e18) * wethInUsd)
+      const strikePriceInUsd = (Number(strikePriceRes) / 1e18) * wethInUsd
 
       setWethPrice(wethInUsd)
       setVCXPrice(vcxInUsd)
-      setOVcxPrice(oVcxInUsd > minPriceInUsd ? oVcxInUsd : minPriceInUsd)
+      setStrikePrice(strikePriceInUsd)
       setOVcxDiscount(multiplier)
     }
     if (!initialLoad) setUpPrices()
@@ -89,7 +89,7 @@ export default function ExerciseOptionTokenInterface({ amountState, maxPaymentAm
   };
 
   function getMaxPaymentAmount(oVcxAmount: number) {
-    const oVcxValue = oVcxAmount * oVcxPrice;
+    const oVcxValue = oVcxAmount * strikePrice;
 
     return String((oVcxValue / wethPrice) * (1 + SLIPPAGE));
   }
@@ -97,7 +97,7 @@ export default function ExerciseOptionTokenInterface({ amountState, maxPaymentAm
   function getOPopAmount(paymentAmount: number) {
     const ethValue = paymentAmount * wethPrice;
 
-    return String((ethValue / oVcxPrice) * (1 - SLIPPAGE));
+    return String((ethValue / strikePrice) * (1 - SLIPPAGE));
   }
 
   const handleOPopInput: FormEventHandler<HTMLInputElement> = ({ currentTarget: { value } }) => {
@@ -116,8 +116,8 @@ export default function ExerciseOptionTokenInterface({ amountState, maxPaymentAm
     <div className="mb-8 text-start">
       <h2 className="text-start text-5xl">Exercise oVCX</h2>
       <p className="text-primary font-semibold">
-        Strike Price: $ {formatNumber(vcxPrice - oVcxPrice)}
-        {" "}| oVCX Price: $ {oVcxPrice}
+        Strike Price: $ {formatNumber(strikePrice)}
+        {" "}| oVCX Price: $ {vcxPrice - strikePrice}
         {" "}| VCX Price: $ {vcxPrice}
         {" "}| Discount: {((10_000 - oVcxDiscount) / 100).toFixed(2)} %</p>
       <div className="mt-8">
