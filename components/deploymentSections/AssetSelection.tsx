@@ -1,13 +1,13 @@
-import { DEFAULT_PROTOCOL, DEFAULT_STRATEGY, assetAddressesAtom, assetAtom, networkAtom, protocolAtom, strategyAtom } from "@/lib/atoms";
+import { DEFAULT_PROTOCOL, DEFAULT_STRATEGY, assetAddressesAtom, assetAtom, protocolAtom, strategyAtom } from "@/lib/atoms";
 import Input from "@/components/input/Input";
 import Selector, { Option } from "@/components/input/Selector";
 import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
-import { localhost, mainnet } from "wagmi/chains";
 import { Address, getAddress, isAddress } from "viem";
 import { Asset } from "@/lib/types";
 import assets from "@/lib/constants/assets";
 import { RPC_URLS } from "@/lib/utils/connectors";
+import { useWalletClient } from "wagmi";
 
 async function fetchViaAlchemy(address: string, chainId: number, metadata: any) {
   const options = {
@@ -51,8 +51,8 @@ async function getTokenMetadata(address: Address, chainId: number, protocol: str
 }
 
 function AssetSelection() {
-  const [network] = useAtom(networkAtom);
-  const chainId = network.id === localhost.id ? mainnet.id : network.id;
+  const { data: walletClient } = useWalletClient()
+  const chainId = walletClient?.chain.id || 1
 
   const [asset, setAsset] = useAtom(assetAtom);
 
@@ -112,7 +112,7 @@ function AssetSelection() {
       }
     >
       {availableAssets.length > 0 ?
-        availableAssets.map((assetIter) => (
+        availableAssets.filter(a => a.chains?.includes(chainId)).map((assetIter) => (
           <Option
             // @ts-ignore
             key={`asset-selc-${assetIter.address[String(chainId)]}-${chainId}`}

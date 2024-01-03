@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import { atom, useAtom } from "jotai";
-import { metadataAtom, assetAtom, protocolAtom, strategyAtom, assetAddressesAtom, networkAtom, strategyConfigAtom } from "@/lib/atoms";
+import { metadataAtom, assetAtom, protocolAtom, strategyAtom, assetAddressesAtom, strategyConfigAtom } from "@/lib/atoms";
 import MainActionButton from "@/components/button/MainActionButton";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import MetadataConfiguration from "@/components/deploymentSections/MetadataConfiguration";
@@ -11,10 +11,11 @@ import { useEffect, useState } from "react";
 import AssetSelection from "@/components/deploymentSections/AssetSelection";
 import ProtocolSelection from "@/components/deploymentSections/ProtocolSelection";
 import { resolveStrategyDefaults } from "@/lib/resolver/strategyDefaults/strategyDefaults";
-import { getAddress } from "viem";
+import { Address, getAddress } from "viem";
 import { yieldOptionsAtom } from "@/lib/atoms/sdk";
-import { usePublicClient } from "wagmi";
+import { usePublicClient, useWalletClient } from "wagmi";
 import { VaultCreationContainerProps } from ".";
+import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 
 export const basicsAtom = atom(get => ({
   metadata: get(metadataAtom),
@@ -33,11 +34,12 @@ export function isBasicsValid(basics: any): boolean {
 export default function BasicsContainer({ route, stages, activeStage }: VaultCreationContainerProps): JSX.Element {
   const router = useRouter();
   const publicClient = usePublicClient();
+  const { data: walletClient } = useWalletClient()
+
   const [yieldOptions] = useAtom(yieldOptionsAtom);
 
   const [basics] = useAtom(basicsAtom)
   const [strategy] = useAtom(strategyAtom);
-  const [network] = useAtom(networkAtom);
   const [asset] = useAtom(assetAtom);
 
   const [loading, setLoading] = useState(false)
@@ -48,7 +50,9 @@ export default function BasicsContainer({ route, stages, activeStage }: VaultCre
 
   useEffect(() => {
     if (!!yieldOptions && availableAssetAddresses) {
-      yieldOptions.getAssets(1).then((res: any) => setAvailableAssetAddresses({ 1: res }))
+      const newAvailableAssetAddresses: { [key: number]: Address[] } = {}
+      SUPPORTED_NETWORKS.forEach(async (chain) => newAvailableAssetAddresses[chain.id] = await yieldOptions.getAssets(chain.id))
+      setAvailableAssetAddresses(newAvailableAssetAddresses);
     }
   }, [yieldOptions])
 
@@ -56,23 +60,24 @@ export default function BasicsContainer({ route, stages, activeStage }: VaultCre
     // @ts-ignore
     async function getStrategyDefaults() {
       setLoading(true)
+      const chainId = walletClient?.chain.id || 1
 
       let strategyDefaults = []
 
       if (strategy.name.includes("Depositor")) {
         if (strategy.initParams && strategy.initParams.length > 0) {
           strategyDefaults = await resolveStrategyDefaults({
-            chainId: network.id,
+            chainId: chainId,
             client: publicClient,
-            address: getAddress(asset.address[network.id]),
+            address: getAddress(asset.address[chainId]),
             resolver: strategy.resolver
           })
         }
       } else {
         strategyDefaults = await resolveStrategyDefaults({
-          chainId: network.id,
+          chainId: chainId,
           client: publicClient,
-          address: getAddress(asset.address[network.id]),
+          address: getAddress(asset.address[chainId]),
           resolver: strategy.resolver
         })
       }

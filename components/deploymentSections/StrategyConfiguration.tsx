@@ -3,7 +3,6 @@ import { useState } from "react";
 import {
   adapterAtom,
   assetAtom,
-  networkAtom,
   strategyAtom,
   strategyConfigAtom
 } from "@/lib/atoms";
@@ -15,7 +14,6 @@ function StrategyConfiguration() {
   const [strategy] = useAtom(strategyAtom);
   const [strategyConfig, setStrategyConfig] = useAtom(strategyConfigAtom);
 
-  const [network] = useAtom(networkAtom);
   const [asset] = useAtom(assetAtom);
   const [adapter] = useAtom(adapterAtom);
 
