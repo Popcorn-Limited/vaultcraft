@@ -26,7 +26,7 @@ export async function auraCompounder({ chainId, client, address }: StrategyDefau
   const rewardTokens = [BAL[chainId], AURA[chainId]];
   const baseAsset = poolTokens[0][0] // TODO - find a smarter algorithm to determine the base asset
   const minTradeAmounts = [ZERO.toString(), ZERO.toString()];
-  const optionalData = [poolId, 0];
+  const optionalData = [poolId, 0, 2];
 
   const [auraPoolId] = await aura({ chainId, client, address })
 

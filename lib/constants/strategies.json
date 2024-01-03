@@ -121,7 +121,7 @@
   },
   {
     "name": "Balancer Compounder",
-    "key": "BalancerLpCompounder",
+    "key": "BalancerLpCompounder2",
     "resolver": "balancerLpCompounder",
     "protocol": "balancer",
     "adapter": "BalancerGaugeAdapter",
@@ -166,7 +166,7 @@
   },
   {
     "name": "Aura Compounder",
-    "key": "BalancerLpCompounder",
+    "key": "BalancerLpCompounder2",
     "resolver": "auraCompounder",
     "protocol": "aura",
     "adapter": "AuraAdapter",

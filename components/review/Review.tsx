@@ -77,6 +77,7 @@ export default function Review(): JSX.Element {
           resolver: strategy.resolver
         })
       }
+      
       setAdapterData({
         id: adapterId,
         data: adapterInitParams,
