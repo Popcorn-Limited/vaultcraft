@@ -41,7 +41,7 @@ export default function Products(): JSX.Element {
               </>
             }
             customContent={<PopSmileyIcon size={"60"} color={"white"} className="group-hover:fill-[#FFA0B4]" />}
-            description="Lock your assets in yield strategies and earn additional rewards on top!"
+            description="Single-asset vaults to earn yield on your digital assets"
             stats={[
               {
                 label: "TVL",
@@ -49,7 +49,7 @@ export default function Products(): JSX.Element {
                 infoIconProps: {
                   title: "Total Value Locked",
                   content: <p>The total value of assets held <br /> by the underlying smart contracts.</p>,
-                  id: "lock-vault-tvl",
+                  id: "smart-vault-tvl",
                 },
               }
             ]}
@@ -63,7 +63,7 @@ export default function Products(): JSX.Element {
               </>
             }
             customContent={<PopIcon size={"60"} color={"white"} className="group-hover:fill-[#80FF77]" />}
-            description="Monitor the market performance of VCX, veVCX, and oVCX"
+            description="Lock your assets in yield strategies and earn additional rewards on top!"
             stats={[
               {
                 label: "TVL",
@@ -71,11 +71,11 @@ export default function Products(): JSX.Element {
                 infoIconProps: {
                   title: "Total Value Locked",
                   content: <p>The total value of assets held <br /> by the underlying smart contracts.</p>,
-                  id: "sweet-vault-tvl",
+                  id: "lock-vault-tvl",
                 },
               }
             ]}
-            route="stats"
+            route="lock-vaults"
           />
           <Product
             title={
