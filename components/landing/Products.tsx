@@ -6,7 +6,7 @@ import SmileyIcon from "@/components/svg/popcorn/SmileyIcon";
 import HandIcon from "@/components/svg/popcorn/HandIcon";
 import PopIcon from "@/components/svg/popcorn/PopIcon";
 import { useAtom } from "jotai";
-import { vaultsAtom } from "@/lib/atoms/vaults";
+import { lockvaultsAtom, vaultsAtom } from "@/lib/atoms/vaults";
 
 export default function Products(): JSX.Element {
   const [vaults] = useAtom(vaultsAtom)
@@ -17,6 +17,15 @@ export default function Products(): JSX.Element {
       setVaultTvl((vaults.reduce((a, b) => a + b.tvl, 0)))
     }
   }, [vaults])
+
+  const [lockVaults] = useAtom(lockvaultsAtom)
+  const [lockVaultTvl, setLockVaultTvl] = useState<number>(0);
+
+  useEffect(() => {
+    if (lockVaults) {
+      setLockVaultTvl((lockVaults.reduce((a, b) => a + b.tvl, 0)))
+    }
+  }, [lockVaults])
 
   return (
     <>
@@ -32,7 +41,7 @@ export default function Products(): JSX.Element {
               </>
             }
             customContent={<PopSmileyIcon size={"60"} color={"white"} className="group-hover:fill-[#FFA0B4]" />}
-            description="Single-asset vaults to earn yield on your digital assets "
+            description="Lock your assets in yield strategies and earn additional rewards on top!"
             stats={[
               {
                 label: "TVL",
@@ -40,11 +49,33 @@ export default function Products(): JSX.Element {
                 infoIconProps: {
                   title: "Total Value Locked",
                   content: <p>The total value of assets held <br /> by the underlying smart contracts.</p>,
-                  id: "sweet-vault-tvl",
+                  id: "lock-vault-tvl",
                 },
               }
             ]}
             route="vaults"
+          />
+          <Product
+            title={
+              <>
+                Lock <br className="hidden md:inline" />
+                Vaults
+              </>
+            }
+            customContent={<PopIcon size={"60"} color={"white"} className="group-hover:fill-[#80FF77]" />}
+            description="Monitor the market performance of VCX, veVCX, and oVCX"
+            stats={[
+              {
+                label: "TVL",
+                content: `$${NumberFormatter.format(lockVaultTvl)}`,
+                infoIconProps: {
+                  title: "Total Value Locked",
+                  content: <p>The total value of assets held <br /> by the underlying smart contracts.</p>,
+                  id: "sweet-vault-tvl",
+                },
+              }
+            ]}
+            route="stats"
           />
           <Product
             title={
@@ -69,17 +100,6 @@ export default function Products(): JSX.Element {
             description="Create automated assets strategies within minutes"
             stats={[]}
             route="/create-vault"
-          />
-          <Product
-            title={
-              <>
-                Stats
-              </>
-            }
-            customContent={<PopIcon size={"60"} color={"white"} className="group-hover:fill-[#80FF77]" />}
-            description="Monitor the market performance of VCX, veVCX, and oVCX"
-            stats={[]}
-            route="stats"
           />
         </div>
       </section>
