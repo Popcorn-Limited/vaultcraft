@@ -1,6 +1,8 @@
 // @ts-ignore
 import NoSSR from "react-no-ssr";
 import axios from "axios";
+import { differenceInCalendarWeeks } from "date-fns";
+
 // import { BalancerSDK, Network } from '@balancer-labs/sdk';
 import { useEffect, useRef, useState } from "react";
 import Highcharts from "highcharts";
@@ -52,6 +54,25 @@ const leaderboardOptions = [{
     label: 'Top Depositors'
 }]
 
+const totalEmission = () => {
+    let totalEmission = 0;
+    let today = new Date();
+
+    const epochDiff = differenceInCalendarWeeks(
+      new Date(today.getFullYear(), today.getMonth() + 1, today.getDate()),
+      new Date(2023, 11, 30)
+    )
+
+    if (epochDiff <= 13) {
+        totalEmission += epochDiff * 2000000;
+    } else {
+        const emission = 2000000 * Math.pow(0.9729, epochDiff - 13);
+        totalEmission += 13 * 2000000 + emission
+    }
+
+    return totalEmission;
+}
+
 const formatDate = (timestamp: number) => {
     const date = new Date(timestamp)
 
@@ -89,6 +110,7 @@ export default function Vaults() {
         }[]
         totalRevenue: number
         oVcxRevenue: number
+        burnedVcx: number
         weekDexVolume: number
         holderTotal: number
         holderPlankton: number
@@ -122,6 +144,7 @@ export default function Vaults() {
         tvlMonthByMonth: [],
         totalRevenue: 0,
         oVcxRevenue: 0,
+        burnedVcx: 0,
         weekDexVolume: 0,
         holderTotal: 0,
         holderPlankton: 0,
@@ -301,7 +324,8 @@ export default function Vaults() {
             tvlByTime,
             holder,
             veLocked,
-            volume
+            volume,
+            oVCXRevenue,
         ] = await Promise.all([
             axios.get<DuneQueryResult<{
                 created: number
@@ -352,6 +376,9 @@ export default function Vaults() {
                 'USD Volume': number
                 blockchain: string
             }>>('https://api.dune.com/api/v1/query/2490697/results', duneOpts),
+            axios.get<DuneQueryResult<{
+                'cumulative_eth_redeemed': number
+            }>>('https://api.dune.com/api/v1/query/3237707/results', duneOpts),
         ])
 
         const vcxInUsd = prices.data.coins["ethereum:0xcE246eEa10988C495B4A90a905Ee9237a0f91543"].price
@@ -364,6 +391,7 @@ export default function Vaults() {
             fdv: duneTokenResult.data.result.rows[0].totalsupply * vcxInUsd,
             totalSupply: duneTokenResult.data.result.rows[0].totalsupply,
             vcxPrice: vcxInUsd,
+            burnedVcx: duneTokenResult.data.result.rows[0].totalburn,
             liquidSupply: duneTokenResult.data.result.rows[0].circulatingsupply,
             marketCap: duneTokenResult.data.result.rows[0].circulatingsupply * vcxInUsd,
             holderTotal: holder.data.result.rows[0].total_number,
@@ -385,7 +413,11 @@ export default function Vaults() {
             balLp: ((Number(poolTokens[1][1]) / 1e18) * vcxInUsd) + ((Number(poolTokens[1][0]) / 1e18) * wethInUsd),
             vcxInBalPool: (Number(poolTokens[1][1]) / 1e18) * vcxInUsd,
             wethInBalPool: (Number(poolTokens[1][0]) / 1e18) * wethInUsd,
-            veVcx: (Number(veLocked) / 1e18) * lpInUsd
+            veVcx: (Number(veLocked) / 1e18) * lpInUsd,
+            oVcxExercised: duneTokenResult.data.result.rows[0].cumulativeexercisedvcx,
+            totalRevenue: Number(oVCXRevenue.data.result.rows[0].cumulative_eth_redeemed) * wethInUsd,
+            oVcxRevenue: Number(oVCXRevenue.data.result.rows[0].cumulative_eth_redeemed) * wethInUsd,
+            oVcxEmissions: totalEmission() * vcxInUsd * 0.25
         })
 
         initDonutChart(liquidVcxMarketChartElem.current,
@@ -461,7 +493,7 @@ export default function Vaults() {
                         </div>
                         <div className={`flex flex-col`}>
                             <p className={`text-[1rem]`}>Burned VCX</p>
-                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>Coming Soon</h2>
+                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>{statistics.burnedVcx} VCX</h2>
                         </div>
                     </div>
                     <div className={`flex flex-col border border-[#353945] rounded-[1rem] bg-[#23262f]`}>
@@ -492,11 +524,11 @@ export default function Vaults() {
                                 </div>
                                 <div className={`flex justify-between`}>
                                     <p>oVCX emissions</p>
-                                    <p className={`font-bold text-right`}>Coming Soon {/*statistics.oVcxEmissions.toLocaleString()*/}</p>
+                                    <p className={`font-bold text-right`}>${statistics.oVcxEmissions.toLocaleString()}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
                                     <p>oVCX exercised</p>
-                                    <p className={`font-bold text-right`}>Coming Soon {/*(statistics.oVcxExercised * 100).toLocaleString() %*/}</p>
+                                    <p className={`font-bold text-right`}>{(statistics.oVcxExercised).toLocaleString()} VCX</p>
                                 </div>
                             </div>
                             <div className={`flex justify-center`} ref={liquidVcxMarketChartElem} />
@@ -529,16 +561,16 @@ export default function Vaults() {
                             <div className={`flex flex-col grow-[1]`}>
                                 <div className={`flex justify-between`}>
                                     <p>Total Revenue</p>
-                                    <p className={`font-bold text-right`}>Coming Soon{/*statistics.totalRevenue.toLocaleString()*/}</p>
+                                    <p className={`font-bold text-right`}>${statistics.totalRevenue.toLocaleString()}</p>
                                 </div>
-                                <div className={`flex justify-between`}>
+                                {/*<div className={`flex justify-between`}>
                                     <p>Smart Vault Fees</p>
                                     <p className={`font-bold text-right`}>Coming Soon</p>
-                                </div>
-                                <div className={`flex justify-between`}>
-                                    <p>oVCX Revenue</p>
-                                    <p className={`font-bold text-right`}>Coming Soon {/*statistics.oVcxRevenue.toLocaleString()*/}</p>
-                                </div>
+                                </div>*/}
+                                {/*<div className={`flex justify-between`}>*/}
+                                {/*    <p>oVCX Revenue</p>*/}
+                                {/*    <p className={`font-bold text-right`}>${statistics.oVcxRevenue.toLocaleString()}</p>*/}
+                                {/*</div>*/}
                                 <div className={`flex justify-between`}>
                                     <p>7 Day Dex Volume</p>
                                     <p className={`font-bold text-right`}>${statistics.weekDexVolume.toLocaleString()}</p>
