@@ -10,6 +10,8 @@ import SelectField from "@/components/input/SelectField";
 import { erc20ABI, usePublicClient } from "wagmi";
 import { getVeAddresses } from "@/lib/utils/addresses";
 import { BalancerVaultAbi, VCX_POOL_ID, VotingEscrowAbi } from "@/lib/constants";
+import {formatToFixedDecimals} from "@/lib/utils/formatBigNumber";
+import {bigint} from "zod";
 
 const { VCX, VotingEscrow, WETH, WETH_VCX_LP, oVCX, BalancerVault } = getVeAddresses()
 
@@ -473,27 +475,27 @@ export default function Vaults() {
                     <div className={`border border-[#353945] rounded-[1rem] bg-[#23262f] p-6 grid col-span-full md:grid-cols-6 gap-6`}>
                         <div className={`flex flex-col`}>
                             <p className={`text-[1rem]`}>Total Supply</p>
-                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>{statistics.totalSupply.toLocaleString()}</h2>
+                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>{ formatToFixedDecimals(statistics.totalSupply, 0) }</h2>
                         </div>
                         <div className={`flex flex-col`}>
                             <p className={`text-[1rem]`}>Liquid Supply</p>
-                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>{statistics.liquidSupply.toLocaleString()}</h2>
+                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>{ formatToFixedDecimals(statistics.liquidSupply, 0) }</h2>
                         </div>
                         <div className={`flex flex-col`}>
                             <p className={`text-[1rem]`}>FDV</p>
-                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>${statistics.fdv.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 })}</h2>
+                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>${ formatToFixedDecimals(statistics.fdv, 0) }</h2>
                         </div>
                         <div className={`flex flex-col`}>
                             <p className={`text-[1rem]`}>Market Cap</p>
-                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>${statistics.marketCap.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 })}</h2>
+                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>${ formatToFixedDecimals(statistics.marketCap, 0) }</h2>
                         </div>
                         <div className={`flex flex-col`}>
                             <p className={`text-[1rem]`}>VCX Price</p>
-                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>${statistics.vcxPrice.toLocaleString(undefined, { maximumFractionDigits: 4, minimumFractionDigits: 2 })}</h2>
+                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>${ statistics.vcxPrice.toLocaleString(undefined, { maximumFractionDigits: 4, minimumFractionDigits: 2 })}</h2>
                         </div>
                         <div className={`flex flex-col`}>
                             <p className={`text-[1rem]`}>Burned VCX</p>
-                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>{statistics.burnedVcx} VCX</h2>
+                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>{ formatToFixedDecimals(statistics.burnedVcx, 0) } VCX</h2>
                         </div>
                     </div>
                     <div className={`flex flex-col border border-[#353945] rounded-[1rem] bg-[#23262f]`}>
@@ -508,27 +510,27 @@ export default function Vaults() {
                             <div className={`flex flex-col grow-[1]`}>
                                 <div className={`flex justify-between`}>
                                     <p>VCX in 80/20 BAL pool</p>
-                                    <p className={`font-bold text-right`}>${statistics.vcxInBalPool.toLocaleString()}</p>
+                                    <p className={`font-bold text-right`}>${ formatToFixedDecimals(statistics.vcxInBalPool, 0)}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
                                     <p>WETH in 80/20 BAL pool</p>
-                                    <p className={`font-bold text-right`}>${statistics.wethInBalPool.toLocaleString()}</p>
+                                    <p className={`font-bold text-right`}>${ formatToFixedDecimals(statistics.wethInBalPool, 0)}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
                                     <p>BAL LPs</p>
-                                    <p className={`font-bold text-right`}>${statistics.balLp.toLocaleString()}</p>
+                                    <p className={`font-bold text-right`}>${ formatToFixedDecimals(statistics.balLp, 0)}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
                                     <p>veVCX (staked LPs)</p>
-                                    <p className={`font-bold text-right`}>${statistics.veVcx.toLocaleString()}</p>
+                                    <p className={`font-bold text-right`}>${ formatToFixedDecimals(statistics.veVcx, 0)}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
                                     <p>oVCX emissions</p>
-                                    <p className={`font-bold text-right`}>${statistics.oVcxEmissions.toLocaleString()}</p>
+                                    <p className={`font-bold text-right`}>${ formatToFixedDecimals(statistics.oVcxEmissions, 0)}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
                                     <p>oVCX exercised</p>
-                                    <p className={`font-bold text-right`}>{(statistics.oVcxExercised).toLocaleString()} VCX</p>
+                                    <p className={`font-bold text-right`}>{ formatToFixedDecimals(statistics.oVcxExercised, 0)} VCX</p>
                                 </div>
                             </div>
                             <div className={`flex justify-center`} ref={liquidVcxMarketChartElem} />
@@ -545,7 +547,7 @@ export default function Vaults() {
                                     return (
                                         <div key={idx} className={`flex justify-between`}>
                                             <p>{item.title}</p>
-                                            <p className={`font-bold text-right`}>${item.count.toLocaleString()}</p>
+                                            <p className={`font-bold text-right`}>${formatToFixedDecimals(item.count, 0)}</p>
                                         </div>
                                     )
                                 })}
@@ -561,7 +563,7 @@ export default function Vaults() {
                             <div className={`flex flex-col grow-[1]`}>
                                 <div className={`flex justify-between`}>
                                     <p>Total Revenue</p>
-                                    <p className={`font-bold text-right`}>${statistics.totalRevenue.toLocaleString()}</p>
+                                    <p className={`font-bold text-right`}>${ formatToFixedDecimals(statistics.totalRevenue, 0)}</p>
                                 </div>
                                 {/*<div className={`flex justify-between`}>
                                     <p>Smart Vault Fees</p>
@@ -573,31 +575,31 @@ export default function Vaults() {
                                 {/*</div>*/}
                                 <div className={`flex justify-between`}>
                                     <p>7 Day Dex Volume</p>
-                                    <p className={`font-bold text-right`}>${statistics.weekDexVolume.toLocaleString()}</p>
+                                    <p className={`font-bold text-right`}>${formatToFixedDecimals(statistics.weekDexVolume, 0)}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
                                     <p>Total Holder</p>
-                                    <p className={`font-bold text-right`}>{statistics.holderTotal.toLocaleString()}</p>
+                                    <p className={`font-bold text-right`}>{formatToFixedDecimals(statistics.holderTotal, 0)}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
                                     <p>Wallets with 100-1K VCX</p>
-                                    <p className={`font-bold text-right`}>{statistics.holderPlankton.toLocaleString()}</p>
+                                    <p className={`font-bold text-right`}>{formatToFixedDecimals(statistics.holderPlankton, 0)}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
                                     <p>Wallets with 1K - 100K VCX</p>
-                                    <p className={`font-bold text-right`}>{statistics.holderShrimp.toLocaleString()}</p>
+                                    <p className={`font-bold text-right`}>{formatToFixedDecimals(statistics.holderShrimp, 0)}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
                                     <p>Wallets with 100K-1M VCX</p>
-                                    <p className={`font-bold text-right`}>{statistics.holderFish.toLocaleString()}</p>
+                                    <p className={`font-bold text-right`}>{formatToFixedDecimals(statistics.holderFish, 0)}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
                                     <p>Wallets with 1M-10M VCX</p>
-                                    <p className={`font-bold text-right`}>{statistics.holderDolphin.toLocaleString()}</p>
+                                    <p className={`font-bold text-right`}>{formatToFixedDecimals(statistics.holderDolphin, 0)}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
                                     <p>Wallets with 10M+ VCX</p>
-                                    <p className={`font-bold text-right`}>{statistics.holderWhale.toLocaleString()}</p>
+                                    <p className={`font-bold text-right`}>{formatToFixedDecimals(statistics.holderWhale, 0)}</p>
                                 </div>
                             </div>
                         </div>
