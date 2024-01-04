@@ -124,7 +124,10 @@ export default function Migration(): JSX.Element {
                 return
             }
         }
-        let success = await handleAllowance({
+
+        console.log({ val, bal: Number(popBal) })
+
+        const approveSuccess = await handleAllowance({
             token: POP,
             amount: val,
             account,
@@ -134,14 +137,16 @@ export default function Migration(): JSX.Element {
                 walletClient
             }
         })
-        if (success) success = await migrate({
-            address: VCX,
-            account,
-            amount: val,
-            publicClient,
-            walletClient
-        })
-        setPopBal(prevState => prevState - BigInt(val.toLocaleString("fullwide", { useGrouping: false })))
+        if (approveSuccess) {
+            const migrateSuccess = await migrate({
+                address: VCX,
+                account,
+                amount: val,
+                publicClient,
+                walletClient
+            })
+            if (migrateSuccess) setPopBal(prevState => prevState - BigInt(val.toLocaleString("fullwide", { useGrouping: false })))
+        }
     }
 
     return (
@@ -155,7 +160,7 @@ export default function Migration(): JSX.Element {
                 </p>
             </div>
             <div className="px-6 md:px-8 py-10 border-t border-b border-[#353945] mt-6 md:mt-10 w-full">
-                {vcxBal  ?
+                {vcxBal ?
                     <div className="rounded-lg w-full md:w-1/3 md:min-w-[870px] bg-[#23262F] md:ml-auto md:mr-auto md:p-8 px-8 pt-6 pb-5 md:pl-11 border border-[#353945] [&_summary::-webkit-details-marker]:hidden">
                         <InputTokenWithError
                             onSelectToken={() => { }}
