@@ -62,6 +62,9 @@ export function numberToBigNumber(value: number | string, decimals: number): Big
   return ZERO;
 }
 
+export function formatToFixedDecimals(value: number, decimals: number): string {
+  return Number(Number.parseFloat(value.toString()).toFixed(decimals)).toLocaleString()
+}
 
 export const NumberFormatter = Intl.NumberFormat("en", {
   //@ts-ignore
