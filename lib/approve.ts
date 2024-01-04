@@ -33,8 +33,9 @@ export async function handleAllowance({ token, amount, account, spender, clients
   console.log({ allowance: Number(allowance), amount })
   if (Number(allowance) === 0 || Number(allowance) < amount) {
     return approve({ address: token, account, spender, publicClient: clients.publicClient, walletClient: clients.walletClient })
+  } else {
+    return true
   }
-  return true
 }
 
 export default async function approve({ address, account, spender, publicClient, walletClient }: ApproveProps): Promise<boolean> {
