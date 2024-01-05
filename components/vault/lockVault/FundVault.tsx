@@ -138,6 +138,7 @@ export default function FundVault({ vaultData, mutateTokenBalance, searchTerm }:
             <div className="space-y-4">
               <VaultStats
                 vaultData={vaultData}
+                zapAvailable={false}
               />
             </div>
 
@@ -222,7 +223,7 @@ export default function FundVault({ vaultData, mutateTokenBalance, searchTerm }:
           <div className="flex items-center justify-between select-none w-full">
             <AssetWithName vault={vaultData} />
           </div>
-          <VaultStats vaultData={vaultData} />
+          <VaultStats vaultData={vaultData} zapAvailable={false} />
         </div>
       </Accordion >
     </>
