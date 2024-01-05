@@ -5,12 +5,40 @@ import VaultStats from "./VaultStats";
 import VaultInteraction from "./VaultInteraction";
 import Accordion from "@/components/common/Accordion";
 import Modal from "@/components/modal/Modal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AssetWithName from "../AssetWithName";
-import { LockVaultData } from "@/lib/types";
+import { LockVaultData, Token } from "@/lib/types";
+import { useAtom } from "jotai";
+import { availableZapAssetAtom, zapAssetsAtom } from "@/lib/atoms";
+import { getTokenOptions, isDefiPosition } from "@/lib/vault/utils";
 
 export default function LockVault({ vaultData, mutateTokenBalance, searchTerm }: { vaultData: LockVaultData, mutateTokenBalance: () => {}, searchTerm: string }): JSX.Element {
   const [showModal, setShowModal] = useState(false)
+
+  const [zapAssets] = useAtom(zapAssetsAtom)
+  const [availableZapAssets] = useAtom(availableZapAssetAtom)
+
+  const [zapAvailable, setZapAvailable] = useState<boolean>(false)
+  const [tokenOptions, setTokenOptions] = useState<Token[]>([])
+
+  useEffect(() => {
+    if (!!vaultData && Object.keys(availableZapAssets).length > 0) {
+      if (availableZapAssets[vaultData.chainId].includes(vaultData.asset.address)) {
+        setZapAvailable(true)
+        setTokenOptions(getTokenOptions(vaultData, zapAssets[vaultData.chainId]))
+      } else {
+        isDefiPosition({ address: vaultData.asset.address, chainId: vaultData.chainId }).then(isZapable => {
+          if (isZapable) {
+            setZapAvailable(true)
+            setTokenOptions(getTokenOptions(vaultData, zapAssets[vaultData.chainId]))
+          } else {
+            setTokenOptions(getTokenOptions(vaultData))
+          }
+        })
+      }
+    }
+  }, [availableZapAssets, vaultData])
+
 
   if (!vaultData) return <></>
   if (searchTerm !== "" &&
@@ -26,6 +54,7 @@ export default function LockVault({ vaultData, mutateTokenBalance, searchTerm }:
             <div className="space-y-4">
               <VaultStats
                 vaultData={vaultData}
+                zapAvailable={zapAvailable}
               />
             </div>
 
@@ -63,6 +92,7 @@ export default function LockVault({ vaultData, mutateTokenBalance, searchTerm }:
           <div className="w-full md:w-1/2 mt-4 md:mt-0 flex-grow rounded-lg border border-[#353945] bg-[#141416] p-6">
             <VaultInteraction
               vaultData={vaultData}
+              tokenOptions={tokenOptions}
               hideModal={() => setShowModal(false)}
               mutateTokenBalance={mutateTokenBalance}
             />
@@ -75,7 +105,7 @@ export default function LockVault({ vaultData, mutateTokenBalance, searchTerm }:
           <div className="flex items-center justify-between select-none w-full">
             <AssetWithName vault={vaultData} />
           </div>
-          <VaultStats vaultData={vaultData} />
+          <VaultStats vaultData={vaultData} zapAvailable={zapAvailable} />
         </div>
       </Accordion >
     </>

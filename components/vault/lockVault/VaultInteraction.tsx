@@ -10,21 +10,20 @@ import Deposit from "./Deposit";
 import Withdraw from "./Withdraw";
 import { useEffect, useState } from "react";
 import { ActionStep } from "@/lib/vault/getActionSteps";
-import { LockVaultActionType, LockVaultData } from "@/lib/types";
+import { LockVaultActionType, LockVaultData, Token } from "@/lib/types";
 import getActionSteps from "@/lib/vault/lockVault/getActionSteps";
 import Claim from "./Claim";
-import { handleClaim, handleDeposit, handleIncreaseAmount, handleWithdraw } from "@/lib/vault/lockVault/interactions";
-import { handleAllowance } from "@/lib/approve";
 import { getAddress, isAddress } from "viem";
-import { validateInput } from "@/lib/utils/helpers";
+import handleVaultInteraction from "@/lib/vault/lockVault/handleVaultInteraction";
 
 interface VaultInteractionProps {
   vaultData: LockVaultData;
+  tokenOptions: Token[];
   hideModal: () => void;
   mutateTokenBalance: () => void;
 }
 
-export default function VaultInteraction({ vaultData, hideModal, mutateTokenBalance }: VaultInteractionProps): JSX.Element {
+export default function VaultInteraction({ vaultData, tokenOptions, hideModal, mutateTokenBalance }: VaultInteractionProps): JSX.Element {
   const { query } = useRouter()
   const [masaSdk,] = useAtom(masaAtom)
 
@@ -35,6 +34,9 @@ export default function VaultInteraction({ vaultData, hideModal, mutateTokenBala
 
   const { switchNetworkAsync } = useSwitchNetwork();
   const { openConnectModal } = useConnectModal();
+
+  const [inputToken, setInputToken] = useState<Token>(vaultData.asset)
+  const [outputToken, setOutputToken] = useState<Token>(vaultData.vault)
 
   const [inputBalance, setInputBalance] = useState<string>("0");
   const [days, setDays] = useState<string>(String(vaultData.lock.daysToUnlock > 0 ? vaultData.lock.daysToUnlock : "7"));
@@ -56,12 +58,16 @@ export default function VaultInteraction({ vaultData, hideModal, mutateTokenBala
       const newAction = vaultData.lock.unlockTime === 0 ? LockVaultActionType.Deposit : LockVaultActionType.IncreaseAmount
       setAction(newAction)
       setSteps(getActionSteps(newAction))
+      setInputToken(vaultData.asset)
+      setOutputToken(vaultData.vault)
     } else {
       setAction(LockVaultActionType.Withdrawal)
       setSteps(getActionSteps(LockVaultActionType.Withdrawal))
       setInputBalance(String(vaultData.lock.amount / (10 ** vaultData.vault.decimals)))
+      setInputToken(vaultData.vault)
+      setOutputToken(vaultData.asset)
     }
-  }, [vaultData])
+  }, [])
 
   function switchActiveTab(tab: string) {
     setStepCounter(0)
@@ -72,10 +78,14 @@ export default function VaultInteraction({ vaultData, hideModal, mutateTokenBala
         setAction(newAction)
         setSteps(getActionSteps(newAction))
         setInputBalance("0")
+        setInputToken(vaultData.asset)
+        setOutputToken(vaultData.vault)
       } else {
         setAction(LockVaultActionType.Withdrawal)
         setSteps(getActionSteps(LockVaultActionType.Withdrawal))
         setInputBalance(String(vaultData.lock.amount / (10 ** vaultData.vault.decimals)))
+        setInputToken(vaultData.vault)
+        setOutputToken(vaultData.asset)
       }
     } else {
       setActiveTab("Claim")
@@ -103,73 +113,23 @@ export default function VaultInteraction({ vaultData, hideModal, mutateTokenBala
     currentStep.loading = true
     setSteps(stepsCopy)
 
-    const clients = {
-      publicClient,
-      walletClient
-    }
-
-    const ref = {
+    const vaultInteraction = await handleVaultInteraction({
+      amount: (val * (10 ** inputToken.decimals)),
+      days: Number(days),
+      action,
+      stepCounter,
+      chainId: vaultData.chainId,
+      inputToken,
+      outputToken,
+      vaultData,
+      account,
+      slippage: 100, // In BPS 0 - 10_000
+      tradeTimeout: 300,
+      clients: { publicClient, walletClient },
       fireEvent: masaSdk?.fireEvent,
       referral: !!query?.ref && isAddress(query.ref as string) ? getAddress(query.ref as string) : undefined
-    }
-
-    let success = false
-    switch (action) {
-      case LockVaultActionType.Deposit:
-        if (stepCounter === 0) {
-          success = await handleAllowance({
-            token: vaultData.asset.address,
-            amount: (val * (10 ** vaultData.asset.decimals)),
-            account,
-            spender: vaultData.vault.address,
-            clients
-          })
-        } else {
-          success = await handleDeposit({
-            vaultData,
-            account,
-            amount: (val * (10 ** vaultData.asset.decimals)),
-            days: Number(days),
-            clients,
-            ...ref
-          })
-        }
-        break;
-      case LockVaultActionType.IncreaseAmount:
-        if (stepCounter === 0) {
-          success = await handleAllowance({
-            token: vaultData.asset.address,
-            amount: (val * (10 ** vaultData.asset.decimals)),
-            account,
-            spender: vaultData.vault.address,
-            clients
-          })
-        } else {
-          success = await handleIncreaseAmount({
-            vaultData,
-            account,
-            amount: (val * (10 ** vaultData.asset.decimals)),
-            clients
-          })
-        }
-        break;
-      case LockVaultActionType.Withdrawal:
-        success = await handleWithdraw({
-          vaultData,
-          account,
-          amount: (val * (10 ** vaultData.vault.decimals)),
-          clients,
-          ...ref
-        })
-        break;
-      case LockVaultActionType.Claim:
-        success = await handleClaim({
-          vaultData,
-          account,
-          clients
-        })
-        break;
-    }
+    })
+    const success = await vaultInteraction()
 
     currentStep.loading = false
     currentStep.success = success;
@@ -181,6 +141,37 @@ export default function VaultInteraction({ vaultData, hideModal, mutateTokenBala
     if (newStepCounter === steps.length) mutateTokenBalance()
   }
 
+  function handleTokenSelect(input: Token, output: Token): void {
+    setInputToken(input);
+    setOutputToken(output);
+    switch (input.address) {
+      case vaultData.asset.address:
+        if (action === LockVaultActionType.Claim) {
+          setAction(LockVaultActionType.Claim)
+          setSteps(getActionSteps(LockVaultActionType.Claim))
+        } else {
+          const newAction = vaultData.lock.unlockTime === 0 ? LockVaultActionType.Deposit : LockVaultActionType.IncreaseAmount
+          setAction(newAction)
+          setSteps(getActionSteps(newAction))
+        }
+        break;
+      case vaultData.vault.address:
+        if (output.address === vaultData.asset.address) {
+          setAction(LockVaultActionType.Withdrawal)
+          setSteps(getActionSteps(LockVaultActionType.Withdrawal))
+        } else {
+          setAction(LockVaultActionType.ZapWithdrawal)
+          setSteps(getActionSteps(LockVaultActionType.ZapWithdrawal))
+        }
+        break;
+      default:
+        const newAction = vaultData.lock.unlockTime === 0 ? LockVaultActionType.ZapDeposit : LockVaultActionType.ZapIncreaseAmount
+        setAction(newAction)
+        setSteps(getActionSteps(newAction))
+        break;
+    }
+  }
+
   return <>
     <TabSelector
       className="mb-6"
@@ -189,8 +180,24 @@ export default function VaultInteraction({ vaultData, hideModal, mutateTokenBala
       setActiveTab={() => switchActiveTab(activeTab)}
     />
 
-    {activeTab === "Deposit" && <Deposit vaultData={vaultData} inputBalState={[inputBalance, setInputBalance]} daysState={[days, setDays]} />}
-    {activeTab === "Withdraw" && <Withdraw vaultData={vaultData} />}
+    {activeTab === "Deposit" &&
+      <Deposit
+        vaultData={vaultData}
+        tokenOptions={tokenOptions}
+        inputBalState={[inputBalance, setInputBalance]}
+        daysState={[days, setDays]}
+        handleTokenSelect={handleTokenSelect}
+        inputToken={inputToken}
+      />
+    }
+    {activeTab === "Withdraw" &&
+      <Withdraw
+        vaultData={vaultData}
+        tokenOptions={tokenOptions}
+        handleTokenSelect={handleTokenSelect}
+        outputToken={outputToken}
+      />
+    }
     {activeTab === "Claim" && <Claim vaultData={vaultData} />}
 
     <div className="w-full flex justify-center my-6">
@@ -201,22 +208,12 @@ export default function VaultInteraction({ vaultData, hideModal, mutateTokenBala
       {account ? (
         <>
           {(stepCounter === steps.length || steps.some(step => !step.loading && step.error)) ?
-            <MainActionButton
-              label={"Close Modal"}
-              handleClick={hideModal}
-            /> :
-            <MainActionButton
-              label={steps[stepCounter].label}
-              handleClick={handleMainAction}
-              disabled={inputBalance === "0" || steps[stepCounter].loading || (action === LockVaultActionType.Deposit && Number(days) === 0)}
-            />
+            <MainActionButton label={"Close Modal"} handleClick={hideModal} /> :
+            <MainActionButton label={steps[stepCounter].label} handleClick={handleMainAction} disabled={inputBalance === "0" || steps[stepCounter].loading} />
           }
         </>
       )
-        : < MainActionButton
-          label={"Connect Wallet"}
-          handleClick={openConnectModal}
-        />
+        : < MainActionButton label={"Connect Wallet"} handleClick={openConnectModal} />
       }
     </div>
   </>

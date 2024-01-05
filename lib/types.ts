@@ -150,5 +150,8 @@ export enum LockVaultActionType {
   Deposit,
   IncreaseAmount,
   Withdrawal,
-  Claim
+  Claim,
+  ZapDeposit,
+  ZapIncreaseAmount,
+  ZapWithdrawal
 }

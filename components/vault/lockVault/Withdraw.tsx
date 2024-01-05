@@ -1,8 +1,15 @@
 import InputTokenWithError from "@/components/input/InputTokenWithError"
-import { LockVaultData } from "@/lib/types"
+import { LockVaultData, Token } from "@/lib/types"
 import { ArrowDownIcon } from "@heroicons/react/24/outline"
 
-export default function Withdraw({ vaultData }: { vaultData: LockVaultData }): JSX.Element {
+interface WithdrawProps {
+  vaultData: LockVaultData;
+  tokenOptions: Token[];
+  handleTokenSelect: (input: Token, output: Token) => void;
+  outputToken: Token;
+}
+
+export default function Withdraw({ vaultData, tokenOptions, handleTokenSelect, outputToken }: WithdrawProps): JSX.Element {
   return (
     <>
       <InputTokenWithError
@@ -40,15 +47,15 @@ export default function Withdraw({ vaultData }: { vaultData: LockVaultData }): J
       </div>
       <InputTokenWithError
         captionText={"Output Amount"}
-        onSelectToken={option => { }}
+        onSelectToken={option => handleTokenSelect(vaultData.vault, option)}
         onMaxClick={() => { }}
         chainId={vaultData.chainId}
         value={((vaultData.vault.balance * vaultData.vault.price) / (10 ** vaultData.vault.decimals)) / vaultData.asset.price}
         onChange={() => { }}
-        selectedToken={vaultData.asset}
+        selectedToken={outputToken}
         errorMessage={""}
-        tokenList={[]}
-        allowSelection={false}
+        tokenList={tokenOptions.filter(option => option.address !== vaultData.address)}
+        allowSelection
         allowInput={false}
       />
     </>

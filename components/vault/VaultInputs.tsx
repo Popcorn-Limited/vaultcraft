@@ -18,7 +18,6 @@ import { MutateTokenBalanceProps } from "@/components/vault/VaultsContainer";
 import { useAtom } from "jotai";
 import { masaAtom } from "@/lib/atoms/sdk";
 import { useRouter } from "next/router";
-import { fi } from "date-fns/locale";
 
 interface VaultInputsProps {
   vaultData: VaultData;

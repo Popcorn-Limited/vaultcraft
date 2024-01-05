@@ -13,19 +13,8 @@ import { showSuccessToast } from '@/lib/toasts';
 import { MutateTokenBalanceProps } from '@/components/vault/VaultsContainer';
 import { useAtom } from 'jotai';
 import { availableZapAssetAtom, zapAssetsAtom } from '@/lib/atoms';
-import axios from "axios";
+import { getTokenOptions, isDefiPosition } from '@/lib/vault/utils';
 
-async function isDefiPosition({ address, chainId }: { address: Address, chainId: number }): Promise<boolean> {
-  const { data } = await axios.get(`https://api.enso.finance/api/v1/positions?verified=false&tokenAddress=${address}&page=1&chainId=${chainId}`)
-  return data.data.length > 0
-}
-
-function getTokenOptions(vaultData: VaultData, zapAssets?: Token[]): Token[] {
-  const tokenOptions = [vaultData.vault, vaultData.asset]
-  if (!!vaultData.gauge) tokenOptions.push(vaultData.gauge)
-  if (zapAssets) tokenOptions.push(...zapAssets.filter(asset => getAddress(asset.address) !== getAddress(vaultData.asset.address)))
-  return tokenOptions;
-}
 
 interface SmartVaultsProps {
   vaultData: VaultData;

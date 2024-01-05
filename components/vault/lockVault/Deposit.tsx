@@ -6,7 +6,7 @@ import InputNumber from "@/components/input/InputNumber";
 import { calcUnlockTime } from "@/lib/gauges/utils";
 import { safeRound } from "@/lib/utils/formatBigNumber";
 import { validateInput } from "@/lib/utils/helpers";
-import { LockVaultData } from "@/lib/types";
+import { LockVaultData, Token } from "@/lib/types";
 import { useAccount } from "wagmi";
 
 function LockTimeButton({ label, isActive, handleClick }: { label: string, isActive: boolean, handleClick: Function }): JSX.Element {
@@ -22,11 +22,14 @@ function LockTimeButton({ label, isActive, handleClick }: { label: string, isAct
 
 interface DepositProps {
   vaultData: LockVaultData;
-  inputBalState: [string, Dispatch<SetStateAction<string>>]
-  daysState: [string, Dispatch<SetStateAction<string>>]
+  tokenOptions: Token[];
+  inputBalState: [string, Dispatch<SetStateAction<string>>];
+  daysState: [string, Dispatch<SetStateAction<string>>];
+  handleTokenSelect: (input: Token, output: Token) => void;
+  inputToken: Token;
 }
 
-export default function Deposit({ vaultData, inputBalState, daysState }: DepositProps): JSX.Element {
+export default function Deposit({ vaultData, tokenOptions, inputBalState, daysState, handleTokenSelect, inputToken }: DepositProps): JSX.Element {
   const { address: account } = useAccount()
   const [inputBalance, setInputBalance] = inputBalState;
   const [days, setDays] = daysState;
@@ -55,15 +58,15 @@ export default function Deposit({ vaultData, inputBalState, daysState }: Deposit
   return <>
     <InputTokenWithError
       captionText={"Deposit Amount"}
-      onSelectToken={option => { }}
+      onSelectToken={option => handleTokenSelect(option, vaultData.vault)}
       onMaxClick={handleMaxClick}
       chainId={vaultData.chainId}
       value={inputBalance}
       onChange={handleChangeInput}
-      selectedToken={vaultData.asset}
+      selectedToken={inputToken}
       errorMessage={""}
-      tokenList={[]}
-      allowSelection={false}
+      tokenList={tokenOptions.filter(option => option.address !== vaultData.address)}
+      allowSelection
       allowInput
     />
     <div className="mt-6">

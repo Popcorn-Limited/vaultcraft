@@ -4,9 +4,10 @@ import { NumberFormatter, formatAndRoundNumber } from "@/lib/utils/formatBigNumb
 
 interface VaultStatsProps {
   vaultData: LockVaultData;
+  zapAvailable: boolean;
 }
 
-export default function VaultStats({ vaultData }: VaultStatsProps): JSX.Element {
+export default function VaultStats({ vaultData, zapAvailable }: VaultStatsProps): JSX.Element {
   const totalRewardApy = vaultData.rewards.reduce((a, b) => a + b.rewardApy, 0)
   return (
     <>
@@ -57,6 +58,12 @@ export default function VaultStats({ vaultData }: VaultStatsProps): JSX.Element 
           </Title>
         </div>
       </div>
+
+      {zapAvailable && (
+        <div className="w-full h-fit mt-auto">
+          <p className="font-normal text-primary text-[15px] mb-1">⚡ Zap available</p>
+        </div>
+      )}
     </>
   )
 }

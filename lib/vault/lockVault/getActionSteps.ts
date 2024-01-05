@@ -17,7 +17,7 @@ export default function getActionSteps(action: LockVaultActionType): ActionStep[
       },
       {
         step: 2,
-        label: "Deposit into Vault",
+        label: "Deposit",
         ...BaseStepInfo
       }]
     case LockVaultActionType.IncreaseAmount:
@@ -28,13 +28,13 @@ export default function getActionSteps(action: LockVaultActionType): ActionStep[
       },
       {
         step: 2,
-        label: "Deposit into Vault",
+        label: "Deposit",
         ...BaseStepInfo
       }]
     case LockVaultActionType.Withdrawal:
       return [{
         step: 1,
-        label: "Withdraw from Vault",
+        label: "Withdraw",
         ...BaseStepInfo
       }]
     case LockVaultActionType.Claim:
@@ -44,5 +44,55 @@ export default function getActionSteps(action: LockVaultActionType): ActionStep[
           label: "Claim Rewards",
           ...BaseStepInfo
         }]
+    case LockVaultActionType.ZapDeposit:
+      return [{
+        step: 1,
+        label: "Handle Zap Allowance",
+        ...BaseStepInfo
+      }, {
+        step: 2,
+        label: "Zap",
+        ...BaseStepInfo
+      }, {
+        step: 3,
+        label: "Handle Allowance",
+        ...BaseStepInfo
+      }, {
+        step: 4,
+        label: "Deposit",
+        ...BaseStepInfo
+      }]
+    case LockVaultActionType.ZapIncreaseAmount:
+      return [{
+        step: 1,
+        label: "Handle Zap Allowance",
+        ...BaseStepInfo
+      }, {
+        step: 2,
+        label: "Zap",
+        ...BaseStepInfo
+      }, {
+        step: 3,
+        label: "Handle Allowance",
+        ...BaseStepInfo
+      }, {
+        step: 4,
+        label: "Deposit",
+        ...BaseStepInfo
+      }]
+    case LockVaultActionType.ZapWithdrawal:
+      return [{
+        step: 1,
+        label: "Withdraw",
+        ...BaseStepInfo
+      }, {
+        step: 2,
+        label: "Handle Zap Allowance",
+        ...BaseStepInfo
+      }, {
+        step: 3,
+        label: "Zap",
+        ...BaseStepInfo
+      }]
   }
 }
