@@ -100,7 +100,7 @@ export async function handleIncreaseAmount({ vaultData, account, amount, clients
       address: vaultData.address,
       account,
       args: [account, BigInt(Number(amount).toLocaleString("fullwide", { useGrouping: false }))],
-      functionName: "increaseAmount",
+      functionName: "increaseLockAmount",
       publicClient: clients.publicClient
     }),
     clients
