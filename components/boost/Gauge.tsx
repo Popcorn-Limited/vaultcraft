@@ -37,11 +37,22 @@ export default function Gauge({ vaultData, index, votes, handleVotes, canVote }:
 
   function onChange(value: number) {
     const currentVoteForThisGauge = votes[index];
-    const potentialNewTotalVotes = Object.values(votes).reduce((a, b) => a + b, 0) - currentVoteForThisGauge + Number(value);
-    if (potentialNewTotalVotes <= 10000) {
-      handleVotes(value, index);
-      setAmount(value);
+
+    // As long as you keep moving the slider, `value` continues to count to the max value(10000). This sometimes makes the
+    // potentialNewTotalVotes to be greater than the cumulative total max, 10000. Whenever this happens,
+    // the potentialNewTotalVotes can never be exactly 10000, therefore, we never achieve 100% votes. To resolve this,
+    // whenever the value potentialNewTotalVotes spills over 10000, we normalize the value that caused the spill to only
+    // be as high as it needs to be to make the potentialNewTotalVotes (cumulative total max) = 10000, therefor reaching
+    // 100% votes.
+    const potentialNewTotalVotes =
+      Object.values(votes).reduce((a, b) => a + b, 0) - currentVoteForThisGauge + Number(value);
+
+    if(potentialNewTotalVotes > 10000) {
+      value = value - (potentialNewTotalVotes - 10000)
     }
+
+    handleVotes(value, index);
+    setAmount(value);
   }
 
   return (
