@@ -21,6 +21,7 @@ import {
   coinbaseWallet,
   walletConnectWallet,
   coin98Wallet,
+  rabbyWallet
 } from '@rainbow-me/rainbowkit/wallets';
 
 const { chains, publicClient } = configureChains(SUPPORTED_NETWORKS, [
@@ -41,6 +42,7 @@ const connectors = connectorsForWallets([
       injectedWallet({ chains }),
       rainbowWallet({ projectId: '9b83e8f348c7515d3f94d83f95a05749', chains }),
       metaMaskWallet({ projectId: '9b83e8f348c7515d3f94d83f95a05749', chains }),
+      rabbyWallet({ chains })
     ],
   },
   {
