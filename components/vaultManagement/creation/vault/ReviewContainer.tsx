@@ -52,14 +52,11 @@ export default function ReviewContainer({ route, stages, activeStage }: VaultCre
     // @ts-ignore
     if (!SUPPORTED_NETWORKS.map(network => network.id).includes(chain.id)) switchNetwork?.(Number(mainnet.id));
 
-    IpfsClient.add(metadata.name, { name: metadata.name }).then(res => {
-      setMetadata((prefState) => { return { ...prefState, ipfsHash: res } });
-      setIsLoading(true)
-      deployVault(chain, walletClient as WalletClient, publicClient, fees, asset, limit, adapterData, strategyData, res).then(res => {
-        !!res ? setIsSuccess(true) : setIsError(true);
-        setIsLoading(false)
-      })
-    });
+    setIsLoading(true)
+    deployVault(chain, walletClient as WalletClient, publicClient, fees, asset, limit, adapterData, strategyData, "").then(res => {
+      !!res ? setIsSuccess(true) : setIsError(true);
+      setIsLoading(false)
+    })
   }
 
   return (metadata && adapter ?

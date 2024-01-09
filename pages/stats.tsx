@@ -1,12 +1,19 @@
 // @ts-ignore
 import NoSSR from "react-no-ssr";
 import axios from "axios";
+import { differenceInCalendarWeeks } from "date-fns";
+
 // import { BalancerSDK, Network } from '@balancer-labs/sdk';
 import { useEffect, useRef, useState } from "react";
 import Highcharts from "highcharts";
 import SelectField from "@/components/input/SelectField";
+import { erc20ABI, usePublicClient } from "wagmi";
+import { getVeAddresses } from "@/lib/utils/addresses";
+import { BalancerVaultAbi, VCX_POOL_ID, VotingEscrowAbi } from "@/lib/constants";
+import {formatToFixedDecimals} from "@/lib/utils/formatBigNumber";
+import {bigint} from "zod";
 
-// TODO -- removed balancer since it was causing build issues with ethers. Need to readd it once the vcx pool is live
+const { VCX, VotingEscrow, WETH, WETH_VCX_LP, oVCX, BalancerVault } = getVeAddresses()
 
 type DuneQueryResult<T> = {
     result: {
@@ -49,7 +56,24 @@ const leaderboardOptions = [{
     label: 'Top Depositors'
 }]
 
-// const balancerPoolId = '0x5c6ee304399dbdb9c8ef030ab642b10820db8f56000200000000000000000014'
+const totalEmission = () => {
+    let totalEmission = 0;
+    let today = new Date();
+
+    const epochDiff = differenceInCalendarWeeks(
+      new Date(today.getFullYear(), today.getMonth() + 1, today.getDate()),
+      new Date(2023, 11, 30)
+    )
+
+    if (epochDiff <= 13) {
+        totalEmission += epochDiff * 2000000;
+    } else {
+        const emission = 2000000 * Math.pow(0.9729, epochDiff - 13);
+        totalEmission += 13 * 2000000 + emission
+    }
+
+    return totalEmission;
+}
 
 const formatDate = (timestamp: number) => {
     const date = new Date(timestamp)
@@ -62,18 +86,19 @@ const formatDate = (timestamp: number) => {
 }
 
 export default function Vaults() {
+    const publicClient = usePublicClient({ chainId: 1 })
     const [statistics, setStatistics] = useState<{
         totalSupply: number
         liquidSupply: number
         fdv: number
         marketCap: number
-        popPrice: number
-        popInBalPool: number
+        vcxPrice: number
+        vcxInBalPool: number
         wethInBalPool: number
         balLp: number
-        vePop: number
-        cPopEmissions: number
-        cPopExercised: number
+        veVcx: number
+        oVcxEmissions: number
+        oVcxExercised: number
         networkId: number
         vaultTvl: {
             title: string
@@ -86,14 +111,15 @@ export default function Vaults() {
             }
         }[]
         totalRevenue: number
-        cPopRevenue: number
-        weekCexVolume: number
+        oVcxRevenue: number
+        burnedVcx: number
         weekDexVolume: number
-        walletsPopMoreZero: number
-        walletsPopMoreHundred: number
-        walletsPopMoreThousand: number
-        walletsPopMoreHundredThousand: number
-        walletsPopMoreMillion: number
+        holderTotal: number
+        holderPlankton: number
+        holderShrimp: number
+        holderFish: number
+        holderDolphin: number
+        holderWhale: number
         tvl: number
         snapshotPips: {
             created: number
@@ -108,25 +134,26 @@ export default function Vaults() {
         liquidSupply: 0,
         fdv: 0,
         marketCap: 0,
-        popPrice: 0,
-        popInBalPool: 0,
+        vcxPrice: 0,
+        vcxInBalPool: 0,
         wethInBalPool: 0,
         balLp: 0,
-        vePop: 0,
-        cPopEmissions: 0,
-        cPopExercised: 0,
+        veVcx: 0,
+        oVcxEmissions: 0,
+        oVcxExercised: 0,
         networkId: 0,
         vaultTvl: [],
         tvlMonthByMonth: [],
         totalRevenue: 0,
-        cPopRevenue: 0,
-        weekCexVolume: 0,
+        oVcxRevenue: 0,
+        burnedVcx: 0,
         weekDexVolume: 0,
-        walletsPopMoreZero: 0,
-        walletsPopMoreHundred: 0,
-        walletsPopMoreThousand: 0,
-        walletsPopMoreHundredThousand: 0,
-        walletsPopMoreMillion: 0,
+        holderTotal: 0,
+        holderPlankton: 0,
+        holderShrimp: 0,
+        holderFish: 0,
+        holderDolphin: 0,
+        holderWhale: 0,
         tvl: 0,
         snapshotPips: [],
         leaderboard: [],
@@ -137,7 +164,7 @@ export default function Vaults() {
     }>(chainOptions[0])
     const [leaderboardOption, setleaderboardOption] = useState(leaderboardOptions[1])
 
-    const liquidPopMarketChartElem = useRef(null);
+    const liquidVcxMarketChartElem = useRef(null);
     const vaultTvlChartElem = useRef(null);
     const TVLOverTimeChartElem = useRef(null);
 
@@ -291,53 +318,34 @@ export default function Vaults() {
             }
         }
 
-        // const balancer = new BalancerSDK({
-        //     network: Network.MAINNET,
-        //     rpcUrl: RPC_URLS[ChainId.Ethereum] as string,
-        // })
-
         const [
-            // balancerPool,
-            duneTokenResult,
-            duneHoldersWithPop,
-            duneHoldersWithPopMoreHundred,
-            duneHoldersWithPopMoreThousand,
-            duneHoldersWithPopMoreHundredThousand,
-            duneHoldersWithPopMoreMillion,
             snapshotPips,
-            duneDexVolume,
+            duneTokenResult,
+            prices,
+            poolTokens,
             tvlByTime,
-            popPriceResult
+            holder,
+            veLocked,
+            volume,
+            oVCXRevenue,
         ] = await Promise.all([
-            // balancer.pools.find(balancerPoolId),
-            axios.get<DuneQueryResult<{
-                TotalSupply: number
-                CirculatingSupply: number
-                MarketCap: number
-            }>>('https://api.dune.com/api/v1/query/2521095/results', duneOpts),
-            axios.get<DuneQueryResult<{
-                total_holders: number
-            }>>('https://api.dune.com/api/v1/query/2490604/results', duneOpts),
-            axios.get<DuneQueryResult<{
-                total_holders: number
-            }>>('https://api.dune.com/api/v1/query/2490577/results', duneOpts),
-            axios.get<DuneQueryResult<{
-                total_holders: number
-            }>>('https://api.dune.com/api/v1/query/2490615/results', duneOpts),
-            axios.get<DuneQueryResult<{
-                total_holders: number
-            }>>('https://api.dune.com/api/v1/query/2490624/results', duneOpts),
-            axios.get<DuneQueryResult<{
-                total_holders: number
-            }>>('https://api.dune.com/api/v1/query/2490650/results', duneOpts),
             axios.get<DuneQueryResult<{
                 created: number
                 title: string
             }>>('https://api.dune.com/api/v1/query/2548926/results', duneOpts),
             axios.get<DuneQueryResult<{
-                'USD Volume': number
-                blockchain: string
-            }>>('https://api.dune.com/api/v1/query/2490697/results', duneOpts),
+                totalsupply: number
+                totalburn: number
+                cumulativeexercisedvcx: number
+                circulatingsupply: number
+            }>>('https://api.dune.com/api/v1/query/3238349/results', duneOpts),
+            axios.get(`https://coins.llama.fi/prices/current/ethereum:0xcE246eEa10988C495B4A90a905Ee9237a0f91543,ethereum:0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2,ethereum:0x577A7f7EE659Aa14Dc16FD384B3F8078E23F1920`),
+            publicClient.readContract({
+                address: BalancerVault,
+                abi: BalancerVaultAbi,
+                functionName: "getPoolTokens",
+                args: [VCX_POOL_ID]
+            }),
             axios.get<{
                 tokensInUsd: {
                     date: number
@@ -345,39 +353,57 @@ export default function Vaults() {
                         [key: string]: number
                     }
                 }[]
-            }>('https://api.llama.fi/protocol/popcorn'),
-            axios.get<{
-                coins: {
-                    "optimism:0x6F0fecBC276de8fC69257065fE47C5a03d986394": {
-                        price: number,
-                        decimals: number,
-                        symbol: string,
-                        timestamp: number,
-                        confidence: number,
-                    }
-                }
-            }>('https://coins.llama.fi/prices/current/optimism:0x6F0fecBC276de8fC69257065fE47C5a03d986394'),
+            }>('https://api.llama.fi/protocol/vaultcraft'),
+            axios.get<DuneQueryResult<{
+                summary_type: string
+                whales_balance: number
+                whales_number: number
+                dolphins_balance: number
+                dolphins_number: number
+                fish_balance: number
+                fish_number: number
+                shrimps_balance: number
+                shrimps_number: number
+                plankton_balance: number
+                plankton_number: number
+                total_balance: number
+                total_number: number
+            }>>('https://api.dune.com/api/v1/query/3237039/results', duneOpts),
+            publicClient.readContract({
+                address: VotingEscrow,
+                abi: VotingEscrowAbi,
+                functionName: "supply"
+            }),
+            axios.get<DuneQueryResult<{
+                'USD Volume': number
+                blockchain: string
+            }>>('https://api.dune.com/api/v1/query/2490697/results', duneOpts),
+            axios.get<DuneQueryResult<{
+                'cumulative_eth_redeemed': number
+            }>>('https://api.dune.com/api/v1/query/3237707/results', duneOpts),
         ])
 
-        // const popInBalPool = balancerPool?.tokens.find(token => token.symbol === 'BAL')
-        // const wethInBalPool = balancerPool?.tokens.find(token => token.symbol === 'WETH')
+        const vcxInUsd = prices.data.coins["ethereum:0xcE246eEa10988C495B4A90a905Ee9237a0f91543"].price
+        const wethInUsd = prices.data.coins["ethereum:0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"].price
+        const lpInUsd = prices.data.coins["ethereum:0x577A7f7EE659Aa14Dc16FD384B3F8078E23F1920"].price
         const tvlByTokens = Object.keys(tvlByTime.data.tokensInUsd.slice(-1)[0].tokens)
-        const popPrice = popPriceResult.data.coins['optimism:0x6F0fecBC276de8fC69257065fE47C5a03d986394'].price
 
         setStatistics({
             ...statistics,
-            fdv: duneTokenResult.data.result.rows[0].TotalSupply * popPrice,
-            totalSupply: duneTokenResult.data.result.rows[0].TotalSupply,
-            popPrice: popPrice,
-            liquidSupply: duneTokenResult.data.result.rows[0].CirculatingSupply,
-            marketCap: duneTokenResult.data.result.rows[0].CirculatingSupply * popPrice,
-            walletsPopMoreZero: duneHoldersWithPop.data.result.rows[0].total_holders,
-            walletsPopMoreHundred: duneHoldersWithPopMoreHundred.data.result.rows[0].total_holders,
-            walletsPopMoreThousand: duneHoldersWithPopMoreThousand.data.result.rows[0].total_holders,
-            walletsPopMoreHundredThousand: duneHoldersWithPopMoreHundredThousand.data.result.rows[0].total_holders,
-            walletsPopMoreMillion: duneHoldersWithPopMoreMillion.data.result.rows[0].total_holders,
+            fdv: duneTokenResult.data.result.rows[0].totalsupply * vcxInUsd,
+            totalSupply: duneTokenResult.data.result.rows[0].totalsupply,
+            vcxPrice: vcxInUsd,
+            burnedVcx: duneTokenResult.data.result.rows[0].totalburn,
+            liquidSupply: duneTokenResult.data.result.rows[0].circulatingsupply,
+            marketCap: duneTokenResult.data.result.rows[0].circulatingsupply * vcxInUsd,
+            holderTotal: holder.data.result.rows[0].total_number,
+            holderPlankton: holder.data.result.rows[0].plankton_number,
+            holderShrimp: holder.data.result.rows[0].shrimps_number,
+            holderFish: holder.data.result.rows[0].fish_number,
+            holderDolphin: holder.data.result.rows[0].dolphins_number,
+            holderWhale: holder.data.result.rows[0].whales_number,
             snapshotPips: snapshotPips.data.result.rows,
-            weekDexVolume: duneDexVolume.data.result.rows.reduce((acc, item) => acc + item['USD Volume'], 0),
+            weekDexVolume: volume.data.result.rows[0]['USD Volume'],
             tvlMonthByMonth: tvlByTime.data.tokensInUsd,
             tvl: tvlByTokens.reduce((acc, key) => acc + tvlByTime.data.tokensInUsd.slice(-1)[0].tokens[key], 0),
             vaultTvl: tvlByTokens.map(item => {
@@ -386,20 +412,26 @@ export default function Vaults() {
                     count: tvlByTime.data.tokensInUsd.slice(-1)[0].tokens[item]
                 }
             }),
-            popInBalPool: 0, // Number(popInBalPool?.balance),
-            wethInBalPool: 0, // Number(wethInBalPool?.balance),
+            balLp: ((Number(poolTokens[1][1]) / 1e18) * vcxInUsd) + ((Number(poolTokens[1][0]) / 1e18) * wethInUsd),
+            vcxInBalPool: (Number(poolTokens[1][1]) / 1e18) * vcxInUsd,
+            wethInBalPool: (Number(poolTokens[1][0]) / 1e18) * wethInUsd,
+            veVcx: (Number(veLocked) / 1e18) * lpInUsd,
+            oVcxExercised: duneTokenResult.data.result.rows[0].cumulativeexercisedvcx,
+            totalRevenue: Number(oVCXRevenue.data.result.rows[0].cumulative_eth_redeemed) * wethInUsd,
+            oVcxRevenue: Number(oVCXRevenue.data.result.rows[0].cumulative_eth_redeemed) * wethInUsd,
+            oVcxEmissions: totalEmission() * vcxInUsd * 0.25
         })
 
-        initDonutChart(liquidPopMarketChartElem.current,
+        initDonutChart(liquidVcxMarketChartElem.current,
             [
                 {
                     name: "WETH in 80/20 BAL pool, USD",
-                    y: 20, //Number(wethInBalPool?.token?.latestUSDPrice) * Number(wethInBalPool?.balance),
+                    y: (Number(poolTokens[1][0]) / 1e18) * wethInUsd,
                     color: "#9B55FF"
                 },
                 {
                     name: "VCX in 80/20 BAL pool, USD",
-                    y: 80, //Number(popInBalPool?.token?.latestUSDPrice) * Number(popInBalPool?.balance),
+                    y: (Number(poolTokens[1][1]) / 1e18) * vcxInUsd,
                     color: "#7AFB79"
                 },
             ]
@@ -443,27 +475,27 @@ export default function Vaults() {
                     <div className={`border border-[#353945] rounded-[1rem] bg-[#23262f] p-6 grid col-span-full md:grid-cols-6 gap-6`}>
                         <div className={`flex flex-col`}>
                             <p className={`text-[1rem]`}>Total Supply</p>
-                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>{statistics.totalSupply.toLocaleString()}</h2>
+                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>{ formatToFixedDecimals(statistics.totalSupply, 0) }</h2>
                         </div>
                         <div className={`flex flex-col`}>
                             <p className={`text-[1rem]`}>Liquid Supply</p>
-                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>{statistics.liquidSupply.toLocaleString()}</h2>
+                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>{ formatToFixedDecimals(statistics.liquidSupply, 0) }</h2>
                         </div>
                         <div className={`flex flex-col`}>
                             <p className={`text-[1rem]`}>FDV</p>
-                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>${statistics.fdv.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 })}</h2>
+                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>${ formatToFixedDecimals(statistics.fdv, 0) }</h2>
                         </div>
                         <div className={`flex flex-col`}>
                             <p className={`text-[1rem]`}>Market Cap</p>
-                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>${statistics.marketCap.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 })}</h2>
+                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>${ formatToFixedDecimals(statistics.marketCap, 0) }</h2>
                         </div>
                         <div className={`flex flex-col`}>
                             <p className={`text-[1rem]`}>VCX Price</p>
-                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>${statistics.popPrice.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 })}</h2>
+                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>${ statistics.vcxPrice.toLocaleString(undefined, { maximumFractionDigits: 4, minimumFractionDigits: 2 })}</h2>
                         </div>
                         <div className={`flex flex-col`}>
                             <p className={`text-[1rem]`}>Burned VCX</p>
-                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>Coming Soon</h2>
+                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>{ formatToFixedDecimals(statistics.burnedVcx, 0) } VCX</h2>
                         </div>
                     </div>
                     <div className={`flex flex-col border border-[#353945] rounded-[1rem] bg-[#23262f]`}>
@@ -478,30 +510,30 @@ export default function Vaults() {
                             <div className={`flex flex-col grow-[1]`}>
                                 <div className={`flex justify-between`}>
                                     <p>VCX in 80/20 BAL pool</p>
-                                    <p className={`font-bold text-right`}>Coming Soon {/*statistics.popInBalPool.toLocaleString()*/}</p>
+                                    <p className={`font-bold text-right`}>${ formatToFixedDecimals(statistics.vcxInBalPool, 0)}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
                                     <p>WETH in 80/20 BAL pool</p>
-                                    <p className={`font-bold text-right`}>Coming Soon {/*statistics.wethInBalPool.toLocaleString()*/}</p>
+                                    <p className={`font-bold text-right`}>${ formatToFixedDecimals(statistics.wethInBalPool, 0)}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
                                     <p>BAL LPs</p>
-                                    <p className={`font-bold text-right`}>Coming Soon {/*statistics.balLp.toLocaleString()*/}</p>
+                                    <p className={`font-bold text-right`}>${ formatToFixedDecimals(statistics.balLp, 0)}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
                                     <p>veVCX (staked LPs)</p>
-                                    <p className={`font-bold text-right`}>Coming Soon {/*statistics.vePop.toLocaleString()*/}</p>
+                                    <p className={`font-bold text-right`}>${ formatToFixedDecimals(statistics.veVcx, 0)}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
                                     <p>oVCX emissions</p>
-                                    <p className={`font-bold text-right`}>Coming Soon {/*statistics.cPopEmissions.toLocaleString()*/}</p>
+                                    <p className={`font-bold text-right`}>${ formatToFixedDecimals(statistics.oVcxEmissions, 0)}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
                                     <p>oVCX exercised</p>
-                                    <p className={`font-bold text-right`}>Coming Soon {/*(statistics.cPopExercised * 100).toLocaleString() %*/}</p>
+                                    <p className={`font-bold text-right`}>{ formatToFixedDecimals(statistics.oVcxExercised, 0)} VCX</p>
                                 </div>
                             </div>
-                            <div className={`flex justify-center`} ref={liquidPopMarketChartElem} />
+                            <div className={`flex justify-center`} ref={liquidVcxMarketChartElem} />
                         </div>
                     </div>
                     <div className={`flex flex-col border border-[#353945] rounded-[1rem] bg-[#23262f]`}>
@@ -515,7 +547,7 @@ export default function Vaults() {
                                     return (
                                         <div key={idx} className={`flex justify-between`}>
                                             <p>{item.title}</p>
-                                            <p className={`font-bold text-right`}>${item.count.toLocaleString()}</p>
+                                            <p className={`font-bold text-right`}>${formatToFixedDecimals(item.count, 0)}</p>
                                         </div>
                                     )
                                 })}
@@ -531,43 +563,43 @@ export default function Vaults() {
                             <div className={`flex flex-col grow-[1]`}>
                                 <div className={`flex justify-between`}>
                                     <p>Total Revenue</p>
-                                    <p className={`font-bold text-right`}>Coming Soon{/*statistics.totalRevenue.toLocaleString()*/}</p>
+                                    <p className={`font-bold text-right`}>${ formatToFixedDecimals(statistics.totalRevenue, 0)}</p>
                                 </div>
-                                <div className={`flex justify-between`}>
+                                {/*<div className={`flex justify-between`}>
                                     <p>Smart Vault Fees</p>
                                     <p className={`font-bold text-right`}>Coming Soon</p>
-                                </div>
-                                <div className={`flex justify-between`}>
-                                    <p>oVCX Revenue</p>
-                                    <p className={`font-bold text-right`}>Coming Soon {/*statistics.cPopRevenue.toLocaleString()*/}</p>
-                                </div>
-                                <div className={`flex justify-between`}>
-                                    <p>Total Users</p>
-                                    <p className={`font-bold text-right`}>{statistics.walletsPopMoreZero.toLocaleString()}</p>
-                                </div>
-                                <div className={`flex justify-between`}>
-                                    <p>7 Day Cex Volume</p>
-                                    <p className={`font-bold text-right`}>${statistics.weekCexVolume.toLocaleString()}</p>
-                                </div>
+                                </div>*/}
+                                {/*<div className={`flex justify-between`}>*/}
+                                {/*    <p>oVCX Revenue</p>*/}
+                                {/*    <p className={`font-bold text-right`}>${statistics.oVcxRevenue.toLocaleString()}</p>*/}
+                                {/*</div>*/}
                                 <div className={`flex justify-between`}>
                                     <p>7 Day Dex Volume</p>
-                                    <p className={`font-bold text-right`}>${statistics.weekDexVolume.toLocaleString()}</p>
+                                    <p className={`font-bold text-right`}>${formatToFixedDecimals(statistics.weekDexVolume, 0)}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
-                                    <p>{'Wallets with VCX > 100'}</p>
-                                    <p className={`font-bold text-right`}>{statistics.walletsPopMoreHundred.toLocaleString()}</p>
+                                    <p>Total Holder</p>
+                                    <p className={`font-bold text-right`}>{formatToFixedDecimals(statistics.holderTotal, 0)}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
-                                    <p>{'Wallets with VCX > 1,000'}</p>
-                                    <p className={`font-bold text-right`}>{statistics.walletsPopMoreThousand.toLocaleString()}</p>
+                                    <p>Wallets with 100-1K VCX</p>
+                                    <p className={`font-bold text-right`}>{formatToFixedDecimals(statistics.holderPlankton, 0)}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
-                                    <p>{'Wallets with VCX > 100,000'}</p>
-                                    <p className={`font-bold text-right`}>{statistics.walletsPopMoreHundredThousand.toLocaleString()}</p>
+                                    <p>Wallets with 1K - 100K VCX</p>
+                                    <p className={`font-bold text-right`}>{formatToFixedDecimals(statistics.holderShrimp, 0)}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
-                                    <p>{'Wallets with VCX > 1,000,000'}</p>
-                                    <p className={`font-bold text-right`}>{statistics.walletsPopMoreMillion.toLocaleString()}</p>
+                                    <p>Wallets with 100K-1M VCX</p>
+                                    <p className={`font-bold text-right`}>{formatToFixedDecimals(statistics.holderFish, 0)}</p>
+                                </div>
+                                <div className={`flex justify-between`}>
+                                    <p>Wallets with 1M-10M VCX</p>
+                                    <p className={`font-bold text-right`}>{formatToFixedDecimals(statistics.holderDolphin, 0)}</p>
+                                </div>
+                                <div className={`flex justify-between`}>
+                                    <p>Wallets with 10M+ VCX</p>
+                                    <p className={`font-bold text-right`}>{formatToFixedDecimals(statistics.holderWhale, 0)}</p>
                                 </div>
                             </div>
                         </div>

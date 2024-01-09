@@ -47,7 +47,7 @@ const BugBountyLinks = [
 const GovernanceLinks = [
   {
     label: "Forum",
-    href: "https://forum.pop.network/",
+    href: "https://forum.vaultcraft.io/",
   },
   {
     label: "Snapshot",

@@ -1,4 +1,4 @@
-import { ActionType } from "../types";
+import { SmartVaultActionType } from "../types";
 
 export interface ActionStep {
   step: number;
@@ -14,9 +14,9 @@ const BaseStepInfo = {
   loading: false
 }
 
-export default function getActionSteps(action: ActionType): ActionStep[] {
+export default function getActionSteps(action: SmartVaultActionType): ActionStep[] {
   switch (action) {
-    case ActionType.Deposit:
+    case SmartVaultActionType.Deposit:
       return [{
         step: 1,
         label: "Handle Allowance",
@@ -27,13 +27,13 @@ export default function getActionSteps(action: ActionType): ActionStep[] {
         label: "Deposit into Vault",
         ...BaseStepInfo
       }]
-    case ActionType.Withdrawal:
+    case SmartVaultActionType.Withdrawal:
       return [{
         step: 1,
         label: "Withdraw from Vault",
         ...BaseStepInfo
       }]
-    case ActionType.Stake:
+    case SmartVaultActionType.Stake:
       return [{
         step: 1,
         label: "Handle Allowance",
@@ -44,13 +44,13 @@ export default function getActionSteps(action: ActionType): ActionStep[] {
         label: "Stake into Gauge",
         ...BaseStepInfo
       }]
-    case ActionType.Unstake:
+    case SmartVaultActionType.Unstake:
       return [{
         step: 1,
         label: "Unstake from Gauge",
         ...BaseStepInfo
       }]
-    case ActionType.DepositAndStake:
+    case SmartVaultActionType.DepositAndStake:
       return [{
         step: 1,
         label: "Handle Allowance",
@@ -61,7 +61,7 @@ export default function getActionSteps(action: ActionType): ActionStep[] {
         label: "Deposit and Stake",
         ...BaseStepInfo
       }]
-    case ActionType.UnstakeAndWithdraw:
+    case SmartVaultActionType.UnstakeAndWithdraw:
       return [{
         step: 1,
         label: "Handle Allowance",
@@ -72,7 +72,7 @@ export default function getActionSteps(action: ActionType): ActionStep[] {
         label: "Unstake and Withdraw",
         ...BaseStepInfo
       }]
-    case ActionType.ZapDeposit:
+    case SmartVaultActionType.ZapDeposit:
       return [{
         step: 1,
         label: "Handle Zap Allowance",
@@ -90,7 +90,7 @@ export default function getActionSteps(action: ActionType): ActionStep[] {
         label: "Deposit",
         ...BaseStepInfo
       }]
-    case ActionType.ZapWithdrawal:
+    case SmartVaultActionType.ZapWithdrawal:
       return [{
         step: 1,
         label: "Withdraw",
@@ -104,7 +104,7 @@ export default function getActionSteps(action: ActionType): ActionStep[] {
         label: "Zap",
         ...BaseStepInfo
       }]
-    case ActionType.ZapDepositAndStake:
+    case SmartVaultActionType.ZapDepositAndStake:
       return [{
         step: 1,
         label: "Handle Zap Allowance",
@@ -122,7 +122,7 @@ export default function getActionSteps(action: ActionType): ActionStep[] {
         label: "Deposit and Stake",
         ...BaseStepInfo
       }]
-    case ActionType.ZapUnstakeAndWithdraw:
+    case SmartVaultActionType.ZapUnstakeAndWithdraw:
       return [{
         step: 1,
         label: "Handle Allowance",

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { usePublicClient } from "wagmi";
+import { usePublicClient, useWalletClient } from "wagmi";
 import { useAtom } from "jotai";
 import { Switch } from '@headlessui/react'
 import {
@@ -8,7 +8,6 @@ import {
   assetAtom,
   feeAtom,
   limitAtom,
-  networkAtom,
   metadataAtom,
   strategyAtom,
   strategyConfigAtom,
@@ -27,7 +26,9 @@ function shortenAddress(address: string): string {
 
 export default function Review(): JSX.Element {
   const publicClient = usePublicClient();
-  const [network] = useAtom(networkAtom);
+  const { data: walletClient } = useWalletClient()
+  const chainId = walletClient?.chain.id || 1
+
   const [conditions, setConditions] = useAtom(conditionsAtom);
 
   const [asset] = useAtom(assetAtom);
@@ -70,13 +71,14 @@ export default function Review(): JSX.Element {
         adapterInitParams = encodeAbiParameters(parseAbiParameters(strategy.initParams?.[0].type as string), [strategyConfig[0]])
 
         strategyInitParams = await resolveStrategyEncoding({
-          chainId: network.id,
+          chainId: chainId,
           client: publicClient,
-          address: getAddress(asset.address[network.id]),
+          address: getAddress(asset.address[chainId]),
           params: strategyConfig.slice(1),
           resolver: strategy.resolver
         })
       }
+      
       setAdapterData({
         id: adapterId,
         data: adapterInitParams,

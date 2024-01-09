@@ -55,7 +55,7 @@ export default function VaultStats({ vaultData, account, zapAvailable }: VaultSt
             <>
               <p className="font-normal text-primary md:text-[14px]">Min Boost</p>
               <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
-                {NumberFormatter.format(roundToTwoDecimalPlaces(gaugeMinApy))} %
+                {gaugeMinApy.toFixed(2)} %
               </Title>
             </>) : <></>
           }
@@ -65,7 +65,7 @@ export default function VaultStats({ vaultData, account, zapAvailable }: VaultSt
             <>
               <p className="font-normal text-primary md:text-[14px]">Max Boost</p>
               <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
-                {NumberFormatter.format(roundToTwoDecimalPlaces(gaugeMaxApy))} %
+                {gaugeMaxApy.toFixed(2)} %
               </Title>
             </> : <></>
           }

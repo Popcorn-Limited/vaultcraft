@@ -1,7 +1,8 @@
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
-import { Strategy, assetAtom, networkAtom, protocolAtom, strategyAtom, useStrategies } from "@/lib/atoms";
+import { Strategy, assetAtom, protocolAtom, strategyAtom, useStrategies } from "@/lib/atoms";
 import Selector, { Option } from "@/components/input/Selector";
+import { useWalletClient } from "wagmi";
 
 
 const STRATEGY_NOT_AVAILABLE: Strategy = {
@@ -21,7 +22,9 @@ export async function getStrategyOptions(strategies: Strategy[], chainId: number
 }
 
 function StrategySelection({ isDisabled }: { isDisabled?: boolean }) {
-  const [network] = useAtom(networkAtom);
+  const { data: walletClient } = useWalletClient()
+  const chainId = walletClient?.chain.id || 1
+
   const [asset] = useAtom(assetAtom);
   const [protocol] = useAtom(protocolAtom);
 
@@ -30,10 +33,10 @@ function StrategySelection({ isDisabled }: { isDisabled?: boolean }) {
   const [options, setOptions] = useState<Strategy[]>([]);
 
   useEffect(() => {
-    if (protocol.key !== "none" && asset.symbol !== "none" && network) {
+    if (protocol.key !== "none" && asset.symbol !== "none" && chainId) {
       getStrategyOptions(
         strategies,
-        network.id,
+        chainId,
         protocol.key
       )
         .then(res => {
@@ -43,7 +46,7 @@ function StrategySelection({ isDisabled }: { isDisabled?: boolean }) {
           }
         });
     }
-  }, [asset, network, protocol]);
+  }, [asset, chainId, protocol]);
 
   return (
     <section>

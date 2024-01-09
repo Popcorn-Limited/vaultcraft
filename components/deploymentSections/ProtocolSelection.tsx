@@ -3,7 +3,6 @@ import { useAtom } from "jotai";
 import {
   adapterConfigAtom,
   assetAtom,
-  networkAtom,
   Protocol,
   protocolAtom,
 } from "@/lib/atoms";
@@ -11,6 +10,7 @@ import Selector, { Option } from "@/components/input/Selector";
 import { yieldOptionsAtom } from "@/lib/atoms/sdk";
 import { YieldOptions } from "vaultcraft-sdk";
 import { Address, getAddress } from "viem";
+import { useWalletClient } from "wagmi";
 
 interface ProtocolOption extends Protocol {
   disabled: boolean;
@@ -29,8 +29,9 @@ async function getProtocolOptions(asset: Address, chainId: number, yieldOptions:
 
 function ProtocolSelection() {
   const [yieldOptions] = useAtom(yieldOptionsAtom);
+  const { data: walletClient } = useWalletClient()
+  const chainId = walletClient?.chain.id || 1
 
-  const [network] = useAtom(networkAtom);
   const [protocol, setProtocol] = useAtom(protocolAtom);
   const [asset] = useAtom(assetAtom);
 
@@ -39,11 +40,11 @@ function ProtocolSelection() {
   const [, setAdapterConfig] = useAtom(adapterConfigAtom);
 
   useEffect(() => {
-    if (network && asset.symbol !== "none" && yieldOptions) {
+    if (chainId && asset.symbol !== "none" && yieldOptions) {
       setOptions([])
-      getProtocolOptions(getAddress(asset.address[network.id]), 1, yieldOptions).then(res => setOptions(res));
+      getProtocolOptions(getAddress(asset.address[chainId]), chainId, yieldOptions).then(res => setOptions(res));
     }
-  }, [network, asset]);
+  }, [chainId, asset]);
 
   function selectProtocol(newProtocol: any) {
     if (protocol !== newProtocol) {

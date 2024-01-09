@@ -48,7 +48,6 @@ export type VaultData = {
   address: Address;
   vault: Token;
   asset: Token;
-  adapter: Token;
   gauge?: Token;
   totalAssets: number;
   totalSupply: number;
@@ -69,6 +68,27 @@ export type VaultData = {
   gaugeMinApy?: number;
   gaugeMaxApy?: number;
   totalApy: number;
+}
+
+type LockVaultLock = {
+  unlockTime: number;
+  amount: number;
+  rewardShares: number;
+  daysToUnlock: number;
+}
+
+export type LockVaultData = VaultData & {
+  strategyShares: bigint;
+  rewardAddresses: Address[];
+  rewards: RewardToken[];
+  lock: LockVaultLock;
+}
+
+export type RewardToken = Token & {
+  rewardBalance: number;
+  userIndex: number;
+  globalIndex: number;
+  rewardApy: number;
 }
 
 export type VaultMetadata = {
@@ -113,8 +133,7 @@ export interface Clients {
   walletClient: WalletClient;
 }
 
-
-export enum ActionType {
+export enum SmartVaultActionType {
   Deposit,
   Withdrawal,
   Stake,
@@ -125,4 +144,14 @@ export enum ActionType {
   ZapWithdrawal,
   ZapDepositAndStake,
   ZapUnstakeAndWithdraw
+}
+
+export enum LockVaultActionType {
+  Deposit,
+  IncreaseAmount,
+  Withdrawal,
+  Claim,
+  ZapDeposit,
+  ZapIncreaseAmount,
+  ZapWithdrawal
 }

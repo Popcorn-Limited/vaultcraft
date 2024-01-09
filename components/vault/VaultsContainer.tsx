@@ -11,7 +11,7 @@ import SmartVault from "@/components/vault/SmartVault";
 import NetworkFilter from "@/components/network/NetworkFilter";
 import { getVeAddresses } from "@/lib/utils/addresses";
 import getZapAssets, { getAvailableZapAssets } from "@/lib/utils/getZapAssets";
-import { ERC20Abi, VaultAbi } from "@/lib/constants";
+import { ERC20Abi, VCXAbi, VaultAbi } from "@/lib/constants";
 import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
 import MainActionButton from "@/components/button/MainActionButton";
 import { claimOPop } from "@/lib/optionToken/interactions";
@@ -20,6 +20,8 @@ import { useAtom } from "jotai";
 import { vaultsAtom } from "@/lib/atoms/vaults";
 import { getVaultNetworthByChain } from "@/lib/getNetworth";
 import VaultsSorting, { VAULT_SORTING_TYPE } from "@/components/vault/VaultsSorting";
+import { llama } from "@/lib/resolver/price/resolver";
+import { zapAssetsAtom } from "@/lib/atoms";
 
 interface VaultsContainerProps {
   hiddenVaults: Address[];
@@ -34,7 +36,7 @@ export interface MutateTokenBalanceProps {
   account: Address;
 }
 
-const { oVCX: OVCX } = getVeAddresses();
+const { oVCX: OVCX, VCX } = getVeAddresses();
 
 const NETWORKS_SUPPORTING_ZAP = [1, 137, 10, 42161, 56]
 
@@ -43,45 +45,23 @@ export default function VaultsContainer({ hiddenVaults, displayVaults }: VaultsC
   const publicClient = usePublicClient()
   const { data: walletClient } = useWalletClient()
 
-  const [initalLoad, setInitalLoad] = useState<boolean>(false);
-  const [accountLoad, setAccountLoad] = useState<boolean>(false);
-
   const [selectedNetworks, selectNetwork] = useNetworkFilter(SUPPORTED_NETWORKS.map(network => network.id));
   const [vaults, setVaults] = useAtom(vaultsAtom)
-  const [zapAssets, setZapAssets] = useState<{ [key: number]: Token[] }>({});
-  const [availableZapAssets, setAvailableZapAssets] = useState<{ [key: number]: Address[] }>({})
+  const [zapAssets, setZapAssets] = useAtom(zapAssetsAtom)
+
   const [tvl, setTvl] = useState<number>(0);
   const [networth, setNetworth] = useState<number>(0);
 
   const [gaugeRewards, setGaugeRewards] = useState<GaugeRewards>()
   const { data: oBal } = useBalance({ chainId: 1, address: account, token: OVCX, watch: true })
+  const [vcxPrice, setVcxPrice] = useState<number>(0)
 
   const [searchString, handleSearch] = useState("");
 
   const [sortingType, setSortingType] = useState(VAULT_SORTING_TYPE.none)
 
   useEffect(() => {
-    async function getVaults() {
-      setInitalLoad(true)
-      if (account) setAccountLoad(true)
-      // get zap assets
-      const newZapAssets: { [key: number]: Token[] } = {}
-      SUPPORTED_NETWORKS.forEach(async (chain) => newZapAssets[chain.id] = await getZapAssets({ chain, account }))
-      setZapAssets(newZapAssets);
-
-      // get available zapAddresses
-      setAvailableZapAssets({
-        1: await getAvailableZapAssets(1),
-        137: [],
-        10: [],
-        42161: [],
-        56: []
-        // 137: await getAvailableZapAssets(137),
-        // 10: await getAvailableZapAssets(10),
-        // 42161: await getAvailableZapAssets(42161),
-        // 56: await getAvailableZapAssets(56)
-      })
-
+    async function getAccountData() {
       // get gauge rewards
       if (account) {
         const rewards = await getGaugeRewards({
@@ -90,13 +70,14 @@ export default function VaultsContainer({ hiddenVaults, displayVaults }: VaultsC
           publicClient
         })
         setGaugeRewards(rewards)
+        const vcxPriceInUsd = await llama({ address: VCX, chainId: 1 })
+        setVcxPrice(vcxPriceInUsd)
       }
       setNetworth(SUPPORTED_NETWORKS.map(chain => getVaultNetworthByChain({ vaults, chainId: chain.id })).reduce((a, b) => a + b, 0));
       setTvl(vaults.reduce((a, b) => a + b.tvl, 0))
     }
-    if (!account && !initalLoad && vaults.length > 0) getVaults();
-    if (account && !accountLoad && vaults.length > 0) getVaults()
-  }, [account, initalLoad, accountLoad, vaults])
+    getAccountData()
+  }, [account])
 
 
   async function mutateTokenBalance({ inputToken, outputToken, vault, chainId, account }: MutateTokenBalanceProps) {
@@ -230,14 +211,14 @@ export default function VaultsContainer({ hiddenVaults, displayVaults }: VaultsC
               <div className="w-[120px] md:w-max">
                 <p className="w-max leading-6 text-base text-primaryDark md:text-primary">My oVCX</p>
                 <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
-                  {`${oBal ? NumberFormatter.format(Number(oBal?.value) / 1e18) : "0"}`}
+                  {`$${oBal && vcxPrice ? NumberFormatter.format((Number(oBal?.value) / 1e18) * (vcxPrice * 0.25)) : "0"}`}
                 </div>
               </div>
 
               <div className="w-[120px] md:w-max">
                 <p className="w-max leading-6 text-base text-primaryDark md:text-primary">Claimable oVCX</p>
                 <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
-                  {`$${gaugeRewards ? NumberFormatter.format(Number(gaugeRewards?.total) / 1e18) : "0"}`}
+                  {`$${gaugeRewards && vcxPrice ? NumberFormatter.format((Number(gaugeRewards?.total) / 1e18) * (vcxPrice * 0.25)) : "0"}`}
                 </div>
               </div>
             </div>
@@ -286,7 +267,7 @@ export default function VaultsContainer({ hiddenVaults, displayVaults }: VaultsC
       </section>
 
       <section className="grid grid-cols-1 md:grid-cols-3 gap-4 px-4 md:px-8">
-        {(vaults.length > 0 && Object.keys(availableZapAssets).length > 0) ?
+        {vaults.length > 0 ?
           vaults.filter(vault => selectedNetworks.includes(vault.chainId))
             .filter(vault => displayVaults.length > 0 ? displayVaults.includes(vault.address) : true)
             .filter(vault => !hiddenVaults.includes(vault.address))
@@ -297,8 +278,6 @@ export default function VaultsContainer({ hiddenVaults, displayVaults }: VaultsC
                   vaultData={vault}
                   mutateTokenBalance={mutateTokenBalance}
                   searchString={searchString}
-                  zapAssets={availableZapAssets[vault.chainId].includes(vault.asset.address) ? zapAssets[vault.chainId] : undefined}
-                  deployer={"0x22f5413C075Ccd56D575A54763831C4c27A37Bdb"}
                 />
               )
             })

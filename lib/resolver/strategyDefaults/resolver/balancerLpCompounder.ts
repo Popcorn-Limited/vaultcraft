@@ -24,7 +24,7 @@ export async function balancerLpCompounder({ chainId, client, address }: Strateg
   const rewardTokens = [BAL[chainId]];
   const baseAsset = poolTokens[0][0] // TODO - find a smarter algorithm to determine the base asset
   const minTradeAmounts = [ZERO.toString()];
-  const optionalData = [poolId, 0];
+  const optionalData = [poolId, 0, 2];
 
   const [gaugeAddress] = await balancer({ chainId, client, address })
 

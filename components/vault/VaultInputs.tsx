@@ -4,7 +4,7 @@ import MainActionButton from "@/components/button/MainActionButton";
 import { useEffect, useState } from "react";
 import { useAccount, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
 import TabSelector from "@/components/common/TabSelector";
-import { ActionType, Token, VaultData } from "@/lib/types";
+import { SmartVaultActionType, Token, VaultData } from "@/lib/types";
 import { validateInput } from "@/lib/utils/helpers";
 import Modal from "@/components/modal/Modal";
 import InputNumber from "@/components/input/InputNumber";
@@ -18,7 +18,6 @@ import { MutateTokenBalanceProps } from "@/components/vault/VaultsContainer";
 import { useAtom } from "jotai";
 import { masaAtom } from "@/lib/atoms/sdk";
 import { useRouter } from "next/router";
-import { fi } from "date-fns/locale";
 
 interface VaultInputsProps {
   vaultData: VaultData;
@@ -44,7 +43,7 @@ export default function VaultInputs({ vaultData, tokenOptions, chainId, hideModa
 
   const [stepCounter, setStepCounter] = useState<number>(0)
   const [steps, setSteps] = useState<ActionStep[]>([])
-  const [action, setAction] = useState<ActionType>(ActionType.Deposit)
+  const [action, setAction] = useState<SmartVaultActionType>(SmartVaultActionType.Deposit)
 
   const [inputBalance, setInputBalance] = useState<string>("0");
 
@@ -59,7 +58,7 @@ export default function VaultInputs({ vaultData, tokenOptions, chainId, hideModa
     // set default input/output tokens
     setInputToken(asset)
     setOutputToken(!!gauge ? gauge : vault)
-    const actionType = !!gauge ? ActionType.DepositAndStake : ActionType.Deposit
+    const actionType = !!gauge ? SmartVaultActionType.DepositAndStake : SmartVaultActionType.Deposit
     setAction(actionType)
     setSteps(getActionSteps(actionType))
   }, [])
@@ -76,7 +75,7 @@ export default function VaultInputs({ vaultData, tokenOptions, chainId, hideModa
       setInputToken(!!gauge ? gauge : vault);
       setOutputToken(asset)
       setIsDeposit(false)
-      const newAction = !!gauge ? ActionType.UnstakeAndWithdraw : ActionType.Withdrawal
+      const newAction = !!gauge ? SmartVaultActionType.UnstakeAndWithdraw : SmartVaultActionType.Withdrawal
       setAction(newAction)
       setSteps(getActionSteps(newAction))
     } else {
@@ -84,7 +83,7 @@ export default function VaultInputs({ vaultData, tokenOptions, chainId, hideModa
       setInputToken(asset);
       setOutputToken(!!gauge ? gauge : vault)
       setIsDeposit(true)
-      const newAction = !!gauge ? ActionType.DepositAndStake : ActionType.Deposit
+      const newAction = !!gauge ? SmartVaultActionType.DepositAndStake : SmartVaultActionType.Deposit
       setAction(newAction)
       setSteps(getActionSteps(newAction))
     }
@@ -101,12 +100,12 @@ export default function VaultInputs({ vaultData, tokenOptions, chainId, hideModa
             // error
             return
           case vault.address:
-            setAction(ActionType.Deposit)
-            setSteps(getActionSteps(ActionType.Deposit))
+            setAction(SmartVaultActionType.Deposit)
+            setSteps(getActionSteps(SmartVaultActionType.Deposit))
             return
           case gauge?.address:
-            setAction(ActionType.DepositAndStake)
-            setSteps(getActionSteps(ActionType.DepositAndStake))
+            setAction(SmartVaultActionType.DepositAndStake)
+            setSteps(getActionSteps(SmartVaultActionType.DepositAndStake))
             return
           default:
             // error
@@ -115,37 +114,37 @@ export default function VaultInputs({ vaultData, tokenOptions, chainId, hideModa
       case vault.address:
         switch (output.address) {
           case asset.address:
-            setAction(ActionType.Withdrawal)
-            setSteps(getActionSteps(ActionType.Withdrawal))
+            setAction(SmartVaultActionType.Withdrawal)
+            setSteps(getActionSteps(SmartVaultActionType.Withdrawal))
             return
           case vault.address:
             // error
             return
           case gauge?.address:
-            setAction(ActionType.Stake)
-            setSteps(getActionSteps(ActionType.Stake))
+            setAction(SmartVaultActionType.Stake)
+            setSteps(getActionSteps(SmartVaultActionType.Stake))
             return
           default:
-            setAction(ActionType.ZapWithdrawal)
-            setSteps(getActionSteps(ActionType.ZapWithdrawal))
+            setAction(SmartVaultActionType.ZapWithdrawal)
+            setSteps(getActionSteps(SmartVaultActionType.ZapWithdrawal))
             return
         }
       case gauge?.address:
         switch (output.address) {
           case asset.address:
-            setAction(ActionType.UnstakeAndWithdraw)
-            setSteps(getActionSteps(ActionType.UnstakeAndWithdraw))
+            setAction(SmartVaultActionType.UnstakeAndWithdraw)
+            setSteps(getActionSteps(SmartVaultActionType.UnstakeAndWithdraw))
             return
           case vault.address:
-            setAction(ActionType.Unstake)
-            setSteps(getActionSteps(ActionType.Unstake))
+            setAction(SmartVaultActionType.Unstake)
+            setSteps(getActionSteps(SmartVaultActionType.Unstake))
             return
           case gauge?.address:
             // error
             return
           default:
-            setAction(ActionType.ZapUnstakeAndWithdraw)
-            setSteps(getActionSteps(ActionType.ZapUnstakeAndWithdraw))
+            setAction(SmartVaultActionType.ZapUnstakeAndWithdraw)
+            setSteps(getActionSteps(SmartVaultActionType.ZapUnstakeAndWithdraw))
             return
         }
       default:
@@ -154,12 +153,12 @@ export default function VaultInputs({ vaultData, tokenOptions, chainId, hideModa
             // error
             return
           case vault.address:
-            setAction(ActionType.ZapDeposit)
-            setSteps(getActionSteps(ActionType.ZapDeposit))
+            setAction(SmartVaultActionType.ZapDeposit)
+            setSteps(getActionSteps(SmartVaultActionType.ZapDeposit))
             return
           case gauge?.address:
-            setAction(ActionType.ZapDepositAndStake)
-            setSteps(getActionSteps(ActionType.ZapDepositAndStake))
+            setAction(SmartVaultActionType.ZapDepositAndStake)
+            setSteps(getActionSteps(SmartVaultActionType.ZapDepositAndStake))
             return
           default:
             // error
@@ -179,7 +178,6 @@ export default function VaultInputs({ vaultData, tokenOptions, chainId, hideModa
         return
       }
     }
-
 
     const stepsCopy = [...steps]
     const currentStep = stepsCopy[stepCounter]
@@ -295,10 +293,10 @@ export default function VaultInputs({ vaultData, tokenOptions, chainId, hideModa
         <p className="text-secondaryLight group-hover/zap:text-primary">Zap Settings</p>
       </div >
     }
-    <div className="w-full flex justify-center mt-4">
+    <div className="w-full flex justify-center my-6">
       <ActionSteps steps={steps} stepCounter={stepCounter} />
     </div>
-    <div className="mt-4">
+    <div className="">
       {account ? (
         <>
           {(stepCounter === steps.length || steps.some(step => !step.loading && step.error)) ?

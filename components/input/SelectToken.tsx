@@ -6,7 +6,7 @@ import TokenIcon from "@/components/common/TokenIcon";
 import SearchToken from "@/components/input/SearchToken";
 import Modal from "@/components/modal/Modal";
 import PopUpModal from "@/components/modal/PopUpModal";
-import {Tooltip} from "react-tooltip";
+import { Tooltip } from "react-tooltip";
 
 export interface SelectTokenProps {
   allowSelection: boolean;
@@ -62,23 +62,23 @@ export default function SelectToken({
           </p>
           <div className='hidden md:block'>
             <Tooltip
-                anchorSelect={`#${selectTokenId}`}
-                place="bottom"
-                style={{ backgroundColor: "#353945" }}
+              anchorSelect={`#${selectTokenId}`}
+              place="bottom"
+              style={{ backgroundColor: "#353945" }}
             >
               {selectedToken?.symbol}
             </Tooltip>
           </div>
-      <div className='md:hidden'>
-        <Tooltip
-            anchorSelect={`#${selectedToken?.symbol}`}
-            openOnClick
-            place="bottom"
-            style={{ backgroundColor: "#353945" }}
-        >
-          {selectedToken?.symbol}
-        </Tooltip>
-      </div>
+          <div className='md:hidden'>
+            <Tooltip
+              anchorSelect={`#${selectedToken?.symbol}`}
+              openOnClick
+              place="bottom"
+              style={{ backgroundColor: "#353945" }}
+            >
+              {selectedToken?.symbol}
+            </Tooltip>
+          </div>
           {allowSelection && (
             <ChevronDownIcon
               className={`w-6 h-6 ml-2 text-secondaryLight group-hover:text-primary 

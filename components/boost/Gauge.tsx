@@ -31,17 +31,28 @@ export default function Gauge({ vaultData, index, votes, handleVotes, canVote }:
 
   useEffect(() => {
     if (vaultData?.vault.price && gaugeApr.length === 0) {
-      calculateAPR({ vaultPrice: vaultData.vault.price, gauge: vaultData.gauge?.address as Address, publicClient }).then(res => setGaugeApr(res))
+      calculateAPR({ vaultData, publicClient }).then(res => setGaugeApr(res))
     }
   }, [vaultData, gaugeApr])
 
   function onChange(value: number) {
     const currentVoteForThisGauge = votes[index];
-    const potentialNewTotalVotes = Object.values(votes).reduce((a, b) => a + b, 0) - currentVoteForThisGauge + Number(value);
-    if (potentialNewTotalVotes <= 10000) {
-      handleVotes(value, index);
-      setAmount(value);
+
+    // As long as you keep moving the slider, `value` continues to count to the max value(10000). This sometimes makes the
+    // potentialNewTotalVotes to be greater than the cumulative total max, 10000. Whenever this happens,
+    // the potentialNewTotalVotes can never be exactly 10000, therefore, we never achieve 100% votes. To resolve this,
+    // whenever the value potentialNewTotalVotes spills over 10000, we normalize the value that caused the spill to only
+    // be as high as it needs to be to make the potentialNewTotalVotes (cumulative total max) = 10000, therefor reaching
+    // 100% votes.
+    const potentialNewTotalVotes =
+      Object.values(votes).reduce((a, b) => a + b, 0) - currentVoteForThisGauge + Number(value);
+
+    if(potentialNewTotalVotes > 10000) {
+      value = value - (potentialNewTotalVotes - 10000)
     }
+
+    handleVotes(value, index);
+    setAmount(value);
   }
 
   return (
@@ -88,19 +99,19 @@ export default function Gauge({ vaultData, index, votes, handleVotes, canVote }:
             <div className="w-full mt-6 xs:mt-0">
               <p className="font-normal text-primary xs:text-[14px]">Current Weight</p>
               <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
-                {(Number(weights?.[0]) / 1e16).toFixed() || 0} %
+                {(Number(weights?.[0]) / 1e16).toFixed(2) || 0} %
               </Title>
             </div>
             <div className="w-full mt-6 xs:mt-0">
               <p className="font-normal text-primary xs:text-[14px]">Upcoming Weight</p>
               <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
-                {(Number(weights?.[1]) / 1e16).toFixed() || 0} %
+                {(Number(weights?.[1]) / 1e16).toFixed(2) || 0} %
               </Title>
             </div>
             <div className="w-full mt-6 xs:mt-0">
               <p className="font-normal text-primary xs:text-[14px]">My Votes</p>
               <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
-                {(Number(weights?.[2].power) / 100).toFixed()} %
+                {(Number(weights?.[2].power) / 100).toFixed(2)} %
               </Title>
             </div>
           </div>

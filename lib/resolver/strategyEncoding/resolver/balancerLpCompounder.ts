@@ -73,7 +73,7 @@ export async function balancerLpCompounder({ chainId, client, address, params }:
     ]);
 }
 
-const balancerOptionalDataAbi = [{ name: 'poolId', type: 'bytes32' }, { name: 'indexIn', type: 'uint8' }] as const
+const balancerOptionalDataAbi = [{ name: 'poolId', type: 'bytes32' }, { name: 'indexIn', type: 'uint8' }, { name: 'amountsInLen', type: 'uint8' }] as const
 
 const baseAssetAbi = { name: 'baseAsset', type: 'address' } as const
 const vaultAbi = { name: 'vault', type: 'address' } as const

@@ -1,8 +1,8 @@
-import { useMemo, Fragment, useState, useEffect } from "react";
+import { Fragment, useState, useEffect } from "react";
 import Link from "next/link";
 import { Dialog, Transition } from "@headlessui/react";
-import { ChevronDownIcon } from "@heroicons/react/24/solid";
-import { useNetwork, useAccount } from "wagmi";
+import { ChevronDownIcon, PowerIcon } from "@heroicons/react/24/solid";
+import { useNetwork, useAccount, useDisconnect } from "wagmi";
 import { useChainModal, useConnectModal } from "@rainbow-me/rainbowkit";
 import { networkLogos } from "@/lib/utils/connectors";
 import MainActionButton from "@/components/button/MainActionButton";
@@ -10,6 +10,7 @@ import SocialMediaLinks from "@/components/common/SocialMediaLinks";
 import NavbarLinks from "@/components/navbar/NavbarLinks";
 
 export default function DesktopMenu(): JSX.Element {
+  const { disconnect } = useDisconnect();
   const { openConnectModal } = useConnectModal();
   const { openChainModal } = useChainModal();
   const { address } = useAccount();
@@ -17,6 +18,10 @@ export default function DesktopMenu(): JSX.Element {
   const [menuVisible, toggleMenu] = useState<boolean>(false);
   const [logo, setLogo] = useState<string>(networkLogos[1])
   const [chainName, setChainName] = useState<string>("Ethereum")
+
+  const handleWalletDisconnect = () => {
+    disconnect();
+  };
 
   useEffect(() => {
     if (address && chain?.id) {
@@ -28,7 +33,7 @@ export default function DesktopMenu(): JSX.Element {
 
   return (
     <>
-      <div className="flex flex-row items-center justify-between w-full py-8 px-4 md:px-8 z-30">
+      <div className="flex flex-row items-center justify-between w-full py-8 px-4 md:px-8 z-10">
         <div className="flex flex-row items-center">
           <div>
             <Link href={`/`} passHref>
@@ -46,13 +51,14 @@ export default function DesktopMenu(): JSX.Element {
             <div className={`relative flex flex-container flex-row z-10`}>
               <div
                 className={`w-fit cursor-pointer h-full py-2 bg-[#141416] md:bg-transparent md:py-[10px] px-4 md:px-6 flex flex-row items-center justify-between border border-customLightGray rounded-4xl text-primary`}
-                onClick={openChainModal}
+
               >
-                <img src={logo} alt={chainName} className="w-5 h-5 md:mr-2" />
+                <img src={logo} alt={chainName} className="w-5 h-5 md:mr-2" onClick={openChainModal} />
                 <div className="hidden w-2 h-2 bg-[#50C56E] ml-2 rounded-full"></div>
                 <span className="hidden md:inline">|</span>
                 <p className="ml-2 leading-none hidden md:block">{address?.substring(0, 5)}...</p>
-                <ChevronDownIcon className="w-5 h-5 ml-3 text-primary hidden md:block" aria-hidden="true" />
+                <span className="hidden md:inline">|</span>
+                <PowerIcon className="w-5 h-5 ml-3 text-primary hidden md:block" aria-hidden="true" onClick={handleWalletDisconnect}  />
               </div>
             </div>
           ) : (

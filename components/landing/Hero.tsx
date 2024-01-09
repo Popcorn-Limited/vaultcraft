@@ -1,5 +1,5 @@
 import StatusWithLabel from "@/components/common/StatusWithLabel";
-import { vaultsAtom } from "@/lib/atoms/vaults";
+import { lockvaultsAtom, vaultsAtom } from "@/lib/atoms/vaults";
 import { Networth, getTotalNetworth, getVaultNetworthByChain } from "@/lib/getNetworth";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
@@ -10,6 +10,8 @@ import { Address, useAccount } from "wagmi";
 export default function Hero(): JSX.Element {
   const { address: account } = useAccount();
   const [vaults] = useAtom(vaultsAtom)
+  const [lockVaults] = useAtom(lockvaultsAtom)
+
   const [networth, setNetworth] = useState<Networth>({ wallet: 0, stake: 0, vault: 0, total: 0 });
   const [tvl, setTvl] = useState<string>("0");
   const [loading, setLoading] = useState<boolean>(true);
@@ -17,16 +19,19 @@ export default function Hero(): JSX.Element {
   useEffect(() => {
     async function fetchNetworth() {
       const vaultNetworth = SUPPORTED_NETWORKS.map(chain => getVaultNetworthByChain({ vaults, chainId: chain.id })).reduce((a, b) => a + b, 0)
+      const lockVaultNetworth = lockVaults.reduce((a, b) => a + (b.vault.balance * b.vault.price / (10 ** b.vault.decimals)), 0)
       const totalNetworth = await getTotalNetworth({ account: account as Address })
-      setNetworth({ ...totalNetworth.total, vault: vaultNetworth, total: totalNetworth.total.total + vaultNetworth });
+      setNetworth({ ...totalNetworth.total, vault: vaultNetworth + lockVaultNetworth, total: totalNetworth.total.total + vaultNetworth + lockVaultNetworth });
       setLoading(false);
     }
-    if (account && vaults.length > 0) fetchNetworth()
-  }, [account]);
+    if (account && vaults.length > 0 && lockVaults.length > 0) fetchNetworth()
+  }, [account, vaults, lockVaults]);
 
   useEffect(() => {
-    setTvl(NumberFormatter.format((vaults.reduce((a, b) => a + b.tvl, 0))))
-  }, [vaults])
+    const vaultTvl = vaults.reduce((a, b) => a + b.tvl, 0)
+    const lockVaultTvl = lockVaults.reduce((a, b) => a + b.tvl, 0)
+    setTvl(NumberFormatter.format(vaultTvl + lockVaultTvl))
+  }, [vaults, lockVaults])
 
 
   return (
@@ -35,23 +40,50 @@ export default function Hero(): JSX.Element {
         <div className="flex flex-col sm:flex-row sm:space-x-28 smmd:space-x-10">
           <StatusWithLabel
             label={"Deposits"}
-            content={<p className="text-3xl font-bold text-primary leading-[120%]">$ {loading ? "..." : NumberFormatter.format(networth.vault)}</p>}
+            content={
+              <p className="text-3xl font-bold text-primary leading-[120%]">
+                $ {loading ?
+                  "..." :
+                  <>
+                    {networth.vault > 0.01 ? NumberFormatter.format(networth.vault) : "0"}
+                  </>
+                }
+              </p>
+            }
             className="md:min-w-[160px] lg:min-w-0"
           />
           <div className="flex flex-row space-x-28 smmd:space-x-10 items-center mt-4 sm:mt-0">
             <StatusWithLabel
               label={"Staked"}
-              content={<p className="text-3xl font-bold text-primary leading-[120%]">$ {loading ? "..." : NumberFormatter.format(networth.stake)}</p>}
+              content={
+                <p className="text-3xl font-bold text-primary leading-[120%]">
+                  $ {loading ?
+                    "..." :
+                    <>
+                      {networth.stake > 0.01 ? NumberFormatter.format(networth.stake) : "0"}
+                    </>
+                  }
+                </p>
+              }
               className="md:min-w-[160px] lg:min-w-0"
             />
             <StatusWithLabel
               label={"VCX in Wallet"}
-              content={<p className="text-3xl font-bold text-primary leading-[120%]">$ {loading ? "..." : NumberFormatter.format(networth.wallet)}</p>}
+              content={
+                <p className="text-3xl font-bold text-primary leading-[120%]">
+                  $ {loading ?
+                    "..." :
+                    <>
+                      {networth.wallet > 0.01 ? NumberFormatter.format(networth.wallet) : "0"}
+                    </>
+                  }
+                </p>
+              }
               className="md:min-w-[160px] lg:min-w-0"
             />
           </div>
         </div>
-        <div className="w-full md:w-fit-content mt-12">
+        <div className="w-full md:w-fit-content">
           <p className="uppercase md:hidden text-[#C8C8C8] text-sm mb-2">Platform</p>
           <div className="flex flex-row items-center w-full space-x-10">
             <StatusWithLabel
@@ -65,7 +97,16 @@ export default function Hero(): JSX.Element {
             />
             <StatusWithLabel
               label={"My Net Worth"}
-              content={<p className="text-3xl font-bold text-primary leading-[120%]">$ {loading ? "..." : NumberFormatter.format(networth.total)}</p>}
+              content={
+                <p className="text-3xl font-bold text-primary leading-[120%]">
+                  $ {loading ?
+                    "..." :
+                    <>
+                      {networth.total > 0.01 ? NumberFormatter.format(networth.total) : "0"}
+                    </>
+                  }
+                </p>
+              }
               infoIconProps={{
                 id: "networth",
                 title: "My Networth",
