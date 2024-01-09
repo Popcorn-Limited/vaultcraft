@@ -18,6 +18,8 @@ import MainActionButton from "../button/MainActionButton";
 import { availableZapAssetAtom, zapAssetsAtom } from "@/lib/atoms";
 import { Token } from "@/lib/types";
 import getZapAssets, { getAvailableZapAssets } from "@/lib/utils/getZapAssets";
+import SecondaryActionButton from "../button/SecondaryActionButton";
+import TertiaryActionButton from "../button/TertiaryActionButton";
 
 async function setUpYieldOptions() {
   const ttl = 360_000;
@@ -97,7 +99,8 @@ export default function Page({
 }: {
   children: JSX.Element;
 }): JSX.Element {
-  const { asPath, query } = useRouter()
+  const router = useRouter()
+  const { query, asPath } = router;
   const { address: account } = useAccount()
 
   const [yieldOptions, setYieldOptions] = useAtom(yieldOptionsAtom)
@@ -166,12 +169,23 @@ export default function Page({
         56: await getAvailableZapAssets(56)
       })
     }
-    if(Object.keys(zapAssets).length === 0 && Object.keys(availableZapAssets).length === 0) getZapData()
+    if (Object.keys(zapAssets).length === 0 && Object.keys(availableZapAssets).length === 0) getZapData()
   }, [])
 
   return (
     <>
       <div className="bg-[#141416] w-full mx-auto min-h-screen h-full font-khTeka flex flex-col">
+
+        {/* Temporary Banner */}
+        <div className="bg-[#DFFF1C] p-4 md:p-2 mt-2 mx-4 md:mx-8 rounded-lg flex flex-row justify-center">
+          <div className="flex flex-row items-center justify-center">
+            <p className="text-black font-bold md:mr-4">Migrate POP to VCX by January 31, 2024!</p>
+            <div className="w-40">
+              <SecondaryActionButton label="Migrate Now" handleClick={() => router.push("https://app.vaultcraft.io/migration")} />
+            </div>
+          </div>
+        </div>
+
         <DesktopMenu />
         <div className="flex-1">
           <TermsModal showModal={showTermsModal} setShowModal={setShowTermsModal} setTermsSigned={setTermsSigned} />
