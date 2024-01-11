@@ -10,7 +10,15 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import NoSSR from "react-no-ssr";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
-
+import axios from "axios"
+import { Address, PublicClient, createPublicClient, extractChain, http, zeroAddress } from "viem";
+import { VaultAbi } from "@/lib/constants";
+import { RPC_URLS } from "@/lib/utils/connectors";
+import * as chains from 'viem/chains'
+import { ProtocolName, YieldOptions } from "vaultcraft-sdk";
+import { yieldOptionsAtom } from "@/lib/atoms/sdk";
+import TabSelector from "@/components/common/TabSelector";
+import VaultStrategyConfiguration from "@/components/vault/management/vault/strategy";
 
 // TODO
 // - Change Fees
@@ -24,9 +32,105 @@ import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 // - Change DepositLimit
 // - Pause / Unpause
 
+
+
+async function getData(vault: VaultData, yieldOptions: YieldOptions) {
+  const { data: strategyDescriptions } = await axios.get(`https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/descriptions/strategies/${vault.chainId}.json`)
+
+  const client = createPublicClient({
+    chain: extractChain({
+      chains: Object.values(chains),
+      // @ts-ignore
+      id: vault.chainId,
+    }),
+    transport: http(RPC_URLS[vault.chainId])
+  })
+
+  const vaultContract = {
+    address: vault.address,
+    abi: VaultAbi
+  }
+
+  const res = await client.multicall({
+    contracts: [
+      {
+        ...vaultContract,
+        functionName: "proposedAdapter"
+      },
+      {
+        ...vaultContract,
+        functionName: "proposedAdapterTime"
+      },
+      {
+        ...vaultContract,
+        functionName: "proposedFees"
+      },
+      {
+        ...vaultContract,
+        functionName: "proposedFeeTime"
+      },
+      {
+        ...vaultContract,
+        functionName: "paused"
+      },
+      {
+        ...vaultContract,
+        functionName: "balanceOf",
+        args: [vault.metadata.feeRecipient]
+      },
+      {
+        ...vaultContract,
+        functionName: "accruedManagementFee"
+      },
+      {
+        ...vaultContract,
+        functionName: "accruedPerformanceFee"
+      },
+    ],
+    allowFailure: false
+  })
+
+  let proposedAdapter = {
+    name: "None",
+    description: "None",
+    resolver: "None",
+    apy: 0
+  }
+
+  if (res[0] !== zeroAddress) {
+    proposedAdapter = {
+      name: strategyDescriptions[res[0]].name,
+      description: strategyDescriptions[res[0]].description,
+      resolver: strategyDescriptions[res[0]].resolver,
+      apy: (await yieldOptions.getApy({
+        chainId: vault.chainId,
+        protocol: strategyDescriptions[res[0]].resolver as ProtocolName,
+        asset: vault.asset.address
+      })).total
+    }
+  }
+
+  return {
+    proposedAdapter: proposedAdapter,
+    proposedAdapterTime: res[1],
+    proposedFees: {
+      deposit: Number(res[2][0]),
+      withdrawal: Number(res[2][1]),
+      management: Number(res[2][2]),
+      performance: Number(res[2][3])
+    },
+    proposedFeeTime: res[3],
+    paused: res[4],
+    feeBalance: Number(res[5]),
+    accruedFees: Number(res[6]) + Number(res[7])
+  }
+}
+
 export default function Index() {
   const router = useRouter();
   const { query } = router;
+
+  const [yieldOptions] = useAtom(yieldOptionsAtom)
 
   const { address: account } = useAccount();
   const publicClient = usePublicClient()
@@ -41,76 +145,85 @@ export default function Index() {
     }
   }, [vaults, query, vault])
 
+  const [settings, setSettings] = useState<any>()
+
+  useEffect(() => {
+    if (vault && yieldOptions && !settings) {
+      getData(vault, yieldOptions).then(res => setSettings(res))
+    }
+  }, [vault, yieldOptions, settings])
+
+  const [tab, setTab] = useState<string>("Strategy")
+
+  function changeTab(tab: string) {
+    setTab(tab)
+  }
+
+  console.log({ settings })
+
   return <NoSSR>
     {
       vault ? (
         <section className="py-10 px-4 md:px-8 text-white">
           <AssetWithName vault={vault} />
+          <TabSelector
+            className="my-6"
+            availableTabs={["Strategy", "Fee Configuration", "Fee Recipient", "Take Fees", "Deposit Limit", "Pausing"]}
+            activeTab={tab}
+            setActiveTab={changeTab}
+          />
           <div>
-            <div className="flex flex-row justify-between items-center">
+            {tab === "Strategy" && <VaultStrategyConfiguration vaultData={vault} settings={settings} />}
+            {tab === "Fee Configuration" && <div className="flex flex-row justify-between items-center">
               <div>
-                <p>Current Strategy</p>
-                <p>Name: {vault.metadata.optionalMetadata.protocol.name}</p>
-                <p>Description: {vault.metadata.optionalMetadata.protocol.description}</p>
-                <p>Apy: {`${NumberFormatter.format(roundToTwoDecimalPlaces(vault.totalApy))} %`}</p>
-                <p>Propose new Strategy in: 3d</p>
-                <MainActionButton label="Propose new Strategy" />
-              </div>
-              <div>
-                <ArrowRightIcon className="text-white w-8 h-8" />
-              </div>
-              <div>
-                <p>Proposed Strategy</p>
-                <p>Name: {vault.metadata.optionalMetadata.protocol.name}</p>
-                <p>Description: {vault.metadata.optionalMetadata.protocol.description}</p>
-                <p>Apy: {`${NumberFormatter.format(roundToTwoDecimalPlaces(vault.totalApy))} %`}</p>
-                <p>Accept in: 0s</p>
-                <MainActionButton label="Accept new Strategy" />
-              </div>
-            </div>
-            <div className="flex flex-row justify-between items-center">
-              <div>
-                <p>Current Fee Config:</p>
+                <h2 className="text-xl">Current Fee Configuration</h2>
                 <p>Deposit: {vault.fees.deposit / 1e16} %</p>
                 <p>Withdrawal: {vault.fees.withdrawal / 1e16} %</p>
                 <p>Management: {vault.fees.management / 1e16} %</p>
                 <p>Performance: {vault.fees.performance / 1e16} %</p>
                 <p>Propose new Fee in: 3d</p>
-                <MainActionButton label="Propose new Fee" />
+                <div className="w-40">
+                  <MainActionButton label="Propose new Fee" />
+                </div>
               </div>
               <div>
                 <ArrowRightIcon className="text-white w-8 h-8" />
               </div>
               <div>
-                <p>Proposed Fee Config:</p>
+                <h2 className="text-xl">Proposed Fee Configuration</h2>
                 <p>Deposit: {vault.fees.deposit / 1e16} %</p>
                 <p>Withdrawal: {vault.fees.withdrawal / 1e16} %</p>
                 <p>Management: {vault.fees.management / 1e16} %</p>
                 <p>Performance: {vault.fees.performance / 1e16} %</p>
                 <p>Accept in: 0s</p>
-                <MainActionButton label="Accept new Fee" />
+                <div className="w-40">
+                  <MainActionButton label="Accept new Fee" />
+                </div>
               </div>
-            </div>
-            <div>
-              <p>FeeRecipient:</p>
-              {/* TODO change to actual fee recipient */}
-              <p>Fee recipient: {vault.metadata.creator}</p>
-              <MainActionButton label="Change Fee Recipient" />
-            </div>
-            <div>
-              <p>Deposit Limit</p>
-              <p>Deposit Limit: {vault.depositLimit}</p>
-              <MainActionButton label="Change Deposit Limit" />
-            </div>
-            <div>
-              <p>Accumulated Fees</p>
-              <p>Accumulated Fees: $10k</p>
-              <MainActionButton label="Take Fees" />
-            </div>
-            <div>
-              <p>IsPaused: false</p>
-              <MainActionButton label="Pause Vault" />
-            </div>
+            </div>}
+            {tab === "Fee Recipient" && <div>
+              <p>Fee recipient: {vault.metadata.feeRecipient}</p>
+              <div className="w-40">
+                <MainActionButton label="Change Fee Recipient" />
+              </div>
+            </div>}
+            {tab === "Deposit Limit" && <div>
+              <p>Deposit Limit: {vault.depositLimit / (10 ** vault.asset.decimals)} {vault.asset.symbol}</p>
+              <div className="w-40">
+                <MainActionButton label="Change Deposit Limit" />
+              </div>
+            </div>}
+            {tab === "Take Fees" && <div>
+              <p>Accumulated Fees: {settings?.accruedFees / (10 ** vault.asset.decimals)} {vault.asset.symbol}</p>
+              <div className="w-40">
+                <MainActionButton label="Take Fees" />
+              </div>
+            </div>}
+            {tab === "Pausing" && <div>
+              <div className="w-40">
+                <MainActionButton label={settings?.paused ? "Unpause Vault" : "Pause Vault"} />
+              </div>
+            </div>}
           </div>
         </section>
       ) :

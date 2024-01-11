@@ -193,3 +193,13 @@ export async function vaultUnstakeAndWithdraw({ chainId, router, vaultData, acco
   }
   return success
 }
+
+export async function takeFees({ chainId, vaultData, account, amount, clients }: VaultWriteProps): Promise<boolean> {
+  showLoadingToast("Taking fees...")
+
+  return handleCallResult({
+    successMessage: "Took fees!",
+    simulationResponse: await simulateVaultCall({ address: vaultData.address, account, amount, functionName: "takeManagementAndPerformanceFees", publicClient: clients.publicClient }),
+    clients
+  })
+}

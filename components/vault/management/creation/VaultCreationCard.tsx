@@ -1,4 +1,4 @@
-import ProgressBar, { ProgressBarProps } from "@/components/vaultManagement/creation/ProgressBar";
+import ProgressBar, { ProgressBarProps } from "@/components/vault/management/creation/ProgressBar";
 
 interface VaultCreationCardProps extends ProgressBarProps {
   children: any

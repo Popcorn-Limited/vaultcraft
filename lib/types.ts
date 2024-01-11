@@ -93,6 +93,7 @@ export type RewardToken = Token & {
 
 export type VaultMetadata = {
   creator: Address;
+  feeRecipient: Address;
   cid: string;
   optionalMetadata: OptionalMetadata;
   vaultName?: string;

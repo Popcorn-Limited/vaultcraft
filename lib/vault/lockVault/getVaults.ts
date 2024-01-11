@@ -39,11 +39,14 @@ async function getVaults({ account, publicClient }: { account: Address, publicCl
   const { data: vaultTokens } = await axios.get(`https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/vaults/tokens/42161.json`)
   const { data: assets } = await axios.get(`https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/assets/tokens/42161.json`)
 
-  let result = addresses.map(address => vaults[address]).map(vault => {
+  let result: any[] = addresses.map(address => vaults[address]).map(vault => {
     return {
-      ...vault,
+      address: vault.address,
       vault: { ...vaultTokens[vault.address], balance: 0 },
       asset: { ...assets[vault.assetAddress], balance: 0 },
+      chainId: vault.chainId,
+      fees: vault.fees,
+      strategies: vault.strategies,
       lock: {
         unlockTime: 0,
         rewardIndex: 0,
@@ -51,6 +54,8 @@ async function getVaults({ account, publicClient }: { account: Address, publicCl
         rewardShares: 0
       },
       metadata: {
+        creator: vault.creator,
+        feeRecipient: vault.feeRecipient,
         optionalMetadata: {
           protocol: {
             name: "Frax"
@@ -62,8 +67,8 @@ async function getVaults({ account, publicClient }: { account: Address, publicCl
 
   const uniqueAssetAdresses: Address[] = []
   result.forEach(vault => {
-    if (!uniqueAssetAdresses.includes(vault.assetAddress)) {
-      uniqueAssetAdresses.push(vault.assetAddress)
+    if (!uniqueAssetAdresses.includes(vault.asset.address)) {
+      uniqueAssetAdresses.push(vault.asset.address)
     }
   })
 
@@ -145,10 +150,10 @@ async function getVaults({ account, publicClient }: { account: Address, publicCl
 
     let assetPrice
     // @dev -- manual override for ibFRAX
-    if (vaultData.assetAddress === "0x2D0483FefAbA4325c7521539a3DFaCf94A19C472") {
+    if (vaultData.asset.address === "0x2D0483FefAbA4325c7521539a3DFaCf94A19C472") {
       assetPrice = 1.0149
     } else {
-      assetPrice = priceData.coins[`arbitrum:${vaultData.assetAddress}`].price
+      assetPrice = priceData.coins[`arbitrum:${vaultData.asset.address}`].price
     }
 
     const pricePerShare = assetsPerShare * assetPrice
@@ -184,7 +189,7 @@ async function getVaults({ account, publicClient }: { account: Address, publicCl
             args: [account]
           },
           {
-            address: vaultData.assetAddress,
+            address: vaultData.asset.address,
             abi: StakingVaultAbi,
             functionName: 'balanceOf',
             args: [account]
