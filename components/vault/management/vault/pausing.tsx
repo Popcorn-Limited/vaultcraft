@@ -1,0 +1,20 @@
+import MainActionButton from "@/components/button/MainActionButton";
+import { VaultData } from "@/lib/types";
+
+export default function VaultPausing({ vaultData, settings }: { vaultData: VaultData, settings: any }): JSX.Element {
+  return (
+    <div className="flex flex-row justify-center">
+      <div className="w-1/2">
+        <p className="text-gray-500">
+          Pausing the vault pulls all funds from its strategy and the underlying protocol and disables new vault deposits.
+          Use this in case the underlying protocol puts funds in risk.
+          All assets are available in the vault and idle. Withdrawals are still possible once a vault is paused.
+        </p>
+        <div className="w-40 mt-4">
+          <MainActionButton label={settings?.paused ? "Unpause Vault" : "Pause Vault"} />
+        </div>
+      </div>
+    </div>
+  )
+}
+

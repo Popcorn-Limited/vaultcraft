@@ -1,5 +1,5 @@
 import { useAtom } from "jotai";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { feeAtom } from "@/lib/atoms/fees";
 import { validateInput } from "@/lib/helpers";
 import Fieldset from "@/components/input/Fieldset";
@@ -65,12 +65,16 @@ const FEE_INPUTS = [
 
 interface Errors { [key: string]: string[] | undefined }
 
-function FeeConfiguration() {
+function FeeConfiguration({ showFeeRecipient = true }: { showFeeRecipient?: boolean }): JSX.Element {
   const [fees, setFee] = useAtom(feeAtom);
   const [errors, setErrors] = useState<Errors>()
   const [recipientErrors, setRecipientErrors] = useState<string[] | undefined>(undefined)
-  // @ts-ignore
-  const [areCategoriesOpened, setAreCategoriesOpened] = useState(FEE_INPUTS.map(fee => fees[fee.inputs[0].key] > 0))
+  const [areCategoriesOpened, setAreCategoriesOpened] = useState<boolean[]>(FEE_INPUTS.map(i => false))
+
+  useEffect(() => {
+    // @ts-ignore
+    setAreCategoriesOpened(FEE_INPUTS.map(fee => fees[fee.inputs[0].key] > 0))
+  }, [fees])
 
   function handlePercentageChange(value: string, key: string) {
     const formattedValue = validateInput(value)
@@ -169,27 +173,28 @@ function FeeConfiguration() {
           </div>
         );
       })}
-      <div className="">
-        <Fieldset className="flex-grow" label="Fee Recipient" description="Which address should receive the fees?" isSwitchNeeded={false}>
-          <Input
-            onChange={(e) =>
-              setFee((prefState) => {
-                return {
-                  ...prefState,
-                  recipient: (e.target as HTMLInputElement).value,
-                };
-              })
-            }
-            defaultValue={fees.recipient}
-            placeholder="0x00"
-            autoComplete="off"
-            autoCorrect="off"
-            info={"Required"}
-            onBlur={verifyRecipient}
-            errors={recipientErrors}
-          />
-        </Fieldset>
-      </div>
+      {showFeeRecipient && (
+        <div className="">
+          <Fieldset className="flex-grow" label="Fee Recipient" description="Which address should receive the fees?" isSwitchNeeded={false}>
+            <Input
+              onChange={(e) =>
+                setFee((prefState) => {
+                  return {
+                    ...prefState,
+                    recipient: (e.target as HTMLInputElement).value,
+                  };
+                })
+              }
+              defaultValue={fees.recipient}
+              placeholder="0x00"
+              autoComplete="off"
+              autoCorrect="off"
+              info={"Required"}
+              onBlur={verifyRecipient}
+              errors={recipientErrors}
+            />
+          </Fieldset>
+        </div>)}
     </section>
   );
 }

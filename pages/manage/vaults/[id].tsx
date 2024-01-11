@@ -19,6 +19,11 @@ import { ProtocolName, YieldOptions } from "vaultcraft-sdk";
 import { yieldOptionsAtom } from "@/lib/atoms/sdk";
 import TabSelector from "@/components/common/TabSelector";
 import VaultStrategyConfiguration from "@/components/vault/management/vault/strategy";
+import VaultPausing from "@/components/vault/management/vault/pausing";
+import VaultFees from "@/components/vault/management/vault/fees";
+import VaultDepositLimit from "@/components/vault/management/vault/depositLimit";
+import VaultFeeRecipient from "@/components/vault/management/vault/feeRecipient";
+import VaultFeeConfiguration from "@/components/vault/management/vault/feeConfiguration";
 
 // TODO
 // - Change Fees
@@ -167,64 +172,20 @@ export default function Index() {
         <section className="py-10 px-4 md:px-8 text-white">
           <AssetWithName vault={vault} />
           <TabSelector
-            className="my-6"
+            className="mt-6 mb-12"
             availableTabs={["Strategy", "Fee Configuration", "Fee Recipient", "Take Fees", "Deposit Limit", "Pausing"]}
             activeTab={tab}
             setActiveTab={changeTab}
           />
-          <div>
+          {settings ? <div>
             {tab === "Strategy" && <VaultStrategyConfiguration vaultData={vault} settings={settings} />}
-            {tab === "Fee Configuration" && <div className="flex flex-row justify-between items-center">
-              <div>
-                <h2 className="text-xl">Current Fee Configuration</h2>
-                <p>Deposit: {vault.fees.deposit / 1e16} %</p>
-                <p>Withdrawal: {vault.fees.withdrawal / 1e16} %</p>
-                <p>Management: {vault.fees.management / 1e16} %</p>
-                <p>Performance: {vault.fees.performance / 1e16} %</p>
-                <p>Propose new Fee in: 3d</p>
-                <div className="w-40">
-                  <MainActionButton label="Propose new Fee" />
-                </div>
-              </div>
-              <div>
-                <ArrowRightIcon className="text-white w-8 h-8" />
-              </div>
-              <div>
-                <h2 className="text-xl">Proposed Fee Configuration</h2>
-                <p>Deposit: {vault.fees.deposit / 1e16} %</p>
-                <p>Withdrawal: {vault.fees.withdrawal / 1e16} %</p>
-                <p>Management: {vault.fees.management / 1e16} %</p>
-                <p>Performance: {vault.fees.performance / 1e16} %</p>
-                <p>Accept in: 0s</p>
-                <div className="w-40">
-                  <MainActionButton label="Accept new Fee" />
-                </div>
-              </div>
-            </div>}
-            {tab === "Fee Recipient" && <div>
-              <p>Fee recipient: {vault.metadata.feeRecipient}</p>
-              <div className="w-40">
-                <MainActionButton label="Change Fee Recipient" />
-              </div>
-            </div>}
-            {tab === "Deposit Limit" && <div>
-              <p>Deposit Limit: {vault.depositLimit / (10 ** vault.asset.decimals)} {vault.asset.symbol}</p>
-              <div className="w-40">
-                <MainActionButton label="Change Deposit Limit" />
-              </div>
-            </div>}
-            {tab === "Take Fees" && <div>
-              <p>Accumulated Fees: {settings?.accruedFees / (10 ** vault.asset.decimals)} {vault.asset.symbol}</p>
-              <div className="w-40">
-                <MainActionButton label="Take Fees" />
-              </div>
-            </div>}
-            {tab === "Pausing" && <div>
-              <div className="w-40">
-                <MainActionButton label={settings?.paused ? "Unpause Vault" : "Pause Vault"} />
-              </div>
-            </div>}
+            {tab === "Fee Configuration" && <VaultFeeConfiguration vaultData={vault} settings={settings} />}
+            {tab === "Fee Recipient" && <VaultFeeRecipient vaultData={vault} settings={settings} />}
+            {tab === "Deposit Limit" && <VaultDepositLimit vaultData={vault} settings={settings} />}
+            {tab === "Take Fees" && <VaultFees vaultData={vault} settings={settings} />}
+            {tab === "Pausing" && <VaultPausing vaultData={vault} settings={settings} />}
           </div>
+            : <p>Loading...</p>}
         </section>
       ) :
         <p className="text-white">Loading...</p>
