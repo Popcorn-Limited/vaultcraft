@@ -155,3 +155,9 @@ export enum LockVaultActionType {
   ZapIncreaseAmount,
   ZapWithdrawal
 }
+
+export type DuneQueryResult<T> = {
+  result: {
+      rows: T[]
+  }
+}

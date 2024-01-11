@@ -12,14 +12,9 @@ import { getVeAddresses } from "@/lib/utils/addresses";
 import { BalancerVaultAbi, VCX_POOL_ID, VotingEscrowAbi } from "@/lib/constants";
 import {formatToFixedDecimals} from "@/lib/utils/formatBigNumber";
 import {bigint} from "zod";
+import { DuneQueryResult } from "@/lib/types";
 
 const { VCX, VotingEscrow, WETH, WETH_VCX_LP, oVCX, BalancerVault } = getVeAddresses()
-
-type DuneQueryResult<T> = {
-    result: {
-        rows: T[]
-    }
-}
 
 const vaultTvlChartColors = [
     "#FFE650",
