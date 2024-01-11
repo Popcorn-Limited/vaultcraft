@@ -1,7 +1,14 @@
 import MainActionButton from "@/components/button/MainActionButton";
 import { VaultData } from "@/lib/types";
+import { takeFees } from "@/lib/vault/management/interactions";
+import { WalletClient } from "viem";
+import { Address, useAccount, usePublicClient, useWalletClient } from "wagmi";
 
 export default function VaultFees({ vaultData, settings }: { vaultData: VaultData, settings: any }): JSX.Element {
+  const { address: account } = useAccount();
+  const publicClient = usePublicClient()
+  const { data: walletClient } = useWalletClient()
+
   return (
     <div className="flex flex-row justify-center">
       <div className="w-1/2">
@@ -14,7 +21,12 @@ export default function VaultFees({ vaultData, settings }: { vaultData: VaultDat
           <div className="w-full">
             <p>Accumulated Fees: {settings?.accruedFees / (10 ** vaultData.asset.decimals)} {vaultData.asset.symbol}</p>
             <div className="w-40 mt-4">
-              <MainActionButton label="Take Fees" />
+              <MainActionButton
+                label="Take Fees"
+                handleClick={() =>
+                  takeFees({ vaultData, account: account as Address, clients: { publicClient, walletClient: walletClient as WalletClient } })
+                }
+              />
             </div>
           </div>
         </div>

@@ -1,10 +1,16 @@
 import MainActionButton from "@/components/button/MainActionButton";
 import Input from "@/components/input/Input";
 import { VaultData } from "@/lib/types";
+import { changeFeeRecipient } from "@/lib/vault/management/interactions";
 import { FormEventHandler, useState } from "react";
-import { Address, isAddress, zeroAddress } from "viem";
+import { isAddress, zeroAddress } from "viem";
+import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 
 export default function VaultFeeRecipient({ vaultData, settings }: { vaultData: VaultData, settings: any }): JSX.Element {
+  const { address: account } = useAccount();
+  const publicClient = usePublicClient()
+  const { data: walletClient } = useWalletClient()
+
   const [feeRecipient, setFeeRecipient] = useState<string>(vaultData.metadata.feeRecipient)
 
   const handleChangeInput: FormEventHandler<HTMLInputElement> = ({ currentTarget: { value } }) => {
@@ -15,7 +21,7 @@ export default function VaultFeeRecipient({ vaultData, settings }: { vaultData: 
     <div className="flex flex-row justify-center">
       <div className="w-1/2">
         <p className="text-gray-500">
-          Change the address receiving fees from this vault. 
+          Change the address receiving fees from this vault.
           Fee shares that got minted already will not be transfered to the new fee recipient.
         </p>
         <div className="mb-8 mt-4">
@@ -34,6 +40,7 @@ export default function VaultFeeRecipient({ vaultData, settings }: { vaultData: 
         <div className="w-60 mt-4">
           <MainActionButton
             label="Change Fee Recipient"
+            handleClick={() => changeFeeRecipient({ feeRecipient, vaultData, account, clients: { publicClient, walletClient } })}
             disabled={feeRecipient === vaultData.metadata.feeRecipient || !isAddress(feeRecipient) || feeRecipient === zeroAddress}
           />
         </div>

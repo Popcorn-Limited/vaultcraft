@@ -138,8 +138,6 @@ export default function Index() {
   const [yieldOptions] = useAtom(yieldOptionsAtom)
 
   const { address: account } = useAccount();
-  const publicClient = usePublicClient()
-  const { data: walletClient } = useWalletClient()
 
   const [vaults, setVaults] = useAtom(vaultsAtom)
   const [vault, setVault] = useState<VaultData>()
@@ -163,8 +161,6 @@ export default function Index() {
   function changeTab(tab: string) {
     setTab(tab)
   }
-
-  console.log({ settings })
 
   return <NoSSR>
     {

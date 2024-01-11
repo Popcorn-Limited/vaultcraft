@@ -3,8 +3,13 @@ import Input from "@/components/input/Input";
 import { VaultData } from "@/lib/types";
 import { FormEventHandler, useState } from "react";
 import { maxUint256 } from "viem";
+import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 
 export default function VaultDepositLimit({ vaultData, settings }: { vaultData: VaultData, settings: any }): JSX.Element {
+  const { address: account } = useAccount();
+  const publicClient = usePublicClient()
+  const { data: walletClient } = useWalletClient()
+  
   const [depositLimit, setDepositLimit] = useState<string>(String(vaultData.depositLimit / (10 ** vaultData.asset.decimals)))
 
   const handleChangeInput: FormEventHandler<HTMLInputElement> = ({ currentTarget: { value } }) => {

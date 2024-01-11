@@ -2,14 +2,21 @@ import MainActionButton from "@/components/button/MainActionButton";
 import FeeConfiguration from "@/components/deploymentSections/FeeConfiguration";
 import { feeAtom } from "@/lib/atoms";
 import { VaultData } from "@/lib/types";
+import { acceptFees, proposeFees } from "@/lib/vault/management/interactions";
 import { useAtom } from "jotai";
 import { useEffect } from "react";
+import { parseUnits } from "viem";
+import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 
 export default function VaultFeeConfiguration({ vaultData, settings }: { vaultData: VaultData, settings: any }): JSX.Element {
-  const [, setFee] = useAtom(feeAtom);
+  const { address: account } = useAccount();
+  const publicClient = usePublicClient()
+  const { data: walletClient } = useWalletClient()
+
+  const [fees, setFees] = useAtom(feeAtom);
 
   useEffect(() => {
-    if (vaultData) setFee({
+    if (vaultData) setFees({
       deposit: String(vaultData.fees.deposit / 1e16),
       withdrawal: String(vaultData.fees.withdrawal / 1e16),
       management: String(vaultData.fees.management / 1e16),
@@ -38,7 +45,26 @@ export default function VaultFeeConfiguration({ vaultData, settings }: { vaultDa
           : <FeeConfiguration showFeeRecipient={false} />
         }
         <div className="w-60 mt-4">
-          {Number(settings.proposedFeeTime) > 0 ? <MainActionButton label="Propose new Fee" /> : <MainActionButton label="Accept new Fee" />}
+          {Number(settings.proposedFeeTime) > 0 ?
+            <MainActionButton
+              label="Accept new Fee"
+              handleClick={() => acceptFees({ vaultData, account, clients: { publicClient, walletClient } })}
+            />
+            : <MainActionButton
+              label="Propose new Fee"
+              handleClick={() => proposeFees({
+                fees: {
+                  deposit: parseUnits(String(Number(fees.deposit) / 100), 18),
+                  withdrawal: parseUnits(String(Number(fees.withdrawal) / 100), 18),
+                  management: parseUnits(String(Number(fees.management) / 100), 18),
+                  performance: parseUnits(String(Number(fees.performance) / 100), 18),
+                },
+                vaultData,
+                account,
+                clients: { publicClient, walletClient }
+              })}
+            />
+          }
         </div>
       </div>
     </div>

@@ -6,10 +6,12 @@ import { yieldOptionsAtom } from "@/lib/atoms/sdk";
 import { VaultData } from "@/lib/types";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import { roundToTwoDecimalPlaces } from "@/lib/utils/helpers";
+import { proposeStrategy } from "@/lib/vault/management/interactions";
 import axios from "axios";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { ProtocolName, YieldOptions } from "vaultcraft-sdk";
+import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 
 async function getStrategies(vaultData: VaultData, yieldOptions: YieldOptions) {
   const { data: strategyDescriptions } = await axios.get(`https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/descriptions/strategies/${vaultData.chainId}.json`)
@@ -30,7 +32,13 @@ async function getStrategies(vaultData: VaultData, yieldOptions: YieldOptions) {
 
 export default function VaultStrategyConfiguration({ vaultData, settings }: { vaultData: VaultData, settings: any }): JSX.Element {
   const [yieldOptions] = useAtom(yieldOptionsAtom)
+
+  const { address: account } = useAccount();
+  const publicClient = usePublicClient()
+  const { data: walletClient } = useWalletClient()
+
   const [show, setShow] = useState(false);
+
   const [strategies, setStrategies] = useState<any[]>([])
   const [strategy, setStrategy] = useState<any>()
 
@@ -118,7 +126,10 @@ export default function VaultStrategyConfiguration({ vaultData, settings }: { va
             </div>
             {(Number(settings.proposedAdapterTime) === 0 && strategy) &&
               <div className="w-60 mt-4">
-                <MainActionButton label="Propose new Strategy" handleClick={() => setShow(true)} />
+                <MainActionButton
+                  label="Propose new Strategy"
+                  handleClick={() => proposeStrategy({ strategy: strategy.address, vaultData: vaultData, account, clients: { publicClient, walletClient } })}
+                />
               </div>
             }
           </div>
