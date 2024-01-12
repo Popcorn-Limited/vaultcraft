@@ -1,7 +1,4 @@
-import { ethers } from "ethers";
-import { atomWithStorage } from "jotai/utils";
-import strategies from "@/lib/constants/strategies.json";
-import { atom, useAtom } from "jotai";
+import { atom } from "jotai";
 import { stringToHex } from "viem";
 
 export type Adapter = {
@@ -33,10 +30,6 @@ export interface AdapterConfig {
   id: string;
   data: string;
 }
-
-export const useAdapters = () => {
-  return strategies as any as Array<Adapter>;
-};
 
 export const DEFAULT_ADAPTER: Adapter = { name: "Choose an Adapter", key: "none", logoURI: "", protocol: "none", description: "none", chains: [] }
 
