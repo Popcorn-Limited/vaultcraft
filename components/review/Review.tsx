@@ -103,7 +103,7 @@ export default function Review(): JSX.Element {
         <ReviewParam title="Strategy" value={strategy.name === DEFAULT_STRATEGY.name ? '-' : strategy.name} img={strategy.logoURI} />
       </ReviewSection>
       <ReviewSection title="Fees">
-        <ReviewParam title="Deposit Fee" value={`${Number(fees.deposit)}%`} />
+        <ReviewParam title="Deposit Fee" value={`${fees.deposit}%`} />
         <ReviewParam title="Withdrawal Fee" value={`${fees.withdrawal}%`} />
         <ReviewParam title="Performance Fee" value={`${fees.performance}%`} />
         <ReviewParam title="Management Fee" value={`${fees.management}%`} />

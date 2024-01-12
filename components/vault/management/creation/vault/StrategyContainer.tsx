@@ -1,5 +1,5 @@
 import { VaultCreationContainerProps } from ".";
-import VaultCreationCard from "@/components/vaultManagement/creation/VaultCreationCard";
+import VaultCreationCard from "@/components/vault/management/creation/VaultCreationCard";
 import { useRouter } from "next/router";
 import { useAtom } from "jotai";
 import { adapterAtom, adapterConfigAtom } from "@/lib/atoms";

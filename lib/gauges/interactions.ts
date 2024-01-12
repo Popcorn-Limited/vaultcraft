@@ -1,5 +1,5 @@
 import { Abi, Address, PublicClient, WalletClient, parseEther, zeroAddress } from "viem";
-import { VaultData } from "@/lib/types";
+import { Clients, VaultData } from "@/lib/types";
 import { showErrorToast, showLoadingToast, showSuccessToast } from "@/lib/toasts";
 import { SimulationResponse } from "@/lib/types";
 import { getVeAddresses } from "@/lib/utils/addresses";
@@ -35,11 +35,6 @@ async function simulateCall({ account, contract, functionName, publicClient, arg
   } catch (error: any) {
     return { request: null, success: false, error: error.shortMessage }
   }
-}
-
-type Clients = {
-  publicClient: PublicClient;
-  walletClient: WalletClient;
 }
 
 interface SendVotesProps {

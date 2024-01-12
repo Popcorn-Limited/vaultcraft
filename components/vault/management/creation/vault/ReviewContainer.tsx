@@ -15,7 +15,7 @@ import { deployVault } from "@/lib/vault/deployVault";
 import { stringToHex } from "viem";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { VaultCreationContainerProps } from ".";
-import VaultCreationCard from "@/components/vaultManagement/creation/VaultCreationCard";
+import VaultCreationCard from "@/components/vault/management/creation/VaultCreationCard";
 
 export default function ReviewContainer({ route, stages, activeStage }: VaultCreationContainerProps): JSX.Element {
   const router = useRouter();

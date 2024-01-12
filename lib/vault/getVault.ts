@@ -93,6 +93,7 @@ export async function getVaults({ account = ADDRESS_ZERO, client, yieldOptions }
         fees: vault.fees,
         metadata: {
           creator: vault.creator,
+          feeRecipient: vault.feeRecipient,
           optionalMetadata: {
             protocol: {
               name: stratDesc.name,

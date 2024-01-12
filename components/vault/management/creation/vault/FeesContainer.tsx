@@ -2,7 +2,7 @@ import MainActionButton from "@/components/button/MainActionButton";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import FeeConfiguration from "@/components/deploymentSections/FeeConfiguration";
 import { VaultCreationContainerProps } from ".";
-import VaultCreationCard from "@/components/vaultManagement/creation/VaultCreationCard";
+import VaultCreationCard from "@/components/vault/management/creation/VaultCreationCard";
 import { feeAtom } from "@/lib/atoms";
 import { useAtom } from "jotai";
 import { useRouter } from "next/router";

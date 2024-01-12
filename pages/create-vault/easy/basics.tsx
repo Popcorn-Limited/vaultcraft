@@ -1,4 +1,4 @@
-import { BasicsContainer } from "@/components/vaultManagement/creation/vault";
+import { BasicsContainer } from "@/components/vault/management/creation/vault";
 import { BASIC_CREATION_STAGES } from "@/lib/stages";
 
 export default function Basics() {

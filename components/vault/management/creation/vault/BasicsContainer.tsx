@@ -4,7 +4,7 @@ import { metadataAtom, assetAtom, protocolAtom, strategyAtom, assetAddressesAtom
 import MainActionButton from "@/components/button/MainActionButton";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import MetadataConfiguration from "@/components/deploymentSections/MetadataConfiguration";
-import VaultCreationCard from "@/components/vaultManagement/creation/VaultCreationCard";
+import VaultCreationCard from "@/components/vault/management/creation/VaultCreationCard";
 import DepositLimitConfiguration from "@/components/deploymentSections/DepositLimitConfiguration";
 import StrategySelection from "@/components/deploymentSections/StrategySelection";
 import { useEffect, useState } from "react";
