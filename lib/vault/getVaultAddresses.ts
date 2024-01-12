@@ -1,5 +1,5 @@
 import { Address, PublicClient } from "viem";
-import { VaultRegistryByChain, VaultRegistryAbi } from "../constants";
+import { VaultRegistryByChain, VaultRegistryAbi } from "@/lib/constants";
 
 export default async function getVaultAddresses({ client }: { client: PublicClient }): Promise<Address[]> {
   return client.readContract({

@@ -1,7 +1,7 @@
 import NetworkSticker from "@/components/network/NetworkSticker";
 import TokenIcon from "@/components/common/TokenIcon";
 import { VaultData } from "@/lib/types";
-import ProtocolIcon from "../common/ProtocolIcon";
+import ProtocolIcon from "@/components/common/ProtocolIcon";
 
 export default function AssetWithName({ vault }: { vault: VaultData }) {  
   return <div className="flex items-center gap-4 max-w-full flex-wrap md:flex-nowrap flex-1">

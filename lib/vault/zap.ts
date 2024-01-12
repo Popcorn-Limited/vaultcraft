@@ -1,8 +1,7 @@
 import axios from "axios"
-import { Address, PublicClient, WalletClient, getAddress } from "viem";
+import { Address } from "viem";
 import { showErrorToast, showSuccessToast } from "@/lib/toasts";
-import { handleAllowance } from "@/lib/approve";
-import { Clients } from "../types";
+import { Clients } from "@/lib/types";
 
 interface ZapProps {
   chainId: number;

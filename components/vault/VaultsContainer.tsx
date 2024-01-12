@@ -9,7 +9,7 @@ import useNetworkFilter from "@/lib/useNetworkFilter";
 import { Token, VaultData } from "@/lib/types";
 import SmartVault from "@/components/vault/SmartVault";
 import NetworkFilter from "@/components/network/NetworkFilter";
-import { getVeAddresses } from "@/lib/utils/addresses";
+import { getVeAddresses } from "@/lib/constants";
 import getZapAssets, { getAvailableZapAssets } from "@/lib/utils/getZapAssets";
 import { ERC20Abi, VCXAbi, VaultAbi } from "@/lib/constants";
 import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";

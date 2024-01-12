@@ -1,4 +1,4 @@
-import { SmartVaultActionType } from "../types";
+import { SmartVaultActionType } from "@/lib/types";
 
 export interface ActionStep {
   step: number;

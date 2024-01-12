@@ -1,5 +1,5 @@
 import { Address, PublicClient } from "viem"
-import { VaultAbi } from "../constants"
+import { VaultAbi } from "@/lib/constants"
 
 type AssetAndValue = {
   vault: Address,

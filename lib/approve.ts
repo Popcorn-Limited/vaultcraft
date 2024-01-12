@@ -1,8 +1,8 @@
-import { Address, PublicClient, WalletClient, getAddress } from "viem"
+import { Address, PublicClient, WalletClient } from "viem"
 import { ERC20Abi } from "@/lib/constants"
 import { showErrorToast, showLoadingToast, showSuccessToast } from "@/lib/toasts"
-import { Clients, SimulationResponse, Token } from "@/lib/types";
-import { UsdtAbi } from "./constants/abi/USDT";
+import { Clients, SimulationResponse } from "@/lib/types";
+import { UsdtAbi } from "@/lib/constants/abi/USDT";
 
 interface HandleAllowanceProps {
   token: Address;

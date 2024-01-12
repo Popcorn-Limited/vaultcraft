@@ -3,12 +3,11 @@ import { PublicClient } from "wagmi"
 import axios from "axios"
 import { VaultAbi } from "@/lib/constants/abi/Vault"
 import { VaultData } from "@/lib/types"
-import { ADDRESS_ZERO } from "@/lib/constants"
+import { ADDRESS_ZERO, getVeAddresses } from "@/lib/constants"
 import { RPC_URLS, networkMap } from "@/lib/utils/connectors";
-import { getVeAddresses } from "../utils/addresses"
-import getGauges, { Gauge } from "../gauges/getGauges"
+import getGauges, { Gauge } from "@/lib/gauges/getGauges"
 import { ProtocolName, YieldOptions } from "vaultcraft-sdk"
-import calculateAPR from "../gauges/calculateGaugeAPR"
+import calculateAPR from "@/lib/gauges/calculateGaugeAPR"
 
 const HIDDEN_VAULTS: Address[] = ["0xb6cED1C0e5d26B815c3881038B88C829f39CE949", "0x2fD2C18f79F93eF299B20B681Ab2a61f5F28A6fF",
   "0xDFf04Efb38465369fd1A2E8B40C364c22FfEA340", "0xd4D442AC311d918272911691021E6073F620eb07", //@dev for some reason the live 3Crypto yVault isnt picked up by the yearnAdapter nor the yearnFactoryAdapter

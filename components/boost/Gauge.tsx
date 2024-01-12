@@ -10,7 +10,6 @@ import useGaugeWeights from "@/lib/gauges/useGaugeWeights";
 import calculateAPR from "@/lib/gauges/calculateGaugeAPR";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import { roundToTwoDecimalPlaces } from '@/lib/utils/helpers'
-import { getVotePeriodEndTime } from "@/lib/gauges/utils";
 
 interface GaugeProps {
   vaultData: VaultData;

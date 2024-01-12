@@ -1,7 +1,8 @@
 export * from "./abi";
+export * from "./addresses";
 import assets from "@/lib/constants/assets";
 import { Token } from "../types";
-import { Address, getAddress, maxInt256, maxUint256, zeroAddress } from "viem";
+import { getAddress, maxInt256, maxUint256, zeroAddress } from "viem";
 
 export function getAssetsByChain(chainId: number): Token[] {
   return assets.filter((asset) => asset.chains.includes(chainId)).map((asset) => {
@@ -15,13 +16,6 @@ export function getAssetsByChain(chainId: number): Token[] {
       price: 0
     }
   });
-}
-
-export const VaultRegistryByChain: { [key: number]: Address } = {
-  1: "0x007318Dc89B314b47609C684260CfbfbcD412864",
-  137: "0x2246c4c469735bCE95C120939b0C078EC37A08D0",
-  10: "0xdD0d135b5b52B7EDd90a83d4A4112C55a1A6D23A",
-  42161: "0xB205e94D402742B919E851892f7d515592a7A6cC",
 }
 
 export const ADDRESS_ZERO = zeroAddress

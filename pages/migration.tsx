@@ -4,7 +4,7 @@ import { handleAllowance } from "@/lib/approve";
 import { ROUNDING_VALUE, VCXAbi, ZERO } from "@/lib/constants";
 import { showErrorToast, showLoadingToast, showSuccessToast } from "@/lib/toasts";
 import { SimulationResponse } from "@/lib/types";
-import { getVeAddresses } from "@/lib/utils/addresses";
+import { getVeAddresses } from "@/lib/constants";
 import { validateInput } from "@/lib/utils/helpers";
 import { ArrowDownIcon } from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";

@@ -1,6 +1,6 @@
 import { Dispatch, FormEventHandler, SetStateAction, useEffect, useMemo, useState } from "react";
 import { useAccount, useBalance, usePublicClient, useToken } from "wagmi";
-import { getVeAddresses } from "@/lib/utils/addresses";
+import { getVeAddresses } from "@/lib/constants";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import InputNumber from "@/components/input/InputNumber";
 import { calcUnlockTime, calculateVeOut } from "@/lib/gauges/utils";

@@ -1,10 +1,10 @@
-import { Abi, Address, PublicClient, WalletClient, parseEther, zeroAddress } from "viem";
+import { Abi, Address, PublicClient, parseEther, zeroAddress } from "viem";
 import { Clients, VaultData } from "@/lib/types";
-import { showErrorToast, showLoadingToast, showSuccessToast } from "@/lib/toasts";
+import { showLoadingToast } from "@/lib/toasts";
 import { SimulationResponse } from "@/lib/types";
-import { getVeAddresses } from "@/lib/utils/addresses";
+import { getVeAddresses } from "@/lib/constants";
 import { GaugeAbi, GaugeControllerAbi, VotingEscrowAbi } from "@/lib/constants";
-import { handleCallResult } from "../utils/helpers";
+import { handleCallResult } from "@/lib/utils/helpers";
 
 type SimulationContract = {
   address: Address;

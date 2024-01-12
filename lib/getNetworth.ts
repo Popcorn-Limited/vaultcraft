@@ -1,11 +1,10 @@
-import { PublicClient, createPublicClient, http } from "viem";
+import { createPublicClient, http } from "viem";
 import { Chain, arbitrum, optimism, polygon } from "viem/chains";
-import { Address, mainnet, usePublicClient } from "wagmi";
+import { Address, mainnet } from "wagmi";
 import { ChainId, RPC_URLS } from "@/lib/utils/connectors";
-import { BalancerOracleAbi, ERC20Abi, VotingEscrowAbi } from "@/lib/constants";
+import { ERC20Abi, VotingEscrowAbi, getVeAddresses } from "@/lib/constants";
 import { resolvePrice } from "@/lib/resolver/price/price";
-import { VaultData } from "./types";
-import { getVeAddresses } from "./utils/addresses";
+import { VaultData } from "@/lib/types";
 
 const { VCX, VE_VCX, WETH_VCX_LP } = getVeAddresses()
 

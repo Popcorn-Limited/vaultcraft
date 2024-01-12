@@ -1,5 +1,5 @@
-import { showErrorToast, showSuccessToast } from "../toasts";
-import { Clients, SimulationResponse, Token } from "../types";
+import { showErrorToast, showSuccessToast } from "@/lib/toasts";
+import { Clients, SimulationResponse, Token } from "@/lib/types";
 
 export function validateInput(value: string | number): { formatted: string, isValid: boolean } {
   const formatted = value === "." ? "0" : (`${value || "0"}`.replace(/\.$/, ".0") as any);

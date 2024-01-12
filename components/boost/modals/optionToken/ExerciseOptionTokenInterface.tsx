@@ -4,7 +4,7 @@ import { PlusIcon } from "@heroicons/react/24/outline";
 import TokenIcon from "@/components/common/TokenIcon";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import { BalancerOracleAbi, ZERO } from "@/lib/constants";
-import { getVeAddresses } from "@/lib/utils/addresses";
+import { getVeAddresses } from "@/lib/constants";
 import { formatNumber, safeRound } from "@/lib/utils/formatBigNumber";
 import { validateInput } from "@/lib/utils/helpers";
 import { Token } from "@/lib/types";

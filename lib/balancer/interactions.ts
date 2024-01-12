@@ -1,6 +1,6 @@
 import { Abi, Address, PublicClient, encodeAbiParameters, parseAbiParameters } from "viem";
 import { showLoadingToast } from "@/lib/toasts";
-import { getVeAddresses } from "@/lib/utils/addresses";
+import { getVeAddresses } from "@/lib/constants";
 import { Clients, SimulationResponse } from "@/lib/types";
 import { BalancerVaultAbi } from "../constants/abi/BalancerVault";
 import { handleCallResult } from "../utils/helpers";

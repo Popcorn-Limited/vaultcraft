@@ -5,7 +5,7 @@ import {
   curveCompounder,
   curveStargateCompounder
 
-} from "./resolver";
+} from "@/lib/resolver/strategyEncoding/resolver";
 import { PublicClient } from "wagmi";
 
 export type StrategyEncodingResolverParams = {

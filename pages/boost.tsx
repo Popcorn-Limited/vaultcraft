@@ -3,7 +3,7 @@ import NoSSR from "react-no-ssr";
 import { useAccount, useBalance, usePublicClient, useWalletClient } from "wagmi";
 import { Address, WalletClient } from "viem";
 import { useEffect, useState } from "react";
-import { getVeAddresses } from "@/lib/utils/addresses";
+import { getVeAddresses } from "@/lib/constants";
 import { hasAlreadyVoted } from "@/lib/gauges/hasAlreadyVoted";
 import { Token, VaultData } from "@/lib/types";
 import StakingInterface from "@/components/boost/StakingInterface";

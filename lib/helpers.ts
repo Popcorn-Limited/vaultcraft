@@ -1,6 +1,6 @@
 import { InitParam, InitParamRequirement } from "@/lib/atoms/adapter"
 import { isAddress } from "viem";
-import { ADDRESS_ZERO } from "./constants";
+import { ADDRESS_ZERO } from "@/lib/constants";
 
 export function noOp() { }
 

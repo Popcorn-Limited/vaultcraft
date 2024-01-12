@@ -1,5 +1,5 @@
 import { curveApiCallToBytes } from "@/lib/external/curve/router/call";
-import { StrategyEncodingResolverParams } from "..";
+import { StrategyEncodingResolverParams } from "@/lib/resolver/strategyEncoding";
 import { MAX_UINT256 } from "@/lib/constants";
 
 export async function curveCompounder({ chainId, client, address, params }: StrategyEncodingResolverParams): Promise<string> {

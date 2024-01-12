@@ -1,5 +1,5 @@
 import { LockVaultActionType } from "@/lib/types"
-import { ActionStep } from "../getActionSteps"
+import { ActionStep } from "@/lib/vault/getActionSteps"
 
 const BaseStepInfo = {
   success: false,

@@ -1,5 +1,5 @@
 import { localhost, mainnet } from "wagmi/chains";
-import StrategyEncodingResolvers, { StrategyEncodingResolverParams } from ".";
+import StrategyEncodingResolvers, { StrategyEncodingResolverParams } from "@/lib/resolver/strategyEncoding";
 import { getAddress } from "viem";
 
 export async function resolveStrategyEncoding({ chainId, client, address, params, resolver }: StrategyEncodingResolverParams & { resolver?: string }): Promise<string> {

@@ -3,7 +3,7 @@ import { balancerApiProxyCall } from "@/lib/external/balancer/router/call";
 import { BatchSwapStep } from "@/lib/external/balancer/router/interfaces";
 import { Address, encodeAbiParameters, getAddress, parseUnits } from "viem";
 import { PublicClient } from "wagmi";
-import { StrategyEncodingResolverParams } from "..";
+import { StrategyEncodingResolverParams } from "@/lib/resolver/strategyEncoding";
 
 interface BalancerRoute {
   swaps: BatchSwapStep[];

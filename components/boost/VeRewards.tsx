@@ -6,7 +6,7 @@ import MainActionButton from "@/components/button/MainActionButton";
 import getClaimableVeReward from "@/lib/feeDistributor/getClaimableVeReward";
 import getVeApy from "@/lib/feeDistributor/getVeApy";
 import { useClaimTokens } from "@/lib/feeDistributor/useClaimToken";
-import { getVeAddresses } from "@/lib/utils/addresses";
+import { getVeAddresses } from "@/lib/constants";
 
 function noOp() { }
 

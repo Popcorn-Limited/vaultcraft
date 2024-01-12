@@ -1,7 +1,6 @@
 import { Address, useAccount, useBalance, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
 import { WalletClient } from "viem";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { getVeAddresses } from "lib/utils/addresses";
 import useLockedBalanceOf from "@/lib/gauges/useLockedBalanceOf";
 import Modal from "@/components/modal/Modal";
 import MainActionButton from "@/components/button/MainActionButton";
@@ -15,6 +14,7 @@ import IncreaseStakePreview from "@/components/boost/modals/manage/IncreaseStake
 import IncreaseTimeInterface from "@/components/boost/modals/manage/IncreaseTimeInterface";
 import IncreaseTimePreview from "@/components/boost/modals/manage/IncreaseTimePreview";
 import UnstakePreview from "@/components/boost/modals/manage/UnstakePreview";
+import { getVeAddresses } from "@/lib/constants";
 
 const {
   BalancerPool: VCX_LP,

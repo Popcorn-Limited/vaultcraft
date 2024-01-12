@@ -1,7 +1,7 @@
 import { Address, zeroAddress } from "viem";
 import { useContractReads } from "wagmi";
 import { getVotePeriodEndTime } from "@/lib/gauges/utils";
-import { getVeAddresses } from "@/lib/utils/addresses";
+import { getVeAddresses } from "@/lib/constants";
 import { GaugeControllerAbi } from "@/lib/constants";
 
 const { GaugeController: GAUGE_CONTROLLER } = getVeAddresses();

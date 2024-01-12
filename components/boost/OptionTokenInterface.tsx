@@ -1,5 +1,5 @@
 import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards"
-import { getVeAddresses } from "@/lib/utils/addresses";
+import { getVeAddresses } from "@/lib/constants";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import { Address, useAccount, useBalance, usePublicClient, useWalletClient } from "wagmi"

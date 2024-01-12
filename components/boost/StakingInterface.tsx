@@ -4,11 +4,11 @@ import { Address, useAccount, useBalance } from "wagmi";
 import { getVotePeriodEndTime } from "@/lib/gauges/utils";
 import MainActionButton from "@/components/button/MainActionButton";
 import useLockedBalanceOf from "@/lib/gauges/useLockedBalanceOf";
-import { getVeAddresses } from "@/lib/utils/addresses";
+import { getVeAddresses } from "@/lib/constants";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import { formatEther } from "viem";
 import { ZERO } from "@/lib/constants";
-import SecondaryActionButton from "../button/SecondaryActionButton";
+import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 
 function votingPeriodEnd(): number[] {
   const periodEnd = getVotePeriodEndTime();

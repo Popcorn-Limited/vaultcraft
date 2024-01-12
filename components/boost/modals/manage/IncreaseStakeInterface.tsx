@@ -1,5 +1,5 @@
 import { Dispatch, FormEventHandler, SetStateAction, useMemo } from "react";
-import { getVeAddresses } from "@/lib/utils/addresses";
+import { getVeAddresses } from "@/lib/constants";
 import { Address, useAccount, useBalance, useToken } from "wagmi";
 import { formatAndRoundBigNumber, safeRound } from "@/lib/utils/formatBigNumber";
 import { ZERO } from "@/lib/constants";

@@ -1,6 +1,6 @@
 import { PublicClient, zeroAddress } from 'viem';
 import { Address } from 'wagmi';
-import { getVeAddresses } from '@/lib/utils/addresses';
+import { getVeAddresses } from '@/lib/constants';
 import { GaugeControllerAbi } from '@/lib/constants';
 
 const DAYS = 24 * 60 * 60;

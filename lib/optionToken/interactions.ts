@@ -1,9 +1,8 @@
-import { Abi, Address, PublicClient, WalletClient } from "viem";
-import { showErrorToast, showSuccessToast } from "@/lib/toasts";
+import { Abi, Address, PublicClient } from "viem";
 import { MinterAbi, OptionTokenAbi } from "@/lib/constants";
-import { getVeAddresses } from "@/lib/utils/addresses";
+import { getVeAddresses } from "@/lib/constants";
 import { Clients, SimulationResponse } from "@/lib/types";
-import { handleCallResult } from "../utils/helpers";
+import { handleCallResult } from "@/lib/utils/helpers";
 
 type SimulationContract = {
   address: Address;

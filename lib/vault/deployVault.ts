@@ -1,17 +1,8 @@
 import { toast } from "react-hot-toast";
 import { Address, parseUnits } from "viem";
 import { PublicClient, WalletClient } from "wagmi";
-import { ADDRESS_ZERO, EMPTY_BYTES, MAX_UINT256, ZERO } from "../constants";
-import { AdapterConfig } from "../atoms";
-
-const VAULT_CONTROLLER: { [key: number]: Address } = {
-  1: "0x7D51BABA56C2CA79e15eEc9ECc4E92d9c0a7dbeb",
-  1337: "0x7D51BABA56C2CA79e15eEc9ECc4E92d9c0a7dbeb",
-  42161: "0xF40749d72Ab5422CC5d735A373E66d67f7cA9393",
-  10: "0x757D953c53aD28748aCf94AD2d59C13955E09c08",
-  56: "0x815B4A955169Ba1D66944A4d8F18B69bc9553a62",
-  137: "0xCe22Ff6d00c5414E64b9253Dd49a35e0B9Ea8b60"
-}
+import { ADDRESS_ZERO, EMPTY_BYTES, MAX_UINT256, VaultControllerByChain, ZERO } from "@/lib/constants";
+import { AdapterConfig } from "@/lib/atoms";
 
 async function simulateDeployVault(
   chain: any,
@@ -26,11 +17,11 @@ async function simulateDeployVault(
 ): Promise<{ request: any | null, success: boolean, error: string | null }> {
   const [account] = await walletClient.getAddresses()
 
-  if (VAULT_CONTROLLER[chain.id] === undefined) return { request: null, success: false, error: "Connected to the wrong network" }
+  if (VaultControllerByChain[chain.id] === undefined) return { request: null, success: false, error: "Connected to the wrong network" }
   try {
     const { request } = await publicClient.simulateContract({
       account,
-      address: VAULT_CONTROLLER[chain.id],
+      address: VaultControllerByChain[chain.id],
       abi,
       functionName: "deployVault",
       args: [

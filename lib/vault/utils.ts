@@ -1,6 +1,6 @@
 import axios from "axios";
 import { Address, getAddress } from "viem";
-import { Token, VaultData } from "../types";
+import { Token, VaultData } from "@/lib/types";
 
 export async function isDefiPosition({ address, chainId }: { address: Address, chainId: number }): Promise<boolean> {
   const { data } = await axios.get(`https://api.enso.finance/api/v1/positions?verified=false&tokenAddress=${address}&page=1&chainId=${chainId}`)

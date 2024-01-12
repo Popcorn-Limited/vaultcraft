@@ -4,7 +4,7 @@ import { WalletClient } from "viem";
 import Modal from "@/components/modal/Modal";
 import MainActionButton from "@/components/button/MainActionButton";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
-import { getVeAddresses } from "@/lib/utils/addresses";
+import { getVeAddresses } from "@/lib/constants";
 import LockVxcInfo from "@/components/boost/modals/lock/LockVxcInfo";
 import LockVcxInterface from "@/components/boost/modals/lock/LockVcxInterface";
 import LockPreview from "@/components/boost/modals/lock/LockPreview";

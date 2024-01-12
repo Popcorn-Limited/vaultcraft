@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import Highcharts from "highcharts";
 import SelectField from "@/components/input/SelectField";
 import { erc20ABI, usePublicClient } from "wagmi";
-import { getVeAddresses } from "@/lib/utils/addresses";
+import { getVeAddresses } from "@/lib/constants";
 import { BalancerVaultAbi, VCX_POOL_ID, VotingEscrowAbi } from "@/lib/constants";
 import {formatToFixedDecimals} from "@/lib/utils/formatBigNumber";
 import {bigint} from "zod";

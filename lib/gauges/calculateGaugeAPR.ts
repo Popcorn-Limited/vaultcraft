@@ -1,6 +1,6 @@
 import { thisPeriodTimestamp } from "@/lib/gauges/utils";
 import { Address, PublicClient, formatEther, formatUnits } from "viem";
-import { getVeAddresses } from "@/lib/utils/addresses";
+import { getVeAddresses } from "@/lib/constants";
 import { llama } from "@/lib/resolver/price/resolver";
 import { GaugeAbi, GaugeControllerAbi } from "@/lib/constants";
 

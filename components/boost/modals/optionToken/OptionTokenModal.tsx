@@ -5,7 +5,7 @@ import OptionInfo from "@/components/boost/modals/optionToken/OptionInfo";
 import ExerciseOptionTokenInterface from "@/components/boost/modals/optionToken/ExerciseOptionTokenInterface";
 import MainActionButton from "@/components/button/MainActionButton";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
-import { getVeAddresses } from "@/lib/utils/addresses";
+import { getVeAddresses } from "@/lib/constants";
 import { handleAllowance } from "@/lib/approve";
 import { parseEther } from "viem";
 import { exerciseOPop } from "@/lib/optionToken/interactions";

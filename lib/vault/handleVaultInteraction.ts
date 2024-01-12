@@ -1,13 +1,13 @@
 import axios from "axios"
 import { Address, getAddress } from "viem";
-import { handleAllowance } from "../approve";
-import { SmartVaultActionType, Clients, Token, VaultData } from "../types";
-import { vaultDeposit, vaultDepositAndStake, vaultRedeem, vaultUnstakeAndWithdraw } from "./interactions";
-import zap from "./zap";
-import { getVeAddresses } from "../utils/addresses";
-import { gaugeDeposit, gaugeWithdraw } from "../gauges/interactions";
+import { handleAllowance } from "@/lib/approve";
+import { SmartVaultActionType, Clients, Token, VaultData } from "@/lib/types";
+import { vaultDeposit, vaultDepositAndStake, vaultRedeem, vaultUnstakeAndWithdraw } from "@/lib/vault/interactions";
+import zap from "@/lib/vault/zap";
+import { gaugeDeposit, gaugeWithdraw } from "@/lib/gauges/interactions";
 import { erc20ABI } from "wagmi";
 import { FireEventArgs } from "@masa-finance/analytics-sdk";
+import { getVeAddresses } from "@/lib/constants";
 
 const { VaultRouter: VAULT_ROUTER } = getVeAddresses()
 
