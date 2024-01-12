@@ -9,7 +9,7 @@ import MainActionButton from "@/components/button/MainActionButton";
 import SocialMediaLinks from "@/components/common/SocialMediaLinks";
 import NavbarLinks from "@/components/navbar/NavbarLinks";
 
-export default function DesktopMenu(): JSX.Element {
+export default function Navbar(): JSX.Element {
   const { disconnect } = useDisconnect();
   const { openConnectModal } = useConnectModal();
   const { openChainModal } = useChainModal();
@@ -86,7 +86,7 @@ export default function DesktopMenu(): JSX.Element {
       <Transition.Root show={menuVisible} as={Fragment}>
         <Dialog as="div" className="fixed inset-0 overflow-hidden z-50" onClose={() => toggleMenu(false)}>
           <button
-            className={`text-gray-500 absolute top-8 right-8 p-6 bg-[#353945] z-50 rounded-full flex justify-center items-center w-12 h-12 `}
+            className={`text-gray-500 absolute top-8 right-8 p-6 bg-[#353945] z-50 rounded-full flex justify-center items-center w-12 h-12`}
             onClick={() => toggleMenu(!menuVisible)}
           >
             <div className="block w-10 bg-transparent">

@@ -1,4 +1,4 @@
-import DesktopMenu from "@/components/navbar/DesktopMenu";
+import Navbar from "@/components/navbar/Navbar";
 import { masaAtom, yieldOptionsAtom } from "@/lib/atoms/sdk";
 import { lockvaultsAtom, vaultsAtom } from "@/lib/atoms/vaults";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
@@ -186,7 +186,7 @@ export default function Page({
           </div>
         </div>
 
-        <DesktopMenu />
+        <Navbar />
         <div className="flex-1">
           <TermsModal showModal={showTermsModal} setShowModal={setShowTermsModal} setTermsSigned={setTermsSigned} />
           {children}
