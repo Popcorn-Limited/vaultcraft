@@ -1,4 +1,3 @@
-import protocols from "@/lib/constants/protocols.json";
 import { atom } from "jotai";
 
 export type Protocol = {

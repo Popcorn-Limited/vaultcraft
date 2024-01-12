@@ -1,7 +1,6 @@
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { useEffect, useState } from "react";
-import { Address, useAccount } from "wagmi";
-import { getAddress } from "viem";
+import { useAccount } from "wagmi";
 import AssetWithName from "@/components/vault/AssetWithName";
 import VaultInputs from "@/components/vault/VaultInputs";
 import Accordion from "@/components/common/Accordion";

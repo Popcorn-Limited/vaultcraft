@@ -6,11 +6,10 @@ import { useConnectModal } from "@rainbow-me/rainbowkit";
 import Image from "next/image";
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
 import { metadataAtom, adapterAtom, strategyDeploymentAtom, conditionsAtom, adapterDeploymentAtom, feeAtom, limitAtom, assetAtom } from "@/lib/atoms";
-import { IpfsClient } from "@/lib/ipfsClient";
 import Review from "@/components/review/Review";
 import MainActionButton from "@/components/button/MainActionButton";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
-import Modal from "@/components/Modal";
+import Modal from "@/components/modal/Modal";
 import { deployVault } from "@/lib/vault/deployVault";
 import { stringToHex } from "viem";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
@@ -91,7 +90,7 @@ export default function ReviewContainer({ route, stages, activeStage }: VaultCre
         />
       </div>
 
-      {<Modal show={showModal} setShowModal={setShowModal} >
+      {<Modal visibility={[showModal, setShowModal]}>
         <div>
           <p className="text-[white] text-2xl mb-4">Creating Vault</p>
           <span className="flex flex-row items-center mb-2">
