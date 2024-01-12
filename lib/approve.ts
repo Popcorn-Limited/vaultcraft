@@ -13,6 +13,7 @@ interface HandleAllowanceProps {
 }
 
 interface SimulateApproveProps {
+  amount: bigint
   address: Address;
   account: Address;
   spender: Address;
@@ -23,6 +24,10 @@ interface ApproveProps extends SimulateApproveProps {
   walletClient: WalletClient;
 }
 
+const ZERO_APPROVAL_AMOUNT = BigInt("0");
+
+const MAX_APPROVAL_AMOUNT = BigInt("115792089237316195423570985008687907853269984665640");
+
 export async function handleAllowance({ token, amount, account, spender, clients }: HandleAllowanceProps): Promise<boolean> {
   const allowance = await clients.publicClient.readContract({
     address: token,
@@ -30,20 +35,45 @@ export async function handleAllowance({ token, amount, account, spender, clients
     functionName: "allowance",
     args: [account, spender]
   })
-  console.log({ allowance: Number(allowance), amount, insufficient: Number(allowance) < amount })
-  if (Number(allowance) === 0 || Number(allowance) < amount) {
-    console.log("APPROVE")
-    return approve({ address: token, account, spender, publicClient: clients.publicClient, walletClient: clients.walletClient })
+
+  if(Number(allowance) === 0) {
+    return approve({
+      amount: MAX_APPROVAL_AMOUNT,
+      address: token,
+      account,
+      spender,
+      publicClient: clients.publicClient,
+      walletClient: clients.walletClient
+    })
+  } else if(Number(allowance) < amount) {
+    await approve({
+      amount: ZERO_APPROVAL_AMOUNT,
+      address: token,
+      account,
+      spender,
+      publicClient: clients.publicClient,
+      walletClient: clients.walletClient
+    })
+
+    return approve({
+      amount: BigInt(amount),
+      address: token,
+      account,
+      spender,
+      publicClient: clients.publicClient,
+      walletClient: clients.walletClient
+    })
   } else {
     console.log("NOTHING TO APPROVE")
     return true
   }
 }
 
-export default async function approve({ address, account, spender, publicClient, walletClient }: ApproveProps): Promise<boolean> {
+export default async function approve({ amount, address, account, spender, publicClient, walletClient }: ApproveProps): Promise<boolean> {
   showLoadingToast("Approving assets for deposit...")
 
-  const { request, success, error: simulationError } = await simulateApprove({ address, account, spender, publicClient })
+  const { request, success, error: simulationError } =
+    await simulateApprove({ amount, address, account, spender, publicClient })
   if (success) {
     try {
       const hash = await walletClient.writeContract(request)
@@ -60,7 +90,7 @@ export default async function approve({ address, account, spender, publicClient,
   }
 };
 
-async function simulateApprove({ address, account, spender, publicClient }: SimulateApproveProps): Promise<SimulationResponse> {
+async function simulateApprove({ amount, address, account, spender, publicClient }: SimulateApproveProps): Promise<SimulationResponse> {
   try {
     const { request } = await publicClient.simulateContract({
       account,
@@ -68,7 +98,7 @@ async function simulateApprove({ address, account, spender, publicClient }: Simu
       // @ts-ignore -- for some reason viem is not happy when the two abis are slightly different
       abi: address === "0xdAC17F958D2ee523a2206206994597C13D831ec7" ? UsdtAbi : ERC20Abi, // USDT doesnt return a bool on approval
       functionName: 'approve',
-      args: [spender, BigInt("115792089237316195423570985008687907853269984665640")]
+      args: [spender, amount]
     })
     return { request: request, success: true, error: null }
   } catch (error: any) {
