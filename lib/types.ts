@@ -161,6 +161,6 @@ export enum LockVaultActionType {
 
 export type DuneQueryResult<T> = {
   result: {
-      rows: T[]
+    rows: T[]
   }
 }

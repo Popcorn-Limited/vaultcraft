@@ -54,6 +54,7 @@ async function getVaults({ account, publicClient }: { account: Address, publicCl
         rewardShares: 0
       },
       metadata: {
+        vaultName: vaultTokens[vault.address].name,
         creator: vault.creator,
         feeRecipient: vault.feeRecipient,
         optionalMetadata: {
