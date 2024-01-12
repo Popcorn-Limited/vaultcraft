@@ -1,9 +1,11 @@
 import MainActionButton from "@/components/button/MainActionButton";
 import { VaultData } from "@/lib/types";
 import { pauseVault, unpauseVault } from "@/lib/vault/management/interactions";
+import { VaultSettings } from "pages/manage/vaults/[id]";
+import { WalletClient } from "viem";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 
-export default function VaultPausing({ vaultData, settings }: { vaultData: VaultData, settings: any }): JSX.Element {
+export default function VaultPausing({ vaultData, settings }: { vaultData: VaultData, settings: VaultSettings }): JSX.Element {
   const { address: account } = useAccount();
   const publicClient = usePublicClient()
   const { data: walletClient } = useWalletClient()
@@ -20,8 +22,8 @@ export default function VaultPausing({ vaultData, settings }: { vaultData: Vault
           <MainActionButton
             label={settings?.paused ? "Unpause Vault" : "Pause Vault"}
             handleClick={settings?.paused ?
-              () => unpauseVault({ vaultData, account, clients: { publicClient, walletClient } })
-              : () => pauseVault({ vaultData, account, clients: { publicClient, walletClient } })}
+              () => unpauseVault({ vaultData, account, clients: { publicClient, walletClient: walletClient as WalletClient } })
+              : () => pauseVault({ vaultData, account, clients: { publicClient, walletClient: walletClient as WalletClient } })}
           />
         </div>
       </div>

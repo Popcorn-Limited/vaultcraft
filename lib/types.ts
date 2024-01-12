@@ -44,6 +44,13 @@ export type Asset = {
   apy?: number;
 };
 
+export type FeeConfiguration = {
+  deposit: number;
+  withdrawal: number;
+  management: number;
+  performance: number;
+}
+
 export type VaultData = {
   address: Address;
   vault: Token;
@@ -55,12 +62,7 @@ export type VaultData = {
   assetPrice: number;
   pricePerShare: number;
   tvl: number;
-  fees: {
-    deposit: number;
-    withdrawal: number;
-    management: number;
-    performance: number;
-  };
+  fees: FeeConfiguration;
   depositLimit: number;
   metadata: VaultMetadata;
   chainId: number;

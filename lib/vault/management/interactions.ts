@@ -1,38 +1,13 @@
-import { StakingVaultAbi, VaultAbi, VaultControllerAbi, ZERO } from "@/lib/constants"
+import { VaultAbi, VaultControllerAbi } from "@/lib/constants"
 import { showLoadingToast } from "@/lib/toasts"
-import { Clients, SimulationResponse, LockVaultData } from "@/lib/types"
-import { networkMap } from "@/lib/utils/connectors"
+import { Clients, SimulationResponse, VaultData } from "@/lib/types"
 import { handleCallResult } from "@/lib/utils/helpers"
-import { FireEventArgs } from "@masa-finance/analytics-sdk";
 import { Address, PublicClient } from "viem"
 
 interface BaseWriteProps {
-  vaultData: LockVaultData;
-  account: Address;
+  vaultData: VaultData;
+  account?: Address;
   clients: Clients;
-}
-
-interface IncreaseAmountWrite extends BaseWriteProps {
-  amount: number;
-}
-
-interface DistributeRewardsWrite extends BaseWriteProps {
-  token: Address;
-  amount: number;
-}
-
-interface WritePropsWithRef extends BaseWriteProps {
-  fireEvent?: (type: string, { user_address, network, contract_address, asset_amount, asset_ticker, additionalEventData }: FireEventArgs) => Promise<void>;
-  referral?: Address;
-}
-
-interface WithdrawWrite extends WritePropsWithRef {
-  amount: number;
-}
-
-interface DepositWrite extends WritePropsWithRef {
-  amount: number;
-  days: number;
 }
 
 interface VaultControllerSimulateProps {
@@ -57,7 +32,7 @@ const VAULT_CONTROLLER_ADDRESS: { [key: number]: Address } = {
 async function simulateCall({ account, args, functionName, publicClient, chainId }: VaultControllerSimulateProps): Promise<SimulationResponse> {
   try {
     const { request } = await publicClient.simulateContract({
-      account,
+      account: account as Address,
       address: VAULT_CONTROLLER_ADDRESS[chainId],
       abi: VaultControllerAbi,
       // @ts-ignore
@@ -74,7 +49,7 @@ async function simulateCall({ account, args, functionName, publicClient, chainId
 async function simulateVaultCall({ address, account, functionName, publicClient }: VaultSimulateProps): Promise<SimulationResponse> {
   try {
     const { request } = await publicClient.simulateContract({
-      account,
+      account: account as Address,
       address,
       abi: VaultAbi,
       // @ts-ignore
@@ -88,13 +63,13 @@ async function simulateVaultCall({ address, account, functionName, publicClient 
   }
 }
 
-export async function proposeStrategy({ strategy, vaultData, account, clients }: any): Promise<boolean> {
+export async function proposeStrategy({ strategy, vaultData, account, clients }: BaseWriteProps & { strategy: Address }): Promise<boolean> {
   showLoadingToast("Proposing new strategy...")
 
   const success = await handleCallResult({
     successMessage: "Proposed new strategy!",
     simulationResponse: await simulateCall({
-      account,
+      account: account as Address,
       functionName: "proposeVaultAdapters",
       args: [[vaultData.address], [strategy]],
       publicClient: clients.publicClient,
@@ -106,13 +81,13 @@ export async function proposeStrategy({ strategy, vaultData, account, clients }:
   return success
 }
 
-export async function acceptStrategy({ vaultData, account, clients }: any): Promise<boolean> {
+export async function acceptStrategy({ vaultData, account, clients }: BaseWriteProps): Promise<boolean> {
   showLoadingToast("Accepting new strategy...")
 
   const success = await handleCallResult({
     successMessage: "Accepted new strategy!",
     simulationResponse: await simulateCall({
-      account,
+      account: account as Address,
       functionName: "changeVaultAdapters",
       args: [vaultData.address],
       publicClient: clients.publicClient,
@@ -124,13 +99,13 @@ export async function acceptStrategy({ vaultData, account, clients }: any): Prom
   return success
 }
 
-export async function proposeFees({ fees, vaultData, account, clients }: any): Promise<boolean> {
+export async function proposeFees({ fees, vaultData, account, clients }: BaseWriteProps & { fees: { deposit: bigint, withdrawal: bigint, management: bigint, performance: bigint } }): Promise<boolean> {
   showLoadingToast("Proposing new fees...")
 
   const success = await handleCallResult({
     successMessage: "Proposed new fees!",
     simulationResponse: await simulateCall({
-      account,
+      account: account as Address,
       functionName: "proposeVaultFees",
       args: [[vaultData.address], [fees]],
       publicClient: clients.publicClient,
@@ -142,13 +117,13 @@ export async function proposeFees({ fees, vaultData, account, clients }: any): P
   return success
 }
 
-export async function acceptFees({ vaultData, account, clients }: any): Promise<boolean> {
+export async function acceptFees({ vaultData, account, clients }: BaseWriteProps): Promise<boolean> {
   showLoadingToast("Accepting new fees...")
 
   const success = await handleCallResult({
     successMessage: "Accepted new fees!",
     simulationResponse: await simulateCall({
-      account,
+      account: account as Address,
       functionName: "changeVaultFees",
       args: [vaultData.address],
       publicClient: clients.publicClient,
@@ -160,13 +135,13 @@ export async function acceptFees({ vaultData, account, clients }: any): Promise<
   return success
 }
 
-export async function changeFeeRecipient({ feeRecipient, vaultData, account, clients }: any): Promise<boolean> {
+export async function changeFeeRecipient({ feeRecipient, vaultData, account, clients }: BaseWriteProps & { feeRecipient: Address }): Promise<boolean> {
   showLoadingToast("Changing fee recipient...")
 
   const success = await handleCallResult({
     successMessage: "Changed fee recipient!",
     simulationResponse: await simulateCall({
-      account,
+      account: account as Address,
       functionName: "setVaultFeeRecipients",
       args: [[vaultData.address], [feeRecipient]],
       publicClient: clients.publicClient,
@@ -178,13 +153,13 @@ export async function changeFeeRecipient({ feeRecipient, vaultData, account, cli
   return success
 }
 
-export async function changeDepositLimit({ depositLimit, vaultData, account, clients }: any): Promise<boolean> {
+export async function changeDepositLimit({ depositLimit, vaultData, account, clients }: BaseWriteProps & { depositLimit: number }): Promise<boolean> {
   showLoadingToast("Changing deposit limit...")
 
   const success = await handleCallResult({
     successMessage: "Changed deposit limit!",
     simulationResponse: await simulateCall({
-      account,
+      account: account as Address,
       functionName: "setVaultDepositLimits",
       args: [[vaultData.address], [depositLimit]],
       publicClient: clients.publicClient,
@@ -196,13 +171,13 @@ export async function changeDepositLimit({ depositLimit, vaultData, account, cli
   return success
 }
 
-export async function pauseVault({ vaultData, account, clients }: any): Promise<boolean> {
+export async function pauseVault({ vaultData, account, clients }: BaseWriteProps): Promise<boolean> {
   showLoadingToast("Pausing vault...")
 
   const success = await handleCallResult({
     successMessage: "Paused vault!",
     simulationResponse: await simulateCall({
-      account,
+      account: account as Address,
       functionName: "pauseVaults",
       args: [[vaultData.address]],
       publicClient: clients.publicClient,
@@ -214,13 +189,13 @@ export async function pauseVault({ vaultData, account, clients }: any): Promise<
   return success
 }
 
-export async function unpauseVault({ vaultData, account, clients }: any): Promise<boolean> {
+export async function unpauseVault({ vaultData, account, clients }: BaseWriteProps): Promise<boolean> {
   showLoadingToast("Unpausing vault...")
 
   const success = await handleCallResult({
     successMessage: "Unpaused vault!",
     simulationResponse: await simulateCall({
-      account,
+      account: account as Address,
       functionName: "unpauseVaults",
       args: [[vaultData.address]],
       publicClient: clients.publicClient,
@@ -233,7 +208,7 @@ export async function unpauseVault({ vaultData, account, clients }: any): Promis
 }
 
 
-export async function takeFees({ vaultData, account, clients }: any): Promise<boolean> {
+export async function takeFees({ vaultData, account, clients }: BaseWriteProps): Promise<boolean> {
   showLoadingToast("Taking fees...")
 
   return handleCallResult({
@@ -241,7 +216,7 @@ export async function takeFees({ vaultData, account, clients }: any): Promise<bo
     simulationResponse: await simulateVaultCall(
       {
         address: vaultData.address,
-        account,
+        account: account as Address,
         functionName: "takeManagementAndPerformanceFees",
         publicClient: clients.publicClient
       }),

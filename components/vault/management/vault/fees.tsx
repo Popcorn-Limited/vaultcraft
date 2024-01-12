@@ -1,10 +1,11 @@
 import MainActionButton from "@/components/button/MainActionButton";
 import { VaultData } from "@/lib/types";
 import { takeFees } from "@/lib/vault/management/interactions";
+import { VaultSettings } from "pages/manage/vaults/[id]";
 import { WalletClient } from "viem";
 import { Address, useAccount, usePublicClient, useWalletClient } from "wagmi";
 
-export default function VaultFees({ vaultData, settings }: { vaultData: VaultData, settings: any }): JSX.Element {
+export default function VaultFees({ vaultData, settings }: { vaultData: VaultData, settings: VaultSettings }): JSX.Element {
   const { address: account } = useAccount();
   const publicClient = usePublicClient()
   const { data: walletClient } = useWalletClient()

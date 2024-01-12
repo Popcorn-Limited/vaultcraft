@@ -9,8 +9,10 @@ import { roundToTwoDecimalPlaces } from "@/lib/utils/helpers";
 import { proposeStrategy } from "@/lib/vault/management/interactions";
 import axios from "axios";
 import { useAtom } from "jotai";
+import { VaultSettings } from "pages/manage/vaults/[id]";
 import { useEffect, useState } from "react";
 import { ProtocolName, YieldOptions } from "vaultcraft-sdk";
+import { WalletClient } from "viem";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 
 async function getStrategies(vaultData: VaultData, yieldOptions: YieldOptions) {
@@ -30,7 +32,7 @@ async function getStrategies(vaultData: VaultData, yieldOptions: YieldOptions) {
   )
 }
 
-export default function VaultStrategyConfiguration({ vaultData, settings }: { vaultData: VaultData, settings: any }): JSX.Element {
+export default function VaultStrategyConfiguration({ vaultData, settings }: { vaultData: VaultData, settings: VaultSettings }): JSX.Element {
   const [yieldOptions] = useAtom(yieldOptionsAtom)
 
   const { address: account } = useAccount();
@@ -54,6 +56,7 @@ export default function VaultStrategyConfiguration({ vaultData, settings }: { va
         <div className="text-start space-y-4">
           {strategies.map(strategy =>
             <div
+              key={strategy.address}
               className="px-2 py-2 rounded-lg cursor-pointer hover:bg-gray-500"
               onClick={() => {
                 setStrategy(strategy)
@@ -82,7 +85,18 @@ export default function VaultStrategyConfiguration({ vaultData, settings }: { va
             When accepting all funds from the old strategy will be withdrawn and deposited into the new strategy.
           </p>
           {Number(settings.proposedAdapterTime) > 0 ?
-            <></>
+            <div className="mt-4">
+              <h2 className="text-xl">Proposed Strategy</h2>
+              <div className="mt-1 border border-gray-500 p-4 rounded-md">
+                <span className="flex flex-row items-center gap-x-4 mb-2">
+                  <ProtocolIcon protocolName={settings.proposedAdapter.name} />
+                  <p >
+                    {`${NumberFormatter.format(roundToTwoDecimalPlaces(settings.proposedAdapter.apy))} %`}
+                  </p>
+                </span>
+                <p>{settings.proposedAdapter.description.split("** - ")[1]}</p>
+              </div>
+            </div>
             :
             <div className="mt-4">
               <h2 className="text-xl">Current Strategy</h2>
@@ -128,7 +142,13 @@ export default function VaultStrategyConfiguration({ vaultData, settings }: { va
               <div className="w-60 mt-4">
                 <MainActionButton
                   label="Propose new Strategy"
-                  handleClick={() => proposeStrategy({ strategy: strategy.address, vaultData: vaultData, account, clients: { publicClient, walletClient } })}
+                  handleClick={() => proposeStrategy({
+                    strategy: strategy.address,
+                    vaultData,
+                    account,
+                    clients: { publicClient, walletClient: walletClient as WalletClient }
+                  }
+                  )}
                 />
               </div>
             }

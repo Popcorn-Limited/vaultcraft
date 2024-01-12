@@ -1,17 +1,13 @@
-import MainActionButton from "@/components/button/MainActionButton";
 import AssetWithName from "@/components/vault/AssetWithName";
 import { vaultsAtom } from "@/lib/atoms/vaults";
-import { VaultData } from "@/lib/types";
-import { NumberFormatter } from "@/lib/utils/formatBigNumber";
-import { roundToTwoDecimalPlaces } from "@/lib/utils/helpers";
-import { ArrowRightCircleIcon, ArrowRightIcon } from "@heroicons/react/24/outline";
+import { FeeConfiguration, VaultData } from "@/lib/types";
 import { useAtom } from "jotai";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import NoSSR from "react-no-ssr";
-import { useAccount, usePublicClient, useWalletClient } from "wagmi";
+import { useAccount } from "wagmi";
 import axios from "axios"
-import { Address, PublicClient, createPublicClient, extractChain, http, zeroAddress } from "viem";
+import { createPublicClient, extractChain, http, zeroAddress } from "viem";
 import { VaultAbi } from "@/lib/constants";
 import { RPC_URLS } from "@/lib/utils/connectors";
 import * as chains from 'viem/chains'
@@ -20,26 +16,29 @@ import { yieldOptionsAtom } from "@/lib/atoms/sdk";
 import TabSelector from "@/components/common/TabSelector";
 import VaultStrategyConfiguration from "@/components/vault/management/vault/strategy";
 import VaultPausing from "@/components/vault/management/vault/pausing";
-import VaultFees from "@/components/vault/management/vault/fees";
 import VaultDepositLimit from "@/components/vault/management/vault/depositLimit";
 import VaultFeeRecipient from "@/components/vault/management/vault/feeRecipient";
 import VaultFeeConfiguration from "@/components/vault/management/vault/feeConfiguration";
+import VaultFees from "@/components/vault/management/vault/fees";
 
-// TODO
-// - Change Fees
-// -- Propose
-// -- Accept
-// - Change Strategy
-// -- Propose
-// -- Accept
-// - Take Fees
-// - Change FeeRecipient
-// - Change DepositLimit
-// - Pause / Unpause
+export type Strategy = {
+  name: string;
+  description: string;
+  resolver: string;
+  apy: number;
+}
 
+export interface VaultSettings {
+  proposedAdapter: Strategy;
+  proposedAdapterTime: number;
+  proposedFees: FeeConfiguration;
+  proposedFeeTime: number;
+  paused: boolean;
+  feeBalance: number;
+  accruedFees: number;
+}
 
-
-async function getData(vault: VaultData, yieldOptions: YieldOptions) {
+async function getVaultSettings(vault: VaultData, yieldOptions: YieldOptions): Promise<VaultSettings> {
   const { data: strategyDescriptions } = await axios.get(`https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/descriptions/strategies/${vault.chainId}.json`)
 
   const client = createPublicClient({
@@ -117,14 +116,14 @@ async function getData(vault: VaultData, yieldOptions: YieldOptions) {
 
   return {
     proposedAdapter: proposedAdapter,
-    proposedAdapterTime: res[1],
+    proposedAdapterTime: Number(res[1]),
     proposedFees: {
       deposit: Number(res[2][0]),
       withdrawal: Number(res[2][1]),
       management: Number(res[2][2]),
       performance: Number(res[2][3])
     },
-    proposedFeeTime: res[3],
+    proposedFeeTime: Number(res[3]),
     paused: res[4],
     feeBalance: Number(res[5]),
     accruedFees: Number(res[6]) + Number(res[7])
@@ -148,11 +147,11 @@ export default function Index() {
     }
   }, [vaults, query, vault])
 
-  const [settings, setSettings] = useState<any>()
+  const [settings, setSettings] = useState<VaultSettings>()
 
   useEffect(() => {
     if (vault && yieldOptions && !settings) {
-      getData(vault, yieldOptions).then(res => setSettings(res))
+      getVaultSettings(vault, yieldOptions).then(res => setSettings(res))
     }
   }, [vault, yieldOptions, settings])
 
@@ -167,21 +166,30 @@ export default function Index() {
       vault ? (
         <section className="py-10 px-4 md:px-8 text-white">
           <AssetWithName vault={vault} />
-          <TabSelector
-            className="mt-6 mb-12"
-            availableTabs={["Strategy", "Fee Configuration", "Fee Recipient", "Take Fees", "Deposit Limit", "Pausing"]}
-            activeTab={tab}
-            setActiveTab={changeTab}
-          />
-          {settings ? <div>
-            {tab === "Strategy" && <VaultStrategyConfiguration vaultData={vault} settings={settings} />}
-            {tab === "Fee Configuration" && <VaultFeeConfiguration vaultData={vault} settings={settings} />}
-            {tab === "Fee Recipient" && <VaultFeeRecipient vaultData={vault} settings={settings} />}
-            {tab === "Deposit Limit" && <VaultDepositLimit vaultData={vault} settings={settings} />}
-            {tab === "Take Fees" && <VaultFees vaultData={vault} settings={settings} />}
-            {tab === "Pausing" && <VaultPausing vaultData={vault} settings={settings} />}
-          </div>
-            : <p>Loading...</p>}
+          <>
+            {account === vault.metadata.creator ?
+              <>
+                <TabSelector
+                  className="mt-6 mb-12"
+                  availableTabs={["Strategy", "Fee Configuration", "Fee Recipient", "Take Fees", "Deposit Limit", "Pausing"]}
+                  activeTab={tab}
+                  setActiveTab={changeTab}
+                />
+                {
+                  settings ? <div>
+                    {tab === "Strategy" && <VaultStrategyConfiguration vaultData={vault} settings={settings} />}
+                    {tab === "Fee Configuration" && <VaultFeeConfiguration vaultData={vault} settings={settings} />}
+                    {tab === "Fee Recipient" && <VaultFeeRecipient vaultData={vault} settings={settings} />}
+                    {tab === "Deposit Limit" && <VaultDepositLimit vaultData={vault} settings={settings} />}
+                    {tab === "Take Fees" && <VaultFees vaultData={vault} settings={settings} />}
+                    {tab === "Pausing" && <VaultPausing vaultData={vault} settings={settings} />}
+                  </div>
+                    : <p className="text-white">Loading...</p>
+                }
+              </>
+              : <p className="text-white">Only the Vault Creator ({vault.metadata.creator}) has access to this page.</p>
+            }
+          </>
         </section>
       ) :
         <p className="text-white">Loading...</p>

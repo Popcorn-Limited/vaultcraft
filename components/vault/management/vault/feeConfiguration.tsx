@@ -4,11 +4,12 @@ import { feeAtom } from "@/lib/atoms";
 import { VaultData } from "@/lib/types";
 import { acceptFees, proposeFees } from "@/lib/vault/management/interactions";
 import { useAtom } from "jotai";
+import { VaultSettings } from "pages/manage/vaults/[id]";
 import { useEffect } from "react";
-import { parseUnits } from "viem";
+import { WalletClient, parseUnits } from "viem";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 
-export default function VaultFeeConfiguration({ vaultData, settings }: { vaultData: VaultData, settings: any }): JSX.Element {
+export default function VaultFeeConfiguration({ vaultData, settings }: { vaultData: VaultData, settings: VaultSettings }): JSX.Element {
   const { address: account } = useAccount();
   const publicClient = usePublicClient()
   const { data: walletClient } = useWalletClient()
@@ -48,7 +49,7 @@ export default function VaultFeeConfiguration({ vaultData, settings }: { vaultDa
           {Number(settings.proposedFeeTime) > 0 ?
             <MainActionButton
               label="Accept new Fee"
-              handleClick={() => acceptFees({ vaultData, account, clients: { publicClient, walletClient } })}
+              handleClick={() => acceptFees({ vaultData, account, clients: { publicClient, walletClient: walletClient as WalletClient } })}
             />
             : <MainActionButton
               label="Propose new Fee"
@@ -61,7 +62,7 @@ export default function VaultFeeConfiguration({ vaultData, settings }: { vaultDa
                 },
                 vaultData,
                 account,
-                clients: { publicClient, walletClient }
+                clients: { publicClient, walletClient: walletClient as WalletClient }
               })}
             />
           }
