@@ -12,6 +12,7 @@ import VaultsSorting, { VAULT_SORTING_TYPE } from "@/components/vault/VaultsSort
 import { useEffect, useState } from "react"
 import { NumberFormatter } from "@/lib/utils/formatBigNumber"
 import FundVault from "@/components/vault/lockVault/FundVault"
+import SearchBar from "@/components/input/SearchBar"
 
 
 export default function Index(): JSX.Element {
@@ -31,7 +32,12 @@ export default function Index(): JSX.Element {
     setVaults(newVaults)
   }
 
-  const [searchTerm, handleSearch] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+
+  function handleSearch(value: string) {
+    setSearchTerm(value)
+  }
+
   const [sortingType, setSortingType] = useState(VAULT_SORTING_TYPE.none)
 
   const sortByAscendingTvl = () => {
@@ -83,20 +89,11 @@ export default function Index(): JSX.Element {
         </div>
       </section>
 
-      <section className="mt-8 mb-10 md:mb-6 md:my-10 md:flex px-4 md:px-8 flex-row items-center justify-between">
+      <section className="my-10 px-4 md:px-8 md:flex flex-row items-center justify-between">
         <NetworkFilter supportedNetworks={[42161]} selectNetwork={() => { }} />
-        <div className="flex gap-4 justify-between md:justify-end">
-          <div className="md:w-96 flex px-6 py-3 items-center rounded-lg border border-gray-300 border-opacity-40 group/search hover:border-opacity-80 gap-2 md:mt-6 mt-12 mb-6 md:my-0">
-            <MagnifyingGlassIcon className="w-8 h-8 text-gray-400 group-hover/search:text-gray-200" />
-            <input
-              className="w-10/12 md:w-80 focus:outline-none border-0 text-gray-500 focus:text-gray-200 leading-none bg-transparent"
-              type="text"
-              placeholder="Search..."
-              onChange={(e) => handleSearch(e.target.value.toLowerCase())}
-              defaultValue={searchTerm}
-            />
-          </div>
-          <VaultsSorting className="md:mt-6 mt-12 mb-6 md:my-0" currentSortingType={sortingType} sortByLessTvl={sortByDescendingTvl} sortByMostTvl={sortByAscendingTvl} sortByLessApy={sortByDescendingApy} sortByMostApy={sortByAscendingApy} />
+        <div className="flex flex-row space-x-4">
+          <SearchBar searchTerm={searchTerm} handleSearch={handleSearch} />
+          <VaultsSorting className="" currentSortingType={sortingType} sortByLessTvl={sortByDescendingTvl} sortByMostTvl={sortByAscendingTvl} sortByLessApy={sortByDescendingApy} sortByMostApy={sortByAscendingApy} />
         </div>
       </section>
 

@@ -17,13 +17,13 @@ import { getTokenOptions, isDefiPosition } from '@/lib/vault/utils';
 
 interface SmartVaultsProps {
   vaultData: VaultData;
-  searchString: string;
+  searchTerm: string;
   mutateTokenBalance: (props: MutateTokenBalanceProps) => void;
 }
 
 export default function SmartVault({
   vaultData,
-  searchString,
+  searchTerm,
   mutateTokenBalance,
 }: SmartVaultsProps) {
   const { address: account } = useAccount();
@@ -61,10 +61,10 @@ export default function SmartVault({
   // Is loading / error
   if (!vaultData || tokenOptions.length === 0) return <></>
   // Vault is not in search term
-  if (searchString !== "" &&
-    !vault.name.toLowerCase().includes(searchString) &&
-    !vault.symbol.toLowerCase().includes(searchString) &&
-    !vaultData.metadata.optionalMetadata.protocol?.name.toLowerCase().includes(searchString)) return <></>
+  if (searchTerm !== "" &&
+    !vault.name.toLowerCase().includes(searchTerm) &&
+    !vault.symbol.toLowerCase().includes(searchTerm) &&
+    !vaultData.metadata.optionalMetadata.protocol?.name.toLowerCase().includes(searchTerm)) return <></>
   return (
     <>
       <Modal visibility={[showModal, setShowModal]} title={<AssetWithName vault={vaultData} />} >
