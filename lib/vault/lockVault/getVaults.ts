@@ -59,8 +59,9 @@ async function getVaults({ account, publicClient }: { account: Address, publicCl
         feeRecipient: vault.feeRecipient,
         optionalMetadata: {
           protocol: {
-            name: "Frax"
-          }
+            name: "Frax",
+            description:"**Lending** - The vault supplies assets into Fraxlend to earn interest."
+          },
         }
       }
     }
