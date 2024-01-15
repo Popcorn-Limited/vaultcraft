@@ -29,15 +29,19 @@ const ZERO_APPROVAL_AMOUNT = BigInt("0");
 const MAX_APPROVAL_AMOUNT = BigInt("115792089237316195423570985008687907853269984665640");
 
 export async function handleAllowance({ token, amount, account, spender, clients }: HandleAllowanceProps): Promise<boolean> {
-  const allowance = await clients.publicClient.readContract({
-    address: token,
-    abi: ERC20Abi,
-    functionName: "allowance",
-    args: [account, spender]
-  })
+  const fetchAllowance = async () => {
+    return await clients.publicClient.readContract({
+      address: token,
+      abi: ERC20Abi,
+      functionName: "allowance",
+      args: [account, spender]
+    })
+  }
+  let allowance = await fetchAllowance();
+  console.log("checks allowance: ", allowance);
 
   if(Number(allowance) === 0) {
-    return approve({
+    await approve({
       amount: MAX_APPROVAL_AMOUNT,
       address: token,
       account,
@@ -55,7 +59,7 @@ export async function handleAllowance({ token, amount, account, spender, clients
       walletClient: clients.walletClient
     })
 
-    return approve({
+    await approve({
       amount: BigInt(amount),
       address: token,
       account,
@@ -67,6 +71,9 @@ export async function handleAllowance({ token, amount, account, spender, clients
     console.log("NOTHING TO APPROVE")
     return true
   }
+
+  allowance = await fetchAllowance();
+  return (Number(allowance) >= amount);
 }
 
 export default async function approve({ amount, address, account, spender, publicClient, walletClient }: ApproveProps): Promise<boolean> {

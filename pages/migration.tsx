@@ -146,6 +146,8 @@ export default function Migration(): JSX.Element {
                 walletClient
             })
             if (migrateSuccess) setPopBal(prevState => prevState - BigInt(val.toLocaleString("fullwide", { useGrouping: false })))
+        }else {
+            showErrorToast("Insufficient Approved Amount")
         }
     }
 
