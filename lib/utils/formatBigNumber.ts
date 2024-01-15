@@ -52,14 +52,18 @@ export function formatNumber(value: number): string {
   });
 }
 
-export function numberToBigNumber(value: number | string, decimals: number): BigInt {
-  if (typeof value === "number") {
-    return parseUnits(String(value), decimals);
-  } else if (typeof value === "string") {
-    if (value == "" || value == ".") value = "0";
-    return parseUnits(value, decimals);
+export function multiplyDecimals(value: number, multiplier: number): number {
+  function countDecimalPlaces(value: number): number {
+    if ((value % 1) !== 0) {
+      let decimalString = value.toString().split('.')[1];
+      if (decimalString) {
+        return decimalString.length;
+      }
+    }
+    return 0;
   }
-  return ZERO;
+
+  return Number((value * multiplier).toFixed(countDecimalPlaces(value)));
 }
 
 export function formatToFixedDecimals(value: number, decimals: number): string {

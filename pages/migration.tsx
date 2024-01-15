@@ -10,6 +10,7 @@ import { ArrowDownIcon } from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
 import { Address, WalletClient, formatEther, parseEther, zeroAddress } from "viem";
 import { PublicClient, useAccount, useBalance, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
+import {multiplyDecimals} from "@/lib/utils/formatBigNumber";
 
 const { VCX, POP } = getVeAddresses();
 
@@ -111,7 +112,7 @@ export default function Migration(): JSX.Element {
     function handleChangeInput(e: any) {
         const value = e.currentTarget.value
         setInputBalance(validateInput(value).isValid ? value : "0");
-    };
+    }
 
     async function handleMainAction() {
         const val = Number(inputBalance) * 1e18
@@ -125,8 +126,6 @@ export default function Migration(): JSX.Element {
             }
         }
 
-        console.log({ val, bal: Number(popBal) })
-
         const approveSuccess = await handleAllowance({
             token: POP,
             amount: val,
@@ -137,6 +136,7 @@ export default function Migration(): JSX.Element {
                 walletClient
             }
         })
+
         if (approveSuccess) {
             const migrateSuccess = await migrate({
                 address: VCX,
@@ -146,6 +146,8 @@ export default function Migration(): JSX.Element {
                 walletClient
             })
             if (migrateSuccess) setPopBal(prevState => prevState - BigInt(val.toLocaleString("fullwide", { useGrouping: false })))
+        }else {
+            showErrorToast("Insufficient Approved Amount")
         }
     }
 
@@ -164,7 +166,7 @@ export default function Migration(): JSX.Element {
                     <div className="rounded-lg w-full md:w-1/3 md:min-w-[870px] bg-[#23262F] md:ml-auto md:mr-auto md:p-8 px-8 pt-6 pb-5 md:pl-11 border border-[#353945] [&_summary::-webkit-details-marker]:hidden">
                         <InputTokenWithError
                             onSelectToken={() => { }}
-                            onMaxClick={() => handleChangeInput({ currentTarget: { value: Math.round(Number(formatEther(popBal)) * ROUNDING_VALUE) / ROUNDING_VALUE } })}
+                            onMaxClick={() => handleChangeInput({ currentTarget: { value: Number(formatEther(popBal)) } })}
                             chainId={1}
                             value={inputBalance}
                             onChange={handleChangeInput}
@@ -177,7 +179,7 @@ export default function Migration(): JSX.Element {
                                 balance: Number(popBal),
                                 price: 1,
                             }}
-                            errorMessage={""}
+                            errorMessage={(Number(inputBalance) > Number(formatEther(popBal)))?"Insufficient POP balance":""}
                             tokenList={[]}
                             allowInput
                         />
@@ -191,7 +193,7 @@ export default function Migration(): JSX.Element {
                             onSelectToken={() => { }}
                             onMaxClick={() => { }}
                             chainId={1}
-                            value={(Number(inputBalance) * 10) || 0}
+                            value={multiplyDecimals(Number(inputBalance), 10) || 0}
                             onChange={() => { }}
                             selectedToken={{
                                 address: VCX,
@@ -207,7 +209,8 @@ export default function Migration(): JSX.Element {
                             allowSelection={false}
                             allowInput
                         />
-                        <MainActionButton className="mt-10 md:mt-8" label="Convert POP" handleClick={handleMainAction} />
+                        <MainActionButton className="mt-10 md:mt-8" label="Convert POP" handleClick={handleMainAction}
+                                          disabled={(Number(inputBalance) > Number(formatEther(popBal)))}/>
                     </div>
                     : <p>Loading...</p>
                 }
