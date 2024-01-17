@@ -10,8 +10,8 @@ import SelectField from "@/components/input/SelectField";
 import { erc20ABI, usePublicClient } from "wagmi";
 import { getVeAddresses } from "@/lib/constants";
 import { BalancerVaultAbi, VCX_POOL_ID, VotingEscrowAbi } from "@/lib/constants";
-import {formatToFixedDecimals} from "@/lib/utils/formatBigNumber";
-import {bigint} from "zod";
+import { formatToFixedDecimals } from "@/lib/utils/formatBigNumber";
+import { bigint } from "zod";
 import { DuneQueryResult } from "@/lib/types";
 
 const { VCX, VotingEscrow, WETH, WETH_VCX_LP, oVCX, BalancerVault } = getVeAddresses()
@@ -56,8 +56,8 @@ const totalEmission = () => {
     let today = new Date();
 
     const epochDiff = differenceInCalendarWeeks(
-      new Date(today.getFullYear(), today.getMonth() + 1, today.getDate()),
-      new Date(2023, 11, 30)
+        new Date(today.getFullYear(), today.getMonth() + 1, today.getDate()),
+        new Date(2023, 11, 30)
     )
 
     if (epochDiff <= 13) {
@@ -101,9 +101,7 @@ export default function Vaults() {
         }[]
         tvlMonthByMonth: {
             date: number
-            tokens: {
-                [key: string]: number
-            }
+            value: number
         }[]
         totalRevenue: number
         oVcxRevenue: number
@@ -318,7 +316,7 @@ export default function Vaults() {
             duneTokenResult,
             prices,
             poolTokens,
-            tvlByTime,
+            llamaRes,
             holder,
             veLocked,
             volume,
@@ -342,6 +340,21 @@ export default function Vaults() {
                 args: [VCX_POOL_ID]
             }),
             axios.get<{
+                tvl: {
+                    date: number,
+                    totalLiquidityUSD: number
+                }[]
+                currentChainTvls: {
+                    [key: string]: number
+                }
+                chainTvls: {
+                    [key: string]: {
+                        tvl: {
+                            date: number,
+                            totalLiquidityUSD: number
+                        }[]
+                    }
+                }
                 tokensInUsd: {
                     date: number
                     tokens: {
@@ -381,7 +394,7 @@ export default function Vaults() {
         const vcxInUsd = prices.data.coins["ethereum:0xcE246eEa10988C495B4A90a905Ee9237a0f91543"].price
         const wethInUsd = prices.data.coins["ethereum:0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"].price
         const lpInUsd = prices.data.coins["ethereum:0x577A7f7EE659Aa14Dc16FD384B3F8078E23F1920"].price
-        const tvlByTokens = Object.keys(tvlByTime.data.tokensInUsd.slice(-1)[0].tokens)
+        const tvlByTime = Object.keys(llamaRes.data.tokensInUsd.slice(-1)[0].tokens)
 
         setStatistics({
             ...statistics,
@@ -399,12 +412,18 @@ export default function Vaults() {
             holderWhale: holder.data.result.rows[0].whales_number,
             snapshotPips: snapshotPips.data.result.rows,
             weekDexVolume: volume.data.result.rows[0]['USD Volume'],
-            tvlMonthByMonth: tvlByTime.data.tokensInUsd,
-            tvl: tvlByTokens.reduce((acc, key) => acc + tvlByTime.data.tokensInUsd.slice(-1)[0].tokens[key], 0),
-            vaultTvl: tvlByTokens.map(item => {
+            tvlMonthByMonth: llamaRes.data.tvl.map((tvl, i) => {
+                if (i >= 41) {
+                    console.log(tvl.totalLiquidityUSD + llamaRes.data.chainTvls.staking.tvl[i - 41].totalLiquidityUSD)
+                }
+                return i >= 41 ? { date: tvl.date, value: tvl.totalLiquidityUSD + llamaRes.data.chainTvls.staking.tvl[i - 41].totalLiquidityUSD }
+                    : { date: tvl.date, value: tvl.totalLiquidityUSD }
+            }),
+            tvl: Object.values(llamaRes.data.currentChainTvls).reduce((a, b) => a + b, 0) - llamaRes.data.currentChainTvls["Ethereum-staking"],
+            vaultTvl: tvlByTime.map(item => {
                 return {
                     title: item,
-                    count: tvlByTime.data.tokensInUsd.slice(-1)[0].tokens[item]
+                    count: llamaRes.data.tokensInUsd.slice(-1)[0].tokens[item]
                 }
             }),
             balLp: ((Number(poolTokens[1][1]) / 1e18) * vcxInUsd) + ((Number(poolTokens[1][0]) / 1e18) * wethInUsd),
@@ -431,17 +450,17 @@ export default function Vaults() {
                 },
             ]
         )
-        initDonutChart(vaultTvlChartElem.current, tvlByTokens.map((item, idx) => {
+        initDonutChart(vaultTvlChartElem.current, tvlByTime.map((item, idx) => {
             return {
                 name: item,
-                y: tvlByTime.data.tokensInUsd.slice(-1)[0].tokens[item],
+                y: llamaRes.data.tokensInUsd.slice(-1)[0].tokens[item],
                 color: vaultTvlChartColors[idx % vaultTvlChartColors.length]
             }
         }))
-        initLineChart(TVLOverTimeChartElem.current, tvlByTime.data.tokensInUsd.map(item => {
+        initLineChart(TVLOverTimeChartElem.current, statistics.tvlMonthByMonth.map(item => {
             return {
                 x: item.date * 1000,
-                y: Object.keys(item.tokens).reduce((acc, key) => acc + item.tokens[key], 0),
+                y: item.value,
             }
         }))
     }
@@ -453,7 +472,7 @@ export default function Vaults() {
             initLineChart(TVLOverTimeChartElem.current, statistics.tvlMonthByMonth.map(item => {
                 return {
                     x: item.date * 1000,
-                    y: Object.keys(item.tokens).reduce((acc, key) => acc + item.tokens[key], 0),
+                    y: item.value,
                 }
             }))
         }
@@ -470,27 +489,27 @@ export default function Vaults() {
                     <div className={`border border-[#353945] rounded-[1rem] bg-[#23262f] p-6 grid col-span-full md:grid-cols-6 gap-6`}>
                         <div className={`flex flex-col`}>
                             <p className={`text-[1rem]`}>Total Supply</p>
-                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>{ formatToFixedDecimals(statistics.totalSupply, 0) }</h2>
+                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>{formatToFixedDecimals(statistics.totalSupply, 0)}</h2>
                         </div>
                         <div className={`flex flex-col`}>
                             <p className={`text-[1rem]`}>Liquid Supply</p>
-                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>{ formatToFixedDecimals(statistics.liquidSupply, 0) }</h2>
+                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>{formatToFixedDecimals(statistics.liquidSupply, 0)}</h2>
                         </div>
                         <div className={`flex flex-col`}>
                             <p className={`text-[1rem]`}>FDV</p>
-                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>${ formatToFixedDecimals(statistics.fdv, 0) }</h2>
+                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>${formatToFixedDecimals(statistics.fdv, 0)}</h2>
                         </div>
                         <div className={`flex flex-col`}>
                             <p className={`text-[1rem]`}>Market Cap</p>
-                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>${ formatToFixedDecimals(statistics.marketCap, 0) }</h2>
+                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>${formatToFixedDecimals(statistics.marketCap, 0)}</h2>
                         </div>
                         <div className={`flex flex-col`}>
                             <p className={`text-[1rem]`}>VCX Price</p>
-                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>${ statistics.vcxPrice.toLocaleString(undefined, { maximumFractionDigits: 4, minimumFractionDigits: 2 })}</h2>
+                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>${statistics.vcxPrice.toLocaleString(undefined, { maximumFractionDigits: 4, minimumFractionDigits: 2 })}</h2>
                         </div>
                         <div className={`flex flex-col`}>
                             <p className={`text-[1rem]`}>Burned VCX</p>
-                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>{ formatToFixedDecimals(statistics.burnedVcx, 0) } VCX</h2>
+                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>{formatToFixedDecimals(statistics.burnedVcx, 0)} VCX</h2>
                         </div>
                     </div>
                     <div className={`flex flex-col border border-[#353945] rounded-[1rem] bg-[#23262f]`}>
@@ -505,27 +524,27 @@ export default function Vaults() {
                             <div className={`flex flex-col grow-[1]`}>
                                 <div className={`flex justify-between`}>
                                     <p>VCX in 80/20 BAL pool</p>
-                                    <p className={`font-bold text-right`}>${ formatToFixedDecimals(statistics.vcxInBalPool, 0)}</p>
+                                    <p className={`font-bold text-right`}>${formatToFixedDecimals(statistics.vcxInBalPool, 0)}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
                                     <p>WETH in 80/20 BAL pool</p>
-                                    <p className={`font-bold text-right`}>${ formatToFixedDecimals(statistics.wethInBalPool, 0)}</p>
+                                    <p className={`font-bold text-right`}>${formatToFixedDecimals(statistics.wethInBalPool, 0)}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
                                     <p>BAL LPs</p>
-                                    <p className={`font-bold text-right`}>${ formatToFixedDecimals(statistics.balLp, 0)}</p>
+                                    <p className={`font-bold text-right`}>${formatToFixedDecimals(statistics.balLp, 0)}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
                                     <p>veVCX (staked LPs)</p>
-                                    <p className={`font-bold text-right`}>${ formatToFixedDecimals(statistics.veVcx, 0)}</p>
+                                    <p className={`font-bold text-right`}>${formatToFixedDecimals(statistics.veVcx, 0)}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
                                     <p>oVCX emissions</p>
-                                    <p className={`font-bold text-right`}>${ formatToFixedDecimals(statistics.oVcxEmissions, 0)}</p>
+                                    <p className={`font-bold text-right`}>${formatToFixedDecimals(statistics.oVcxEmissions, 0)}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
                                     <p>oVCX exercised</p>
-                                    <p className={`font-bold text-right`}>{ formatToFixedDecimals(statistics.oVcxExercised, 0)} VCX</p>
+                                    <p className={`font-bold text-right`}>{formatToFixedDecimals(statistics.oVcxExercised, 0)} VCX</p>
                                 </div>
                             </div>
                             <div className={`flex justify-center`} ref={liquidVcxMarketChartElem} />
@@ -558,7 +577,7 @@ export default function Vaults() {
                             <div className={`flex flex-col grow-[1]`}>
                                 <div className={`flex justify-between`}>
                                     <p>Total Revenue</p>
-                                    <p className={`font-bold text-right`}>${ formatToFixedDecimals(statistics.totalRevenue, 0)}</p>
+                                    <p className={`font-bold text-right`}>${formatToFixedDecimals(statistics.totalRevenue, 0)}</p>
                                 </div>
                                 {/*<div className={`flex justify-between`}>
                                     <p>Smart Vault Fees</p>

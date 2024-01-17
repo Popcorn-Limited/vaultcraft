@@ -6,6 +6,7 @@ import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { Address, useAccount } from "wagmi";
+import axios from "axios";
 
 export default function Hero(): JSX.Element {
   const { address: account } = useAccount();
@@ -28,9 +29,10 @@ export default function Hero(): JSX.Element {
   }, [account, vaults, lockVaults]);
 
   useEffect(() => {
-    const vaultTvl = vaults.reduce((a, b) => a + b.tvl, 0)
-    const lockVaultTvl = lockVaults.reduce((a, b) => a + b.tvl, 0)
-    setTvl(NumberFormatter.format(vaultTvl + lockVaultTvl))
+    axios.get("https://api.llama.fi/protocol/vaultcraft").then(res =>
+      setTvl(
+        // @ts-ignore
+        NumberFormatter.format(Object.values(res.data.currentChainTvls).reduce((a, b) => a + b, 0) - res.data.currentChainTvls["Ethereum-staking"])))
   }, [vaults, lockVaults])
 
 
