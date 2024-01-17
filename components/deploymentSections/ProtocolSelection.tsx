@@ -19,7 +19,6 @@ interface ProtocolOption extends Protocol {
 
 async function getProtocolOptions(asset: Address, chainId: number, yieldOptions: YieldOptions): Promise<ProtocolOption[]> {
   const protocols = await yieldOptions?.getProtocolsByAsset({ chainId, asset: getAddress(asset) });
-  console.log({ asset, chainId, protocols })
   const apys = await Promise.all(protocols.map(async (protocol) => yieldOptions?.getApy({ chainId, protocol: protocol.key, asset })))
   return protocols.map((protocol, i) => ({
     ...protocol,
@@ -36,14 +35,20 @@ function ProtocolSelection() {
   const [protocol, setProtocol] = useAtom(protocolAtom);
   const [asset] = useAtom(assetAtom);
 
+  const [loading, setLoading] = useState<boolean>(true);
   const [options, setOptions] = useState<ProtocolOption[]>([]);
 
   const [, setAdapterConfig] = useAtom(adapterConfigAtom);
 
   useEffect(() => {
     if (chainId && asset.symbol !== "none" && yieldOptions) {
+      setLoading(true)
       setOptions([])
-      getProtocolOptions(getAddress(asset.address), chainId, yieldOptions).then(res => setOptions(res));
+      getProtocolOptions(getAddress(asset.address), chainId, yieldOptions)
+        .then(res => {
+          setOptions(res)
+          setLoading(false)
+        });
     }
   }, [chainId, asset]);
 
@@ -65,16 +70,24 @@ function ProtocolSelection() {
       title="Select Protocol"
       description="Select a protocol to use to earn yield. You need to select an asset first."
     >
-      {options.length > 0 ? options.filter(option => !option.disabled).sort((a, b) => (b.apy || 0) - (a.apy || 0)).map((option) => (
-        <Option
-          key={`protocol-selc-${option.name}`}
-          value={option}
-          selected={option?.name === protocol.name}
-          disabled={option.disabled}
-          apy={option?.apy}
-        >
-        </Option>
-      )) : <p className="text-white">Loading, please wait...</p>}
+      {loading ?
+        <p className="text-white">Loading, please wait...</p>
+        : <>
+          {options.length > 0 ?
+            options.filter(option => !option.disabled).sort((a, b) => (b.apy || 0) - (a.apy || 0)).map((option) => (
+              <Option
+                key={`protocol-selc-${option.name}`}
+                value={option}
+                selected={option?.name === protocol.name}
+                disabled={option.disabled}
+                apy={option?.apy}
+              >
+              </Option>
+            ))
+            : <p className="text-white">No available protocols...</p>
+          }
+        </>
+      }
     </Selector>
   );
 }
