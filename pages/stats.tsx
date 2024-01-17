@@ -396,7 +396,7 @@ export default function Vaults() {
         const lpInUsd = prices.data.coins["ethereum:0x577A7f7EE659Aa14Dc16FD384B3F8078E23F1920"].price
         const tvlByTime = Object.keys(llamaRes.data.tokensInUsd.slice(-1)[0].tokens)
 
-        setStatistics({
+        const newStats = {
             ...statistics,
             fdv: duneTokenResult.data.result.rows[0].totalsupply * vcxInUsd,
             totalSupply: duneTokenResult.data.result.rows[0].totalsupply,
@@ -413,9 +413,6 @@ export default function Vaults() {
             snapshotPips: snapshotPips.data.result.rows,
             weekDexVolume: volume.data.result.rows[0]['USD Volume'],
             tvlMonthByMonth: llamaRes.data.tvl.map((tvl, i) => {
-                if (i >= 41) {
-                    console.log(tvl.totalLiquidityUSD + llamaRes.data.chainTvls.staking.tvl[i - 41].totalLiquidityUSD)
-                }
                 return i >= 41 ? { date: tvl.date, value: tvl.totalLiquidityUSD + llamaRes.data.chainTvls.staking.tvl[i - 41].totalLiquidityUSD }
                     : { date: tvl.date, value: tvl.totalLiquidityUSD }
             }),
@@ -434,7 +431,8 @@ export default function Vaults() {
             totalRevenue: Number(oVCXRevenue.data.result.rows[0].cumulative_eth_redeemed) * wethInUsd,
             oVcxRevenue: Number(oVCXRevenue.data.result.rows[0].cumulative_eth_redeemed) * wethInUsd,
             oVcxEmissions: totalEmission() * vcxInUsd * 0.25
-        })
+        }
+        setStatistics(newStats)
 
         initDonutChart(liquidVcxMarketChartElem.current,
             [
@@ -457,7 +455,7 @@ export default function Vaults() {
                 color: vaultTvlChartColors[idx % vaultTvlChartColors.length]
             }
         }))
-        initLineChart(TVLOverTimeChartElem.current, statistics.tvlMonthByMonth.map(item => {
+        initLineChart(TVLOverTimeChartElem.current, newStats.tvlMonthByMonth.map(item => {
             return {
                 x: item.date * 1000,
                 y: item.value,
