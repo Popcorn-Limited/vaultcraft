@@ -1,21 +1,13 @@
 export * from "./abi";
 export * from "./addresses";
-import assets from "@/lib/constants/assets";
 import { Token } from "../types";
-import { getAddress, maxInt256, maxUint256, zeroAddress } from "viem";
+import { maxInt256, maxUint256, zeroAddress } from "viem";
+import axios from "axios";
 
-export function getAssetsByChain(chainId: number): Token[] {
-  return assets.filter((asset) => asset.chains.includes(chainId)).map((asset) => {
-    return {
-      address: getAddress(asset.address[String(chainId)]),
-      name: asset.name,
-      symbol: asset.symbol,
-      decimals: asset.decimals,
-      logoURI: asset.logoURI,
-      balance: 0,
-      price: 0
-    }
-  });
+export async function getAssetsByChain(chainId: number): Promise<Token[]> {
+  const { data: assets } = await axios.get(`https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/assets/tokens/${chainId}.json`)
+
+  return Object.values(assets).map(asset => { return { ...(asset as Token), balance: 0, price: 0 } })
 }
 
 export const ADDRESS_ZERO = zeroAddress

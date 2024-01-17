@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChainId } from "@/lib/utils/connectors";
 import { Token } from "@/lib/types";
 import TokenIcon from "@/components/common/TokenIcon";
-import { getAssetsByChain } from "@/lib/constants";
+import { getAssetsByChain, zapAssetAddressesByChain } from "@/lib/constants";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
 interface SearchTokenProps {
@@ -13,8 +13,6 @@ interface SearchTokenProps {
 }
 
 export default function SearchToken({ options, selectToken, selectedToken, chainId }: SearchTokenProps): JSX.Element {
-  const quickOptionsTokens = getAssetsByChain(chainId);
-
   const [search, setSearch] = useState("");
   const [filteredOptions, setFilteredOptions] = useState<Token[]>(options);
 
@@ -44,7 +42,7 @@ export default function SearchToken({ options, selectToken, selectedToken, chain
         />
       </div>
       {options
-        .filter((option) => quickOptionsTokens.find((token) => token.address == option.address))
+        .filter((option) => zapAssetAddressesByChain[chainId].find((address) => address == option.address))
         .reduce((acc: Token[][], _, i, arr: Token[],) => (i % 2 === 0 ? acc.push(arr.slice(i, i + 2)) : acc, acc), [])
         .map((quickOption) => (
           <div className="flex gap-6" key={`quickOption-${quickOption[0].address}`}>

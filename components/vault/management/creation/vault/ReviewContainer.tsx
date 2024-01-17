@@ -93,20 +93,6 @@ export default function ReviewContainer({ route, stages, activeStage }: VaultCre
       {<Modal visibility={[showModal, setShowModal]}>
         <div>
           <p className="text-[white] text-2xl mb-4">Creating Vault</p>
-          <span className="flex flex-row items-center mb-2">
-            <p className="text-white mr-2">Uploading Metadata to IPFS... </p>
-            {metadata.ipfsHash === "" ?
-              <figure className="relative w-5 h-5 mt-0.5">
-                <Image
-                  fill
-                  className="object-contain"
-                  alt="loader"
-                  src={"/images/loader/spinner.svg"}
-                />
-              </figure> :
-              <CheckCircleIcon className="w-6 h-6 text-green-500" />
-            }
-          </span>
           <span className="flex flex-row">
             <p className="text-white mr-2">Creating Vault... </p>
             {(metadata.ipfsHash === "" || isLoading) &&

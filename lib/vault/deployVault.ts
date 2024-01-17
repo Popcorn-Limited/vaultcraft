@@ -26,7 +26,7 @@ async function simulateDeployVault(
       functionName: "deployVault",
       args: [
         {
-          asset: asset.address[chain.id],
+          asset: asset.address,
           adapter: ADDRESS_ZERO,
           fees: {
             deposit: parseUnits(String(Number(fees.deposit) / 100), 18),

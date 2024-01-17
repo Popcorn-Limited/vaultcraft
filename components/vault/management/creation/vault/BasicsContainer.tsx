@@ -69,7 +69,7 @@ export default function BasicsContainer({ route, stages, activeStage }: VaultCre
           strategyDefaults = await resolveStrategyDefaults({
             chainId: chainId,
             client: publicClient,
-            address: getAddress(asset.address[chainId]),
+            address: getAddress(asset.address),
             resolver: strategy.resolver
           })
         }
@@ -77,7 +77,7 @@ export default function BasicsContainer({ route, stages, activeStage }: VaultCre
         strategyDefaults = await resolveStrategyDefaults({
           chainId: chainId,
           client: publicClient,
-          address: getAddress(asset.address[chainId]),
+          address: getAddress(asset.address),
           resolver: strategy.resolver
         })
       }

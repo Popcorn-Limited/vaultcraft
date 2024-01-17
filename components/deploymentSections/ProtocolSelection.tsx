@@ -42,7 +42,7 @@ function ProtocolSelection() {
   useEffect(() => {
     if (chainId && asset.symbol !== "none" && yieldOptions) {
       setOptions([])
-      getProtocolOptions(getAddress(asset.address[chainId]), chainId, yieldOptions).then(res => setOptions(res));
+      getProtocolOptions(getAddress(asset.address), chainId, yieldOptions).then(res => setOptions(res));
     }
   }, [chainId, asset]);
 

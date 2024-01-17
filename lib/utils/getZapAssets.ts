@@ -1,17 +1,15 @@
 import { Token } from "@/lib/types";
-import assets from "@/lib/constants/assets";
-import { Address, Chain, createPublicClient, getAddress, http } from "viem";
+import { Address, Chain, createPublicClient, http } from "viem";
 import axios from "axios";
 import { RPC_URLS, networkMap } from "@/lib/utils/connectors";
-import { ERC20Abi } from "@/lib/constants";
-
-const symbolsToSelect = ["DAI", "USDC", "USDC.e", "USDT", "LUSD", "WETH", "WBTC"]
+import { ERC20Abi, zapAssetAddressesByChain } from "@/lib/constants";
 
 export default async function getZapAssets({ chain, account }: { chain: Chain, account?: Address }): Promise<Token[]> {
-  const selected = assets.filter(asset => asset.chains.includes(chain.id)).filter(asset => symbolsToSelect.includes(asset.symbol))
+  const { data: assets } = await axios.get(`https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/assets/tokens/${chain.id}.json`)
+  const selected: Token[] = Object.values(assets).filter((asset: any) => zapAssetAddressesByChain[chain.id].includes(asset.address)).map(asset => { return { ...(asset as Token), balance: 0 } })
   if (selected.length === 0) return []
   // Add prices
-  const { data } = await axios.get(`https://coins.llama.fi/prices/current/${String(selected.map(asset => `${networkMap[chain.id].toLowerCase()}:${asset.address[String(chain.id)]}`))}`)
+  const { data } = await axios.get(`https://coins.llama.fi/prices/current/${String(selected.map(asset => `${networkMap[chain.id].toLowerCase()}:${asset.address}`))}`)
 
   let balances: bigint[];
   if (account) {
@@ -19,7 +17,7 @@ export default async function getZapAssets({ chain, account }: { chain: Chain, a
     balances = await client.multicall({
       contracts: selected.map(asset => {
         return {
-          address: asset.address[String(chain.id)],
+          address: asset.address,
           abi: ERC20Abi,
           functionName: 'balanceOf',
           args: [account]
@@ -30,7 +28,7 @@ export default async function getZapAssets({ chain, account }: { chain: Chain, a
   }
 
   return selected.map((asset, i) => {
-    const address = asset.address[String(chain.id)]
+    const address = asset.address
     const key = `${networkMap[chain.id].toLowerCase()}:${address}`
     const price = Number(data.coins[key]?.price || 0)
     return {

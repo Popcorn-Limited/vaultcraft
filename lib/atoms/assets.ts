@@ -1,5 +1,5 @@
 import { atom } from "jotai";
-import { Address } from "viem";
+import { Address, zeroAddress } from "viem";
 import { Asset, Token } from "../types";
 
 type AssetAddresses = {
@@ -7,9 +7,9 @@ type AssetAddresses = {
   [key: number]: Address[]
 }
 
-export const DEFAULT_ASSET: Asset = { name: "Choose an Asset", symbol: "none", decimals: 0, logoURI: "", address: {}, chains: [] }
+export const DEFAULT_ASSET: Token = { name: "Choose an Asset", symbol: "none", decimals: 0, logoURI: "", address: zeroAddress, balance: 0, price: 0 }
 
-export const assetAtom = atom<Asset>(DEFAULT_ASSET);
+export const assetAtom = atom<Token>(DEFAULT_ASSET);
 
 export const assetAddressesAtom = atom<AssetAddresses>({});
 

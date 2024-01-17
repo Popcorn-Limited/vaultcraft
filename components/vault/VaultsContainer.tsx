@@ -2,16 +2,14 @@
 import NoSSR from "react-no-ssr";
 import { useEffect, useState } from "react";
 import { Address, useAccount, useBalance, usePublicClient, useWalletClient } from "wagmi";
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import useNetworkFilter from "@/lib/useNetworkFilter";
-import { Token, VaultData } from "@/lib/types";
+import { VaultData } from "@/lib/types";
 import SmartVault from "@/components/vault/SmartVault";
 import NetworkFilter from "@/components/network/NetworkFilter";
 import { getVeAddresses } from "@/lib/constants";
-import getZapAssets, { getAvailableZapAssets } from "@/lib/utils/getZapAssets";
-import { ERC20Abi, VCXAbi, VaultAbi } from "@/lib/constants";
+import { ERC20Abi, VaultAbi } from "@/lib/constants";
 import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
 import MainActionButton from "@/components/button/MainActionButton";
 import { claimOPop } from "@/lib/optionToken/interactions";

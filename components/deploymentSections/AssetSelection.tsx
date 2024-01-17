@@ -4,85 +4,49 @@ import Selector, { Option } from "@/components/input/Selector";
 import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import { Address, getAddress, isAddress } from "viem";
-import { Asset } from "@/lib/types";
-import assets from "@/lib/constants/assets";
+import { Asset, Token } from "@/lib/types";
 import { RPC_URLS } from "@/lib/utils/connectors";
 import { useWalletClient } from "wagmi";
+import { getAssetsByChain, zapAssetAddressesByChain } from "@/lib/constants";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
-async function fetchViaAlchemy(address: string, chainId: number, metadata: any) {
-  const options = {
-    method: 'POST',
-    headers: { accept: 'application/json', 'content-type': 'application/json' },
-    body: JSON.stringify({
-      id: chainId,
-      jsonrpc: '2.0',
-      method: 'alchemy_getTokenMetadata',
-      params: [address]
-    })
-  };
-  // @ts-ignore
-  const res = await fetch(RPC_URLS[chainId], options)
-  const data = await res.json()
-
-  metadata.name = data.result.name
-  metadata.symbol = data.result.symbol
-  metadata.decimals = data.result.decimals
-  if (data.result.logo) metadata.logoURI = data.result.logo
-
-  return metadata
-}
-
-async function getTokenMetadata(address: Address, chainId: number, protocol: string): Promise<Asset> {
-  let metadata = {
-    name: "",
-    symbol: "",
-    decimals: 0,
-    logoURI: "https://etherscan.io/images/main/empty-token.png",
-    address: { [chainId]: address },
-    chains: [chainId]
-  }
-
-  try {
-    metadata = await fetchViaAlchemy(address, chainId, metadata)
-
-  } catch (e) { console.error("error", e) }
-
-  return metadata
-}
 
 function AssetSelection() {
   const { data: walletClient } = useWalletClient()
   const chainId = walletClient?.chain.id || 1
 
+  const [, setStrategy] = useAtom(strategyAtom);
+  const [protocol, setProtocol] = useAtom(protocolAtom);
   const [asset, setAsset] = useAtom(assetAtom);
 
-  const [availableAssets, setAvailableAssets] = useState(assets);
   const [availableAssetAddresses] = useAtom(assetAddressesAtom);
+  const networkAssetsAvailable = (availableAssetAddresses[chainId] && Object.keys(availableAssetAddresses[chainId]).length > 0) || false
+
+  const [assetsByChain, setAssetsByChain] = useState<{ [key: number]: Token[] }>({});
+  const [availableAssets, setAvailableAssets] = useState<Token[]>([]);
+
+  useEffect(() => {
+    async function addAssetsByChain() {
+      // @ts-ignore
+      const newAssets: { [key: number]: Token[] } = { ...availableAssets, [chainId]: await getAssetsByChain(chainId) }
+      setAssetsByChain(newAssets)
+      setAvailableAssets(newAssets[chainId].filter(asset => zapAssetAddressesByChain[chainId].includes(asset.address)))
+    }
+    if (!Object.keys(availableAssets).includes(String(chainId))) addAssetsByChain();
+  }, [chainId])
 
   const [searchTerm, setSearchTerm] = useState<string>("")
 
-  const [, setStrategy] = useAtom(strategyAtom);
-  const [protocol, setProtocol] = useAtom(protocolAtom);
-
-  const networkAssetsAvailable = (availableAssetAddresses[chainId] && Object.keys(availableAssetAddresses[chainId]).length > 0) || false
-
-  useEffect(() => {
-    const avAssets = assets.filter(a => a.chains?.includes(chainId)).filter(
+  function handleSearch() {
+    const avAssets = assetsByChain[chainId].filter(
       item => searchTerm === "" ? true :
-        item.address[String(chainId)].toLowerCase().includes(searchTerm) ||
+        item.address.toLowerCase().includes(searchTerm) ||
         item.name.toLowerCase().includes(searchTerm) ||
         item.symbol.toLowerCase().includes(searchTerm)
     )
 
-    if (avAssets.length === 0
-      && isAddress(searchTerm)
-      && availableAssetAddresses[chainId].includes(getAddress(searchTerm))) {
-      getTokenMetadata(searchTerm, chainId, protocol.key).then(res => setAvailableAssets([res]))
-    } else {
-      setAvailableAssets(avAssets)
-    }
-
-  }, [searchTerm])
+    setAvailableAssets(avAssets)
+  }
 
   function selectAsset(newAsset: any) {
     if (asset !== newAsset) {
@@ -99,26 +63,30 @@ function AssetSelection() {
       title="Select Asset"
       description="Choose an asset that you want to deposit into your vault and earn yield on. If you can't find your asset in the list, paste its address into the search bar to add it."
       optionalChildren={
-        <div className="h-12">
-          <Input
-            onChange={(e) => setSearchTerm((e.target as HTMLInputElement).value.toLowerCase())}
-            placeholder={networkAssetsAvailable ? "Search by name, symbol or address" : "Loading more assets..."}
-            defaultValue={searchTerm}
-            autoComplete="off"
-            autoCorrect="off"
-            disabled={!networkAssetsAvailable}
-          />
+        <div className="h-12 flex flex-row items-center">
+          <div className="w-10/12">
+            <Input
+              onChange={(e) => setSearchTerm((e.target as HTMLInputElement).value.toLowerCase())}
+              placeholder={networkAssetsAvailable ? "Search by name, symbol or address" : "Loading more assets..."}
+              defaultValue={searchTerm}
+              autoComplete="off"
+              autoCorrect="off"
+              disabled={!networkAssetsAvailable}
+            />
+          </div>
+          <button className="w-2/12 ml-2 rounded-md border-2 border-[#353945] bg-[#23262F] hover:bg-[#353945] h-14 justify-center" onClick={handleSearch}>
+            <MagnifyingGlassIcon className="w-6 h-6 text-white mx-auto" />
+          </button>
         </div>
       }
     >
       {availableAssets.length > 0 ?
-        availableAssets.filter(a => a.chains?.includes(chainId)).map((assetIter) => (
+        availableAssets.map((assetIter) => (
           <Option
             // @ts-ignore
-            key={`asset-selc-${assetIter.address[String(chainId)]}-${chainId}`}
-            selected={asset.name === assetIter.name}
+            key={`asset-selc-${assetIter.address}-${chainId}`}
+            selected={asset.address === assetIter.address}
             value={assetIter}
-            apy={assetIter.apy}
           >
           </Option>
         )) :
