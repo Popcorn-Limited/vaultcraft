@@ -94,12 +94,14 @@ export async function deployVault(
 
       return true;
     } catch (error: any) {
+      console.log({ error })
       toast.dismiss()
       toast.error(error.shortMessage)
 
       return false;
     }
   } else {
+    console.log({ simulationError })
     toast.dismiss()
     toast.error(simulationError)
 
