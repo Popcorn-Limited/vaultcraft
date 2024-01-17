@@ -36,10 +36,13 @@ interface TermsModalProps {
 }
 
 function TermsModal({ showModal, setShowModal, setTermsSigned }: TermsModalProps): JSX.Element {
+
   function handleAccept() {
     setTermsSigned(true)
     setShowModal(false)
+    localStorage.setItem("termsAndConditionsSigned", String(Number(new Date())));
   }
+
   return (
     <Modal visibility={[showModal, setShowModal]} title={<h2 className="text-xl">VaultCraft Terms of Service</h2>}>
       <div className="text-start">
@@ -59,7 +62,7 @@ function TermsModal({ showModal, setShowModal, setTermsSigned }: TermsModalProps
           </li>
           <li>
             You can participate in the governance process by staking tokens in accordance with the rules and parameters summarized
-            <a className="text-blue-500" href="https://docs.vaultcraft.io/welcome-to-vaultcraft/introduction" target="_blank"> here</a>,
+            <a className="text-blue-500 focus:none" href="https://docs.vaultcraft.io/welcome-to-vaultcraft/introduction" target="_blank"> here</a>,
             and/or joining the VaultCraft forum and contributing to the conversation.
           </li>
           <li>
@@ -148,7 +151,14 @@ export default function Page({
   const [termsSigned, setTermsSigned] = useState<boolean>(false)
 
   useEffect(() => {
-    if (!termsSigned) setShowTermsModal(true)
+    if (!termsSigned) {
+      const expiryDate = localStorage.getItem("termsAndConditionsSigned");
+      if (expiryDate && Number(expiryDate) + 1209600000 < Number(new Date())) {
+        setShowTermsModal(true)
+      } else {
+        setTermsSigned(true)
+      }
+    }
   }, [termsSigned])
 
   const [zapAssets, setZapAssets] = useAtom(zapAssetsAtom)
