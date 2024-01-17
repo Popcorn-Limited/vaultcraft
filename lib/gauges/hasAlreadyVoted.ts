@@ -23,7 +23,7 @@ export async function hasAlreadyVoted(
     })
 
     const limitTimestamp = BigInt(Math.floor(Date.now() / 1000) - (DAYS * 10));
-    const canVoteOnGauges = data?.map((voteTimestamp: bigint) => voteTimestamp < limitTimestamp);
-    const canCastVote = data?.some((voteTimestamp: bigint) => voteTimestamp < limitTimestamp);
+    const canVoteOnGauges = data.map((voteTimestamp: bigint) => voteTimestamp < limitTimestamp);
+    const canCastVote = data.some((voteTimestamp: bigint) => voteTimestamp < limitTimestamp);
     return {canCastVote, canVoteOnGauges};
 }
