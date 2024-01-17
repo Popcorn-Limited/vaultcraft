@@ -19,6 +19,7 @@ interface ProtocolOption extends Protocol {
 
 async function getProtocolOptions(asset: Address, chainId: number, yieldOptions: YieldOptions): Promise<ProtocolOption[]> {
   const protocols = await yieldOptions?.getProtocolsByAsset({ chainId, asset: getAddress(asset) });
+  console.log({ asset, chainId, protocols })
   const apys = await Promise.all(protocols.map(async (protocol) => yieldOptions?.getApy({ chainId, protocol: protocol.key, asset })))
   return protocols.map((protocol, i) => ({
     ...protocol,

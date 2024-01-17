@@ -40,6 +40,7 @@ function StrategySelection({ isDisabled }: { isDisabled?: boolean }) {
         protocol.key
       )
         .then(res => {
+          console.log({ res })
           setOptions(res);
           if (res.length > 0) {
             setStrategy(res[0]);

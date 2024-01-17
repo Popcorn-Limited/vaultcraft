@@ -27,6 +27,7 @@ function AssetSelection() {
 
   useEffect(() => {
     async function addAssetsByChain() {
+      console.log({ chainId })
       // @ts-ignore
       const newAssets: { [key: number]: Token[] } = { ...availableAssets, [chainId]: await getAssetsByChain(chainId) }
       setAssetsByChain(newAssets)

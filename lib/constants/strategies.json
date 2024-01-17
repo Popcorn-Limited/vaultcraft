@@ -5,52 +5,40 @@
     "resolver": "curveStargateCompounder",
     "protocol": "stargate",
     "adapter": "StargateLpStakingAdapter",
-    "chains": [
-      1
-    ],
+    "chains": [1],
     "description": "description",
     "logoURI": "/images/icons/popLogo.svg",
     "initParams": [
       {
         "name": "Staking Id",
         "type": "uint256",
-        "requirements": [
-          "Required"
-        ],
+        "requirements": ["Required"],
         "description": "Pid used for stargate staking"
       },
       {
         "name": "Reward Token",
         "type": "address",
-        "requirements": [
-          "Required"
-        ],
+        "requirements": ["Required"],
         "description": "Addresses of reward tokens",
         "multiple": true
       },
       {
         "name": "Minimum Trade Amounts",
         "type": "uint256",
-        "requirements": [
-          "Required"
-        ],
+        "requirements": ["Required"],
         "description": "The minimum amount of tokens to trade (in wei)",
         "multiple": true
       },
       {
         "name": "Base Asset",
         "type": "address",
-        "requirements": [
-          "Required"
-        ],
+        "requirements": ["Required"],
         "description": "Middle asset to trade through"
       },
       {
         "name": "Stargate Router",
         "type": "uint256",
-        "requirements": [
-          "Required"
-        ],
+        "requirements": ["Required"],
         "description": "Stargate Router Address"
       }
     ]
@@ -61,44 +49,34 @@
     "resolver": "curveCompounder",
     "protocol": "curve",
     "adapter": "CurveGaugeAdapterV2",
-    "chains": [
-      1
-    ],
+    "chains": [1],
     "description": "description",
     "logoURI": "/images/icons/popLogo.svg",
     "initParams": [
       {
         "name": "GaugeId",
         "type": "uint256",
-        "requirements": [
-          "Required"
-        ],
+        "requirements": ["Required"],
         "description": "Id of the Gauge to use"
       },
       {
         "name": "Reward Token",
         "type": "address",
-        "requirements": [
-          "Required"
-        ],
+        "requirements": ["Required"],
         "description": "Addresses of reward tokens",
         "multiple": true
       },
       {
         "name": "Minimum Trade Amounts",
         "type": "uint256",
-        "requirements": [
-          "Required"
-        ],
+        "requirements": ["Required"],
         "description": "The minimum amount of tokens to trade (in wei)",
         "multiple": true
       },
       {
         "name": "Base Asset",
         "type": "address",
-        "requirements": [
-          "Required"
-        ],
+        "requirements": ["Required"],
         "description": "Middle asset to trade through"
       }
     ]
@@ -109,44 +87,34 @@
     "resolver": "convexCompounder",
     "protocol": "convex",
     "adapter": "ConvexAdapterV2",
-    "chains": [
-      1
-    ],
+    "chains": [1],
     "description": "description",
     "logoURI": "/images/icons/popLogo.svg",
     "initParams": [
       {
         "name": "Pid",
         "type": "uint256",
-        "requirements": [
-          "Required"
-        ],
+        "requirements": ["Required"],
         "description": "Pid of the Convex Pool"
       },
       {
         "name": "Reward Token",
         "type": "address",
-        "requirements": [
-          "Required"
-        ],
+        "requirements": ["Required"],
         "description": "Addresses of reward tokens",
         "multiple": true
       },
       {
         "name": "Minimum Trade Amounts",
         "type": "uint256",
-        "requirements": [
-          "Required"
-        ],
+        "requirements": ["Required"],
         "description": "The minimum amount of tokens to trade (in wei)",
         "multiple": true
       },
       {
         "name": "Base Asset",
         "type": "address",
-        "requirements": [
-          "Required"
-        ],
+        "requirements": ["Required"],
         "description": "Middle asset to trade through"
       }
     ]
@@ -157,53 +125,40 @@
     "resolver": "balancerLpCompounder",
     "protocol": "balancer",
     "adapter": "BalancerGaugeAdapter",
-    "chains": [
-      1
-    ],
+    "chains": [1],
     "description": "description",
     "logoURI": "/images/icons/popLogo.svg",
     "initParams": [
       {
         "name": "BalancerGauge",
         "type": "address",
-        "requirements": [
-          "Required",
-          "NotAddressZero"
-        ],
+        "requirements": ["Required", "NotAddressZero"],
         "description": "Address of the Balancer Gauge to use"
       },
       {
         "name": "Reward Token",
         "type": "address",
-        "requirements": [
-          "Required"
-        ],
+        "requirements": ["Required"],
         "description": "Addresses of reward tokens",
         "multiple": true
       },
       {
         "name": "Minimum Trade Amounts",
         "type": "uint256",
-        "requirements": [
-          "Required"
-        ],
+        "requirements": ["Required"],
         "description": "The minimum amount of tokens to trade (in wei)",
         "multiple": true
       },
       {
         "name": "Base Asset",
         "type": "address",
-        "requirements": [
-          "Required"
-        ],
+        "requirements": ["Required"],
         "description": "Middle asset to trade through"
       },
       {
         "name": "Optional Data",
         "type": "bytes32",
-        "requirements": [
-          "Required"
-        ],
+        "requirements": ["Required"],
         "description": "Pool Id of the LpToken and Index of the DepositToken",
         "multiple": true
       }
@@ -215,52 +170,40 @@
     "resolver": "auraCompounder",
     "protocol": "aura",
     "adapter": "AuraAdapter",
-    "chains": [
-      1
-    ],
+    "chains": [1],
     "description": "description",
     "logoURI": "/images/icons/popLogo.svg",
     "initParams": [
       {
         "name": "Pid",
         "type": "uint256",
-        "requirements": [
-          "Required"
-        ],
+        "requirements": ["Required"],
         "description": "Pid of the Aura Pool"
       },
       {
         "name": "Reward Token",
         "type": "address",
-        "requirements": [
-          "Required"
-        ],
+        "requirements": ["Required"],
         "description": "Addresses of reward tokens",
         "multiple": true
       },
       {
         "name": "Minimum Trade Amounts",
         "type": "uint256",
-        "requirements": [
-          "Required"
-        ],
+        "requirements": ["Required"],
         "description": "The minimum amount of tokens to trade (in wei)",
         "multiple": true
       },
       {
         "name": "Base Asset",
         "type": "address",
-        "requirements": [
-          "Required"
-        ],
+        "requirements": ["Required"],
         "description": "Middle asset to trade through"
       },
       {
         "name": "Optional Data",
         "type": "bytes32",
-        "requirements": [
-          "Required"
-        ],
+        "requirements": ["Required"],
         "description": "Pool Id of the LpToken and Index of the DepositToken",
         "multiple": true
       }
@@ -272,10 +215,7 @@
     "name": "AaveV2 Depositor",
     "key": "AaveV2Adapter",
     "protocol": "aaveV2",
-    "chains": [
-      1,
-      1337
-    ],
+    "chains": [1, 1337],
     "resolver": "aaveV2"
   },
   {
@@ -284,11 +224,7 @@
     "name": "AaveV3 Depositor",
     "key": "AaveV3Adapter",
     "protocol": "aaveV3",
-    "chains": [
-      1,
-      1337,
-      42161
-    ],
+    "chains": [1, 1337, 42161],
     "resolver": "aaveV3"
   },
   {
@@ -301,16 +237,11 @@
       {
         "name": "AlpacaVault",
         "type": "address",
-        "requirements": [
-          "Required",
-          "NotAddressZero"
-        ],
+        "requirements": ["Required", "NotAddressZero"],
         "description": "Address of the Alpaca Vault to use"
       }
     ],
-    "chains": [
-      56
-    ],
+    "chains": [56],
     "resolver": "default"
   },
   {
@@ -323,15 +254,11 @@
       {
         "name": "Pid",
         "type": "uint256",
-        "requirements": [
-          "Required"
-        ],
+        "requirements": ["Required"],
         "description": "Pid of the AlpacaV2 Pool"
       }
     ],
-    "chains": [
-      56
-    ],
+    "chains": [56],
     "resolver": "default"
   },
   {
@@ -344,9 +271,7 @@
       {
         "name": "Pid",
         "type": "uint256",
-        "requirements": [
-          "Required"
-        ],
+        "requirements": ["Required"],
         "description": "Pid of the Aura Pool"
       }
     ],
@@ -363,10 +288,7 @@
       {
         "name": "BalancerGauge",
         "type": "address",
-        "requirements": [
-          "Required",
-          "NotAddressZero"
-        ],
+        "requirements": ["Required", "NotAddressZero"],
         "description": "Address of the Balancer Gauge to use"
       }
     ],
@@ -383,10 +305,7 @@
       {
         "name": "BeefyVault",
         "type": "address",
-        "requirements": [
-          "Required",
-          "NotAddressZero"
-        ],
+        "requirements": ["Required", "NotAddressZero"],
         "description": "Address of the Beefy Vault to use"
       },
       {
@@ -395,10 +314,29 @@
         "description": "Address of the BeefyBooster to use if the BeefyVault has any."
       }
     ],
-    "chains": [
-      1,
-      1337
+    "chains": [1, 1337],
+    "resolver": "beefy"
+  },
+  {
+    "description": "description",
+    "logoURI": "/images/icons/popLogo.svg",
+    "name": "Beefy Depositor",
+    "key": "BeefyAdapter1",
+    "protocol": "beefy",
+    "initParams": [
+      {
+        "name": "BeefyVault",
+        "type": "address",
+        "requirements": ["Required", "NotAddressZero"],
+        "description": "Address of the Beefy Vault to use"
+      },
+      {
+        "name": "BeefyBooster",
+        "type": "address",
+        "description": "Address of the BeefyBooster to use if the BeefyVault has any."
+      }
     ],
+    "chains": [10],
     "resolver": "beefy"
   },
   {
@@ -411,10 +349,7 @@
       {
         "name": "BeefyVault",
         "type": "address",
-        "requirements": [
-          "Required",
-          "NotAddressZero"
-        ],
+        "requirements": ["Required", "NotAddressZero"],
         "description": "Address of the Beefy Vault to use"
       },
       {
@@ -423,10 +358,7 @@
         "description": "Address of the BeefyBooster to use if the BeefyVault has any."
       }
     ],
-    "chains": [
-      10,
-      42161
-    ],
+    "chains": [137, 42161],
     "resolver": "beefy"
   },
   {
@@ -439,16 +371,11 @@
       {
         "name": "CToken",
         "type": "address",
-        "requirements": [
-          "Required",
-          "NotAddressZero"
-        ],
+        "requirements": ["Required", "NotAddressZero"],
         "description": "Address of the fitting CToken for the asset"
       }
     ],
-    "chains": [
-      1
-    ],
+    "chains": [1],
     "resolver": "compoundV2"
   },
   {
@@ -461,26 +388,17 @@
       {
         "name": "CToken",
         "type": "address",
-        "requirements": [
-          "Required",
-          "NotAddressZero"
-        ],
+        "requirements": ["Required", "NotAddressZero"],
         "description": "Address of the fitting CToken for the asset"
       },
       {
         "name": "CometRewarder",
         "type": "address",
-        "requirements": [
-          "Required",
-          "NotAddressZero"
-        ],
+        "requirements": ["Required", "NotAddressZero"],
         "description": "Address of the fitting CometRewarder for the asset"
       }
     ],
-    "chains": [
-      1,
-      1337
-    ],
+    "chains": [1, 1337],
     "resolver": "compoundV3"
   },
   {
@@ -493,25 +411,17 @@
       {
         "name": "CToken",
         "type": "address",
-        "requirements": [
-          "Required",
-          "NotAddressZero"
-        ],
+        "requirements": ["Required", "NotAddressZero"],
         "description": "Address of the fitting CToken for the asset"
       },
       {
         "name": "CometRewarder",
         "type": "address",
-        "requirements": [
-          "Required",
-          "NotAddressZero"
-        ],
+        "requirements": ["Required", "NotAddressZero"],
         "description": "Address of the fitting CometRewarder for the asset"
       }
     ],
-    "chains": [
-      42161
-    ],
+    "chains": [42161],
     "resolver": "compoundV3"
   },
   {
@@ -524,17 +434,11 @@
       {
         "name": "CToken",
         "type": "address",
-        "requirements": [
-          "Required",
-          "NotAddressZero"
-        ],
+        "requirements": ["Required", "NotAddressZero"],
         "description": "Address of the fitting CToken for the asset"
       }
     ],
-    "chains": [
-      1,
-      1337
-    ],
+    "chains": [1, 1337],
     "resolver": "flux"
   },
   {
@@ -547,9 +451,7 @@
       {
         "name": "Pid",
         "type": "uint256",
-        "requirements": [
-          "Required"
-        ],
+        "requirements": ["Required"],
         "description": "Pid of the Convex Pool"
       }
     ],
@@ -566,9 +468,7 @@
       {
         "name": "GaugeId",
         "type": "uint256",
-        "requirements": [
-          "Required"
-        ],
+        "requirements": ["Required"],
         "description": "Id of the Gauge to use"
       }
     ],
@@ -585,10 +485,7 @@
       {
         "name": "CRV",
         "type": "address",
-        "requirements": [
-          "Required",
-          "NotAddressZero"
-        ],
+        "requirements": ["Required", "NotAddressZero"],
         "description": "Address of the CRV-Token on the specific network"
       }
     ],
@@ -601,9 +498,7 @@
     "name": "DotDot Gauge Depositor",
     "key": "DotDotGaugeAdapter",
     "protocol": "dotdot",
-    "chains": [
-      56
-    ],
+    "chains": [56],
     "resolver": "default"
   },
   {
@@ -616,15 +511,11 @@
       {
         "name": "Pid",
         "type": "uint256",
-        "requirements": [
-          "Required"
-        ],
+        "requirements": ["Required"],
         "description": "Pid of the Ellipsis Pool"
       }
     ],
-    "chains": [
-      56
-    ],
+    "chains": [56],
     "resolver": "default"
   },
   {
@@ -637,9 +528,7 @@
       {
         "name": "Pid",
         "type": "uint256",
-        "requirements": [
-          "Required"
-        ],
+        "requirements": ["Required"],
         "description": "Pid of the Gearbox Pool"
       }
     ],
@@ -656,17 +545,11 @@
       {
         "name": "CDO",
         "type": "address",
-        "requirements": [
-          "Required",
-          "NotAddressZero"
-        ],
+        "requirements": ["Required", "NotAddressZero"],
         "description": "Address of the CDO Contract"
       }
     ],
-    "chains": [
-      1,
-      1337
-    ],
+    "chains": [1, 1337],
     "resolver": "idle"
   },
   {
@@ -679,17 +562,11 @@
       {
         "name": "CDO",
         "type": "address",
-        "requirements": [
-          "Required",
-          "NotAddressZero"
-        ],
+        "requirements": ["Required", "NotAddressZero"],
         "description": "Address of the CDO Contract"
       }
     ],
-    "chains": [
-      1,
-      1337
-    ],
+    "chains": [1, 1337],
     "resolver": "idle"
   },
   {
@@ -702,16 +579,11 @@
       {
         "name": "CDO",
         "type": "address",
-        "requirements": [
-          "Required",
-          "NotAddressZero"
-        ],
+        "requirements": ["Required", "NotAddressZero"],
         "description": "Address of the CDO Contract"
       }
     ],
-    "chains": [
-      10
-    ],
+    "chains": [10],
     "resolver": "idle"
   },
   {
@@ -724,16 +596,11 @@
       {
         "name": "CDO",
         "type": "address",
-        "requirements": [
-          "Required",
-          "NotAddressZero"
-        ],
+        "requirements": ["Required", "NotAddressZero"],
         "description": "Address of the CDO Contract"
       }
     ],
-    "chains": [
-      10
-    ],
+    "chains": [10],
     "resolver": "idle"
   },
   {
@@ -746,17 +613,11 @@
       {
         "name": "Wrapped Asset",
         "type": "address",
-        "requirements": [
-          "Required",
-          "NotAddressZero"
-        ],
+        "requirements": ["Required", "NotAddressZero"],
         "description": "Address of the wrapped version of the asset"
       }
     ],
-    "chains": [
-      1,
-      1337
-    ],
+    "chains": [1, 1337],
     "resolver": "origin"
   },
   {
@@ -778,16 +639,11 @@
       {
         "name": "Gauge",
         "type": "address",
-        "requirements": [
-          "Required",
-          "NotAddressZero"
-        ],
+        "requirements": ["Required", "NotAddressZero"],
         "description": "Address of the Solidly Gauge"
       }
     ],
-    "chains": [
-      250
-    ],
+    "chains": [250],
     "resolver": "default"
   },
   {
@@ -800,9 +656,7 @@
       {
         "name": "Staking Id",
         "type": "uint256",
-        "requirements": [
-          "Required"
-        ],
+        "requirements": ["Required"],
         "description": "Pid used for stargate staking"
       }
     ],
@@ -819,18 +673,13 @@
       {
         "name": "Pid",
         "type": "uint256",
-        "requirements": [
-          "Required"
-        ],
+        "requirements": ["Required"],
         "description": "Pid of the Convex Pool"
       },
       {
         "name": "RewardsToken",
         "type": "address",
-        "requirements": [
-          "Required",
-          "NotAddressZero"
-        ],
+        "requirements": ["Required", "NotAddressZero"],
         "description": "RewardToken of the MasterChef contract"
       }
     ],
@@ -847,18 +696,13 @@
       {
         "name": "Pid",
         "type": "uint256",
-        "requirements": [
-          "Required"
-        ],
+        "requirements": ["Required"],
         "description": "Pid of the Convex Pool"
       },
       {
         "name": "RewardsToken",
         "type": "address",
-        "requirements": [
-          "Required",
-          "NotAddressZero"
-        ],
+        "requirements": ["Required", "NotAddressZero"],
         "description": "RewardToken of the MasterChef contract"
       }
     ],
@@ -875,10 +719,7 @@
       {
         "name": "Gauge",
         "type": "address",
-        "requirements": [
-          "Required",
-          "NotAddressZero"
-        ],
+        "requirements": ["Required", "NotAddressZero"],
         "description": "Address of the Velodrome Gauge"
       }
     ],
@@ -898,10 +739,7 @@
         "description": "Max Loss for the yVault"
       }
     ],
-    "chains": [
-      1,
-      1337
-    ],
+    "chains": [1, 1337],
     "resolver": "yearn"
   },
   {
@@ -917,9 +755,7 @@
         "description": "Max Loss for the yVault"
       }
     ],
-    "chains": [
-      42161
-    ],
+    "chains": [42161],
     "resolver": "yearn"
   },
   {
@@ -932,10 +768,7 @@
       {
         "name": "Gauge",
         "type": "address",
-        "requirements": [
-          "Required",
-          "NotAddressZero"
-        ],
+        "requirements": ["Required", "NotAddressZero"],
         "description": "Address of the Balancer or Curve Gauge"
       },
       {
@@ -944,10 +777,7 @@
         "description": "Max Loss for the yVault"
       }
     ],
-    "chains": [
-      1,
-      1337
-    ],
+    "chains": [1, 1337],
     "resolver": "yearnFactory"
   }
 ]
