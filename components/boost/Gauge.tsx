@@ -23,8 +23,12 @@ export default function Gauge({ vaultData, index, votes, handleVotes, canVote }:
   const { address: account } = useAccount()
   const publicClient = usePublicClient();
 
-  const { data: weights } = useGaugeWeights({ address: vaultData.gauge?.address as Address, account: account as Address, chainId: vaultData.chainId })
-  const [amount, setAmount] = useState(0);
+  const { data: weights } = useGaugeWeights({
+    address: vaultData.gauge?.address as Address,
+    account: account as Address,
+    chainId: vaultData.chainId
+  })
+  const [amount, setAmount] = useState(Number(weights?.[2].power));
 
   const [gaugeApr, setGaugeApr] = useState<number[]>([]);
 

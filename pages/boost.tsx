@@ -17,6 +17,7 @@ import { useAtom } from "jotai";
 import { vaultsAtom } from "@/lib/atoms/vaults";
 import OptionTokenInterface from "@/components/boost/OptionTokenInterface";
 import LpModal from "@/components/boost/modals/lp/LpModal";
+import {voteUserSlopes} from "@/lib/gauges/useGaugeWeights";
 
 const { VotingEscrow: VOTING_ESCROW } = getVeAddresses();
 
@@ -46,11 +47,19 @@ function VePopContainer() {
 
       const vaultsWithGauges = vaults.filter(vault => !!vault.gauge)
       setVaults(vaultsWithGauges);
+      console.log("vault with gauges: ", vaultsWithGauges);
       if (vaultsWithGauges.length > 0 && Object.keys(votes).length === 0 && publicClient.chain.id === 1) {
-        const emptyVotes: { [key: Address]: number } = {}
-        // @ts-ignore
-        vaultsWithGauges.forEach(vault => emptyVotes[vault.gauge.address] = 0)
-        setVotes(emptyVotes);
+        const initialVotes: { [key: Address]: number } = {}
+        const voteUserSlopesData = await voteUserSlopes({
+          gaugeAddresses: vaultsWithGauges?.map((vault: VaultData) => vault.gauge?.address as Address),
+          publicClient,
+          account: account as Address
+        });
+        vaultsWithGauges.forEach((vault, index) => {
+          // @ts-ignore
+          initialVotes[vault.gauge?.address] = Number(voteUserSlopesData[index].power)
+        })
+        setVotes(initialVotes);
 
         const hasVoted = await hasAlreadyVoted({
           addresses: vaultsWithGauges?.map((vault: VaultData) => vault.gauge?.address as Address),
@@ -141,5 +150,6 @@ function VePopContainer() {
 }
 
 export default function VeVCX() {
+  // @ts-ignore
   return <NoSSR><VePopContainer /></NoSSR>
 }
