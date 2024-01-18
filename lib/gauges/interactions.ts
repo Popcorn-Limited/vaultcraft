@@ -5,6 +5,7 @@ import { SimulationResponse } from "@/lib/types";
 import { getVeAddresses } from "@/lib/constants";
 import { GaugeAbi, GaugeControllerAbi, VotingEscrowAbi } from "@/lib/constants";
 import { handleCallResult } from "@/lib/utils/helpers";
+import {voteUserSlopes} from "@/lib/gauges/useGaugeWeights";
 
 type SimulationContract = {
   address: Address;
@@ -42,12 +43,21 @@ interface SendVotesProps {
   votes: { [key: Address]: number };
   account: Address;
   clients: Clients;
+  canVoteOnGauges: boolean[]
 }
 
-export async function sendVotes({ vaults, votes, account, clients }: SendVotesProps): Promise<boolean> {
+export async function sendVotes({ vaults, votes, account, clients, canVoteOnGauges }: SendVotesProps): Promise<boolean> {
   showLoadingToast("Sending votes...")
 
-  const votesCleaned = Object.entries(votes).filter(v => v[1] > 0)
+  const prevVotes = await voteUserSlopes({
+    gaugeAddresses: Object.entries(votes)?.map((vote:[string, number]) => vote[0] as Address),
+    publicClient: clients.publicClient,
+    account: account as Address
+  });
+
+  const votesCleaned = Object.entries(votes).filter(
+    (vote, index) => Math.abs(vote[1] - Number(prevVotes[index].power)) > 0 && canVoteOnGauges[index]
+  )
 
   let addr = new Array<string>(8);
   let v = new Array<number>(8);

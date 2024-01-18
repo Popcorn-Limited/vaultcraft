@@ -38,7 +38,9 @@ export default function useGaugeWeights({ address, account, chainId }: { address
   })
 }
 
-export async function voteUserSlopes({ gaugeAddresses, publicClient, account = zeroAddress }: { gaugeAddresses: Address[], publicClient: PublicClient, account?: Address }): Promise<VoteUserSlopes[]> {
+export async function voteUserSlopes(
+  {gaugeAddresses, publicClient, account = zeroAddress }: { gaugeAddresses: Address[], publicClient: PublicClient, account?: Address }
+): Promise<VoteUserSlopes[]> {
   return await publicClient.multicall({
     contracts: gaugeAddresses.map((gaugeAddress) => {
       return {
