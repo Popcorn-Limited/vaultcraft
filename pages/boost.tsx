@@ -1,4 +1,3 @@
-// @ts-ignore
 import NoSSR from "react-no-ssr";
 import { useAccount, useBalance, usePublicClient, useWalletClient } from "wagmi";
 import { Address, WalletClient } from "viem";
@@ -17,6 +16,7 @@ import { useAtom } from "jotai";
 import { vaultsAtom } from "@/lib/atoms/vaults";
 import OptionTokenInterface from "@/components/boost/OptionTokenInterface";
 import LpModal from "@/components/boost/modals/lp/LpModal";
+import { voteUserSlopes } from "@/lib/gauges/useGaugeWeights";
 
 const { VotingEscrow: VOTING_ESCROW } = getVeAddresses();
 
@@ -31,8 +31,10 @@ function VePopContainer() {
   const [accountLoad, setAccountLoad] = useState<boolean>(false);
 
   const [vaults, setVaults] = useAtom(vaultsAtom)
+  const [initialVotes, setInitialVotes] = useState<{ [key: Address]: number }>({});
   const [votes, setVotes] = useState<{ [key: Address]: number }>({});
-  const [canVote, setCanVote] = useState<boolean>(false);
+  const [canCastVote, setCanCastVote] = useState<boolean>(false);
+  const [canVoteOnGauges, setCanVoteOnGauges] = useState<boolean[]>([]);
 
   const [showLockModal, setShowLockModal] = useState(false);
   const [showMangementModal, setShowMangementModal] = useState(false);
@@ -46,18 +48,28 @@ function VePopContainer() {
 
       const vaultsWithGauges = vaults.filter(vault => !!vault.gauge)
       setVaults(vaultsWithGauges);
-      if (vaultsWithGauges.length > 0 && Object.keys(votes).length === 0 && publicClient.chain.id === 1) {
-        const emptyVotes: { [key: Address]: number } = {}
-        // @ts-ignore
-        vaultsWithGauges.forEach(vault => emptyVotes[vault.gauge.address] = 0)
-        setVotes(emptyVotes);
 
-        const hasVoted = await hasAlreadyVoted({
+      if (vaultsWithGauges.length > 0 && Object.keys(votes).length === 0 && publicClient.chain.id === 1) {
+        const initialVotes: { [key: Address]: number } = {}
+        const voteUserSlopesData = await voteUserSlopes({
+          gaugeAddresses: vaultsWithGauges?.map((vault: VaultData) => vault.gauge?.address as Address),
+          publicClient,
+          account: account as Address
+        });
+        vaultsWithGauges.forEach((vault, index) => {
+          // @ts-ignore
+          initialVotes[vault.gauge?.address] = Number(voteUserSlopesData[index].power)
+        })
+        setInitialVotes(initialVotes);
+        setVotes(initialVotes);
+
+        const { canCastVote, canVoteOnGauges } = await hasAlreadyVoted({
           addresses: vaultsWithGauges?.map((vault: VaultData) => vault.gauge?.address as Address),
           publicClient,
           account: account as Address
         })
-        setCanVote(!!account && Number(veBal?.value) > 0 && !hasVoted)
+        setCanVoteOnGauges(canVoteOnGauges);
+        setCanCastVote(!!account && Number(veBal?.value) > 0 && canCastVote)
       }
     }
     if (!account && !initalLoad && vaults.length > 0) initialSetup();
@@ -107,32 +119,40 @@ function VePopContainer() {
 
         <section className="grid grid-cols-1 md:grid-cols-3 gap-4 px-4 md:px-8">
           {vaults?.length > 0 ? vaults.filter(vault => !!vault.gauge?.address).map((vault: VaultData, index: number) =>
-            <Gauge key={vault.address} vaultData={vault} index={vault.gauge?.address as Address} votes={votes} handleVotes={handleVotes} canVote={canVote} />
+            <Gauge key={vault.address} vaultData={vault} index={vault.gauge?.address as Address} votes={votes} handleVotes={handleVotes} canVote={canVoteOnGauges[index]} />
           )
             : <p className="text-primary">Loading Gauges...</p>
           }
         </section>
 
         <div className="fixed left-0 bottom-10 w-full">
-          {canVote && <>
-            <div className="z-10 mx-auto w-60 md:w-104 bg-[#23262F] px-6 py-4 rounded-lg flex flex-col md:flex-row items-center justify-between text-white border border-[#353945]">
-              <p className="mt-1">
-                Voting power used: <span className="font-bold">
-                  {
-                    veBal && veBal.value && Object.keys(votes).length > 0
-                      ? (Object.values(votes).reduce((a, b) => a + b, 0) / 100).toFixed(2)
-                      : "0"
-                  }%
-                </span>
-              </p>
-              <div className="mt-4 md:mt-0 w-40">
-                <MainActionButton
-                  label="Cast Votes"
-                  handleClick={() => sendVotes({ vaults, votes, account: account as Address, clients: { publicClient, walletClient: walletClient as WalletClient } })}
-                />
-              </div>
+
+          <div className="z-10 mx-auto w-60 md:w-104 bg-[#23262F] px-6 py-4 rounded-lg flex flex-col md:flex-row items-center justify-between text-white border border-[#353945]">
+            <p className="mt-1">
+              Voting power used: <span className="font-bold">
+                {
+                  veBal && veBal.value && Object.keys(votes).length > 0
+                    ? (Object.values(votes).reduce((a, b) => a + b, 0) / 100).toFixed(2)
+                    : "0"
+                }%
+              </span>
+            </p>
+            <div className="mt-4 md:mt-0 w-40">
+              <MainActionButton
+                label="Cast Votes"
+                disabled={!canCastVote}
+                handleClick={() => sendVotes({
+                  vaults,
+                  votes,
+                  prevVotes: initialVotes,
+                  account: account as Address,
+                  clients: { publicClient, walletClient: walletClient as WalletClient },
+                  canVoteOnGauges
+                })}
+              />
             </div>
-          </>}
+          </div>
+
         </div>
 
       </div>
@@ -141,5 +161,6 @@ function VePopContainer() {
 }
 
 export default function VeVCX() {
+  // @ts-ignore
   return <NoSSR><VePopContainer /></NoSSR>
 }

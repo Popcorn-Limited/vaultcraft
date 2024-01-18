@@ -164,3 +164,9 @@ export type DuneQueryResult<T> = {
     rows: T[]
   }
 }
+
+export type VoteUserSlopes = {
+  slope: bigint,
+  power: bigint,
+  end: bigint,
+}

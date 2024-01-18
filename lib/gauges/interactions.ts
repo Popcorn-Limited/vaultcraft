@@ -1,10 +1,11 @@
-import { Abi, Address, PublicClient, parseEther, zeroAddress } from "viem";
+import { Abi, Address, PublicClient, getAddress, parseEther, zeroAddress } from "viem";
 import { Clients, VaultData } from "@/lib/types";
 import { showLoadingToast } from "@/lib/toasts";
 import { SimulationResponse } from "@/lib/types";
 import { getVeAddresses } from "@/lib/constants";
 import { GaugeAbi, GaugeControllerAbi, VotingEscrowAbi } from "@/lib/constants";
 import { handleCallResult } from "@/lib/utils/helpers";
+import { voteUserSlopes } from "@/lib/gauges/useGaugeWeights";
 
 type SimulationContract = {
   address: Address;
@@ -40,14 +41,18 @@ async function simulateCall({ account, contract, functionName, publicClient, arg
 interface SendVotesProps {
   vaults: VaultData[];
   votes: { [key: Address]: number };
+  prevVotes: { [key: Address]: number };
+  canVoteOnGauges: boolean[];
   account: Address;
   clients: Clients;
 }
 
-export async function sendVotes({ vaults, votes, account, clients }: SendVotesProps): Promise<boolean> {
+export async function sendVotes({ vaults, votes, prevVotes, canVoteOnGauges, account, clients, }: SendVotesProps): Promise<boolean> {
   showLoadingToast("Sending votes...")
 
-  const votesCleaned = Object.entries(votes).filter(v => v[1] > 0)
+  const votesCleaned = Object.entries(votes).filter(
+    (vote, index) => Math.abs(vote[1] - Number(prevVotes[vote[0] as Address])) > 0 && canVoteOnGauges[index]
+  )
 
   let addr = new Array<string>(8);
   let v = new Array<number>(8);
