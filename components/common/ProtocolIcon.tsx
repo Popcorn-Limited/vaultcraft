@@ -16,7 +16,8 @@ const protocolNameToLlamaProtocol: { [key: string]: string } = {
   "Yearn": "yearn-finance",
   "Pirex": "pirex",
   "Sommelier": "sommelier",
-  "Frax": "frax"
+  "Frax": "frax",
+  "Velodrome": "velodrome"
 }
 
 export default function ProtocolIcon({ protocolName, tooltip }: { protocolName: string, tooltip?: { id: string, content: JSX.Element } }): JSX.Element {
