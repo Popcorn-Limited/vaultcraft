@@ -5,9 +5,8 @@ import InputTokenWithError from "@/components/input/InputTokenWithError";
 import InputNumber from "@/components/input/InputNumber";
 import { calcUnlockTime, calculateVeOut } from "@/lib/gauges/utils";
 import { ZERO } from "@/lib/constants";
-import { safeRound } from "@/lib/utils/formatBigNumber";
 import { validateInput } from "@/lib/utils/helpers";
-import { formatEther } from "viem";
+import {formatEther} from "viem";
 
 const { BalancerPool: VCX_LP } = getVeAddresses();
 
@@ -40,7 +39,7 @@ export default function LockVcxInterface({ amountState, daysState, showLpModal }
     return (Number(amount) || 0) > Number(lpBal?.formatted) ? "* Balance not available" : "";
   }, [amount, lpBal?.formatted]);
 
-  const handleMaxClick = () => setAmount(formatEther(safeRound(lpBal?.value || ZERO, 18)));
+  const handleMaxClick = () => setAmount(formatEther(lpBal?.value || ZERO));
 
   const handleChangeInput: FormEventHandler<HTMLInputElement> = ({ currentTarget: { value } }) => {
     setAmount(validateInput(value).isValid ? value : "0");

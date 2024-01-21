@@ -1,6 +1,6 @@
 import { Address, useAccount, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { WalletClient } from "viem";
+import {parseUnits, WalletClient} from "viem";
 import Modal from "@/components/modal/Modal";
 import MainActionButton from "@/components/button/MainActionButton";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
@@ -25,7 +25,9 @@ interface LockModalProps {
 }
 
 export default function LockModal({ show, setShowLpModal }: LockModalProps): JSX.Element {
-  const { address: account } = useAccount();
+  // const { address: account } = useAccount();
+  const account = "0x912e741CC6d3d42C8cf36e6cb28d219A9b0BE954";
+
   const { chain } = useNetwork();
   const { switchNetworkAsync } = useSwitchNetwork();
 
@@ -61,7 +63,7 @@ export default function LockModal({ show, setShowLpModal }: LockModalProps): JSX
   }, [modalStep])
 
   async function handleLock() {
-    const val = Number(amount) * 1e18
+    const val = Number(parseUnits(amount, 18));
 
     // Early exit if value is ZERO
     if (val == 0) return;
