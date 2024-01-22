@@ -12,7 +12,7 @@ import VotingPowerInfo from "@/components/boost/modals/lock/VotingPowerInfo";
 import { handleAllowance } from "@/lib/approve";
 import { createLock } from "@/lib/gauges/interactions";
 import ActionSteps from "@/components/vault/ActionSteps";
-import { ActionStep, LOCK_VCX_LP_STEPS } from "@/lib/vault/getActionSteps";
+import { ActionStep, LOCK_VCX_LP_STEPS } from "@/lib/getActionSteps";
 
 const {
   BalancerPool: VCX_LP,

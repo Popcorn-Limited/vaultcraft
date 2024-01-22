@@ -159,6 +159,14 @@ export enum LockVaultActionType {
   ZapWithdrawal
 }
 
+export enum KelpVaultActionType {
+  Deposit,
+  Withdrawal,
+  ZapDeposit,
+  EthxZapDeposit,
+  ZapWithdrawal
+}
+
 export type DuneQueryResult<T> = {
   result: {
     rows: T[]

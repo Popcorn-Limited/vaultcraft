@@ -9,7 +9,6 @@ import { formatNumber, safeRound } from "@/lib/utils/formatBigNumber";
 import { validateInput } from "@/lib/utils/helpers";
 import { Token } from "@/lib/types";
 import { llama } from "@/lib/resolver/price/resolver";
-import { useEthToUsd } from "@/lib/optionToken/ethToUsd";
 import { formatEther } from "viem";
 
 const {

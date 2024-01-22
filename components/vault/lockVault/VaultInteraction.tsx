@@ -9,12 +9,11 @@ import MainActionButton from "@/components/button/MainActionButton";
 import Deposit from "./Deposit";
 import Withdraw from "./Withdraw";
 import { useEffect, useState } from "react";
-import { ActionStep } from "@/lib/vault/getActionSteps";
 import { LockVaultActionType, LockVaultData, Token } from "@/lib/types";
-import getActionSteps from "@/lib/vault/lockVault/getActionSteps";
 import Claim from "./Claim";
 import { getAddress, isAddress } from "viem";
 import handleVaultInteraction from "@/lib/vault/lockVault/handleVaultInteraction";
+import { ActionStep, getLockVaultActionSteps } from "@/lib/getActionSteps";
 
 interface VaultInteractionProps {
   vaultData: LockVaultData;
@@ -57,12 +56,12 @@ export default function VaultInteraction({ vaultData, tokenOptions, hideModal, m
     if (isDeposit) {
       const newAction = vaultData.lock.unlockTime === 0 ? LockVaultActionType.Deposit : LockVaultActionType.IncreaseAmount
       setAction(newAction)
-      setSteps(getActionSteps(newAction))
+      setSteps(getLockVaultActionSteps(newAction))
       setInputToken(vaultData.asset)
       setOutputToken(vaultData.vault)
     } else {
       setAction(LockVaultActionType.Withdrawal)
-      setSteps(getActionSteps(LockVaultActionType.Withdrawal))
+      setSteps(getLockVaultActionSteps(LockVaultActionType.Withdrawal))
       setInputBalance(String(vaultData.lock.amount / (10 ** vaultData.vault.decimals)))
       setInputToken(vaultData.vault)
       setOutputToken(vaultData.asset)
@@ -76,13 +75,13 @@ export default function VaultInteraction({ vaultData, tokenOptions, hideModal, m
       if (isDeposit) {
         const newAction = vaultData.lock.unlockTime === 0 ? LockVaultActionType.Deposit : LockVaultActionType.IncreaseAmount
         setAction(newAction)
-        setSteps(getActionSteps(newAction))
+        setSteps(getLockVaultActionSteps(newAction))
         setInputBalance("0")
         setInputToken(vaultData.asset)
         setOutputToken(vaultData.vault)
       } else {
         setAction(LockVaultActionType.Withdrawal)
-        setSteps(getActionSteps(LockVaultActionType.Withdrawal))
+        setSteps(getLockVaultActionSteps(LockVaultActionType.Withdrawal))
         setInputBalance(String(vaultData.lock.amount / (10 ** vaultData.vault.decimals)))
         setInputToken(vaultData.vault)
         setOutputToken(vaultData.asset)
@@ -90,7 +89,7 @@ export default function VaultInteraction({ vaultData, tokenOptions, hideModal, m
     } else {
       setActiveTab("Claim")
       setAction(LockVaultActionType.Claim)
-      setSteps(getActionSteps(LockVaultActionType.Claim))
+      setSteps(getLockVaultActionSteps(LockVaultActionType.Claim))
       setInputBalance(String("1"))
     }
   }
@@ -148,26 +147,26 @@ export default function VaultInteraction({ vaultData, tokenOptions, hideModal, m
       case vaultData.asset.address:
         if (action === LockVaultActionType.Claim) {
           setAction(LockVaultActionType.Claim)
-          setSteps(getActionSteps(LockVaultActionType.Claim))
+          setSteps(getLockVaultActionSteps(LockVaultActionType.Claim))
         } else {
           const newAction = vaultData.lock.unlockTime === 0 ? LockVaultActionType.Deposit : LockVaultActionType.IncreaseAmount
           setAction(newAction)
-          setSteps(getActionSteps(newAction))
+          setSteps(getLockVaultActionSteps(newAction))
         }
         break;
       case vaultData.vault.address:
         if (output.address === vaultData.asset.address) {
           setAction(LockVaultActionType.Withdrawal)
-          setSteps(getActionSteps(LockVaultActionType.Withdrawal))
+          setSteps(getLockVaultActionSteps(LockVaultActionType.Withdrawal))
         } else {
           setAction(LockVaultActionType.ZapWithdrawal)
-          setSteps(getActionSteps(LockVaultActionType.ZapWithdrawal))
+          setSteps(getLockVaultActionSteps(LockVaultActionType.ZapWithdrawal))
         }
         break;
       default:
         const newAction = vaultData.lock.unlockTime === 0 ? LockVaultActionType.ZapDeposit : LockVaultActionType.ZapIncreaseAmount
         setAction(newAction)
-        setSteps(getActionSteps(newAction))
+        setSteps(getLockVaultActionSteps(newAction))
         break;
     }
   }

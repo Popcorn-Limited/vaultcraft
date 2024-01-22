@@ -9,8 +9,8 @@ import LpInfo from "@/components/boost/modals/lp/LpInfo";
 import LpInterface from "@/components/boost/modals/lp/LpInterface";
 import { handleAllowance } from "@/lib/approve";
 import ActionSteps from "@/components/vault/ActionSteps";
-import { ActionStep, POOL_DEPOSIT_STEPS } from "@/lib/vault/getActionSteps";
 import { depositIntoPool } from "@/lib/balancer/interactions";
+import { ActionStep, POOL_DEPOSIT_STEPS } from "@/lib/getActionSteps";
 
 const {
   BalancerPool: VCX_LP,
