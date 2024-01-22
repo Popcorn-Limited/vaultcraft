@@ -1,7 +1,7 @@
 import axios from "axios"
 import { Address, getAddress } from "viem";
 import { handleAllowance } from "@/lib/approve";
-import { KelpVaultActionType, Clients, Token, VaultData, KelpVaultActionType } from "@/lib/types";
+import { Clients, Token, VaultData, KelpVaultActionType } from "@/lib/types";
 import { vaultDeposit, vaultDepositAndStake, vaultRedeem, vaultUnstakeAndWithdraw } from "@/lib/vault/interactions";
 import zap from "@/lib/vault/zap";
 import { gaugeDeposit, gaugeWithdraw } from "@/lib/gauges/interactions";
@@ -60,12 +60,12 @@ export default async function handleVaultInteraction({
           return () => mintEthX({ amount, account, clients })
         case 1:
           postBal = Number(await clients.publicClient.readContract({ address: vaultData.asset.address, abi: erc20ABI, functionName: "balanceOf", args: [account] }))
-          return () => handleAllowance({ token: inputToken.address, amount, account, spender: getAddress(ensoWallet.address), clients })
+          return () => handleAllowance({ token: inputToken.address, amount, account, spender: getAddress("0xcf5EA1b38380f6aF39068375516Daf40Ed70D299"), clients })
         case 2:
           return () => mintRsEth({ amount, account, clients })
         case 3:
           postBal = Number(await clients.publicClient.readContract({ address: vaultData.asset.address, abi: erc20ABI, functionName: "balanceOf", args: [account] }))
-          return () => handleAllowance({ token: inputToken.address, amount, account, spender: getAddress(ensoWallet.address), clients })
+          return () => handleAllowance({ token: inputToken.address, amount, account, spender: getAddress(vaultData.address), clients })
         case 4:
           return () => vaultDeposit({ chainId, vaultData, account, amount: postBal - vaultData.asset.balance, clients })
       }
@@ -73,12 +73,12 @@ export default async function handleVaultInteraction({
       switch (stepCounter) {
         case 0:
           postBal = Number(await clients.publicClient.readContract({ address: vaultData.asset.address, abi: erc20ABI, functionName: "balanceOf", args: [account] }))
-          return () => handleAllowance({ token: inputToken.address, amount, account, spender: getAddress(ensoWallet.address), clients })
+          return () => handleAllowance({ token: inputToken.address, amount, account, spender: getAddress("0xcf5EA1b38380f6aF39068375516Daf40Ed70D299"), clients })
         case 1:
           return () => mintRsEth({ amount, account, clients })
         case 2:
           postBal = Number(await clients.publicClient.readContract({ address: vaultData.asset.address, abi: erc20ABI, functionName: "balanceOf", args: [account] }))
-          return () => handleAllowance({ token: inputToken.address, amount, account, spender: getAddress(ensoWallet.address), clients })
+          return () => handleAllowance({ token: inputToken.address, amount, account, spender: getAddress(vaultData.address), clients })
         case 3:
           return () => vaultDeposit({ chainId, vaultData, account, amount: postBal - vaultData.asset.balance, clients })
       }

@@ -2,18 +2,22 @@ import MainActionButton from "@/components/button/MainActionButton";
 import TabSelector from "@/components/common/TabSelector";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import ActionSteps from "@/components/vault/ActionSteps";
+import { masaAtom } from "@/lib/atoms/sdk";
 import { getKelpVaultActionSteps } from "@/lib/getActionSteps";
 import { getAssets } from "@/lib/resolver/velodrome";
 import { Clients, KelpVaultActionType, Token } from "@/lib/types";
 import { safeRound } from "@/lib/utils/formatBigNumber";
 import { handleCallResult, validateInput } from "@/lib/utils/helpers";
 import { ActionStep } from "@/lib/vault/getActionSteps";
+import handleVaultInteraction from "@/lib/vault/kelp/handleVaultInteraction";
 import zap from "@/lib/vault/zap";
 import { ArrowDownIcon, Cog6ToothIcon } from "@heroicons/react/24/outline";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import axios from "axios"
+import { useAtom } from "jotai";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { Address, PublicClient, formatUnits, parseEther, zeroAddress } from "viem";
+import { Address, PublicClient, formatUnits, getAddress, isAddress, parseEther, zeroAddress } from "viem";
 import { erc20ABI, useAccount, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
 
 const minDeposit = 100000000000000;
@@ -167,12 +171,14 @@ async function fetchTokens(account: Address, publicClient: PublicClient) {
 }
 
 export default function Test() {
+  const { query } = useRouter()
   const { address: account } = useAccount();
   const publicClient = usePublicClient({ chainId: 1 })
   const { data: walletClient } = useWalletClient()
   const { openConnectModal } = useConnectModal();
   const { chain } = useNetwork();
   const { switchNetworkAsync } = useSwitchNetwork();
+  const [masaSdk,] = useAtom(masaAtom)
 
   const [tokens, setTokens] = useState<{ eth: Token, ethx: Token, rseth: Token, vault: Token } | null>(null)
 
@@ -305,14 +311,15 @@ export default function Test() {
     const vaultInteraction = await handleVaultInteraction({
       action,
       stepCounter,
-      chainId,
+      chainId: 1,
       amount: (val * (10 ** inputToken.decimals)),
       inputToken,
       outputToken,
+      // TODO create some hardcoded vaultData based on `Vault` (for vault), `rsETH` (for asset) and a resolver in the metadata for rsEth
       vaultData,
       account,
-      slippage,
-      tradeTimeout,
+      slippage: 100,
+      tradeTimeout: 60,
       clients: { publicClient, walletClient },
       fireEvent: masaSdk?.fireEvent,
       referral: !!query?.ref && isAddress(query.ref as string) ? getAddress(query.ref as string) : undefined
@@ -326,10 +333,12 @@ export default function Test() {
     setSteps(stepsCopy)
     setStepCounter(newStepCounter)
 
-    if (newStepCounter === steps.length) mutateTokenBalance({ inputToken: inputToken.address, outputToken: outputToken.address, vault: vault.address, chainId, account })
+    // TODO refetch new token balances
+    // if (newStepCounter === steps.length) mutateTokenBalance({ inputToken: inputToken.address, outputToken: outputToken.address, vault: vault.address, chainId, account })
   }
 
   return <>
+    {/* TODO add apy display (show simply the apy for rsETH) */}
     <TabSelector
       className="mb-6"
       availableTabs={["Deposit", "Withdraw"]}
@@ -345,6 +354,7 @@ export default function Test() {
       onChange={handleChangeInput}
       selectedToken={inputToken}
       errorMessage={""}
+      // TODO use state tokens once they are available (so they show price and balance)
       tokenList={[ETH, rsETH]}
       allowSelection={isDeposit}
       allowInput
@@ -372,6 +382,7 @@ export default function Test() {
       onChange={() => { }}
       selectedToken={outputToken}
       errorMessage={""}
+      // TODO use state tokens once they are available (so they show price and balance)
       tokenList={[ETH, rsETH]}
       allowSelection={!isDeposit}
       allowInput={false}
