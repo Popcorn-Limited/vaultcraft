@@ -8,7 +8,7 @@ import { gaugeDeposit, gaugeWithdraw } from "@/lib/gauges/interactions";
 import { erc20ABI } from "wagmi";
 import { FireEventArgs } from "@masa-finance/analytics-sdk";
 import { getVeAddresses } from "@/lib/constants";
-import { mintEthX, mintRsEth } from "pages/test";
+import { mintEthX, mintRsEth } from "../../../pages/kelp-vault";
 
 const { VaultRouter: VAULT_ROUTER } = getVeAddresses()
 

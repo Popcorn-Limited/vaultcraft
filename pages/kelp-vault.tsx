@@ -2,16 +2,16 @@ import MainActionButton from "@/components/button/MainActionButton";
 import TabSelector from "@/components/common/TabSelector";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import ActionSteps from "@/components/vault/ActionSteps";
+
 import { masaAtom } from "@/lib/atoms/sdk";
-import { getKelpVaultActionSteps } from "@/lib/getActionSteps";
+import { getKelpVaultActionSteps, ActionStep } from "@/lib/getActionSteps";
 import { getAssets } from "@/lib/resolver/velodrome";
-import { Clients, KelpVaultActionType, Token } from "@/lib/types";
+import {Clients, KelpVaultActionType, Token, VaultData} from "@/lib/types";
 import { safeRound } from "@/lib/utils/formatBigNumber";
 import { handleCallResult, validateInput } from "@/lib/utils/helpers";
-import { ActionStep } from "@/lib/vault/getActionSteps";
 import handleVaultInteraction from "@/lib/vault/kelp/handleVaultInteraction";
 import zap from "@/lib/vault/zap";
-import { ArrowDownIcon, Cog6ToothIcon } from "@heroicons/react/24/outline";
+import {ArrowDownIcon, Cog6ToothIcon, Square2StackIcon} from "@heroicons/react/24/outline";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import axios from "axios"
 import { useAtom } from "jotai";
@@ -19,6 +19,12 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { Address, PublicClient, formatUnits, getAddress, isAddress, parseEther, zeroAddress } from "viem";
 import { erc20ABI, useAccount, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
+import AssetWithName from "@/components/vault/AssetWithName";
+import Modal from "@/components/modal/Modal";
+import VaultStats from "@/components/vault/VaultStats";
+import {CopyToClipboard} from "react-copy-to-clipboard";
+import {showSuccessToast} from "@/lib/toasts";
+import {vaultsAtom} from "@/lib/atoms/vaults";
 
 const minDeposit = 100000000000000;
 
@@ -170,7 +176,9 @@ async function fetchTokens(account: Address, publicClient: PublicClient) {
   }
 }
 
-export default function Test() {
+export default function KelpVault(vaultData: VaultData) {
+  const [vaults, setVaults] = useAtom(vaultsAtom)
+
   const { query } = useRouter()
   const { address: account } = useAccount();
   const publicClient = usePublicClient({ chainId: 1 })
@@ -337,64 +345,82 @@ export default function Test() {
     // if (newStepCounter === steps.length) mutateTokenBalance({ inputToken: inputToken.address, outputToken: outputToken.address, vault: vault.address, chainId, account })
   }
 
-  return <>
-    {/* TODO add apy display (show simply the apy for rsETH) */}
-    <TabSelector
-      className="mb-6"
-      availableTabs={["Deposit", "Withdraw"]}
-      activeTab={isDeposit ? "Deposit" : "Withdraw"}
-      setActiveTab={switchTokens}
-    />
-    <InputTokenWithError
-      captionText={isDeposit ? "Deposit Amount" : "Withdraw Amount"}
-      onSelectToken={option => handleTokenSelect(option, Vault)}
-      onMaxClick={handleMaxClick}
-      chainId={1}
-      value={inputBalance}
-      onChange={handleChangeInput}
-      selectedToken={inputToken}
-      errorMessage={""}
-      // TODO use state tokens once they are available (so they show price and balance)
-      tokenList={[ETH, rsETH]}
-      allowSelection={isDeposit}
-      allowInput
-    />
-    <div className="relative py-4">
-      <div className="absolute inset-0 flex items-center" aria-hidden="true">
-        <div className="w-full border-t border-customLightGray" />
+  const [showModal, setShowModal] = useState(true)
+  const gauge = vaultData.gauge;
+
+  console.log("vaults: ", vaults)
+  return (
+    <>
+      <div className="w-full pt-6 px-6 md:pt-0 border-t border-[#353945] md:border-none md:mt-10">
+        <h1 className="text-[32px] leading-none md:text-center md:text-[56px] font-normal m-0 mb-2 md:mb-6 leading-0 text-primary">
+          Kelp Vault
+        </h1>
+        <p className="leading-none md:text-4 text-left md:text-center text-xl text-primary">
+          Deposit into kelp vault
+        </p>
       </div>
-      <div className="relative flex justify-center">
-        <span className="bg-[#141416] px-4">
-          <ArrowDownIcon
-            className="h-10 w-10 p-2 text-customLightGray border border-customLightGray rounded-full cursor-pointer hover:text-primary hover:border-primary"
-            aria-hidden="true"
-            onClick={switchTokens}
+
+      <div className="px-6 md:px-8 py-10 border-t border-b border-[#353945] mt-6 md:mt-10 w-full">
+        <div className="rounded-lg w-full md:w-1/3 md:min-w-[870px] bg-[#23262F] md:ml-auto md:mr-auto md:p-8 px-8 pt-6 pb-5 md:pl-11 border border-[#353945] [&_summary::-webkit-details-marker]:hidden">
+          {/* TODO add apy display (show simply the apy for rsETH) */}
+          <TabSelector
+            className="mb-6"
+            availableTabs={["Deposit", "Withdraw"]}
+            activeTab={isDeposit ? "Deposit" : "Withdraw"}
+            setActiveTab={switchTokens}
           />
-        </span>
+
+          <InputTokenWithError
+            captionText={isDeposit ? "Deposit Amount" : "Withdraw Amount"}
+            onSelectToken={option => handleTokenSelect(option, Vault)}
+            onMaxClick={handleMaxClick}
+            chainId={1}
+            value={inputBalance}
+            onChange={handleChangeInput}
+            selectedToken={inputToken}
+            errorMessage={""}
+            // TODO use state tokens once they are available (so they show price and balance)
+            tokenList={[ETH, rsETH]}
+            allowSelection={isDeposit}
+            allowInput
+          />
+
+          <div className="relative flex justify-center my-6">
+            <ArrowDownIcon
+              className="h-10 w-10 p-2 text-[#9CA3AF] border border-[#4D525C] rounded-full cursor-pointer hover:text-primary hover:border-primary"
+              aria-hidden="true"
+              onClick={switchTokens}
+            />
+          </div>
+
+           <InputTokenWithError
+            captionText={"Output Amount"}
+            onSelectToken={option => handleTokenSelect(Vault, option)}
+            onMaxClick={() => { }}
+            chainId={1}
+            value={(Number(inputBalance) * (Number(inputToken?.price)) / Number(outputToken?.price)) || 0}
+            onChange={() => { }}
+            selectedToken={outputToken}
+            errorMessage={""}
+            // TODO use state tokens once they are available (so they show price and balance)
+            tokenList={[ETH, rsETH]}
+            allowSelection={!isDeposit}
+            allowInput={false}
+          />
+
+          <div className="w-full flex justify-center my-6">
+            <ActionSteps steps={steps} stepCounter={stepCounter} />
+          </div>
+
+          <div className="">
+            {account ?
+              <MainActionButton label={steps[stepCounter]?.label} handleClick={handleMainAction} disabled={inputBalance === "0" || steps[stepCounter].loading} />
+              : < MainActionButton label={"Connect Wallet"} handleClick={openConnectModal} />
+            }
+          </div>
+
+        </div>
       </div>
-    </div>
-    <InputTokenWithError
-      captionText={"Output Amount"}
-      onSelectToken={option => handleTokenSelect(Vault, option)}
-      onMaxClick={() => { }}
-      chainId={1}
-      value={(Number(inputBalance) * (Number(inputToken?.price)) / Number(outputToken?.price)) || 0}
-      onChange={() => { }}
-      selectedToken={outputToken}
-      errorMessage={""}
-      // TODO use state tokens once they are available (so they show price and balance)
-      tokenList={[ETH, rsETH]}
-      allowSelection={!isDeposit}
-      allowInput={false}
-    />
-    <div className="w-full flex justify-center my-6">
-      <ActionSteps steps={steps} stepCounter={stepCounter} />
-    </div>
-    <div className="">
-      {account ?
-        <MainActionButton label={steps[stepCounter].label} handleClick={handleMainAction} disabled={inputBalance === "0" || steps[stepCounter].loading} />
-        : < MainActionButton label={"Connect Wallet"} handleClick={openConnectModal} />
-      }
-    </div>
-  </>
+    </>
+  );
 }
