@@ -8,14 +8,20 @@ import { Clients, KelpVaultActionType, Token, VaultData } from "@/lib/types";
 import { safeRound } from "@/lib/utils/formatBigNumber";
 import { handleCallResult, validateInput } from "@/lib/utils/helpers";
 import handleVaultInteraction from "@/lib/vault/kelp/handleVaultInteraction";
-import { ArrowDownIcon } from "@heroicons/react/24/outline";
+import {ArrowDownIcon, Square2StackIcon, XMarkIcon} from "@heroicons/react/24/outline";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import axios from "axios"
 import { useAtom } from "jotai";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import {Fragment, useEffect, useState} from "react";
 import { Address, PublicClient, formatUnits, getAddress, isAddress, maxUint256, zeroAddress } from "viem";
 import { erc20ABI, useAccount, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
+import VaultStats from "@/components/vault/VaultStats";
+import AssetWithName from "@/components/vault/AssetWithName";
+import Modal from "@/components/modal/Modal";
+import {Dialog, Transition} from "@headlessui/react";
+import {CopyToClipboard} from "react-copy-to-clipboard";
+import {showSuccessToast} from "@/lib/toasts";
 
 const minDeposit = 100000000000000;
 
@@ -169,7 +175,8 @@ async function fetchTokens(account: Address, publicClient: PublicClient) {
 
 export default function KelpVault() {
   const { query } = useRouter()
-  const { address: account } = useAccount();
+  // const { address: account } = useAccount();
+  const account = "0xfF9f8DC2f76f02CB1D4C3a960D2591Ca6a7f6867";
   const publicClient = usePublicClient({ chainId: 1 })
   const { data: walletClient } = useWalletClient()
   const { openConnectModal } = useConnectModal();
@@ -178,10 +185,40 @@ export default function KelpVault() {
   const [masaSdk,] = useAtom(masaAtom)
 
   const [tokens, setTokens] = useState<{ eth: Token, ethx: Token, rseth: Token, vault: Token }>({ eth: ETH, ethx: ETHx, rseth: rsETH, vault: Vault })
-  const [vaultData, setVaultData] = useState<VaultData>()
+  //TODO: remove initial state
+  const [vaultData, setVaultData] = useState<VaultData>({
+    address: Vault.address,
+    apy: 0,
+    asset: Vault,
+    assetPrice: 0,
+    assetsPerShare: 0,
+    chainId: 0,
+    depositLimit: 0,
+    fees: 0,
+    gauge: Vault.address,
+    gaugeMaxApy: 0,
+    gaugeMinApy: 0,
+    metadata: {
+      creator: "0x22f5413C075Ccd56D575A54763831C4c27A37Bdb",
+      feeRecipient: "0x47fd36ABcEeb9954ae9eA1581295Ce9A8308655E",
+      cid: "",
+      optionalMetadata: {
+        protocol: { name: "KelpDao", description: "" },
+        resolver: "kelpDao"
+      },
+    },
+    pricePerShare: 0,
+    totalApy: 0,
+    totalAssets: 0,
+    totalSupply: 0,
+    tvl: 0,
+    vault: Vault
+  })
 
   useEffect(() => {
+    console.log("use effecterr");
     if (account) fetchTokens(account, publicClient).then(res => {
+      console.log("called use effect");
       setTokens(res)
       setVaultData({
         address: Vault.address,
@@ -386,8 +423,63 @@ export default function KelpVault() {
       </div>
 
       <div className="px-6 md:px-8 py-10 border-t border-b border-[#353945] mt-6 md:mt-10 w-full">
+
         <div className="rounded-lg w-full md:w-1/3 md:min-w-[870px] bg-[#23262F] md:ml-auto md:mr-auto md:p-8 px-8 pt-6 pb-5 md:pl-11 border border-[#353945] [&_summary::-webkit-details-marker]:hidden">
           {/* TODO add apy display (show simply the apy for rsETH) */}
+
+          <div className="flex flex-row justify-between font-medium md:items-center mb-8">
+            <>{<AssetWithName vault={vaultData} />}</>
+          </div>
+
+          <div className="w-full flex flex-wrap items-center justify-between flex-col gap-4">
+            <VaultStats vaultData={vaultData} account={account} zapAvailable={true} />
+          </div>
+
+          <div className="hidden md:block space-y-4">
+            <div className="w-10/12 border border-[#353945] rounded-lg p-4">
+              <p className="text-primary font-normal">Asset address:</p>
+              <div className="flex flex-row items-center justify-between">
+                <p className="font-bold text-primary">
+                  {Vault.address.slice(0, 6)}...{Vault.address.slice(-4)}
+                </p>
+                <div className='w-6 h-6 group/assetAddress'>
+                  <CopyToClipboard text={Vault.address} onCopy={() => showSuccessToast("Asset address copied!")}>
+                    <Square2StackIcon className="text-white group-hover/assetAddress:text-[#DFFF1C]" />
+                  </CopyToClipboard>
+                </div>
+              </div>
+            </div>
+            <div className="w-10/12 border border-[#353945] rounded-lg p-4">
+              <p className="text-primary font-normal">Vault address:</p>
+              <div className="flex flex-row items-center justify-between">
+                <p className="font-bold text-primary">
+                  {vaultData.address.slice(0, 6)}...{vaultData.address.slice(-4)}
+                </p>
+                <div className='w-6 h-6 group/vaultAddress'>
+                  <CopyToClipboard text={vaultData.address} onCopy={() => showSuccessToast("Vault address copied!")}>
+                    <Square2StackIcon className="text-white group-hover/vaultAddress:text-[#DFFF1C]" />
+                  </CopyToClipboard>
+                </div>
+              </div>
+            </div>
+            {gauge &&
+              <div className="w-10/12 border border-[#353945] rounded-lg p-4">
+                <p className="text-primary font-normal">Gauge address:</p>
+                <div className="flex flex-row items-center justify-between">
+                  <p className="font-bold text-primary">
+                    {gauge.address?.slice(0, 6)}...{gauge.address?.slice(-4)}
+                  </p>
+                  <div className='w-6 h-6 group/gaugeAddress'>
+                    <CopyToClipboard text={gauge.address} onCopy={() => showSuccessToast("Gauge address copied!")}>
+                      <Square2StackIcon className="text-white group-hover/gaugeAddress:text-[#DFFF1C]" />
+                    </CopyToClipboard>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+
+
           <TabSelector
             className="mb-6"
             availableTabs={["Deposit", "Withdraw"]}
