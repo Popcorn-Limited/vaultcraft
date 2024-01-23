@@ -11,7 +11,7 @@ import { LockVaultData, RewardToken } from "@/lib/types";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import { useAccount, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import { ActionStep } from "@/lib/vault/getActionSteps";
+import { ActionStep } from "@/lib/getActionSteps";
 import { handleAllowance } from "@/lib/approve";
 import MainActionButton from "@/components/button/MainActionButton";
 import ActionSteps from "../ActionSteps";

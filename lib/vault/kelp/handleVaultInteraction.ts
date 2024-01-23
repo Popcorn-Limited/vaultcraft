@@ -57,28 +57,31 @@ export default async function handleVaultInteraction({
     case KelpVaultActionType.ZapDeposit:
       switch (stepCounter) {
         case 0:
+          postBal = Number(await clients.publicClient.readContract({ address: "0xA35b1B31Ce002FBF2058D22F30f95D405200A15b", abi: erc20ABI, functionName: "balanceOf", args: [account] }))
           return () => mintEthX({ amount, account, clients })
         case 1:
-          postBal = Number(await clients.publicClient.readContract({ address: vaultData.asset.address, abi: erc20ABI, functionName: "balanceOf", args: [account] }))
-          return () => handleAllowance({ token: inputToken.address, amount, account, spender: getAddress("0xcf5EA1b38380f6aF39068375516Daf40Ed70D299"), clients })
+          postBal = Number(await clients.publicClient.readContract({ address: "0xA35b1B31Ce002FBF2058D22F30f95D405200A15b", abi: erc20ABI, functionName: "balanceOf", args: [account] })) - postBal
+          return () => handleAllowance({ token: "0xA35b1B31Ce002FBF2058D22F30f95D405200A15b", amount: postBal, account, spender: getAddress("0x036676389e48133B63a802f8635AD39E752D375D"), clients })
         case 2:
+          postBal = Number(await clients.publicClient.readContract({ address: "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7", abi: erc20ABI, functionName: "balanceOf", args: [account] }))
           return () => mintRsEth({ amount, account, clients })
         case 3:
-          postBal = Number(await clients.publicClient.readContract({ address: vaultData.asset.address, abi: erc20ABI, functionName: "balanceOf", args: [account] }))
-          return () => handleAllowance({ token: inputToken.address, amount, account, spender: getAddress(vaultData.address), clients })
+          postBal = Number(await clients.publicClient.readContract({ address: "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7", abi: erc20ABI, functionName: "balanceOf", args: [account] })) - postBal
+          return () => handleAllowance({ token: "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7", amount: postBal, account, spender: getAddress(vaultData.address), clients })
         case 4:
           return () => vaultDeposit({ chainId, vaultData, account, amount: postBal - vaultData.asset.balance, clients })
       }
     case KelpVaultActionType.EthxZapDeposit:
       switch (stepCounter) {
         case 0:
-          postBal = Number(await clients.publicClient.readContract({ address: vaultData.asset.address, abi: erc20ABI, functionName: "balanceOf", args: [account] }))
-          return () => handleAllowance({ token: inputToken.address, amount, account, spender: getAddress("0xcf5EA1b38380f6aF39068375516Daf40Ed70D299"), clients })
+          postBal = Number(await clients.publicClient.readContract({ address: "0xA35b1B31Ce002FBF2058D22F30f95D405200A15b", abi: erc20ABI, functionName: "balanceOf", args: [account] }))
+          return () => handleAllowance({ token: "0xA35b1B31Ce002FBF2058D22F30f95D405200A15b", amount, account, spender: getAddress("0x036676389e48133B63a802f8635AD39E752D375D"), clients })
         case 1:
+          postBal = Number(await clients.publicClient.readContract({ address: "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7", abi: erc20ABI, functionName: "balanceOf", args: [account] }))
           return () => mintRsEth({ amount, account, clients })
         case 2:
-          postBal = Number(await clients.publicClient.readContract({ address: vaultData.asset.address, abi: erc20ABI, functionName: "balanceOf", args: [account] }))
-          return () => handleAllowance({ token: inputToken.address, amount, account, spender: getAddress(vaultData.address), clients })
+          postBal = Number(await clients.publicClient.readContract({ address: "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7", abi: erc20ABI, functionName: "balanceOf", args: [account] })) - postBal
+          return () => handleAllowance({ token: "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7", amount, account, spender: getAddress(vaultData.address), clients })
         case 3:
           return () => vaultDeposit({ chainId, vaultData, account, amount: postBal - vaultData.asset.balance, clients })
       }
