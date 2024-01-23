@@ -3,21 +3,18 @@ import TabSelector from "@/components/common/TabSelector";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import ActionSteps from "@/components/vault/ActionSteps";
 import { masaAtom } from "@/lib/atoms/sdk";
-import { getKelpVaultActionSteps } from "@/lib/getActionSteps";
-import { getAssets } from "@/lib/resolver/velodrome";
-import { Clients, KelpVaultActionType, Token } from "@/lib/types";
+import { ActionStep, getKelpVaultActionSteps } from "@/lib/getActionSteps";
+import { Clients, KelpVaultActionType, Token, VaultData } from "@/lib/types";
 import { safeRound } from "@/lib/utils/formatBigNumber";
 import { handleCallResult, validateInput } from "@/lib/utils/helpers";
-import { ActionStep } from "@/lib/vault/getActionSteps";
 import handleVaultInteraction from "@/lib/vault/kelp/handleVaultInteraction";
-import zap from "@/lib/vault/zap";
-import { ArrowDownIcon, Cog6ToothIcon } from "@heroicons/react/24/outline";
+import { ArrowDownIcon } from "@heroicons/react/24/outline";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import axios from "axios"
 import { useAtom } from "jotai";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { Address, PublicClient, formatUnits, getAddress, isAddress, parseEther, zeroAddress } from "viem";
+import { Address, PublicClient, formatUnits, getAddress, isAddress, maxUint256, zeroAddress } from "viem";
 import { erc20ABI, useAccount, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
 
 const minDeposit = 100000000000000;
@@ -62,7 +59,7 @@ export async function mintRsEth({ amount, account, clients }: { amount: number, 
     successMessage: "Minting rsEth!",
     simulationResponse: await simulate({
       account,
-      address: "0xcf5EA1b38380f6aF39068375516Daf40Ed70D299", // Stader Staking Pool Manager
+      address: "0x036676389e48133B63a802f8635AD39E752D375D", // KelpDao Deposit Pool
       abi: [{ "inputs": [{ "internalType": "address", "name": "asset", "type": "address" }, { "internalType": "uint256", "name": "depositAmount", "type": "uint256" }, { "internalType": "uint256", "name": "minRSETHAmountToReceive", "type": "uint256" }, { "internalType": "string", "name": "referralId", "type": "string" }], "name": "depositAsset", "outputs": [], "stateMutability": "nonpayable", "type": "function" }],
       functionName: "depositAsset",
       args: ["0xA35b1B31Ce002FBF2058D22F30f95D405200A15b", BigInt(amount), BigInt(0), ""], // TODO -> add minAmount and refId
@@ -96,7 +93,7 @@ const ETHx: Token = {
 }
 
 const rsETH: Token = {
-  address: "0xc1D4a319dD7C44e332Bd54c724433C6067FeDd0D",
+  address: "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7",
   name: "rsETH",
   symbol: "rsETH",
   decimals: 18,
@@ -118,8 +115,8 @@ const Vault: Token = {
 async function fetchTokens(account: Address, publicClient: PublicClient) {
   const { data: llamaPrices } = await axios.get("https://coins.llama.fi/prices/current/ethereum:0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2,ethereum:0xA35b1B31Ce002FBF2058D22F30f95D405200A15b")
 
-  const { data: rsEthPrice } = await axios.get("https://api.coingecko.com/api/v3/simple/price?ids=kelp-dao-restaked-eth&vs_currencies=usd")
-
+  //const { data: rsEthPrice } = await axios.get("https://api.coingecko.com/api/v3/simple/price?ids=kelp-dao-restaked-eth&vs_currencies=usd")
+  const rsEthPrice = 2221.40
 
   const ethBal = await publicClient.getBalance({ address: account })
   const balRes = await publicClient.multicall({
@@ -159,12 +156,12 @@ async function fetchTokens(account: Address, publicClient: PublicClient) {
     },
     rseth: {
       ...rsETH,
-      price: rsEthPrice["kelp-dao-restaked-eth"].usd,
+      price: rsEthPrice,
       balance: Number(balRes[1])
     },
     vault: {
       ...Vault,
-      price: rsEthPrice["kelp-dao-restaked-eth"].usd,
+      price: rsEthPrice,
       balance: Number(balRes[2])
     }
   }
@@ -180,10 +177,42 @@ export default function Test() {
   const { switchNetworkAsync } = useSwitchNetwork();
   const [masaSdk,] = useAtom(masaAtom)
 
-  const [tokens, setTokens] = useState<{ eth: Token, ethx: Token, rseth: Token, vault: Token } | null>(null)
+  const [tokens, setTokens] = useState<{ eth: Token, ethx: Token, rseth: Token, vault: Token }>({ eth: ETH, ethx: ETHx, rseth: rsETH, vault: Vault })
+  const [vaultData, setVaultData] = useState<VaultData>()
 
   useEffect(() => {
-    if (account) fetchTokens(account, publicClient).then(res => setTokens(res))
+    if (account) fetchTokens(account, publicClient).then(res => {
+      setTokens(res)
+      setVaultData({
+        address: Vault.address,
+        vault: res.vault,
+        asset: res.rseth,
+        totalAssets: 1,
+        totalSupply: 1,
+        assetsPerShare: 1,
+        pricePerShare: 1,
+        tvl: 1,
+        fees: {
+          deposit: 0,
+          withdrawal: 0,
+          performance: 0,
+          management: 0
+        },
+        depositLimit: Number(maxUint256),
+        metadata: {
+          creator: "0x22f5413C075Ccd56D575A54763831C4c27A37Bdb",
+          feeRecipient: "0x47fd36ABcEeb9954ae9eA1581295Ce9A8308655E",
+          cid: "",
+          optionalMetadata: {
+            protocol: { name: "KelpDao", description: "" },
+            resolver: "kelpDao"
+          },
+        },
+        chainId: 1,
+        apy: 0,
+        totalApy: 0
+      })
+    })
   }, [account])
 
   const [inputToken, setInputToken] = useState<Token>()
@@ -191,7 +220,7 @@ export default function Test() {
 
   const [stepCounter, setStepCounter] = useState<number>(0)
   const [steps, setSteps] = useState<ActionStep[]>([])
-  const [action, setAction] = useState<KelpVaultActionType>(KelpVaultActionType.Deposit)
+  const [action, setAction] = useState<KelpVaultActionType>(KelpVaultActionType.ZapDeposit)
 
   const [inputBalance, setInputBalance] = useState<string>("0");
 
@@ -199,10 +228,10 @@ export default function Test() {
 
   useEffect(() => {
     // set default input/output tokens
-    setInputToken(ETH)
-    setOutputToken(Vault)
+    setInputToken(tokens.eth)
+    setOutputToken(tokens.vault)
     setSteps(getKelpVaultActionSteps(action))
-  }, [])
+  }, [tokens])
 
   function handleChangeInput(e: any) {
     const value = e.currentTarget.value
@@ -293,7 +322,7 @@ export default function Test() {
 
   async function handleMainAction() {
     const val = Number(inputBalance)
-    if (val === 0 || !inputToken || !outputToken || !account || !walletClient) return;
+    if (val === 0 || !inputToken || !outputToken || !account || !walletClient || !vaultData) return;
 
     if (chain?.id !== Number(1)) {
       try {
@@ -303,7 +332,7 @@ export default function Test() {
       }
     }
 
-    const stepsCopy = [...steps]
+    let stepsCopy = [...steps]
     const currentStep = stepsCopy[stepCounter]
     currentStep.loading = true
     setSteps(stepsCopy)
@@ -315,8 +344,7 @@ export default function Test() {
       amount: (val * (10 ** inputToken.decimals)),
       inputToken,
       outputToken,
-      // TODO create some hardcoded vaultData based on `Vault` (for vault), `rsETH` (for asset) and a resolver in the metadata for rsEth
-      vaultData,
+      vaultData: vaultData,
       account,
       slippage: 100,
       tradeTimeout: 60,
@@ -329,13 +357,21 @@ export default function Test() {
     currentStep.loading = false
     currentStep.success = success;
     currentStep.error = !success;
-    const newStepCounter = stepCounter + 1
+
+    let newStepCounter = stepCounter + 1
+    if (stepCounter === stepsCopy.length) {
+      newStepCounter = 0;
+      stepsCopy = [...getKelpVaultActionSteps(action)]
+    }
+
     setSteps(stepsCopy)
     setStepCounter(newStepCounter)
 
     // TODO refetch new token balances
     // if (newStepCounter === steps.length) mutateTokenBalance({ inputToken: inputToken.address, outputToken: outputToken.address, vault: vault.address, chainId, account })
   }
+
+  console.log({ steps, stepCounter, tokens, vaultData, inputToken, outputToken })
 
   return <>
     {/* TODO add apy display (show simply the apy for rsETH) */}
@@ -347,15 +383,14 @@ export default function Test() {
     />
     <InputTokenWithError
       captionText={isDeposit ? "Deposit Amount" : "Withdraw Amount"}
-      onSelectToken={option => handleTokenSelect(option, Vault)}
+      onSelectToken={option => handleTokenSelect(option, tokens.vault)}
       onMaxClick={handleMaxClick}
       chainId={1}
       value={inputBalance}
       onChange={handleChangeInput}
       selectedToken={inputToken}
       errorMessage={""}
-      // TODO use state tokens once they are available (so they show price and balance)
-      tokenList={[ETH, rsETH]}
+      tokenList={[tokens.eth, tokens.rseth, tokens.ethx]}
       allowSelection={isDeposit}
       allowInput
     />
@@ -375,15 +410,14 @@ export default function Test() {
     </div>
     <InputTokenWithError
       captionText={"Output Amount"}
-      onSelectToken={option => handleTokenSelect(Vault, option)}
+      onSelectToken={option => handleTokenSelect(tokens.vault, option)}
       onMaxClick={() => { }}
       chainId={1}
       value={(Number(inputBalance) * (Number(inputToken?.price)) / Number(outputToken?.price)) || 0}
       onChange={() => { }}
       selectedToken={outputToken}
       errorMessage={""}
-      // TODO use state tokens once they are available (so they show price and balance)
-      tokenList={[ETH, rsETH]}
+      tokenList={[tokens.eth, tokens.rseth]}
       allowSelection={!isDeposit}
       allowInput={false}
     />
@@ -391,7 +425,7 @@ export default function Test() {
       <ActionSteps steps={steps} stepCounter={stepCounter} />
     </div>
     <div className="">
-      {account ?
+      {account && steps.length > 0 ?
         <MainActionButton label={steps[stepCounter].label} handleClick={handleMainAction} disabled={inputBalance === "0" || steps[stepCounter].loading} />
         : < MainActionButton label={"Connect Wallet"} handleClick={openConnectModal} />
       }

@@ -1,4 +1,4 @@
-import { ActionStep } from "@/lib/vault/getActionSteps"
+import { ActionStep } from "@/lib/getActionSteps";
 import { XMarkIcon } from "@heroicons/react/24/outline"
 
 function getStepColor(preFix: string, step: any): string {
