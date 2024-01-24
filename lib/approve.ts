@@ -1,5 +1,5 @@
 import { Address, PublicClient, WalletClient } from "viem"
-import { ERC20Abi } from "@/lib/constants"
+import { ERC20Abi, ZERO, getVeAddresses } from "@/lib/constants"
 import { showErrorToast, showLoadingToast, showSuccessToast } from "@/lib/toasts"
 import { Clients, SimulationResponse } from "@/lib/types";
 import { UsdtAbi } from "@/lib/constants/abi/USDT";
@@ -24,9 +24,9 @@ interface ApproveProps extends SimulateApproveProps {
   walletClient: WalletClient;
 }
 
-const ZERO_APPROVAL_AMOUNT = BigInt("0");
-
 const MAX_APPROVAL_AMOUNT = BigInt("115792089237316195423570985008687907853269984665640");
+
+const { POP } = getVeAddresses()
 
 export async function handleAllowance({ token, amount, account, spender, clients }: HandleAllowanceProps): Promise<boolean> {
   const fetchAllowance = async () => {
@@ -40,7 +40,7 @@ export async function handleAllowance({ token, amount, account, spender, clients
   let allowance = await fetchAllowance();
   console.log("checks allowance: ", allowance);
 
-  if(Number(allowance) === 0) {
+  if (Number(allowance) === 0) {
     await approve({
       amount: MAX_APPROVAL_AMOUNT,
       address: token,
@@ -49,15 +49,17 @@ export async function handleAllowance({ token, amount, account, spender, clients
       publicClient: clients.publicClient,
       walletClient: clients.walletClient
     })
-  } else if(Number(allowance) < amount) {
-    await approve({
-      amount: ZERO_APPROVAL_AMOUNT,
-      address: token,
-      account,
-      spender,
-      publicClient: clients.publicClient,
-      walletClient: clients.walletClient
-    })
+  } else if (Number(allowance) < amount) {
+    if (token === POP) {
+      await approve({
+        amount: ZERO,
+        address: token,
+        account,
+        spender,
+        publicClient: clients.publicClient,
+        walletClient: clients.walletClient
+      })
+    }
 
     await approve({
       amount: BigInt(amount),
