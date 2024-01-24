@@ -239,7 +239,7 @@ export function getKelpVaultActionSteps(action: KelpVaultActionType): ActionStep
     case KelpVaultActionType.Deposit:
       return [{
         step: 1,
-        label: "Handle Allowance",
+        label: "Handle Vault Allowance",
         ...BaseStepInfo
       },
       {
@@ -260,7 +260,7 @@ export function getKelpVaultActionSteps(action: KelpVaultActionType): ActionStep
         ...BaseStepInfo
       }, {
         step: 3,
-        label: "Handle Allowance",
+        label: "Handle rsETH Allowance",
         ...BaseStepInfo
       }, {
         step: 3,
@@ -268,7 +268,7 @@ export function getKelpVaultActionSteps(action: KelpVaultActionType): ActionStep
         ...BaseStepInfo
       }, {
         step: 4,
-        label: "Handle Allowance",
+        label: "Handle Vault Allowance",
         ...BaseStepInfo
       }, {
         step: 5,
@@ -278,7 +278,7 @@ export function getKelpVaultActionSteps(action: KelpVaultActionType): ActionStep
     case KelpVaultActionType.EthxZapDeposit:
       return [{
         step: 1,
-        label: "Handle Allowance",
+        label: "Handle rsETH Allowance",
         ...BaseStepInfo
       }, {
         step: 2,
@@ -286,7 +286,7 @@ export function getKelpVaultActionSteps(action: KelpVaultActionType): ActionStep
         ...BaseStepInfo
       }, {
         step: 3,
-        label: "Handle Allowance",
+        label: "Handle Vault Allowance",
         ...BaseStepInfo
       }, {
         step: 4,
