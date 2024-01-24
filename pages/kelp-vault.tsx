@@ -14,7 +14,7 @@ import axios from "axios"
 import { useAtom } from "jotai";
 import { useRouter } from "next/router";
 import { Fragment, useEffect, useState } from "react";
-import { Address, PublicClient, formatUnits, getAddress, isAddress, maxUint256, zeroAddress } from "viem";
+import { Address, PublicClient, formatUnits, getAddress, isAddress, maxUint256, stringToHex, zeroAddress } from "viem";
 import { erc20ABI, useAccount, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
 import VaultStats from "@/components/vault/VaultStats";
 import AssetWithName from "@/components/vault/AssetWithName";
@@ -114,10 +114,10 @@ const rsETH: Token = {
 }
 
 const Vault: Token = {
-  address: "0x008a1832841b0bBA57886Da2005aE7f666EFEcc4",
+  address: "0x008a1832841b0bBA57886Da2005aE7f666EFEcc4", // "0x7CEbA0cAeC8CbE74DB35b26D7705BA68Cb38D725"
   name: "VaultCraft rsETH Vault",
   symbol: "vc-rsETH",
-  decimals: 18,
+  decimals: 18, // 27
   logoURI: "https://app.vaultcraft.io/images/tokens/vcx.svg",
   balance: 0,
   price: 1
@@ -197,7 +197,7 @@ async function getKelpVaultData(account: Address, publicClient: PublicClient, yi
       deposit: 0,
       withdrawal: 0,
       management: 0,
-      performance: 100000000000000000
+      performance: 0
     },
     depositLimit: Number(maxUint256),
     metadata: {
@@ -234,8 +234,6 @@ async function getKelpVaultData(account: Address, publicClient: PublicClient, yi
 
 
 export default function Index() {
-  axios.get(`https://yields.llama.fi/chart/90bfb3c2-5d35-4959-a275-ba5085b08aa3`).then(res => console.log(res.data.data.pop().apyBase7d))
-
   return <>
     <KelpVault searchTerm="" />
   </>
