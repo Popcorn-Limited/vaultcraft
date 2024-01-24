@@ -19,7 +19,7 @@ import { masaAtom } from "@/lib/atoms/sdk";
 import { useRouter } from "next/router";
 import { ActionStep, getSmartVaultActionSteps } from "@/lib/getActionSteps";
 
-interface VaultInputsProps {
+export interface VaultInputsProps {
   vaultData: VaultData;
   tokenOptions: Token[];
   chainId: number;
