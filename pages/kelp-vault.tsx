@@ -204,6 +204,7 @@ async function getKelpVaultData(account: Address, publicClient: PublicClient, yi
       creator: "0x22f5413C075Ccd56D575A54763831C4c27A37Bdb",
       feeRecipient: "0x47fd36ABcEeb9954ae9eA1581295Ce9A8308655E",
       cid: "",
+      // @ts-ignore
       optionalMetadata: {
         protocol: { name: "KelpDao", description: "" },
         resolver: "kelpDao"
