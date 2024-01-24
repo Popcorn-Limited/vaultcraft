@@ -2,7 +2,7 @@ import MainActionButton from "@/components/button/MainActionButton";
 import TabSelector from "@/components/common/TabSelector";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import ActionSteps from "@/components/vault/ActionSteps";
-import { masaAtom } from "@/lib/atoms/sdk";
+import { masaAtom, yieldOptionsAtom } from "@/lib/atoms/sdk";
 import { ActionStep, getKelpVaultActionSteps } from "@/lib/getActionSteps";
 import { Clients, KelpVaultActionType, Token, VaultData } from "@/lib/types";
 import { safeRound } from "@/lib/utils/formatBigNumber";
@@ -26,6 +26,7 @@ import { VaultInputsProps } from "@/components/vault/VaultInputs";
 import Accordion from "@/components/common/Accordion";
 import { ADDRESS_ZERO, VaultAbi } from "@/lib/constants";
 import { MutateTokenBalanceProps } from "@/components/vault/VaultsContainer";
+import { YieldOptions } from "vaultcraft-sdk";
 
 const minDeposit = 100000000000000;
 
@@ -122,7 +123,7 @@ const Vault: Token = {
   price: 1
 }
 
-async function getKelpVaultData(account: Address, publicClient: PublicClient): Promise<{ tokenOptions: Token[], vaultData: VaultData }> {
+async function getKelpVaultData(account: Address, publicClient: PublicClient, yieldOptions: YieldOptions): Promise<{ tokenOptions: Token[], vaultData: VaultData }> {
   const { data: llamaPrices } = await axios.get("https://coins.llama.fi/prices/current/ethereum:0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2,ethereum:0xA35b1B31Ce002FBF2058D22F30f95D405200A15b,ethereum:0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7")
 
   const ethBal = await publicClient.getBalance({ address: account })
@@ -177,6 +178,12 @@ async function getKelpVaultData(account: Address, publicClient: PublicClient): P
   const assetsPerShare = totalSupply > 0 ? (totalAssets + 1) / (totalSupply + (1e9)) : Number(1e-9)
   const pricePerShare = assetsPerShare * asset.price
 
+  const apy = await yieldOptions.getApy({
+    chainId: 1,
+    protocol: "kelpDao",
+    asset: asset.address
+  })
+
   const vaultData: VaultData = {
     address: Vault.address,
     asset: asset,
@@ -203,8 +210,8 @@ async function getKelpVaultData(account: Address, publicClient: PublicClient): P
       },
     },
     chainId: 1,
-    apy: 0,
-    totalApy: 0
+    apy: apy.total,
+    totalApy: apy.total
   }
 
   return {
@@ -226,6 +233,8 @@ async function getKelpVaultData(account: Address, publicClient: PublicClient): P
 
 
 export default function Index() {
+  axios.get(`https://yields.llama.fi/chart/90bfb3c2-5d35-4959-a275-ba5085b08aa3`).then(res => console.log(res.data.data.pop().apyBase7d))
+
   return <>
     <KelpVault searchTerm="" />
   </>
@@ -234,18 +243,20 @@ export default function Index() {
 export function KelpVault({ searchTerm }: { searchTerm: string }) {
   const { address: account } = useAccount();
   const publicClient = usePublicClient({ chainId: 1 })
+  const [yieldOptions] = useAtom(yieldOptionsAtom)
+
   const [showModal, setShowModal] = useState(false)
 
   const [vaultData, setVaultData] = useState<VaultData>()
   const [tokenOptions, setTokenOptions] = useState<Token[]>([])
 
   useEffect(() => {
-    getKelpVaultData(account || zeroAddress, publicClient)
+    if (yieldOptions) getKelpVaultData(account || zeroAddress, publicClient, yieldOptions)
       .then(res => {
         setVaultData(res.vaultData);
         setTokenOptions(res.tokenOptions)
       })
-  }, [account])
+  }, [account, yieldOptions])
 
   async function mutateTokenBalance({ inputToken, outputToken, vault, chainId, account }: MutateTokenBalanceProps) {
     if (!vaultData) return
@@ -377,7 +388,7 @@ export function KelpVault({ searchTerm }: { searchTerm: string }) {
               tokenOptions={tokenOptions}
               chainId={vaultData.chainId}
               hideModal={() => setShowModal(false)}
-              mutateTokenBalance={() => { }}
+              mutateTokenBalance={mutateTokenBalance}
             />
           </div>
         </div>
@@ -425,6 +436,8 @@ export function KelpVaultInputs({ vaultData, tokenOptions, chainId, hideModal, m
     setOutputToken(vaultData.vault)
     setSteps(getKelpVaultActionSteps(action))
   }, [tokenOptions, vaultData])
+
+  console.log({ steps, stepCounter })
 
   function handleChangeInput(e: any) {
     const value = e.currentTarget.value
@@ -555,7 +568,7 @@ export function KelpVaultInputs({ vaultData, tokenOptions, chainId, hideModal, m
     if (stepCounter === steps.length) {
       newStepCounter = 0;
       stepsCopy = [...getKelpVaultActionSteps(action)]
-      mutateTokenBalance({ inputToken: inputToken.address, outputToken: outputToken.address, vault: vault.address, chainId, account })
+      mutateTokenBalance({ inputToken: inputToken.address, outputToken: outputToken.address, vault: vaultData.vault.address, chainId, account })
     }
 
     setSteps(stepsCopy)
