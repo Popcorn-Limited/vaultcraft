@@ -21,20 +21,24 @@ interface VaultRouterWriteProps extends VaultWriteProps {
   router: Address;
 }
 
-interface VaultSimulateProps {
+interface BaseSimulateProps {
   address: Address;
   account: Address;
-  amount: number;
   functionName: string;
   publicClient: PublicClient;
 }
 
-interface VaultRouterSimulateProps extends VaultSimulateProps {
+interface VaultSimulateProps extends BaseSimulateProps {
+  args: any[];
+}
+
+interface VaultRouterSimulateProps extends BaseSimulateProps {
+  amount: number;
   vault: Address;
   gauge: Address;
 }
 
-async function simulateVaultCall({ address, account, amount, functionName, publicClient }: VaultSimulateProps): Promise<SimulationResponse> {
+async function simulateVaultCall({ address, account, args, functionName, publicClient }: VaultSimulateProps): Promise<SimulationResponse> {
   try {
     const { request } = await publicClient.simulateContract({
       account,
@@ -42,8 +46,8 @@ async function simulateVaultCall({ address, account, amount, functionName, publi
       abi: VaultAbi,
       // @ts-ignore
       functionName,
-      // @dev Since numbers get converted to strings like 1e+21 or similar we need to convert it back to numbers like 10000000000000 and than cast them into BigInts
-      args: [BigInt(Number(amount).toLocaleString("fullwide", { useGrouping: false })), account]
+      // @ts-ignore
+      args
     })
     return { request: request, success: true, error: null }
   } catch (error: any) {
@@ -75,7 +79,14 @@ export async function vaultDeposit({ chainId, vaultData, account, amount, client
 
   const success = await handleCallResult({
     successMessage: "Deposited into the vault!",
-    simulationResponse: await simulateVaultCall({ address: vaultData.address, account, amount, functionName: "deposit", publicClient: clients.publicClient }),
+    simulationResponse: await simulateVaultCall({
+      address: vaultData.address,
+      account,
+      // @dev Since numbers get converted to strings like 1e+21 or similar we need to convert it back to numbers like 10000000000000 and than cast them into BigInts
+      args: [BigInt(Number(amount).toLocaleString("fullwide", { useGrouping: false })), account],
+      functionName: "deposit",
+      publicClient: clients.publicClient
+    }),
     clients
   })
 
@@ -112,7 +123,14 @@ export async function vaultRedeem({ chainId, vaultData, account, amount, clients
 
   const success = await handleCallResult({
     successMessage: "Withdrawn from the vault!",
-    simulationResponse: await simulateVaultCall({ address: vaultData.address, account, amount, functionName: "redeem", publicClient: clients.publicClient }),
+    simulationResponse: await simulateVaultCall({
+      address: vaultData.address,
+      account,
+      // @dev Since numbers get converted to strings like 1e+21 or similar we need to convert it back to numbers like 10000000000000 and than cast them into BigInts
+      args: [BigInt(Number(amount).toLocaleString("fullwide", { useGrouping: false })), account, account],
+      functionName: "redeem",
+      publicClient: clients.publicClient
+    }),
     clients
   })
 
