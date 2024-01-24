@@ -529,7 +529,7 @@ export default function KelpVault() {
 
           <div className="">
             {account && steps.length > 0 ?
-              <MainActionButton label={steps[stepCounter].label} handleClick={handleMainAction} disabled={inputBalance === "0" || steps[stepCounter].loading} />
+              <MainActionButton label={steps[stepCounter]?.label} handleClick={handleMainAction} disabled={inputBalance === "0" || steps[stepCounter]?.loading} />
               : < MainActionButton label={"Connect Wallet"} handleClick={openConnectModal} />
             }
           </div>
