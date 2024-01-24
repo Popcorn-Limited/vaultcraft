@@ -43,7 +43,7 @@ async function simulateVaultCall({ address, account, amount, functionName, publi
       // @ts-ignore
       functionName,
       // @dev Since numbers get converted to strings like 1e+21 or similar we need to convert it back to numbers like 10000000000000 and than cast them into BigInts
-      args: [BigInt(Number(amount).toLocaleString("fullwide", { useGrouping: false }))]
+      args: [BigInt(Number(amount).toLocaleString("fullwide", { useGrouping: false })), account]
     })
     return { request: request, success: true, error: null }
   } catch (error: any) {
@@ -70,6 +70,8 @@ async function simulateVaultRouterCall({ address, account, amount, vault, gauge,
 
 export async function vaultDeposit({ chainId, vaultData, account, amount, clients, fireEvent, referral }: VaultWriteProps): Promise<boolean> {
   showLoadingToast("Depositing into the vault...")
+
+  console.log(vaultData.address, account, amount)
 
   const success = await handleCallResult({
     successMessage: "Deposited into the vault!",
