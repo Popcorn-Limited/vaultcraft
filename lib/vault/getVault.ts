@@ -7,7 +7,6 @@ import { ADDRESS_ZERO, getVeAddresses } from "@/lib/constants"
 import { RPC_URLS, networkMap } from "@/lib/utils/connectors";
 import getGauges, { Gauge } from "@/lib/gauges/getGauges"
 import { ProtocolName, YieldOptions } from "vaultcraft-sdk"
-import calculateAPR from "@/lib/gauges/calculateGaugeAPR"
 
 const HIDDEN_VAULTS: Address[] = ["0xb6cED1C0e5d26B815c3881038B88C829f39CE949", "0x2fD2C18f79F93eF299B20B681Ab2a61f5F28A6fF",
   "0xDFf04Efb38465369fd1A2E8B40C364c22FfEA340", "0xd4D442AC311d918272911691021E6073F620eb07", //@dev for some reason the live 3Crypto yVault isnt picked up by the yearnAdapter nor the yearnFactoryAdapter
@@ -69,6 +68,15 @@ interface GetVaultsProps {
   account?: Address;
   client: PublicClient;
   yieldOptions: YieldOptions
+}
+
+type GaugeData = {
+  [key: Address]: {
+    address: Address;
+    vault: Address;
+    lowerAPR: number;
+    upperAPR: number;
+  };
 }
 
 export async function getVaults({ account = ADDRESS_ZERO, client, yieldOptions }: GetVaultsProps): Promise<VaultData[]> {
@@ -182,6 +190,7 @@ export async function getVaults({ account = ADDRESS_ZERO, client, yieldOptions }
   // Add gauges
   if (client.chain.id === 1) {
     const gauges = await getGauges({ address: GAUGE_CONTROLLER, account: account, publicClient: client })
+    const gaugeApyData = (await axios.get(`https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/gauge-apy-data.json`)).data as GaugeData;
     await Promise.all(result.map(async (vault, i) => {
       const foundGauge = gauges.find((gauge: Gauge) => gauge.lpToken === vault.address)
       const gauge = foundGauge ? {
@@ -199,10 +208,9 @@ export async function getVaults({ account = ADDRESS_ZERO, client, yieldOptions }
       let totalApy = vault.totalApy;
 
       if (!!gauge) {
-        const gaugeApr = await calculateAPR({ vaultData: { ...vault, gauge: gauge }, publicClient: client })
-        gaugeMinApy = gaugeApr[0];
-        gaugeMaxApy = gaugeApr[1];
-        totalApy += gaugeApr[1];
+        gaugeMinApy = gaugeApyData[gauge.address].lowerAPR;
+        gaugeMaxApy = gaugeApyData[gauge.address].upperAPR;
+        totalApy += gaugeMaxApy;
       }
 
       vault.gauge = gauge;

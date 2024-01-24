@@ -7,7 +7,7 @@ import { VaultData } from "@/lib/types";
 import Accordion from "@/components/common/Accordion";
 import Title from "@/components/common/Title";
 import useGaugeWeights from "@/lib/gauges/useGaugeWeights";
-import calculateAPR from "@/lib/gauges/calculateGaugeAPR";
+import getAPR from "@/lib/gauges/getGaugeAPR";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import { roundToTwoDecimalPlaces } from '@/lib/utils/helpers'
 
@@ -34,7 +34,7 @@ export default function Gauge({ vaultData, index, votes, handleVotes, canVote }:
 
   useEffect(() => {
     if (vaultData?.vault.price && gaugeApr.length === 0) {
-      calculateAPR({ vaultData, publicClient }).then(res => setGaugeApr(res))
+      getAPR({ vaultData }).then(res => setGaugeApr(res))
     }
   }, [vaultData, gaugeApr])
 
