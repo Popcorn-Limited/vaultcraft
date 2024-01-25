@@ -38,7 +38,6 @@ export async function handleAllowance({ token, amount, account, spender, clients
     })
   }
   let allowance = await fetchAllowance();
-  console.log("checks allowance: ", allowance);
 
   if (Number(allowance) === 0) {
     await approve({
@@ -70,7 +69,6 @@ export async function handleAllowance({ token, amount, account, spender, clients
       walletClient: clients.walletClient
     })
   } else {
-    console.log("NOTHING TO APPROVE")
     return true
   }
 

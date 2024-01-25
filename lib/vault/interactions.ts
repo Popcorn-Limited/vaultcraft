@@ -75,8 +75,6 @@ async function simulateVaultRouterCall({ address, account, amount, vault, gauge,
 export async function vaultDeposit({ chainId, vaultData, account, amount, clients, fireEvent, referral }: VaultWriteProps): Promise<boolean> {
   showLoadingToast("Depositing into the vault...")
 
-  console.log(vaultData.address, account, amount)
-
   const success = await handleCallResult({
     successMessage: "Deposited into the vault!",
     simulationResponse: await simulateVaultCall({

@@ -78,14 +78,6 @@ export default function Review(): JSX.Element {
           resolver: strategy.resolver
         })
       }
-
-      console.log({
-        adapterId,
-        adapterInitParams,
-        strategyId,
-        strategyInitParams,
-        strategyConfig
-      })
       
       setAdapterData({
         id: adapterId,

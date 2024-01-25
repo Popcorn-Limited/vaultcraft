@@ -21,6 +21,7 @@ import VaultsSorting, { VAULT_SORTING_TYPE } from "@/components/vault/VaultsSort
 import { llama } from "@/lib/resolver/price/resolver";
 import { zapAssetsAtom } from "@/lib/atoms";
 import SearchBar from "../input/SearchBar";
+import KelpVault from "./KelpVault";
 
 interface VaultsContainerProps {
   hiddenVaults: Address[];
@@ -261,20 +262,25 @@ export default function VaultsContainer({ hiddenVaults, displayVaults }: VaultsC
       </section>
 
       <section className="grid grid-cols-1 md:grid-cols-3 gap-4 px-4 md:px-8">
+
         {vaults.length > 0 ?
-          vaults.filter(vault => selectedNetworks.includes(vault.chainId))
-            .filter(vault => displayVaults.length > 0 ? displayVaults.includes(vault.address) : true)
-            .filter(vault => !hiddenVaults.includes(vault.address))
-            .map((vault) => {
-              return (
-                <SmartVault
-                  key={`sv-${vault.address}-${vault.chainId}`}
-                  vaultData={vault}
-                  mutateTokenBalance={mutateTokenBalance}
-                  searchTerm={searchTerm}
-                />
-              )
-            })
+          <>
+            {selectedNetworks.includes(1) && <KelpVault searchTerm={searchTerm} />}
+            {vaults.filter(vault => selectedNetworks.includes(vault.chainId))
+              .filter(vault => displayVaults.length > 0 ? displayVaults.includes(vault.address) : true)
+              .filter(vault => !hiddenVaults.includes(vault.address))
+              .map((vault) => {
+                return (
+                  <SmartVault
+                    key={`sv-${vault.address}-${vault.chainId}`}
+                    vaultData={vault}
+                    mutateTokenBalance={mutateTokenBalance}
+                    searchTerm={searchTerm}
+                  />
+                )
+              })
+            }
+          </>
           : <p className="text-white">Loading Vaults...</p>
         }
       </section>

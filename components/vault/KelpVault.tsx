@@ -29,58 +29,6 @@ import { YieldOptions } from "vaultcraft-sdk";
 
 const minDeposit = 100000000000000;
 
-// pass in everything to use for mint/withdraw on both protocols
-async function simulate(
-  { account, address, abi, functionName, args, value, publicClient }
-    : { account: Address, address: Address, abi: any, value: bigint | undefined, functionName: string, args: any[], publicClient: PublicClient }) {
-  try {
-    const { request } = await publicClient.simulateContract({
-      account,
-      address,
-      abi,
-      functionName,
-      args,
-      value
-    })
-    return { request: request, success: true, error: null }
-  } catch (error: any) {
-    return { request: null, success: false, error: error.shortMessage }
-  }
-}
-
-export async function mintEthX({ amount, account, clients }: { amount: number, account: Address, clients: Clients }) {
-  return await handleCallResult({
-    successMessage: "Minting EthX!",
-    simulationResponse: await simulate({
-      account,
-      address: "0xcf5EA1b38380f6aF39068375516Daf40Ed70D299", // Stader Staking Pool Manager
-      abi: [{ "inputs": [{ "internalType": "address", "name": "_receiver", "type": "address" }, { "internalType": "string", "name": "_referralId", "type": "string" }], "name": "deposit", "outputs": [{ "internalType": "uint256", "name": "_shares", "type": "uint256" }], "stateMutability": "payable", "type": "function" }],
-      functionName: "deposit",
-      args: [account, ""], // TODO -> add refId
-      value: BigInt(amount),
-      publicClient: clients.publicClient
-    }),
-    clients
-  })
-}
-
-export async function mintRsEth({ amount, account, clients }: { amount: number, account: Address, clients: Clients }) {
-  return await handleCallResult({
-    successMessage: "Minting rsEth!",
-    simulationResponse: await simulate({
-      account,
-      address: "0x036676389e48133B63a802f8635AD39E752D375D", // KelpDao Deposit Pool
-      abi: [{ "inputs": [{ "internalType": "address", "name": "asset", "type": "address" }, { "internalType": "uint256", "name": "depositAmount", "type": "uint256" }, { "internalType": "uint256", "name": "minRSETHAmountToReceive", "type": "uint256" }, { "internalType": "string", "name": "referralId", "type": "string" }], "name": "depositAsset", "outputs": [], "stateMutability": "nonpayable", "type": "function" }],
-      functionName: "depositAsset",
-      args: ["0xA35b1B31Ce002FBF2058D22F30f95D405200A15b", BigInt(amount), BigInt(0), ""], // TODO -> add minAmount and refId
-      value: undefined,
-      publicClient: clients.publicClient
-    }),
-    clients
-  })
-}
-
-
 const ETH: Token = {
   address: zeroAddress,
   name: "Ethereum",
@@ -199,8 +147,6 @@ async function getKelpVaultData(account: Address, publicClient: PublicClient, yi
     asset: asset.address
   })
 
-  console.log({ res })
-
   const gaugeApyData = (await axios.get(`https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/gauge-apy-data.json`)).data as GaugeData;
 
   const gaugeMinApy = gaugeApyData["0x35fCa05eb9d7B4BeEbDfa110Ea342e6d9CA972ac"]?.lowerAPR || 0;
@@ -261,14 +207,7 @@ async function getKelpVaultData(account: Address, publicClient: PublicClient, yi
   }
 }
 
-
-export default function Index() {
-  return <>
-    <KelpVault searchTerm="" />
-  </>
-}
-
-export function KelpVault({ searchTerm }: { searchTerm: string }) {
+export default function KelpVault({ searchTerm }: { searchTerm: string }) {
   const { address: account } = useAccount();
   const publicClient = usePublicClient({ chainId: 1 })
   const [yieldOptions] = useAtom(yieldOptionsAtom)
@@ -347,8 +286,6 @@ export function KelpVault({ searchTerm }: { searchTerm: string }) {
     setVaultData(newVaultData);
     setTokenOptions(newTokenOptions);
   }
-
-  console.log({ vaultData })
 
   // Is loading / error
   if (!vaultData || tokenOptions.length === 0) return <></>
@@ -466,8 +403,6 @@ export function KelpVaultInputs({ vaultData, tokenOptions, chainId, hideModal, m
     setOutputToken(vaultData.vault)
     setSteps(getKelpVaultActionSteps(action))
   }, [tokenOptions, vaultData])
-
-  console.log({ steps, stepCounter })
 
   function handleChangeInput(e: any) {
     const value = e.currentTarget.value

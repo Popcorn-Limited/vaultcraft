@@ -2,13 +2,12 @@ import axios from "axios"
 import { Address, getAddress } from "viem";
 import { handleAllowance } from "@/lib/approve";
 import { Clients, Token, VaultData, KelpVaultActionType } from "@/lib/types";
-import { vaultDeposit, vaultDepositAndStake, vaultRedeem, vaultUnstakeAndWithdraw } from "@/lib/vault/interactions";
+import { vaultDepositAndStake, vaultUnstakeAndWithdraw } from "@/lib/vault/interactions";
 import zap from "@/lib/vault/zap";
-import { gaugeDeposit, gaugeWithdraw } from "@/lib/gauges/interactions";
 import { erc20ABI } from "wagmi";
 import { FireEventArgs } from "@masa-finance/analytics-sdk";
 import { getVeAddresses } from "@/lib/constants";
-import { mintEthX, mintRsEth } from "../../../pages/kelp-vault";
+import { mintEthX, mintRsEth } from "@/lib/vault/kelp/interactionts";
 
 const { VaultRouter: VAULT_ROUTER } = getVeAddresses()
 
