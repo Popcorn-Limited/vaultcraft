@@ -244,13 +244,18 @@ export function getKelpVaultActionSteps(action: KelpVaultActionType): ActionStep
       },
       {
         step: 2,
-        label: "Deposit",
+        label: "Deposit and Stake",
         ...BaseStepInfo
       }]
     case KelpVaultActionType.Withdrawal:
       return [{
         step: 1,
-        label: "Withdraw",
+        label: "Handle Router Allowance",
+        ...BaseStepInfo
+      },
+      {
+        step: 2,
+        label: "Unstake and Withdraw",
         ...BaseStepInfo
       }]
     case KelpVaultActionType.ZapDeposit:
@@ -272,7 +277,7 @@ export function getKelpVaultActionSteps(action: KelpVaultActionType): ActionStep
         ...BaseStepInfo
       }, {
         step: 5,
-        label: "Deposit",
+        label: "Deposit and Stake",
         ...BaseStepInfo
       }]
     case KelpVaultActionType.EthxZapDeposit:
@@ -290,20 +295,24 @@ export function getKelpVaultActionSteps(action: KelpVaultActionType): ActionStep
         ...BaseStepInfo
       }, {
         step: 4,
-        label: "Deposit",
+        label: "Deposit and Stake",
         ...BaseStepInfo
       }]
     case KelpVaultActionType.ZapWithdrawal:
       return [{
         step: 1,
-        label: "Withdraw",
+        label: "Handle Router Allowance",
         ...BaseStepInfo
       }, {
         step: 2,
-        label: "Handle Zap Allowance",
+        label: "Unstake and Withdraw",
         ...BaseStepInfo
       }, {
         step: 3,
+        label: "Handle Zap Allowance",
+        ...BaseStepInfo
+      }, {
+        step: 4,
         label: "Zap",
         ...BaseStepInfo
       }]

@@ -136,6 +136,16 @@ export interface Clients {
   walletClient: WalletClient;
 }
 
+export type GaugeData = {
+  [key: Address]: {
+    address: Address;
+    vault: Address;
+    lowerAPR: number;
+    upperAPR: number;
+  };
+}
+
+
 export enum SmartVaultActionType {
   Deposit,
   Withdrawal,

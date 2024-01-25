@@ -2,7 +2,7 @@ import { Address, Chain, ReadContractParameters, createPublicClient, getAddress,
 import { PublicClient } from "wagmi"
 import axios from "axios"
 import { VaultAbi } from "@/lib/constants/abi/Vault"
-import { VaultData } from "@/lib/types"
+import { GaugeData, VaultData } from "@/lib/types"
 import { ADDRESS_ZERO, getVeAddresses } from "@/lib/constants"
 import { RPC_URLS, networkMap } from "@/lib/utils/connectors";
 import getGauges, { Gauge } from "@/lib/gauges/getGauges"
@@ -68,15 +68,6 @@ interface GetVaultsProps {
   account?: Address;
   client: PublicClient;
   yieldOptions: YieldOptions
-}
-
-type GaugeData = {
-  [key: Address]: {
-    address: Address;
-    vault: Address;
-    lowerAPR: number;
-    upperAPR: number;
-  };
 }
 
 export async function getVaults({ account = ADDRESS_ZERO, client, yieldOptions }: GetVaultsProps): Promise<VaultData[]> {

@@ -4,27 +4,26 @@ import InputTokenWithError from "@/components/input/InputTokenWithError";
 import ActionSteps from "@/components/vault/ActionSteps";
 import { masaAtom, yieldOptionsAtom } from "@/lib/atoms/sdk";
 import { ActionStep, getKelpVaultActionSteps } from "@/lib/getActionSteps";
-import { Clients, KelpVaultActionType, Token, VaultData } from "@/lib/types";
+import { Clients, GaugeData, KelpVaultActionType, Token, VaultData } from "@/lib/types";
 import { safeRound } from "@/lib/utils/formatBigNumber";
 import { handleCallResult, validateInput } from "@/lib/utils/helpers";
 import handleVaultInteraction from "@/lib/vault/kelp/handleVaultInteraction";
-import { ArrowDownIcon, Square2StackIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { ArrowDownIcon, Square2StackIcon } from "@heroicons/react/24/outline";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import axios from "axios"
 import { useAtom } from "jotai";
 import { useRouter } from "next/router";
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Address, PublicClient, formatUnits, getAddress, isAddress, maxUint256, stringToHex, zeroAddress } from "viem";
 import { erc20ABI, useAccount, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
 import VaultStats from "@/components/vault/VaultStats";
 import AssetWithName from "@/components/vault/AssetWithName";
 import Modal from "@/components/modal/Modal";
-import { Dialog, Transition } from "@headlessui/react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { showSuccessToast } from "@/lib/toasts";
 import { VaultInputsProps } from "@/components/vault/VaultInputs";
 import Accordion from "@/components/common/Accordion";
-import { ADDRESS_ZERO, VaultAbi } from "@/lib/constants";
+import { VaultAbi } from "@/lib/constants";
 import { MutateTokenBalanceProps } from "@/components/vault/VaultsContainer";
 import { YieldOptions } from "vaultcraft-sdk";
 
@@ -114,10 +113,10 @@ const rsETH: Token = {
 }
 
 const Vault: Token = {
-  address: "0x008a1832841b0bBA57886Da2005aE7f666EFEcc4", // "0x7CEbA0cAeC8CbE74DB35b26D7705BA68Cb38D725"
+  address: "0x7CEbA0cAeC8CbE74DB35b26D7705BA68Cb38D725",
   name: "VaultCraft rsETH Vault",
   symbol: "vc-rsETH",
-  decimals: 18, // 27
+  decimals: 27,
   logoURI: "https://app.vaultcraft.io/images/tokens/vcx.svg",
   balance: 0,
   price: 1
@@ -157,6 +156,12 @@ async function getKelpVaultData(account: Address, publicClient: PublicClient, yi
         abi: VaultAbi,
         functionName: 'totalSupply'
       },
+      {
+        address: Vault.address,
+        abi: erc20ABI,
+        functionName: 'balanceOf',
+        args: [account]
+      },
     ],
     allowFailure: false
   }) as bigint[]
@@ -184,6 +189,11 @@ async function getKelpVaultData(account: Address, publicClient: PublicClient, yi
     asset: asset.address
   })
 
+  const gaugeApyData = (await axios.get(`https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/gauge-apy-data.json`)).data as GaugeData;
+
+  const gaugeMinApy = gaugeApyData["0x35fCa05eb9d7B4BeEbDfa110Ea342e6d9CA972ac"]?.lowerAPR || 0;
+  const gaugeMaxApy = gaugeApyData["0x35fCa05eb9d7B4BeEbDfa110Ea342e6d9CA972ac"]?.upperAPR || 0;
+
   const vaultData: VaultData = {
     address: Vault.address,
     asset: asset,
@@ -210,9 +220,20 @@ async function getKelpVaultData(account: Address, publicClient: PublicClient, yi
         resolver: "kelpDao"
       },
     },
+    gauge: {
+      address: "0x35fCa05eb9d7B4BeEbDfa110Ea342e6d9CA972ac",
+      name: `Vaultcraft rsETH Vault-gauge`,
+      symbol: `st-vc-rsETH`,
+      decimals: 27,
+      logoURI: "/images/tokens/vcx.svg",  // wont be used, just here for consistency
+      balance: account === zeroAddress ? 0 : Number(res[5]),
+      price: pricePerShare * 1e9,
+    },
     chainId: 1,
     apy: apy.total,
-    totalApy: apy.total
+    totalApy: apy.total + gaugeMaxApy,
+    gaugeMinApy: gaugeMinApy,
+    gaugeMaxApy: gaugeMaxApy,
   }
 
   return {
@@ -319,6 +340,8 @@ export function KelpVault({ searchTerm }: { searchTerm: string }) {
     setTokenOptions(newTokenOptions);
   }
 
+  console.log({ vaultData })
+
   // Is loading / error
   if (!vaultData || tokenOptions.length === 0) return <></>
   // Vault is not in search term
@@ -363,21 +386,21 @@ export function KelpVault({ searchTerm }: { searchTerm: string }) {
                   </div>
                 </div>
               </div>
-              {/* {gauge &&
+              {vaultData.gauge && (
                 <div className="w-10/12 border border-[#353945] rounded-lg p-4">
                   <p className="text-primary font-normal">Gauge address:</p>
                   <div className="flex flex-row items-center justify-between">
                     <p className="font-bold text-primary">
-                      {gauge.address.slice(0, 6)}...{gauge.address.slice(-4)}
+                      {vaultData.gauge.address.slice(0, 6)}...{vaultData.gauge.address.slice(-4)}
                     </p>
                     <div className='w-6 h-6 group/gaugeAddress'>
-                      <CopyToClipboard text={gauge.address} onCopy={() => showSuccessToast("Gauge address copied!")}>
+                      <CopyToClipboard text={vaultData.gauge.address} onCopy={() => showSuccessToast("Gauge address copied!")}>
                         <Square2StackIcon className="text-white group-hover/gaugeAddress:text-[#DFFF1C]" />
                       </CopyToClipboard>
                     </div>
                   </div>
                 </div>
-              } */}
+              )}
             </div>
 
           </div>
@@ -585,7 +608,7 @@ export function KelpVaultInputs({ vaultData, tokenOptions, chainId, hideModal, m
 
       <InputTokenWithError
         captionText={isDeposit ? "Deposit Amount" : "Withdraw Amount"}
-        onSelectToken={option => handleTokenSelect(option, vaultData.vault)}
+        onSelectToken={option => handleTokenSelect(option, vaultData.gauge || vaultData.vault)}
         onMaxClick={handleMaxClick}
         chainId={1}
         value={inputBalance}
@@ -607,7 +630,7 @@ export function KelpVaultInputs({ vaultData, tokenOptions, chainId, hideModal, m
 
       <InputTokenWithError
         captionText={"Output Amount"}
-        onSelectToken={option => handleTokenSelect(vaultData.vault, option)}
+        onSelectToken={option => handleTokenSelect(vaultData.gauge || vaultData.vault, option)}
         onMaxClick={() => { }}
         chainId={1}
         value={(Number(inputBalance) * (Number(inputToken?.price)) / Number(outputToken?.price)) || 0}
