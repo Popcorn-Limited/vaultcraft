@@ -10,7 +10,6 @@ import Modal from "@/components/modal/Modal";
 import InputNumber from "@/components/input/InputNumber";
 import { safeRound } from "@/lib/utils/formatBigNumber";
 import { formatUnits, getAddress, isAddress } from "viem";
-import getActionSteps, { ActionStep } from "@/lib/vault/getActionSteps";
 import handleVaultInteraction from "@/lib/vault/handleVaultInteraction";
 import ActionSteps from "@/components/vault/ActionSteps";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
@@ -18,8 +17,9 @@ import { MutateTokenBalanceProps } from "@/components/vault/VaultsContainer";
 import { useAtom } from "jotai";
 import { masaAtom } from "@/lib/atoms/sdk";
 import { useRouter } from "next/router";
+import { ActionStep, getSmartVaultActionSteps } from "@/lib/getActionSteps";
 
-interface VaultInputsProps {
+export interface VaultInputsProps {
   vaultData: VaultData;
   tokenOptions: Token[];
   chainId: number;
@@ -60,7 +60,7 @@ export default function VaultInputs({ vaultData, tokenOptions, chainId, hideModa
     setOutputToken(!!gauge ? gauge : vault)
     const actionType = !!gauge ? SmartVaultActionType.DepositAndStake : SmartVaultActionType.Deposit
     setAction(actionType)
-    setSteps(getActionSteps(actionType))
+    setSteps(getSmartVaultActionSteps(actionType))
   }, [])
 
   function handleChangeInput(e: any) {
@@ -77,7 +77,7 @@ export default function VaultInputs({ vaultData, tokenOptions, chainId, hideModa
       setIsDeposit(false)
       const newAction = !!gauge ? SmartVaultActionType.UnstakeAndWithdraw : SmartVaultActionType.Withdrawal
       setAction(newAction)
-      setSteps(getActionSteps(newAction))
+      setSteps(getSmartVaultActionSteps(newAction))
     } else {
       // Switch to Deposit
       setInputToken(asset);
@@ -85,7 +85,7 @@ export default function VaultInputs({ vaultData, tokenOptions, chainId, hideModa
       setIsDeposit(true)
       const newAction = !!gauge ? SmartVaultActionType.DepositAndStake : SmartVaultActionType.Deposit
       setAction(newAction)
-      setSteps(getActionSteps(newAction))
+      setSteps(getSmartVaultActionSteps(newAction))
     }
   }
 
@@ -101,11 +101,11 @@ export default function VaultInputs({ vaultData, tokenOptions, chainId, hideModa
             return
           case vault.address:
             setAction(SmartVaultActionType.Deposit)
-            setSteps(getActionSteps(SmartVaultActionType.Deposit))
+            setSteps(getSmartVaultActionSteps(SmartVaultActionType.Deposit))
             return
           case gauge?.address:
             setAction(SmartVaultActionType.DepositAndStake)
-            setSteps(getActionSteps(SmartVaultActionType.DepositAndStake))
+            setSteps(getSmartVaultActionSteps(SmartVaultActionType.DepositAndStake))
             return
           default:
             // error
@@ -115,36 +115,36 @@ export default function VaultInputs({ vaultData, tokenOptions, chainId, hideModa
         switch (output.address) {
           case asset.address:
             setAction(SmartVaultActionType.Withdrawal)
-            setSteps(getActionSteps(SmartVaultActionType.Withdrawal))
+            setSteps(getSmartVaultActionSteps(SmartVaultActionType.Withdrawal))
             return
           case vault.address:
             // error
             return
           case gauge?.address:
             setAction(SmartVaultActionType.Stake)
-            setSteps(getActionSteps(SmartVaultActionType.Stake))
+            setSteps(getSmartVaultActionSteps(SmartVaultActionType.Stake))
             return
           default:
             setAction(SmartVaultActionType.ZapWithdrawal)
-            setSteps(getActionSteps(SmartVaultActionType.ZapWithdrawal))
+            setSteps(getSmartVaultActionSteps(SmartVaultActionType.ZapWithdrawal))
             return
         }
       case gauge?.address:
         switch (output.address) {
           case asset.address:
             setAction(SmartVaultActionType.UnstakeAndWithdraw)
-            setSteps(getActionSteps(SmartVaultActionType.UnstakeAndWithdraw))
+            setSteps(getSmartVaultActionSteps(SmartVaultActionType.UnstakeAndWithdraw))
             return
           case vault.address:
             setAction(SmartVaultActionType.Unstake)
-            setSteps(getActionSteps(SmartVaultActionType.Unstake))
+            setSteps(getSmartVaultActionSteps(SmartVaultActionType.Unstake))
             return
           case gauge?.address:
             // error
             return
           default:
             setAction(SmartVaultActionType.ZapUnstakeAndWithdraw)
-            setSteps(getActionSteps(SmartVaultActionType.ZapUnstakeAndWithdraw))
+            setSteps(getSmartVaultActionSteps(SmartVaultActionType.ZapUnstakeAndWithdraw))
             return
         }
       default:
@@ -154,11 +154,11 @@ export default function VaultInputs({ vaultData, tokenOptions, chainId, hideModa
             return
           case vault.address:
             setAction(SmartVaultActionType.ZapDeposit)
-            setSteps(getActionSteps(SmartVaultActionType.ZapDeposit))
+            setSteps(getSmartVaultActionSteps(SmartVaultActionType.ZapDeposit))
             return
           case gauge?.address:
             setAction(SmartVaultActionType.ZapDepositAndStake)
-            setSteps(getActionSteps(SmartVaultActionType.ZapDepositAndStake))
+            setSteps(getSmartVaultActionSteps(SmartVaultActionType.ZapDepositAndStake))
             return
           default:
             // error

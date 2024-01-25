@@ -123,7 +123,6 @@ export const curveApiCallToBytes = async ({
     optionalData: string
 }): Promise<string> => {
     const curveData = await curveApiCall({ depositAsset, rewardTokens, baseAsset, router, minTradeAmounts, optionalData });
-    console.log({ curveData })
     // Prepare the data for encoding.
     const values = [
         curveData.baseAsset,

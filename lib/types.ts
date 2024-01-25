@@ -136,6 +136,16 @@ export interface Clients {
   walletClient: WalletClient;
 }
 
+export type GaugeData = {
+  [key: Address]: {
+    address: Address;
+    vault: Address;
+    lowerAPR: number;
+    upperAPR: number;
+  };
+}
+
+
 export enum SmartVaultActionType {
   Deposit,
   Withdrawal,
@@ -156,6 +166,14 @@ export enum LockVaultActionType {
   Claim,
   ZapDeposit,
   ZapIncreaseAmount,
+  ZapWithdrawal
+}
+
+export enum KelpVaultActionType {
+  Deposit,
+  Withdrawal,
+  ZapDeposit,
+  EthxZapDeposit,
   ZapWithdrawal
 }
 

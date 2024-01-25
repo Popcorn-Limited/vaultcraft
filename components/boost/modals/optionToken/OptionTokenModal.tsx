@@ -9,8 +9,8 @@ import { getVeAddresses } from "@/lib/constants";
 import { handleAllowance } from "@/lib/approve";
 import { parseEther } from "viem";
 import { exerciseOPop } from "@/lib/optionToken/interactions";
-import { ActionStep, EXERCISE_OVCX_STEPS } from "@/lib/vault/getActionSteps";
 import ActionSteps from "@/components/vault/ActionSteps";
+import { ActionStep, EXERCISE_OVCX_STEPS } from "@/lib/getActionSteps";
 
 const { WETH, oVCX } = getVeAddresses();
 

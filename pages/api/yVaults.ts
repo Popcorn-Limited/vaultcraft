@@ -13,6 +13,5 @@ export default async function handler(
       { timeout: 30000, httpsAgent: new https.Agent({ keepAlive: true }) }
     )
   ).data;
-  console.log({ vaults: vaults.length })
   return res.status(200).json(vaults)
 }
