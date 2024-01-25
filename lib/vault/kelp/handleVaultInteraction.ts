@@ -24,6 +24,7 @@ interface HandleVaultInteractionProps {
   slippage: number;
   tradeTimeout: number;
   clients: Clients;
+  ethX: Token;
   fireEvent?: (type: string, { user_address, network, contract_address, asset_amount, asset_ticker, additionalEventData }: FireEventArgs) => Promise<void>;
   referral?: Address;
 }
@@ -40,6 +41,7 @@ export default async function handleVaultInteraction({
   slippage,
   tradeTimeout,
   clients,
+  ethX,
   fireEvent,
   referral
 }: HandleVaultInteractionProps): Promise<() => Promise<boolean>> {
@@ -50,7 +52,7 @@ export default async function handleVaultInteraction({
         case 0:
           return () => handleAllowance({ token: inputToken.address, amount, account, spender: VAULT_ROUTER, clients })
         case 1:
-          return () => vaultDepositAndStake({ chainId, router: VAULT_ROUTER, vaultData, account, amount: postBal - vaultData.asset.balance, clients, fireEvent, referral })
+          return () => vaultDepositAndStake({ chainId, router: VAULT_ROUTER, vaultData, account, amount, clients, fireEvent, referral })
       }
     case KelpVaultActionType.Withdrawal:
       switch (stepCounter) {
@@ -67,7 +69,8 @@ export default async function handleVaultInteraction({
           postBal = Number(await clients.publicClient.readContract({ address: "0xA35b1B31Ce002FBF2058D22F30f95D405200A15b", abi: erc20ABI, functionName: "balanceOf", args: [account] }))
           return () => handleAllowance({ token: "0xA35b1B31Ce002FBF2058D22F30f95D405200A15b", amount: postBal, account, spender: getAddress("0x036676389e48133B63a802f8635AD39E752D375D"), clients })
         case 2:
-          return () => mintRsEth({ amount: postBal, account, clients })
+          postBal = Number(await clients.publicClient.readContract({ address: "0xA35b1B31Ce002FBF2058D22F30f95D405200A15b", abi: erc20ABI, functionName: "balanceOf", args: [account] }))
+          return () => mintRsEth({ amount: postBal - ethX.balance, account, clients })
         case 3:
           postBal = Number(await clients.publicClient.readContract({ address: "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7", abi: erc20ABI, functionName: "balanceOf", args: [account] }))
           return () => handleAllowance({ token: "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7", amount: postBal, account, spender: getAddress(VAULT_ROUTER), clients })
@@ -80,7 +83,8 @@ export default async function handleVaultInteraction({
         case 0:
           return () => handleAllowance({ token: "0xA35b1B31Ce002FBF2058D22F30f95D405200A15b", amount, account, spender: getAddress("0x036676389e48133B63a802f8635AD39E752D375D"), clients })
         case 1:
-          return () => mintRsEth({ amount, account, clients })
+          postBal = Number(await clients.publicClient.readContract({ address: "0xA35b1B31Ce002FBF2058D22F30f95D405200A15b", abi: erc20ABI, functionName: "balanceOf", args: [account] }))
+          return () => mintRsEth({ amount: postBal - ethX.balance, account, clients })
         case 2:
           postBal = Number(await clients.publicClient.readContract({ address: "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7", abi: erc20ABI, functionName: "balanceOf", args: [account] }))
           return () => handleAllowance({ token: "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7", amount: postBal, account, spender: getAddress(VAULT_ROUTER), clients })

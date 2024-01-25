@@ -122,6 +122,16 @@ const Vault: Token = {
   price: 1
 }
 
+const Gauge: Token = {
+  address: "0x35fCa05eb9d7B4BeEbDfa110Ea342e6d9CA972ac",
+  name: `Vaultcraft rsETH Vault-gauge`,
+  symbol: `st-vc-rsETH`,
+  decimals: 27,
+  logoURI: "/images/tokens/vcx.svg",  // wont be used, just here for consistency
+  balance: 0,
+  price: 1
+}
+
 async function getKelpVaultData(account: Address, publicClient: PublicClient, yieldOptions: YieldOptions): Promise<{ tokenOptions: Token[], vaultData: VaultData }> {
   const { data: llamaPrices } = await axios.get("https://coins.llama.fi/prices/current/ethereum:0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2,ethereum:0xA35b1B31Ce002FBF2058D22F30f95D405200A15b,ethereum:0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7")
 
@@ -157,7 +167,7 @@ async function getKelpVaultData(account: Address, publicClient: PublicClient, yi
         functionName: 'totalSupply'
       },
       {
-        address: Vault.address,
+        address: Gauge.address,
         abi: erc20ABI,
         functionName: 'balanceOf',
         args: [account]
@@ -188,6 +198,8 @@ async function getKelpVaultData(account: Address, publicClient: PublicClient, yi
     protocol: "kelpDao",
     asset: asset.address
   })
+
+  console.log({ res })
 
   const gaugeApyData = (await axios.get(`https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/gauge-apy-data.json`)).data as GaugeData;
 
@@ -221,11 +233,7 @@ async function getKelpVaultData(account: Address, publicClient: PublicClient, yi
       },
     },
     gauge: {
-      address: "0x35fCa05eb9d7B4BeEbDfa110Ea342e6d9CA972ac",
-      name: `Vaultcraft rsETH Vault-gauge`,
-      symbol: `st-vc-rsETH`,
-      decimals: 27,
-      logoURI: "/images/tokens/vcx.svg",  // wont be used, just here for consistency
+      ...Gauge,
       balance: account === zeroAddress ? 0 : Number(res[5]),
       price: pricePerShare * 1e9,
     },
@@ -478,7 +486,7 @@ export function KelpVaultInputs({ vaultData, tokenOptions, chainId, hideModal, m
     setStepCounter(0)
     if (isDeposit) {
       // Switch to Withdraw
-      setInputToken(vaultData.vault);
+      setInputToken(vaultData.gauge);
       setOutputToken(vaultData.asset)
       setIsDeposit(false)
       setAction(KelpVaultActionType.Withdrawal)
@@ -486,7 +494,7 @@ export function KelpVaultInputs({ vaultData, tokenOptions, chainId, hideModal, m
     } else {
       // Switch to Deposit
       setInputToken(tokenOptions.find(o => o.address === ETH.address));
-      setOutputToken(vaultData.vault)
+      setOutputToken(vaultData.gauge)
       setIsDeposit(true)
       setAction(KelpVaultActionType.ZapDeposit)
       setSteps(getKelpVaultActionSteps(KelpVaultActionType.ZapDeposit))
@@ -500,6 +508,7 @@ export function KelpVaultInputs({ vaultData, tokenOptions, chainId, hideModal, m
     switch (input.address) {
       case ETH.address:
         switch (output.address) {
+          case Gauge.address:
           case Vault.address:
             setAction(KelpVaultActionType.ZapDeposit)
             setSteps(getKelpVaultActionSteps(KelpVaultActionType.ZapDeposit))
@@ -510,6 +519,7 @@ export function KelpVaultInputs({ vaultData, tokenOptions, chainId, hideModal, m
         }
       case ETHx.address:
         switch (output.address) {
+          case Gauge.address:
           case Vault.address:
             setAction(KelpVaultActionType.EthxZapDeposit)
             setSteps(getKelpVaultActionSteps(KelpVaultActionType.EthxZapDeposit))
@@ -520,6 +530,7 @@ export function KelpVaultInputs({ vaultData, tokenOptions, chainId, hideModal, m
         }
       case rsETH.address:
         switch (output.address) {
+          case Gauge.address:
           case Vault.address:
             setAction(KelpVaultActionType.Deposit)
             setSteps(getKelpVaultActionSteps(KelpVaultActionType.Deposit))
@@ -528,6 +539,7 @@ export function KelpVaultInputs({ vaultData, tokenOptions, chainId, hideModal, m
             // error
             return
         }
+      case Gauge.address:
       case Vault.address:
         switch (output.address) {
           case rsETH.address:
@@ -576,6 +588,7 @@ export function KelpVaultInputs({ vaultData, tokenOptions, chainId, hideModal, m
       account,
       slippage: 100,
       tradeTimeout: 60,
+      ethX: tokenOptions.find(o => o.address === ETHx.address) as Token,
       clients: { publicClient, walletClient },
       fireEvent: masaSdk?.fireEvent,
       referral: !!query?.ref && isAddress(query.ref as string) ? getAddress(query.ref as string) : undefined
@@ -586,15 +599,12 @@ export function KelpVaultInputs({ vaultData, tokenOptions, chainId, hideModal, m
     currentStep.success = success;
     currentStep.error = !success;
 
-    let newStepCounter = stepCounter + 1
-    if (stepCounter === steps.length) {
-      newStepCounter = 0;
-      stepsCopy = [...getKelpVaultActionSteps(action)]
-      mutateTokenBalance({ inputToken: inputToken.address, outputToken: outputToken.address, vault: vaultData.vault.address, chainId, account })
-    }
+    const newStepCounter = stepCounter + 1
 
     setSteps(stepsCopy)
     setStepCounter(newStepCounter)
+
+    if (newStepCounter === steps.length) mutateTokenBalance({ inputToken: inputToken.address, outputToken: outputToken.address, vault: vaultData.vault.address, chainId, account })
   }
 
   return (
@@ -630,7 +640,7 @@ export function KelpVaultInputs({ vaultData, tokenOptions, chainId, hideModal, m
 
       <InputTokenWithError
         captionText={"Output Amount"}
-        onSelectToken={option => handleTokenSelect(vaultData.gauge || vaultData.vault, option)}
+        onSelectToken={option => handleTokenSelect(!!vaultData.gauge ? vaultData.gauge : vaultData.vault, option)}
         onMaxClick={() => { }}
         chainId={1}
         value={(Number(inputBalance) * (Number(inputToken?.price)) / Number(outputToken?.price)) || 0}
