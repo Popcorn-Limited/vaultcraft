@@ -261,7 +261,7 @@ export function getKelpVaultActionSteps(action: KelpVaultActionType): ActionStep
     case KelpVaultActionType.ZapDeposit:
       return [{
         step: 1,
-        label: "Mint EthX",
+        label: "Mint ETHx",
         ...BaseStepInfo
       }, {
         step: 3,
@@ -269,7 +269,7 @@ export function getKelpVaultActionSteps(action: KelpVaultActionType): ActionStep
         ...BaseStepInfo
       }, {
         step: 3,
-        label: "Mint rsEth",
+        label: "Mint rsETH",
         ...BaseStepInfo
       }, {
         step: 4,
@@ -287,7 +287,7 @@ export function getKelpVaultActionSteps(action: KelpVaultActionType): ActionStep
         ...BaseStepInfo
       }, {
         step: 2,
-        label: "Mint rsEth",
+        label: "Mint rsETH",
         ...BaseStepInfo
       }, {
         step: 3,

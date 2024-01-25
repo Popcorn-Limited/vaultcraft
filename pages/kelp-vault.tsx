@@ -228,7 +228,7 @@ async function getKelpVaultData(account: Address, publicClient: PublicClient, yi
       cid: "",
       // @ts-ignore
       optionalMetadata: {
-        protocol: { name: "KelpDao", description: "" },
+        protocol: { name: "KelpDAO", description: "" },
         resolver: "kelpDao"
       },
     },
