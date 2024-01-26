@@ -6,7 +6,7 @@ import { acceptFees, proposeFees } from "@/lib/vault/management/interactions";
 import { useAtom } from "jotai";
 import { VaultSettings } from "pages/manage/vaults/[id]";
 import { useEffect } from "react";
-import { WalletClient, parseUnits } from "viem";
+import { WalletClient, parseUnits, zeroAddress } from "viem";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 
 export default function VaultFeeConfiguration({ vaultData, settings }: { vaultData: VaultData, settings: VaultSettings }): JSX.Element {
@@ -43,7 +43,15 @@ export default function VaultFeeConfiguration({ vaultData, settings }: { vaultDa
             <p>Performance: {vaultData.fees.performance / 1e16} %</p>
             <p>Management: {vaultData.fees.management / 1e16} %</p>
           </div>
-          : <FeeConfiguration showFeeRecipient={false} />
+          : <>
+            {fees.recipient !== zeroAddress ?
+              <FeeConfiguration
+                showFeeRecipient={false}
+                openCategories={Object.values(vaultData.fees).map(v => Number(v) > 0)}
+              />
+              : <p className="text-white">Loading Configuration...</p>
+            }
+          </>
         }
         <div className="w-60 mt-4">
           {Number(settings.proposedFeeTime) > 0 ?
