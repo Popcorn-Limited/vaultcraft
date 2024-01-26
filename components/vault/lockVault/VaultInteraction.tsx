@@ -208,7 +208,15 @@ export default function VaultInteraction({ vaultData, tokenOptions, hideModal, m
         <>
           {(stepCounter === steps.length || steps.some(step => !step.loading && step.error)) ?
             <MainActionButton label={"Close Modal"} handleClick={hideModal} /> :
-            <MainActionButton label={steps[stepCounter].label} handleClick={handleMainAction} disabled={inputBalance === "0" || steps[stepCounter].loading} />
+            <MainActionButton
+              label={steps[stepCounter].label}
+              handleClick={handleMainAction}
+              disabled={
+                inputBalance === "0" || 
+                steps[stepCounter].loading ||
+                activeTab !== "Withdraw"
+              }
+            />
           }
         </>
       )
