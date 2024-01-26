@@ -42,7 +42,7 @@ export default function VaultInteraction({ vaultData, tokenOptions, hideModal, m
 
   const isDeposit = vaultData.lock.unlockTime === 0 || vaultData.lock.daysToUnlock > 0
 
-  const [availableTabs, setAvailableTabs] = useState<string[]>(["Deposit", "Claim"])
+  const [availableTabs, setAvailableTabs] = useState<string[]>(["Deposit"])
   const [activeTab, setActiveTab] = useState<string>("Deposit")
 
   const [stepCounter, setStepCounter] = useState<number>(0)
@@ -50,7 +50,7 @@ export default function VaultInteraction({ vaultData, tokenOptions, hideModal, m
   const [action, setAction] = useState<LockVaultActionType>(LockVaultActionType.Deposit)
 
   useEffect(() => {
-    setAvailableTabs([isDeposit ? "Deposit" : "Withdraw", "Claim"])
+    setAvailableTabs([isDeposit ? "Deposit" : "Withdraw"])
     setActiveTab(isDeposit ? "Deposit" : "Withdraw")
 
     if (isDeposit) {
