@@ -90,6 +90,7 @@ export async function getVaults({ account = ADDRESS_ZERO, client, yieldOptions }
         chainId: vault.chainId,
         fees: vault.fees,
         metadata: {
+          vaultName: vault.name ? vault.name : undefined,
           creator: vault.creator,
           feeRecipient: vault.feeRecipient,
           optionalMetadata: {
