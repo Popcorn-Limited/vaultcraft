@@ -14,7 +14,7 @@ import axios from "axios"
 import { useAtom } from "jotai";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { Address, PublicClient, formatUnits, getAddress, isAddress, maxUint256, stringToHex, zeroAddress } from "viem";
+import { Address, PublicClient, formatUnits, getAddress, isAddress, maxUint256, zeroAddress } from "viem";
 import { erc20ABI, useAccount, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
 import VaultStats from "@/components/vault/VaultStats";
 import AssetWithName from "@/components/vault/AssetWithName";

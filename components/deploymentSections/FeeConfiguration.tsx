@@ -65,16 +65,18 @@ const FEE_INPUTS = [
 
 interface Errors { [key: string]: string[] | undefined }
 
-function FeeConfiguration({ showFeeRecipient = true }: { showFeeRecipient?: boolean }): JSX.Element {
+interface FeeConfigurationProps { showFeeRecipient?: boolean, openCategories?: boolean[] };
+
+function FeeConfiguration({ showFeeRecipient = true, openCategories = [false, false, false, false, false] }: FeeConfigurationProps): JSX.Element {
   const [fees, setFee] = useAtom(feeAtom);
   const [errors, setErrors] = useState<Errors>()
   const [recipientErrors, setRecipientErrors] = useState<string[] | undefined>(undefined)
-  const [areCategoriesOpened, setAreCategoriesOpened] = useState<boolean[]>(FEE_INPUTS.map(i => false))
+  const [areCategoriesOpened, setAreCategoriesOpened] = useState<boolean[]>([])
 
   useEffect(() => {
     // @ts-ignore
     setAreCategoriesOpened(FEE_INPUTS.map(fee => fees[fee.inputs[0].key] > 0))
-  }, [fees])
+  }, [])
 
   function handlePercentageChange(value: string, key: string) {
     const formattedValue = validateInput(value)

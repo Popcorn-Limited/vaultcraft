@@ -25,7 +25,8 @@ import KelpVault from "./KelpVault";
 
 interface VaultsContainerProps {
   hiddenVaults: Address[];
-  displayVaults: Address[]
+  displayVaults: Address[];
+  showDescription?: boolean;
 }
 
 export interface MutateTokenBalanceProps {
@@ -40,7 +41,7 @@ const { oVCX: OVCX, VCX } = getVeAddresses();
 
 const NETWORKS_SUPPORTING_ZAP = [1, 137, 10, 42161, 56]
 
-export default function VaultsContainer({ hiddenVaults, displayVaults }: VaultsContainerProps): JSX.Element {
+export default function VaultsContainer({ hiddenVaults, displayVaults, showDescription = false }: VaultsContainerProps): JSX.Element {
   const { address: account } = useAccount();
   const publicClient = usePublicClient()
   const { data: walletClient } = useWalletClient()
@@ -265,7 +266,7 @@ export default function VaultsContainer({ hiddenVaults, displayVaults }: VaultsC
 
         {vaults.length > 0 ?
           <>
-            {selectedNetworks.includes(1) && <KelpVault searchTerm={searchTerm} />}
+            {selectedNetworks.includes(1) && !hiddenVaults.includes("0x7CEbA0cAeC8CbE74DB35b26D7705BA68Cb38D725") && <KelpVault searchTerm={searchTerm} />}
             {vaults.filter(vault => selectedNetworks.includes(vault.chainId))
               .filter(vault => displayVaults.length > 0 ? displayVaults.includes(vault.address) : true)
               .filter(vault => !hiddenVaults.includes(vault.address))
@@ -276,6 +277,7 @@ export default function VaultsContainer({ hiddenVaults, displayVaults }: VaultsC
                     vaultData={vault}
                     mutateTokenBalance={mutateTokenBalance}
                     searchTerm={searchTerm}
+                    description={showDescription ? vault.metadata.description : undefined}
                   />
                 )
               })

@@ -93,12 +93,19 @@ export type RewardToken = Token & {
   rewardApy: number;
 }
 
+export enum VaultLabel {
+  experimental = "Experimental",
+  deprecated = "Deprecated"
+}
+
 export type VaultMetadata = {
   creator: Address;
   feeRecipient: Address;
   cid: string;
   optionalMetadata: OptionalMetadata;
   vaultName?: string;
+  labels?: VaultLabel[];
+  description?: string;
 }
 
 export type OptionalMetadata = {

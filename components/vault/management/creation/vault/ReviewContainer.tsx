@@ -115,7 +115,7 @@ export default function ReviewContainer({ route, stages, activeStage }: VaultCre
           <div className="mt-8">
             <MainActionButton
               label="Done"
-              handleClick={() => isSuccess ? router.push("/vaults") : setShowModal(false)}
+              handleClick={() => isSuccess ? router.push("/vaults/factory") : setShowModal(false)}
               disabled={metadata.ipfsHash === "" || isLoading || (strategyData.id !== stringToHex("", { size: 32 }) && strategyData.data === "0x")}
             />
           </div>

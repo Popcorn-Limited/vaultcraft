@@ -75,7 +75,7 @@ export default function Products(): JSX.Element {
                 },
               }
             ]}
-            route="lock-vaults"
+            route="vaults/lock"
           />
           <Product
             title={

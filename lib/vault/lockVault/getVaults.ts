@@ -1,7 +1,7 @@
 import { FraxLendAbi, StakingVaultAbi, VaultAbi, VaultRegistryAbi } from "@/lib/constants";
 import { Address, Chain, PublicClient, createPublicClient, http, zeroAddress } from "viem";
 import axios from "axios"
-import { LockVaultData, Token } from "@/lib/types";
+import { LockVaultData, Token, VaultLabel } from "@/lib/types";
 import { RPC_URLS } from "@/lib/utils/connectors";
 
 interface CalcRewardProps {
@@ -26,14 +26,19 @@ export default async function getLockVaultsByChain({ chain, account }: { chain: 
 }
 
 async function getVaults({ account, publicClient }: { account: Address, publicClient: PublicClient }): Promise<LockVaultData[]> {
-  let addresses = await publicClient.readContract({
+  let depracatedAddresses = await publicClient.readContract({
     address: "0x25172C73958064f9ABc757ffc63EB859D7dc2219",
+    abi: VaultRegistryAbi,
+    functionName: "getRegisteredAddresses",
+  }) as Address[];
+  let addresses = await publicClient.readContract({
+    address: "0x58A2704deA4168D307EFF593E897eC73C6670F6A",
     abi: VaultRegistryAbi,
     functionName: "getRegisteredAddresses",
   }) as Address[];
 
   // @dev -- remove test vault
-  addresses = addresses.filter(address => address !== "0x355d6ee7a1386d0659495d249E3cC085eC90Ba18")
+  addresses = [...addresses, ...depracatedAddresses.filter(address => address !== "0x355d6ee7a1386d0659495d249E3cC085eC90Ba18")]
 
   const { data: vaults } = await axios.get(`https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/vaults/42161.json`)
   const { data: vaultTokens } = await axios.get(`https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/vaults/tokens/42161.json`)
@@ -60,9 +65,10 @@ async function getVaults({ account, publicClient }: { account: Address, publicCl
         optionalMetadata: {
           protocol: {
             name: "Frax",
-            description:"**Lending** - The vault supplies assets into Fraxlend to earn interest."
+            description: "**Lending** - The vault supplies assets into Fraxlend to earn interest."
           },
-        }
+        },
+        labels: vault.labels ? vault.labels.map((label: string) => <VaultLabel>label) : undefined
       }
     }
   })

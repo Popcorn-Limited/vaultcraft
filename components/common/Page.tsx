@@ -2,7 +2,7 @@ import Navbar from "@/components/navbar/Navbar";
 import { masaAtom, yieldOptionsAtom } from "@/lib/atoms/sdk";
 import { lockvaultsAtom, vaultsAtom } from "@/lib/atoms/vaults";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
-import { getVaultsByChain } from "@/lib/vault/getVault";
+import { getVaultsByChain } from "@/lib/vault/getVaults";
 import { useAtom } from "jotai";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { CachedProvider, YieldOptions } from "vaultcraft-sdk";
@@ -19,7 +19,6 @@ import { availableZapAssetAtom, zapAssetsAtom } from "@/lib/atoms";
 import { Token } from "@/lib/types";
 import getZapAssets, { getAvailableZapAssets } from "@/lib/utils/getZapAssets";
 import SecondaryActionButton from "../button/SecondaryActionButton";
-import TertiaryActionButton from "../button/TertiaryActionButton";
 
 async function setUpYieldOptions() {
   const ttl = 360_000;

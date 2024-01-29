@@ -42,7 +42,7 @@ export default function VaultInteraction({ vaultData, tokenOptions, hideModal, m
 
   const isDeposit = vaultData.lock.unlockTime === 0 || vaultData.lock.daysToUnlock > 0
 
-  const [availableTabs, setAvailableTabs] = useState<string[]>(["Deposit", "Claim"])
+  const [availableTabs, setAvailableTabs] = useState<string[]>(["Deposit"])
   const [activeTab, setActiveTab] = useState<string>("Deposit")
 
   const [stepCounter, setStepCounter] = useState<number>(0)
@@ -50,7 +50,7 @@ export default function VaultInteraction({ vaultData, tokenOptions, hideModal, m
   const [action, setAction] = useState<LockVaultActionType>(LockVaultActionType.Deposit)
 
   useEffect(() => {
-    setAvailableTabs([isDeposit ? "Deposit" : "Withdraw", "Claim"])
+    setAvailableTabs([isDeposit ? "Deposit" : "Withdraw"])
     setActiveTab(isDeposit ? "Deposit" : "Withdraw")
 
     if (isDeposit) {
@@ -208,7 +208,15 @@ export default function VaultInteraction({ vaultData, tokenOptions, hideModal, m
         <>
           {(stepCounter === steps.length || steps.some(step => !step.loading && step.error)) ?
             <MainActionButton label={"Close Modal"} handleClick={hideModal} /> :
-            <MainActionButton label={steps[stepCounter].label} handleClick={handleMainAction} disabled={inputBalance === "0" || steps[stepCounter].loading} />
+            <MainActionButton
+              label={steps[stepCounter].label}
+              handleClick={handleMainAction}
+              disabled={
+                inputBalance === "0" || 
+                steps[stepCounter].loading ||
+                activeTab !== "Withdraw"
+              }
+            />
           }
         </>
       )

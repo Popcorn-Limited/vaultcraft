@@ -1,8 +1,8 @@
-import { Address, Chain, ReadContractParameters, createPublicClient, getAddress, http, zeroAddress } from "viem"
+import { Address, Chain, ReadContractParameters, createPublicClient, getAddress, http, validateTypedData, zeroAddress } from "viem"
 import { PublicClient } from "wagmi"
 import axios from "axios"
 import { VaultAbi } from "@/lib/constants/abi/Vault"
-import { GaugeData, VaultData } from "@/lib/types"
+import { GaugeData, VaultData, VaultLabel } from "@/lib/types"
 import { ADDRESS_ZERO, getVeAddresses } from "@/lib/constants"
 import { RPC_URLS, networkMap } from "@/lib/utils/connectors";
 import getGauges, { Gauge } from "@/lib/gauges/getGauges"
@@ -79,7 +79,7 @@ export async function getVaults({ account = ADDRESS_ZERO, client, yieldOptions }
   const { data: strategyDescriptions } = await axios.get(`https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/descriptions/strategies/${chainId}.json`)
 
   const result: any[] = Object.values(allVaults)
-    .filter((vault: any) => vault.type === "single-asset-vault-v1")
+    .filter((vault: any) => vault.type === "single-asset-vault-v1" || vault.type === "multi-strategy-vault-v1")
     .filter((vault: any) => !HIDDEN_VAULTS.includes(vault.address))
     .map((vault: any) => {
       const stratDesc = strategyDescriptions[vault.strategies[0]]
@@ -90,6 +90,7 @@ export async function getVaults({ account = ADDRESS_ZERO, client, yieldOptions }
         chainId: vault.chainId,
         fees: vault.fees,
         metadata: {
+          vaultName: vault.name ? vault.name : undefined,
           creator: vault.creator,
           feeRecipient: vault.feeRecipient,
           optionalMetadata: {
@@ -98,7 +99,9 @@ export async function getVaults({ account = ADDRESS_ZERO, client, yieldOptions }
               description: stratDesc.description
             },
             resolver: stratDesc.resolver
-          }
+          },
+          labels: vault.labels ? vault.labels.map((label: string) => <VaultLabel>label) : undefined,
+          description: vault.description || undefined
         }
       }
     })
