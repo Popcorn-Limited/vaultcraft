@@ -19,12 +19,14 @@ interface SmartVaultsProps {
   vaultData: VaultData;
   searchTerm: string;
   mutateTokenBalance: (props: MutateTokenBalanceProps) => void;
+  description?: string;
 }
 
 export default function SmartVault({
   vaultData,
   searchTerm,
   mutateTokenBalance,
+  description
 }: SmartVaultsProps) {
   const { address: account } = useAccount();
 
@@ -140,6 +142,11 @@ export default function SmartVault({
 
           <VaultStats vaultData={vaultData} account={account} zapAvailable={zapAvailable} />
 
+          {description &&
+            <p className='text-gray-500'>
+              {vaultData.metadata.description}
+            </p>
+          }
         </div>
       </Accordion >
     </>

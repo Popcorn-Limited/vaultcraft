@@ -104,7 +104,8 @@ export type VaultMetadata = {
   cid: string;
   optionalMetadata: OptionalMetadata;
   vaultName?: string;
-  labels?: VaultLabel[]
+  labels?: VaultLabel[];
+  description?: string;
 }
 
 export type OptionalMetadata = {

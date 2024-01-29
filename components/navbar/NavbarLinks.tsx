@@ -8,7 +8,7 @@ const links: { label: string, url: string, onClick?: Function }[] = [
   },
   {
     label: "Lock Vaults",
-    url: "/lock-vaults",
+    url: "/vaults/lock",
   },
   {
     label: "Boost Vaults",

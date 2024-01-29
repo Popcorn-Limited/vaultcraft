@@ -1,4 +1,4 @@
-import { Address, Chain, ReadContractParameters, createPublicClient, getAddress, http, zeroAddress } from "viem"
+import { Address, Chain, ReadContractParameters, createPublicClient, getAddress, http, validateTypedData, zeroAddress } from "viem"
 import { PublicClient } from "wagmi"
 import axios from "axios"
 import { VaultAbi } from "@/lib/constants/abi/Vault"
@@ -100,7 +100,8 @@ export async function getVaults({ account = ADDRESS_ZERO, client, yieldOptions }
             },
             resolver: stratDesc.resolver
           },
-          labels: vault.labels ? vault.labels.map((label: string) => <VaultLabel>label) : undefined
+          labels: vault.labels ? vault.labels.map((label: string) => <VaultLabel>label) : undefined,
+          description: vault.description || undefined
         }
       }
     })

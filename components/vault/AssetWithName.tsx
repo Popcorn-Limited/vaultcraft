@@ -47,7 +47,7 @@ export default function AssetWithName({ vault }: { vault: VaultData }) {
       }}
     />
     {vault.metadata.labels && vault.metadata.labels.length > 0 &&
-      vault.metadata.labels.map(label => <VaultLabelPill label={label} id={tooltipId} />)
+      vault.metadata.labels.map(label => <VaultLabelPill key={`${tooltipId}-${label}`} label={label} id={tooltipId} />)
     }
   </div>
 }

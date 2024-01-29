@@ -25,7 +25,8 @@ import KelpVault from "./KelpVault";
 
 interface VaultsContainerProps {
   hiddenVaults: Address[];
-  displayVaults: Address[]
+  displayVaults: Address[];
+  showDescription?: boolean;
 }
 
 export interface MutateTokenBalanceProps {
@@ -40,7 +41,7 @@ const { oVCX: OVCX, VCX } = getVeAddresses();
 
 const NETWORKS_SUPPORTING_ZAP = [1, 137, 10, 42161, 56]
 
-export default function VaultsContainer({ hiddenVaults, displayVaults }: VaultsContainerProps): JSX.Element {
+export default function VaultsContainer({ hiddenVaults, displayVaults, showDescription = false }: VaultsContainerProps): JSX.Element {
   const { address: account } = useAccount();
   const publicClient = usePublicClient()
   const { data: walletClient } = useWalletClient()
@@ -276,6 +277,7 @@ export default function VaultsContainer({ hiddenVaults, displayVaults }: VaultsC
                     vaultData={vault}
                     mutateTokenBalance={mutateTokenBalance}
                     searchTerm={searchTerm}
+                    description={showDescription ? vault.metadata.description : undefined}
                   />
                 )
               })
