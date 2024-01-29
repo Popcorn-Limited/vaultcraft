@@ -2,7 +2,7 @@ import { Address, Chain, ReadContractParameters, createPublicClient, getAddress,
 import { PublicClient } from "wagmi"
 import axios from "axios"
 import { VaultAbi } from "@/lib/constants/abi/Vault"
-import { GaugeData, VaultData } from "@/lib/types"
+import { GaugeData, VaultData, VaultLabel } from "@/lib/types"
 import { ADDRESS_ZERO, getVeAddresses } from "@/lib/constants"
 import { RPC_URLS, networkMap } from "@/lib/utils/connectors";
 import getGauges, { Gauge } from "@/lib/gauges/getGauges"
@@ -99,7 +99,8 @@ export async function getVaults({ account = ADDRESS_ZERO, client, yieldOptions }
               description: stratDesc.description
             },
             resolver: stratDesc.resolver
-          }
+          },
+          labels: vault.labels ? vault.labels.map((label: string) => <VaultLabel>label) : undefined
         }
       }
     })

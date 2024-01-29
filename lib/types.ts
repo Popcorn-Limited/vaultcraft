@@ -93,12 +93,17 @@ export type RewardToken = Token & {
   rewardApy: number;
 }
 
+export enum VaultLabel {
+  experimental = "Experimental"
+}
+
 export type VaultMetadata = {
   creator: Address;
   feeRecipient: Address;
   cid: string;
   optionalMetadata: OptionalMetadata;
   vaultName?: string;
+  labels?: VaultLabel[]
 }
 
 export type OptionalMetadata = {
