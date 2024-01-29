@@ -5,11 +5,13 @@ import ProtocolIcon from "@/components/common/ProtocolIcon";
 import ResponsiveTooltip from "../common/Tooltip";
 
 const vaultLabelColor: { [key: string]: string } = {
-  Experimental: "bg-yellow-500"
+  Experimental: "bg-yellow-500",
+  Deprecated: "bg-red-500"
 }
 
 const vaultLabelTooltip: { [key: string]: string } = {
-  Experimental: "Unaudited strategy in testing stage"
+  Experimental: "Unaudited strategy in testing stage",
+  Deprecated: "This strategy got deprecated. Only withdrawals are open"
 }
 
 function VaultLabelPill({ label, id }: { label: VaultLabel, id: string }): JSX.Element {

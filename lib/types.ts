@@ -94,7 +94,8 @@ export type RewardToken = Token & {
 }
 
 export enum VaultLabel {
-  experimental = "Experimental"
+  experimental = "Experimental",
+  deprecated = "Deprecated"
 }
 
 export type VaultMetadata = {
