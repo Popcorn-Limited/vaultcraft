@@ -79,7 +79,7 @@ export async function getVaults({ account = ADDRESS_ZERO, client, yieldOptions }
   const { data: strategyDescriptions } = await axios.get(`https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/descriptions/strategies/${chainId}.json`)
 
   const result: any[] = Object.values(allVaults)
-    .filter((vault: any) => vault.type === "single-asset-vault-v1")
+    .filter((vault: any) => vault.type === "single-asset-vault-v1" || vault.type === "multi-strategy-vault-v1")
     .filter((vault: any) => !HIDDEN_VAULTS.includes(vault.address))
     .map((vault: any) => {
       const stratDesc = strategyDescriptions[vault.strategies[0]]
