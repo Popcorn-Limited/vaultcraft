@@ -32,7 +32,7 @@ const FLAGSHIP_VAULTS: Address[] = [
 
 
 const Vaults: NextPage = () => {
-  return <VaultsContainer hiddenVaults={["0x7CEbA0cAeC8CbE74DB35b26D7705BA68Cb38D725"]} displayVaults={FLAGSHIP_VAULTS} />
+  return <VaultsContainer hiddenVaults={[]} displayVaults={FLAGSHIP_VAULTS} />
 };
 
 export default Vaults;
