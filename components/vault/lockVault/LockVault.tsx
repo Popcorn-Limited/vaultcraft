@@ -11,8 +11,15 @@ import { LockVaultData, Token, VaultLabel } from "@/lib/types";
 import { useAtom } from "jotai";
 import { availableZapAssetAtom, zapAssetsAtom } from "@/lib/atoms";
 import { getTokenOptions, isDefiPosition } from "@/lib/vault/utils";
+import { MutateTokenBalanceProps } from "@/lib/vault/mutateTokenBalance";
 
-export default function LockVault({ vaultData, mutateTokenBalance, searchTerm }: { vaultData: LockVaultData, mutateTokenBalance: () => {}, searchTerm: string }): JSX.Element {
+interface LockVaultProps {
+  vaultData: LockVaultData;
+  mutateTokenBalance: (props: MutateTokenBalanceProps) => void;
+  searchTerm: string;
+}
+
+export default function LockVault({ vaultData, mutateTokenBalance, searchTerm }: LockVaultProps): JSX.Element {
   const [showModal, setShowModal] = useState(false)
 
   const [zapAssets] = useAtom(zapAssetsAtom)

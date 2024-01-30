@@ -9,10 +9,10 @@ import Modal from "@/components/modal/Modal";
 import VaultStats from "@/components/vault/VaultStats";
 import { Square2StackIcon } from "@heroicons/react/24/outline";
 import { showSuccessToast } from '@/lib/toasts';
-import { MutateTokenBalanceProps } from '@/components/vault/VaultsContainer';
 import { useAtom } from 'jotai';
 import { availableZapAssetAtom, zapAssetsAtom } from '@/lib/atoms';
 import { getTokenOptions, isDefiPosition } from '@/lib/vault/utils';
+import { MutateTokenBalanceProps } from '@/lib/vault/mutateTokenBalance';
 
 
 interface SmartVaultsProps {

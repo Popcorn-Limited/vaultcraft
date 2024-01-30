@@ -13,11 +13,13 @@ import { formatUnits, getAddress, isAddress } from "viem";
 import handleVaultInteraction from "@/lib/vault/handleVaultInteraction";
 import ActionSteps from "@/components/vault/ActionSteps";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import { MutateTokenBalanceProps } from "@/components/vault/VaultsContainer";
 import { useAtom } from "jotai";
 import { masaAtom } from "@/lib/atoms/sdk";
 import { useRouter } from "next/router";
 import { ActionStep, getSmartVaultActionSteps } from "@/lib/getActionSteps";
+import { MutateTokenBalanceProps } from "@/lib/vault/mutateTokenBalance";
+import { vaultsAtom } from "@/lib/atoms/vaults";
+import { zapAssetsAtom } from "@/lib/atoms";
 
 export interface VaultInputsProps {
   vaultData: VaultData;
@@ -30,13 +32,17 @@ export interface VaultInputsProps {
 export default function VaultInputs({ vaultData, tokenOptions, chainId, hideModal, mutateTokenBalance }: VaultInputsProps): JSX.Element {
   const { asset, vault, gauge } = vaultData;
   const { query } = useRouter()
+
   const publicClient = usePublicClient({ chainId });
   const { data: walletClient } = useWalletClient()
   const { address: account } = useAccount();
   const { chain } = useNetwork();
   const { switchNetworkAsync } = useSwitchNetwork();
   const { openConnectModal } = useConnectModal();
+
   const [masaSdk,] = useAtom(masaAtom)
+  const [zapAssets, setZapAssets] = useAtom(zapAssetsAtom)
+  const [vaults, setVaults] = useAtom(vaultsAtom)
 
   const [inputToken, setInputToken] = useState<Token>()
   const [outputToken, setOutputToken] = useState<Token>()
@@ -208,7 +214,16 @@ export default function VaultInputs({ vaultData, tokenOptions, chainId, hideModa
     setSteps(stepsCopy)
     setStepCounter(newStepCounter)
 
-    if (newStepCounter === steps.length) mutateTokenBalance({ inputToken: inputToken.address, outputToken: outputToken.address, vault: vault.address, chainId, account })
+    if (newStepCounter === steps.length) mutateTokenBalance({
+      inputToken: inputToken.address,
+      outputToken: outputToken.address,
+      vault: vault.address,
+      chainId,
+      account,
+      zapAssetState: [zapAssets, setZapAssets],
+      vaultsState: [vaults, setVaults],
+      publicClient
+    })
   }
 
   function handleMaxClick() {
@@ -323,7 +338,7 @@ export default function VaultInputs({ vaultData, tokenOptions, chainId, hideModa
       {account ? (
         <>
           {(stepCounter === steps.length || steps.some(step => !step.loading && step.error)) ?
-            <MainActionButton label={"Close Modal"} handleClick={hideModal} /> :
+            <MainActionButton label={"Finish"} handleClick={hideModal} /> :
             <MainActionButton label={steps[stepCounter].label} handleClick={handleMainAction} disabled={inputBalance === "0" || steps[stepCounter].loading} />
           }
         </>

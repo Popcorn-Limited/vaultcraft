@@ -19,9 +19,9 @@ import { vaultsAtom } from "@/lib/atoms/vaults";
 import { getVaultNetworthByChain } from "@/lib/getNetworth";
 import VaultsSorting, { VAULT_SORTING_TYPE } from "@/components/vault/VaultsSorting";
 import { llama } from "@/lib/resolver/price/resolver";
-import { zapAssetsAtom } from "@/lib/atoms";
 import SearchBar from "../input/SearchBar";
 import KelpVault from "./KelpVault";
+import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
 
 interface VaultsContainerProps {
   hiddenVaults: Address[];
@@ -29,17 +29,7 @@ interface VaultsContainerProps {
   showDescription?: boolean;
 }
 
-export interface MutateTokenBalanceProps {
-  inputToken: Address;
-  outputToken: Address;
-  vault: Address;
-  chainId: number;
-  account: Address;
-}
-
 const { oVCX: OVCX, VCX } = getVeAddresses();
-
-const NETWORKS_SUPPORTING_ZAP = [1, 137, 10, 42161, 56]
 
 export default function VaultsContainer({ hiddenVaults, displayVaults, showDescription = false }: VaultsContainerProps): JSX.Element {
   const { address: account } = useAccount();
@@ -48,7 +38,6 @@ export default function VaultsContainer({ hiddenVaults, displayVaults, showDescr
 
   const [selectedNetworks, selectNetwork] = useNetworkFilter(SUPPORTED_NETWORKS.map(network => network.id));
   const [vaults, setVaults] = useAtom(vaultsAtom)
-  const [zapAssets, setZapAssets] = useAtom(zapAssetsAtom)
 
   const [tvl, setTvl] = useState<number>(0);
   const [networth, setNetworth] = useState<number>(0);
@@ -75,79 +64,6 @@ export default function VaultsContainer({ hiddenVaults, displayVaults, showDescr
     }
     getAccountData()
   }, [account])
-
-
-  async function mutateTokenBalance({ inputToken, outputToken, vault, chainId, account }: MutateTokenBalanceProps) {
-    const data = await publicClient.multicall({
-      contracts: [
-        {
-          address: inputToken,
-          abi: ERC20Abi,
-          functionName: "balanceOf",
-          args: [account]
-        },
-        {
-          address: outputToken,
-          abi: ERC20Abi,
-          functionName: "balanceOf",
-          args: [account]
-        },
-        {
-          address: vault,
-          abi: VaultAbi,
-          functionName: 'totalAssets'
-        },
-        {
-          address: vault,
-          abi: VaultAbi,
-          functionName: 'totalSupply'
-        }],
-      allowFailure: false
-    })
-
-    // Modify zap assets
-    if (NETWORKS_SUPPORTING_ZAP.includes(chainId)) {
-      const zapAssetFound = zapAssets[chainId].find(asset => asset.address === inputToken || asset.address === outputToken) // @dev -- might need to copy the state here already to avoid modifing a pointer
-      if (zapAssetFound) {
-        zapAssetFound.balance = zapAssetFound.address === inputToken ? Number(data[0]) : Number(data[1])
-        setZapAssets({ ...zapAssets, [chainId]: [...zapAssets[chainId], zapAssetFound] })
-      }
-    }
-
-    // Modify vaults, assets and gauges
-    const newVaultState: VaultData[] = [...vaults]
-    newVaultState.forEach(vaultData => {
-      if (vaultData.chainId === chainId) {
-        // Modify vault pricing and tvl
-        if (vaultData.address === vault) {
-          const assetsPerShare = Number(data[3]) > 0 ? Number(data[2]) / Number(data[3]) : Number(1e-9)
-          const pricePerShare = assetsPerShare * vaultData.assetPrice
-
-          vaultData.totalAssets = Number(data[2])
-          vaultData.totalSupply = Number(data[3])
-          vaultData.assetsPerShare = assetsPerShare
-          vaultData.pricePerShare = pricePerShare
-          vaultData.tvl = (Number(data[3]) * pricePerShare) / (10 ** vaultData.asset.decimals)
-          vaultData.vault.price = pricePerShare * 1e9
-
-          if (vaultData.gauge) vaultData.gauge.price = pricePerShare * 1e9
-        }
-        // Adjust vault balance
-        if (vaultData.vault.address === inputToken || vaultData.vault.address === outputToken) {
-          vaultData.vault.balance = vaultData.vault.address === inputToken ? Number(data[0]) : Number(data[1])
-        }
-        // Adjust asset balance
-        if (vaultData.asset.address === inputToken || vaultData.asset.address === outputToken) {
-          vaultData.asset.balance = vaultData.asset.address === inputToken ? Number(data[0]) : Number(data[1])
-        }
-        // Adjust gauge balance
-        if (vaultData.gauge?.address === inputToken || vaultData.gauge?.address === outputToken) {
-          vaultData.gauge.balance = vaultData.gauge.address === inputToken ? Number(data[0]) : Number(data[1])
-        }
-      }
-    })
-    setVaults(newVaultState)
-  }
 
   const [searchTerm, setSearchTerm] = useState("");
 

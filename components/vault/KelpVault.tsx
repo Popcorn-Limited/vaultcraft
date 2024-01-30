@@ -24,8 +24,10 @@ import { showSuccessToast } from "@/lib/toasts";
 import { VaultInputsProps } from "@/components/vault/VaultInputs";
 import Accordion from "@/components/common/Accordion";
 import { VaultAbi } from "@/lib/constants";
-import { MutateTokenBalanceProps } from "@/components/vault/VaultsContainer";
 import { YieldOptions } from "vaultcraft-sdk";
+import { MutateTokenBalanceProps } from "@/lib/vault/mutateTokenBalance";
+import { zapAssetsAtom } from "@/lib/atoms";
+import { vaultsAtom } from "@/lib/atoms/vaults";
 
 const minDeposit = 100000000000000;
 
@@ -378,13 +380,17 @@ export default function KelpVault({ searchTerm }: { searchTerm: string }) {
 
 export function KelpVaultInputs({ vaultData, tokenOptions, chainId, hideModal, mutateTokenBalance }: VaultInputsProps): JSX.Element {
   const { query } = useRouter()
+
   const { address: account } = useAccount();
   const publicClient = usePublicClient({ chainId: 1 })
   const { data: walletClient } = useWalletClient()
   const { openConnectModal } = useConnectModal();
   const { chain } = useNetwork();
   const { switchNetworkAsync } = useSwitchNetwork();
+
   const [masaSdk,] = useAtom(masaAtom)
+  const [zapAssets, setZapAssets] = useAtom(zapAssetsAtom)
+  const [vaults, setVaults] = useAtom(vaultsAtom)
 
   const [inputToken, setInputToken] = useState<Token>()
   const [outputToken, setOutputToken] = useState<Token>()
@@ -539,7 +545,16 @@ export function KelpVaultInputs({ vaultData, tokenOptions, chainId, hideModal, m
     setSteps(stepsCopy)
     setStepCounter(newStepCounter)
 
-    if (newStepCounter === steps.length) mutateTokenBalance({ inputToken: inputToken.address, outputToken: outputToken.address, vault: vaultData.vault.address, chainId, account })
+    if (newStepCounter === steps.length) mutateTokenBalance({ 
+      inputToken: inputToken.address, 
+      outputToken: outputToken.address, 
+      vault: vaultData.vault.address, 
+      chainId, 
+      account,
+      zapAssetState: [zapAssets, setZapAssets],
+      vaultsState: [vaults, setVaults],
+      publicClient
+     })
   }
 
   return (

@@ -14,26 +14,31 @@ import Claim from "./Claim";
 import { getAddress, isAddress } from "viem";
 import handleVaultInteraction from "@/lib/vault/lockVault/handleVaultInteraction";
 import { ActionStep, getLockVaultActionSteps } from "@/lib/getActionSteps";
+import { MutateTokenBalanceProps } from "@/lib/vault/mutateTokenBalance";
+import { zapAssetsAtom } from "@/lib/atoms";
+import { lockvaultsAtom } from "@/lib/atoms/vaults";
 
 interface VaultInteractionProps {
   vaultData: LockVaultData;
   tokenOptions: Token[];
   hideModal: () => void;
-  mutateTokenBalance: () => void;
+  mutateTokenBalance: (props: MutateTokenBalanceProps) => void;
   depositDisabled?: boolean;
 }
 
 export default function VaultInteraction({ vaultData, tokenOptions, hideModal, mutateTokenBalance, depositDisabled = false }: VaultInteractionProps): JSX.Element {
   const { query } = useRouter()
-  const [masaSdk,] = useAtom(masaAtom)
 
   const { address: account } = useAccount()
   const publicClient = usePublicClient({ chainId: vaultData.chainId });
   const { data: walletClient } = useWalletClient()
   const { chain } = useNetwork();
-
   const { switchNetworkAsync } = useSwitchNetwork();
   const { openConnectModal } = useConnectModal();
+
+  const [masaSdk,] = useAtom(masaAtom)
+  const [zapAssets, setZapAssets] = useAtom(zapAssetsAtom)
+  const [vaults, setVaults] = useAtom(lockvaultsAtom)
 
   const [inputToken, setInputToken] = useState<Token>(vaultData.asset)
   const [outputToken, setOutputToken] = useState<Token>(vaultData.vault)
@@ -140,7 +145,16 @@ export default function VaultInteraction({ vaultData, tokenOptions, hideModal, m
     setSteps(stepsCopy)
     setStepCounter(newStepCounter)
 
-    if (newStepCounter === steps.length) mutateTokenBalance()
+    if (newStepCounter === steps.length) mutateTokenBalance({
+      inputToken: inputToken.address,
+      outputToken: outputToken.address,
+      vault: vaultData.address,
+      chainId: 42161,
+      account,
+      zapAssetState: [zapAssets, setZapAssets],
+      vaultsState: [vaults, setVaults],
+      publicClient
+    })
   }
 
   function handleTokenSelect(input: Token, output: Token): void {
