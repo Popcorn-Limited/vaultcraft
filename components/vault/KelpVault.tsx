@@ -179,7 +179,7 @@ export async function getKelpVaultData(account: Address, publicClient: PublicCli
         protocol: {
           name: "KelpDAO", description: `**KelpDao Depositor** - rsETH is a Liquid Restaked Token (LRT) issued by Kelp DAO designed to offer liquidity to illiquid assets deposited into restaking platforms, such as EigenLayer. rsETH contracts distribute the deposited tokens into different Node Operators that operate with the Kelp DAO. 
 
-        Rewards accrue from the various services to the rsETH contracts. The price of rsETH token assumes the underlying price of the various rewards and staked tokens
+        Rewards accrue from the various services to the rsETH contracts. The price of rsETH token assumes the underlying price of the various rewards and staked tokens.
         
         Additionally, depositors earn Kelp Miles and Eigen Layer points along with any eligible boosts.` },
         resolver: "kelpDao"
