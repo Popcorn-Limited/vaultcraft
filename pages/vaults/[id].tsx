@@ -6,20 +6,9 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import NoSSR from "react-no-ssr";
 import { useAccount, useBalance, usePublicClient, useWalletClient } from "wagmi";
-import axios from "axios"
 import { Address, WalletClient, createPublicClient, extractChain, http, zeroAddress } from "viem";
 import { VaultAbi, getVeAddresses } from "@/lib/constants";
-import { RPC_URLS } from "@/lib/utils/connectors";
-import * as chains from 'viem/chains'
-import { ProtocolName, YieldOptions } from "vaultcraft-sdk";
 import { yieldOptionsAtom } from "@/lib/atoms/sdk";
-import TabSelector from "@/components/common/TabSelector";
-import VaultStrategyConfiguration from "@/components/vault/management/vault/strategy";
-import VaultPausing from "@/components/vault/management/vault/pausing";
-import VaultDepositLimit from "@/components/vault/management/vault/depositLimit";
-import VaultFeeRecipient from "@/components/vault/management/vault/feeRecipient";
-import VaultFeeConfiguration from "@/components/vault/management/vault/feeConfiguration";
-import VaultFees from "@/components/vault/management/vault/fees";
 import { NumberFormatter, formatAndRoundNumber } from "@/lib/utils/formatBigNumber";
 import { roundToTwoDecimalPlaces } from "@/lib/utils/helpers";
 import MainActionButton from "@/components/button/MainActionButton";
@@ -109,7 +98,7 @@ export default function Index() {
   return <NoSSR>
     {
       vaultData ? (
-        <>
+        <div className="min-h-screen overflow-scroll">
           <button
             className="border border-gray-500 rounded-lg flex flex-row items-center px-4 py-2 ml-4 md:ml-8 mt-10"
             type="button"
@@ -132,14 +121,14 @@ export default function Index() {
                 <div className="w-[120px] md:w-max">
                   <p className="leading-6 text-base text-primaryDark md:text-primary">Your Wallet</p>
                   <div className="text-3xl font-bold whitespace-nowrap text-primary">
-                    {`$${formatAndRoundNumber(vaultData.asset.balance, vaultData.asset.decimals)}`}
+                    {`${formatAndRoundNumber(vaultData.asset.balance, vaultData.asset.decimals)}`}
                   </div>
                 </div>
 
                 <div className="w-[120px] md:w-max">
                   <p className="leading-6 text-base text-primaryDark md:text-primary">Deposits</p>
                   <div className="text-3xl font-bold whitespace-nowrap text-primary">
-                    {`$${formatAndRoundNumber(vaultData.vault.balance, vaultData.vault.decimals)}`}
+                    {`${formatAndRoundNumber(vaultData.vault.balance, vaultData.vault.decimals)}`}
                   </div>
                 </div>
 
@@ -257,7 +246,7 @@ export default function Index() {
                 </p>
 
                 <div className="mt-8">
-                  
+
                 </div>
 
                 <div className="md:flex md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4 mt-8">
@@ -311,7 +300,7 @@ export default function Index() {
             </div>
 
           </section>
-        </>
+        </div>
       )
         :
         <p className="text-white ml-4 md:ml-8">Loading...</p>

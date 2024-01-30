@@ -336,6 +336,7 @@ export default function VaultInputs(
     <div className="w-full flex justify-center my-6">
       <ActionSteps steps={steps} stepCounter={stepCounter} />
     </div>
+    
     <div className="">
       {account ? (
         <>

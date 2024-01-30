@@ -176,7 +176,8 @@ export async function getKelpVaultData(account: Address, publicClient: PublicCli
       cid: "",
       // @ts-ignore
       optionalMetadata: {
-        protocol: { name: "KelpDAO", description: `**KelpDao Depositor** - rsETH is a Liquid Restaked Token (LRT) issued by Kelp DAO designed to offer liquidity to illiquid assets deposited into restaking platforms, such as EigenLayer. rsETH contracts distribute the deposited tokens into different Node Operators that operate with the Kelp DAO. 
+        protocol: {
+          name: "KelpDAO", description: `**KelpDao Depositor** - rsETH is a Liquid Restaked Token (LRT) issued by Kelp DAO designed to offer liquidity to illiquid assets deposited into restaking platforms, such as EigenLayer. rsETH contracts distribute the deposited tokens into different Node Operators that operate with the Kelp DAO. 
 
         Rewards accrue from the various services to the rsETH contracts. The price of rsETH token assumes the underlying price of the various rewards and staked tokens
         
@@ -619,6 +620,28 @@ export function KelpVaultInputs(
         allowInput={false}
       />
 
+      <div className="mt-6">
+        <p className="text-white font-bold mb-2 text-start">Fee Breakdown</p>
+        <div className="bg-[#23262f] py-2 px-4 rounded-lg space-y-2">
+          <span className="flex flex-row items-center justify-between text-white">
+            <p>Deposit Fee</p>
+            <p>{vaultData.fees.deposit / 1e16} %</p>
+          </span>
+          <span className="flex flex-row items-center justify-between text-white">
+            <p>Withdrawal Fee</p>
+            <p>{vaultData.fees.withdrawal / 1e16} %</p>
+          </span>
+          <span className="flex flex-row items-center justify-between text-white">
+            <p>Management Fee</p>
+            <p>{vaultData.fees.management / 1e16} %</p>
+          </span>
+          <span className="flex flex-row items-center justify-between text-white">
+            <p>Performance Fee</p>
+            <p>{vaultData.fees.performance / 1e16} %</p>
+          </span>
+        </div>
+      </div>
+
       <div className="w-full flex justify-center my-6">
         <ActionSteps steps={steps} stepCounter={stepCounter} />
       </div>
@@ -627,7 +650,7 @@ export function KelpVaultInputs(
         {account && steps.length > 0 ? (
           <>
             {(stepCounter === steps.length || steps.some(step => !step.loading && step.error)) ?
-              <MainActionButton label={"Close Modal"} handleClick={hideModal} /> :
+              <MainActionButton label={"Finish"} handleClick={hideModal} /> :
               <MainActionButton label={steps[stepCounter]?.label} handleClick={handleMainAction} disabled={inputBalance === "0" || steps[stepCounter]?.loading} />
             }
           </>

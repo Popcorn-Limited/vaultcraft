@@ -4,7 +4,7 @@ import { XMarkIcon } from "@heroicons/react/24/outline"
 function getStepColor(preFix: string, step: any): string {
   if (step.loading || step.success) return `${preFix}-[#DFFF1C]`
   if (step.error) return `${preFix}-red-500`
-  return `${preFix}-[#d7d7d766]`
+  return `${preFix}-gray-500`
 }
 
 interface ActionStepsProps {
@@ -26,7 +26,7 @@ export default function ActionSteps({ steps, stepCounter }: ActionStepsProps): J
             {!step.loading && step.success && <img src="/images/icons/checkIconYellow.svg" className={`h-4 w-4`} />}
             {!step.loading && !step.error && !step.success && <div className={`rounded-full h-3 w-3 ${i === stepCounter ? "bg-[#DFFF1C]" : getStepColor("bg", step)}`} />}
           </div>
-          {step.step < steps.length && <p className={`mb-4 ${getStepColor("text", step)}`}>___</p>}
+          {step.step < steps.length && <p className={`mb-4 ${getStepColor("text", step)} leading-0`}>___</p>}
         </div>
       )}
     </div>
