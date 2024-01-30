@@ -20,9 +20,10 @@ interface VaultInteractionProps {
   tokenOptions: Token[];
   hideModal: () => void;
   mutateTokenBalance: () => void;
+  depositDisabled?: boolean;
 }
 
-export default function VaultInteraction({ vaultData, tokenOptions, hideModal, mutateTokenBalance }: VaultInteractionProps): JSX.Element {
+export default function VaultInteraction({ vaultData, tokenOptions, hideModal, mutateTokenBalance, depositDisabled = false }: VaultInteractionProps): JSX.Element {
   const { query } = useRouter()
   const [masaSdk,] = useAtom(masaAtom)
 
@@ -42,7 +43,7 @@ export default function VaultInteraction({ vaultData, tokenOptions, hideModal, m
 
   const isDeposit = vaultData.lock.unlockTime === 0 || vaultData.lock.daysToUnlock > 0
 
-  const [availableTabs, setAvailableTabs] = useState<string[]>(["Deposit"])
+  const [availableTabs, setAvailableTabs] = useState<string[]>(depositDisabled ? ["Deposit"] : ["Deposit", "Claim"])
   const [activeTab, setActiveTab] = useState<string>("Deposit")
 
   const [stepCounter, setStepCounter] = useState<number>(0)
@@ -50,7 +51,9 @@ export default function VaultInteraction({ vaultData, tokenOptions, hideModal, m
   const [action, setAction] = useState<LockVaultActionType>(LockVaultActionType.Deposit)
 
   useEffect(() => {
-    setAvailableTabs([isDeposit ? "Deposit" : "Withdraw"])
+    let newActiveTabs = [isDeposit ? "Deposit" : "Withdraw"]
+    if (!depositDisabled) newActiveTabs.push("Claim")
+    setAvailableTabs(newActiveTabs)
     setActiveTab(isDeposit ? "Deposit" : "Withdraw")
 
     if (isDeposit) {
@@ -212,9 +215,9 @@ export default function VaultInteraction({ vaultData, tokenOptions, hideModal, m
               label={steps[stepCounter].label}
               handleClick={handleMainAction}
               disabled={
-                inputBalance === "0" || 
+                inputBalance === "0" ||
                 steps[stepCounter].loading ||
-                activeTab !== "Withdraw"
+                (depositDisabled && activeTab !== "Withdraw")
               }
             />
           }

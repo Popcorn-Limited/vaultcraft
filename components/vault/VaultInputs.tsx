@@ -293,6 +293,29 @@ export default function VaultInputs({ vaultData, tokenOptions, chainId, hideModa
         <p className="text-secondaryLight group-hover/zap:text-primary">Zap Settings</p>
       </div >
     }
+
+    <div className="mt-6">
+      <p className="text-white font-bold mb-2 text-start">Fee Breakdown</p>
+      <div className="bg-[#23262f] py-2 px-4 rounded-lg space-y-2">
+        <span className="flex flex-row items-center justify-between text-white">
+          <p>Deposit Fee</p>
+          <p>{vaultData.fees.deposit / 1e16} %</p>
+        </span>
+        <span className="flex flex-row items-center justify-between text-white">
+          <p>Withdrawal Fee</p>
+          <p>{vaultData.fees.withdrawal / 1e16} %</p>
+        </span>
+        <span className="flex flex-row items-center justify-between text-white">
+          <p>Management Fee</p>
+          <p>{vaultData.fees.management / 1e16} %</p>
+        </span>
+        <span className="flex flex-row items-center justify-between text-white">
+          <p>Performance Fee</p>
+          <p>{vaultData.fees.performance / 1e16} %</p>
+        </span>
+      </div>
+    </div>
+
     <div className="w-full flex justify-center my-6">
       <ActionSteps steps={steps} stepCounter={stepCounter} />
     </div>

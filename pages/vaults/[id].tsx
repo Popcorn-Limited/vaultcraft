@@ -1,0 +1,266 @@
+import AssetWithName from "@/components/vault/AssetWithName";
+import { vaultsAtom } from "@/lib/atoms/vaults";
+import { FeeConfiguration, VaultData } from "@/lib/types";
+import { useAtom } from "jotai";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import NoSSR from "react-no-ssr";
+import { useAccount, useBalance, usePublicClient, useWalletClient } from "wagmi";
+import axios from "axios"
+import { Address, WalletClient, createPublicClient, extractChain, http, zeroAddress } from "viem";
+import { VaultAbi, getVeAddresses } from "@/lib/constants";
+import { RPC_URLS } from "@/lib/utils/connectors";
+import * as chains from 'viem/chains'
+import { ProtocolName, YieldOptions } from "vaultcraft-sdk";
+import { yieldOptionsAtom } from "@/lib/atoms/sdk";
+import TabSelector from "@/components/common/TabSelector";
+import VaultStrategyConfiguration from "@/components/vault/management/vault/strategy";
+import VaultPausing from "@/components/vault/management/vault/pausing";
+import VaultDepositLimit from "@/components/vault/management/vault/depositLimit";
+import VaultFeeRecipient from "@/components/vault/management/vault/feeRecipient";
+import VaultFeeConfiguration from "@/components/vault/management/vault/feeConfiguration";
+import VaultFees from "@/components/vault/management/vault/fees";
+import { NumberFormatter, formatAndRoundNumber } from "@/lib/utils/formatBigNumber";
+import { roundToTwoDecimalPlaces } from "@/lib/utils/helpers";
+import MainActionButton from "@/components/button/MainActionButton";
+import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
+import { claimOPop } from "@/lib/optionToken/interactions";
+import { llama } from "@/lib/resolver/price/resolver";
+import VaultInputs from "@/components/vault/VaultInputs";
+import { showSuccessToast } from "@/lib/toasts";
+import CopyToClipboard from "react-copy-to-clipboard";
+import { Square2StackIcon } from "@heroicons/react/24/outline";
+
+const { oVCX: OVCX, VCX } = getVeAddresses();
+
+
+export default function Index() {
+  const router = useRouter();
+  const { query } = router;
+
+  const [yieldOptions] = useAtom(yieldOptionsAtom)
+
+  const { address: account } = useAccount();
+  const publicClient = usePublicClient()
+  const { data: walletClient } = useWalletClient()
+
+  const [vaults] = useAtom(vaultsAtom)
+  const [vaultData, setVaultData] = useState<VaultData>()
+
+  useEffect(() => {
+    if (!vaultData && query && vaults.length > 0) {
+      setVaultData(vaults.find(vault => vault.address === query?.id && vault.chainId === Number(query?.chainId)))
+    }
+  }, [vaults, query, vaultData])
+
+  const [gaugeRewards, setGaugeRewards] = useState<GaugeRewards>()
+  const { data: oBal } = useBalance({ chainId: 1, address: account, token: OVCX, watch: true })
+  const [vcxPrice, setVcxPrice] = useState<number>(0)
+
+  useEffect(() => {
+    async function getRewardsData() {
+      const rewards = await getGaugeRewards({
+        gauges: vaults.filter(vault => vault.gauge && vault.chainId === 1).map(vault => vault.gauge?.address) as Address[],
+        account: account as Address,
+        publicClient
+      })
+      setGaugeRewards(rewards)
+      const vcxPriceInUsd = await llama({ address: VCX, chainId: 1 })
+      setVcxPrice(vcxPriceInUsd)
+    }
+    if (account) getRewardsData();
+  }, [account])
+
+
+  return <NoSSR>
+    {
+      vaultData ? (
+        <>
+          <section className="md:border-b border-[#353945] py-10 px-4 md:px-8">
+
+            <div className="w-full mb-8">
+              <AssetWithName vault={vaultData} size={3} />
+            </div>
+
+            <div className="w-full flex flex-row justify-between space-y-4 md:space-y-0 mt-4 md:mt-0">
+              <div className="flex flex-row items-center md:pr-10 gap-10 md:w-fit">
+
+                <div className="w-[120px] md:w-max">
+                  <p className="leading-6 text-base text-primaryDark md:text-primary">Your Wallet</p>
+                  <div className="text-3xl font-bold whitespace-nowrap text-primary">
+                    {`$${formatAndRoundNumber(vaultData.asset.balance, vaultData.asset.decimals)}`}
+                  </div>
+                </div>
+
+                <div className="w-[120px] md:w-max">
+                  <p className="leading-6 text-base text-primaryDark md:text-primary">Deposits</p>
+                  <div className="text-3xl font-bold whitespace-nowrap text-primary">
+                    {`$${formatAndRoundNumber(vaultData.vault.balance, vaultData.vault.decimals)}`}
+                  </div>
+                </div>
+
+                <div className="w-[120px] md:w-max">
+                  <p className="leading-6 text-base text-primaryDark md:text-primary">TVL</p>
+                  <div className="text-3xl font-bold whitespace-nowrap text-primary">
+                    $ {vaultData.tvl < 1 ? "0" : NumberFormatter.format(vaultData.tvl)}
+                  </div>
+                </div>
+
+                <div className="w-[120px] md:w-max">
+                  <p className="w-max leading-6 text-base text-primaryDark md:text-primary">vAPY</p>
+                  <div className="text-3xl font-bold whitespace-nowrap text-primary">
+                    {`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.apy))} %`}
+                  </div>
+                </div>
+                {
+                  vaultData.gaugeMinApy ? (
+                    <div className="w-[120px] md:w-max">
+                      <p className="w-max leading-6 text-base text-primaryDark md:text-primary">Min Boost</p>
+                      <div className="text-3xl font-bold whitespace-nowrap text-primary">
+                        {vaultData.gaugeMinApy.toFixed(2)} %
+                      </div>
+                    </div>
+                  )
+                    : <></>
+                }
+                {
+                  vaultData.gaugeMaxApy ? (
+                    <div className="w-[120px] md:w-max">
+                      <p className="w-max leading-6 text-base text-primaryDark md:text-primary">Max Boost</p>
+                      <div className="text-3xl font-bold whitespace-nowrap text-primary">
+                        {vaultData.gaugeMaxApy.toFixed(2)} %
+                      </div>
+                    </div>
+                  )
+                    : <></>
+                }
+              </div>
+
+              <div className="flex flex-row items-center md:gap-6 md:w-fit md:pl-12">
+                <div className="flex gap-10 w-fit">
+                  <div className="w-[120px] md:w-max">
+                    <p className="w-max leading-6 text-base text-primaryDark md:text-primary">My oVCX</p>
+                    <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
+                      {`$${oBal && vcxPrice ? NumberFormatter.format((Number(oBal?.value) / 1e18) * (vcxPrice * 0.25)) : "0"}`}
+                    </div>
+                  </div>
+
+                  <div className="w-[120px] md:w-max">
+                    <p className="w-max leading-6 text-base text-primaryDark md:text-primary">Claimable oVCX</p>
+                    <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
+                      {`$${gaugeRewards && vcxPrice ? NumberFormatter.format((Number(gaugeRewards?.total) / 1e18) * (vcxPrice * 0.25)) : "0"}`}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="hidden align-bottom md:block md:mt-auto w-fit mb-2">
+                  <MainActionButton
+                    label="Claim oVCX"
+                    handleClick={() =>
+                      claimOPop({
+                        gauges: gaugeRewards?.amounts?.filter(gauge => Number(gauge.amount) > 0).map(gauge => gauge.address) as Address[],
+                        account: account as Address,
+                        clients: { publicClient, walletClient: walletClient as WalletClient }
+                      })}
+                  />
+                </div>
+              </div>
+              <div className="md:hidden">
+                <MainActionButton
+                  label="Claim oVCX"
+                  handleClick={() =>
+                    claimOPop({
+                      gauges: gaugeRewards?.amounts?.filter(gauge => Number(gauge.amount) > 0).map(gauge => gauge.address) as Address[],
+                      account: account as Address,
+                      clients: { publicClient, walletClient: walletClient as WalletClient }
+                    })}
+                />
+              </div>
+            </div>
+          </section>
+
+          <section className="flex flex-row justify-between space-x-8 py-10 px-4 md:px-8">
+
+            <div className="w-full md:w-1/3">
+              <div className="bg-[#23262f] p-6 rounded-lg">
+                <div className="bg-[#141416] px-6 py-6 rounded-lg">
+                  <VaultInputs
+                    vaultData={vaultData}
+                    tokenOptions={[]}
+                    chainId={vaultData.chainId}
+                    hideModal={() => { }}
+                    mutateTokenBalance={() => { }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="w-full md:w-2/3">
+              <div className="bg-[#23262f] p-6 rounded-lg">
+                <p className="text-white text-2xl font-bold mb-8">Strategy</p>
+                <p className='text-white'>
+                  {vaultData.metadata.optionalMetadata.protocol.description.split("** - ")[1]}
+                </p>
+
+                <div className="mt-8">
+
+                </div>
+
+                <div className="flex flex-row items-center space-x-4 mt-8">
+
+                  <div className="w-10/12 border border-[#353945] rounded-lg p-4">
+                    <p className="text-primary font-normal">Vault address:</p>
+                    <div className="flex flex-row items-center justify-between">
+                      <p className="font-bold text-primary">
+                        {vaultData.address.slice(0, 6)}...{vaultData.address.slice(-4)}
+                      </p>
+                      <div className='w-6 h-6 group/vaultAddress'>
+                        <CopyToClipboard text={vaultData.address} onCopy={() => showSuccessToast("Vault address copied!")}>
+                          <Square2StackIcon className="text-white group-hover/vaultAddress:text-[#DFFF1C]" />
+                        </CopyToClipboard>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="w-10/12 border border-[#353945] rounded-lg p-4">
+                    <p className="text-primary font-normal">Asset address:</p>
+                    <div className="flex flex-row items-center justify-between">
+                      <p className="font-bold text-primary">
+                        {vaultData.asset.address.slice(0, 6)}...{vaultData.asset.address.slice(-4)}
+                      </p>
+                      <div className='w-6 h-6 group/vaultAddress'>
+                        <CopyToClipboard text={vaultData.asset.address} onCopy={() => showSuccessToast("Asset address copied!")}>
+                          <Square2StackIcon className="text-white group-hover/vaultAddress:text-[#DFFF1C]" />
+                        </CopyToClipboard>
+                      </div>
+                    </div>
+                  </div>
+
+                  {vaultData.gauge &&
+                    <div className="w-10/12 border border-[#353945] rounded-lg p-4">
+                      <p className="text-primary font-normal">Gauge address:</p>
+                      <div className="flex flex-row items-center justify-between">
+                        <p className="font-bold text-primary">
+                          {vaultData.gauge.address.slice(0, 6)}...{vaultData.gauge.address.slice(-4)}
+                        </p>
+                        <div className='w-6 h-6 group/gaugeAddress'>
+                          <CopyToClipboard text={vaultData.gauge.address} onCopy={() => showSuccessToast("Gauge address copied!")}>
+                            <Square2StackIcon className="text-white group-hover/gaugeAddress:text-[#DFFF1C]" />
+                          </CopyToClipboard>
+                        </div>
+                      </div>
+                    </div>
+                  }
+
+                </div>
+              </div>
+            </div>
+
+          </section>
+        </>
+      )
+        :
+        <p className="text-white">Loading...</p>
+    }
+  </NoSSR>
+}

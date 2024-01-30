@@ -7,7 +7,7 @@ import Accordion from "@/components/common/Accordion";
 import Modal from "@/components/modal/Modal";
 import { useEffect, useState } from "react";
 import AssetWithName from "../AssetWithName";
-import { LockVaultData, Token } from "@/lib/types";
+import { LockVaultData, Token, VaultLabel } from "@/lib/types";
 import { useAtom } from "jotai";
 import { availableZapAssetAtom, zapAssetsAtom } from "@/lib/atoms";
 import { getTokenOptions, isDefiPosition } from "@/lib/vault/utils";
@@ -95,6 +95,7 @@ export default function LockVault({ vaultData, mutateTokenBalance, searchTerm }:
               tokenOptions={tokenOptions}
               hideModal={() => setShowModal(false)}
               mutateTokenBalance={mutateTokenBalance}
+              depositDisabled={vaultData.metadata.labels && vaultData.metadata.labels.includes(VaultLabel.deprecated)}
             />
           </div>
 
