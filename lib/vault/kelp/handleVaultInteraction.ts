@@ -45,6 +45,7 @@ export default async function handleVaultInteraction({
   referral
 }: HandleVaultInteractionProps): Promise<() => Promise<boolean>> {
   let postBal = 0;
+  console.log({ action, })
   switch (action) {
     case KelpVaultActionType.Deposit:
       switch (stepCounter) {
@@ -82,8 +83,7 @@ export default async function handleVaultInteraction({
         case 0:
           return () => handleAllowance({ token: "0xA35b1B31Ce002FBF2058D22F30f95D405200A15b", amount, account, spender: getAddress("0x036676389e48133B63a802f8635AD39E752D375D"), clients })
         case 1:
-          postBal = Number(await clients.publicClient.readContract({ address: "0xA35b1B31Ce002FBF2058D22F30f95D405200A15b", abi: erc20ABI, functionName: "balanceOf", args: [account] }))
-          return () => mintRsEth({ amount: postBal - ethX.balance, account, clients })
+          return () => mintRsEth({ amount, account, clients })
         case 2:
           postBal = Number(await clients.publicClient.readContract({ address: "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7", abi: erc20ABI, functionName: "balanceOf", args: [account] }))
           return () => handleAllowance({ token: "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7", amount: postBal, account, spender: getAddress(VAULT_ROUTER), clients })
