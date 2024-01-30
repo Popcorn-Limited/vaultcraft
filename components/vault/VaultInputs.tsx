@@ -26,10 +26,12 @@ export interface VaultInputsProps {
   tokenOptions: Token[];
   chainId: number;
   hideModal: () => void;
-  mutateTokenBalance: (props: MutateTokenBalanceProps) => void;
 }
 
-export default function VaultInputs({ vaultData, tokenOptions, chainId, hideModal, mutateTokenBalance }: VaultInputsProps): JSX.Element {
+export default function VaultInputs(
+  { vaultData, tokenOptions, chainId, hideModal, mutateTokenBalance }
+    : VaultInputsProps & { mutateTokenBalance: (props: MutateTokenBalanceProps) => void }
+): JSX.Element {
   const { asset, vault, gauge } = vaultData;
   const { query } = useRouter()
 

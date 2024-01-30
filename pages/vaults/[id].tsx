@@ -34,6 +34,7 @@ import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
 import { availableZapAssetAtom, zapAssetsAtom } from "@/lib/atoms";
 import { getTokenOptions, isDefiPosition } from "@/lib/vault/utils";
 import LeftArrowIcon from "@/components/svg/LeftArrowIcon";
+import { KelpVaultInputs, getKelpVaultData, mutateKelpTokenBalance } from "@/components/vault/KelpVault";
 
 const { oVCX: OVCX, VCX } = getVeAddresses();
 
@@ -46,12 +47,21 @@ export default function Index() {
   const publicClient = usePublicClient()
   const { data: walletClient } = useWalletClient()
 
+  const [yieldOptions] = useAtom(yieldOptionsAtom)
+
   const [vaults] = useAtom(vaultsAtom)
   const [vaultData, setVaultData] = useState<VaultData>()
 
   useEffect(() => {
-    if (!vaultData && query && vaults.length > 0) {
-      setVaultData(vaults.find(vault => vault.address === query?.id && vault.chainId === Number(query?.chainId)))
+    if (!vaultData && query && yieldOptions && vaults.length > 0) {
+      if (query?.id === "0x7CEbA0cAeC8CbE74DB35b26D7705BA68Cb38D725") {
+        getKelpVaultData(account || zeroAddress, publicClient, yieldOptions).then(res => {
+          setVaultData(res.vaultData);
+          setTokenOptions(res.tokenOptions)
+        })
+      } else {
+        setVaultData(vaults.find(vault => vault.address === query?.id && vault.chainId === Number(query?.chainId)))
+      }
     }
   }, [vaults, query, vaultData])
 
@@ -61,7 +71,7 @@ export default function Index() {
   const [tokenOptions, setTokenOptions] = useState<Token[]>([])
 
   useEffect(() => {
-    if (!!vaultData && Object.keys(availableZapAssets).length > 0) {
+    if (!!vaultData && Object.keys(availableZapAssets).length > 0 && vaultData.address !== "0x7CEbA0cAeC8CbE74DB35b26D7705BA68Cb38D725") {
       if (availableZapAssets[vaultData.chainId].includes(vaultData.asset.address)) {
         setZapAvailable(true)
         setTokenOptions(getTokenOptions(vaultData, zapAssets[vaultData.chainId]))
@@ -95,8 +105,6 @@ export default function Index() {
     }
     if (account) getRewardsData();
   }, [account])
-
-
 
   return <NoSSR>
     {
@@ -220,13 +228,23 @@ export default function Index() {
             <div className="w-full md:w-1/3">
               <div className="bg-[#23262f] p-6 rounded-lg">
                 <div className="bg-[#141416] px-6 py-6 rounded-lg">
-                  <VaultInputs
-                    vaultData={vaultData}
-                    tokenOptions={tokenOptions}
-                    chainId={vaultData.chainId}
-                    hideModal={() => router.push("/vaults")}
-                    mutateTokenBalance={mutateTokenBalance}
-                  />
+                  {vaultData.address === "0x7CEbA0cAeC8CbE74DB35b26D7705BA68Cb38D725" ?
+                    <KelpVaultInputs
+                      vaultData={vaultData}
+                      tokenOptions={tokenOptions}
+                      chainId={vaultData.chainId}
+                      hideModal={() => router.push("/vaults")}
+                      mutateTokenBalance={mutateKelpTokenBalance}
+                      setVaultData={setVaultData}
+                      setTokenOptions={setTokenOptions}
+                    /> :
+                    <VaultInputs
+                      vaultData={vaultData}
+                      tokenOptions={tokenOptions}
+                      chainId={vaultData.chainId}
+                      hideModal={() => router.push("/vaults")}
+                      mutateTokenBalance={mutateTokenBalance}
+                    />}
                 </div>
               </div>
             </div>
@@ -239,7 +257,7 @@ export default function Index() {
                 </p>
 
                 <div className="mt-8">
-
+                  
                 </div>
 
                 <div className="md:flex md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4 mt-8">
