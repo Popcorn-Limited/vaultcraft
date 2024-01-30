@@ -272,20 +272,22 @@ export default function VaultInputs(
       allowSelection={isDeposit}
       allowInput
     />
+
     <div className="relative py-4">
       <div className="absolute inset-0 flex items-center" aria-hidden="true">
-        <div className="w-full border-t border-customLightGray" />
+        <div className="w-full border-t border-gray-500" />
       </div>
       <div className="relative flex justify-center">
         <span className="bg-[#141416] px-4">
           <ArrowDownIcon
-            className="h-10 w-10 p-2 text-customLightGray border border-customLightGray rounded-full cursor-pointer hover:text-primary hover:border-primary"
+            className="h-10 w-10 p-2 text-gray-500 border border-gray-500 rounded-full cursor-pointer hover:text-primary hover:border-primary"
             aria-hidden="true"
             onClick={switchTokens}
           />
         </span>
       </div>
     </div>
+
     <InputTokenWithError
       captionText={"Output Amount"}
       onSelectToken={option => handleTokenSelect(!!gauge ? gauge : vault, option)}
@@ -336,7 +338,7 @@ export default function VaultInputs(
     <div className="w-full flex justify-center my-6">
       <ActionSteps steps={steps} stepCounter={stepCounter} />
     </div>
-    
+
     <div className="">
       {account ? (
         <>

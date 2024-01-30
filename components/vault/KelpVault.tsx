@@ -598,12 +598,19 @@ export function KelpVaultInputs(
         allowInput
       />
 
-      <div className="relative flex justify-center my-6">
-        <ArrowDownIcon
-          className="h-10 w-10 p-2 text-[#9CA3AF] border border-[#4D525C] rounded-full cursor-pointer hover:text-primary hover:border-primary"
-          aria-hidden="true"
-          onClick={switchTokens}
-        />
+      <div className="relative py-4">
+        <div className="absolute inset-0 flex items-center" aria-hidden="true">
+          <div className="w-full border-t border-gray-500" />
+        </div>
+        <div className="relative flex justify-center">
+          <span className="bg-[#141416] px-4">
+            <ArrowDownIcon
+              className="h-10 w-10 p-2 text-gray-500 border border-gray-500 rounded-full cursor-pointer hover:text-primary hover:border-primary"
+              aria-hidden="true"
+              onClick={switchTokens}
+            />
+          </span>
+        </div>
       </div>
 
       <InputTokenWithError
