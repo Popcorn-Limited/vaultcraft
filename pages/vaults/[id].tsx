@@ -222,7 +222,7 @@ export default function Index() {
                       vaultData={vaultData}
                       tokenOptions={tokenOptions}
                       chainId={vaultData.chainId}
-                      hideModal={() => router.push("/vaults")}
+                      hideModal={() => router.reload()}
                       mutateTokenBalance={mutateKelpTokenBalance}
                       setVaultData={setVaultData}
                       setTokenOptions={setTokenOptions}
@@ -231,7 +231,7 @@ export default function Index() {
                       vaultData={vaultData}
                       tokenOptions={tokenOptions}
                       chainId={vaultData.chainId}
-                      hideModal={() => router.push("/vaults")}
+                      hideModal={() => router.reload()}
                       mutateTokenBalance={mutateTokenBalance}
                     />}
                 </div>
