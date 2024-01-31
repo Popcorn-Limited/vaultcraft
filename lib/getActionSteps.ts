@@ -1,4 +1,4 @@
-import { KelpVaultActionType, LockVaultActionType, SmartVaultActionType } from "@/lib/types";
+import {DepositVaultActionType, KelpVaultActionType, LockVaultActionType, SmartVaultActionType} from "@/lib/types";
 
 export interface ActionStep {
   step: number;
@@ -314,6 +314,45 @@ export function getKelpVaultActionSteps(action: KelpVaultActionType): ActionStep
       }, {
         step: 4,
         label: "Zap",
+        ...BaseStepInfo
+      }]
+  }
+}
+
+
+export function getDepositVaultActionSteps(action: DepositVaultActionType): ActionStep[] {
+  switch (action) {
+    case DepositVaultActionType.Supply:
+      return [{
+        step: 1,
+        label: "Supply Asset",
+        ...BaseStepInfo
+      },
+        {
+          step: 2,
+          label: "Borrow Asset",
+          ...BaseStepInfo
+        },
+        {
+          step: 3,
+          label: "Deposit Asset",
+          ...BaseStepInfo
+        }]
+    case DepositVaultActionType.Borrow:
+      return [{
+        step: 2,
+        label: "Borrow Asset",
+        ...BaseStepInfo
+      },
+        {
+          step: 3,
+          label: "Deposit Asset",
+          ...BaseStepInfo
+        }]
+    case DepositVaultActionType.Deposit:
+      return [{
+        step: 0,
+        label: "Supply to Aave",
         ...BaseStepInfo
       }]
   }
