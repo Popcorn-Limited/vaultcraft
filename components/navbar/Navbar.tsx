@@ -40,11 +40,6 @@ export default function Navbar(): JSX.Element {
               <img src="/images/icons/popLogo.svg" alt="Logo" className="w-12 h-12 md:w-10 md:h-10 text-white" />
             </Link>
           </div>
-          <div className="hidden md:block ml-8 py-2 px-4 bg-[#dfff1c26] rounded">
-            <span className="text-[#DFFF1C]">
-              Beta
-            </span>
-          </div>
         </div>
         <div className="flex flex-container h-full flex-row w-fit-content gap-x-6">
           {address ? (
