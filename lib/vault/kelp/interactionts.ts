@@ -46,7 +46,7 @@ export async function mintRsEth({ amount, account, clients }: { amount: number, 
       address: "0x036676389e48133B63a802f8635AD39E752D375D", // KelpDao Deposit Pool
       abi: KelpDepositPoolAbi,
       functionName: "depositAsset",
-      args: ["0xA35b1B31Ce002FBF2058D22F30f95D405200A15b", BigInt(amount), BigInt(0), ""], // TODO -> add minAmount and refId
+      args: ["0xA35b1B31Ce002FBF2058D22F30f95D405200A15b", BigInt(amount), BigInt(0), "cb593439f84d0331ef8dc2507746aa14f999e1cee9b0b67364e20c8e847214c0"], // TODO -> add minAmount
       value: undefined,
       publicClient: clients.publicClient
     }),
