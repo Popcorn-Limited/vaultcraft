@@ -108,7 +108,7 @@ export default async function handleVaultInteraction({
           return () => handleAllowance({ token: vaultData.asset.address, amount, account, spender: getAddress(ensoWallet.address), clients })
         case 3:
           postBal = Number(await clients.publicClient.readContract({ address: vaultData.asset.address, abi: erc20ABI, functionName: "balanceOf", args: [account] }))
-          return () => zap({ chainId, sellToken: vaultData.asset.address, buyToken: outputToken.address, amount: postBal - vaultData.asset.balance, account, slippage, tradeTimeout, clients })
+          return () => zap({ chainId, sellToken: vaultData.asset.address, buyToken: "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", amount: postBal - vaultData.asset.balance, account, slippage, tradeTimeout, clients })
       }
     default:
       // We should never reach this code. This is here just to make ts happy
