@@ -8,6 +8,7 @@ import { erc20ABI } from "wagmi";
 import { FireEventArgs } from "@masa-finance/analytics-sdk";
 import { getVeAddresses } from "@/lib/constants";
 import { mintEthX, mintRsEth } from "@/lib/vault/kelp/interactionts";
+import { assetAddressesAtom } from "@/lib/atoms";
 
 const { VaultRouter: VAULT_ROUTER } = getVeAddresses()
 
@@ -70,6 +71,7 @@ export default async function handleVaultInteraction({
           return () => handleAllowance({ token: "0xA35b1B31Ce002FBF2058D22F30f95D405200A15b", amount: postBal, account, spender: getAddress("0x036676389e48133B63a802f8635AD39E752D375D"), clients })
         case 2:
           postBal = Number(await clients.publicClient.readContract({ address: "0xA35b1B31Ce002FBF2058D22F30f95D405200A15b", abi: erc20ABI, functionName: "balanceOf", args: [account] }))
+          console.log({ postBal, ethXBal: ethX.balance, amount: postBal - ethX.balance })
           return () => mintRsEth({ amount: postBal - ethX.balance, account, clients })
         case 3:
           postBal = Number(await clients.publicClient.readContract({ address: "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7", abi: erc20ABI, functionName: "balanceOf", args: [account] }))
@@ -83,6 +85,7 @@ export default async function handleVaultInteraction({
         case 0:
           return () => handleAllowance({ token: "0xA35b1B31Ce002FBF2058D22F30f95D405200A15b", amount, account, spender: getAddress("0x036676389e48133B63a802f8635AD39E752D375D"), clients })
         case 1:
+          console.log({ amount, balance: ethX.balance })
           return () => mintRsEth({ amount, account, clients })
         case 2:
           postBal = Number(await clients.publicClient.readContract({ address: "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7", abi: erc20ABI, functionName: "balanceOf", args: [account] }))
