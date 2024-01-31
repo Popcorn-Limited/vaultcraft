@@ -78,6 +78,7 @@ export default async function handleVaultInteraction({
           return () => handleAllowance({ token: "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7", amount: postBal, account, spender: getAddress(VAULT_ROUTER), clients })
         case 4:
           postBal = Number(await clients.publicClient.readContract({ address: "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7", abi: erc20ABI, functionName: "balanceOf", args: [account] }))
+          console.log({ amount: postBal - vaultData.asset.balance, balance: vaultData.asset.balance, postBal })
           return () => vaultDepositAndStake({ chainId, router: VAULT_ROUTER, vaultData, account, amount: postBal - vaultData.asset.balance, clients, fireEvent, referral })
       }
     case KelpVaultActionType.EthxZapDeposit:
@@ -92,6 +93,7 @@ export default async function handleVaultInteraction({
           return () => handleAllowance({ token: "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7", amount: postBal, account, spender: getAddress(VAULT_ROUTER), clients })
         case 3:
           postBal = Number(await clients.publicClient.readContract({ address: "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7", abi: erc20ABI, functionName: "balanceOf", args: [account] }))
+          console.log({ amount: postBal - vaultData.asset.balance, balance: vaultData.asset.balance, postBal })
           return () => vaultDepositAndStake({ chainId, router: VAULT_ROUTER, vaultData, account, amount: postBal - vaultData.asset.balance, clients, fireEvent, referral })
       }
     case KelpVaultActionType.ZapWithdrawal:
