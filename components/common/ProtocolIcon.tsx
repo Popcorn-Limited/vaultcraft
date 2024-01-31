@@ -19,7 +19,7 @@ const protocolNameToLlamaProtocol: { [key: string]: string } = {
   "Frax": "frax",
   "Velodrome": "velodrome",
   "Stader": "stader",
-  "KelpDao": "kelp-dao"
+  "KelpDAO": "kelp-dao"
 }
 
 const iconSize: { [key: number]: string } = {
