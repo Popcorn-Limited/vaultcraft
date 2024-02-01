@@ -15,7 +15,7 @@ export default function SocialMediaLinks({ color, color2, size }: SocialMediaLin
     <a href="https://twitter.com/VaultCraft_io" target="_blank">
       <TwitterIcon color={color} size={size} />
     </a>
-    <a href="https://discord.com/invite/3xBnfxeEj5" target="_blank">
+    <a href="https://discord.com/invite/kgCun7SbkR" target="_blank">
       <DiscordIcon color={color} size={size} />
     </a>
     <a href="https://t.me/vaultcraft" target="_blank">
