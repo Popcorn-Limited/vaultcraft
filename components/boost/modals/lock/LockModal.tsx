@@ -25,8 +25,7 @@ interface LockModalProps {
 }
 
 export default function LockModal({ show, setShowLpModal }: LockModalProps): JSX.Element {
-  // const { address: account } = useAccount();
-  const account = "0x912e741CC6d3d42C8cf36e6cb28d219A9b0BE954";
+  const { address: account } = useAccount();
 
   const { chain } = useNetwork();
   const { switchNetworkAsync } = useSwitchNetwork();
