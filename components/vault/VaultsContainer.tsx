@@ -46,6 +46,7 @@ export default function VaultsContainer({ hiddenVaults, displayVaults, showDescr
   const publicClient = usePublicClient()
   const { data: walletClient } = useWalletClient()
 
+  // @ts-ignore
   const [selectedNetworks, selectNetwork] = useNetworkFilter(SUPPORTED_NETWORKS.map(network => network.id));
   const [vaults, setVaults] = useAtom(vaultsAtom)
   const [zapAssets, setZapAssets] = useAtom(zapAssetsAtom)
