@@ -5,7 +5,7 @@ import {
   borrowFromAave,
   supplyToAave,
   vaultDeposit
-} from "@/lib/vault/interactions";
+} from "@/lib/vault/aave/interactionts";
 
 import { FireEventArgs } from "@masa-finance/analytics-sdk";
 import { getVeAddresses } from "@/lib/constants";
