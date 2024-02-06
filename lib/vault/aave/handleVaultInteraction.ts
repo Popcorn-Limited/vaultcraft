@@ -12,7 +12,7 @@ import { getVeAddresses } from "@/lib/constants";
 
 const { VaultRouter: VAULT_ROUTER } = getVeAddresses()
 
-const AAVE_POOL_PROXY = "0xcC6114B983E4Ed2737E9BD3961c9924e6216c704";
+export const AAVE_POOL_PROXY = "0x794a61358D6845594F94dc1DB02A252b5b4814aD"; //OPTIMISM
 
 interface HandleVaultInteractionProps {
   stepCounter: number;

@@ -16,6 +16,7 @@ import {networkMap} from "@/lib/utils/connectors";
 import {AavePoolAbi} from "@/lib/constants/abi/Aave";
 import axios from "axios"
 import {erc20ABI} from "wagmi";
+import {AAVE_POOL_PROXY} from "@/lib/vault/aave/handleVaultInteraction";
 
 interface VaultWriteProps {
   chainId: number;
@@ -136,7 +137,7 @@ export async function supplyToAave({ asset, amount, onBehalfOf, chainId, account
   return await handleCallResult({
     successMessage: "Supplied underlying asset into Aave pool!",
     simulationResponse: await simulateAavePoolCall({
-      address: "0xcC6114B983E4Ed2737E9BD3961c9924e6216c704",
+      address: AAVE_POOL_PROXY,
       account,
       args:[asset, amount, onBehalfOf, 0],
       functionName: "supply",
@@ -152,7 +153,7 @@ export async function borrowFromAave({ asset, amount, onBehalfOf, chainId, accou
   return await handleCallResult({
     successMessage: "Borrowed underlying asset from Aave pool!",
     simulationResponse: await simulateAavePoolCall({
-      address: "0xcC6114B983E4Ed2737E9BD3961c9924e6216c704",
+      address: AAVE_POOL_PROXY,
       account,
       args:[asset, amount, 2, 0, onBehalfOf],
       functionName: "borrow",
@@ -176,6 +177,7 @@ export async function fetchTokens(account: Address, tokens: Tokens, publicClient
   )
 
   const {DAI, USDC, USDT, BAL} = tokens;
+  console.log(publicClient.chain, publicClient)
   const balRes = await publicClient.multicall({
     contracts: [
       {
@@ -233,7 +235,7 @@ export async function fetchTokens(account: Address, tokens: Tokens, publicClient
 
 export async function fetchUserAccountData(account: Address, publicClient: PublicClient): Promise<UserAccountData> {
   const userData = await publicClient.readContract({
-    address: "0xcC6114B983E4Ed2737E9BD3961c9924e6216c704",
+    address: AAVE_POOL_PROXY,
     abi: AavePoolAbi,
     functionName: 'getUserAccountData',
     args: [account],
@@ -251,7 +253,7 @@ export async function fetchUserAccountData(account: Address, publicClient: Publi
 
 export async function fetchReserveData(asset: Address, publicClient: PublicClient): Promise<ReserveData> {
   const reserveData = await publicClient.readContract({
-    address: "0xcC6114B983E4Ed2737E9BD3961c9924e6216c704",
+    address: AAVE_POOL_PROXY,
     abi: AavePoolAbi,
     functionName: 'getReserveData',
     args: [asset],

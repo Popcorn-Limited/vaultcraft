@@ -4,7 +4,7 @@ import InputTokenWithError from "@/components/input/InputTokenWithError";
 import ActionSteps from "@/components/vault/ActionSteps";
 import {masaAtom} from "@/lib/atoms/sdk";
 import {ActionStep, getDepositVaultActionSteps} from "@/lib/getActionSteps";
-import {DepositVaultActionType, FeeConfiguration, Token, UserAccountData, VaultData} from "@/lib/types";
+import {DepositVaultActionType, Token, UserAccountData, VaultData} from "@/lib/types";
 import {safeRound} from "@/lib/utils/formatBigNumber";
 import {validateInput} from "@/lib/utils/helpers";
 import handleVaultInteraction from "@/lib/vault/aave/handleVaultInteraction";
@@ -13,18 +13,17 @@ import {useConnectModal} from "@rainbow-me/rainbowkit";
 import {useAtom} from "jotai";
 import {useRouter} from "next/router";
 import {useEffect, useState} from "react";
-import {Address, formatUnits, getAddress, isAddress, maxUint256} from "viem";
+import {formatUnits, getAddress, isAddress, maxUint256} from "viem";
 import {useAccount, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient} from "wagmi";
 import {AaveUserAccountData} from "@/components/vault/VaultStats";
 import ProtocolIcon from "@/components/common/ProtocolIcon";
 import {fetchReserveData, fetchTokens, fetchUserAccountData} from "@/lib/vault/aave/interactionts";
-import {ProtocolName} from "vaultcraft-sdk";
 
 const ACTIVE_TABS = ["Supply", "Borrow", "Deposit"];
 
 const DAI: Token = {
-  address: "0xc8c0Cf9436F4862a8F60Ce680Ca5a9f0f99b5ded",
-  name: "Polygon Mumbai",
+  address: "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1", //OPTIMISM
+  name: "DAI Stablecoin",
   symbol: "DAI",
   decimals: 18,
   logoURI: "https://etherscan.io/token/images/MCDDai_32.png",
@@ -34,7 +33,7 @@ const DAI: Token = {
 
 
 const USDC: Token = {
-  address: "0x52D800ca262522580CeBAD275395ca6e7598C014",
+  address: "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85", //OPTIMISM
   name: "USD Coin",
   symbol: "USDC",
   decimals: 6,
@@ -44,7 +43,7 @@ const USDC: Token = {
 }
 
 const USDT: Token = {
-  address: "0x1fdE0eCc619726f4cD597887C9F3b4c8740e19e2",
+  address: "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58", //OPTIMISM
   name: "Tether",
   symbol: "USDT",
   decimals: 6,
@@ -54,7 +53,7 @@ const USDT: Token = {
 }
 
 const BAL: Token = {
-  address: "0x00DF377c2C82a65A8bAe2Ff04a9434a721Bc5aEB",
+  address: "0xFE8B128bA8C78aabC59d4c64cEE7fF28e9379921", //OPTIMISM
   name: "Balancer",
   symbol: "BAL",
   decimals: 18,
@@ -64,10 +63,10 @@ const BAL: Token = {
 }
 
 const Vault: Token = {
-  address: "0x008a1832841b0bBA57886Da2005aE7f666EFEcc4",
-  name: "VaultCraft rsETH Vault",
-  symbol: "vc-rsETH",
-  decimals: 18,
+  address: "0x5372c5AF5f078f2d4B5dbBE4377b2f0225f2863A",
+  name: "Popcorn USD Coin Vault (pop-USDC)",
+  symbol: "pop-USDC",
+  decimals: 15,
   logoURI: "https://app.vaultcraft.io/images/tokens/vcx.svg",
   balance: 0,
   price: 1
@@ -124,12 +123,13 @@ export default function DepositViaLoan() {
 
   useEffect(() => {
     if (account) {
+      console.log("chain id:", chain?.id)
       fetchTokens(account, {DAI, USDT, USDC, BAL}, publicClient).then(tokens => {
         setInputTokens(tokens)
         setVaultData({
           assetPrice: 0, gauge: undefined, gaugeMaxApy: 0, gaugeMinApy: 0,
           address: Vault.address,
-          vault: tokens.usdc, //todo: update this with aave data. check how this is used in VaultStat
+          vault: Vault, //todo: update this with aave data. check how this is used in VaultStat
           asset: tokens.usdc, //todo: update this with aave data. change VaultStat to AaveVaultStat
           totalAssets: 1,
           totalSupply: 1,
@@ -148,7 +148,7 @@ export default function DepositViaLoan() {
             feeRecipient: "0x47fd36ABcEeb9954ae9eA1581295Ce9A8308655E",
             cid: "",
             optionalMetadata: {
-              protocol: {name: "KelpDao", description: ""},
+              protocol: {name: "Aave Deposit To Loan", description: ""},
               token: {name: "", description: "",},
               strategy: {name: "", description: ""},
             },
