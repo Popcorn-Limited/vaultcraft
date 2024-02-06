@@ -201,3 +201,51 @@ export type VoteUserSlopes = {
   power: bigint,
   end: bigint,
 }
+
+export type UserAccountData  = {
+  totalCollateralBase: number,
+  totalDebtBase: number,
+  availableBorrowsBase: number,
+  currentLiquidationThreshold: number,
+  ltv: number,
+  healthFactor: number
+}
+
+export type ReserveDataResponse  = {
+  id: bigint;
+  underlyingAsset: string;
+  aTokenAddress: string;
+  stableDebtTokenAddress: string;
+  variableDebtTokenAddress: string;
+  interestRateStrategyAddress: string;
+  liquidityIndex: bigint;
+  variableBorrowIndex: bigint;
+  currentLiquidityRate: bigint;
+  currentVariableBorrowRate: bigint;
+  currentStableBorrowRate: bigint;
+  lastUpdateTimestamp: bigint;
+  configuration: bigint;
+  liquidityRate: bigint;
+  stableBorrowRate: bigint;
+  averageStableBorrowRate: bigint;
+  variableBorrowRate: bigint;
+  totalPrincipalStableDebt: bigint;
+  totalScaledVariableDebt: bigint;
+  totalDeposits: bigint;
+  totalLiquidity: bigint;
+  utilizationRate: bigint;
+  reserveFactor: bigint;
+  accruedToTreasury: bigint;
+  unbacked: bigint;
+  isolationModeTotalDebt: bigint;
+  eModeCategoryId: bigint;
+  debtCeiling: bigint;
+  debtOutstanding: bigint;
+  coverageRatio: bigint;
+}
+
+export type ReserveData  = {
+  variableBorrowRate: number,
+  stableBorrowRate: number,
+  liquidityRate: number
+}

@@ -1,7 +1,7 @@
-import { Address } from "viem";
-import { NumberFormatter, formatAndRoundNumber } from "@/lib/utils/formatBigNumber";
+import {Address, formatEther, formatUnits} from "viem";
+import {NumberFormatter, formatAndRoundNumber, formatToFixedDecimals} from "@/lib/utils/formatBigNumber";
 import Title from "@/components/common/Title";
-import { VaultData } from "@/lib/types";
+import {UserAccountData, VaultData} from "@/lib/types";
 import { roundToTwoDecimalPlaces } from "@/lib/utils/helpers";
 
 interface VaultStatProps {
@@ -76,6 +76,81 @@ export default function VaultStats({ vaultData, account, zapAvailable }: VaultSt
           <p className="font-normal text-primary text-[15px] mb-1">⚡ Zap available</p>
         </div>
       )}
+    </>
+  )
+}
+
+
+interface AaveUserAccountDataProps {
+  userAccountData: UserAccountData
+  account?: Address
+  interestRate?: number
+}
+
+export function AaveUserAccountData({ userAccountData, interestRate }: AaveUserAccountDataProps): JSX.Element {
+  return (
+    <>
+      <div className="w-full flex justify-between gap-8 md:gap-4">
+        <div className="w-full mt-6 md:mt-0">
+          <p className="text-primary font-normal md:text-[14px]">Debt Balance</p>
+          <p className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
+            <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
+              {(userAccountData.totalDebtBase/ 1e8).toFixed(2)} USD
+            </Title>
+          </p>
+        </div>
+
+        <div className="w-full mt-6 md:mt-0">
+          <p className="text-primary font-normal md:text-[14px]">Max LTV</p>
+          <div className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
+            <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
+              {(userAccountData.ltv/ 10000).toFixed(2)}
+            </Title>
+          </div>
+        </div>
+
+        <div className="w-full mt-6 md:mt-0">
+          <p className="leading-6 text-primary md:text-[14px]">Liquidation threshold</p>
+          <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
+            {(userAccountData.currentLiquidationThreshold / 10000).toFixed(2)}
+          </Title>
+        </div>
+      </div>
+
+      <div className="w-full flex justify-between gap-8 md:gap-4">
+        <div className="w-full mt-6 md:mt-0">
+          <p className="font-normal text-primary md:text-[14px]">Health Factor</p>
+          <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
+            {Number(formatEther(BigInt(userAccountData.healthFactor))).toFixed(2)}
+          </Title>
+        </div>
+
+        <div className="w-full mt-6 md:mt-0">
+          <p className="font-normal text-primary md:text-[14px]">Total Collateral</p>
+          <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
+            {(userAccountData.totalCollateralBase / 1e8).toFixed(2)} USD
+          </Title>
+        </div>
+
+        <div className="w-full mt-6 md:mt-0">
+          <p className="font-normal text-primary md:text-[14px]">Available Borrow</p>
+          <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
+            {(userAccountData.availableBorrowsBase / 1e8).toFixed(2)} USD
+          </Title>
+        </div>
+      </div>
+
+      <div className="w-full flex justify-between gap-8 md:gap-4">
+        <div className="w-full mt-6 md:mt-0">
+          <p className="font-normal text-primary md:text-[14px]">Borrow Interest Rate</p>
+          <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
+            {formatToFixedDecimals(interestRate || 0, 2)} %
+          </Title>
+        </div>
+      </div>
+      <div className="w-full flex justify-between gap-8 md:gap-4"></div>
+      <div className="w-full flex justify-between gap-8 md:gap-4"></div>
+
     </>
   )
 }

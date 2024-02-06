@@ -1,15 +1,18 @@
-import axios from "axios"
-import { Address, getAddress } from "viem";
+import { Address } from "viem";
 import { handleAllowance } from "@/lib/approve";
-import {Clients, Token, VaultData, KelpVaultActionType, DepositVaultActionType} from "@/lib/types";
-import { vaultDepositAndStake, vaultUnstakeAndWithdraw } from "@/lib/vault/interactions";
-import zap from "@/lib/vault/zap";
-import { erc20ABI } from "wagmi";
+import {Clients, Token, VaultData, DepositVaultActionType} from "@/lib/types";
+import {
+  borrowFromAave,
+  supplyToAave,
+  vaultDeposit
+} from "@/lib/vault/interactions";
+
 import { FireEventArgs } from "@masa-finance/analytics-sdk";
 import { getVeAddresses } from "@/lib/constants";
-import { mintEthX, mintRsEth } from "@/lib/vault/kelp/interactionts";
 
 const { VaultRouter: VAULT_ROUTER } = getVeAddresses()
+
+const AAVE_POOL_PROXY = "0xcC6114B983E4Ed2737E9BD3961c9924e6216c704";
 
 interface HandleVaultInteractionProps {
   stepCounter: number;
@@ -44,19 +47,24 @@ export default async function handleVaultInteraction({
   fireEvent,
   referral
 }: HandleVaultInteractionProps): Promise<() => Promise<boolean>> {
-  let postBal = 0;
   switch (action) {
     case DepositVaultActionType.Supply:
-      await handleAllowance({ token: inputToken.address, amount, account, spender: VAULT_ROUTER, clients })
-      //call supply function
-      await vaultDepositAndStake({ chainId, router: VAULT_ROUTER, vaultData, account, amount, clients, fireEvent, referral })
+      return async (): Promise<boolean> => {
+        await handleAllowance({ token: inputToken.address, amount, account, spender: AAVE_POOL_PROXY, clients })
+        await supplyToAave({asset: inputToken.address, amount, onBehalfOf: account, chainId, account, clients})
+        return true
+      }
     case DepositVaultActionType.Borrow:
-      //call borrow function
-      await vaultUnstakeAndWithdraw({ chainId, router: VAULT_ROUTER, vaultData, account, amount, clients, fireEvent, referral })
+      return async (): Promise<boolean> => {
+        await borrowFromAave({asset: inputToken.address, amount, onBehalfOf: account, chainId, account, clients})
+        return true
+      }
     case DepositVaultActionType.Deposit:
-      await handleAllowance({ token: inputToken.address, amount, account, spender: VAULT_ROUTER, clients })
-      //call deposit function
-      await vaultUnstakeAndWithdraw({ chainId, router: VAULT_ROUTER, vaultData, account, amount, clients, fireEvent, referral })
+      return async (): Promise<boolean> => {
+        await handleAllowance({ token: inputToken.address, amount, account, spender: VAULT_ROUTER, clients })
+        await vaultDeposit({ chainId, vaultData, account, amount, clients })
+        return true
+      }
     default:
       // We should never reach this code. This is here just to make ts happy
       return async () => false

@@ -1,4 +1,4 @@
-import { arbitrum, bsc, localhost, mainnet, optimism, polygon } from "viem/chains";
+import {arbitrum, bsc, localhost, mainnet, optimism, polygon, polygonMumbai} from "viem/chains";
 
 export enum ChainId {
   Ethereum = 1,
@@ -91,4 +91,4 @@ export const RPC_URLS: { [key: number]: string } = {
   [ChainId.RemoteFork]: `http://localhost:8545`,
 };
 
-export const SUPPORTED_NETWORKS = [mainnet, polygon, optimism, arbitrum]
+export const SUPPORTED_NETWORKS = [/*mainnet, polygon, optimism, arbitrum,*/ polygonMumbai]

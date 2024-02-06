@@ -76,5 +76,11 @@ export const zapAssetAddressesByChain: { [key: number]: Address[] } = {
     "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1", // WETH
     "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f", // WBTC
   ],
-  56: []
+  56: [],
+  80001: [
+    "0xc8c0Cf9436F4862a8F60Ce680Ca5a9f0f99b5ded", //DAI
+    "0x52D800ca262522580CeBAD275395ca6e7598C014", //USDC
+    "0x1fdE0eCc619726f4cD597887C9F3b4c8740e19e2", //USDT
+    "0x00DF377c2C82a65A8bAe2Ff04a9434a721Bc5aEB", //BAL
+  ]
 }
