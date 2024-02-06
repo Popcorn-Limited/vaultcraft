@@ -46,7 +46,6 @@ export default function VaultsContainer({ hiddenVaults, displayVaults, showDescr
   const publicClient = usePublicClient()
   const { data: walletClient } = useWalletClient()
 
-  // @ts-ignore
   const [selectedNetworks, selectNetwork] = useNetworkFilter(SUPPORTED_NETWORKS.map(network => network.id));
   const [vaults, setVaults] = useAtom(vaultsAtom)
   const [zapAssets, setZapAssets] = useAtom(zapAssetsAtom)
@@ -183,7 +182,8 @@ export default function VaultsContainer({ hiddenVaults, displayVaults, showDescr
   }
 
   return (
-    <NoSSR>
+    // @ts-ignore
+    <NoSSR >
       <section className="md:border-b border-[#353945] md:flex md:flex-row items-center justify-between py-10 px-4 md:px-8 md:gap-4">
 
         <div className="w-full md:w-max">

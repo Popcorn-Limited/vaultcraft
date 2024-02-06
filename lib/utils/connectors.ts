@@ -10,6 +10,7 @@ export enum ChainId {
   RemoteFork = 31338,
   Optimism = 10,
   ALL = 0,
+  polygonMumbai = 80001
 }
 
 export enum named {
