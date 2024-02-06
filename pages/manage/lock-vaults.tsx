@@ -38,32 +38,6 @@ export default function Index(): JSX.Element {
     setSearchTerm(value)
   }
 
-  const [sortingType, setSortingType] = useState(VAULT_SORTING_TYPE.none)
-
-  const sortByAscendingTvl = () => {
-    const sortedVaults = [...vaults].sort((a, b) => b.tvl - a.tvl);
-    setSortingType(VAULT_SORTING_TYPE.mostTvl)
-    setVaults(sortedVaults)
-  }
-
-  const sortByDescendingTvl = () => {
-    const sortedVaults = [...vaults].sort((a, b) => a.tvl - b.tvl);
-    setSortingType(VAULT_SORTING_TYPE.lessTvl)
-    setVaults(sortedVaults)
-  }
-
-  const sortByAscendingApy = () => {
-    const sortedVaults = [...vaults].sort((a, b) => b.totalApy - a.totalApy);
-    setSortingType(VAULT_SORTING_TYPE.mostvAPR)
-    setVaults(sortedVaults)
-  }
-
-  const sortByDescendingApy = () => {
-    const sortedVaults = [...vaults].sort((a, b) => a.totalApy - b.totalApy);
-    setSortingType(VAULT_SORTING_TYPE.lessvAPR)
-    setVaults(sortedVaults)
-  }
-
   return (
     <NoSSR>
       <section className="md:border-b border-[#353945] md:flex md:flex-row items-center justify-between py-10 px-4 md:px-8 md:gap-4">
@@ -93,7 +67,7 @@ export default function Index(): JSX.Element {
         <NetworkFilter supportedNetworks={[42161]} selectNetwork={() => { }} />
         <div className="flex flex-row space-x-4">
           <SearchBar searchTerm={searchTerm} handleSearch={handleSearch} />
-          <VaultsSorting className="" currentSortingType={sortingType} sortByLessTvl={sortByDescendingTvl} sortByMostTvl={sortByAscendingTvl} sortByLessApy={sortByDescendingApy} sortByMostApy={sortByAscendingApy} />
+          <VaultsSorting className="" vaultState={[vaults, setVaults]} />
         </div>
       </section>
 

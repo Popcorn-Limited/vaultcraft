@@ -36,7 +36,6 @@ export default function VaultsContainer({ hiddenVaults, displayVaults, showDescr
   const publicClient = usePublicClient()
   const { data: walletClient } = useWalletClient()
 
-  const [selectedNetworks, selectNetwork] = useNetworkFilter(SUPPORTED_NETWORKS.map(network => network.id));
   const [vaults, setVaults] = useAtom(vaultsAtom)
 
   const [tvl, setTvl] = useState<number>(0);
@@ -65,36 +64,11 @@ export default function VaultsContainer({ hiddenVaults, displayVaults, showDescr
     getAccountData()
   }, [account])
 
+  const [selectedNetworks, selectNetwork] = useNetworkFilter(SUPPORTED_NETWORKS.map(network => network.id));
   const [searchTerm, setSearchTerm] = useState("");
 
   function handleSearch(value: string) {
     setSearchTerm(value)
-  }
-
-  const [sortingType, setSortingType] = useState(VAULT_SORTING_TYPE.none)
-
-  const sortByAscendingTvl = () => {
-    const sortedVaults = [...vaults].sort((a, b) => b.tvl - a.tvl);
-    setSortingType(VAULT_SORTING_TYPE.mostTvl)
-    setVaults(sortedVaults)
-  }
-
-  const sortByDescendingTvl = () => {
-    const sortedVaults = [...vaults].sort((a, b) => a.tvl - b.tvl);
-    setSortingType(VAULT_SORTING_TYPE.lessTvl)
-    setVaults(sortedVaults)
-  }
-
-  const sortByAscendingApy = () => {
-    const sortedVaults = [...vaults].sort((a, b) => b.apy - a.apy);
-    setSortingType(VAULT_SORTING_TYPE.mostvAPR)
-    setVaults(sortedVaults)
-  }
-
-  const sortByDescendingApy = () => {
-    const sortedVaults = [...vaults].sort((a, b) => a.apy - b.apy);
-    setSortingType(VAULT_SORTING_TYPE.lessvAPR)
-    setVaults(sortedVaults)
   }
 
   return (
@@ -174,7 +148,7 @@ export default function VaultsContainer({ hiddenVaults, displayVaults, showDescr
         <NetworkFilter supportedNetworks={SUPPORTED_NETWORKS.map(chain => chain.id)} selectNetwork={selectNetwork} />
         <div className="flex flex-row space-x-4">
           <SearchBar searchTerm={searchTerm} handleSearch={handleSearch} />
-          <VaultsSorting className="" currentSortingType={sortingType} sortByLessTvl={sortByDescendingTvl} sortByMostTvl={sortByAscendingTvl} sortByLessApy={sortByDescendingApy} sortByMostApy={sortByAscendingApy} />
+          <VaultsSorting className="" vaultState={[vaults, setVaults]} />
         </div>
       </section>
 

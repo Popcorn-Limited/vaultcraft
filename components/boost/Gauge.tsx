@@ -17,11 +17,11 @@ interface GaugeProps {
   votes: { [key: Address]: number };
   handleVotes: Function;
   canVote: boolean;
+  searchTerm: string;
 }
 
-export default function Gauge({ vaultData, index, votes, handleVotes, canVote }: GaugeProps): JSX.Element {
+export default function Gauge({ vaultData, index, votes, handleVotes, canVote, searchTerm }: GaugeProps): JSX.Element {
   const { address: account } = useAccount()
-  const publicClient = usePublicClient();
 
   const { data: weights } = useGaugeWeights({
     address: vaultData.gauge?.address as Address,
@@ -29,7 +29,6 @@ export default function Gauge({ vaultData, index, votes, handleVotes, canVote }:
     chainId: vaultData.chainId
   })
   const [amount, setAmount] = useState(Number(weights?.[2].power));
-
   const [gaugeApr, setGaugeApr] = useState<number[]>([]);
 
   useEffect(() => {
@@ -50,7 +49,7 @@ export default function Gauge({ vaultData, index, votes, handleVotes, canVote }:
     const potentialNewTotalVotes =
       Object.values(votes).reduce((a, b) => a + b, 0) - currentVoteForThisGauge + Number(value);
 
-    if(potentialNewTotalVotes > 10000) {
+    if (potentialNewTotalVotes > 10000) {
       value = value - (potentialNewTotalVotes - 10000)
     }
 
@@ -58,6 +57,11 @@ export default function Gauge({ vaultData, index, votes, handleVotes, canVote }:
     setAmount(value);
   }
 
+  // Vault is not in search term
+  if (searchTerm !== "" &&
+    !vaultData.vault.name.toLowerCase().includes(searchTerm) &&
+    !vaultData.vault.symbol.toLowerCase().includes(searchTerm) &&
+    !vaultData.metadata.optionalMetadata.protocol?.name.toLowerCase().includes(searchTerm)) return <></>
   return (
     <Accordion>
       <>
