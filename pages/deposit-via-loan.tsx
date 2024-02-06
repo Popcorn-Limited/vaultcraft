@@ -17,7 +17,7 @@ import {formatUnits, getAddress, isAddress, maxUint256} from "viem";
 import {useAccount, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient} from "wagmi";
 import {AaveUserAccountData} from "@/components/vault/VaultStats";
 import ProtocolIcon from "@/components/common/ProtocolIcon";
-import {fetchReserveData, fetchTokens, fetchUserAccountData} from "@/lib/vault/interactions";
+import {fetchReserveData, fetchTokens, fetchUserAccountData} from "@/lib/vault/aave/interactionts";
 
 const ACTIVE_TABS = ["Supply", "Borrow", "Deposit"];
 
