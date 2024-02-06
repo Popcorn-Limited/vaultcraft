@@ -140,6 +140,7 @@ function VePopContainer() {
           {vaults?.length > 0 ?
             vaults.filter(vault => selectedNetworks.includes(vault.chainId))
               .filter(vault => !!vault.gauge?.address)
+              .sort((a, b) => b.tvl - a.tvl)
               .map((vault: VaultData, index: number) =>
                 <Gauge
                   key={vault.address}
