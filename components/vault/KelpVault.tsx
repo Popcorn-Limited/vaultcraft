@@ -24,8 +24,10 @@ import { showSuccessToast } from "@/lib/toasts";
 import { VaultInputsProps } from "@/components/vault/VaultInputs";
 import Accordion from "@/components/common/Accordion";
 import { VaultAbi } from "@/lib/constants";
-import { MutateTokenBalanceProps } from "@/components/vault/VaultsContainer";
 import { YieldOptions } from "vaultcraft-sdk";
+import { MutateTokenBalanceProps } from "@/lib/vault/mutateTokenBalance";
+import { zapAssetsAtom } from "@/lib/atoms";
+import { vaultsAtom } from "@/lib/atoms/vaults";
 
 const minDeposit = 100000000000000;
 
@@ -45,7 +47,7 @@ const ETHx: Token = {
   name: "ETHx",
   symbol: "ETHx",
   decimals: 18,
-  logoURI: "https://etherscan.io/token/images/ethxv2_32.png",
+  logoURI: "https://www.staderlabs.com/eth/ethx.svg?imwidth=32",
   balance: 0,
   price: 1
 }
@@ -55,7 +57,7 @@ const rsETH: Token = {
   name: "rsETH",
   symbol: "rsETH",
   decimals: 18,
-  logoURI: "https://etherscan.io/token/images/kelprseth_32.png",
+  logoURI: "https://icons.llamao.fi/icons/protocols/kelp-dao?w=48&h=48",
   balance: 0,
   price: 1
 }
@@ -80,7 +82,7 @@ const Gauge: Token = {
   price: 1
 }
 
-async function getKelpVaultData(account: Address, publicClient: PublicClient, yieldOptions: YieldOptions): Promise<{ tokenOptions: Token[], vaultData: VaultData }> {
+export async function getKelpVaultData(account: Address, publicClient: PublicClient, yieldOptions: YieldOptions): Promise<{ tokenOptions: Token[], vaultData: VaultData }> {
   const { data: llamaPrices } = await axios.get("https://coins.llama.fi/prices/current/ethereum:0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2,ethereum:0xA35b1B31Ce002FBF2058D22F30f95D405200A15b,ethereum:0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7")
 
   const ethBal = await publicClient.getBalance({ address: account })
@@ -174,7 +176,12 @@ async function getKelpVaultData(account: Address, publicClient: PublicClient, yi
       cid: "",
       // @ts-ignore
       optionalMetadata: {
-        protocol: { name: "KelpDAO", description: "" },
+        protocol: {
+          name: "KelpDAO", description: `**KelpDao Depositor** - rsETH is a Liquid Restaked Token (LRT) issued by Kelp DAO designed to offer liquidity to illiquid assets deposited into restaking platforms, such as EigenLayer. rsETH contracts distribute the deposited tokens into different Node Operators that operate with the Kelp DAO. 
+
+        Rewards accrue from the various services to the rsETH contracts. The price of rsETH token assumes the underlying price of the various rewards and staked tokens.
+        
+        Additionally, depositors earn Kelp Miles and Eigen Layer points along with any eligible boosts.` },
         resolver: "kelpDao"
       },
     },
@@ -207,6 +214,76 @@ async function getKelpVaultData(account: Address, publicClient: PublicClient, yi
   }
 }
 
+export interface KelpMutateTokenBalanceProps {
+  vaultDataState: [VaultData, Function];
+  tokenOptionState: [Token[], Function];
+  account: Address;
+  publicClient: PublicClient;
+}
+
+export async function mutateKelpTokenBalance({ vaultDataState, tokenOptionState, account, publicClient }: KelpMutateTokenBalanceProps) {
+  const [vaultData, setVaultData] = vaultDataState;
+  const [tokenOptions, setTokenOptions] = tokenOptionState;
+
+  const ethBal = await publicClient.getBalance({ address: account })
+  const res = await publicClient.multicall({
+    contracts: [
+      {
+        address: ETHx.address,
+        abi: erc20ABI,
+        functionName: 'balanceOf',
+        args: [account]
+      },
+      {
+        address: rsETH.address,
+        abi: erc20ABI,
+        functionName: 'balanceOf',
+        args: [account]
+      },
+      {
+        address: Vault.address,
+        abi: erc20ABI,
+        functionName: 'balanceOf',
+        args: [account]
+      },
+      {
+        address: Vault.address,
+        abi: VaultAbi,
+        functionName: 'totalAssets'
+      },
+      {
+        address: Vault.address,
+        abi: VaultAbi,
+        functionName: 'totalSupply'
+      },
+    ],
+    allowFailure: false
+  }) as bigint[]
+
+  const newVaultData = { ...vaultData };
+  const newTokenOptions = [...tokenOptions];
+
+  newTokenOptions[0].balance = Number(ethBal);
+  newTokenOptions[1].balance = Number(res[0]);
+  newTokenOptions[2].balance = Number(res[1]);
+  newVaultData.asset.balance = Number(res[1]);
+  newVaultData.vault.balance = Number(res[2])
+
+  const totalAssets = Number(res[3]);
+  const totalSupply = Number(res[4])
+  const assetsPerShare = totalSupply > 0 ? (totalAssets + 1) / (totalSupply + (1e9)) : Number(1e-9)
+  const pricePerShare = assetsPerShare * vaultData?.asset.price
+
+  newVaultData.totalAssets = totalAssets;
+  newVaultData.totalSupply = totalSupply;
+  newVaultData.assetsPerShare = assetsPerShare;
+  newVaultData.pricePerShare = pricePerShare;
+  newVaultData.tvl = (totalSupply * pricePerShare) / (10 ** vaultData.asset.decimals)
+
+  setVaultData(newVaultData);
+  setTokenOptions(newTokenOptions);
+}
+
 export default function KelpVault({ searchTerm }: { searchTerm: string }) {
   const { address: account } = useAccount();
   const publicClient = usePublicClient({ chainId: 1 })
@@ -224,68 +301,6 @@ export default function KelpVault({ searchTerm }: { searchTerm: string }) {
         setTokenOptions(res.tokenOptions)
       })
   }, [account, yieldOptions])
-
-  async function mutateTokenBalance({ inputToken, outputToken, vault, chainId, account }: MutateTokenBalanceProps) {
-    if (!vaultData) return
-
-    const ethBal = await publicClient.getBalance({ address: account })
-    const res = await publicClient.multicall({
-      contracts: [
-        {
-          address: ETHx.address,
-          abi: erc20ABI,
-          functionName: 'balanceOf',
-          args: [account]
-        },
-        {
-          address: rsETH.address,
-          abi: erc20ABI,
-          functionName: 'balanceOf',
-          args: [account]
-        },
-        {
-          address: Vault.address,
-          abi: erc20ABI,
-          functionName: 'balanceOf',
-          args: [account]
-        },
-        {
-          address: Vault.address,
-          abi: VaultAbi,
-          functionName: 'totalAssets'
-        },
-        {
-          address: Vault.address,
-          abi: VaultAbi,
-          functionName: 'totalSupply'
-        },
-      ],
-      allowFailure: false
-    }) as bigint[]
-
-    const newVaultData = { ...vaultData };
-    const newTokenOptions = [...tokenOptions];
-
-    newTokenOptions[0].balance = Number(ethBal);
-    newTokenOptions[1].balance = Number(res[0]);
-    newTokenOptions[2].balance = Number(res[1]);
-    newVaultData.asset.balance = Number(res[1]);
-    newVaultData.vault.balance = Number(res[2])
-
-    const totalAssets = Number(res[3]);
-    const totalSupply = Number(res[4])
-    const assetsPerShare = totalSupply > 0 ? (totalAssets + 1) / (totalSupply + (1e9)) : Number(1e-9)
-    const pricePerShare = assetsPerShare * vaultData?.asset.price
-
-    newVaultData.totalAssets = totalAssets;
-    newVaultData.totalSupply = totalSupply;
-    newVaultData.assetsPerShare = assetsPerShare;
-    newVaultData.pricePerShare = pricePerShare;
-    newVaultData.tvl = (totalSupply * pricePerShare) / (10 ** vaultData.asset.decimals)
-
-    setVaultData(newVaultData);
-    setTokenOptions(newTokenOptions);
-  }
 
   // Is loading / error
   if (!vaultData || tokenOptions.length === 0) return <></>
@@ -355,7 +370,9 @@ export default function KelpVault({ searchTerm }: { searchTerm: string }) {
               tokenOptions={tokenOptions}
               chainId={vaultData.chainId}
               hideModal={() => setShowModal(false)}
-              mutateTokenBalance={mutateTokenBalance}
+              mutateTokenBalance={mutateKelpTokenBalance}
+              setVaultData={setVaultData}
+              setTokenOptions={setTokenOptions}
             />
           </div>
         </div>
@@ -376,14 +393,25 @@ export default function KelpVault({ searchTerm }: { searchTerm: string }) {
 }
 
 
-export function KelpVaultInputs({ vaultData, tokenOptions, chainId, hideModal, mutateTokenBalance }: VaultInputsProps): JSX.Element {
+export function KelpVaultInputs(
+  { vaultData, tokenOptions, chainId, hideModal, mutateTokenBalance, setVaultData, setTokenOptions }
+    : VaultInputsProps
+    & {
+      mutateTokenBalance: (props: KelpMutateTokenBalanceProps) => void;
+      setVaultData: Function;
+      setTokenOptions: Function;
+    }
+
+): JSX.Element {
   const { query } = useRouter()
+
   const { address: account } = useAccount();
   const publicClient = usePublicClient({ chainId: 1 })
   const { data: walletClient } = useWalletClient()
   const { openConnectModal } = useConnectModal();
   const { chain } = useNetwork();
   const { switchNetworkAsync } = useSwitchNetwork();
+
   const [masaSdk,] = useAtom(masaAtom)
 
   const [inputToken, setInputToken] = useState<Token>()
@@ -539,7 +567,12 @@ export function KelpVaultInputs({ vaultData, tokenOptions, chainId, hideModal, m
     setSteps(stepsCopy)
     setStepCounter(newStepCounter)
 
-    if (newStepCounter === steps.length) mutateTokenBalance({ inputToken: inputToken.address, outputToken: outputToken.address, vault: vaultData.vault.address, chainId, account })
+    if (newStepCounter === steps.length) mutateTokenBalance({
+      vaultDataState: [vaultData, setVaultData],
+      tokenOptionState: [tokenOptions, setTokenOptions],
+      account,
+      publicClient
+    })
   }
 
   return (
@@ -565,12 +598,19 @@ export function KelpVaultInputs({ vaultData, tokenOptions, chainId, hideModal, m
         allowInput
       />
 
-      <div className="relative flex justify-center my-6">
-        <ArrowDownIcon
-          className="h-10 w-10 p-2 text-[#9CA3AF] border border-[#4D525C] rounded-full cursor-pointer hover:text-primary hover:border-primary"
-          aria-hidden="true"
-          onClick={switchTokens}
-        />
+      <div className="relative py-4">
+        <div className="absolute inset-0 flex items-center" aria-hidden="true">
+          <div className="w-full border-t border-gray-500" />
+        </div>
+        <div className="relative flex justify-center">
+          <span className="bg-[#141416] px-4">
+            <ArrowDownIcon
+              className="h-10 w-10 p-2 text-gray-500 border border-gray-500 rounded-full cursor-pointer hover:text-primary hover:border-primary"
+              aria-hidden="true"
+              onClick={switchTokens}
+            />
+          </span>
+        </div>
       </div>
 
       <InputTokenWithError
@@ -587,6 +627,28 @@ export function KelpVaultInputs({ vaultData, tokenOptions, chainId, hideModal, m
         allowInput={false}
       />
 
+      <div className="mt-6">
+        <p className="text-white font-bold mb-2 text-start">Fee Breakdown</p>
+        <div className="bg-[#23262f] py-2 px-4 rounded-lg space-y-2">
+          <span className="flex flex-row items-center justify-between text-white">
+            <p>Deposit Fee</p>
+            <p>{vaultData.fees.deposit / 1e16} %</p>
+          </span>
+          <span className="flex flex-row items-center justify-between text-white">
+            <p>Withdrawal Fee</p>
+            <p>{vaultData.fees.withdrawal / 1e16} %</p>
+          </span>
+          <span className="flex flex-row items-center justify-between text-white">
+            <p>Management Fee</p>
+            <p>{vaultData.fees.management / 1e16} %</p>
+          </span>
+          <span className="flex flex-row items-center justify-between text-white">
+            <p>Performance Fee</p>
+            <p>{vaultData.fees.performance / 1e16} %</p>
+          </span>
+        </div>
+      </div>
+
       <div className="w-full flex justify-center my-6">
         <ActionSteps steps={steps} stepCounter={stepCounter} />
       </div>
@@ -595,7 +657,7 @@ export function KelpVaultInputs({ vaultData, tokenOptions, chainId, hideModal, m
         {account && steps.length > 0 ? (
           <>
             {(stepCounter === steps.length || steps.some(step => !step.loading && step.error)) ?
-              <MainActionButton label={"Close Modal"} handleClick={hideModal} /> :
+              <MainActionButton label={"Finish"} handleClick={hideModal} /> :
               <MainActionButton label={steps[stepCounter]?.label} handleClick={handleMainAction} disabled={inputBalance === "0" || steps[stepCounter]?.loading} />
             }
           </>

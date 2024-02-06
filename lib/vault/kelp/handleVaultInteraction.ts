@@ -8,6 +8,7 @@ import { erc20ABI } from "wagmi";
 import { FireEventArgs } from "@masa-finance/analytics-sdk";
 import { getVeAddresses } from "@/lib/constants";
 import { mintEthX, mintRsEth } from "@/lib/vault/kelp/interactionts";
+import { assetAddressesAtom } from "@/lib/atoms";
 
 const { VaultRouter: VAULT_ROUTER } = getVeAddresses()
 
@@ -45,6 +46,7 @@ export default async function handleVaultInteraction({
   referral
 }: HandleVaultInteractionProps): Promise<() => Promise<boolean>> {
   let postBal = 0;
+  console.log({ action, })
   switch (action) {
     case KelpVaultActionType.Deposit:
       switch (stepCounter) {
@@ -69,12 +71,14 @@ export default async function handleVaultInteraction({
           return () => handleAllowance({ token: "0xA35b1B31Ce002FBF2058D22F30f95D405200A15b", amount: postBal, account, spender: getAddress("0x036676389e48133B63a802f8635AD39E752D375D"), clients })
         case 2:
           postBal = Number(await clients.publicClient.readContract({ address: "0xA35b1B31Ce002FBF2058D22F30f95D405200A15b", abi: erc20ABI, functionName: "balanceOf", args: [account] }))
+          console.log({ postBal, ethXBal: ethX.balance, amount: postBal - ethX.balance })
           return () => mintRsEth({ amount: postBal - ethX.balance, account, clients })
         case 3:
           postBal = Number(await clients.publicClient.readContract({ address: "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7", abi: erc20ABI, functionName: "balanceOf", args: [account] }))
           return () => handleAllowance({ token: "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7", amount: postBal, account, spender: getAddress(VAULT_ROUTER), clients })
         case 4:
           postBal = Number(await clients.publicClient.readContract({ address: "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7", abi: erc20ABI, functionName: "balanceOf", args: [account] }))
+          console.log({ amount: postBal - vaultData.asset.balance, balance: vaultData.asset.balance, postBal })
           return () => vaultDepositAndStake({ chainId, router: VAULT_ROUTER, vaultData, account, amount: postBal - vaultData.asset.balance, clients, fireEvent, referral })
       }
     case KelpVaultActionType.EthxZapDeposit:
@@ -82,13 +86,14 @@ export default async function handleVaultInteraction({
         case 0:
           return () => handleAllowance({ token: "0xA35b1B31Ce002FBF2058D22F30f95D405200A15b", amount, account, spender: getAddress("0x036676389e48133B63a802f8635AD39E752D375D"), clients })
         case 1:
-          postBal = Number(await clients.publicClient.readContract({ address: "0xA35b1B31Ce002FBF2058D22F30f95D405200A15b", abi: erc20ABI, functionName: "balanceOf", args: [account] }))
-          return () => mintRsEth({ amount: postBal - ethX.balance, account, clients })
+          console.log({ amount, balance: ethX.balance })
+          return () => mintRsEth({ amount, account, clients })
         case 2:
           postBal = Number(await clients.publicClient.readContract({ address: "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7", abi: erc20ABI, functionName: "balanceOf", args: [account] }))
           return () => handleAllowance({ token: "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7", amount: postBal, account, spender: getAddress(VAULT_ROUTER), clients })
         case 3:
           postBal = Number(await clients.publicClient.readContract({ address: "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7", abi: erc20ABI, functionName: "balanceOf", args: [account] }))
+          console.log({ amount: postBal - vaultData.asset.balance, balance: vaultData.asset.balance, postBal })
           return () => vaultDepositAndStake({ chainId, router: VAULT_ROUTER, vaultData, account, amount: postBal - vaultData.asset.balance, clients, fireEvent, referral })
       }
     case KelpVaultActionType.ZapWithdrawal:
@@ -105,7 +110,7 @@ export default async function handleVaultInteraction({
           return () => handleAllowance({ token: vaultData.asset.address, amount, account, spender: getAddress(ensoWallet.address), clients })
         case 3:
           postBal = Number(await clients.publicClient.readContract({ address: vaultData.asset.address, abi: erc20ABI, functionName: "balanceOf", args: [account] }))
-          return () => zap({ chainId, sellToken: vaultData.asset.address, buyToken: outputToken.address, amount: postBal - vaultData.asset.balance, account, slippage, tradeTimeout, clients })
+          return () => zap({ chainId, sellToken: vaultData.asset.address, buyToken: "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", amount: postBal - vaultData.asset.balance, account, slippage, tradeTimeout, clients })
       }
     default:
       // We should never reach this code. This is here just to make ts happy

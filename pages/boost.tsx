@@ -17,6 +17,10 @@ import { vaultsAtom } from "@/lib/atoms/vaults";
 import OptionTokenInterface from "@/components/boost/OptionTokenInterface";
 import LpModal from "@/components/boost/modals/lp/LpModal";
 import { voteUserSlopes } from "@/lib/gauges/useGaugeWeights";
+import NetworkFilter from "@/components/network/NetworkFilter";
+import SearchBar from "@/components/input/SearchBar";
+import VaultsSorting from "@/components/vault/VaultsSorting";
+import useNetworkFilter from "@/lib/useNetworkFilter";
 
 const { VotingEscrow: VOTING_ESCROW } = getVeAddresses();
 
@@ -88,6 +92,13 @@ function VePopContainer() {
     setVotes((prevVotes) => updatedVotes);
   }
 
+  const [selectedNetworks, selectNetwork] = useNetworkFilter([1]);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  function handleSearch(value: string) {
+    setSearchTerm(value)
+  }
+
   return (
     <>
       <LockModal show={[showLockModal, setShowLockModal]} setShowLpModal={setShowLpModal} />
@@ -117,10 +128,29 @@ function VePopContainer() {
           />
         </section >
 
+        <section className="my-10 px-4 md:px-8 md:flex flex-row items-center justify-between">
+          <NetworkFilter supportedNetworks={[1]} selectNetwork={() => { }} />
+          <div className="flex flex-row space-x-4">
+            <SearchBar searchTerm={searchTerm} handleSearch={handleSearch} />
+            <VaultsSorting className="" vaultState={[vaults, setVaults]} />
+          </div>
+        </section>
+
         <section className="grid grid-cols-1 md:grid-cols-3 gap-4 px-4 md:px-8">
-          {vaults?.length > 0 ? vaults.filter(vault => !!vault.gauge?.address).map((vault: VaultData, index: number) =>
-            <Gauge key={vault.address} vaultData={vault} index={vault.gauge?.address as Address} votes={votes} handleVotes={handleVotes} canVote={canVoteOnGauges[index]} />
-          )
+          {vaults?.length > 0 ?
+            vaults.filter(vault => selectedNetworks.includes(vault.chainId))
+              .filter(vault => !!vault.gauge?.address)
+              .map((vault: VaultData, index: number) =>
+                <Gauge
+                  key={vault.address}
+                  vaultData={vault}
+                  index={vault.gauge?.address as Address}
+                  votes={votes}
+                  handleVotes={handleVotes}
+                  canVote={canVoteOnGauges[index]}
+                  searchTerm={searchTerm}
+                />
+              )
             : <p className="text-primary">Loading Gauges...</p>
           }
         </section>

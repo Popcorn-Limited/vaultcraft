@@ -11,7 +11,7 @@ interface ModalProps {
 
 export default function Modal({ visibility, children, title, classNames = "" }: ModalProps): JSX.Element {
   const [show, setShowModal] = visibility;
-
+  
   return (
     <Transition.Root show={show} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={setShowModal}>

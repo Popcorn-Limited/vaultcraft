@@ -1,21 +1,16 @@
-import { zeroAddress } from "viem"
-import { useAccount } from "wagmi"
 import LockVault from "@/components/vault/lockVault/LockVault"
 import { useAtom } from "jotai"
 import { lockvaultsAtom } from "@/lib/atoms/vaults"
-import getLockVaultsByChain from "@/lib/vault/lockVault/getVaults"
-import { arbitrum } from "viem/chains"
 import NoSSR from "react-no-ssr"
 import NetworkFilter from "@/components/network/NetworkFilter"
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline"
 import VaultsSorting, { VAULT_SORTING_TYPE } from "@/components/vault/VaultsSorting"
 import { useEffect, useState } from "react"
 import { NumberFormatter } from "@/lib/utils/formatBigNumber"
 import SearchBar from "@/components/input/SearchBar"
+import mutateTokenBalance from "@/lib/vault/mutateTokenBalance"
 
 
 export default function Index(): JSX.Element {
-  const { address: account } = useAccount();
   const [vaults, setVaults] = useAtom(lockvaultsAtom)
 
   const [tvl, setTvl] = useState<number>(0);
@@ -28,41 +23,10 @@ export default function Index(): JSX.Element {
     }
   }, [vaults])
 
-  async function mutateTokenBalance() {
-    const newVaults = await getLockVaultsByChain({ chain: arbitrum, account: account || zeroAddress })
-    setVaults(newVaults)
-  }
-
   const [searchTerm, setSearchTerm] = useState("");
 
   function handleSearch(value: string) {
     setSearchTerm(value)
-  }
-
-  const [sortingType, setSortingType] = useState(VAULT_SORTING_TYPE.none)
-
-  const sortByAscendingTvl = () => {
-    const sortedVaults = [...vaults].sort((a, b) => b.tvl - a.tvl);
-    setSortingType(VAULT_SORTING_TYPE.mostTvl)
-    setVaults(sortedVaults)
-  }
-
-  const sortByDescendingTvl = () => {
-    const sortedVaults = [...vaults].sort((a, b) => a.tvl - b.tvl);
-    setSortingType(VAULT_SORTING_TYPE.lessTvl)
-    setVaults(sortedVaults)
-  }
-
-  const sortByAscendingApy = () => {
-    const sortedVaults = [...vaults].sort((a, b) => b.totalApy - a.totalApy);
-    setSortingType(VAULT_SORTING_TYPE.mostvAPR)
-    setVaults(sortedVaults)
-  }
-
-  const sortByDescendingApy = () => {
-    const sortedVaults = [...vaults].sort((a, b) => a.totalApy - b.totalApy);
-    setSortingType(VAULT_SORTING_TYPE.lessvAPR)
-    setVaults(sortedVaults)
   }
 
   return (
@@ -101,7 +65,7 @@ export default function Index(): JSX.Element {
         <NetworkFilter supportedNetworks={[42161]} selectNetwork={() => { }} />
         <div className="flex flex-row space-x-4">
           <SearchBar searchTerm={searchTerm} handleSearch={handleSearch} />
-          <VaultsSorting className="" currentSortingType={sortingType} sortByLessTvl={sortByDescendingTvl} sortByMostTvl={sortByAscendingTvl} sortByLessApy={sortByDescendingApy} sortByMostApy={sortByAscendingApy} />
+          <VaultsSorting className="" vaultState={[vaults, setVaults]} />
         </div>
       </section>
 
@@ -116,12 +80,14 @@ export default function Index(): JSX.Element {
       <section className="grid grid-cols-1 md:grid-cols-3 gap-4 px-4 md:px-8">
 
         {vaults.length > 0 ?
-          vaults.map(vault => <LockVault
-            key={vault.address}
-            vaultData={vault}
-            mutateTokenBalance={mutateTokenBalance}
-            searchTerm={searchTerm}
-          />
+          vaults.map(vault => (
+            <LockVault
+              key={vault.address}
+              vaultData={vault}
+              searchTerm={searchTerm}
+              mutateTokenBalance={mutateTokenBalance}
+            />
+          )
           )
           : <p className="text-white">Loading Vaults...</p>
         }

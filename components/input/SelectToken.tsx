@@ -25,6 +25,7 @@ export default function SelectToken({
 }: SelectTokenProps): JSX.Element {
   const [show, setShow] = useState(false);
   const selectTokenId = selectedToken?.symbol.split(' ').join('');
+
   return (
     <>
       {/* Desktop Token Search */}
@@ -88,11 +89,11 @@ export default function SelectToken({
         </span>
       </div>
       {/* Mobile Token Search */}
-      <div className="fixed z-100 left-0">
+      <div className="fixed z-100 left-0 md:hidden">
         <PopUpModal
           visible={show}
           onClosePopUpModal={() => setShow(false)}
-          classNames="w-fit max-w-fit min-w-fit"
+          classNames="w-fit max-w-fit min-w-fit md:hidden"
         >
           <p className="text-base text-white font-normal mb-2">Select a token</p>
           <SearchToken

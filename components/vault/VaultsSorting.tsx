@@ -1,7 +1,8 @@
 import PseudoRadioButton from "@/components/button/PseudoRadioButton";
-import {useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import PopUpModal from "@/components/modal/PopUpModal";
 import SwitchIcon from "@/components/svg/SwitchIcon";
+import { LockVaultData, VaultData } from "@/lib/types";
 
 export enum VAULT_SORTING_TYPE {
     none = 'none',
@@ -9,54 +10,41 @@ export enum VAULT_SORTING_TYPE {
     lessTvl = 'less-tvl',
     mostvAPR = 'most-apr',
     lessvAPR = 'less-apr'
-  }
-
-interface VaultSortingProps {
-    className?: string,
-    currentSortingType: VAULT_SORTING_TYPE,
-    sortByMostTvl: () => void,
-    sortByLessTvl: () => void
-    sortByMostApy: () => void,
-    sortByLessApy: () => void
 }
 
-export default function VaultsSorting(
-    {
-        className,
-        currentSortingType,
-        sortByMostTvl,
-        sortByLessTvl,
-        sortByMostApy,
-        sortByLessApy,
-    }: VaultSortingProps): JSX.Element {
+interface VaultSortingProps {
+    className?: string;
+    vaultState: [VaultData[] | LockVaultData[], Function];
+}
+
+export default function VaultsSorting({ className, vaultState }: VaultSortingProps): JSX.Element {
+    const [vaults, setVaults] = vaultState;
+    const [sortingType, setSortingType] = useState(VAULT_SORTING_TYPE.none)
     const [openFilter, setOpenSorting] = useState(false);
 
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     const isLessThenMdScreenSize = useMemo(() => window.innerWidth < 1024, [window.innerWidth])
 
-    const sortingLessTvl = ()  => {
-        sortByLessTvl()
-        toggleDropdown()
-    }
-
-    const sortingMostTvl = ()  => {
-        sortByMostTvl()
-        toggleDropdown()
-    }
-
-    const sortingLessApy = ()  => {
-        sortByLessApy()
-        toggleDropdown()
-    }
-
-    const sortingMostApy = ()  => {
-        sortByMostApy()
-        toggleDropdown()
-    }
-
-    const toggleDropdown = () => {
+    function sortVaults(sortType: VAULT_SORTING_TYPE) {
+        setVaults(sort(sortType, [...vaults]))
+        setSortingType(sortType)
         setOpenSorting(prevState => !prevState)
+    }
+
+    function sort(sortType: VAULT_SORTING_TYPE, vaults: VaultData[] | LockVaultData[]) {
+        switch (sortType) {
+            case VAULT_SORTING_TYPE.mostTvl:
+                return vaults.sort((a, b) => b.tvl - a.tvl);
+            case VAULT_SORTING_TYPE.lessTvl:
+                return vaults.sort((a, b) => a.tvl - b.tvl);
+            case VAULT_SORTING_TYPE.mostvAPR:
+                return vaults.sort((a, b) => b.totalApy - a.totalApy);
+            case VAULT_SORTING_TYPE.lessvAPR:
+                return vaults.sort((a, b) => a.totalApy - b.totalApy);
+            default:
+                return vaults
+        }
     }
 
     return (
@@ -64,7 +52,7 @@ export default function VaultsSorting(
             <button
                 onClick={(e) => {
                     e.preventDefault();
-                    toggleDropdown();
+                    setOpenSorting(prevState => !prevState);
                 }}
                 className="w-full h-[58px] py-[14px] px-6 gap-2 flex flex-row items-center justify-between rounded-lg border border-[#626263]"
             >
@@ -85,9 +73,9 @@ export default function VaultsSorting(
                             transition 
                             ease-in-out 
                             duration-250 
-                            ${currentSortingType === VAULT_SORTING_TYPE.mostTvl ? 'bg-[#353945]': 'bg-[#141416]'}
+                            ${sortingType === VAULT_SORTING_TYPE.mostTvl ? 'bg-[#353945]' : 'bg-[#141416]'}
                         `}
-                        onClick={sortingMostTvl}
+                        onClick={() => sortVaults(VAULT_SORTING_TYPE.mostTvl)}
                     >
                         Most TVL
                     </button>
@@ -100,9 +88,9 @@ export default function VaultsSorting(
                             transition 
                             ease-in-out 
                             duration-250
-                            ${currentSortingType === VAULT_SORTING_TYPE.lessTvl ? 'bg-[#353945]': 'bg-[#141416]'}
+                            ${sortingType === VAULT_SORTING_TYPE.lessTvl ? 'bg-[#353945]' : 'bg-[#141416]'}
                         `}
-                        onClick={sortingLessTvl}
+                        onClick={() => sortVaults(VAULT_SORTING_TYPE.lessTvl)}
                     >
                         Less TVL
                     </button>
@@ -115,9 +103,9 @@ export default function VaultsSorting(
                             transition 
                             ease-in-out 
                             duration-250
-                            ${currentSortingType === VAULT_SORTING_TYPE.mostvAPR ? 'bg-[#353945]': 'bg-[#141416]'}
+                            ${sortingType === VAULT_SORTING_TYPE.mostvAPR ? 'bg-[#353945]' : 'bg-[#141416]'}
                         `}
-                        onClick={sortingMostApy}
+                        onClick={() => sortVaults(VAULT_SORTING_TYPE.mostvAPR)}
                     >
                         Most vAPY
                     </button>
@@ -131,9 +119,9 @@ export default function VaultsSorting(
                             transition 
                             ease-in-out 
                             duration-250
-                            ${currentSortingType === VAULT_SORTING_TYPE.lessvAPR ? 'bg-[#353945]': 'bg-[#141416]'}
+                            ${sortingType === VAULT_SORTING_TYPE.lessvAPR ? 'bg-[#353945]' : 'bg-[#141416]'}
                         `}
-                        onClick={sortingLessApy}
+                        onClick={() => sortVaults(VAULT_SORTING_TYPE.lessvAPR)}
                     >
                         Less vAPY
                     </button>
@@ -145,10 +133,26 @@ export default function VaultsSorting(
                         <>
                             <p className="text-white mb-3 text-center">Select a sorting type</p>
                             <div className="space-y-4 w-full">
-                                <PseudoRadioButton label="Most TVL" handleClick={sortingMostTvl} isActive={currentSortingType === VAULT_SORTING_TYPE.mostTvl} />
-                                <PseudoRadioButton label="Less TVL" handleClick={sortingLessTvl} isActive={currentSortingType === VAULT_SORTING_TYPE.lessTvl} />
-                                <PseudoRadioButton label="Most vAPR" handleClick={sortingMostApy} isActive={currentSortingType === VAULT_SORTING_TYPE.mostvAPR} />
-                                <PseudoRadioButton label="Less vAPR" handleClick={sortingLessApy} isActive={currentSortingType === VAULT_SORTING_TYPE.lessvAPR} />
+                                <PseudoRadioButton
+                                    label="Most TVL"
+                                    handleClick={() => sortVaults(VAULT_SORTING_TYPE.mostTvl)}
+                                    isActive={sortingType === VAULT_SORTING_TYPE.mostTvl}
+                                />
+                                <PseudoRadioButton
+                                    label="Less TVL"
+                                    handleClick={() => sortVaults(VAULT_SORTING_TYPE.lessTvl)}
+                                    isActive={sortingType === VAULT_SORTING_TYPE.lessTvl}
+                                />
+                                <PseudoRadioButton
+                                    label="Most vAPR"
+                                    handleClick={() => sortVaults(VAULT_SORTING_TYPE.mostvAPR)}
+                                    isActive={sortingType === VAULT_SORTING_TYPE.mostvAPR}
+                                />
+                                <PseudoRadioButton
+                                    label="Less vAPR"
+                                    handleClick={() => sortVaults(VAULT_SORTING_TYPE.lessvAPR)}
+                                    isActive={sortingType === VAULT_SORTING_TYPE.lessvAPR}
+                                />
                             </div>
                         </>
                     </PopUpModal>

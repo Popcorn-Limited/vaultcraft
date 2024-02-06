@@ -184,17 +184,6 @@ export default function Page({
   return (
     <>
       <div className="bg-[#141416] w-full mx-auto min-h-screen h-full font-khTeka flex flex-col">
-
-        {/* Temporary Banner */}
-        <div className="bg-[#DFFF1C] p-4 md:p-2 mt-2 mx-4 md:mx-8 rounded-lg flex flex-row justify-center">
-          <div className="flex flex-row items-center justify-center">
-            <p className="text-black font-bold md:mr-4">Migrate POP to VCX by January 31, 2024!</p>
-            <div className="w-40">
-              <SecondaryActionButton label="Migrate Now" handleClick={() => router.push("https://app.vaultcraft.io/migration")} />
-            </div>
-          </div>
-        </div>
-
         <Navbar />
         <div className="flex-1">
           <TermsModal showModal={showTermsModal} setShowModal={setShowTermsModal} setTermsSigned={setTermsSigned} />

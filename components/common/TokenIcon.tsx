@@ -17,10 +17,12 @@ export default function TokenIcon({
   chainId,
 }: TokenIconProps): JSX.Element {
   icon = token?.logoURI || icon
+  const className = `${imageSize ? imageSize : "w-6 md:w-10 h-6 md:h-10"} object-contain rounded-full`
+  
   if (icon) {
-    return <img src={icon} alt="token icon" className={imageSize ? imageSize : "w-6 md:w-10 h-6 md:h-10"} />
+    return <img src={icon} alt="token icon" className={className} />
   }
   return (
-    <img src={"/images/tokens/vcx.svg"} alt="token icon" className={imageSize ? imageSize : "w-6 md:w-10 h-6 md:h-10"} />
+    <img src={"/images/tokens/vcx.svg"} alt="token icon" className={className} />
   );
 }
