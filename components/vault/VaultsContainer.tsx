@@ -71,6 +71,8 @@ export default function VaultsContainer({ hiddenVaults, displayVaults, showDescr
     setSearchTerm(value)
   }
 
+  console.log(vaults.find(v => v.address === "0x7CEbA0cAeC8CbE74DB35b26D7705BA68Cb38D725"))
+
   return (
     <NoSSR>
       <section className="md:border-b border-[#353945] md:flex md:flex-row items-center justify-between py-10 px-4 md:px-8 md:gap-4">
@@ -156,20 +158,19 @@ export default function VaultsContainer({ hiddenVaults, displayVaults, showDescr
 
         {vaults.length > 0 ?
           <>
-            {selectedNetworks.includes(1) && !hiddenVaults.includes("0x7CEbA0cAeC8CbE74DB35b26D7705BA68Cb38D725") && <KelpVault searchTerm={searchTerm} />}
             {vaults.filter(vault => selectedNetworks.includes(vault.chainId))
               .filter(vault => displayVaults.length > 0 ? displayVaults.includes(vault.address) : true)
               .filter(vault => !hiddenVaults.includes(vault.address))
               .map((vault) => {
-                return (
-                  <SmartVault
+                return vault.address === "0x7CEbA0cAeC8CbE74DB35b26D7705BA68Cb38D725" ?
+                  <KelpVault searchTerm={searchTerm} />
+                  : <SmartVault
                     key={`sv-${vault.address}-${vault.chainId}`}
                     vaultData={vault}
                     mutateTokenBalance={mutateTokenBalance}
                     searchTerm={searchTerm}
                     description={showDescription ? vault.metadata.description : undefined}
                   />
-                )
               })
             }
           </>

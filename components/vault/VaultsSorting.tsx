@@ -34,11 +34,11 @@ export default function VaultsSorting({ className, vaultState }: VaultSortingPro
 
     function sort(sortType: VAULT_SORTING_TYPE, vaults: VaultData[] | LockVaultData[]) {
         switch (sortType) {
-            case VAULT_SORTING_TYPE.lessvAPR:
+            case VAULT_SORTING_TYPE.mostTvl:
                 return vaults.sort((a, b) => b.tvl - a.tvl);
-            case VAULT_SORTING_TYPE.lessvAPR:
+            case VAULT_SORTING_TYPE.lessTvl:
                 return vaults.sort((a, b) => a.tvl - b.tvl);
-            case VAULT_SORTING_TYPE.lessvAPR:
+            case VAULT_SORTING_TYPE.mostvAPR:
                 return vaults.sort((a, b) => b.totalApy - a.totalApy);
             case VAULT_SORTING_TYPE.lessvAPR:
                 return vaults.sort((a, b) => a.totalApy - b.totalApy);
