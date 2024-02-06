@@ -4,7 +4,7 @@ import InputTokenWithError from "@/components/input/InputTokenWithError";
 import ActionSteps from "@/components/vault/ActionSteps";
 import {masaAtom} from "@/lib/atoms/sdk";
 import {ActionStep, getDepositVaultActionSteps} from "@/lib/getActionSteps";
-import {DepositVaultActionType, Token, UserAccountData, VaultData} from "@/lib/types";
+import {DepositVaultActionType, FeeConfiguration, Token, UserAccountData, VaultData} from "@/lib/types";
 import {safeRound} from "@/lib/utils/formatBigNumber";
 import {validateInput} from "@/lib/utils/helpers";
 import handleVaultInteraction from "@/lib/vault/aave/handleVaultInteraction";
@@ -13,11 +13,12 @@ import {useConnectModal} from "@rainbow-me/rainbowkit";
 import {useAtom} from "jotai";
 import {useRouter} from "next/router";
 import {useEffect, useState} from "react";
-import {formatUnits, getAddress, isAddress, maxUint256} from "viem";
+import {Address, formatUnits, getAddress, isAddress, maxUint256} from "viem";
 import {useAccount, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient} from "wagmi";
 import {AaveUserAccountData} from "@/components/vault/VaultStats";
 import ProtocolIcon from "@/components/common/ProtocolIcon";
 import {fetchReserveData, fetchTokens, fetchUserAccountData} from "@/lib/vault/aave/interactionts";
+import {ProtocolName} from "vaultcraft-sdk";
 
 const ACTIVE_TABS = ["Supply", "Borrow", "Deposit"];
 
@@ -99,10 +100,8 @@ export default function DepositViaLoan() {
     assetsPerShare: 0,
     chainId: 0,
     depositLimit: 0,
-    // @ts-ignore
-    fees: 0,
-    // @ts-ignore
-    gauge: Vault.address,
+    fees: {deposit: 0, withdrawal: 0, management: 0, performance: 0},
+    gauge: {address: "0x", name: "", symbol: "", decimals: 0, logoURI: "", balance: 0, price: 0},
     gaugeMaxApy: 0,
     gaugeMinApy: 0,
     metadata: {
@@ -111,8 +110,8 @@ export default function DepositViaLoan() {
       cid: "",
       optionalMetadata: {
         protocol: {name: "KelpDao", description: ""},
-        // @ts-ignore
-        resolver: "kelpDao"
+        token: {name: "", description: "",},
+        strategy: {name: "", description: ""},
       },
     },
     pricePerShare: 0,
@@ -149,9 +148,9 @@ export default function DepositViaLoan() {
             feeRecipient: "0x47fd36ABcEeb9954ae9eA1581295Ce9A8308655E",
             cid: "",
             optionalMetadata: {
-              protocol: {name: "Aave", description: "lend from aave"},
-              // @ts-ignore
-              resolver: "Popcorn"
+              protocol: {name: "KelpDao", description: ""},
+              token: {name: "", description: "",},
+              strategy: {name: "", description: ""},
             },
           },
           chainId: 1,
