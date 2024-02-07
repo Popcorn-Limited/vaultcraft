@@ -128,7 +128,7 @@ function GaugeRewards({ vaultData, baseTooltipId }: { vaultData: VaultData | Loc
       </Title>
       <ResponsiveTooltip
         id={`${baseTooltipId}-minBoost`}
-        content={<p className="max-w-52">Minimum oVCX boost APR based on most current epoch's distribution</p>}
+        content={<p className="max-w-52">Minimum oVCX boost APR based on most current epoch&apos;s distribution</p>}
       />
     </div>
 
@@ -139,7 +139,7 @@ function GaugeRewards({ vaultData, baseTooltipId }: { vaultData: VaultData | Loc
       </Title>
       <ResponsiveTooltip
         id={`${baseTooltipId}-maxBoost`}
-        content={<p className="max-w-52">Maximum oVCX boost APR based on most current epoch's distribution</p>}
+        content={<p className="max-w-52">Maximum oVCX boost APR based on most current epoch&apos;s distribution</p>}
       />
     </div>
   </>
