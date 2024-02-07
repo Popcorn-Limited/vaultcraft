@@ -62,7 +62,7 @@ export default function AssetWithName({ vault, size = 1 }: { vault: VaultData, s
       protocolName={vault.metadata.optionalMetadata?.protocol?.name}
       tooltip={{
         id: tooltipId,
-        content: <p>{vault.metadata.optionalMetadata?.protocol?.description.split("** - ")[1]}</p>
+        content: <p className="w-60">{vault.metadata.optionalMetadata?.protocol?.description.split("** - ")[1]}</p>
       }}
       size={size}
     />

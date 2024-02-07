@@ -101,7 +101,8 @@ export async function getVaults({ account = ADDRESS_ZERO, client, yieldOptions }
             resolver: stratDesc.resolver
           },
           labels: vault.labels ? vault.labels.map((label: string) => <VaultLabel>label) : undefined,
-          description: vault.description || undefined
+          description: vault.description || undefined,
+          type: vault.type
         }
       }
     })
