@@ -25,7 +25,7 @@ import { getTokenOptions, isDefiPosition } from "@/lib/vault/utils";
 import LeftArrowIcon from "@/components/svg/LeftArrowIcon";
 import { KelpVaultInputs, getKelpVaultData, mutateKelpTokenBalance } from "@/components/vault/KelpVault";
 
-const { oVCX: OVCX, VCX } = getVeAddresses();
+const { oVCX: OVCX, VCX, Minter: MINTER } = getVeAddresses();
 
 
 export default function Index() {
@@ -86,6 +86,7 @@ export default function Index() {
       const rewards = await getGaugeRewards({
         gauges: vaults.filter(vault => vault.gauge && vault.chainId === 1).map(vault => vault.gauge?.address) as Address[],
         account: account as Address,
+        chainId: 1,
         publicClient
       })
       setGaugeRewards(rewards)
@@ -193,6 +194,7 @@ export default function Index() {
                       claimOPop({
                         gauges: gaugeRewards?.amounts?.filter(gauge => Number(gauge.amount) > 0).map(gauge => gauge.address) as Address[],
                         account: account as Address,
+                        minter: MINTER,
                         clients: { publicClient, walletClient: walletClient as WalletClient }
                       })}
                   />
@@ -205,6 +207,7 @@ export default function Index() {
                     claimOPop({
                       gauges: gaugeRewards?.amounts?.filter(gauge => Number(gauge.amount) > 0).map(gauge => gauge.address) as Address[],
                       account: account as Address,
+                      minter: MINTER,
                       clients: { publicClient, walletClient: walletClient as WalletClient }
                     })}
                 />

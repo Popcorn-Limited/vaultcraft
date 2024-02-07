@@ -9,9 +9,10 @@ export type Token = {
   logoURI: string;
   balance: number;
   price: number;
+  chainId?: number;
 };
 
-export type veAddresses = {
+export type VeAddresses = {
   VCX: Address;
   WETH_VCX_LP: Address;
   VE_VCX: Address;
@@ -30,7 +31,9 @@ export type veAddresses = {
   GaugeFactory: Address;
   SmartWalletChecker: Address;
   VotingEscrowDelegation: Address;
-  VaultRouter: Address;
+  VeBeacon: Address;
+  VeRecipient: Address;
+  ArbitrumBridge: Address;
   FeeDistributor: Address;
 };
 
@@ -151,7 +154,6 @@ export type GaugeData = {
     upperAPR: number;
   };
 }
-
 
 export enum SmartVaultActionType {
   Deposit,

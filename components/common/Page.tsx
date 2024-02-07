@@ -132,19 +132,19 @@ export default function Page({
     }
   }, [])
 
-  useEffect(() => {
-    async function getVaults() {
-      // get vaults
-      const fetchedVaults = (await Promise.all(
-        SUPPORTED_NETWORKS.map(async (chain) => getVaultsByChain({ chain, account: account || zeroAddress, yieldOptions: yieldOptions as YieldOptions }))
-      )).flat();
-      setVaults(fetchedVaults)
+  // useEffect(() => {
+  //   async function getVaults() {
+  //     // get vaults
+  //     const fetchedVaults = (await Promise.all(
+  //       SUPPORTED_NETWORKS.map(async (chain) => getVaultsByChain({ chain, account: account || zeroAddress, yieldOptions: yieldOptions as YieldOptions }))
+  //     )).flat();
+  //     setVaults(fetchedVaults)
 
-      const fetchedLockVaults = await getLockVaultsByChain({ chain: arbitrum, account: account || zeroAddress })
-      setLockVaults(fetchedLockVaults)
-    }
-    if (yieldOptions) getVaults()
-  }, [yieldOptions, account])
+  //     const fetchedLockVaults = await getLockVaultsByChain({ chain: arbitrum, account: account || zeroAddress })
+  //     setLockVaults(fetchedLockVaults)
+  //   }
+  //   if (yieldOptions) getVaults()
+  // }, [yieldOptions, account])
 
   const [showTermsModal, setShowTermsModal] = useState<boolean>(false)
   const [termsSigned, setTermsSigned] = useState<boolean>(false)
@@ -175,7 +175,9 @@ export default function Page({
         137: await getAvailableZapAssets(137),
         10: await getAvailableZapAssets(10),
         42161: await getAvailableZapAssets(42161),
-        56: await getAvailableZapAssets(56)
+        56: await getAvailableZapAssets(56),
+        11155111: [],
+        421614: []
       })
     }
     if (Object.keys(zapAssets).length === 0 && Object.keys(availableZapAssets).length === 0) getZapData()

@@ -1,4 +1,4 @@
-import { arbitrum, bsc, localhost, mainnet, optimism, polygon } from "viem/chains";
+import { arbitrum, arbitrumSepolia, bsc, localhost, mainnet, optimism, polygon, sepolia } from "viem/chains";
 
 export enum ChainId {
   Ethereum = 1,
@@ -9,6 +9,8 @@ export enum ChainId {
   BNB = 56,
   RemoteFork = 31338,
   Optimism = 10,
+  EthSepolia = 11155111,
+  ArbSepolia = 421614,
   ALL = 0,
 }
 
@@ -54,6 +56,8 @@ export const supportedChainIds = [
   ChainId.BNB,
   ChainId.RemoteFork,
   ChainId.Optimism,
+  ChainId.EthSepolia,
+  ChainId.ArbSepolia,
   ChainId.ALL,
 ];
 
@@ -66,6 +70,8 @@ export const networkMap: { [key: number]: string } = {
   [ChainId.RemoteFork]: "RemoteFork",
   [ChainId.Optimism]: "Optimism",
   [ChainId.BNB]: "BSC",
+  [ChainId.EthSepolia]: "EthSepolia",
+  [ChainId.ArbSepolia]: "ArbSepolia",
   [ChainId.ALL]: "All Networks",
 };
 
@@ -76,9 +82,12 @@ export const networkLogos: { [key: number]: string } = {
   [ChainId.Arbitrum]: "/images/networks/arbitrum.svg",
   [ChainId.Optimism]: "/images/networks/optimism.svg",
   [ChainId.BNB]: "/images/networks/binanceSmartChain.png",
-  [ChainId.Goerli]: "/images/networks/testNets.png",
-  [ChainId.Localhost]: "/images/networks/testNets.png",
-  [ChainId.RemoteFork]: "/images/networks/testNets.png",
+  [ChainId.Goerli]: "/images/networks/ethTestnet.svg",
+  [ChainId.Localhost]: "/images/networks/ethTestnet.svg",
+  [ChainId.RemoteFork]: "/images/networks/ethTestnet.svg",
+  [ChainId.EthSepolia]: "/images/networks/ethTestnet.svg",
+  [ChainId.ArbSepolia]: "/images/networks/arbTestnet.svg",
+
 };
 export const RPC_URLS: { [key: number]: string } = {
   [ChainId.Ethereum]: `https://eth-mainnet.alchemyapi.io/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`,
@@ -89,6 +98,9 @@ export const RPC_URLS: { [key: number]: string } = {
   [ChainId.BNB]: `https://bsc-dataseed1.binance.org`,
   [ChainId.Localhost]: `http://localhost:8545`,
   [ChainId.RemoteFork]: `http://localhost:8545`,
+  [ChainId.EthSepolia]: "https://ethereum-sepolia.publicnode.com",
+  [ChainId.ArbSepolia]: "https://sepolia-rollup.arbitrum.io/rpc",
+
 };
 
 export const SUPPORTED_NETWORKS = [mainnet, polygon, optimism, arbitrum]

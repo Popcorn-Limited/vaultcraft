@@ -62,10 +62,11 @@ export async function exerciseOPop({ amount, maxPaymentAmount, account, clients 
 interface ClaimOPopProps {
   gauges: Address[];
   account: Address;
+  minter: Address;
   clients: Clients
 }
 
-export async function claimOPop({ gauges, account, clients }: ClaimOPopProps): Promise<boolean> {
+export async function claimOPop({ gauges, account, minter, clients }: ClaimOPopProps): Promise<boolean> {
   return handleCallResult({
     successMessage: "oVCX Succesfully Claimed!",
     simulationResponse: await simulateCall({

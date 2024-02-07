@@ -13,7 +13,8 @@ import { llama } from "@/lib/resolver/price/resolver";
 const {
   oVCX: OVCX,
   VCX,
-  WETH
+  WETH,
+  Minter: MINTER
 } = getVeAddresses();
 
 interface OptionTokenInterfaceProps {
@@ -45,6 +46,7 @@ export default function OptionTokenInterface({ gauges, setShowOptionTokenModal }
       const rewards = await getGaugeRewards({
         gauges: gauges.map(gauge => gauge.address) as Address[],
         account: account as Address,
+        chainId: 1,
         publicClient
       })
       setGaugeRewards(rewards)
@@ -81,6 +83,7 @@ export default function OptionTokenInterface({ gauges, setShowOptionTokenModal }
               claimOPop({
                 gauges: gaugeRewards?.amounts?.filter(gauge => Number(gauge.amount) > 0).map(gauge => gauge.address) as Address[],
                 account: account as Address,
+                minter: MINTER,
                 clients: { publicClient, walletClient: walletClient as WalletClient }
               })}
             disabled={gaugeRewards ? Number(gaugeRewards?.total) === 0 : true}

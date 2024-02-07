@@ -1,5 +1,5 @@
-import { Address } from "viem";
-import { veAddresses } from "lib/types";
+import { Address, zeroAddress } from "viem";
+import { VeAddresses } from "lib/types";
 
 export const VaultRegistryByChain: { [key: number]: Address } = {
   1: "0x007318Dc89B314b47609C684260CfbfbcD412864",
@@ -17,30 +17,39 @@ export const VaultControllerByChain: { [key: number]: Address } = {
   137: "0xCe22Ff6d00c5414E64b9253Dd49a35e0B9Ea8b60"
 }
 
-const VeAddresses = {
+export const VaultRouterByChain: { [key: number]: Address } = {
+  1: "0x7D51BABA56C2CA79e15eEc9ECc4E92d9c0a7dbeb",
+  11155111: "0xd6a81E846725256a910fC51Dce0b67582D4031b4",
+  421614: "0xA5537e56fb1Ef1F892E6FeBb74B858B234D0eA7A"
+}
+
+const veAddresses: VeAddresses = {
   VCX: "0xcE246eEa10988C495B4A90a905Ee9237a0f91543",
-  WETH_VCX_LP: "0x577A7f7EE659Aa14Dc16FD384B3F8078E23F1920",
-  VE_VCX: "0x0aB4bC35Ef33089B9082Ca7BB8657D7c4E819a1A",
-  oVCX: "0xaFa52E3860b4371ab9d8F08E801E9EA1027C0CA2",
+  WETH_VCX_LP: "0x417755cDB723ddA17C781208bdAe81E7e9427398",
+  VE_VCX: "0xC28a4F90C3669574Ff2E40540f1c7b28a82cC7d7",
+  oVCX: "0xB434eA0fBf01884bD9e3F7b06D823277A27BfFBe",
   POP: "0xD0Cd466b34A24fcB2f87676278AF2005Ca8A78c4",
   WETH: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-  BalancerPool: "0x577A7f7EE659Aa14Dc16FD384B3F8078E23F1920", // Same as WETH_VCX_LP
+  BalancerPool: "0x417755cDB723ddA17C781208bdAe81E7e9427398", // Same as WETH_VCX_LP
   BalancerOracle: "0xe2871224b413F55c5a2Fd21E49bD63A52e339b03",
   BalancerVault: "0xBA12222222228d8Ba445958a75a0704d566BF2C8",
-  VaultRegistry: "0x007318Dc89B314b47609C684260CfbfbcD412864",
-  BoostV2: "0xa2E88993a0f0dc6e6020431477f3A70c86109bBf",
-  Minter: "0x49f095B38eE6d8541758af51c509332e7793D4b0",
-  TokenAdmin: "0x03d103c547B43b5a76df7e652BD0Bb61bE0BD70d",
-  VotingEscrow: "0x0aB4bC35Ef33089B9082Ca7BB8657D7c4E819a1A", // Same as VE_VCX
-  GaugeController: "0xD57d8EEC36F0Ba7D8Fd693B9D97e02D8353EB1F4",
-  GaugeFactory: "0x3bd6418e90653945f781e3717D8F9404565444F6",
-  SmartWalletChecker: "0x8427155770f7e6b973249E2f9D140a495aBE4f90",
-  VotingEscrowDelegation: "0xafE32869CAf311585647ADcD79050B83DbCF94C8",
-  VaultRouter: "0x4995F3bb85E1381D02699e2164bC1C6c6Fa243cd",
+  VaultRegistry: "0x80D1648F5d6262299A9A7d496C22c838bf41113F",
+  BoostV2: "0xDC3824c3e90D8383F874435f2004780B0972B980",
+  Minter: "0x5E87fFa7a00Ecc0Bb37Cf1dF253435A81Ccc86d7",
+  TokenAdmin: "0x23C510465ee06621Eb05B88B381153866d25B0da",
+  VotingEscrow: "0xC28a4F90C3669574Ff2E40540f1c7b28a82cC7d7", // Same as VE_VCX
+  GaugeController: "0xAAe633b4aE50023F74D6DEad99036c97f63Ce1c9",
+  GaugeFactory: "0x4C85791b97C5EeB05f63F455e1Da408FDe80fc73",
+  SmartWalletChecker: "0xcaC427993DD4D201fA5B37D65Bb0b1F5c5522315",
+  VotingEscrowDelegation: "0x8F44f5e80964134d0A61351734eA6c0288924548",
+  VeBeacon: "0x6a90dA16ABD7297b8a74B8eD3Bfb1DcfA0cF78a5",
+  VeRecipient: "0xe6C005625AB42B0168de5b91c429184756E923FA",
+  ArbitrumBridge: "0xA66cBBa4f06E19EE424fC778c89a2dEf8982e183",
+  FeeDistributor: zeroAddress
 };
 
-export function getVeAddresses(): veAddresses {
-  return VeAddresses as veAddresses;
+export function getVeAddresses(): VeAddresses {
+  return veAddresses;
 }
 
 export const zapAssetAddressesByChain: { [key: number]: Address[] } = {

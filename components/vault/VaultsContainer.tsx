@@ -29,7 +29,7 @@ interface VaultsContainerProps {
   showDescription?: boolean;
 }
 
-const { oVCX: OVCX, VCX } = getVeAddresses();
+const { oVCX: OVCX, VCX, Minter: MINTER } = getVeAddresses();
 
 export default function VaultsContainer({ hiddenVaults, displayVaults, showDescription = false }: VaultsContainerProps): JSX.Element {
   const { address: account } = useAccount();
@@ -52,6 +52,7 @@ export default function VaultsContainer({ hiddenVaults, displayVaults, showDescr
         const rewards = await getGaugeRewards({
           gauges: vaults.filter(vault => vault.gauge && vault.chainId === 1).map(vault => vault.gauge?.address) as Address[],
           account: account as Address,
+          chainId: 1,
           publicClient
         })
         setGaugeRewards(rewards)
@@ -127,6 +128,7 @@ export default function VaultsContainer({ hiddenVaults, displayVaults, showDescr
                   claimOPop({
                     gauges: gaugeRewards?.amounts?.filter(gauge => Number(gauge.amount) > 0).map(gauge => gauge.address) as Address[],
                     account: account as Address,
+                    minter: MINTER,
                     clients: { publicClient, walletClient: walletClient as WalletClient }
                   })}
               />
@@ -139,6 +141,7 @@ export default function VaultsContainer({ hiddenVaults, displayVaults, showDescr
                 claimOPop({
                   gauges: gaugeRewards?.amounts?.filter(gauge => Number(gauge.amount) > 0).map(gauge => gauge.address) as Address[],
                   account: account as Address,
+                  minter: MINTER,
                   clients: { publicClient, walletClient: walletClient as WalletClient }
                 })}
             />

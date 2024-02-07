@@ -151,6 +151,16 @@ export async function vaultRedeem({ chainId, vaultData, account, amount, clients
 export async function vaultDepositAndStake({ chainId, router, vaultData, account, amount, clients, fireEvent, referral }: VaultRouterWriteProps): Promise<boolean> {
   showLoadingToast("Depositing into the vault...")
 
+  const gauge = vaultData.gauge;
+  console.log({
+    address: router,
+    account,
+    amount,
+    vault: vaultData.address,
+    // @ts-ignore
+    gauge: gauge?.childGauge || gauge?.address as Address,
+    functionName: "depositAndStake",
+  })
   const success = await handleCallResult({
     successMessage: "Deposited into the vault and staked into Gauge!",
     simulationResponse: await simulateVaultRouterCall({
@@ -158,7 +168,8 @@ export async function vaultDepositAndStake({ chainId, router, vaultData, account
       account,
       amount,
       vault: vaultData.address,
-      gauge: vaultData.gauge?.address as Address,
+      // @ts-ignore
+      gauge: gauge?.childGauge || gauge?.address as Address,
       functionName: "depositAndStake",
       publicClient: clients.publicClient
     }),
@@ -183,6 +194,7 @@ export async function vaultDepositAndStake({ chainId, router, vaultData, account
 export async function vaultUnstakeAndWithdraw({ chainId, router, vaultData, account, amount, clients, fireEvent, referral }: VaultRouterWriteProps): Promise<boolean> {
   showLoadingToast("Withdrawing from the vault...")
 
+  const gauge = vaultData.gauge;
   const success = await handleCallResult({
     successMessage: "Unstaked from Gauge and withdrawn from Vault!",
     simulationResponse: await simulateVaultRouterCall({
@@ -190,7 +202,8 @@ export async function vaultUnstakeAndWithdraw({ chainId, router, vaultData, acco
       account,
       amount,
       vault: vaultData.address,
-      gauge: vaultData.gauge?.address as Address,
+      // @ts-ignore
+      gauge: gauge?.childGauge || gauge?.address as Address,
       functionName: "unstakeAndWithdraw",
       publicClient: clients.publicClient
     }),

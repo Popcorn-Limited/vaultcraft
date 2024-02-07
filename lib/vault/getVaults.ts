@@ -183,7 +183,8 @@ export async function getVaults({ account = ADDRESS_ZERO, client, yieldOptions }
 
   // Add gauges
   if (client.chain.id === 1) {
-    const gauges = await getGauges({ address: GAUGE_CONTROLLER, account: account, publicClient: client })
+    // TODO -- change this back to `GAUGE_CONTROLLER`
+    const gauges = await getGauges({ address: "0xD57d8EEC36F0Ba7D8Fd693B9D97e02D8353EB1F4", account: account, publicClient: client })
     const gaugeApyData = (await axios.get(`https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/gauge-apy-data.json`)).data as GaugeData;
     await Promise.all(result.map(async (vault, i) => {
       const foundGauge = gauges.find((gauge: Gauge) => gauge.lpToken === vault.address)

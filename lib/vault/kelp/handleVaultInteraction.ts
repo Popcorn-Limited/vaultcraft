@@ -6,11 +6,9 @@ import { vaultDepositAndStake, vaultUnstakeAndWithdraw } from "@/lib/vault/inter
 import zap from "@/lib/vault/zap";
 import { erc20ABI } from "wagmi";
 import { FireEventArgs } from "@masa-finance/analytics-sdk";
-import { getVeAddresses } from "@/lib/constants";
+import { VaultRouterByChain, getVeAddresses } from "@/lib/constants";
 import { mintEthX, mintRsEth } from "@/lib/vault/kelp/interactionts";
 import { assetAddressesAtom } from "@/lib/atoms";
-
-const { VaultRouter: VAULT_ROUTER } = getVeAddresses()
 
 interface HandleVaultInteractionProps {
   stepCounter: number;
@@ -51,16 +49,16 @@ export default async function handleVaultInteraction({
     case KelpVaultActionType.Deposit:
       switch (stepCounter) {
         case 0:
-          return () => handleAllowance({ token: inputToken.address, amount, account, spender: VAULT_ROUTER, clients })
+          return () => handleAllowance({ token: inputToken.address, amount, account, spender: VaultRouterByChain[chainId], clients })
         case 1:
-          return () => vaultDepositAndStake({ chainId, router: VAULT_ROUTER, vaultData, account, amount, clients, fireEvent, referral })
+          return () => vaultDepositAndStake({ chainId, router: VaultRouterByChain[chainId], vaultData, account, amount, clients, fireEvent, referral })
       }
     case KelpVaultActionType.Withdrawal:
       switch (stepCounter) {
         case 0:
-          return () => handleAllowance({ token: inputToken.address, amount, account, spender: VAULT_ROUTER, clients })
+          return () => handleAllowance({ token: inputToken.address, amount, account, spender: VaultRouterByChain[chainId], clients })
         case 1:
-          return () => vaultUnstakeAndWithdraw({ chainId, router: VAULT_ROUTER, vaultData, account, amount, clients, fireEvent, referral })
+          return () => vaultUnstakeAndWithdraw({ chainId, router: VaultRouterByChain[chainId], vaultData, account, amount, clients, fireEvent, referral })
       }
     case KelpVaultActionType.ZapDeposit:
       switch (stepCounter) {
@@ -75,11 +73,11 @@ export default async function handleVaultInteraction({
           return () => mintRsEth({ amount: postBal - ethX.balance, account, clients })
         case 3:
           postBal = Number(await clients.publicClient.readContract({ address: "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7", abi: erc20ABI, functionName: "balanceOf", args: [account] }))
-          return () => handleAllowance({ token: "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7", amount: postBal, account, spender: getAddress(VAULT_ROUTER), clients })
+          return () => handleAllowance({ token: "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7", amount: postBal, account, spender: getAddress(VaultRouterByChain[chainId]), clients })
         case 4:
           postBal = Number(await clients.publicClient.readContract({ address: "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7", abi: erc20ABI, functionName: "balanceOf", args: [account] }))
           console.log({ amount: postBal - vaultData.asset.balance, balance: vaultData.asset.balance, postBal })
-          return () => vaultDepositAndStake({ chainId, router: VAULT_ROUTER, vaultData, account, amount: postBal - vaultData.asset.balance, clients, fireEvent, referral })
+          return () => vaultDepositAndStake({ chainId, router: VaultRouterByChain[chainId], vaultData, account, amount: postBal - vaultData.asset.balance, clients, fireEvent, referral })
       }
     case KelpVaultActionType.EthxZapDeposit:
       switch (stepCounter) {
@@ -90,18 +88,18 @@ export default async function handleVaultInteraction({
           return () => mintRsEth({ amount, account, clients })
         case 2:
           postBal = Number(await clients.publicClient.readContract({ address: "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7", abi: erc20ABI, functionName: "balanceOf", args: [account] }))
-          return () => handleAllowance({ token: "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7", amount: postBal, account, spender: getAddress(VAULT_ROUTER), clients })
+          return () => handleAllowance({ token: "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7", amount: postBal, account, spender: getAddress(VaultRouterByChain[chainId]), clients })
         case 3:
           postBal = Number(await clients.publicClient.readContract({ address: "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7", abi: erc20ABI, functionName: "balanceOf", args: [account] }))
           console.log({ amount: postBal - vaultData.asset.balance, balance: vaultData.asset.balance, postBal })
-          return () => vaultDepositAndStake({ chainId, router: VAULT_ROUTER, vaultData, account, amount: postBal - vaultData.asset.balance, clients, fireEvent, referral })
+          return () => vaultDepositAndStake({ chainId, router: VaultRouterByChain[chainId], vaultData, account, amount: postBal - vaultData.asset.balance, clients, fireEvent, referral })
       }
     case KelpVaultActionType.ZapWithdrawal:
       switch (stepCounter) {
         case 0:
-          return () => handleAllowance({ token: inputToken.address, amount, account, spender: VAULT_ROUTER, clients })
+          return () => handleAllowance({ token: inputToken.address, amount, account, spender: VaultRouterByChain[chainId], clients })
         case 1:
-          return () => vaultUnstakeAndWithdraw({ chainId, router: VAULT_ROUTER, vaultData, account, amount, clients, fireEvent, referral })
+          return () => vaultUnstakeAndWithdraw({ chainId, router: VaultRouterByChain[chainId], vaultData, account, amount, clients, fireEvent, referral })
         case 2:
           const ensoWallet = (await axios.get(
             `https://api.enso.finance/api/v1/wallet?chainId=${chainId}&fromAddress=${account}`,

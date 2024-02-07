@@ -29,13 +29,6 @@ export default function Gauge({ vaultData, index, votes, handleVotes, canVote, s
     chainId: vaultData.chainId
   })
   const [amount, setAmount] = useState(Number(weights?.[2].power));
-  const [gaugeApr, setGaugeApr] = useState<number[]>([]);
-
-  useEffect(() => {
-    if (vaultData?.vault.price && gaugeApr.length === 0) {
-      getAPR({ vaultData }).then(res => setGaugeApr(res))
-    }
-  }, [vaultData, gaugeApr])
 
   function onChange(value: number) {
     const currentVoteForThisGauge = votes[index];
@@ -81,24 +74,17 @@ export default function Gauge({ vaultData, index, votes, handleVotes, canVote, s
             </div>
 
             <div className="w-full mt-6 xs:mt-0">
-              {gaugeApr.length > 0 &&
-                <>
-                  <p className="font-normal text-primary xs:text-[14px]">Min Boost</p>
-                  <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
-                    {NumberFormatter.format(roundToTwoDecimalPlaces(gaugeApr[0]))} %
-                  </Title>
-                </>
-              }
+              <p className="font-normal text-primary xs:text-[14px]">Min Boost</p>
+              <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
+                {vaultData.gaugeMinApy ? NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.gaugeMinApy)) : "-"} %
+              </Title>
             </div>
+
             <div className="w-full mt-6 xs:mt-0">
-              {gaugeApr.length > 0 &&
-                <>
-                  <p className="font-normal text-primary xs:text-[14px]">Max Boost</p>
-                  <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
-                    {NumberFormatter.format(roundToTwoDecimalPlaces(gaugeApr[1]))} %
-                  </Title>
-                </>
-              }
+              <p className="font-normal text-primary xs:text-[14px]">Max Boost</p>
+              <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
+                {vaultData.gaugeMaxApy ? NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.gaugeMaxApy)) : "-"} %
+              </Title>
             </div>
           </div>
 
