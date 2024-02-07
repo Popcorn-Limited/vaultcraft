@@ -1,6 +1,6 @@
 import NoSSR from "react-no-ssr";
 import { sepolia, useAccount, useBalance, usePublicClient, useWalletClient } from "wagmi";
-import { Address, PublicClient, ReadContractParameters, WalletClient, createPublicClient, http, maxUint256, parseUnits, zeroAddress } from "viem";
+import { Address, PublicClient, ReadContractParameters, WalletClient, createPublicClient, http, maxUint256, parseEther, parseUnits, zeroAddress } from "viem";
 import { useEffect, useState } from "react";
 import { GaugeAbi, GaugeControllerAbi, VaultAbi, ZERO, getVeAddresses } from "@/lib/constants";
 import { hasAlreadyVoted } from "@/lib/gauges/hasAlreadyVoted";
@@ -35,10 +35,10 @@ import { handleCallResult } from "@/lib/utils/helpers";
 import { claimOPop } from "@/lib/optionToken/interactions";
 import SmartVault from "@/components/vault/SmartVault";
 
-const { VotingEscrow: VOTING_ESCROW, WETH_VCX_LP, oVCX: OVCX, GaugeController: GAUGE_CONTROLLER, Minter: MINTER } = getVeAddresses()
+const { VotingEscrow: VOTING_ESCROW, WETH_VCX_LP, oVCX: OVCX, GaugeController: GAUGE_CONTROLLER, Minter: MINTER, VeBeacon: VE_BEACON } = getVeAddresses()
 
-const ETH_SEPOLIA_CHAIN_ID = 11155111;
-const ARB_SEPOLIA_CHAIN_ID = 421614;
+export const ETH_SEPOLIA_CHAIN_ID = 11155111;
+export const ARB_SEPOLIA_CHAIN_ID = 421614;
 const SUPPORTED_CHAINS = [ETH_SEPOLIA_CHAIN_ID as ChainId, ARB_SEPOLIA_CHAIN_ID as ChainId]
 
 const ETH_CLIENT = createPublicClient({
@@ -178,8 +178,17 @@ async function getGaugeData(gauge: Address, childGauge?: Address) {
   };
 }
 
-async function mintMockToken({ account, address, decimals, publicClient, walletClient }
-  : { account: Address, address: Address, decimals: number, publicClient: PublicClient, walletClient: WalletClient }) {
+async function mintMockToken({ account, address, decimals, chainId, publicClient, walletClient }
+  : { account: Address, address: Address, decimals: number, chainId: number, publicClient: PublicClient, walletClient: WalletClient }) {
+
+  if (walletClient.chain?.id !== chainId) {
+    try {
+      await walletClient.switchChain({ id: chainId });
+    } catch (error) {
+      return
+    }
+  }
+
   showLoadingToast("Minting Mock Token...")
 
   let simRes;
@@ -198,6 +207,41 @@ async function mintMockToken({ account, address, decimals, publicClient, walletC
 
   return handleCallResult({
     successMessage: "Minted Mock Token!",
+    simulationResponse: simRes,
+    clients: { publicClient, walletClient }
+  })
+}
+
+async function broadcastVeBalance({ account, address, publicClient, walletClient }
+  : { account: Address, address: Address, publicClient: PublicClient, walletClient: WalletClient }) {
+
+  if (walletClient.chain?.id !== Number(ETH_SEPOLIA_CHAIN_ID)) {
+    try {
+      await walletClient.switchChain({ id: sepolia.id });
+    } catch (error) {
+      return
+    }
+  }
+
+  showLoadingToast("Broadcasting VeBalance...")
+
+  let simRes;
+  try {
+    const { request } = await publicClient.simulateContract({
+      account,
+      address,
+      abi: VeBeaconAbi,
+      functionName: "broadcastVeBalance",
+      args: [account, BigInt(String(ARB_SEPOLIA_CHAIN_ID)), BigInt("150000"), BigInt("10000")],
+      value: parseEther("0.02")
+    })
+    simRes = { request: request, success: true, error: null }
+  } catch (error: any) {
+    simRes = { request: null, success: false, error: error.shortMessage }
+  }
+
+  return handleCallResult({
+    successMessage: "VeBalance broadcasted!",
     simulationResponse: simRes,
     clients: { publicClient, walletClient }
   })
@@ -379,6 +423,10 @@ function VePopContainer() {
 
   return (
     <>
+      <LockModal show={[showLockModal, setShowLockModal]} setShowLpModal={setShowLpModal} />
+      <ManageLockModal show={[showMangementModal, setShowMangementModal]} setShowLpModal={setShowLpModal} />
+      <OptionTokenModal show={[showOptionTokenModal, setShowOptionTokenModal]} />
+      <LpModal show={[showLpModal, setShowLpModal]} />
       <div className="static">
         <section className="py-10 px-4 md:px-8 border-t md:border-t-0 md:border-b border-[#353945] lg:flex lg:flex-row items-center justify-between text-primary">
           <div className="lg:w-[1050px]">
@@ -403,24 +451,24 @@ function VePopContainer() {
               <SecondaryActionButton
                 label="Mint eth mWETH"
                 // @ts-ignore
-                handleClick={() => mintMockToken({ account, address: "0xd75Ec05952E1102a1f543DdFf1bD444F056B44fF", decimals: 18, publicClient: ETH_CLIENT, walletClient })}
+                handleClick={() => mintMockToken({ account, address: "0xd75Ec05952E1102a1f543DdFf1bD444F056B44fF", decimals: 18, chainId: ETH_SEPOLIA_CHAIN_ID, publicClient: ETH_CLIENT, walletClient })}
               />
               <SecondaryActionButton
                 label="Mint eth mDAI"
                 // @ts-ignore
-                handleClick={() => mintMockToken({ account, address: "0xC7b43e61149E992067C4cfC2B0b9E24173c80241", decimals: 18, publicClient: ETH_CLIENT, walletClient })}
+                handleClick={() => mintMockToken({ account, address: "0xC7b43e61149E992067C4cfC2B0b9E24173c80241", decimals: 18, chainId: ETH_SEPOLIA_CHAIN_ID, publicClient: ETH_CLIENT, walletClient })}
               />
               <SecondaryActionButton
                 label="Mint eth mUSDC"
                 // @ts-ignore
-                handleClick={() => mintMockToken({ account, address: "0xD33275AEBc80a988c418B149598E693C4A203677", decimals: 6, publicClient: ETH_CLIENT, walletClient })}
+                handleClick={() => mintMockToken({ account, address: "0xD33275AEBc80a988c418B149598E693C4A203677", decimals: 6, chainId: ETH_SEPOLIA_CHAIN_ID, publicClient: ETH_CLIENT, walletClient })}
               />
             </div>
             <div className="w-1/3 pr-3 mt-4">
               <MainActionButton
                 label="Mint lock token"
                 // @ts-ignore
-                handleClick={() => mintMockToken({ account, address: "0x417755cDB723ddA17C781208bdAe81E7e9427398", decimals: 18, publicClient: ETH_CLIENT, walletClient })}
+                handleClick={() => mintMockToken({ account, address: "0x417755cDB723ddA17C781208bdAe81E7e9427398", decimals: 18, chainId: ETH_SEPOLIA_CHAIN_ID, publicClient: ETH_CLIENT, walletClient })}
               />
             </div>
           </div>
@@ -431,17 +479,17 @@ function VePopContainer() {
               <SecondaryActionButton
                 label="Mint arb mWETH"
                 // @ts-ignore
-                handleClick={() => mintMockToken({ account, address: "0xd75Ec05952E1102a1f543DdFf1bD444F056B44fF", decimals: 18, publicClient: ARB_CLIENT, walletClient })}
+                handleClick={() => mintMockToken({ account, address: "0xd75Ec05952E1102a1f543DdFf1bD444F056B44fF", decimals: 18, chainId: ARB_SEPOLIA_CHAIN_ID, publicClient: ARB_CLIENT, walletClient })}
               />
               <SecondaryActionButton
                 label="Mint arb mDAI"
                 // @ts-ignore
-                handleClick={() => mintMockToken({ account, address: "0xC7b43e61149E992067C4cfC2B0b9E24173c80241", decimals: 18, publicClient: ARB_CLIENT, walletClient })}
+                handleClick={() => mintMockToken({ account, address: "0xC7b43e61149E992067C4cfC2B0b9E24173c80241", decimals: 18, chainId: ARB_SEPOLIA_CHAIN_ID, publicClient: ARB_CLIENT, walletClient })}
               />
               <SecondaryActionButton
                 label="Mint arb mUSDC"
                 // @ts-ignore
-                handleClick={() => mintMockToken({ account, address: "0xD33275AEBc80a988c418B149598E693C4A203677", decimals: 6, publicClient: ARB_CLIENT, walletClient })}
+                handleClick={() => mintMockToken({ account, address: "0xD33275AEBc80a988c418B149598E693C4A203677", decimals: 6, chainId: ARB_SEPOLIA_CHAIN_ID, publicClient: ARB_CLIENT, walletClient })}
               />
             </div>
           </div>
@@ -562,6 +610,7 @@ interface StakingInterfaceProps {
 
 export function StakingInterface({ setShowLockModal, setShowMangementModal, setShowLpModal }: StakingInterfaceProps): JSX.Element {
   const { address: account } = useAccount()
+  const { data: walletClient } = useWalletClient()
 
   const { data: lockedBal } = useLockedBalanceOf({ chainId: ETH_SEPOLIA_CHAIN_ID, address: VOTING_ESCROW, account: account as Address })
   const { data: veBal } = useBalance({ chainId: ETH_SEPOLIA_CHAIN_ID, address: account, token: VOTING_ESCROW, watch: true })
@@ -600,6 +649,13 @@ export function StakingInterface({ setShowLockModal, setShowMangementModal, setS
           }
           <SecondaryActionButton label="Get VCX-LP" handleClick={() => setShowLpModal(true)} />
         </div>
+        {Number(lockedBal?.amount) > 0 &&
+          <MainActionButton
+            label="Broadcast VeBalance"
+            // @ts-ignore
+            handleClick={() => broadcastVeBalance({ account, address: VE_BEACON, publicClient: ETH_CLIENT, walletClient })}
+          />
+        }
       </div>
     </>
   )
@@ -973,3 +1029,6 @@ const VAULTS = [
     },
   }
 ]
+
+
+const VeBeaconAbi = [{ "inputs": [{ "internalType": "contract IVotingEscrow", "name": "votingEscrow_", "type": "address" }, { "internalType": "address", "name": "recipientAddress_", "type": "address" }], "stateMutability": "nonpayable", "type": "constructor" }, { "inputs": [], "name": "UniversalBridgeLib__ChainIdNotSupported", "type": "error" }, { "inputs": [], "name": "UniversalBridgeLib__GasLimitTooLarge", "type": "error" }, { "inputs": [], "name": "UniversalBridgeLib__MsgValueNotSupported", "type": "error" }, { "inputs": [], "name": "VeBeacon__UserNotInitialized", "type": "error" }, { "anonymous": false, "inputs": [{ "indexed": true, "internalType": "address", "name": "user", "type": "address" }, { "indexed": true, "internalType": "uint256", "name": "chainId", "type": "uint256" }], "name": "BroadcastVeBalance", "type": "event" }, { "inputs": [{ "internalType": "address", "name": "user", "type": "address" }, { "internalType": "uint256", "name": "chainId", "type": "uint256" }, { "internalType": "uint256", "name": "gasLimit", "type": "uint256" }, { "internalType": "uint256", "name": "maxFeePerGas", "type": "uint256" }], "name": "broadcastVeBalance", "outputs": [], "stateMutability": "payable", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "user", "type": "address" }, { "internalType": "uint256[]", "name": "chainIdList", "type": "uint256[]" }, { "internalType": "uint256", "name": "gasLimit", "type": "uint256" }, { "internalType": "uint256", "name": "maxFeePerGas", "type": "uint256" }], "name": "broadcastVeBalanceMultiple", "outputs": [], "stateMutability": "payable", "type": "function" }, { "inputs": [{ "internalType": "address[]", "name": "userList", "type": "address[]" }, { "internalType": "uint256[]", "name": "chainIdList", "type": "uint256[]" }, { "internalType": "uint256", "name": "gasLimit", "type": "uint256" }, { "internalType": "uint256", "name": "maxFeePerGas", "type": "uint256" }], "name": "broadcastVeBalanceMultiple", "outputs": [], "stateMutability": "payable", "type": "function" }, { "inputs": [{ "internalType": "uint256", "name": "chainId", "type": "uint256" }, { "internalType": "uint256", "name": "gasLimit", "type": "uint256" }, { "internalType": "uint256", "name": "maxFeePerGas", "type": "uint256" }], "name": "getRequiredMessageValue", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "recipientAddress", "outputs": [{ "internalType": "address", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "votingEscrow", "outputs": [{ "internalType": "contract IVotingEscrow", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" }] as const

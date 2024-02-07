@@ -7,6 +7,7 @@ import { calcUnlockTime, calculateVeOut } from "@/lib/gauges/utils";
 import { ZERO } from "@/lib/constants";
 import { validateInput } from "@/lib/utils/helpers";
 import {formatEther} from "viem";
+import { ETH_SEPOLIA_CHAIN_ID } from "pages/boost-test";
 
 const { BalancerPool: VCX_LP } = getVeAddresses();
 
@@ -29,8 +30,8 @@ interface LockVcxInterfaceProps {
 
 export default function LockVcxInterface({ amountState, daysState, showLpModal }: LockVcxInterfaceProps): JSX.Element {
   const { address: account } = useAccount()
-  const { data: lpToken } = useToken({ chainId: 1, address: VCX_LP });
-  const { data: lpBal } = useBalance({ chainId: 1, address: account, token: VCX_LP })
+  const { data: lpToken } = useToken({ chainId: ETH_SEPOLIA_CHAIN_ID, address: VCX_LP });
+  const { data: lpBal } = useBalance({ chainId: ETH_SEPOLIA_CHAIN_ID, address: account, token: VCX_LP })
 
   const [amount, setAmount] = amountState
   const [days, setDays] = daysState
@@ -60,7 +61,7 @@ export default function LockVcxInterface({ amountState, daysState, showLpModal }
           captionText={``}
           onSelectToken={() => { }}
           onMaxClick={handleMaxClick}
-          chainId={1}
+          chainId={ETH_SEPOLIA_CHAIN_ID}
           value={String(amount)}
           onChange={handleChangeInput}
           selectedToken={

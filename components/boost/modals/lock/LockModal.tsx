@@ -13,6 +13,7 @@ import { handleAllowance } from "@/lib/approve";
 import { createLock } from "@/lib/gauges/interactions";
 import ActionSteps from "@/components/vault/ActionSteps";
 import { ActionStep, LOCK_VCX_LP_STEPS } from "@/lib/getActionSteps";
+import { ETH_SEPOLIA_CHAIN_ID } from "pages/boost-test";
 
 const {
   BalancerPool: VCX_LP,
@@ -67,9 +68,9 @@ export default function LockModal({ show, setShowLpModal }: LockModalProps): JSX
     // Early exit if value is ZERO
     if (val == 0) return;
 
-    if (chain?.id !== Number(1)) {
+    if (chain?.id !== Number(ETH_SEPOLIA_CHAIN_ID)) {
       try {
-        await switchNetworkAsync?.(Number(1));
+        await switchNetworkAsync?.(Number(ETH_SEPOLIA_CHAIN_ID));
       } catch (error) {
         return
       }
