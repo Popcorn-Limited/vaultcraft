@@ -232,8 +232,8 @@ async function broadcastVeBalance({ account, address, publicClient, walletClient
       address,
       abi: VeBeaconAbi,
       functionName: "broadcastVeBalance",
-      args: [account, BigInt(String(ARB_SEPOLIA_CHAIN_ID)), BigInt("150000"), BigInt("10000")],
-      value: parseEther("0.02")
+      args: [account, BigInt(String(ARB_SEPOLIA_CHAIN_ID)), BigInt("500000"), BigInt("1000000")],
+      value: parseEther("0.1")
     })
     simRes = { request: request, success: true, error: null }
   } catch (error: any) {

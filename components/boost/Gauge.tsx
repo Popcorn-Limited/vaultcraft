@@ -28,6 +28,7 @@ export default function Gauge({ vaultData, index, votes, handleVotes, canVote, s
     account: account as Address,
     chainId: vaultData.chainId
   })
+  console.log({ address: vaultData.gauge?.address, weights })
   const [amount, setAmount] = useState(Number(weights?.[2].power));
 
   function onChange(value: number) {
