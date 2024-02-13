@@ -10,6 +10,7 @@ import useGaugeWeights from "@/lib/gauges/useGaugeWeights";
 import getAPR from "@/lib/gauges/getGaugeAPR";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import { roundToTwoDecimalPlaces } from '@/lib/utils/helpers'
+import { ETH_SEPOLIA_CHAIN_ID } from "pages/boost-test";
 
 interface GaugeProps {
   vaultData: VaultData;
@@ -26,9 +27,8 @@ export default function Gauge({ vaultData, index, votes, handleVotes, canVote, s
   const { data: weights } = useGaugeWeights({
     address: vaultData.gauge?.address as Address,
     account: account as Address,
-    chainId: vaultData.chainId
+    chainId: ETH_SEPOLIA_CHAIN_ID
   })
-  console.log({ address: vaultData.gauge?.address, weights })
   const [amount, setAmount] = useState(Number(weights?.[2].power));
 
   function onChange(value: number) {

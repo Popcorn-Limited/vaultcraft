@@ -212,6 +212,41 @@ async function mintMockToken({ account, address, decimals, chainId, publicClient
   })
 }
 
+async function transmitRewards({ account, address, publicClient, walletClient }
+  : { account: Address, address: Address, publicClient: PublicClient, walletClient: WalletClient }) {
+
+  if (walletClient.chain?.id !== Number(ETH_SEPOLIA_CHAIN_ID)) {
+    try {
+      await walletClient.switchChain({ id: sepolia.id });
+    } catch (error) {
+      return
+    }
+  }
+
+  showLoadingToast("Bridging Rewards...")
+
+  let simRes;
+  try {
+    const { request } = await publicClient.simulateContract({
+      account,
+      address,
+      abi: RootGaugeFactoryAbi,
+      functionName: "transmit_emissions_multiple",
+      args: [["0x5D5004850Ad6C2C8bBb16F22E7b45a8a3BbCFd46", "0xb689121e9Cb3FDA136FDD25A32DF1C6a49564528", "0xc809007A1e62F6F938076c9Bc67E07191E10114d"]],
+      value: parseEther("0.01")
+    })
+    simRes = { request: request, success: true, error: null }
+  } catch (error: any) {
+    simRes = { request: null, success: false, error: error.shortMessage }
+  }
+
+  return handleCallResult({
+    successMessage: "Bridged Rewards!",
+    simulationResponse: simRes,
+    clients: { publicClient, walletClient }
+  })
+}
+
 async function broadcastVeBalance({ account, address, publicClient, walletClient }
   : { account: Address, address: Address, publicClient: PublicClient, walletClient: WalletClient }) {
 
@@ -222,6 +257,8 @@ async function broadcastVeBalance({ account, address, publicClient, walletClient
       return
     }
   }
+
+  console.log({ args: [account, BigInt(String(ARB_SEPOLIA_CHAIN_ID)), BigInt("500000"), BigInt("1000000")], address })
 
   showLoadingToast("Broadcasting VeBalance...")
 
@@ -649,13 +686,15 @@ export function StakingInterface({ setShowLockModal, setShowMangementModal, setS
           }
           <SecondaryActionButton label="Get VCX-LP" handleClick={() => setShowLpModal(true)} />
         </div>
-        {Number(lockedBal?.amount) > 0 &&
-          <MainActionButton
-            label="Broadcast VeBalance"
-            // @ts-ignore
-            handleClick={() => broadcastVeBalance({ account, address: VE_BEACON, publicClient: ETH_CLIENT, walletClient })}
-          />
-        }
+        <div className="mt-4">
+          {Number(lockedBal?.amount) > 0 &&
+            <MainActionButton
+              label="Broadcast VeBalance"
+              // @ts-ignore
+              handleClick={() => broadcastVeBalance({ account, address: VE_BEACON, publicClient: ETH_CLIENT, walletClient })}
+            />
+          }
+        </div>
       </div>
     </>
   )
@@ -719,33 +758,39 @@ export function OptionTokenInterface({ gauges, setShowOptionTokenModal }: Option
       </span>
       <span className="flex flex-row items-center justify-between mt-6 pb-6 border-b border-[#353945]">
       </span>
-      <div className="lg:flex lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-8 mt-6">
-        <div className="w-full md:w-60">
-          <MainActionButton
-            label="Claim ETH oVCX"
-            handleClick={() =>
-              claimOPop({
-                gauges: gaugeRewards?.amounts?.filter(gauge => gauge.chainId === ETH_SEPOLIA_CHAIN_ID).filter(gauge => Number(gauge.amount) > 0).map(gauge => gauge.address) as Address[],
-                account: account as Address,
-                minter: MINTER,
-                clients: { publicClient, walletClient: walletClient as WalletClient }
-              })}
-            disabled={gaugeRewards ? Number(gaugeRewards?.total) === 0 : true}
-          />
-        </div>
-        <div className="w-full md:w-60">
-          <MainActionButton
-            label="Claim ARB oVCX"
-            handleClick={() =>
-              claimOPop({
-                gauges: gaugeRewards?.amounts?.filter(gauge => gauge.chainId === ARB_SEPOLIA_CHAIN_ID).filter(gauge => Number(gauge.amount) > 0).map(gauge => gauge.address) as Address[],
-                account: account as Address,
-                minter: "0x690772e7EeD4a15E12d71968B8C615890AAbb455", // Child Gauge Factory
-                clients: { publicClient, walletClient: walletClient as WalletClient }
-              })}
-            disabled={gaugeRewards ? Number(gaugeRewards?.total) === 0 : true}
-          />
-        </div>
+      <div className="lg:flex lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-8 mt-6 lg:max-h-12">
+        <MainActionButton
+          label="Claim ETH oVCX"
+          handleClick={() =>
+            claimOPop({
+              gauges: gaugeRewards?.amounts?.filter(gauge => gauge.chainId === ETH_SEPOLIA_CHAIN_ID).filter(gauge => Number(gauge.amount) > 0).map(gauge => gauge.address) as Address[],
+              account: account as Address,
+              minter: MINTER,
+              clients: { publicClient, walletClient: walletClient as WalletClient }
+            })}
+          disabled={gaugeRewards ? Number(gaugeRewards?.total) === 0 : true}
+        />
+        <MainActionButton label="Claim ARB oVCX"
+          handleClick={() =>
+            claimOPop({
+              gauges: gaugeRewards?.amounts?.filter(gauge => gauge.chainId === ARB_SEPOLIA_CHAIN_ID).filter(gauge => Number(gauge.amount) > 0).map(gauge => gauge.address) as Address[],
+              account: account as Address,
+              minter: "0x690772e7EeD4a15E12d71968B8C615890AAbb455", // Child Gauge Factory
+              clients: { publicClient, walletClient: walletClient as WalletClient }
+            })}
+          disabled={gaugeRewards ? Number(gaugeRewards?.total) === 0 : true} />
+      </div>
+      <div className="mt-4">
+        <SecondaryActionButton
+          label="Transmit Rewards"
+          handleClick={() =>
+            transmitRewards({
+              account: account as Address,
+              address: "0x690772e7EeD4a15E12d71968B8C615890AAbb455", // Root Child Gauge Factory
+              publicClient: ETH_CLIENT,
+              walletClient: walletClient as WalletClient
+            })}
+        />
       </div>
     </div>
   )
@@ -1032,3 +1077,6 @@ const VAULTS = [
 
 
 const VeBeaconAbi = [{ "inputs": [{ "internalType": "contract IVotingEscrow", "name": "votingEscrow_", "type": "address" }, { "internalType": "address", "name": "recipientAddress_", "type": "address" }], "stateMutability": "nonpayable", "type": "constructor" }, { "inputs": [], "name": "UniversalBridgeLib__ChainIdNotSupported", "type": "error" }, { "inputs": [], "name": "UniversalBridgeLib__GasLimitTooLarge", "type": "error" }, { "inputs": [], "name": "UniversalBridgeLib__MsgValueNotSupported", "type": "error" }, { "inputs": [], "name": "VeBeacon__UserNotInitialized", "type": "error" }, { "anonymous": false, "inputs": [{ "indexed": true, "internalType": "address", "name": "user", "type": "address" }, { "indexed": true, "internalType": "uint256", "name": "chainId", "type": "uint256" }], "name": "BroadcastVeBalance", "type": "event" }, { "inputs": [{ "internalType": "address", "name": "user", "type": "address" }, { "internalType": "uint256", "name": "chainId", "type": "uint256" }, { "internalType": "uint256", "name": "gasLimit", "type": "uint256" }, { "internalType": "uint256", "name": "maxFeePerGas", "type": "uint256" }], "name": "broadcastVeBalance", "outputs": [], "stateMutability": "payable", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "user", "type": "address" }, { "internalType": "uint256[]", "name": "chainIdList", "type": "uint256[]" }, { "internalType": "uint256", "name": "gasLimit", "type": "uint256" }, { "internalType": "uint256", "name": "maxFeePerGas", "type": "uint256" }], "name": "broadcastVeBalanceMultiple", "outputs": [], "stateMutability": "payable", "type": "function" }, { "inputs": [{ "internalType": "address[]", "name": "userList", "type": "address[]" }, { "internalType": "uint256[]", "name": "chainIdList", "type": "uint256[]" }, { "internalType": "uint256", "name": "gasLimit", "type": "uint256" }, { "internalType": "uint256", "name": "maxFeePerGas", "type": "uint256" }], "name": "broadcastVeBalanceMultiple", "outputs": [], "stateMutability": "payable", "type": "function" }, { "inputs": [{ "internalType": "uint256", "name": "chainId", "type": "uint256" }, { "internalType": "uint256", "name": "gasLimit", "type": "uint256" }, { "internalType": "uint256", "name": "maxFeePerGas", "type": "uint256" }], "name": "getRequiredMessageValue", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "recipientAddress", "outputs": [{ "internalType": "address", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "votingEscrow", "outputs": [{ "internalType": "contract IVotingEscrow", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" }] as const
+
+
+const RootGaugeFactoryAbi = [{ "name": "BridgerUpdated", "inputs": [{ "name": "_chain_id", "type": "uint256", "indexed": true }, { "name": "_old_bridger", "type": "address", "indexed": false }, { "name": "_new_bridger", "type": "address", "indexed": false }], "anonymous": false, "type": "event" }, { "name": "DeployedGauge", "inputs": [{ "name": "_implementation", "type": "address", "indexed": true }, { "name": "_chain_id", "type": "uint256", "indexed": true }, { "name": "_vault", "type": "address", "indexed": false }, { "name": "_gauge", "type": "address", "indexed": false }], "anonymous": false, "type": "event" }, { "name": "TransferOwnership", "inputs": [{ "name": "_old_owner", "type": "address", "indexed": false }, { "name": "_new_owner", "type": "address", "indexed": false }], "anonymous": false, "type": "event" }, { "name": "UpdateImplementation", "inputs": [{ "name": "_old_implementation", "type": "address", "indexed": false }, { "name": "_new_implementation", "type": "address", "indexed": false }], "anonymous": false, "type": "event" }, { "stateMutability": "nonpayable", "type": "constructor", "inputs": [{ "name": "_owner", "type": "address" }, { "name": "_implementation", "type": "address" }], "outputs": [] }, { "stateMutability": "payable", "type": "function", "name": "transmit_emissions", "inputs": [{ "name": "_gauge", "type": "address" }], "outputs": [] }, { "stateMutability": "payable", "type": "function", "name": "transmit_emissions_multiple", "inputs": [{ "name": "_gauge_list", "type": "address[]" }], "outputs": [] }, { "stateMutability": "payable", "type": "function", "name": "deploy_gauge", "inputs": [{ "name": "_chain_id", "type": "uint256" }, { "name": "_vault", "type": "address" }, { "name": "_relative_weight_cap", "type": "uint256" }], "outputs": [{ "name": "", "type": "address" }] }, { "stateMutability": "nonpayable", "type": "function", "name": "set_bridger", "inputs": [{ "name": "_chain_id", "type": "uint256" }, { "name": "_bridger", "type": "address" }], "outputs": [] }, { "stateMutability": "nonpayable", "type": "function", "name": "set_implementation", "inputs": [{ "name": "_implementation", "type": "address" }], "outputs": [] }, { "stateMutability": "nonpayable", "type": "function", "name": "commit_transfer_ownership", "inputs": [{ "name": "_future_owner", "type": "address" }], "outputs": [] }, { "stateMutability": "nonpayable", "type": "function", "name": "accept_transfer_ownership", "inputs": [], "outputs": [] }, { "stateMutability": "view", "type": "function", "name": "get_bridger", "inputs": [{ "name": "arg0", "type": "uint256" }], "outputs": [{ "name": "", "type": "address" }] }, { "stateMutability": "view", "type": "function", "name": "get_implementation", "inputs": [], "outputs": [{ "name": "", "type": "address" }] }, { "stateMutability": "view", "type": "function", "name": "get_gauge", "inputs": [{ "name": "arg0", "type": "uint256" }, { "name": "arg1", "type": "uint256" }], "outputs": [{ "name": "", "type": "address" }] }, { "stateMutability": "view", "type": "function", "name": "get_gauge_count", "inputs": [{ "name": "arg0", "type": "uint256" }], "outputs": [{ "name": "", "type": "uint256" }] }, { "stateMutability": "view", "type": "function", "name": "is_valid_gauge", "inputs": [{ "name": "arg0", "type": "address" }], "outputs": [{ "name": "", "type": "bool" }] }, { "stateMutability": "view", "type": "function", "name": "owner", "inputs": [], "outputs": [{ "name": "", "type": "address" }] }, { "stateMutability": "view", "type": "function", "name": "future_owner", "inputs": [], "outputs": [{ "name": "", "type": "address" }] }] as const;

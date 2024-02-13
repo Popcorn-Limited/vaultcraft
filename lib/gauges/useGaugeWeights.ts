@@ -14,7 +14,7 @@ export default function useGaugeWeights({ address, account, chainId }: { address
     chainId: Number(chainId),
     abi: GaugeControllerAbi
   }
-
+  
   return useContractReads({
     contracts: [
       {
