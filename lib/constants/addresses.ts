@@ -42,7 +42,7 @@ const veAddresses: VeAddresses = {
   GaugeFactory: "0x4C85791b97C5EeB05f63F455e1Da408FDe80fc73",
   SmartWalletChecker: "0xcaC427993DD4D201fA5B37D65Bb0b1F5c5522315",
   VotingEscrowDelegation: "0x8F44f5e80964134d0A61351734eA6c0288924548",
-  VeBeacon: "0xC3Eb4a04720AB8F30A111dB584a4C4d3620a0f65",
+  VeBeacon: "0x45ae66db2fCa384941Ee958aC74Fc34Db59DC977",
   VeRecipient: "0xe6C005625AB42B0168de5b91c429184756E923FA",
   ArbitrumBridge: "0xA66cBBa4f06E19EE424fC778c89a2dEf8982e183",
   FeeDistributor: zeroAddress
