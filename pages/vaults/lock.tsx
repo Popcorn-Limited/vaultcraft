@@ -69,14 +69,6 @@ export default function Index(): JSX.Element {
         </div>
       </section>
 
-      <div className="bg-red-500 mb-4 p-4 md:p-2 mt-2 mx-4 md:mx-8 rounded-lg flex flex-row justify-center">
-        <div className="flex flex-row items-center justify-center">
-          <p className="text-white font-bold md:mr-4">
-            We found an issue with the claiming function. Deposits and Claims are disabled until further notice. You can still withdraw once your lock period is over.
-          </p>
-        </div>
-      </div>
-
       <section className="grid grid-cols-1 md:grid-cols-3 gap-4 px-4 md:px-8">
 
         {vaults.length > 0 ?

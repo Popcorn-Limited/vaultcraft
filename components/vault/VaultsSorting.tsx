@@ -19,7 +19,7 @@ interface VaultSortingProps {
 
 export default function VaultsSorting({ className, vaultState }: VaultSortingProps): JSX.Element {
     const [vaults, setVaults] = vaultState;
-    const [sortingType, setSortingType] = useState(VAULT_SORTING_TYPE.none)
+    const [sortingType, setSortingType] = useState(VAULT_SORTING_TYPE.mostTvl)
     const [openFilter, setOpenSorting] = useState(false);
 
     const dropdownRef = useRef<HTMLDivElement>(null);

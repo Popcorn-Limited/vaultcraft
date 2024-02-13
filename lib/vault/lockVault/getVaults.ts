@@ -68,7 +68,9 @@ async function getVaults({ account, publicClient }: { account: Address, publicCl
             description: "**Lending** - The vault supplies assets into Fraxlend to earn interest."
           },
         },
-        labels: vault.labels ? vault.labels.map((label: string) => <VaultLabel>label) : undefined
+        labels: vault.labels ? vault.labels.map((label: string) => <VaultLabel>label) : undefined,
+        description: vault.description || undefined,
+        type: vault.type
       }
     }
   })

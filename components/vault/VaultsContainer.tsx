@@ -162,6 +162,7 @@ export default function VaultsContainer({ hiddenVaults, displayVaults, showDescr
             {vaults.filter(vault => selectedNetworks.includes(vault.chainId))
               .filter(vault => displayVaults.length > 0 ? displayVaults.includes(vault.address) : true)
               .filter(vault => !hiddenVaults.includes(vault.address))
+              .sort((a, b) => b.tvl - a.tvl)
               .map((vault) => {
                 return vault.address === "0x7CEbA0cAeC8CbE74DB35b26D7705BA68Cb38D725" ?
                   <KelpVault searchTerm={searchTerm} />

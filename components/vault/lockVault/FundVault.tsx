@@ -1,12 +1,10 @@
 import { showSuccessToast } from "@/lib/toasts";
 import { Square2StackIcon } from "@heroicons/react/24/outline";
 import CopyToClipboard from "react-copy-to-clipboard";
-import VaultStats from "./VaultStats";
-import VaultInteraction from "./VaultInteraction";
 import Accordion from "@/components/common/Accordion";
 import Modal from "@/components/modal/Modal";
 import { useState } from "react";
-import AssetWithName from "../AssetWithName";
+import AssetWithName from "@/components/vault/AssetWithName";
 import { LockVaultData, RewardToken } from "@/lib/types";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import { useAccount, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
@@ -14,11 +12,12 @@ import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { ActionStep } from "@/lib/getActionSteps";
 import { handleAllowance } from "@/lib/approve";
 import MainActionButton from "@/components/button/MainActionButton";
-import ActionSteps from "../ActionSteps";
+import ActionSteps from "@/components/vault/ActionSteps";
 import { safeRound } from "@/lib/utils/formatBigNumber";
 import { formatUnits } from "viem";
 import { validateInput } from "@/lib/utils/helpers";
 import { handleDistributeRewards } from "@/lib/vault/lockVault/interactions";
+import VaultStats from "@/components/vault/VaultStats";
 
 const BaseStepInfo = {
   success: false,

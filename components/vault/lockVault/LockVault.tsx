@@ -1,12 +1,12 @@
 import { showSuccessToast } from "@/lib/toasts";
 import { Square2StackIcon } from "@heroicons/react/24/outline";
 import CopyToClipboard from "react-copy-to-clipboard";
-import VaultStats from "./VaultStats";
-import VaultInteraction from "./VaultInteraction";
+import VaultStats from "@/components/vault/VaultStats";
+import VaultInteraction from "@/components/vault/lockVault/VaultInteraction";
 import Accordion from "@/components/common/Accordion";
 import Modal from "@/components/modal/Modal";
 import { useEffect, useState } from "react";
-import AssetWithName from "../AssetWithName";
+import AssetWithName from "@/components/vault/AssetWithName";
 import { LockVaultData, Token, VaultLabel } from "@/lib/types";
 import { useAtom } from "jotai";
 import { availableZapAssetAtom, zapAssetsAtom } from "@/lib/atoms";
