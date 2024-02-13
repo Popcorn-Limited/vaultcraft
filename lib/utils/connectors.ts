@@ -92,4 +92,4 @@ export const RPC_URLS: { [key: number]: string } = {
   [ChainId.RemoteFork]: `http://localhost:8545`,
 };
 
-export const SUPPORTED_NETWORKS = [mainnet, polygon, optimism, arbitrum, polygonMumbai]
+export const SUPPORTED_NETWORKS = [mainnet, polygon, optimism, arbitrum]

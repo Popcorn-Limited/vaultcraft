@@ -1,4 +1,4 @@
-import {showLoadingToast} from "@/lib/toasts";
+import { showLoadingToast } from "@/lib/toasts";
 import {
   Clients,
   ReserveData,
@@ -8,15 +8,15 @@ import {
   UserAccountData,
   VaultData
 } from "@/lib/types";
-import {VaultAbi} from "@/lib/constants";
-import {Address, formatUnits, PublicClient} from "viem";
-import {handleCallResult} from "@/lib/utils/helpers";
-import {FireEventArgs} from "@masa-finance/analytics-sdk";
-import {networkMap} from "@/lib/utils/connectors";
-import {AavePoolAbi} from "@/lib/constants/abi/Aave";
+import { VaultAbi } from "@/lib/constants";
+import { Address, formatUnits, PublicClient } from "viem";
+import { handleCallResult } from "@/lib/utils/helpers";
+import { FireEventArgs } from "@masa-finance/analytics-sdk";
+import { networkMap } from "@/lib/utils/connectors";
+import { AavePoolAbi } from "@/lib/constants/abi/Aave";
 import axios from "axios"
-import {erc20ABI} from "wagmi";
-import {AAVE_POOL_PROXY} from "@/lib/vault/aave/handleVaultInteraction";
+import { erc20ABI } from "wagmi";
+import { AAVE_POOL_PROXY } from "@/lib/vault/aave/handleVaultInteraction";
 
 interface VaultWriteProps {
   chainId: number;
@@ -131,7 +131,7 @@ export async function vaultDeposit({ chainId, vaultData, account, amount, client
 }
 
 
-export async function supplyToAave({ asset, amount, onBehalfOf, chainId, account,  clients }: AavePoolProps): Promise<boolean> {
+export async function supplyToAave({ asset, amount, onBehalfOf, chainId, account, clients }: AavePoolProps): Promise<boolean> {
   showLoadingToast("Supplying to Aave...")
 
   return await handleCallResult({
@@ -139,7 +139,7 @@ export async function supplyToAave({ asset, amount, onBehalfOf, chainId, account
     simulationResponse: await simulateAavePoolCall({
       address: AAVE_POOL_PROXY,
       account,
-      args:[asset, amount, onBehalfOf, 0],
+      args: [asset, amount, onBehalfOf, 0],
       functionName: "supply",
       publicClient: clients.publicClient
     }),
@@ -147,7 +147,7 @@ export async function supplyToAave({ asset, amount, onBehalfOf, chainId, account
   })
 }
 
-export async function borrowFromAave({ asset, amount, onBehalfOf, chainId, account,  clients }: AavePoolProps): Promise<boolean> {
+export async function borrowFromAave({ asset, amount, onBehalfOf, chainId, account, clients }: AavePoolProps): Promise<boolean> {
   showLoadingToast("Borrowing from Aave...")
 
   return await handleCallResult({
@@ -155,7 +155,7 @@ export async function borrowFromAave({ asset, amount, onBehalfOf, chainId, accou
     simulationResponse: await simulateAavePoolCall({
       address: AAVE_POOL_PROXY,
       account,
-      args:[asset, amount, 2, 0, onBehalfOf],
+      args: [asset, amount, 2, 0, onBehalfOf],
       functionName: "borrow",
       publicClient: clients.publicClient
     }),
@@ -170,13 +170,13 @@ interface Tokens {
   BAL: Token;
 }
 export async function fetchTokens(account: Address, tokens: Tokens, publicClient: PublicClient) {
-  const {data: llamaPrices} = await axios.get("https://coins.llama.fi/prices/current/ethereum:0x6B175474E89094C44Da98b954EedeAC495271d0F,"
+  const { data: llamaPrices } = await axios.get("https://coins.llama.fi/prices/current/ethereum:0x6B175474E89094C44Da98b954EedeAC495271d0F,"
     + "ethereum:0xA35b1B31Ce002FBF2058D22F30f95D405200A15b,"
     + "ethereum:0xdAC17F958D2ee523a2206206994597C13D831ec7,"
     + "ethereum:0xba100000625a3754423978a60c9317c58a424e3D"
   )
 
-  const {DAI, USDC, USDT, BAL} = tokens;
+  const { DAI, USDC, USDT, BAL } = tokens;
   console.log(publicClient.chain, publicClient)
   const balRes = await publicClient.multicall({
     contracts: [
@@ -251,6 +251,8 @@ export async function fetchUserAccountData(account: Address, publicClient: Publi
   }
 }
 
+const secondsPerYear = 31536000
+
 export async function fetchReserveData(asset: Address, publicClient: PublicClient): Promise<ReserveData> {
   const reserveData = await publicClient.readContract({
     address: AAVE_POOL_PROXY,
@@ -259,11 +261,14 @@ export async function fetchReserveData(asset: Address, publicClient: PublicClien
     args: [asset],
   }) as ReserveDataResponse
 
+  console.log({ reserveData })
+
   // Convert rates from ray to more readable format (e.g., percent per year)
   // Note: Aave uses ray encoding for rates, which is a 27-decimal fixed point representation
-  const variableBorrowRate = Number(formatUnits(reserveData.currentVariableBorrowRate, 27)) * 100; // Convert to percentage
-  const stableBorrowRate = Number(formatUnits(reserveData.currentStableBorrowRate, 27)) * 100; // Convert to percentage
-  const liquidityRate = Number(formatUnits(reserveData.currentLiquidityRate, 27)) * 100;
+  const variableBorrowRate = (((1 + (Number(formatUnits(reserveData.currentVariableBorrowRate, 27)) / secondsPerYear)) ** secondsPerYear) - 1) * 100; // Convert to percentage
+  const stableBorrowRate = (((1 + (Number(formatUnits(reserveData.currentStableBorrowRate, 27)) / secondsPerYear)) ** secondsPerYear) - 1) * 100;
+  const liquidityRate = (((1 + (Number(formatUnits(reserveData.currentLiquidityRate, 27)) / secondsPerYear)) ** secondsPerYear) - 1) * 100;
+
 
   return {
     variableBorrowRate,

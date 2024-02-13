@@ -24,6 +24,7 @@ import { availableZapAssetAtom, zapAssetsAtom } from "@/lib/atoms";
 import { getTokenOptions, isDefiPosition } from "@/lib/vault/utils";
 import LeftArrowIcon from "@/components/svg/LeftArrowIcon";
 import { KelpVaultInputs, getKelpVaultData, mutateKelpTokenBalance } from "@/components/vault/KelpVault";
+import { AaveUserAccountData } from "pages/deposit-via-loan";
 
 const { oVCX: OVCX, VCX } = getVeAddresses();
 
@@ -98,7 +99,7 @@ export default function Index() {
   return <NoSSR>
     {
       vaultData ? (
-        <div className="min-h-screen overflow-scroll">
+        <div className="min-h-screen">
           <button
             className="border border-gray-500 rounded-lg flex flex-row items-center px-4 py-2 ml-4 md:ml-8 mt-10"
             type="button"
@@ -238,7 +239,8 @@ export default function Index() {
               </div>
             </div>
 
-            <div className="w-full md:w-2/3 mt-8 md:mt-0">
+            <div className="w-full md:w-2/3 mt-8 md:mt-0 space-y-4">
+
               <div className="bg-[#23262f] p-6 rounded-lg">
                 <p className="text-white text-2xl font-bold mb-8">Strategy</p>
                 <p className='text-white'>
@@ -296,6 +298,30 @@ export default function Index() {
                   }
 
                 </div>
+              </div>
+
+              <div className="bg-[#23262f] p-6 rounded-lg">
+                <p className="text-white text-2xl font-bold mb-8">Borrow Info</p>
+                <AaveUserAccountData
+                  supplyToken={{
+                    address: "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58", //OPTIMISM
+                    name: "Tether",
+                    symbol: "USDT",
+                    decimals: 6,
+                    logoURI: "https://etherscan.io/token/images/tethernew_32.png",
+                    balance: 0,
+                    price: 1
+                  }}
+                  borrowToken={{
+                    address: "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85", //OPTIMISM
+                    name: "USD Coin",
+                    symbol: "USDC",
+                    decimals: 6,
+                    logoURI: "https://etherscan.io/token/images/centre-usdc_28.png",
+                    balance: 0,
+                    price: 1
+                  }}
+                />
               </div>
             </div>
 

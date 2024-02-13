@@ -2,22 +2,22 @@ import MainActionButton from "@/components/button/MainActionButton";
 import TabSelector from "@/components/common/TabSelector";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import ActionSteps from "@/components/vault/ActionSteps";
-import {masaAtom} from "@/lib/atoms/sdk";
-import {ActionStep, getDepositVaultActionSteps} from "@/lib/getActionSteps";
-import {DepositVaultActionType, Token, UserAccountData, VaultData} from "@/lib/types";
-import {safeRound} from "@/lib/utils/formatBigNumber";
-import {validateInput} from "@/lib/utils/helpers";
+import { masaAtom } from "@/lib/atoms/sdk";
+import { ActionStep, getDepositVaultActionSteps } from "@/lib/getActionSteps";
+import { DepositVaultActionType, ReserveData, Token, UserAccountData, VaultData } from "@/lib/types";
+import { formatToFixedDecimals, safeRound } from "@/lib/utils/formatBigNumber";
+import { validateInput } from "@/lib/utils/helpers";
 import handleVaultInteraction from "@/lib/vault/aave/handleVaultInteraction";
-import {ArrowDownIcon} from "@heroicons/react/24/outline";
-import {useConnectModal} from "@rainbow-me/rainbowkit";
-import {useAtom} from "jotai";
-import {useRouter} from "next/router";
-import {useEffect, useState} from "react";
-import {formatUnits, getAddress, isAddress, maxUint256} from "viem";
-import {useAccount, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient} from "wagmi";
-import {AaveUserAccountData} from "@/components/vault/VaultStats";
+import { ArrowDownIcon } from "@heroicons/react/24/outline";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { useAtom } from "jotai";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { Address, formatEther, formatUnits, getAddress, isAddress, maxUint256 } from "viem";
+import { useAccount, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
 import ProtocolIcon from "@/components/common/ProtocolIcon";
-import {fetchReserveData, fetchTokens, fetchUserAccountData} from "@/lib/vault/aave/interactionts";
+import { fetchReserveData, fetchTokens, fetchUserAccountData } from "@/lib/vault/aave/interactionts";
+import Title from "@/components/common/Title";
 
 const ACTIVE_TABS = ["Supply", "Borrow", "Deposit"];
 
@@ -74,21 +74,21 @@ const Vault: Token = {
 
 
 export default function DepositViaLoan() {
-  const {query} = useRouter()
+  const { query } = useRouter()
   const { address: account } = useAccount();
-  const publicClient = usePublicClient({chainId: 1})
-  const {data: walletClient} = useWalletClient()
-  const {openConnectModal} = useConnectModal();
-  const {chain} = useNetwork();
-  const {switchNetworkAsync} = useSwitchNetwork();
+  const publicClient = usePublicClient({ chainId: 10 })
+  const { data: walletClient } = useWalletClient()
+  const { openConnectModal } = useConnectModal();
+  const { chain } = useNetwork();
+  const { switchNetworkAsync } = useSwitchNetwork();
   const [masaSdk,] = useAtom(masaAtom);
 
   const [inputTokens, setInputTokens] = useState<{
     dai: Token, usdc: Token, usdt: Token, bal: Token
-  }>({dai: DAI, usdc: USDC, usdt: BAL, bal: BAL})
+  }>({ dai: DAI, usdc: USDC, usdt: BAL, bal: BAL })
   const [outputTokens, setOutputTokens] = useState<{
     dai: Token, usdc: Token, usdt: Token, bal: Token
-  }>({dai: DAI, usdc: USDC, usdt: BAL, bal: BAL})
+  }>({ dai: DAI, usdc: USDC, usdt: BAL, bal: BAL })
 
   //TODO: remove initial state
   const [vaultData, setVaultData] = useState<VaultData>({
@@ -99,8 +99,8 @@ export default function DepositViaLoan() {
     assetsPerShare: 0,
     chainId: 0,
     depositLimit: 0,
-    fees: {deposit: 0, withdrawal: 0, management: 0, performance: 0},
-    gauge: {address: "0x", name: "", symbol: "", decimals: 0, logoURI: "", balance: 0, price: 0},
+    fees: { deposit: 0, withdrawal: 0, management: 0, performance: 0 },
+    gauge: { address: "0x", name: "", symbol: "", decimals: 0, logoURI: "", balance: 0, price: 0 },
     gaugeMaxApy: 0,
     gaugeMinApy: 0,
     metadata: {
@@ -108,9 +108,9 @@ export default function DepositViaLoan() {
       feeRecipient: "0x47fd36ABcEeb9954ae9eA1581295Ce9A8308655E",
       cid: "",
       optionalMetadata: {
-        protocol: {name: "KelpDao", description: ""},
-        token: {name: "", description: "",},
-        strategy: {name: "", description: ""},
+        protocol: { name: "KelpDao", description: "" },
+        token: { name: "", description: "", },
+        strategy: { name: "", description: "" },
       },
     },
     pricePerShare: 0,
@@ -124,7 +124,7 @@ export default function DepositViaLoan() {
   useEffect(() => {
     if (account) {
       console.log("chain id:", chain?.id)
-      fetchTokens(account, {DAI, USDT, USDC, BAL}, publicClient).then(tokens => {
+      fetchTokens(account, { DAI, USDT, USDC, BAL }, publicClient).then(tokens => {
         setInputTokens(tokens)
         setVaultData({
           assetPrice: 0, gauge: undefined, gaugeMaxApy: 0, gaugeMinApy: 0,
@@ -148,9 +148,9 @@ export default function DepositViaLoan() {
             feeRecipient: "0x47fd36ABcEeb9954ae9eA1581295Ce9A8308655E",
             cid: "",
             optionalMetadata: {
-              protocol: {name: "Aave Deposit To Loan", description: ""},
-              token: {name: "", description: "",},
-              strategy: {name: "", description: ""},
+              protocol: { name: "Aave Deposit To Loan", description: "" },
+              token: { name: "", description: "", },
+              strategy: { name: "", description: "" },
             },
           },
           chainId: 1,
@@ -174,7 +174,7 @@ export default function DepositViaLoan() {
   const [inputBalance, setInputBalance] = useState<string>("0");
   const [isDeposit, setIsDeposit] = useState<boolean>(true);
   const [activeTab, setActiveTab] = useState<string>(ACTIVE_TABS[0]);
-  const [interestRate, setInterestRate] = useState<number>(0);
+  const [reserveData, setReserveData] = useState<ReserveData>();
 
   const [userAccountData, setUserAccountData] = useState<UserAccountData>({
     availableBorrowsBase: 0,
@@ -190,7 +190,7 @@ export default function DepositViaLoan() {
     setOutputToken(Vault)
     setSteps(getDepositVaultActionSteps(action))
     fetchReserveData(inputToken.address, publicClient).then(
-      reserveData => setInterestRate(reserveData.variableBorrowRate)
+      res => setReserveData(res)
     )
     //setInterestRate()
   }, [inputTokens])
@@ -202,10 +202,10 @@ export default function DepositViaLoan() {
 
   function handleMaxClick() {
     if (!inputToken) return
-    const stringBal = inputToken.balance.toLocaleString("fullwide", {useGrouping: false})
+    const stringBal = inputToken.balance.toLocaleString("fullwide", { useGrouping: false })
     const rounded = safeRound(BigInt(stringBal), inputToken.decimals)
     const formatted = formatUnits(rounded, inputToken.decimals)
-    handleChangeInput({currentTarget: {value: formatted}})
+    handleChangeInput({ currentTarget: { value: formatted } })
   }
 
   function handleActiveTabSelect(activeTab: string) {
@@ -234,8 +234,8 @@ export default function DepositViaLoan() {
   function handleTokenSelect(input: Token, output: Token): void {
     setInputToken(input);
     setOutputToken(output)
-    fetchReserveData(input.address, publicClient).then(
-      reserveData => setInterestRate(reserveData.variableBorrowRate)
+    fetchReserveData(inputToken.address, publicClient).then(
+      res => setReserveData(res)
     )
   }
 
@@ -243,9 +243,9 @@ export default function DepositViaLoan() {
     const val = Number(inputBalance)
     if (val === 0 || !inputToken || !outputToken || !account || !walletClient || !vaultData) return;
 
-    if (chain?.id !== Number(80001)) {
+    if (chain?.id !== Number(10)) {
       try {
-        await switchNetworkAsync?.(Number(80001));
+        await switchNetworkAsync?.(Number(10));
       } catch (error) {
         return
       }
@@ -268,7 +268,7 @@ export default function DepositViaLoan() {
       account,
       slippage: 100,
       tradeTimeout: 60,
-      clients: {publicClient, walletClient},
+      clients: { publicClient, walletClient },
       fireEvent: masaSdk?.fireEvent,
       referral: !!query?.ref && isAddress(query.ref as string) ? getAddress(query.ref as string) : undefined
     })
@@ -319,7 +319,7 @@ export default function DepositViaLoan() {
           </div>
 
           <div className="w-full flex flex-wrap items-center justify-between flex-col gap-4">
-            <AaveUserAccountData userAccountData={userAccountData} interestRate={interestRate}/>
+            <AaveUserAccountData userAccountData={userAccountData} reserveData={reserveData} />
           </div>
 
           <TabSelector
@@ -348,12 +348,12 @@ export default function DepositViaLoan() {
               <ArrowDownIcon
                 className="h-10 w-10 p-2 text-[#9CA3AF] border border-[#4D525C] rounded-full cursor-pointer hover:text-primary hover:border-primary"
                 aria-hidden="true"
-                onClick={() => {}}
+                onClick={() => { }}
               />
             </div>
           )}
 
-          {activeTab === "Deposit"  && (
+          {activeTab === "Deposit" && (
             <InputTokenWithError
               captionText={"Output Amount"}
               onSelectToken={option => handleTokenSelect(option, Vault)}  //todo: check that this is the right token assignment
@@ -372,18 +372,121 @@ export default function DepositViaLoan() {
           )}
 
           <div className="w-full flex justify-center my-6">
-            <ActionSteps steps={steps} stepCounter={stepCounter}/>
+            <ActionSteps steps={steps} stepCounter={stepCounter} />
           </div>
 
           <div className="">
             {account && steps.length > 0 ?
               <MainActionButton label={steps[stepCounter]?.label} handleClick={handleMainAction}
-                                disabled={inputBalance === "0" || !steps[stepCounter] || steps[stepCounter].loading}/>
-              : < MainActionButton label={"Connect Wallet"} handleClick={openConnectModal}/>
+                disabled={inputBalance === "0" || !steps[stepCounter] || steps[stepCounter].loading} />
+              : < MainActionButton label={"Connect Wallet"} handleClick={openConnectModal} />
             }
           </div>
         </div>
       </div>
     </>
   );
+}
+
+
+export function AaveUserAccountData({ supplyToken, borrowToken }: { supplyToken: Token, borrowToken: Token }): JSX.Element {
+  const { address: account } = useAccount();
+  const publicClient = usePublicClient({ chainId: 10 })
+
+  const [userAccountData, setUserAccountData] = useState<UserAccountData>({
+    availableBorrowsBase: 0,
+    currentLiquidationThreshold: 0,
+    healthFactor: 0,
+    ltv: 0,
+    totalCollateralBase: 0,
+    totalDebtBase: 0
+  })
+
+  useEffect(() => {
+    if (account) fetchUserAccountData(account, publicClient).then((userAccountData) => {
+      setUserAccountData(userAccountData)
+    })
+  }, [account])
+
+  const [supplyData, setSupplyData] = useState<ReserveData>();
+  const [borrowData, setBorrowData] = useState<ReserveData>();
+
+  useEffect(() => {
+    if (supplyToken) {
+      fetchReserveData(supplyToken.address, publicClient).then(
+        res => setSupplyData(res)
+      )
+    }
+    if (borrowToken) {
+      fetchReserveData(borrowToken.address, publicClient).then(
+        res => setBorrowData(res)
+      )
+    }
+  }, [supplyToken, borrowToken])
+
+
+  return (
+    <>
+      <div className="w-full flex justify-between gap-8 md:gap-4">
+        <div className="w-full mt-6 md:mt-0">
+          <p className="text-primary font-normal md:text-[14px]">Debt Balance</p>
+          <p className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
+            <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
+              {(userAccountData.totalDebtBase / 1e8).toFixed(2)} USD
+            </Title>
+          </p>
+        </div>
+
+        <div className="w-full mt-6 md:mt-0">
+          <p className="text-primary font-normal md:text-[14px]">Max LTV</p>
+          <div className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
+            <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
+              {(userAccountData.ltv / 10000).toFixed(2)}
+            </Title>
+          </div>
+        </div>
+
+        <div className="w-full mt-6 md:mt-0">
+          <p className="leading-6 text-primary md:text-[14px]">Liquidation threshold</p>
+          <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
+            {(userAccountData.currentLiquidationThreshold / 10000).toFixed(2)}
+          </Title>
+        </div>
+      </div>
+
+      <div className="w-full flex justify-between gap-8 md:gap-4">
+        <div className="w-full mt-6 md:mt-0">
+          <p className="font-normal text-primary md:text-[14px]">Health Factor</p>
+          <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
+            {Number(formatEther(BigInt(userAccountData.healthFactor))).toFixed(2)}
+          </Title>
+        </div>
+
+        <div className="w-full mt-6 md:mt-0">
+          <p className="font-normal text-primary md:text-[14px]">Total Collateral</p>
+          <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
+            {(userAccountData.totalCollateralBase / 1e8).toFixed(2)} USD
+          </Title>
+        </div>
+
+        <div className="w-full mt-6 md:mt-0">
+          <p className="font-normal text-primary md:text-[14px]">Available Borrow</p>
+          <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
+            {(userAccountData.availableBorrowsBase / 1e8).toFixed(2)} USD
+          </Title>
+        </div>
+      </div>
+
+      {/* <div className="w-full flex justify-between gap-8 md:gap-4">
+        <div className="w-full mt-6 md:mt-0">
+          <p className="font-normal text-primary md:text-[14px]">Borrow Interest Rate</p>
+          <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
+            {formatToFixedDecimals(interestRate || 0, 2)} %
+          </Title>
+        </div>
+      </div> */}
+      <div className="w-full flex justify-between gap-8 md:gap-4"></div>
+      <div className="w-full flex justify-between gap-8 md:gap-4"></div>
+    </>
+  )
 }
