@@ -823,7 +823,7 @@ const VAULTS = [
       price: 0,
     },
     gauge: {
-      address: "0x299E99c253AE9f75fe3c6B7CC1b8D0ee28E8Ebe7",
+      address: "0xb2bD90C3af3fE1A5F8a1B498Fa26818591A775d0",
       name: `MockETH-gauge`,
       symbol: `st-mETH`,
       decimals: 27,
@@ -868,7 +868,7 @@ const VAULTS = [
       price: 0,
     },
     gauge: {
-      address: "0x657a105D164d8Fcf36921C523B94582ab5507a83",
+      address: "0xA0919E7dD4964c85Ea3d52f0C6475b70f468123b",
       name: `MockDai-gauge`,
       symbol: `st-mDAI`,
       decimals: 27,
@@ -914,7 +914,7 @@ const VAULTS = [
       price: 0,
     },
     gauge: {
-      address: "0x033d13081984E5E02327F901C7268a31ebF14854",
+      address: "0x90Cba940CF0fF50e5A82Fb156D8E0442942aD4e5",
       name: `MockUSDC-gauge`,
       symbol: `st-mUSDC`,
       decimals: 15,
