@@ -12,7 +12,7 @@ import { getVeAddresses } from "@/lib/constants";
 
 const { VaultRouter: VAULT_ROUTER } = getVeAddresses()
 
-export const AAVE_POOL_PROXY = "0x794a61358D6845594F94dc1DB02A252b5b4814aD"; //OPTIMISM
+export const AAVE_UI_DATA_PROVIDER = "0xbd83DdBE37fc91923d59C8c1E0bDe0CccCa332d5"; //OPTIMISM
 
 interface HandleVaultInteractionProps {
   stepCounter: number;
@@ -50,7 +50,7 @@ export default async function handleVaultInteraction({
   switch (action) {
     case DepositVaultActionType.Supply:
       return async (): Promise<boolean> => {
-        await handleAllowance({ token: inputToken.address, amount, account, spender: AAVE_POOL_PROXY, clients })
+        await handleAllowance({ token: inputToken.address, amount, account, spender: AAVE_UI_DATA_PROVIDER, clients })
         await supplyToAave({asset: inputToken.address, amount, onBehalfOf: account, chainId, account, clients})
         return true
       }

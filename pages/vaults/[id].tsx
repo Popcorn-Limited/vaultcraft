@@ -1,6 +1,6 @@
 import AssetWithName from "@/components/vault/AssetWithName";
 import { vaultsAtom } from "@/lib/atoms/vaults";
-import { FeeConfiguration, Token, VaultData } from "@/lib/types";
+import { FeeConfiguration, ReserveData, Token, VaultData } from "@/lib/types";
 import { useAtom } from "jotai";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -25,6 +25,8 @@ import { getTokenOptions, isDefiPosition } from "@/lib/vault/utils";
 import LeftArrowIcon from "@/components/svg/LeftArrowIcon";
 import { KelpVaultInputs, getKelpVaultData, mutateKelpTokenBalance } from "@/components/vault/KelpVault";
 import { AaveUserAccountData } from "pages/deposit-via-loan";
+import TabSelector from "@/components/common/TabSelector";
+import { fetchReserveData } from "@/lib/vault/aave/interactionts";
 
 const { oVCX: OVCX, VCX } = getVeAddresses();
 
@@ -215,7 +217,7 @@ export default function Index() {
 
           <section className="w-full md:flex md:flex-row md:justify-between md:space-x-8 py-10 px-4 md:px-8">
 
-            <div className="w-full md:w-1/3">
+            <div className="w-full md:w-1/3 space-y-4">
               <div className="bg-[#23262f] p-6 rounded-lg">
                 <div className="bg-[#141416] px-6 py-6 rounded-lg">
                   {vaultData.address === "0x7CEbA0cAeC8CbE74DB35b26D7705BA68Cb38D725" ?
@@ -235,6 +237,11 @@ export default function Index() {
                       hideModal={() => router.reload()}
                       mutateTokenBalance={mutateTokenBalance}
                     />}
+                </div>
+              </div>
+              <div className="bg-[#23262f] p-6 rounded-lg">
+                <div className="bg-[#141416] px-6 py-6 rounded-lg">
+
                 </div>
               </div>
             </div>
@@ -302,6 +309,7 @@ export default function Index() {
 
               <div className="bg-[#23262f] p-6 rounded-lg">
                 <p className="text-white text-2xl font-bold mb-8">Borrow Info</p>
+                <p className="text-white mb-4">Test text</p>
                 <AaveUserAccountData
                   supplyToken={{
                     address: "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58", //OPTIMISM
@@ -332,4 +340,36 @@ export default function Index() {
         <p className="text-white ml-4 md:ml-8">Loading...</p>
     }
   </NoSSR>
+}
+
+
+function LoanInterface(): JSX.Element {
+  const { address: account } = useAccount();
+  const publicClient = usePublicClient({ chainId: 10 })
+
+  return <>
+    <TabSelector
+      className="mb-6"
+      availableTabs={["Supply", "Borrow", "Repay", "Withdraw"]}
+      activeTab={"Supply"}
+      setActiveTab={() => { }}
+    />
+    {/* <InputTokenWithError
+                    captionText={isDeposit ? "Deposit Amount" : "Withdraw Amount"}
+                    onSelectToken={option => handleTokenSelect(option, !!gauge ? gauge : vault)}
+                    onMaxClick={handleMaxClick}
+                    chainId={chainId}
+                    value={inputBalance}
+                    onChange={handleChangeInput}
+                    selectedToken={inputToken}
+                    errorMessage={""}
+                    tokenList={tokenOptions.filter(token =>
+                      gauge?.address
+                        ? token.address !== gauge?.address
+                        : token.address !== vault.address
+                    )}
+                    allowSelection={isDeposit}
+                    allowInput
+                  /> */}
+  </>
 }

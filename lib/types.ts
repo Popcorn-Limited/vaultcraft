@@ -203,7 +203,7 @@ export type VoteUserSlopes = {
   end: bigint,
 }
 
-export type UserAccountData  = {
+export type UserAccountData = {
   totalCollateralBase: number,
   totalDebtBase: number,
   availableBorrowsBase: number,
@@ -212,7 +212,7 @@ export type UserAccountData  = {
   healthFactor: number
 }
 
-export type ReserveDataResponse  = {
+export type ReserveDataResponse = {
   id: bigint;
   underlyingAsset: string;
   aTokenAddress: string;
@@ -245,8 +245,11 @@ export type ReserveDataResponse  = {
   coverageRatio: bigint;
 }
 
-export type ReserveData  = {
-  variableBorrowRate: number,
-  stableBorrowRate: number,
-  liquidityRate: number
+export type ReserveData = {
+  ltv: number;
+  liquidationThreshold: number;
+  liquidationPenalty: number;
+  supplyRate: number;
+  borrowRate: number;
+  asset: Address;
 }

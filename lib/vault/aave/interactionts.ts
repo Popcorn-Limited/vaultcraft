@@ -13,10 +13,10 @@ import { Address, formatUnits, PublicClient } from "viem";
 import { handleCallResult } from "@/lib/utils/helpers";
 import { FireEventArgs } from "@masa-finance/analytics-sdk";
 import { networkMap } from "@/lib/utils/connectors";
-import { AavePoolAbi } from "@/lib/constants/abi/Aave";
+import { AavePoolAbi, AavePoolUiAbi } from "@/lib/constants/abi/Aave";
 import axios from "axios"
 import { erc20ABI } from "wagmi";
-import { AAVE_POOL_PROXY } from "@/lib/vault/aave/handleVaultInteraction";
+import { AAVE_UI_DATA_PROVIDER } from "@/lib/vault/aave/handleVaultInteraction";
 
 interface VaultWriteProps {
   chainId: number;
@@ -137,7 +137,7 @@ export async function supplyToAave({ asset, amount, onBehalfOf, chainId, account
   return await handleCallResult({
     successMessage: "Supplied underlying asset into Aave pool!",
     simulationResponse: await simulateAavePoolCall({
-      address: AAVE_POOL_PROXY,
+      address: AAVE_UI_DATA_PROVIDER,
       account,
       args: [asset, amount, onBehalfOf, 0],
       functionName: "supply",
@@ -153,7 +153,7 @@ export async function borrowFromAave({ asset, amount, onBehalfOf, chainId, accou
   return await handleCallResult({
     successMessage: "Borrowed underlying asset from Aave pool!",
     simulationResponse: await simulateAavePoolCall({
-      address: AAVE_POOL_PROXY,
+      address: AAVE_UI_DATA_PROVIDER,
       account,
       args: [asset, amount, 2, 0, onBehalfOf],
       functionName: "borrow",
@@ -235,44 +235,42 @@ export async function fetchTokens(account: Address, tokens: Tokens, publicClient
 
 export async function fetchUserAccountData(account: Address, publicClient: PublicClient): Promise<UserAccountData> {
   const userData = await publicClient.readContract({
-    address: AAVE_POOL_PROXY,
-    abi: AavePoolAbi,
-    functionName: 'getUserAccountData',
-    args: [account],
-  }) as bigint[]
+    address: AAVE_UI_DATA_PROVIDER,
+    abi: AavePoolUiAbi,
+    functionName: 'getUserReservesData',
+    args: ["0xa97684ead0e402dC232d5A977953DF7ECBaB3CDb", account],
+  })
+
+  console.log({ userData })
 
   return {
-    availableBorrowsBase: Number(userData[2]),
-    currentLiquidationThreshold: Number(userData[3]),
-    healthFactor: Number(userData[5]),
-    ltv: Number(userData[4]),
-    totalCollateralBase: Number(userData[0]),
-    totalDebtBase: Number(userData[1])
+    availableBorrowsBase: 1,
+    currentLiquidationThreshold: 1,
+    healthFactor: 1,
+    ltv: 1,
+    totalCollateralBase: 1,
+    totalDebtBase: 1
   }
 }
 
 const secondsPerYear = 31536000
 
-export async function fetchReserveData(asset: Address, publicClient: PublicClient): Promise<ReserveData> {
+export async function fetchReserveData(publicClient: PublicClient): Promise<ReserveData[]> {
   const reserveData = await publicClient.readContract({
-    address: AAVE_POOL_PROXY,
-    abi: AavePoolAbi,
-    functionName: 'getReserveData',
-    args: [asset],
-  }) as ReserveDataResponse
+    address: AAVE_UI_DATA_PROVIDER,
+    abi: AavePoolUiAbi,
+    functionName: 'getReservesData',
+    args: ["0xa97684ead0e402dC232d5A977953DF7ECBaB3CDb"],
+  })
 
-  console.log({ reserveData })
-
-  // Convert rates from ray to more readable format (e.g., percent per year)
-  // Note: Aave uses ray encoding for rates, which is a 27-decimal fixed point representation
-  const variableBorrowRate = (((1 + (Number(formatUnits(reserveData.currentVariableBorrowRate, 27)) / secondsPerYear)) ** secondsPerYear) - 1) * 100; // Convert to percentage
-  const stableBorrowRate = (((1 + (Number(formatUnits(reserveData.currentStableBorrowRate, 27)) / secondsPerYear)) ** secondsPerYear) - 1) * 100;
-  const liquidityRate = (((1 + (Number(formatUnits(reserveData.currentLiquidityRate, 27)) / secondsPerYear)) ** secondsPerYear) - 1) * 100;
-
-
-  return {
-    variableBorrowRate,
-    stableBorrowRate,
-    liquidityRate
-  }
+  return reserveData[0].filter(d => d.isActive).map(d => {
+    return {
+      ltv: Number(d.baseLTVasCollateral) / 100,
+      liquidationThreshold: Number(d.reserveLiquidationThreshold) / 100,
+      liquidationPenalty: (Number(d.reserveLiquidationBonus) - 10000) / 100,
+      supplyRate: (((1 + (Number(formatUnits(d.liquidityRate, 27)) / secondsPerYear)) ** secondsPerYear) - 1) * 100,
+      borrowRate: (((1 + (Number(formatUnits(d.variableBorrowRate, 27)) / secondsPerYear)) ** secondsPerYear) - 1) * 100,
+      asset: d.underlyingAsset
+    }
+  })
 }
