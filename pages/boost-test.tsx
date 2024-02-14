@@ -269,7 +269,7 @@ async function broadcastVeBalance({ account, address, publicClient, walletClient
       address,
       abi: VeBeaconAbi,
       functionName: "broadcastVeBalance",
-      args: [account, BigInt(String(ARB_SEPOLIA_CHAIN_ID)), BigInt("500000"), BigInt("1000000")],
+      args: [account, BigInt(String(ARB_SEPOLIA_CHAIN_ID)), BigInt("500000"), BigInt("100000000")],
       value: parseEther("0.01")
     })
     simRes = { request: request, success: true, error: null }
@@ -868,7 +868,7 @@ const VAULTS = [
       price: 0,
     },
     gauge: {
-      address: "0x299E99c253AE9f75fe3c6B7CC1b8D0ee28E8Ebe7",
+      address: "0x657a105D164d8Fcf36921C523B94582ab5507a83",
       name: `MockDai-gauge`,
       symbol: `st-mDAI`,
       decimals: 27,
@@ -914,7 +914,7 @@ const VAULTS = [
       price: 0,
     },
     gauge: {
-      address: "0x299E99c253AE9f75fe3c6B7CC1b8D0ee28E8Ebe7",
+      address: "0x033d13081984E5E02327F901C7268a31ebF14854",
       name: `MockUSDC-gauge`,
       symbol: `st-mUSDC`,
       decimals: 15,
