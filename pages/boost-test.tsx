@@ -766,7 +766,7 @@ export function OptionTokenInterface({ gauges, setShowOptionTokenModal }: Option
               gauges: gaugeRewards?.amounts?.filter(gauge => gauge.chainId === ETH_SEPOLIA_CHAIN_ID).filter(gauge => Number(gauge.amount) > 0).map(gauge => gauge.address) as Address[],
               account: account as Address,
               minter: MINTER,
-              clients: { publicClient, walletClient: walletClient as WalletClient }
+              clients: { publicClient: ETH_CLIENT, walletClient: walletClient as WalletClient }
             })}
           disabled={gaugeRewards ? Number(gaugeRewards?.total) === 0 : true}
         />
@@ -776,7 +776,7 @@ export function OptionTokenInterface({ gauges, setShowOptionTokenModal }: Option
               gauges: gaugeRewards?.amounts?.filter(gauge => gauge.chainId === ARB_SEPOLIA_CHAIN_ID).filter(gauge => Number(gauge.amount) > 0).map(gauge => gauge.address) as Address[],
               account: account as Address,
               minter: "0x690772e7EeD4a15E12d71968B8C615890AAbb455", // Child Gauge Factory
-              clients: { publicClient, walletClient: walletClient as WalletClient }
+              clients: { publicClient: ARB_CLIENT, walletClient: walletClient as WalletClient }
             })}
           disabled={gaugeRewards ? Number(gaugeRewards?.total) === 0 : true} />
       </div>
