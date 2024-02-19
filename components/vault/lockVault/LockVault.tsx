@@ -21,7 +21,7 @@ interface LockVaultProps {
 }
 
 export default function LockVault({ vaultData, mutateTokenBalance, searchTerm }: LockVaultProps): JSX.Element {
-  const account = useAccount();
+  const { address: account } = useAccount();
   const [showModal, setShowModal] = useState(false)
 
   const [zapAssets] = useAtom(zapAssetsAtom)
