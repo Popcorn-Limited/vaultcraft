@@ -12,6 +12,7 @@ import { useAtom } from "jotai";
 import { availableZapAssetAtom, zapAssetsAtom } from "@/lib/atoms";
 import { getTokenOptions, isDefiPosition } from "@/lib/vault/utils";
 import { MutateTokenBalanceProps } from "@/lib/vault/mutateTokenBalance";
+import { useAccount } from "wagmi";
 
 interface LockVaultProps {
   vaultData: LockVaultData;
@@ -20,6 +21,7 @@ interface LockVaultProps {
 }
 
 export default function LockVault({ vaultData, mutateTokenBalance, searchTerm }: LockVaultProps): JSX.Element {
+  const account = useAccount();
   const [showModal, setShowModal] = useState(false)
 
   const [zapAssets] = useAtom(zapAssetsAtom)
@@ -113,7 +115,7 @@ export default function LockVault({ vaultData, mutateTokenBalance, searchTerm }:
           <div className="flex items-center justify-between select-none w-full">
             <AssetWithName vault={vaultData} />
           </div>
-          <VaultStats vaultData={vaultData} zapAvailable={zapAvailable} />
+          <VaultStats vaultData={vaultData} account={account} zapAvailable={zapAvailable} />
         </div>
       </Accordion >
     </>
