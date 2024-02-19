@@ -3,7 +3,7 @@ import { Address, getAddress } from "viem";
 import { Token, VaultData } from "@/lib/types";
 
 export async function isDefiPosition({ address, chainId }: { address: Address, chainId: number }): Promise<boolean> {
-  const { data } = await axios.get(`https://api.enso.finance/api/v1/positions?verified=false&tokenAddress=${address}&page=1&chainId=${chainId}`)
+  const { data } = await axios.get(`https://shortcuts-backend-dynamic-int.herokuapp.com/api/v1/tokens?address=${address}&chainId=${chainId}&page=1`)
   return data.data.length > 0
 }
 
