@@ -7,7 +7,7 @@ const protocolNameToLlamaProtocol: { [key: string]: string } = {
   "Balancer": "balancer",
   "Beefy": "beefy",
   "Compound": "compound",
-  "Convex": "convex",
+  "Convex": "convex-finance",
   "Curve": "curve",
   "Flux": "flux-finance",
   "Idle": "idle",
