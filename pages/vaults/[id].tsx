@@ -247,16 +247,12 @@ export default function Index() {
                         hideModal={() => router.reload()}
                         mutateTokenBalance={mutateTokenBalance}
                       />}
-                  </div>
-                </div>
-                <div className="bg-[#23262f] p-6 rounded-lg">
-                  <div className="bg-[#141416] px-6 py-6 rounded-lg">
-                    <p className="text-white">Loan</p>
-                    <p className="text-gray-500">Lorem Ipsum</p>
-                    <MainActionButton
-                      label="Open Loan Modal"
-                      handleClick={() => setShowLendModal(true)}
-                    />
+                    <div className="mt-4">
+                      <MainActionButton
+                        label="Open Loan Modal"
+                        handleClick={() => setShowLendModal(true)}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -392,7 +388,7 @@ function LoanInterface({ visibilityState, vaultData }: { visibilityState: [boole
         setInputToken(sorted.length === 0 ? null : sorted[0].asset)
         return;
       case "Withdraw":
-        sorted = reserveData.filter(e => e.borrowAmount === 0).sort((a, b) => b.balance - a.balance)
+        sorted = reserveData.filter(e => e.borrowAmount === 0).filter(e => e.balance > 0).sort((a, b) => b.balance - a.balance)
         setTokenList(!account || sorted.length === 0 ? [] : sorted.map(e => e.asset))
 
         setInputToken(!account || sorted.length === 0 ? null : sorted[0].asset)
@@ -532,25 +528,26 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
   useEffect(() => {
     if (inputToken.symbol === "none") return
     const newReserveData = [...reserveData]
+    const value = Number(inputAmount) * (10 ** inputToken.decimals)
 
     switch (activeTab) {
       case "Supply":
-        newReserveData[reserveData.findIndex(e => e.asset.address === inputToken.address)].supplyAmount += inputAmount
+        newReserveData[reserveData.findIndex(e => e.asset.address === inputToken.address)].supplyAmount += value
 
         setNewUserAccountData(calcUserAccountData(newReserveData, userAccountData.ltv))
         return;
       case "Borrow":
-        newReserveData[reserveData.findIndex(e => e.asset.address === inputToken.address)].borrowAmount += inputAmount
+        newReserveData[reserveData.findIndex(e => e.asset.address === inputToken.address)].borrowAmount += value
 
         setNewUserAccountData(calcUserAccountData(newReserveData, userAccountData.ltv))
         return;
       case "Repay":
-        newReserveData[reserveData.findIndex(e => e.asset.address === inputToken.address)].borrowAmount -= inputAmount
+        newReserveData[reserveData.findIndex(e => e.asset.address === inputToken.address)].borrowAmount -= value
 
         setNewUserAccountData(calcUserAccountData(newReserveData, userAccountData.ltv))
         return;
       case "Withdraw":
-        newReserveData[reserveData.findIndex(e => e.asset.address === inputToken.address)].supplyAmount -= inputAmount
+        newReserveData[reserveData.findIndex(e => e.asset.address === inputToken.address)].supplyAmount -= value
 
         setNewUserAccountData(calcUserAccountData(newReserveData, userAccountData.ltv))
         return;
@@ -558,8 +555,6 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
         return;
     }
   }, [inputAmount, activeTab])
-
-  console.log(userAccountData)
 
   return (supplyReserve && borrowReserve) ? (
     <>
