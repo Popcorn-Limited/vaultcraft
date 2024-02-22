@@ -9,10 +9,10 @@ import {
   VaultData
 } from "@/lib/types";
 import { VaultAbi } from "@/lib/constants";
-import { Address, formatUnits, getAddress, PublicClient, zeroAddress } from "viem";
+import { Address, Chain, createPublicClient, formatUnits, getAddress, http, PublicClient, zeroAddress } from "viem";
 import { handleCallResult } from "@/lib/utils/helpers";
 import { FireEventArgs } from "@masa-finance/analytics-sdk";
-import { networkMap } from "@/lib/utils/connectors";
+import { RPC_URLS, networkMap } from "@/lib/utils/connectors";
 import { AavePoolAbi, AavePoolUiAbi } from "@/lib/constants/abi/Aave";
 import axios from "axios"
 import { erc20ABI } from "wagmi";
@@ -165,21 +165,23 @@ export async function borrowFromAave({ asset, amount, onBehalfOf, chainId, accou
 
 const secondsPerYear = 31536000
 
-export async function fetchAaveData(account: Address, publicClient: PublicClient, chainId: number): Promise<ReserveData[]> {
-  const userData = await publicClient.readContract({
+export async function fetchAaveData(account: Address, chain: Chain): Promise<ReserveData[]> {
+  const client = createPublicClient({ chain, transport: http(RPC_URLS[chain.id]) })
+
+  const userData = await client.readContract({
     address: AAVE_UI_DATA_PROVIDER,
     abi: AavePoolUiAbi,
     functionName: 'getUserReservesData',
     args: ["0xa97684ead0e402dC232d5A977953DF7ECBaB3CDb", account === zeroAddress ? "0xa97684ead0e402dC232d5A977953DF7ECBaB3CDb" : account],
   })
-  const reserveData = await publicClient.readContract({
+  const reserveData = await client.readContract({
     address: AAVE_UI_DATA_PROVIDER,
     abi: AavePoolUiAbi,
     functionName: 'getReservesData',
     args: ["0xa97684ead0e402dC232d5A977953DF7ECBaB3CDb"],
   })
 
-  const { data: assets } = await axios.get(`https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/assets/tokens/${chainId}.json`)
+  const { data: assets } = await axios.get(`https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/assets/tokens/${chain.id}.json`)
 
   let result = reserveData[0].filter(d => d.isActive).map(d => {
     const uData = userData[0].find(e => e.underlyingAsset === d.underlyingAsset)
@@ -198,15 +200,16 @@ export async function fetchAaveData(account: Address, publicClient: PublicClient
   })
 
   const { data: priceData } = await axios.get(`https://coins.llama.fi/prices/current/${String(result.map(
-    e => `${networkMap[chainId].toLowerCase()}:${e.asset.address}`
+    e => `${networkMap[chain.id].toLowerCase()}:${e.asset.address}`
   ))}`)
 
   result.forEach((e, i) => {
-    e.asset.price = Number(priceData.coins[`${networkMap[chainId].toLowerCase()}:${e.asset.address}`]?.price)
+    e.asset.balance = 0;
+    e.asset.price = Number(priceData.coins[`${networkMap[chain.id].toLowerCase()}:${e.asset.address}`]?.price);
   })
 
   if (account !== zeroAddress) {
-    const bals = await publicClient.multicall({
+    const bals = await client.multicall({
       contracts: result.map((e: any) => {
         return {
           address: e.asset.address,

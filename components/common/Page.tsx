@@ -1,24 +1,26 @@
 import Navbar from "@/components/navbar/Navbar";
 import { masaAtom, yieldOptionsAtom } from "@/lib/atoms/sdk";
 import { lockvaultsAtom, vaultsAtom } from "@/lib/atoms/vaults";
-import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
+import { RPC_URLS, SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { getVaultsByChain } from "@/lib/vault/getVaults";
 import { useAtom } from "jotai";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { CachedProvider, YieldOptions } from "vaultcraft-sdk";
-import { useAccount } from "wagmi";
+import { useAccount, usePublicClient } from "wagmi";
 import Footer from "@/components/common/Footer";
 import { useMasaAnalyticsReact } from "@masa-finance/analytics-react";
 import { useRouter } from "next/router";
 import getLockVaultsByChain from "@/lib/vault/lockVault/getVaults";
-import { zeroAddress } from "viem";
-import { arbitrum } from "viem/chains";
+import { createPublicClient, http, zeroAddress } from "viem";
+import { arbitrum, optimism } from "viem/chains";
 import Modal from "@/components/modal/Modal";
 import MainActionButton from "../button/MainActionButton";
 import { availableZapAssetAtom, zapAssetsAtom } from "@/lib/atoms";
 import { Token } from "@/lib/types";
 import getZapAssets, { getAvailableZapAssets } from "@/lib/utils/getZapAssets";
-import SecondaryActionButton from "../button/SecondaryActionButton";
+import { fetchAaveData } from "@/lib/vault/aave/interactionts";
+import { aaveAccountDataAtom, aaveReserveDataAtom } from "@/lib/atoms/lending";
+import { AavePoolAbi } from "@/lib/constants/abi/Aave";
 
 async function setUpYieldOptions() {
   const ttl = 360_000;
@@ -104,6 +106,7 @@ export default function Page({
   const router = useRouter()
   const { query, asPath } = router;
   const { address: account } = useAccount()
+  const publicClient = usePublicClient()
 
   const [yieldOptions, setYieldOptions] = useAtom(yieldOptionsAtom)
   const [masaSdk, setMasaSdk] = useAtom(masaAtom)
@@ -180,6 +183,36 @@ export default function Page({
     }
     if (Object.keys(zapAssets).length === 0 && Object.keys(availableZapAssets).length === 0) getZapData()
   }, [])
+
+  const [, setAaveReserveData] = useAtom(aaveReserveDataAtom)
+  const [, setAaveAccountData] = useAtom(aaveAccountDataAtom)
+
+  useEffect(() => {
+    fetchAaveData(account || zeroAddress, optimism)
+      .then(async res => {
+        const client = createPublicClient({ chain:optimism, transport: http(RPC_URLS[10]) })
+
+        const totalCollateral = res.map(r => r.supplyAmount * r.asset.price).reduce((a, b) => a + b, 0);
+        const totalBorrowed = res.map(r => r.borrowAmount * r.asset.price).reduce((a, b) => a + b, 0);
+        const netValue = totalCollateral - totalBorrowed;
+
+        const accountData = await client.readContract({
+          address: "0x794a61358D6845594F94dc1DB02A252b5b4814aD",
+          abi: AavePoolAbi,
+          functionName: 'getUserAccountData',
+          args: [account || zeroAddress],
+        })
+
+        const totalSupplyRate = res.map(r => r.supplyAmount * r.asset.price * (r.supplyRate / 100)).reduce((a, b) => a + b, 0);
+        const totalBorrowRate = res.map(r => r.borrowAmount * r.asset.price * (r.borrowAmount / 100)).reduce((a, b) => a + b, 0);
+        const netRate = (totalSupplyRate - totalBorrowRate) / netValue
+
+        const healthFactor = (totalCollateral * (Number(accountData[3]) / 10_000)) / totalBorrowed
+
+        setAaveAccountData({ totalCollateral, totalBorrowed, netValue, totalSupplyRate, totalBorrowRate, netRate, healthFactor })
+        setAaveReserveData(res);
+      })
+  }, [account])
 
   return (
     <>

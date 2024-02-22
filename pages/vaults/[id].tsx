@@ -31,6 +31,7 @@ import InputTokenWithError from "@/components/input/InputTokenWithError";
 import TokenIcon from "@/components/common/TokenIcon";
 import Title from "@/components/common/Title";
 import { AavePoolAbi } from "@/lib/constants/abi/Aave";
+import { aaveAccountDataAtom, aaveReserveDataAtom } from "@/lib/atoms/lending";
 
 const { oVCX: OVCX, VCX } = getVeAddresses();
 
@@ -319,31 +320,6 @@ export default function Index() {
 
                   </div>
                 </div>
-
-                {/* <div className="bg-[#23262f] p-6 rounded-lg">
-                <p className="text-white text-2xl font-bold mb-8">Borrow Info</p>
-                <p className="text-white mb-4">Test text</p>
-                <AaveUserAccountData
-                  supplyToken={{
-                    address: "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58", //OPTIMISM
-                    name: "Tether",
-                    symbol: "USDT",
-                    decimals: 6,
-                    logoURI: "https://etherscan.io/token/images/tethernew_32.png",
-                    balance: 0,
-                    price: 1
-                  }}
-                  borrowToken={{
-                    address: "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85", //OPTIMISM
-                    name: "USD Coin",
-                    symbol: "USDC",
-                    decimals: 6,
-                    logoURI: "https://etherscan.io/token/images/centre-usdc_28.png",
-                    balance: 0,
-                    price: 1
-                  }}
-                />
-              </div> */}
               </div>
 
             </section>
@@ -362,42 +338,61 @@ function LoanInterface({ visibilityState, vaultData }: { visibilityState: [boole
   const { address: account } = useAccount();
   const publicClient = usePublicClient({ chainId: 10 })
 
-  const [reserveData, setReserveData] = useState<ReserveData[]>([]);
-
-  useEffect(() => {
-    if (publicClient) fetchAaveData(account || zeroAddress, publicClient, 10)
-      .then(res => {
-        setTokenList(res.map(e => e.asset))
-        setReserveData(res);
-        setInputToken(res[0].asset)
-      })
-  }, [publicClient, account])
-
+  const [reserveData] = useAtom(aaveReserveDataAtom)
 
   const [activeTab, setActiveTab] = useState<string>("Supply")
   const [tokenList, setTokenList] = useState<Token[]>([])
-  const [inputToken, setInputToken] = useState<Token>()
+  const [supplyToken, setSupplyToken] = useState<Token | null>(null)
+  const [borrowToken, setBorrowToken] = useState<Token | null>(null)
+  const [inputToken, setInputToken] = useState<Token | null>(null)
+
+  useEffect(() => {
+    if (reserveData) {
+      const sorted = reserveData.sort((a, b) => a.balance - b.balance)
+      setTokenList(sorted.map(e => e.asset))
+
+      const _supplyToken = sorted[0].asset.address === vaultData.asset.address ? reserveData[1].asset : reserveData[0].asset
+      setSupplyToken(_supplyToken)
+      setInputToken(_supplyToken)
+      setBorrowToken(!!reserveData.find(e => e.asset.address === vaultData.asset.address) ? vaultData.asset : reserveData[0].asset)
+    }
+  }, [reserveData])
 
   function changeTab(newTab: string) {
     setActiveTab(newTab);
 
     const assetBorrowable = !!reserveData.find(e => e.asset.address === vaultData.asset.address);
+    let sorted: ReserveData[]
+    let _inputToken: Token
+
     switch (newTab) {
       case "Supply":
-        setInputToken(reserveData[0].asset)
-        setTokenList(reserveData.map(e => e.asset))
+        sorted = reserveData.filter(e => e.asset.address !== vaultData.asset.address).sort((a, b) => b.balance - a.balance)
+        setTokenList(sorted.map(e => e.asset))
+
+        _inputToken = sorted[0].asset
+        setSupplyToken(_inputToken)
+        setInputToken(_inputToken)
         return;
       case "Borrow":
-        setInputToken(assetBorrowable ? vaultData.asset : reserveData[1].asset)
-        setTokenList(reserveData.map(e => e.asset))
+        sorted = reserveData.sort((a, b) => b.borrowRate - a.borrowRate)
+        setTokenList(sorted.map(e => e.asset))
+
+        _inputToken = assetBorrowable ? vaultData.asset : sorted[0].asset
+        setBorrowToken(_inputToken)
+        setInputToken(_inputToken)
         return;
       case "Repay":
-        setInputToken(assetBorrowable ? vaultData.asset : reserveData[1].asset)
-        setTokenList(reserveData.filter(e => e.borrowAmount > 0).map(e => e.asset))
+        sorted = reserveData.filter(e => e.borrowAmount > 0).sort((a, b) => b.borrowAmount - a.borrowAmount)
+        setTokenList(sorted.length === 0 ? [] : sorted.map(e => e.asset))
+
+        setInputToken(sorted.length === 0 ? null : sorted[0].asset)
         return;
       case "Withdraw":
-        setInputToken(assetBorrowable ? vaultData.asset : reserveData[1].asset)
-        setTokenList(reserveData.filter(e => e.supplyAmount > 0).map(e => e.asset))
+        sorted = reserveData.filter(e => e.borrowAmount === 0).sort((a, b) => b.balance - a.balance)
+        setTokenList(!account || sorted.length === 0 ? [] : sorted.map(e => e.asset))
+
+        setInputToken(!account || sorted.length === 0 ? null : sorted[0].asset)
         return;
       default:
         return;
@@ -429,33 +424,38 @@ function LoanInterface({ visibilityState, vaultData }: { visibilityState: [boole
             activeTab={activeTab}
             setActiveTab={changeTab}
           />
-          <InputTokenWithError
-            captionText={`${activeTab} Amount`}
-            onSelectToken={option => { }}
-            onMaxClick={() => { }}
-            chainId={vaultData.chainId}
-            value={inputBalance}
-            onChange={handleChangeInput}
-            selectedToken={vaultData.asset}
-            errorMessage={""}
-            tokenList={tokenList}
-            allowSelection
-            allowInput
-          />
-          <div className="mt-8">
-            <MainActionButton
-              label="Open Loan Modal"
-              handleClick={() => { }}
-            />
-          </div>
+          {inputToken ?
+            <>
+              <InputTokenWithError
+                captionText={`${activeTab} Amount`}
+                onSelectToken={option => { }}
+                onMaxClick={handleMaxClick}
+                chainId={vaultData.chainId}
+                value={inputBalance}
+                onChange={handleChangeInput}
+                selectedToken={inputToken}
+                errorMessage={""}
+                tokenList={tokenList}
+                allowSelection
+                allowInput
+              />
+              <div className="mt-8">
+                <MainActionButton
+                  label="Open Loan Modal"
+                  handleClick={() => { }}
+                />
+              </div>
+            </>
+            : <div>
+              <p>Nothing to do here</p>
+            </div>
+          }
         </div>
         <div className="w-2/3">
-          {reserveData &&
+          {(!!reserveData && !!supplyToken && !!borrowToken) &&
             <AaveUserAccountData
-              supplyToken={reserveData[0]}
-              // @ts-ignore
-              borrowToken={reserveData.find(d => d.asset.address === vaultData.asset.address)}
-              reserveData={reserveData}
+              supplyToken={supplyToken}
+              borrowToken={borrowToken}
             />
           }
         </div>
@@ -464,46 +464,26 @@ function LoanInterface({ visibilityState, vaultData }: { visibilityState: [boole
   </>
 }
 
-export function AaveUserAccountData({ supplyToken, borrowToken, reserveData }: { supplyToken: ReserveData, borrowToken: ReserveData, reserveData: ReserveData[] }): JSX.Element {
-  const { address: account } = useAccount();
-  const publicClient = usePublicClient({ chainId: 10 })
+export function AaveUserAccountData({ supplyToken, borrowToken }: { supplyToken: Token, borrowToken: Token }): JSX.Element {
+  const [reserveData] = useAtom(aaveReserveDataAtom)
+  const [userAccountData] = useAtom(aaveAccountDataAtom)
 
-  const [userAccountData, setUserAccountData] = useState<UserAccountData>({
-    totalCollateral: 0,
-    totalBorrowed: 0,
-    netValue: 0,
-    totalSupplyRate: 0,
-    totalBorrowRate: 0,
-    netRate: 0,
-    healthFactor: 0
-  })
+  const [supplyReserve, setSupplyReserve] = useState<ReserveData>()
+  const [borrowReserve, setBorrowReserve] = useState<ReserveData>()
 
   useEffect(() => {
-    if (reserveData) {
-      (async () => {
-        const totalCollateral = reserveData.map(r => r.supplyAmount * r.asset.price).reduce((a, b) => a + b, 0);
-        const totalBorrowed = reserveData.map(r => r.borrowAmount * r.asset.price).reduce((a, b) => a + b, 0);
-        const netValue = totalCollateral - totalBorrowed;
-
-        const accountData = await publicClient.readContract({
-          address: "0x794a61358D6845594F94dc1DB02A252b5b4814aD",
-          abi: AavePoolAbi,
-          functionName: 'getUserAccountData',
-          args: [account || zeroAddress],
-        })
-
-        const totalSupplyRate = reserveData.map(r => r.supplyAmount * r.asset.price * (r.supplyRate / 100)).reduce((a, b) => a + b, 0);
-        const totalBorrowRate = reserveData.map(r => r.borrowAmount * r.asset.price * (r.borrowAmount / 100)).reduce((a, b) => a + b, 0);
-        const netRate = (totalSupplyRate - totalBorrowRate) / netValue
-
-        const healthFactor = (totalCollateral * (Number(accountData[3]) / 10_000)) / totalBorrowed
-
-        setUserAccountData({ totalCollateral, totalBorrowed, netValue, totalSupplyRate, totalBorrowRate, netRate, healthFactor })
-      })()
+    if (supplyToken && reserveData) {
+      setSupplyReserve(reserveData.find(e => e.asset.address === supplyToken.address))
     }
-  }, [reserveData])
+  }, [supplyToken, reserveData])
 
-  return (
+  useEffect(() => {
+    if (borrowToken && reserveData) {
+      setBorrowReserve(reserveData.find(e => e.asset.address === borrowToken.address))
+    }
+  }, [borrowToken, reserveData])
+
+  return (supplyReserve && borrowReserve) ? (
     <>
       <div className="w-full space-y-4">
         <div className="border border-[#353945] rounded-lg p-4">
@@ -565,9 +545,9 @@ export function AaveUserAccountData({ supplyToken, borrowToken, reserveData }: {
             <div className="w-1/3">
               <p className="text-start text-primary font-normal md:text-[14px]">Lending Apy</p>
               <span className="flex flex-row items-center space-x-2">
-                <TokenIcon token={supplyToken.asset} icon={supplyToken.asset.logoURI} chainId={10} imageSize={"w-6 h-6 mb-0.5"} />
+                <TokenIcon token={supplyToken} icon={supplyToken.logoURI} chainId={10} imageSize={"w-6 h-6 mb-0.5"} />
                 <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
-                  {formatToFixedDecimals(supplyToken.supplyRate || 0, 2)} %
+                  {formatToFixedDecimals(supplyReserve.supplyRate || 0, 2)} %
                 </Title>
               </span>
             </div>
@@ -575,9 +555,9 @@ export function AaveUserAccountData({ supplyToken, borrowToken, reserveData }: {
             <div className="w-1/3">
               <p className="text-start text-primary font-normal md:text-[14px]">Borrow Apy</p>
               <span className="flex flex-row items-center space-x-2">
-                <TokenIcon token={borrowToken.asset} icon={borrowToken.asset.logoURI} chainId={10} imageSize={"w-6 h-6 mb-0.5"} />
+                <TokenIcon token={borrowToken} icon={borrowToken.logoURI} chainId={10} imageSize={"w-6 h-6 mb-0.5"} />
                 <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
-                  -{formatToFixedDecimals(borrowToken.borrowRate || 0, 2)} %
+                  -{formatToFixedDecimals(borrowReserve.borrowRate || 0, 2)} %
                 </Title>
               </span>
             </div>
@@ -593,21 +573,21 @@ export function AaveUserAccountData({ supplyToken, borrowToken, reserveData }: {
             <div className="text-start w-1/3">
               <p className="font-normal text-primary md:text-[14px]">Max LTV</p>
               <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
-                {supplyToken.ltv.toFixed(2)} %
+                {supplyReserve.ltv.toFixed(2)} %
               </Title>
             </div>
 
             <div className="text-start w-1/3">
               <p className="font-normal text-primary md:text-[14px]">Liquidation Threshold</p>
               <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
-                {supplyToken.liquidationThreshold.toFixed(2)} %
+                {supplyReserve.liquidationThreshold.toFixed(2)} %
               </Title>
             </div>
 
             <div className="text-start w-1/3">
               <p className="font-normal text-primary md:text-[14px]">Liquidation Penalty</p>
               <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
-                {supplyToken.liquidationPenalty.toFixed(2)} %
+                {supplyReserve.liquidationPenalty.toFixed(2)} %
               </Title>
             </div>
 
@@ -615,5 +595,5 @@ export function AaveUserAccountData({ supplyToken, borrowToken, reserveData }: {
         </div>
       </div>
     </>
-  )
+  ) : <p className="text-white">Data loading...</p>
 }
