@@ -170,7 +170,7 @@ export async function fetchAaveData(account: Address, publicClient: PublicClient
     address: AAVE_UI_DATA_PROVIDER,
     abi: AavePoolUiAbi,
     functionName: 'getUserReservesData',
-    args: ["0xa97684ead0e402dC232d5A977953DF7ECBaB3CDb", account],
+    args: ["0xa97684ead0e402dC232d5A977953DF7ECBaB3CDb", account === zeroAddress ? "0xa97684ead0e402dC232d5A977953DF7ECBaB3CDb" : account],
   })
   const reserveData = await publicClient.readContract({
     address: AAVE_UI_DATA_PROVIDER,
@@ -180,8 +180,6 @@ export async function fetchAaveData(account: Address, publicClient: PublicClient
   })
 
   const { data: assets } = await axios.get(`https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/assets/tokens/${chainId}.json`)
-
-  console.log({ reserveData, userData })
 
   let result = reserveData[0].filter(d => d.isActive).map(d => {
     const uData = userData[0].find(e => e.underlyingAsset === d.underlyingAsset)
@@ -193,9 +191,9 @@ export async function fetchAaveData(account: Address, publicClient: PublicClient
       supplyRate: (((1 + (Number(formatUnits(d.liquidityRate, 27)) / secondsPerYear)) ** secondsPerYear) - 1) * 100,
       borrowRate: (((1 + (Number(formatUnits(d.variableBorrowRate, 27)) / secondsPerYear)) ** secondsPerYear) - 1) * 100,
       asset: assets[getAddress(d.underlyingAsset)],
-      supplyAmount: Number(formatUnits(uData?.scaledATokenBalance || BigInt(0), decimals)) * Number(formatUnits(d.liquidityIndex, 27)),
-      borrowAmount: Number(formatUnits(uData?.scaledVariableDebt || BigInt(0), decimals)),
-      balance: Number(uData?.scaledATokenBalance)
+      supplyAmount: account === zeroAddress ? 0 : Number(formatUnits(uData?.scaledATokenBalance || BigInt(0), decimals)) * Number(formatUnits(d.liquidityIndex, 27)),
+      borrowAmount: account === zeroAddress ? 0 : Number(formatUnits(uData?.scaledVariableDebt || BigInt(0), decimals)),
+      balance: account === zeroAddress ? 0 : Number(uData?.scaledATokenBalance)
     }
   })
 
