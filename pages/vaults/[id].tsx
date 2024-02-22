@@ -6,11 +6,11 @@ import { useRouter } from "next/router";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import NoSSR from "react-no-ssr";
 import { useAccount, useBalance, usePublicClient, useWalletClient } from "wagmi";
-import { Address, WalletClient, createPublicClient, extractChain, http, zeroAddress } from "viem";
+import { Address, WalletClient, createPublicClient, extractChain, formatUnits, http, zeroAddress } from "viem";
 import { VaultAbi, getVeAddresses } from "@/lib/constants";
 import { yieldOptionsAtom } from "@/lib/atoms/sdk";
-import { NumberFormatter, formatAndRoundNumber, formatToFixedDecimals } from "@/lib/utils/formatBigNumber";
-import { roundToTwoDecimalPlaces } from "@/lib/utils/helpers";
+import { NumberFormatter, formatAndRoundNumber, formatToFixedDecimals, safeRound } from "@/lib/utils/formatBigNumber";
+import { roundToTwoDecimalPlaces, validateInput } from "@/lib/utils/helpers";
 import MainActionButton from "@/components/button/MainActionButton";
 import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
 import { claimOPop } from "@/lib/optionToken/interactions";
@@ -25,7 +25,7 @@ import { getTokenOptions, isDefiPosition } from "@/lib/vault/utils";
 import LeftArrowIcon from "@/components/svg/LeftArrowIcon";
 import { KelpVaultInputs, getKelpVaultData, mutateKelpTokenBalance } from "@/components/vault/KelpVault";
 import TabSelector from "@/components/common/TabSelector";
-import { fetchAaveData, fetchReserveData, fetchUserAccountData } from "@/lib/vault/aave/interactionts";
+import { fetchAaveData } from "@/lib/vault/aave/interactionts";
 import Modal from "@/components/modal/Modal";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import TokenIcon from "@/components/common/TokenIcon";
@@ -365,14 +365,59 @@ function LoanInterface({ visibilityState, vaultData }: { visibilityState: [boole
   const [reserveData, setReserveData] = useState<ReserveData[]>([]);
 
   useEffect(() => {
-    if (publicClient) fetchAaveData(account || zeroAddress, publicClient, 10).then(
-      res => setReserveData(res)
-    )
+    if (publicClient) fetchAaveData(account || zeroAddress, publicClient, 10)
+      .then(res => {
+        setTokenList(res.map(e => e.asset))
+        setReserveData(res);
+        setInputToken(res[0].asset)
+      })
   }, [publicClient, account])
 
-  const [activeTab, setActiveTab] = useState<string>("Supply")
 
-  console.log({ reserveData })
+  const [activeTab, setActiveTab] = useState<string>("Supply")
+  const [tokenList, setTokenList] = useState<Token[]>([])
+  const [inputToken, setInputToken] = useState<Token>()
+
+  function changeTab(newTab: string) {
+    const assetBorrowable = !!reserveData.find(e => e.asset.address === vaultData.asset.address);
+    switch (newTab) {
+      case "Supply":
+        setInputToken(reserveData[0].asset)
+        setTokenList(reserveData.map(e => e.asset))
+        return;
+      case "Borrow":
+        setInputToken(assetBorrowable ? vaultData.asset : reserveData[1].asset)
+        setTokenList(reserveData.map(e => e.asset))
+        return;
+      case "Repay":
+        setInputToken(assetBorrowable ? vaultData.asset : reserveData[1].asset)
+        setTokenList(reserveData.filter(e => e.borrowAmount > 0).map(e => e.asset))
+        return;
+      case "Withdraw":
+        setInputToken(assetBorrowable ? vaultData.asset : reserveData[1].asset)
+        setTokenList(reserveData.filter(e => e.supplyAmount > 0).map(e => e.asset))
+        return;
+      default:
+        return;
+    }
+
+    setActiveTab(newTab);
+  }
+
+  const [inputBalance, setInputBalance] = useState<string>("0");
+
+  function handleChangeInput(e: any) {
+    const value = e.currentTarget.value
+    setInputBalance(validateInput(value).isValid ? value : "0");
+  };
+
+  function handleMaxClick() {
+    if (!inputToken) return
+    const stringBal = inputToken.balance.toLocaleString("fullwide", { useGrouping: false })
+    const rounded = safeRound(BigInt(stringBal), inputToken.decimals)
+    const formatted = formatUnits(rounded, inputToken.decimals)
+    handleChangeInput({ currentTarget: { value: formatted } })
+  }
 
   return <>
     <Modal visibility={visibilityState} title={<AssetWithName vault={vaultData} />} >
@@ -382,19 +427,19 @@ function LoanInterface({ visibilityState, vaultData }: { visibilityState: [boole
             className="mb-6"
             availableTabs={LOAN_TABS}
             activeTab={activeTab}
-            setActiveTab={setActiveTab}
+            setActiveTab={changeTab}
           />
           <InputTokenWithError
             captionText={`${activeTab} Amount`}
             onSelectToken={option => { }}
             onMaxClick={() => { }}
             chainId={vaultData.chainId}
-            value={0}
-            onChange={() => { }}
+            value={inputBalance}
+            onChange={handleChangeInput}
             selectedToken={vaultData.asset}
             errorMessage={""}
-            tokenList={[]}
-            allowSelection={false}
+            tokenList={tokenList}
+            allowSelection
             allowInput
           />
           <div className="mt-8">
@@ -408,6 +453,7 @@ function LoanInterface({ visibilityState, vaultData }: { visibilityState: [boole
           {reserveData &&
             <AaveUserAccountData
               supplyToken={reserveData[0]}
+              // @ts-ignore
               borrowToken={reserveData.find(d => d.asset.address === vaultData.asset.address)}
               reserveData={reserveData}
             />
@@ -465,7 +511,7 @@ export function AaveUserAccountData({ supplyToken, borrowToken, reserveData }: {
 
             <div className="w-1/3">
               <p className="text-start text-primary font-normal md:text-[14px]">Health Factor</p>
-              <span className="flex flex-row items-center">
+              <span className="flex flex-row items-center space-x-1">
                 <Title
                   as="p"
                   level={2}
@@ -475,7 +521,7 @@ export function AaveUserAccountData({ supplyToken, borrowToken, reserveData }: {
                   }>
                   {formatToFixedDecimals(userAccountData.healthFactor || 0, 2)}
                 </Title>
-                ->
+                <p>&gt;</p>
                 <Title as="p" level={2} fontWeight="font-normal" className="text-red-500">
                   1.07
                 </Title>
@@ -484,24 +530,24 @@ export function AaveUserAccountData({ supplyToken, borrowToken, reserveData }: {
 
             <div className="w-1/3">
               <p className="text-start text-primary font-normal md:text-[14px]">Lending Networth</p>
-              <span className="flex flex-row items-center">
+              <span className="flex flex-row items-center space-x-1">
                 <Title as="p" level={2} fontWeight="font-normal" className="text-primary">
-                  10k
+                  $ {formatToFixedDecimals(userAccountData.netValue || 0, 2)}
                 </Title>
-                ->
+                <p>&gt;</p>
                 <Title as="p" level={2} fontWeight="font-normal" className="text-primary">
-                  7k
+                  $ 7k
                 </Title>
               </span>
             </div>
 
             <div className="w-1/3">
               <p className="text-start text-primary font-normal md:text-[14px]">Net Apy</p>
-              <span className="flex flex-row items-center">
+              <span className="flex flex-row items-center space-x-1">
                 <Title as="p" level={2} fontWeight="font-normal" className="text-primary">
-                  2.21 %
+                  {formatToFixedDecimals(userAccountData.netValue || 0, 2)} %
                 </Title>
-                ->
+                <p>&gt;</p>
                 <Title as="p" level={2} fontWeight="font-normal" className="text-primary">
                   -1.05 %
                 </Title>
