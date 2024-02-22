@@ -24,6 +24,13 @@ import useNetworkFilter from "@/lib/useNetworkFilter";
 
 const { VotingEscrow: VOTING_ESCROW } = getVeAddresses();
 
+const HIDDEN_VAULTS = [
+  // eth
+  "0xdC266B3D2c62Ce094ff4E12DC52399c430283417", // pCVX
+  "0x6B2c5ef7FB59e6A1Ad79a4dB65234fb7bDDcaD6b", // oeth-lp
+  "0xD211486ed1A04A176E588b67dd3A30a7dE164C0B", // 50 aura
+]
+
 function VePopContainer() {
   const { address: account } = useAccount()
   const publicClient = usePublicClient();
@@ -140,6 +147,7 @@ function VePopContainer() {
           {vaults?.length > 0 ?
             vaults.filter(vault => selectedNetworks.includes(vault.chainId))
               .filter(vault => !!vault.gauge?.address)
+              .filter(vault => !HIDDEN_VAULTS.includes(vault.address))
               .sort((a, b) => b.tvl - a.tvl)
               .map((vault: VaultData, index: number) =>
                 <Gauge
