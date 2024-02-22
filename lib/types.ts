@@ -204,12 +204,13 @@ export type VoteUserSlopes = {
 }
 
 export type UserAccountData = {
-  totalCollateralBase: number,
-  totalDebtBase: number,
-  availableBorrowsBase: number,
-  currentLiquidationThreshold: number,
-  ltv: number,
-  healthFactor: number
+  totalCollateral: number;
+  totalBorrowed: number;
+  netValue: number;
+  totalSupplyRate: number;
+  totalBorrowRate: number;
+  netRate: number;
+  healthFactor: number;
 }
 
 export type ReserveDataResponse = {
@@ -251,5 +252,8 @@ export type ReserveData = {
   liquidationPenalty: number;
   supplyRate: number;
   borrowRate: number;
-  asset: Address;
+  asset: Token;
+  supplyAmount: number;
+  borrowAmount: number;
+  balance: number;
 }

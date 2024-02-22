@@ -9,7 +9,7 @@ import {
   VaultData
 } from "@/lib/types";
 import { VaultAbi } from "@/lib/constants";
-import { Address, formatUnits, PublicClient } from "viem";
+import { Address, formatUnits, getAddress, PublicClient, zeroAddress } from "viem";
 import { handleCallResult } from "@/lib/utils/helpers";
 import { FireEventArgs } from "@masa-finance/analytics-sdk";
 import { networkMap } from "@/lib/utils/connectors";
@@ -163,99 +163,15 @@ export async function borrowFromAave({ asset, amount, onBehalfOf, chainId, accou
   })
 }
 
-interface Tokens {
-  DAI: Token;
-  USDC: Token;
-  USDT: Token;
-  BAL: Token;
-}
-export async function fetchTokens(account: Address, tokens: Tokens, publicClient: PublicClient) {
-  const { data: llamaPrices } = await axios.get("https://coins.llama.fi/prices/current/ethereum:0x6B175474E89094C44Da98b954EedeAC495271d0F,"
-    + "ethereum:0xA35b1B31Ce002FBF2058D22F30f95D405200A15b,"
-    + "ethereum:0xdAC17F958D2ee523a2206206994597C13D831ec7,"
-    + "ethereum:0xba100000625a3754423978a60c9317c58a424e3D"
-  )
+const secondsPerYear = 31536000
 
-  const { DAI, USDC, USDT, BAL } = tokens;
-  console.log(publicClient.chain, publicClient)
-  const balRes = await publicClient.multicall({
-    contracts: [
-      {
-        address: DAI.address,
-        abi: erc20ABI,
-        functionName: 'balanceOf',
-        args: [account]
-      },
-      {
-        address: USDC.address,
-        abi: erc20ABI,
-        functionName: 'balanceOf',
-        args: [account]
-      },
-      {
-        address: USDT.address,
-        abi: erc20ABI,
-        functionName: 'balanceOf',
-        args: [account]
-      },
-      {
-        address: BAL.address,
-        abi: erc20ABI,
-        functionName: 'balanceOf',
-        args: [account]
-      }
-    ],
-    allowFailure: false
-  }) as bigint[]
-
-  return {
-    dai: {
-      ...DAI,
-      price: llamaPrices.coins["ethereum:0x6B175474E89094C44Da98b954EedeAC495271d0F"].price,
-      balance: Number(balRes[0])
-    },
-    usdc: {
-      ...USDC,
-      price: llamaPrices.coins["ethereum:0xA35b1B31Ce002FBF2058D22F30f95D405200A15b"].price,
-      balance: Number(balRes[1])
-    },
-    usdt: {
-      ...USDT,
-      price: llamaPrices.coins["ethereum:0xdAC17F958D2ee523a2206206994597C13D831ec7"].price,
-      balance: Number(balRes[2])
-    },
-    bal: {
-      ...BAL,
-      price: llamaPrices.coins["ethereum:0xba100000625a3754423978a60c9317c58a424e3D"].price,
-      balance: Number(balRes[3])
-    }
-  }
-}
-
-
-export async function fetchUserAccountData(account: Address, publicClient: PublicClient): Promise<UserAccountData> {
+export async function fetchAaveData(account: Address, publicClient: PublicClient, chainId: number): Promise<ReserveData[]> {
   const userData = await publicClient.readContract({
     address: AAVE_UI_DATA_PROVIDER,
     abi: AavePoolUiAbi,
     functionName: 'getUserReservesData',
     args: ["0xa97684ead0e402dC232d5A977953DF7ECBaB3CDb", account],
   })
-
-  console.log({ userData })
-
-  return {
-    availableBorrowsBase: 1,
-    currentLiquidationThreshold: 1,
-    healthFactor: 1,
-    ltv: 1,
-    totalCollateralBase: 1,
-    totalDebtBase: 1
-  }
-}
-
-const secondsPerYear = 31536000
-
-export async function fetchReserveData(publicClient: PublicClient): Promise<ReserveData[]> {
   const reserveData = await publicClient.readContract({
     address: AAVE_UI_DATA_PROVIDER,
     abi: AavePoolUiAbi,
@@ -263,14 +179,50 @@ export async function fetchReserveData(publicClient: PublicClient): Promise<Rese
     args: ["0xa97684ead0e402dC232d5A977953DF7ECBaB3CDb"],
   })
 
-  return reserveData[0].filter(d => d.isActive).map(d => {
+  const { data: assets } = await axios.get(`https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/assets/tokens/${chainId}.json`)
+
+  console.log({ reserveData, userData })
+
+  let result = reserveData[0].filter(d => d.isActive).map(d => {
+    const uData = userData[0].find(e => e.underlyingAsset === d.underlyingAsset)
+    const decimals = Number(d.decimals)
     return {
       ltv: Number(d.baseLTVasCollateral) / 100,
       liquidationThreshold: Number(d.reserveLiquidationThreshold) / 100,
       liquidationPenalty: (Number(d.reserveLiquidationBonus) - 10000) / 100,
       supplyRate: (((1 + (Number(formatUnits(d.liquidityRate, 27)) / secondsPerYear)) ** secondsPerYear) - 1) * 100,
       borrowRate: (((1 + (Number(formatUnits(d.variableBorrowRate, 27)) / secondsPerYear)) ** secondsPerYear) - 1) * 100,
-      asset: d.underlyingAsset
+      asset: assets[getAddress(d.underlyingAsset)],
+      supplyAmount: Number(formatUnits(uData?.scaledATokenBalance || BigInt(0), decimals)) * Number(formatUnits(d.liquidityIndex, 27)),
+      borrowAmount: Number(formatUnits(uData?.scaledVariableDebt || BigInt(0), decimals)),
+      balance: Number(uData?.scaledATokenBalance)
     }
   })
+
+  const { data: priceData } = await axios.get(`https://coins.llama.fi/prices/current/${String(result.map(
+    e => `${networkMap[chainId].toLowerCase()}:${e.asset.address}`
+  ))}`)
+
+  result.forEach((e, i) => {
+    e.asset.price = Number(priceData.coins[`${networkMap[chainId].toLowerCase()}:${e.asset.address}`]?.price)
+  })
+
+  if (account !== zeroAddress) {
+    const bals = await publicClient.multicall({
+      contracts: result.map((e: any) => {
+        return {
+          address: e.asset.address,
+          abi: erc20ABI,
+          functionName: 'balanceOf',
+          args: [account]
+        }
+      }),
+      allowFailure: false
+    })
+    result.forEach((e, i) => {
+      e.asset.balance = Number(bals[i])
+    })
+  }
+
+  return result
 }
