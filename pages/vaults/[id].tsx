@@ -9,7 +9,7 @@ import { useAccount, useBalance, usePublicClient, useWalletClient } from "wagmi"
 import { Address, WalletClient, createPublicClient, extractChain, formatUnits, http, zeroAddress } from "viem";
 import { VaultAbi, getVeAddresses } from "@/lib/constants";
 import { yieldOptionsAtom } from "@/lib/atoms/sdk";
-import { NumberFormatter, formatAndRoundNumber, formatToFixedDecimals, safeRound } from "@/lib/utils/formatBigNumber";
+import { NumberFormatter, formatAndRoundNumber, formatNumber, formatToFixedDecimals, safeRound } from "@/lib/utils/formatBigNumber";
 import { roundToTwoDecimalPlaces, validateInput } from "@/lib/utils/helpers";
 import MainActionButton from "@/components/button/MainActionButton";
 import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
@@ -18,20 +18,21 @@ import { llama } from "@/lib/resolver/price/resolver";
 import VaultInputs from "@/components/vault/VaultInputs";
 import { showSuccessToast } from "@/lib/toasts";
 import CopyToClipboard from "react-copy-to-clipboard";
-import { Square2StackIcon } from "@heroicons/react/24/outline";
+import { ArrowRightIcon, Square2StackIcon } from "@heroicons/react/24/outline";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
-import { availableZapAssetAtom, zapAssetsAtom } from "@/lib/atoms";
+import { DEFAULT_ASSET, availableZapAssetAtom, zapAssetsAtom } from "@/lib/atoms";
 import { getTokenOptions, isDefiPosition } from "@/lib/vault/utils";
 import LeftArrowIcon from "@/components/svg/LeftArrowIcon";
 import { KelpVaultInputs, getKelpVaultData, mutateKelpTokenBalance } from "@/components/vault/KelpVault";
 import TabSelector from "@/components/common/TabSelector";
-import { fetchAaveData } from "@/lib/vault/aave/interactionts";
+import { calcUserAccountData, fetchAaveData } from "@/lib/vault/aave/interactionts";
 import Modal from "@/components/modal/Modal";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import TokenIcon from "@/components/common/TokenIcon";
 import Title from "@/components/common/Title";
 import { AavePoolAbi } from "@/lib/constants/abi/Aave";
-import { aaveAccountDataAtom, aaveReserveDataAtom } from "@/lib/atoms/lending";
+import { EMPTY_USER_ACCOUNT_DATA, aaveAccountDataAtom, aaveReserveDataAtom } from "@/lib/atoms/lending";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
 
 const { oVCX: OVCX, VCX } = getVeAddresses();
 
@@ -337,6 +338,7 @@ const LOAN_TABS = ["Supply", "Borrow", "Repay", "Withdraw"]
 function LoanInterface({ visibilityState, vaultData }: { visibilityState: [boolean, Dispatch<SetStateAction<boolean>>], vaultData: VaultData }): JSX.Element {
   const { address: account } = useAccount();
   const publicClient = usePublicClient({ chainId: 10 })
+  const { openConnectModal } = useConnectModal();
 
   const [reserveData] = useAtom(aaveReserveDataAtom)
 
@@ -360,6 +362,7 @@ function LoanInterface({ visibilityState, vaultData }: { visibilityState: [boole
 
   function changeTab(newTab: string) {
     setActiveTab(newTab);
+    setInputAmount("0");
 
     const assetBorrowable = !!reserveData.find(e => e.asset.address === vaultData.asset.address);
     let sorted: ReserveData[]
@@ -399,11 +402,32 @@ function LoanInterface({ visibilityState, vaultData }: { visibilityState: [boole
     }
   }
 
-  const [inputBalance, setInputBalance] = useState<string>("0");
+  function handleTokenSelect(input: Token) {
+    switch (activeTab) {
+      case "Supply":
+        setSupplyToken(input)
+        setInputToken(input)
+        return;
+      case "Borrow":
+        setBorrowToken(input)
+        setInputToken(input)
+        return;
+      case "Repay":
+        setInputToken(input)
+        return;
+      case "Withdraw":
+        setInputToken(input)
+        return;
+      default:
+        return;
+    }
+  }
+
+  const [inputAmount, setInputAmount] = useState<string>("0");
 
   function handleChangeInput(e: any) {
     const value = e.currentTarget.value
-    setInputBalance(validateInput(value).isValid ? value : "0");
+    setInputAmount(validateInput(value).isValid ? value : "0");
   };
 
   function handleMaxClick() {
@@ -424,14 +448,14 @@ function LoanInterface({ visibilityState, vaultData }: { visibilityState: [boole
             activeTab={activeTab}
             setActiveTab={changeTab}
           />
-          {inputToken ?
+          {(account && inputToken) ?
             <>
               <InputTokenWithError
                 captionText={`${activeTab} Amount`}
-                onSelectToken={option => { }}
+                onSelectToken={handleTokenSelect}
                 onMaxClick={handleMaxClick}
                 chainId={vaultData.chainId}
-                value={inputBalance}
+                value={inputAmount}
                 onChange={handleChangeInput}
                 selectedToken={inputToken}
                 errorMessage={""}
@@ -447,7 +471,10 @@ function LoanInterface({ visibilityState, vaultData }: { visibilityState: [boole
               </div>
             </>
             : <div>
-              <p>Nothing to do here</p>
+              <MainActionButton
+                label="Connect Wallet"
+                handleClick={openConnectModal}
+              />
             </div>
           }
         </div>
@@ -456,6 +483,9 @@ function LoanInterface({ visibilityState, vaultData }: { visibilityState: [boole
             <AaveUserAccountData
               supplyToken={supplyToken}
               borrowToken={borrowToken}
+              inputToken={inputToken || DEFAULT_ASSET}
+              inputAmount={Number(inputAmount)}
+              activeTab={activeTab}
             />
           }
         </div>
@@ -464,7 +494,21 @@ function LoanInterface({ visibilityState, vaultData }: { visibilityState: [boole
   </>
 }
 
-export function AaveUserAccountData({ supplyToken, borrowToken }: { supplyToken: Token, borrowToken: Token }): JSX.Element {
+function getHealthFactorColor(healthFactor: number): string {
+  if (!healthFactor) return "text-white"
+  if (healthFactor === 0) {
+    return "text-white"
+  } else if (healthFactor > 3) {
+    return "text-green-500"
+  } else if (healthFactor > 1.3) {
+    return "text-yellow-500"
+  } else {
+    return "text-red-500"
+  }
+}
+
+export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inputAmount, activeTab }
+  : { supplyToken: Token, borrowToken: Token, inputToken: Token, inputAmount: number, activeTab: string }): JSX.Element {
   const [reserveData] = useAtom(aaveReserveDataAtom)
   const [userAccountData] = useAtom(aaveAccountDataAtom)
 
@@ -483,6 +527,40 @@ export function AaveUserAccountData({ supplyToken, borrowToken }: { supplyToken:
     }
   }, [borrowToken, reserveData])
 
+  const [newUserAccountData, setNewUserAccountData] = useState<UserAccountData>(EMPTY_USER_ACCOUNT_DATA)
+
+  useEffect(() => {
+    if (inputToken.symbol === "none") return
+    const newReserveData = [...reserveData]
+
+    switch (activeTab) {
+      case "Supply":
+        newReserveData[reserveData.findIndex(e => e.asset.address === inputToken.address)].supplyAmount += inputAmount
+
+        setNewUserAccountData(calcUserAccountData(newReserveData, userAccountData.ltv))
+        return;
+      case "Borrow":
+        newReserveData[reserveData.findIndex(e => e.asset.address === inputToken.address)].borrowAmount += inputAmount
+
+        setNewUserAccountData(calcUserAccountData(newReserveData, userAccountData.ltv))
+        return;
+      case "Repay":
+        newReserveData[reserveData.findIndex(e => e.asset.address === inputToken.address)].borrowAmount -= inputAmount
+
+        setNewUserAccountData(calcUserAccountData(newReserveData, userAccountData.ltv))
+        return;
+      case "Withdraw":
+        newReserveData[reserveData.findIndex(e => e.asset.address === inputToken.address)].supplyAmount -= inputAmount
+
+        setNewUserAccountData(calcUserAccountData(newReserveData, userAccountData.ltv))
+        return;
+      default:
+        return;
+    }
+  }, [inputAmount, activeTab])
+
+  console.log(userAccountData)
+
   return (supplyReserve && borrowReserve) ? (
     <>
       <div className="w-full space-y-4">
@@ -496,15 +574,22 @@ export function AaveUserAccountData({ supplyToken, borrowToken }: { supplyToken:
                   as="p"
                   level={2}
                   fontWeight="font-normal"
-                  className={userAccountData.healthFactor > 3 ? "text-green-500"
-                    : userAccountData.healthFactor > 1.3 ? "text-yellow-500" : "text-red-500"
-                  }>
+                  className={getHealthFactorColor(userAccountData.healthFactor)}
+                >
                   {formatToFixedDecimals(userAccountData.healthFactor || 0, 2)}
                 </Title>
-                <p>&gt;</p>
-                <Title as="p" level={2} fontWeight="font-normal" className="text-red-500">
-                  1.07
-                </Title>
+                {inputAmount > 0 &&
+                  <>
+                    <ArrowRightIcon className="w-4 h-3 text-white" />
+                    <Title
+                      as="p"
+                      level={2}
+                      fontWeight="font-normal"
+                      className={getHealthFactorColor(newUserAccountData.healthFactor)}
+                    >
+                      {formatToFixedDecimals(newUserAccountData.healthFactor || 0, 2)}
+                    </Title>
+                  </>}
               </span>
             </div>
 
@@ -512,12 +597,16 @@ export function AaveUserAccountData({ supplyToken, borrowToken }: { supplyToken:
               <p className="text-start text-primary font-normal md:text-[14px]">Lending Networth</p>
               <span className="flex flex-row items-center space-x-1">
                 <Title as="p" level={2} fontWeight="font-normal" className="text-primary">
-                  $ {formatToFixedDecimals(userAccountData.netValue || 0, 2)}
+                  $ {formatNumber(userAccountData.netValue || 0)}
                 </Title>
-                <p>&gt;</p>
-                <Title as="p" level={2} fontWeight="font-normal" className="text-primary">
-                  $ 7k
-                </Title>
+                {inputAmount > 0 &&
+                  <>
+                    <ArrowRightIcon className="w-4 h-3 text-white" />
+                    <Title as="p" level={2} fontWeight="font-normal" className="text-primary">
+                      $ {formatNumber(newUserAccountData.netValue || 0)}
+                    </Title>
+                  </>
+                }
               </span>
             </div>
 
@@ -525,18 +614,19 @@ export function AaveUserAccountData({ supplyToken, borrowToken }: { supplyToken:
               <p className="text-start text-primary font-normal md:text-[14px]">Net Apy</p>
               <span className="flex flex-row items-center space-x-1">
                 <Title as="p" level={2} fontWeight="font-normal" className="text-primary">
-                  {formatToFixedDecimals(userAccountData.netValue || 0, 2)} %
+                  {formatToFixedDecimals(userAccountData.netRate || 0, 2)} %
                 </Title>
-                <p>&gt;</p>
-                <Title as="p" level={2} fontWeight="font-normal" className="text-primary">
-                  -1.05 %
-                </Title>
+                {inputAmount > 0 &&
+                  <>
+                    <ArrowRightIcon className="w-4 h-3 text-white" />
+                    <Title as="p" level={2} fontWeight="font-normal" className="text-primary">
+                      {formatToFixedDecimals(newUserAccountData.netRate || 0, 2)} %
+                    </Title>
+                  </>
+                }
               </span>
             </div>
-
           </div>
-
-
         </div>
 
         <div className="border border-[#353945] rounded-lg p-4">
@@ -595,5 +685,7 @@ export function AaveUserAccountData({ supplyToken, borrowToken }: { supplyToken:
         </div>
       </div>
     </>
-  ) : <p className="text-white">Data loading...</p>
+  ) : <div className="w-full space-y-4">
+    <p className="text-white">Data loading...</p>
+  </div>
 }

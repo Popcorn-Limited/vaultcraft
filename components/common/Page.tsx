@@ -18,7 +18,7 @@ import MainActionButton from "../button/MainActionButton";
 import { availableZapAssetAtom, zapAssetsAtom } from "@/lib/atoms";
 import { Token } from "@/lib/types";
 import getZapAssets, { getAvailableZapAssets } from "@/lib/utils/getZapAssets";
-import { fetchAaveData } from "@/lib/vault/aave/interactionts";
+import { calcUserAccountData, fetchAaveData } from "@/lib/vault/aave/interactionts";
 import { aaveAccountDataAtom, aaveReserveDataAtom } from "@/lib/atoms/lending";
 import { AavePoolAbi } from "@/lib/constants/abi/Aave";
 
@@ -190,11 +190,7 @@ export default function Page({
   useEffect(() => {
     fetchAaveData(account || zeroAddress, optimism)
       .then(async res => {
-        const client = createPublicClient({ chain:optimism, transport: http(RPC_URLS[10]) })
-
-        const totalCollateral = res.map(r => r.supplyAmount * r.asset.price).reduce((a, b) => a + b, 0);
-        const totalBorrowed = res.map(r => r.borrowAmount * r.asset.price).reduce((a, b) => a + b, 0);
-        const netValue = totalCollateral - totalBorrowed;
+        const client = createPublicClient({ chain: optimism, transport: http(RPC_URLS[10]) })
 
         const accountData = await client.readContract({
           address: "0x794a61358D6845594F94dc1DB02A252b5b4814aD",
@@ -202,14 +198,9 @@ export default function Page({
           functionName: 'getUserAccountData',
           args: [account || zeroAddress],
         })
-
-        const totalSupplyRate = res.map(r => r.supplyAmount * r.asset.price * (r.supplyRate / 100)).reduce((a, b) => a + b, 0);
-        const totalBorrowRate = res.map(r => r.borrowAmount * r.asset.price * (r.borrowAmount / 100)).reduce((a, b) => a + b, 0);
-        const netRate = (totalSupplyRate - totalBorrowRate) / netValue
-
-        const healthFactor = (totalCollateral * (Number(accountData[3]) / 10_000)) / totalBorrowed
-
-        setAaveAccountData({ totalCollateral, totalBorrowed, netValue, totalSupplyRate, totalBorrowRate, netRate, healthFactor })
+        const ltv = (Number(accountData[3]) / 10_000);
+        
+        setAaveAccountData(calcUserAccountData(res, ltv))
         setAaveReserveData(res);
       })
   }, [account])

@@ -210,6 +210,7 @@ export type UserAccountData = {
   totalSupplyRate: number;
   totalBorrowRate: number;
   netRate: number;
+  ltv: number;
   healthFactor: number;
 }
 

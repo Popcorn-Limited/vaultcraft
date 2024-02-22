@@ -227,3 +227,16 @@ export async function fetchAaveData(account: Address, chain: Chain): Promise<Res
 
   return result
 }
+
+export function calcUserAccountData(reserveData: ReserveData[], ltv: number): UserAccountData {
+  const totalCollateral = reserveData.map(r => r.supplyAmount * r.asset.price).reduce((a, b) => a + b, 0);
+  const totalBorrowed = reserveData.map(r => r.borrowAmount * r.asset.price).reduce((a, b) => a + b, 0);
+  const netValue = totalCollateral - totalBorrowed;
+
+  const totalSupplyRate = reserveData.map(r => r.supplyAmount * r.asset.price * (r.supplyRate / 100)).reduce((a, b) => a + b, 0);
+  const totalBorrowRate = reserveData.map(r => r.borrowAmount * r.asset.price * (r.borrowAmount / 100)).reduce((a, b) => a + b, 0);
+  const netRate = (totalSupplyRate - totalBorrowRate) / netValue
+
+  const healthFactor = (totalCollateral * ltv) / totalBorrowed;
+  return { totalCollateral, totalBorrowed, netValue, totalSupplyRate, totalBorrowRate, netRate, ltv, healthFactor }
+}
