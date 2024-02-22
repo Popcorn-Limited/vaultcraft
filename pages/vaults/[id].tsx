@@ -379,6 +379,8 @@ function LoanInterface({ visibilityState, vaultData }: { visibilityState: [boole
   const [inputToken, setInputToken] = useState<Token>()
 
   function changeTab(newTab: string) {
+    setActiveTab(newTab);
+
     const assetBorrowable = !!reserveData.find(e => e.asset.address === vaultData.asset.address);
     switch (newTab) {
       case "Supply":
@@ -400,8 +402,6 @@ function LoanInterface({ visibilityState, vaultData }: { visibilityState: [boole
       default:
         return;
     }
-
-    setActiveTab(newTab);
   }
 
   const [inputBalance, setInputBalance] = useState<string>("0");
