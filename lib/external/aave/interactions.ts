@@ -139,7 +139,9 @@ export async function fetchAaveData(account: Address, chain: Chain): Promise<Res
 
   const { data: assets } = await axios.get(`https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/assets/tokens/${chain.id}.json`)
 
-  let result = reserveData[0].filter(d => d.isActive).map(d => {
+  console.log({ reserveData })
+
+  let result = reserveData[0].filter(d => !d.isFrozen).map(d => {
     const uData = userData[0].find(e => e.underlyingAsset === d.underlyingAsset)
     const decimals = Number(d.decimals)
     return {
