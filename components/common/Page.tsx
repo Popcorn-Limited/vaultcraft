@@ -18,9 +18,9 @@ import MainActionButton from "../button/MainActionButton";
 import { availableZapAssetAtom, zapAssetsAtom } from "@/lib/atoms";
 import { Token } from "@/lib/types";
 import getZapAssets, { getAvailableZapAssets } from "@/lib/utils/getZapAssets";
-import { calcUserAccountData, fetchAaveData } from "@/lib/vault/aave/interactionts";
 import { aaveAccountDataAtom, aaveReserveDataAtom } from "@/lib/atoms/lending";
 import { AavePoolAbi } from "@/lib/constants/abi/Aave";
+import { calcUserAccountData, fetchAaveData } from "@/lib/external/aave/interactions";
 
 async function setUpYieldOptions() {
   const ttl = 360_000;

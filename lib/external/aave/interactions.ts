@@ -2,31 +2,18 @@ import { showLoadingToast } from "@/lib/toasts";
 import {
   Clients,
   ReserveData,
-  ReserveDataResponse,
   SimulationResponse,
-  Token,
   UserAccountData,
-  VaultData
 } from "@/lib/types";
-import { VaultAbi } from "@/lib/constants";
 import { Address, Chain, createPublicClient, formatUnits, getAddress, http, PublicClient, zeroAddress } from "viem";
 import { handleCallResult } from "@/lib/utils/helpers";
-import { FireEventArgs } from "@masa-finance/analytics-sdk";
 import { RPC_URLS, networkMap } from "@/lib/utils/connectors";
 import { AavePoolAbi, AavePoolUiAbi } from "@/lib/constants/abi/Aave";
 import axios from "axios"
 import { erc20ABI } from "wagmi";
-import { AAVE_UI_DATA_PROVIDER } from "@/lib/vault/aave/handleVaultInteraction";
 
-interface VaultWriteProps {
-  chainId: number;
-  vaultData: VaultData;
-  account: Address;
-  amount: number;
-  clients: Clients;
-  fireEvent?: (type: string, { user_address, network, contract_address, asset_amount, asset_ticker, additionalEventData }: FireEventArgs) => Promise<void>;
-  referral?: Address;
-}
+export const AAVE_POOL = "0x794a61358D6845594F94dc1DB02A252b5b4814aD" //OPTIMISM
+export const AAVE_UI_DATA_PROVIDER = "0xbd83DdBE37fc91923d59C8c1E0bDe0CccCa332d5"; //OPTIMISM
 
 interface AavePoolProps {
   asset?: Address;
@@ -38,10 +25,6 @@ interface AavePoolProps {
   clients: Clients
 }
 
-interface VaultRouterWriteProps extends VaultWriteProps {
-  router: Address;
-}
-
 interface BaseSimulateProps {
   address: Address;
   account: Address;
@@ -49,35 +32,8 @@ interface BaseSimulateProps {
   publicClient: PublicClient;
 }
 
-interface VaultSimulateProps extends BaseSimulateProps {
-  args: any[];
-}
-
 interface AavePoolSimulateProps extends BaseSimulateProps {
   args: any[];
-}
-
-interface VaultRouterSimulateProps extends BaseSimulateProps {
-  amount: number;
-  vault: Address;
-  gauge: Address;
-}
-
-async function simulateVaultCall({ address, account, args, functionName, publicClient }: VaultSimulateProps): Promise<SimulationResponse> {
-  try {
-    const { request } = await publicClient.simulateContract({
-      account,
-      address,
-      abi: VaultAbi,
-      // @ts-ignore
-      functionName,
-      // @ts-ignore
-      args
-    })
-    return { request: request, success: true, error: null }
-  } catch (error: any) {
-    return { request: null, success: false, error: error.shortMessage }
-  }
 }
 
 async function simulateAavePoolCall({ address, account, args, functionName, publicClient }: AavePoolSimulateProps): Promise<SimulationResponse> {
@@ -98,38 +54,6 @@ async function simulateAavePoolCall({ address, account, args, functionName, publ
 }
 
 
-export async function vaultDeposit({ chainId, vaultData, account, amount, clients, fireEvent, referral }: VaultWriteProps): Promise<boolean> {
-  showLoadingToast("Depositing into the vault...")
-
-  const success = await handleCallResult({
-    successMessage: "Deposited into the vault!",
-    simulationResponse: await simulateVaultCall({
-      address: vaultData.address,
-      account,
-      // @dev Since numbers get converted to strings like 1e+21 or similar we need to convert it back to numbers like 10000000000000 and than cast them into BigInts
-      args: [BigInt(Number(amount).toLocaleString("fullwide", { useGrouping: false })), account],
-      functionName: "deposit",
-      publicClient: clients.publicClient
-    }),
-    clients
-  })
-
-  if (success && fireEvent) {
-    void fireEvent("addLiquidity", {
-      user_address: account,
-      network: networkMap[chainId].toLowerCase(),
-      contract_address: vaultData.address,
-      asset_amount: String(amount / (10 ** vaultData.asset.decimals)),
-      asset_ticker: vaultData.asset.symbol,
-      additionalEventData: {
-        referral: referral,
-        vault_name: vaultData.metadata.vaultName
-      }
-    });
-  }
-  return success
-}
-
 
 export async function supplyToAave({ asset, amount, onBehalfOf, chainId, account, clients }: AavePoolProps): Promise<boolean> {
   showLoadingToast("Supplying to Aave...")
@@ -137,10 +61,26 @@ export async function supplyToAave({ asset, amount, onBehalfOf, chainId, account
   return await handleCallResult({
     successMessage: "Supplied underlying asset into Aave pool!",
     simulationResponse: await simulateAavePoolCall({
-      address: AAVE_UI_DATA_PROVIDER,
+      address: AAVE_POOL,
       account,
       args: [asset, amount, onBehalfOf, 0],
       functionName: "supply",
+      publicClient: clients.publicClient
+    }),
+    clients
+  })
+}
+
+export async function withdrawFromAave({ asset, amount, onBehalfOf, chainId, account, clients }: AavePoolProps): Promise<boolean> {
+  showLoadingToast("Withdrawing from Aave...")
+
+  return await handleCallResult({
+    successMessage: "Withdrew underlying asset from Aave pool!",
+    simulationResponse: await simulateAavePoolCall({
+      address: AAVE_POOL,
+      account,
+      args: [asset, amount, onBehalfOf],
+      functionName: "withdraw",
       publicClient: clients.publicClient
     }),
     clients
@@ -153,10 +93,26 @@ export async function borrowFromAave({ asset, amount, onBehalfOf, chainId, accou
   return await handleCallResult({
     successMessage: "Borrowed underlying asset from Aave pool!",
     simulationResponse: await simulateAavePoolCall({
-      address: AAVE_UI_DATA_PROVIDER,
+      address: AAVE_POOL,
       account,
       args: [asset, amount, 2, 0, onBehalfOf],
       functionName: "borrow",
+      publicClient: clients.publicClient
+    }),
+    clients
+  })
+}
+
+export async function repayToAave({ asset, amount, onBehalfOf, chainId, account, clients }: AavePoolProps): Promise<boolean> {
+  showLoadingToast("Repaying Aave...")
+
+  return await handleCallResult({
+    successMessage: "Repayed underlying asset for Aave pool!",
+    simulationResponse: await simulateAavePoolCall({
+      address: AAVE_POOL,
+      account,
+      args: [asset, amount, 2, 0, onBehalfOf],
+      functionName: "repay",
       publicClient: clients.publicClient
     }),
     clients

@@ -1,4 +1,5 @@
-import {DepositVaultActionType, KelpVaultActionType, LockVaultActionType, SmartVaultActionType} from "@/lib/types";
+import { DepositVaultActionType, KelpVaultActionType, LockVaultActionType, SmartVaultActionType } from "@/lib/types";
+import { AaveActionType } from "./external/aave/handleAaveInteractions";
 
 export interface ActionStep {
   step: number;
@@ -319,45 +320,6 @@ export function getKelpVaultActionSteps(action: KelpVaultActionType): ActionStep
   }
 }
 
-
-export function getDepositVaultActionSteps(action: DepositVaultActionType): ActionStep[] {
-  switch (action) {
-    case DepositVaultActionType.Supply:
-      return [{
-        step: 1,
-        label: "Supply Asset",
-        ...BaseStepInfo
-      },
-        {
-          step: 2,
-          label: "Borrow Asset",
-          ...BaseStepInfo
-        },
-        {
-          step: 3,
-          label: "Deposit Asset",
-          ...BaseStepInfo
-        }]
-    case DepositVaultActionType.Borrow:
-      return [{
-        step: 2,
-        label: "Borrow Asset",
-        ...BaseStepInfo
-      },
-        {
-          step: 3,
-          label: "Deposit Asset",
-          ...BaseStepInfo
-        }]
-    case DepositVaultActionType.Deposit:
-      return [{
-        step: 0,
-        label: "Supply to Aave",
-        ...BaseStepInfo
-      }]
-  }
-}
-
 export const POOL_DEPOSIT_STEPS = [
   {
     step: 1,
@@ -402,3 +364,43 @@ export const EXERCISE_OVCX_STEPS = [
     ...BaseStepInfo
   }
 ]
+
+export function getAaveActionSteps(action: AaveActionType): ActionStep[] {
+  switch (action) {
+    case AaveActionType.Supply:
+      return [{
+        step: 1,
+        label: "Handle Allowance",
+        ...BaseStepInfo
+      },
+      {
+        step: 2,
+        label: "Supply Asset",
+        ...BaseStepInfo
+      }]
+    case AaveActionType.Withdraw:
+      return [
+        {
+          step: 1,
+          label: "Withdraw Asset",
+          ...BaseStepInfo
+        }]
+    case AaveActionType.Borrow:
+      return [{
+        step: 1,
+        label: "Borrow Asset",
+        ...BaseStepInfo
+      }]
+    case AaveActionType.Repay:
+      return [{
+        step: 1,
+        label: "Handle Allowance",
+        ...BaseStepInfo
+      },
+      {
+        step: 2,
+        label: "Repay Loan",
+        ...BaseStepInfo
+      }]
+  }
+}

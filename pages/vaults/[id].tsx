@@ -5,8 +5,8 @@ import { useAtom } from "jotai";
 import { useRouter } from "next/router";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import NoSSR from "react-no-ssr";
-import { useAccount, useBalance, usePublicClient, useWalletClient } from "wagmi";
-import { Address, WalletClient, createPublicClient, extractChain, formatUnits, http, zeroAddress } from "viem";
+import { useAccount, useBalance, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
+import { Address, WalletClient, createPublicClient, extractChain, formatUnits, getAddress, http, zeroAddress } from "viem";
 import { VaultAbi, getVeAddresses } from "@/lib/constants";
 import { yieldOptionsAtom } from "@/lib/atoms/sdk";
 import { NumberFormatter, formatAndRoundNumber, formatNumber, formatToFixedDecimals, safeRound } from "@/lib/utils/formatBigNumber";
@@ -25,7 +25,6 @@ import { getTokenOptions, isDefiPosition } from "@/lib/vault/utils";
 import LeftArrowIcon from "@/components/svg/LeftArrowIcon";
 import { KelpVaultInputs, getKelpVaultData, mutateKelpTokenBalance } from "@/components/vault/KelpVault";
 import TabSelector from "@/components/common/TabSelector";
-import { calcUserAccountData, fetchAaveData } from "@/lib/vault/aave/interactionts";
 import Modal from "@/components/modal/Modal";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import TokenIcon from "@/components/common/TokenIcon";
@@ -33,6 +32,9 @@ import Title from "@/components/common/Title";
 import { AavePoolAbi } from "@/lib/constants/abi/Aave";
 import { EMPTY_USER_ACCOUNT_DATA, aaveAccountDataAtom, aaveReserveDataAtom } from "@/lib/atoms/lending";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { ActionStep, getAaveActionSteps } from "@/lib/getActionSteps";
+import handleAaveInteraction, { AaveActionType } from "@/lib/external/aave/handleAaveInteractions";
+import { calcUserAccountData } from "@/lib/external/aave/interactions";
 
 const { oVCX: OVCX, VCX } = getVeAddresses();
 
@@ -332,13 +334,22 @@ export default function Index() {
 const LOAN_TABS = ["Supply", "Borrow", "Repay", "Withdraw"]
 
 function LoanInterface({ visibilityState, vaultData }: { visibilityState: [boolean, Dispatch<SetStateAction<boolean>>], vaultData: VaultData }): JSX.Element {
+  const [visible, setVisible] = visibilityState
   const { address: account } = useAccount();
-  const publicClient = usePublicClient({ chainId: 10 })
+  const publicClient = usePublicClient({ chainId: 10 });
+  const { data: walletClient } = useWalletClient()
+  const { chain } = useNetwork();
+  const { switchNetworkAsync } = useSwitchNetwork();
   const { openConnectModal } = useConnectModal();
 
   const [reserveData] = useAtom(aaveReserveDataAtom)
 
   const [activeTab, setActiveTab] = useState<string>("Supply")
+
+  const [stepCounter, setStepCounter] = useState<number>(0)
+  const [steps, setSteps] = useState<ActionStep[]>(getAaveActionSteps(AaveActionType.Supply))
+  const [action, setAction] = useState<AaveActionType>(AaveActionType.Supply)
+
   const [tokenList, setTokenList] = useState<Token[]>([])
   const [supplyToken, setSupplyToken] = useState<Token | null>(null)
   const [borrowToken, setBorrowToken] = useState<Token | null>(null)
@@ -359,6 +370,7 @@ function LoanInterface({ visibilityState, vaultData }: { visibilityState: [boole
   function changeTab(newTab: string) {
     setActiveTab(newTab);
     setInputAmount("0");
+    setStepCounter(0);
 
     const assetBorrowable = !!reserveData.find(e => e.asset.address === vaultData.asset.address);
     let sorted: ReserveData[]
@@ -372,6 +384,8 @@ function LoanInterface({ visibilityState, vaultData }: { visibilityState: [boole
         _inputToken = sorted[0].asset
         setSupplyToken(_inputToken)
         setInputToken(_inputToken)
+        setAction(AaveActionType.Supply)
+        setSteps(getAaveActionSteps(AaveActionType.Supply))
         return;
       case "Borrow":
         sorted = reserveData.sort((a, b) => b.borrowRate - a.borrowRate)
@@ -380,18 +394,24 @@ function LoanInterface({ visibilityState, vaultData }: { visibilityState: [boole
         _inputToken = assetBorrowable ? vaultData.asset : sorted[0].asset
         setBorrowToken(_inputToken)
         setInputToken(_inputToken)
+        setAction(AaveActionType.Borrow)
+        setSteps(getAaveActionSteps(AaveActionType.Borrow))
         return;
       case "Repay":
         sorted = reserveData.filter(e => e.borrowAmount > 0).sort((a, b) => b.borrowAmount - a.borrowAmount)
         setTokenList(sorted.length === 0 ? [] : sorted.map(e => e.asset))
 
         setInputToken(sorted.length === 0 ? null : sorted[0].asset)
+        setAction(AaveActionType.Repay)
+        setSteps(getAaveActionSteps(AaveActionType.Repay))
         return;
       case "Withdraw":
         sorted = reserveData.filter(e => e.borrowAmount === 0).filter(e => e.balance > 0).sort((a, b) => b.balance - a.balance)
         setTokenList(!account || sorted.length === 0 ? [] : sorted.map(e => e.asset))
 
         setInputToken(!account || sorted.length === 0 ? null : sorted[0].asset)
+        setAction(AaveActionType.Withdraw)
+        setSteps(getAaveActionSteps(AaveActionType.Withdraw))
         return;
       default:
         return;
@@ -434,6 +454,53 @@ function LoanInterface({ visibilityState, vaultData }: { visibilityState: [boole
     handleChangeInput({ currentTarget: { value: formatted } })
   }
 
+  async function handleMainAction() {
+    const val = Number(inputAmount)
+    if (val === 0 || !inputToken || !account || !walletClient) return;
+
+    if (chain?.id !== Number(10)) {
+      try {
+        await switchNetworkAsync?.(Number(10));
+      } catch (error) {
+        return
+      }
+    }
+
+    const stepsCopy = [...steps]
+    const currentStep = stepsCopy[stepCounter]
+    currentStep.loading = true
+    setSteps(stepsCopy)
+
+    const aaveInteraction = await handleAaveInteraction({
+      action,
+      stepCounter,
+      chainId: 10,
+      amount: (val * (10 ** inputToken.decimals)),
+      inputToken,
+      account,
+      clients: { publicClient, walletClient },
+    })
+    const success = await aaveInteraction()
+
+    currentStep.loading = false
+    currentStep.success = success;
+    currentStep.error = !success;
+    const newStepCounter = stepCounter + 1
+    setSteps(stepsCopy)
+    setStepCounter(newStepCounter)
+
+    // if (newStepCounter === steps.length) mutateTokenBalance({
+    //   inputToken: inputToken.address,
+    //   outputToken: outputToken.address,
+    //   vault: vault.address,
+    //   chainId,
+    //   account,
+    //   zapAssetState: [zapAssets, setZapAssets],
+    //   vaultsState: [vaults, setVaults],
+    //   publicClient
+    // })
+  }
+
   return <>
     <Modal visibility={visibilityState} title={<AssetWithName vault={vaultData} />} >
       <div className="flex flex-row space-x-8">
@@ -460,10 +527,10 @@ function LoanInterface({ visibilityState, vaultData }: { visibilityState: [boole
                 allowInput
               />
               <div className="mt-8">
-                <MainActionButton
-                  label="Open Loan Modal"
-                  handleClick={() => { }}
-                />
+                {(stepCounter === steps.length || steps.some(step => !step.loading && step.error)) ?
+                  <MainActionButton label={"Finish"} handleClick={() => setVisible(false)} /> :
+                  <MainActionButton label={steps[stepCounter].label} handleClick={handleMainAction} disabled={inputAmount === "0" || steps[stepCounter].loading} />
+                }
               </div>
             </>
             : <div>
@@ -505,7 +572,7 @@ function getHealthFactorColor(healthFactor: number): string {
 
 export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inputAmount, activeTab }
   : { supplyToken: Token, borrowToken: Token, inputToken: Token, inputAmount: number, activeTab: string }): JSX.Element {
-  const [reserveData] = useAtom(aaveReserveDataAtom)
+  const [reserveData, setReserveData] = useAtom(aaveReserveDataAtom)
   const [userAccountData] = useAtom(aaveAccountDataAtom)
 
   const [supplyReserve, setSupplyReserve] = useState<ReserveData>()
@@ -528,26 +595,28 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
   useEffect(() => {
     if (inputToken.symbol === "none") return
     const newReserveData = [...reserveData]
-    const value = Number(inputAmount) * (10 ** inputToken.decimals)
+    const value = Number(inputAmount)
+
+    console.log(value, newReserveData)
 
     switch (activeTab) {
       case "Supply":
-        newReserveData[reserveData.findIndex(e => e.asset.address === inputToken.address)].supplyAmount += value
+        newReserveData[newReserveData.findIndex(e => e.asset.address === inputToken.address)].supplyAmount += value
 
-        setNewUserAccountData(calcUserAccountData(newReserveData, userAccountData.ltv))
+        setNewUserAccountData({ ...calcUserAccountData(newReserveData, userAccountData.ltv) })
         return;
       case "Borrow":
-        newReserveData[reserveData.findIndex(e => e.asset.address === inputToken.address)].borrowAmount += value
+        newReserveData[newReserveData.findIndex(e => e.asset.address === inputToken.address)].borrowAmount += value
 
-        setNewUserAccountData(calcUserAccountData(newReserveData, userAccountData.ltv))
+        setNewUserAccountData({ ...calcUserAccountData(newReserveData, userAccountData.ltv) })
         return;
       case "Repay":
-        newReserveData[reserveData.findIndex(e => e.asset.address === inputToken.address)].borrowAmount -= value
+        newReserveData[newReserveData.findIndex(e => e.asset.address === inputToken.address)].borrowAmount -= value
 
         setNewUserAccountData(calcUserAccountData(newReserveData, userAccountData.ltv))
         return;
       case "Withdraw":
-        newReserveData[reserveData.findIndex(e => e.asset.address === inputToken.address)].supplyAmount -= value
+        newReserveData[newReserveData.findIndex(e => e.asset.address === inputToken.address)].supplyAmount -= value
 
         setNewUserAccountData(calcUserAccountData(newReserveData, userAccountData.ltv))
         return;
