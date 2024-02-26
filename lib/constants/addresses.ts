@@ -1,14 +1,14 @@
 import { Address } from "viem";
-import { veAddresses } from "lib/types";
+import { AddressByChain, veAddresses } from "lib/types";
 
-export const VaultRegistryByChain: { [key: number]: Address } = {
+export const VaultRegistryByChain: AddressByChain = {
   1: "0x007318Dc89B314b47609C684260CfbfbcD412864",
   137: "0x2246c4c469735bCE95C120939b0C078EC37A08D0",
   10: "0xdD0d135b5b52B7EDd90a83d4A4112C55a1A6D23A",
   42161: "0xB205e94D402742B919E851892f7d515592a7A6cC",
 }
 
-export const VaultControllerByChain: { [key: number]: Address } = {
+export const VaultControllerByChain: AddressByChain = {
   1: "0x7D51BABA56C2CA79e15eEc9ECc4E92d9c0a7dbeb",
   1337: "0x7D51BABA56C2CA79e15eEc9ECc4E92d9c0a7dbeb",
   42161: "0xF40749d72Ab5422CC5d735A373E66d67f7cA9393",

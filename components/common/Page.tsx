@@ -16,11 +16,11 @@ import { arbitrum, optimism } from "viem/chains";
 import Modal from "@/components/modal/Modal";
 import MainActionButton from "../button/MainActionButton";
 import { availableZapAssetAtom, zapAssetsAtom } from "@/lib/atoms";
-import { Token } from "@/lib/types";
+import { ReserveData, Token, UserAccountData } from "@/lib/types";
 import getZapAssets, { getAvailableZapAssets } from "@/lib/utils/getZapAssets";
 import { aaveAccountDataAtom, aaveReserveDataAtom } from "@/lib/atoms/lending";
 import { AavePoolAbi } from "@/lib/constants/abi/Aave";
-import { calcUserAccountData, fetchAaveData } from "@/lib/external/aave/interactions";
+import { AavePoolByChain, calcUserAccountData, fetchAaveData } from "@/lib/external/aave/interactions";
 
 async function setUpYieldOptions() {
   const ttl = 360_000;
@@ -188,21 +188,20 @@ export default function Page({
   const [, setAaveAccountData] = useAtom(aaveAccountDataAtom)
 
   useEffect(() => {
-    fetchAaveData(account || zeroAddress, optimism)
-      .then(async res => {
-        const client = createPublicClient({ chain: optimism, transport: http(RPC_URLS[10]) })
+    async function setAaveData() {
+      const newReserveData: { [key: number]: ReserveData[] } = {}
+      const newUserAccountData: { [key: number]: UserAccountData } = {}
 
-        const accountData = await client.readContract({
-          address: "0x794a61358D6845594F94dc1DB02A252b5b4814aD",
-          abi: AavePoolAbi,
-          functionName: 'getUserAccountData',
-          args: [account || zeroAddress],
-        })
-        const ltv = (Number(accountData[3]) / 10_000);
-        
-        setAaveAccountData(calcUserAccountData(res, ltv))
-        setAaveReserveData(res);
+      SUPPORTED_NETWORKS.forEach(async (chain) => {
+        const res = await fetchAaveData(account || zeroAddress, chain)
+        newReserveData[chain.id] = res.reserveData
+        newUserAccountData[chain.id] = res.userAccountData
       })
+      
+      setAaveReserveData(newReserveData)
+      setAaveAccountData(newUserAccountData)
+    }
+    setAaveData()
   }, [account])
 
   return (

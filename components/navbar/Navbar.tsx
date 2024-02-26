@@ -8,8 +8,16 @@ import { networkLogos } from "@/lib/utils/connectors";
 import MainActionButton from "@/components/button/MainActionButton";
 import SocialMediaLinks from "@/components/common/SocialMediaLinks";
 import NavbarLinks from "@/components/navbar/NavbarLinks";
+import { aaveAccountDataAtom } from "@/lib/atoms/lending";
+import { useAtom } from "jotai";
+import { formatToFixedDecimals } from "@/lib/utils/formatBigNumber";
+import LoanInterface, { getHealthFactorColor } from "../lending/LoanInterface";
+import { vaultsAtom } from "@/lib/atoms/vaults";
+import { useRouter } from "next/router";
 
 export default function Navbar(): JSX.Element {
+  const router = useRouter();
+  const { query } = router;
   const { disconnect } = useDisconnect();
   const { openConnectModal } = useConnectModal();
   const { openChainModal } = useChainModal();
@@ -30,9 +38,22 @@ export default function Navbar(): JSX.Element {
     }
   }, [chain?.id, address])
 
+  const [userAccountData] = useAtom(aaveAccountDataAtom)
+  const [vaults] = useAtom(vaultsAtom)
+  const [showLendModal, setShowLendModal] = useState(false)
 
   return (
     <>
+      {(chain && vaults.length > 0) &&
+        <LoanInterface
+          visibilityState={[showLendModal, setShowLendModal]}
+          vaultData={query?.id && query?.chainId ?
+            (vaults.find(vault => vault.address === query?.id && vault.chainId === Number(query?.chainId))
+              || vaults.filter(vault => vault.chainId === chain.id)[0])
+            : vaults.filter(vault => vault.chainId === chain.id)[0]
+          }
+        />
+      }
       <div className="flex flex-row items-center justify-between w-full py-8 px-4 md:px-8 z-10">
         <div className="flex flex-row items-center">
           <div>
@@ -41,19 +62,27 @@ export default function Navbar(): JSX.Element {
             </Link>
           </div>
         </div>
-        <div className="flex flex-container h-full flex-row w-fit-content gap-x-6">
+        <div className="flex flex-container h-full flex-row w-fit-content items-center gap-x-6">
+          {(chain && userAccountData[chain?.id]?.healthFactor > 0) &&
+            <div className={`w-11 h-11 flex justify-center items-center cursor-pointer rounded-full border ${getHealthFactorColor("border", userAccountData[chain.id].healthFactor)}`}
+              onClick={() => setShowLendModal(true)}
+            >
+              <p className={`text-sm ${getHealthFactorColor("text", userAccountData[chain.id].healthFactor)}`}>
+                {formatToFixedDecimals(userAccountData[chain.id].healthFactor || 0, 2)}
+              </p>
+            </div>
+          }
           {address ? (
             <div className={`relative flex flex-container flex-row z-10`}>
               <div
                 className={`w-fit cursor-pointer h-full py-2 bg-[#141416] md:bg-transparent md:py-[10px] px-4 md:px-6 flex flex-row items-center justify-between border border-customLightGray rounded-4xl text-primary`}
-
               >
                 <img src={logo} alt={chainName} className="w-5 h-5 md:mr-2" onClick={openChainModal} />
                 <div className="hidden w-2 h-2 bg-[#50C56E] ml-2 rounded-full"></div>
                 <span className="hidden md:inline">|</span>
                 <p className="ml-2 leading-none hidden md:block">{address?.substring(0, 5)}...</p>
                 <span className="hidden md:inline">|</span>
-                <PowerIcon className="w-5 h-5 ml-3 text-primary hidden md:block" aria-hidden="true" onClick={handleWalletDisconnect}  />
+                <PowerIcon className="w-5 h-5 ml-3 text-primary hidden md:block" aria-hidden="true" onClick={handleWalletDisconnect} />
               </div>
             </div>
           ) : (
@@ -77,7 +106,7 @@ export default function Navbar(): JSX.Element {
             ></span>
           </button>
         </div>
-      </div>
+      </div >
       <Transition.Root show={menuVisible} as={Fragment}>
         <Dialog as="div" className="fixed inset-0 overflow-hidden z-50" onClose={() => toggleMenu(false)}>
           <button

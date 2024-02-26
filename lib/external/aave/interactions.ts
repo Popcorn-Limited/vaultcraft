@@ -1,5 +1,6 @@
 import { showLoadingToast } from "@/lib/toasts";
 import {
+  AddressByChain,
   Clients,
   ReserveData,
   SimulationResponse,
@@ -12,15 +13,31 @@ import { AavePoolAbi, AavePoolUiAbi } from "@/lib/constants/abi/Aave";
 import axios from "axios"
 import { erc20ABI } from "wagmi";
 
-export const AAVE_POOL = "0x794a61358D6845594F94dc1DB02A252b5b4814aD" //OPTIMISM
-export const AAVE_UI_DATA_PROVIDER = "0xbd83DdBE37fc91923d59C8c1E0bDe0CccCa332d5"; //OPTIMISM
+export const AavePoolByChain: AddressByChain = {
+  1: "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+  137: "0x794a61358D6845594F94dc1DB02A252b5b4814aD",
+  10: "0x794a61358D6845594F94dc1DB02A252b5b4814aD",
+  42161: "0x794a61358D6845594F94dc1DB02A252b5b4814aD"
+}
+export const AaveUiPoolProviderByChain: AddressByChain = {
+  1: "0x91c0eA31b49B69Ea18607702c5d9aC360bf3dE7d",
+  137: "0xC69728f11E9E6127733751c8410432913123acf1",
+  10: "0xbd83DdBE37fc91923d59C8c1E0bDe0CccCa332d5",
+  42161: "0x145dE30c929a065582da84Cf96F88460dB9745A7"
+}
+
+export const AavePoolAddressProviderByChain: AddressByChain = {
+  1: "0x2f39d218133AFaB8F2B819B1066c7E434Ad94E9e",
+  137: "0xa97684ead0e402dC232d5A977953DF7ECBaB3CDb",
+  10: "0xa97684ead0e402dC232d5A977953DF7ECBaB3CDb",
+  42161: "0xa97684ead0e402dC232d5A977953DF7ECBaB3CDb"
+}
 
 interface AavePoolProps {
-  asset?: Address;
-  amount?: number;
-  onBehalfOf?: Address;
-  referralCode?: number;
-  chainId?: number;
+  asset: Address;
+  amount: number;
+  onBehalfOf: Address;
+  chainId: number;
   account: Address
   clients: Clients
 }
@@ -61,7 +78,7 @@ export async function supplyToAave({ asset, amount, onBehalfOf, chainId, account
   return await handleCallResult({
     successMessage: "Supplied underlying asset into Aave pool!",
     simulationResponse: await simulateAavePoolCall({
-      address: AAVE_POOL,
+      address: AavePoolByChain[chainId],
       account,
       args: [asset, amount, onBehalfOf, 0],
       functionName: "supply",
@@ -77,7 +94,7 @@ export async function withdrawFromAave({ asset, amount, onBehalfOf, chainId, acc
   return await handleCallResult({
     successMessage: "Withdrew underlying asset from Aave pool!",
     simulationResponse: await simulateAavePoolCall({
-      address: AAVE_POOL,
+      address: AavePoolByChain[chainId],
       account,
       args: [asset, amount, onBehalfOf],
       functionName: "withdraw",
@@ -93,7 +110,7 @@ export async function borrowFromAave({ asset, amount, onBehalfOf, chainId, accou
   return await handleCallResult({
     successMessage: "Borrowed underlying asset from Aave pool!",
     simulationResponse: await simulateAavePoolCall({
-      address: AAVE_POOL,
+      address: AavePoolByChain[chainId],
       account,
       args: [asset, amount, 2, 0, onBehalfOf],
       functionName: "borrow",
@@ -109,7 +126,7 @@ export async function repayToAave({ asset, amount, onBehalfOf, chainId, account,
   return await handleCallResult({
     successMessage: "Repayed underlying asset for Aave pool!",
     simulationResponse: await simulateAavePoolCall({
-      address: AAVE_POOL,
+      address: AavePoolByChain[chainId],
       account,
       args: [asset, amount, 2, 0, onBehalfOf],
       functionName: "repay",
@@ -121,26 +138,24 @@ export async function repayToAave({ asset, amount, onBehalfOf, chainId, account,
 
 const secondsPerYear = 31536000
 
-export async function fetchAaveData(account: Address, chain: Chain): Promise<ReserveData[]> {
+export async function fetchAaveReserveData(account: Address, chain: Chain): Promise<ReserveData[]> {
   const client = createPublicClient({ chain, transport: http(RPC_URLS[chain.id]) })
 
   const userData = await client.readContract({
-    address: AAVE_UI_DATA_PROVIDER,
+    address: AaveUiPoolProviderByChain[chain.id],
     abi: AavePoolUiAbi,
     functionName: 'getUserReservesData',
-    args: ["0xa97684ead0e402dC232d5A977953DF7ECBaB3CDb", account === zeroAddress ? "0xa97684ead0e402dC232d5A977953DF7ECBaB3CDb" : account],
+    args: [AavePoolAddressProviderByChain[chain.id], account === zeroAddress ? AavePoolAddressProviderByChain[chain.id] : account],
   })
   const reserveData = await client.readContract({
-    address: AAVE_UI_DATA_PROVIDER,
+    address: AaveUiPoolProviderByChain[chain.id],
     abi: AavePoolUiAbi,
     functionName: 'getReservesData',
-    args: ["0xa97684ead0e402dC232d5A977953DF7ECBaB3CDb"],
+    args: [AavePoolAddressProviderByChain[chain.id]],
   })
 
   const { data: assets } = await axios.get(`https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/assets/tokens/${chain.id}.json`)
-
-  console.log({ reserveData })
-
+ 
   let result = reserveData[0].filter(d => !d.isFrozen).map(d => {
     const uData = userData[0].find(e => e.underlyingAsset === d.underlyingAsset)
     const decimals = Number(d.decimals)
@@ -156,7 +171,7 @@ export async function fetchAaveData(account: Address, chain: Chain): Promise<Res
       balance: account === zeroAddress ? 0 : Number(uData?.scaledATokenBalance)
     }
   })
-
+  
   const { data: priceData } = await axios.get(`https://coins.llama.fi/prices/current/${String(result.map(
     e => `${networkMap[chain.id].toLowerCase()}:${e.asset.address}`
   ))}`)
@@ -184,6 +199,19 @@ export async function fetchAaveData(account: Address, chain: Chain): Promise<Res
   }
 
   return result
+}
+
+export async function fetchAaveData(account: Address, chain: Chain): Promise<{ reserveData: ReserveData[], userAccountData: UserAccountData }> {
+  const reserveData = await fetchAaveReserveData(account || zeroAddress, chain);
+
+  const client = createPublicClient({ chain, transport: http(RPC_URLS[chain.id]) })
+  const accountData = await client.readContract({
+    address: AavePoolByChain[chain.id],
+    abi: AavePoolAbi,
+    functionName: 'getUserAccountData',
+    args: [account || zeroAddress],
+  })
+  return { reserveData, userAccountData: calcUserAccountData(reserveData, (Number(accountData[3]) / 10_000)) }
 }
 
 export function calcUserAccountData(reserveData: ReserveData[], ltv: number): UserAccountData {

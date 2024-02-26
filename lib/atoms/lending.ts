@@ -12,5 +12,5 @@ export const EMPTY_USER_ACCOUNT_DATA = {
   healthFactor: 0
 }
 
-export const aaveReserveDataAtom = atom<ReserveData[]>([]);
-export const aaveAccountDataAtom = atom<UserAccountData>(EMPTY_USER_ACCOUNT_DATA)
+export const aaveReserveDataAtom = atom<{ [key: number]: ReserveData[] }>({});
+export const aaveAccountDataAtom = atom<{ [key: number]: UserAccountData }>({})

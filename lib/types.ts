@@ -258,3 +258,7 @@ export type ReserveData = {
   borrowAmount: number;
   balance: number;
 }
+
+export type AddressByChain = {
+  [key: number]: Address
+}

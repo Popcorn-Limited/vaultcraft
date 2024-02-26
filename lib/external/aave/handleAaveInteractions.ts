@@ -1,7 +1,7 @@
 import { Address } from "viem";
 import { handleAllowance } from "@/lib/approve";
 import { Clients, Token } from "@/lib/types";
-import { AAVE_POOL, borrowFromAave, repayToAave, supplyToAave, withdrawFromAave } from "./interactions";
+import { AavePoolByChain, borrowFromAave, repayToAave, supplyToAave, withdrawFromAave } from "./interactions";
 
 export enum AaveActionType {
   Supply,
@@ -24,7 +24,7 @@ export default async function handleAaveInteraction({ action, stepCounter, chain
   switch (action) {
     case AaveActionType.Supply:
       if (stepCounter === 0) {
-        return () => handleAllowance({ token: inputToken.address, amount, account, spender: AAVE_POOL, clients })
+        return () => handleAllowance({ token: inputToken.address, amount, account, spender: AavePoolByChain[chainId], clients })
       } else {
         return () => supplyToAave({ asset: inputToken.address, amount, onBehalfOf: account, chainId, account, clients })
       }
@@ -34,7 +34,7 @@ export default async function handleAaveInteraction({ action, stepCounter, chain
       return () => borrowFromAave({ asset: inputToken.address, amount, onBehalfOf: account, chainId, account, clients })
     case AaveActionType.Repay:
       if (stepCounter === 0) {
-        return () => handleAllowance({ token: inputToken.address, amount, account, spender: AAVE_POOL, clients })
+        return () => handleAllowance({ token: inputToken.address, amount, account, spender: AavePoolByChain[chainId], clients })
       } else {
         return () => repayToAave({ asset: inputToken.address, amount, onBehalfOf: account, chainId, account, clients })
       }
