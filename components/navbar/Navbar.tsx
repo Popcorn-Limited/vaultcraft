@@ -11,9 +11,10 @@ import NavbarLinks from "@/components/navbar/NavbarLinks";
 import { aaveAccountDataAtom } from "@/lib/atoms/lending";
 import { useAtom } from "jotai";
 import { formatToFixedDecimals } from "@/lib/utils/formatBigNumber";
-import LoanInterface, { getHealthFactorColor } from "../lending/LoanInterface";
+import LoanInterface, { getHealthFactorColor } from "@/components/lending/LoanInterface";
 import { vaultsAtom } from "@/lib/atoms/vaults";
 import { useRouter } from "next/router";
+import ResponsiveTooltip from "@/components/common/Tooltip";
 
 export default function Navbar(): JSX.Element {
   const router = useRouter();
@@ -64,12 +65,18 @@ export default function Navbar(): JSX.Element {
         </div>
         <div className="flex flex-container h-full flex-row w-fit-content items-center gap-x-6">
           {(chain && userAccountData[chain?.id]?.healthFactor > 0) &&
-            <div className={`w-11 h-11 flex justify-center items-center cursor-pointer rounded-full border ${getHealthFactorColor("border", userAccountData[chain.id].healthFactor)}`}
+            <div
+              className={`w-11 h-11 flex justify-center items-center cursor-pointer rounded-full border ${getHealthFactorColor("border", userAccountData[chain.id].healthFactor)}`}
+              id="global-health-factor"
               onClick={() => setShowLendModal(true)}
             >
               <p className={`text-sm ${getHealthFactorColor("text", userAccountData[chain.id].healthFactor)}`}>
                 {formatToFixedDecimals(userAccountData[chain.id].healthFactor || 0, 2)}
               </p>
+              <ResponsiveTooltip
+                id="global-health-factor"
+                content={<p className="max-w-52">Health Factor of your Aave Account. (Click to manage)</p>}
+              />
             </div>
           }
           {address ? (
