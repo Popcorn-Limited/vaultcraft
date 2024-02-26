@@ -6,12 +6,14 @@ import ResponsiveTooltip from "../common/Tooltip";
 
 const vaultLabelColor: { [key: string]: string } = {
   Experimental: "bg-yellow-500",
-  Deprecated: "bg-red-500"
+  Deprecated: "bg-red-500",
+  New: "bg-cyan-500"
 }
 
 const vaultLabelTooltip: { [key: string]: string } = {
   Experimental: "Unaudited strategy in testing stage",
-  Deprecated: "This strategy got deprecated. Only withdrawals are open"
+  Deprecated: "This strategy got deprecated. Only withdrawals are open",
+  New: "Newly deployed! ✨"
 }
 
 
@@ -39,7 +41,7 @@ function VaultLabelPill({ label, id, size = 1 }: { label: VaultLabel, id: string
     <>
       <div className="flex align-middle justify-between w-full md:block md:w-max cursor-pointer" id={tooltipId}>
         <div className={`${vaultLabelColor[String(label)]} bg-opacity-40 rounded-lg py-1 px-3 flex flex-row items-center gap-2`}>
-          <p className={`text-primary ${textSize[size]}`}>{String(label)}</p>
+          <p className={`text-primary ${textSize[size]}`}>{label === VaultLabel.new ? "New ✨" : String(label)}</p>
         </div>
       </div>
       <ResponsiveTooltip id={tooltipId} content={<p className="text-white">{vaultLabelTooltip[String(label)]}</p>} />
