@@ -71,8 +71,6 @@ export default function VaultsContainer({ hiddenVaults, displayVaults, showDescr
     setSearchTerm(value)
   }
 
-  console.log(vaults.find(v => v.address === "0x7CEbA0cAeC8CbE74DB35b26D7705BA68Cb38D725"))
-
   return (
     // @ts-ignore
     <NoSSR >

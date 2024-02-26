@@ -285,6 +285,7 @@ export async function mutateKelpTokenBalance({ vaultDataState, tokenOptionState,
 }
 
 export default function KelpVault({ searchTerm }: { searchTerm: string }) {
+  const router = useRouter();
   const { address: account } = useAccount();
   const publicClient = usePublicClient({ chainId: 1 })
   const [yieldOptions] = useAtom(yieldOptionsAtom)
@@ -377,7 +378,7 @@ export default function KelpVault({ searchTerm }: { searchTerm: string }) {
           </div>
         </div>
       </Modal>
-      <Accordion handleClick={() => setShowModal(true)}>
+      <Accordion handleClick={() => router.push(`/vaults/${vaultData.address}?chainId=${vaultData.chainId}`)}>
         <div className="w-full flex flex-wrap items-center justify-between flex-col gap-4">
 
           <div className="flex items-center justify-between select-none w-full">

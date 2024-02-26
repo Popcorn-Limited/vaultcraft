@@ -13,6 +13,7 @@ import { useAtom } from 'jotai';
 import { availableZapAssetAtom, zapAssetsAtom } from '@/lib/atoms';
 import { getTokenOptions, isDefiPosition } from '@/lib/vault/utils';
 import { MutateTokenBalanceProps } from '@/lib/vault/mutateTokenBalance';
+import { Router, useRouter } from 'next/router';
 
 
 interface SmartVaultsProps {
@@ -28,6 +29,7 @@ export default function SmartVault({
   mutateTokenBalance,
   description
 }: SmartVaultsProps) {
+  const router = useRouter();
   const { address: account } = useAccount();
 
   const asset = vaultData.asset;
@@ -133,7 +135,7 @@ export default function SmartVault({
           </div>
         </div>
       </Modal>
-      <Accordion handleClick={() => setShowModal(true)}>
+      <Accordion handleClick={() => router.push(`/vaults/${vaultData.address}?chainId=${vaultData.chainId}`)}>
         <div className="w-full flex flex-wrap items-center justify-between flex-col gap-4">
 
           <div className="flex items-center justify-between select-none w-full">
