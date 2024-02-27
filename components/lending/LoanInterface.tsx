@@ -21,7 +21,8 @@ import { EMPTY_USER_ACCOUNT_DATA, aaveAccountDataAtom, aaveReserveDataAtom } fro
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { ActionStep, getAaveActionSteps } from "@/lib/getActionSteps";
 import handleAaveInteraction, { AaveActionType } from "@/lib/external/aave/handleAaveInteractions";
-import { calcUserAccountData } from "@/lib/external/aave/interactions";
+import { calcUserAccountData, fetchAaveData } from "@/lib/external/aave/interactions";
+import { ERC20Abi } from "@/lib/constants";
 
 const LOAN_TABS = ["Supply", "Borrow", "Repay", "Withdraw"]
 
@@ -35,7 +36,10 @@ export default function LoanInterface({ visibilityState, vaultData }: { visibili
   const { switchNetworkAsync } = useSwitchNetwork();
   const { openConnectModal } = useConnectModal();
 
-  const [reserveData] = useAtom(aaveReserveDataAtom)
+  const [reserveData, setAaveReserveData] = useAtom(aaveReserveDataAtom)
+  const [aaveAccountData, setAaveAccountData] = useAtom(aaveAccountDataAtom)
+  const [zapAssets, setZapAssets] = useAtom(zapAssetsAtom)
+  const [vaults, setVaults] = useAtom(vaultsAtom)
 
   const [activeTab, setActiveTab] = useState<string>("Supply")
 
@@ -149,7 +153,7 @@ export default function LoanInterface({ visibilityState, vaultData }: { visibili
 
   async function handleMainAction() {
     const val = Number(inputAmount)
-    if (val === 0 || !inputToken || !account || !walletClient) return;
+    if (val === 0 || !inputToken || !account || !walletClient || !chain) return;
 
     if (chain?.id !== Number(vaultData.chainId)) {
       try {
@@ -182,16 +186,34 @@ export default function LoanInterface({ visibilityState, vaultData }: { visibili
     setSteps(stepsCopy)
     setStepCounter(newStepCounter)
 
-    // if (newStepCounter === steps.length) mutateTokenBalance({
-    //   inputToken: inputToken.address,
-    //   outputToken: outputToken.address,
-    //   vault: vault.address,
-    //   chainId,
-    //   account,
-    //   zapAssetState: [zapAssets, setZapAssets],
-    //   vaultsState: [vaults, setVaults],
-    //   publicClient
-    // })
+    if (newStepCounter === steps.length) {
+      const newBalance = await publicClient.readContract({
+        address: inputToken.address,
+        abi: ERC20Abi,
+        functionName: "balanceOf",
+        args: [account]
+      })
+
+      // Modify zap assets
+      const zapAssetFound = zapAssets[chain.id].find(asset => asset.address === inputToken.address)
+      if (zapAssetFound) {
+        zapAssetFound.balance = Number(newBalance)
+        setZapAssets({ ...zapAssets, [chain.id]: [...zapAssets[chain.id], zapAssetFound] })
+      }
+
+      // Modify vaults, assets and gauges
+      const newVaultState: VaultData[] = [...vaults]
+      newVaultState.forEach(vaultData => {
+        if (vaultData.chainId === chain.id && vaultData.asset.address === inputToken.address) {
+          vaultData.asset.balance = Number(newBalance)
+        }
+      })
+      setVaults(newVaultState)
+
+      const newAaveData = await fetchAaveData(account || zeroAddress, chain)
+      setAaveReserveData({ ...reserveData, [chain.id]: newAaveData.reserveData })
+      setAaveAccountData({ ...aaveAccountData, [chain.id]: newAaveData.userAccountData })
+    }
   }
 
   return <>
@@ -282,7 +304,7 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
         setBorrowReserve(reserveData[chainId].find(e => e.asset.address === borrowToken.address))
       }
       if (testData.length === 0) {
-        setTestData(reserveData[chainId])
+        setTestData([...reserveData[chainId]])
       }
     }
   }, [supplyToken, borrowToken, reserveData, testData])
