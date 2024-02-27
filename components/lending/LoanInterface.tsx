@@ -217,7 +217,15 @@ export default function LoanInterface({ visibilityState, vaultData }: { visibili
   }
 
   return <>
-    <Modal visibility={visibilityState} title={<AssetWithName vault={vaultData} />} >
+    <Modal
+      visibility={visibilityState}
+      title={vaultData.address ?
+        <AssetWithName vault={vaultData} /> :
+        <h2 className={`text-2xl font-bold text-primary`}>
+          Lending
+        </h2>
+      }
+    >
       <div className="flex flex-row space-x-8">
         <div className="w-1/3">
           <TabSelector

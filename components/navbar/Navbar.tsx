@@ -15,6 +15,7 @@ import LoanInterface, { getHealthFactorColor } from "@/components/lending/LoanIn
 import { vaultsAtom } from "@/lib/atoms/vaults";
 import { useRouter } from "next/router";
 import ResponsiveTooltip from "@/components/common/Tooltip";
+import { VaultData } from "@/lib/types";
 
 export default function Navbar(): JSX.Element {
   const router = useRouter();
@@ -50,8 +51,8 @@ export default function Navbar(): JSX.Element {
           visibilityState={[showLendModal, setShowLendModal]}
           vaultData={query?.id && query?.chainId ?
             (vaults.find(vault => vault.address === query?.id && vault.chainId === Number(query?.chainId))
-              || vaults.filter(vault => vault.chainId === chain.id)[0])
-            : vaults.filter(vault => vault.chainId === chain.id)[0]
+              || ({ chainId: chain.id || 1, asset: { address: "" } } as unknown as VaultData))
+            : ({ chainId: chain.id || 1, asset: { address: "" } } as unknown as VaultData)
           }
         />
       }
