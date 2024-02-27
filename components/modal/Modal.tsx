@@ -39,7 +39,7 @@ export default function Modal({ visibility, children, title, classNames = "" }: 
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
               <Dialog.Panel
-                className={`md:min-w-[700px] md:w-1/2 relative transform overflow-hidden rounded-lg bg-[#23262f] border border-[#353945] px-8 py-9 transition-all text-white ${classNames}`}
+                className={`md:min-w-[700px] md:w-2/3 relative transform overflow-hidden rounded-lg bg-[#23262f] border border-[#353945] px-8 py-9 transition-all text-white ${classNames}`}
               >
                 <div className="flex flex-row justify-between font-medium md:items-center mb-8">
                   <>{title}</>
