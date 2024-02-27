@@ -17,3 +17,5 @@ export const availableAssetsAtom = atom<Asset[]>([]);
 
 export const zapAssetsAtom = atom<{ [key: number]: Token[] }>({});
 export const availableZapAssetAtom = atom<AssetAddresses>({})
+
+export const tokensAtom = atom<{ [key: number]: Token[] }>({});
