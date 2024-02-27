@@ -293,7 +293,6 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
 
   const [supplyReserve, setSupplyReserve] = useState<ReserveData>()
   const [borrowReserve, setBorrowReserve] = useState<ReserveData>()
-  const [testData, setTestData] = useState<ReserveData[]>([])
 
   useEffect(() => {
     if (reserveData) {
@@ -303,23 +302,17 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
       if (reserveData) {
         setBorrowReserve(reserveData[chainId].find(e => e.asset.address === borrowToken.address))
       }
-      if (testData.length === 0) {
-        setTestData([...reserveData[chainId]])
-      }
     }
-  }, [supplyToken, borrowToken, reserveData, testData])
-
-  console.log(testData)
-
+  }, [supplyToken, borrowToken, reserveData])
 
   const [newUserAccountData, setNewUserAccountData] = useState<UserAccountData>(EMPTY_USER_ACCOUNT_DATA)
+  const [oldInputAmount, setOldInputAmount] = useState<number>(0);
 
   useEffect(() => {
-    if (inputToken.symbol === "none" || testData.length === 0) return
-    const newReserveData = [...testData]
-    const value = Number(inputAmount)
-
-    console.log(value, testData)
+    if (inputToken.symbol === "none") return
+    const newReserveData = [...reserveData[chainId]]
+    const value = Number(inputAmount) - oldInputAmount
+    setOldInputAmount(Number(inputAmount))
 
     switch (activeTab) {
       case "Supply":
@@ -328,24 +321,24 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
         setNewUserAccountData({ ...calcUserAccountData(newReserveData, userAccountData[chainId].ltv) })
         return;
       case "Borrow":
-        //newReserveData[newReserveData.findIndex(e => e.asset.address === inputToken.address)].borrowAmount += value
+        newReserveData[newReserveData.findIndex(e => e.asset.address === inputToken.address)].borrowAmount += value
 
         setNewUserAccountData({ ...calcUserAccountData(newReserveData, userAccountData[chainId].ltv) })
         return;
       case "Repay":
-        //newReserveData[newReserveData.findIndex(e => e.asset.address === inputToken.address)].borrowAmount -= value
+        newReserveData[newReserveData.findIndex(e => e.asset.address === inputToken.address)].borrowAmount -= value
 
         setNewUserAccountData(calcUserAccountData(newReserveData, userAccountData[chainId].ltv))
         return;
       case "Withdraw":
-        //newReserveData[newReserveData.findIndex(e => e.asset.address === inputToken.address)].supplyAmount -= value
+        newReserveData[newReserveData.findIndex(e => e.asset.address === inputToken.address)].supplyAmount -= value
 
         setNewUserAccountData(calcUserAccountData(newReserveData, userAccountData[chainId].ltv))
         return;
       default:
         return;
     }
-  }, [inputAmount, activeTab, testData])
+  }, [inputAmount, activeTab])
 
   return (supplyReserve && borrowReserve) ? (
     <>
