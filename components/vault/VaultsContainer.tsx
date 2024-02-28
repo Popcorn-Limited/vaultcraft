@@ -1,15 +1,12 @@
-// @ts-ignore
 import NoSSR from "react-no-ssr";
 import { useEffect, useState } from "react";
 import { Address, useAccount, useBalance, usePublicClient, useWalletClient } from "wagmi";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import useNetworkFilter from "@/lib/useNetworkFilter";
-import { VaultData } from "@/lib/types";
 import SmartVault from "@/components/vault/SmartVault";
 import NetworkFilter from "@/components/network/NetworkFilter";
 import { getVeAddresses } from "@/lib/constants";
-import { ERC20Abi, VaultAbi } from "@/lib/constants";
 import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
 import MainActionButton from "@/components/button/MainActionButton";
 import { claimOPop } from "@/lib/optionToken/interactions";
@@ -19,8 +16,7 @@ import { vaultsAtom } from "@/lib/atoms/vaults";
 import { getVaultNetworthByChain } from "@/lib/getNetworth";
 import VaultsSorting, { VAULT_SORTING_TYPE } from "@/components/vault/VaultsSorting";
 import { llama } from "@/lib/resolver/price/resolver";
-import SearchBar from "../input/SearchBar";
-import KelpVault from "./KelpVault";
+import SearchBar from "@/components/input/SearchBar";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
 
 interface VaultsContainerProps {
@@ -161,15 +157,13 @@ export default function VaultsContainer({ hiddenVaults, displayVaults, showDescr
               .filter(vault => !hiddenVaults.includes(vault.address))
               .sort((a, b) => b.tvl - a.tvl)
               .map((vault) => {
-                return vault.address === "0x7CEbA0cAeC8CbE74DB35b26D7705BA68Cb38D725" ?
-                  <KelpVault searchTerm={searchTerm} />
-                  : <SmartVault
-                    key={`sv-${vault.address}-${vault.chainId}`}
-                    vaultData={vault}
-                    mutateTokenBalance={mutateTokenBalance}
-                    searchTerm={searchTerm}
-                    description={showDescription ? vault.metadata.description : undefined}
-                  />
+                return <SmartVault
+                  key={`sv-${vault.address}-${vault.chainId}`}
+                  vaultData={vault}
+                  mutateTokenBalance={mutateTokenBalance}
+                  searchTerm={searchTerm}
+                  description={showDescription ? vault.metadata.description : undefined}
+                />
               })
             }
           </>

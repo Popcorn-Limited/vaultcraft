@@ -1,5 +1,5 @@
 import { handleAllowance } from "@/lib/approve";
-import { Clients, LockVaultActionType, LockVaultData, Token } from "@/lib/types";
+import { Clients, LockVaultActionType, LockVaultData, Token, ZapProvider } from "@/lib/types";
 import { Address, getAddress } from "viem";
 import { FireEventArgs } from "@masa-finance/analytics-sdk";
 import axios from "axios";
@@ -106,7 +106,7 @@ export default async function handleVaultInteraction({
           ).data
           return () => handleAllowance({ token: inputToken.address, amount, account, spender: getAddress(ensoWallet.address), clients })
         case 1:
-          return () => zap({ chainId, sellToken: inputToken.address, buyToken: vaultData.asset.address, amount, account, slippage, tradeTimeout, clients })
+          return () => zap({ chainId, sellToken: inputToken.address, buyToken: vaultData.asset.address, amount, account, zapProvider: ZapProvider.enso, slippage, tradeTimeout, clients })
         case 2:
           postBal = Number(await clients.publicClient.readContract({ address: vaultData.asset.address, abi: erc20ABI, functionName: "balanceOf", args: [account] }))
           return () => handleAllowance({ token: vaultData.asset.address, amount: postBal - vaultData.asset.balance, account, spender: vaultData.vault.address, clients })
@@ -131,7 +131,7 @@ export default async function handleVaultInteraction({
           ).data
           return () => handleAllowance({ token: inputToken.address, amount, account, spender: getAddress(ensoWallet.address), clients })
         case 1:
-          return () => zap({ chainId, sellToken: inputToken.address, buyToken: vaultData.asset.address, amount, account, slippage, tradeTimeout, clients })
+          return () => zap({ chainId, sellToken: inputToken.address, buyToken: vaultData.asset.address, amount, account, zapProvider: ZapProvider.enso, slippage, tradeTimeout, clients })
         case 2:
           postBal = Number(await clients.publicClient.readContract({ address: vaultData.asset.address, abi: erc20ABI, functionName: "balanceOf", args: [account] }))
           return () => handleAllowance({ token: vaultData.asset.address, amount: postBal - vaultData.asset.balance, account, spender: vaultData.vault.address, clients })
@@ -151,7 +151,7 @@ export default async function handleVaultInteraction({
           return () => handleAllowance({ token: vaultData.asset.address, amount, account, spender: getAddress(ensoWallet.address), clients })
         case 2:
           postBal = Number(await clients.publicClient.readContract({ address: vaultData.asset.address, abi: erc20ABI, functionName: "balanceOf", args: [account] }))
-          return () => zap({ chainId, sellToken: vaultData.asset.address, buyToken: outputToken.address, amount: postBal - vaultData.asset.balance, account, slippage, tradeTimeout, clients })
+          return () => zap({ chainId, sellToken: vaultData.asset.address, buyToken: outputToken.address, amount: postBal - vaultData.asset.balance, account, zapProvider: ZapProvider.enso, slippage, tradeTimeout, clients })
       }
     default:
       // We should never reach this code. This is here just to make ts happy

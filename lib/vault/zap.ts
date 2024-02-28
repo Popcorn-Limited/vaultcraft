@@ -76,10 +76,10 @@ interface HandleZapAllowanceProps {
 }
 
 const OneInchRouterByChain: AddressByChain = {
-  1: "",
-  137: "",
-  10: "",
-  42161: ""
+  1: "0x1111111254EEB25477B68fb85Ed929f73A960582",
+  137: "0x1111111254EEB25477B68fb85Ed929f73A960582",
+  10: "0x1111111254EEB25477B68fb85Ed929f73A960582",
+  42161: "0x1111111254EEB25477B68fb85Ed929f73A960582"
 }
 
 async function getZapSpender({ account, chainId, zapProvider }: { account: Address, chainId: number, zapProvider: ZapProvider }): Promise<Address> {
@@ -94,6 +94,8 @@ async function getZapSpender({ account, chainId, zapProvider }: { account: Addre
       return zeroAddress
     case ZapProvider.oneInch:
       return getAddress(OneInchRouterByChain[chainId])
+    default:
+      return zeroAddress
   }
 }
 
@@ -116,24 +118,34 @@ interface GetZapQuoteProps extends GetZapProviderProps {
 async function getZapQuote({ sellToken, buyToken, amount, chainId, account, zapProvider }: GetZapQuoteProps): Promise<{ zapProvider: ZapProvider, out: number }> {
   switch (zapProvider) {
     case ZapProvider.enso:
-      const ensoRes = (await axios.get(`https://api.enso.finance/api/v1/shortcuts/quote?chainId=${chainId}&fromAddress=${account}&tokenIn=${sellToken}&tokenOut=${buyToken}&amountIn=${amount.toLocaleString("fullwide", { useGrouping: false })}`,
-        { headers: { Authorization: `Bearer ${process.env.ENSO_API_KEY}` } })
-      ).data
-      return { zapProvider, out: Number(ensoRes.amountOut) }
+      try {
+        const ensoRes = (await axios.get(`https://api.enso.finance/api/v1/shortcuts/quote?chainId=${chainId}&fromAddress=${account}&tokenIn=${sellToken}&tokenOut=${buyToken}&amountIn=${amount.toLocaleString("fullwide", { useGrouping: false })}`,
+          { headers: { Authorization: `Bearer ${process.env.ENSO_API_KEY}` } })
+        ).data
+        return { zapProvider, out: Number(ensoRes.amountOut) }
+      } catch {
+        return { zapProvider: ZapProvider.none, out: 0 }
+      }
     case ZapProvider.zeroX:
-      return { zapProvider, out: 100000 }
+      return { zapProvider: ZapProvider.none, out: 0 }
     case ZapProvider.oneInch:
-      const oneInchRes = (await axios.get("https://api.1inch.dev/swap/v5.2/1/quote", {
-        headers: {
-          "Authorization": "Bearer PrbaHy9UX9eBMZ6adKeqXRc0S0dFQ75I"
-        },
-        params: {
-          src: sellToken,
-          ds: buyToken,
-          amount: amount.toLocaleString("fullwide", { useGrouping: false }),
-        }
-      })).data
-      return { zapProvider, out: Number(oneInchRes.toAmount) }
+      try {
+        const oneInchRes = (await axios.get("https://api.1inch.dev/swap/v5.2/1/quote", {
+          headers: {
+            "Authorization": "Bearer PrbaHy9UX9eBMZ6adKeqXRc0S0dFQ75I"
+          },
+          params: {
+            src: sellToken,
+            ds: buyToken,
+            amount: amount.toLocaleString("fullwide", { useGrouping: false }),
+          }
+        })).data
+        return { zapProvider, out: Number(oneInchRes.toAmount) }
+      } catch {
+        return { zapProvider: ZapProvider.none, out: 0 }
+      }
+    default:
+      return { zapProvider: ZapProvider.none, out: 0 }
   }
 }
 

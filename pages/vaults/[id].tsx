@@ -23,7 +23,6 @@ import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
 import { availableZapAssetAtom, zapAssetsAtom } from "@/lib/atoms";
 import { getTokenOptions, isDefiPosition } from "@/lib/vault/utils";
 import LeftArrowIcon from "@/components/svg/LeftArrowIcon";
-import { KelpVaultInputs, getKelpVaultData, mutateKelpTokenBalance } from "@/components/vault/KelpVault";
 
 const { oVCX: OVCX, VCX } = getVeAddresses();
 
@@ -43,14 +42,7 @@ export default function Index() {
 
   useEffect(() => {
     if (!vaultData && query && yieldOptions && vaults.length > 0) {
-      if (query?.id === "0x7CEbA0cAeC8CbE74DB35b26D7705BA68Cb38D725") {
-        getKelpVaultData(account || zeroAddress, publicClient, yieldOptions).then(res => {
-          setVaultData(res.vaultData);
-          setTokenOptions(res.tokenOptions)
-        })
-      } else {
-        setVaultData(vaults.find(vault => vault.address === query?.id && vault.chainId === Number(query?.chainId)))
-      }
+      setVaultData(vaults.find(vault => vault.address === query?.id && vault.chainId === Number(query?.chainId)))
     }
   }, [vaults, query, vaultData])
 
@@ -60,7 +52,7 @@ export default function Index() {
   const [tokenOptions, setTokenOptions] = useState<Token[]>([])
 
   useEffect(() => {
-    if (!!vaultData && Object.keys(availableZapAssets).length > 0 && vaultData.address !== "0x7CEbA0cAeC8CbE74DB35b26D7705BA68Cb38D725") {
+    if (!!vaultData && Object.keys(availableZapAssets).length > 0) {
       if (availableZapAssets[vaultData.chainId].includes(vaultData.asset.address)) {
         setZapAvailable(true)
         setTokenOptions(getTokenOptions(vaultData, zapAssets[vaultData.chainId]))
@@ -217,23 +209,13 @@ export default function Index() {
             <div className="w-full md:w-1/3">
               <div className="bg-[#23262f] p-6 rounded-lg">
                 <div className="bg-[#141416] px-6 py-6 rounded-lg">
-                  {vaultData.address === "0x7CEbA0cAeC8CbE74DB35b26D7705BA68Cb38D725" ?
-                    <KelpVaultInputs
-                      vaultData={vaultData}
-                      tokenOptions={tokenOptions}
-                      chainId={vaultData.chainId}
-                      hideModal={() => router.reload()}
-                      mutateTokenBalance={mutateKelpTokenBalance}
-                      setVaultData={setVaultData}
-                      setTokenOptions={setTokenOptions}
-                    /> :
-                    <VaultInputs
-                      vaultData={vaultData}
-                      tokenOptions={tokenOptions}
-                      chainId={vaultData.chainId}
-                      hideModal={() => router.reload()}
-                      mutateTokenBalance={mutateTokenBalance}
-                    />}
+                  <VaultInputs
+                    vaultData={vaultData}
+                    tokenOptions={tokenOptions}
+                    chainId={vaultData.chainId}
+                    hideModal={() => router.reload()}
+                    mutateTokenBalance={mutateTokenBalance}
+                  />
                 </div>
               </div>
             </div>
