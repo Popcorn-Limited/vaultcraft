@@ -239,17 +239,28 @@ export default function Index() {
                         hideModal={() => router.reload()}
                         mutateTokenBalance={mutateTokenBalance}
                       />}
-                    <div className="mt-4">
-                      <MainActionButton
-                        label="Open Loan Modal"
-                        handleClick={() => setShowLendModal(true)}
-                      />
-                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <MainActionButton
+                      label="Open Loan Modal"
+                      handleClick={() => setShowLendModal(true)}
+                    />
                   </div>
                 </div>
               </div>
 
               <div className="w-full md:w-2/3 mt-8 md:mt-0 space-y-4">
+
+                <div className="bg-[#23262f] p-6 rounded-lg">
+                  <p className="text-white text-2xl font-bold mb-8">Farm with any Token</p>
+                  <p className='text-white'>
+                    Explanation / Marketing text....
+                  </p>
+                  <MainActionButton
+                    label="Open Loan Modal"
+                    handleClick={() => setShowLendModal(true)}
+                  />
+                </div>
 
                 <div className="bg-[#23262f] p-6 rounded-lg">
                   <p className="text-white text-2xl font-bold mb-8">Strategy</p>
@@ -310,7 +321,6 @@ export default function Index() {
                   </div>
                 </div>
               </div>
-
             </section>
           </div>
         </>
@@ -318,5 +328,5 @@ export default function Index() {
         :
         <p className="text-white ml-4 md:ml-8">Loading...</p>
     }
-  </NoSSR>
+  </NoSSR >
 }
