@@ -3,11 +3,12 @@ import { Address } from "viem";
 import { aura } from "./aura";
 import { ZERO } from "@/lib/constants";
 import { StrategyDefaultResolverParams } from "..";
+import { AddressByChain } from "@/lib/types";
 
 // @dev Make sure the addresses here are correct checksum addresses
-const BAL: { [key: number]: Address } = { 1: "0xba100000625a3754423978a60c9317c58a424e3D" }
-const AURA: { [key: number]: Address } = { 1: "0xC0c293ce456fF0ED870ADd98a0828Dd4d2903DBF" }
-const BALANCER_VAULT: { [key: number]: Address } = { 1: "0xBA12222222228d8Ba445958a75a0704d566BF2C8" }
+const BAL: AddressByChain = { 1: "0xba100000625a3754423978a60c9317c58a424e3D" }
+const AURA: AddressByChain = { 1: "0xC0c293ce456fF0ED870ADd98a0828Dd4d2903DBF" }
+const BALANCER_VAULT: AddressByChain = { 1: "0xBA12222222228d8Ba445958a75a0704d566BF2C8" }
 
 export async function auraCompounder({ chainId, client, address }: StrategyDefaultResolverParams): Promise<any[]> {
   const poolId = await client.readContract({

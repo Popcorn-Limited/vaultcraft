@@ -1,6 +1,7 @@
 import { ADDRESS_ZERO } from "@/lib/constants";
 import { Address } from "viem";
 import { StrategyDefaultResolverParams } from "..";
+import { AddressByChain } from "@/lib/types";
 
 // @dev Make sure the keys here are correct checksum addresses
 const assetToCToken: { [key: number]: { [key: Address]: Address } } = {
@@ -29,7 +30,7 @@ const assetToCToken: { [key: number]: { [key: Address]: Address } } = {
 };
 
 // @dev Make sure the keys here are correct checksum addresses
-const COMET_REWARDER: { [key: number]: Address } = {
+const COMET_REWARDER: AddressByChain= {
   1: "0x1B0e765F6224C21223AeA2af16c1C46E38885a40",
   137: "0x45939657d1CA34A8FA39A924B71D28Fe8431e581",
   42161: "0x88730d254A2f7e6AC8388c3198aFd694bA9f7fae",

@@ -197,3 +197,13 @@ export type VoteUserSlopes = {
   power: bigint,
   end: bigint,
 }
+
+export enum ZapProvider {
+  enso,
+  zeroX,
+  oneInch
+}
+
+export type AddressByChain = {
+  [key: number]: Address
+}

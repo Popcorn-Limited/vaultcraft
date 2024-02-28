@@ -2,10 +2,11 @@ import { balancer } from "./balancer";
 import { Address } from "viem";
 import { ZERO } from "@/lib/constants";
 import { StrategyDefaultResolverParams } from "..";
+import { AddressByChain } from "@/lib/types";
 
 // @dev Make sure the addresses here are correct checksum addresses
-const BAL: { [key: number]: Address } = { 1: "0xba100000625a3754423978a60c9317c58a424e3D" }
-const BALANCER_VAULT: { [key: number]: Address } = { 1: "0xBA12222222228d8Ba445958a75a0704d566BF2C8" }
+const BAL: AddressByChain= { 1: "0xba100000625a3754423978a60c9317c58a424e3D" }
+const BALANCER_VAULT: AddressByChain= { 1: "0xBA12222222228d8Ba445958a75a0704d566BF2C8" }
 
 export async function balancerLpCompounder({ chainId, client, address }: StrategyDefaultResolverParams): Promise<any[]> {
   const poolId = await client.readContract({

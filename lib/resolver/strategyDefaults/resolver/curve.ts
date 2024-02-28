@@ -1,8 +1,9 @@
 import { Address, getAddress } from "viem";
 import { StrategyDefaultResolverParams } from "..";
+import { AddressByChain } from "@/lib/types";
 
 
-const CurveControllerByChain: { [key: number]: Address } = { 1: "0x2F50D538606Fa9EDD2B11E2446BEb18C9D5846bB" }
+const CurveControllerByChain: AddressByChain = { 1: "0x2F50D538606Fa9EDD2B11E2446BEb18C9D5846bB" }
 
 // These are multi-chain gauges. These gauges dont have lpTokens on mainnet
 // @dev unfortunately some multichain gauges are of type 0 so we still need to filter later

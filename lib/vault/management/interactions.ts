@@ -1,6 +1,6 @@
 import { VaultAbi, VaultControllerAbi } from "@/lib/constants"
 import { showLoadingToast } from "@/lib/toasts"
-import { Clients, SimulationResponse, VaultData } from "@/lib/types"
+import { AddressByChain, Clients, SimulationResponse, VaultData } from "@/lib/types"
 import { handleCallResult } from "@/lib/utils/helpers"
 import { Address, PublicClient } from "viem"
 
@@ -25,7 +25,7 @@ interface VaultSimulateProps {
   publicClient: PublicClient;
 }
 
-const VAULT_CONTROLLER_ADDRESS: { [key: number]: Address } = {
+const VAULT_CONTROLLER_ADDRESS: AddressByChain = {
   1: "0x7D51BABA56C2CA79e15eEc9ECc4E92d9c0a7dbeb"
 }
 

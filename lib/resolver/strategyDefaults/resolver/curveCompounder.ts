@@ -2,9 +2,10 @@ import { Address } from "viem";
 import { curve } from "./curve";
 import { ZERO } from "@/lib/constants";
 import { StrategyDefaultResolverParams } from "..";
+import { AddressByChain } from "@/lib/types";
 
 // @dev Make sure the addresses here are correct checksum addresses
-const CRV: { [key: number]: Address } = { 1: "0xD533a949740bb3306d119CC777fa900bA034cd52" }
+const CRV: AddressByChain= { 1: "0xD533a949740bb3306d119CC777fa900bA034cd52" }
 
 export async function curveCompounder({ chainId, client, address }: StrategyDefaultResolverParams): Promise<any[]> {
   const rewardTokens = [CRV[chainId]];

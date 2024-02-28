@@ -3,7 +3,7 @@ import { Address, getAddress } from "viem";
 import { handleAllowance } from "@/lib/approve";
 import { SmartVaultActionType, Clients, Token, VaultData } from "@/lib/types";
 import { vaultDeposit, vaultDepositAndStake, vaultRedeem, vaultUnstakeAndWithdraw } from "@/lib/vault/interactions";
-import zap from "@/lib/vault/zap";
+import zap, { handleZapAllowance } from "@/lib/vault/zap";
 import { gaugeDeposit, gaugeWithdraw } from "@/lib/gauges/interactions";
 import { erc20ABI } from "wagmi";
 import { FireEventArgs } from "@masa-finance/analytics-sdk";
@@ -79,11 +79,7 @@ export default async function handleVaultInteraction({
     case SmartVaultActionType.ZapDeposit:
       switch (stepCounter) {
         case 0:
-          const ensoWallet = (await axios.get(
-            `https://api.enso.finance/api/v1/wallet?chainId=${chainId}&fromAddress=${account}`,
-            { headers: { Authorization: `Bearer ${process.env.ENSO_API_KEY}` } })
-          ).data
-          return () => handleAllowance({ token: inputToken.address, amount, account, spender: getAddress(ensoWallet.address), clients })
+          return () => handleZapAllowance({ token: inputToken.address, amount, account, spender: VAULT_ROUTER, clients })
         case 1:
           return () => zap({ chainId, sellToken: inputToken.address, buyToken: vaultData.asset.address, amount, account, slippage, tradeTimeout, clients })
         case 2:
