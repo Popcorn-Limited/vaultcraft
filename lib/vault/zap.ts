@@ -25,7 +25,7 @@ interface ZapProps extends BaseProps {
 }
 
 
-async function getQuote({ chainId, sellToken, buyToken, amount, account, zapProvider, slippage = 100, tradeTimeout = 60 }: BaseProps): Promise<any> {
+async function getZapTransaction({ chainId, sellToken, buyToken, amount, account, zapProvider, slippage = 100, tradeTimeout = 60 }: BaseProps): Promise<any> {
   switch (zapProvider) {
     case ZapProvider.enso:
       return (await axios.get(
@@ -55,9 +55,9 @@ async function getQuote({ chainId, sellToken, buyToken, amount, account, zapProv
 }
 
 export default async function zap({ chainId, sellToken, buyToken, amount, account, zapProvider, slippage = 100, tradeTimeout = 60, clients }: ZapProps): Promise<boolean> {
-  const quote = await getQuote({ chainId, sellToken, buyToken, amount, account, zapProvider, slippage, tradeTimeout })
+  const transaction = await getZapTransaction({ chainId, sellToken, buyToken, amount, account, zapProvider, slippage, tradeTimeout })
   try {
-    const hash = await clients.walletClient.sendTransaction(quote)
+    const hash = await clients.walletClient.sendTransaction(transaction)
     const receipt = await clients.publicClient.waitForTransactionReceipt({ hash })
     showSuccessToast("Zapped successfully")
     return true;
@@ -100,3 +100,47 @@ async function getZapSpender({ account, chainId, zapProvider }: { account: Addre
 export async function handleZapAllowance({ token, amount, account, zapProvider, clients }: HandleZapAllowanceProps) {
   return handleAllowance({ token, amount, account, spender: await getZapSpender({ account, chainId: clients.walletClient.chain?.id || 1, zapProvider }), clients })
 }
+
+interface GetZapProviderProps {
+  sellToken: Address;
+  buyToken: Address;
+  amount: number;
+  chainId: number;
+  account: Address;
+}
+
+interface GetZapQuoteProps extends GetZapProviderProps {
+  zapProvider: ZapProvider
+}
+
+async function getZapQuote({ sellToken, buyToken, amount, chainId, account, zapProvider }: GetZapQuoteProps): Promise<{ zapProvider: ZapProvider, out: number }> {
+  switch (zapProvider) {
+    case ZapProvider.enso:
+      const ensoRes = (await axios.get(`https://api.enso.finance/api/v1/shortcuts/quote?chainId=${chainId}&fromAddress=${account}&tokenIn=${sellToken}&tokenOut=${buyToken}&amountIn=${amount.toLocaleString("fullwide", { useGrouping: false })}`,
+        { headers: { Authorization: `Bearer ${process.env.ENSO_API_KEY}` } })
+      ).data
+      return { zapProvider, out: Number(ensoRes.amountOut) }
+    case ZapProvider.zeroX:
+      return { zapProvider, out: 100000 }
+    case ZapProvider.oneInch:
+      const oneInchRes = (await axios.get("https://api.1inch.dev/swap/v5.2/1/quote", {
+        headers: {
+          "Authorization": "Bearer PrbaHy9UX9eBMZ6adKeqXRc0S0dFQ75I"
+        },
+        params: {
+          src: sellToken,
+          ds: buyToken,
+          amount: amount.toLocaleString("fullwide", { useGrouping: false }),
+        }
+      })).data
+      return { zapProvider, out: Number(oneInchRes.toAmount) }
+  }
+}
+
+const ZAP_PROVIDER = [ZapProvider.enso, ZapProvider.zeroX, ZapProvider.oneInch]
+
+export async function getZapProvider({ sellToken, buyToken, amount, chainId, account }: GetZapProviderProps): Promise<ZapProvider> {
+  const quotes = await Promise.all(ZAP_PROVIDER.map(async zapProvider => getZapQuote({ sellToken, buyToken, amount, chainId, account, zapProvider })))
+  const sorted = quotes.sort((a, b) => a.out - b.out)
+  return sorted[0].zapProvider
+} 
