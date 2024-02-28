@@ -138,7 +138,7 @@ export default function ManageLockModal({ show, setShowLpModal }: { show: [boole
         }
         {mangementOption === ManagementOption.Unlock &&
           <>
-            <UnstakePreview amount={Number(veBal?.value) / 1e18} />
+            <UnstakePreview amount={Number(lockedBal?.amount) / 1e18} />
             <MainActionButton label="Unlock" handleClick={handleMainAction} />
           </>
         }
