@@ -151,8 +151,8 @@ export async function getKelpVaultData(account: Address, publicClient: PublicCli
 
   const gaugeApyData = (await axios.get(`https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/gauge-apy-data.json`)).data as GaugeData;
 
-  const gaugeMinApy = (gaugeApyData["0x35fCa05eb9d7B4BeEbDfa110Ea342e6d9CA972ac"]?.lowerAPR * 100) || 0;
-  const gaugeMaxApy = (gaugeApyData["0x35fCa05eb9d7B4BeEbDfa110Ea342e6d9CA972ac"]?.upperAPR * 100) || 0;
+  const gaugeMinApy = gaugeApyData["0x35fCa05eb9d7B4BeEbDfa110Ea342e6d9CA972ac"]?.lowerAPR || 0;
+  const gaugeMaxApy = gaugeApyData["0x35fCa05eb9d7B4BeEbDfa110Ea342e6d9CA972ac"]?.upperAPR || 0;
 
   const vaultData: VaultData = {
     address: Vault.address,

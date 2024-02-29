@@ -203,8 +203,8 @@ export async function getVaults({ account = ADDRESS_ZERO, client, yieldOptions }
       let totalApy = vault.totalApy;
 
       if (!!gauge) {
-        gaugeMinApy = (gaugeApyData[gauge.address]?.lowerAPR * 100) || 0;
-        gaugeMaxApy = (gaugeApyData[gauge.address]?.upperAPR * 100) || 0;
+        gaugeMinApy = gaugeApyData[gauge.address]?.lowerAPR || 0;
+        gaugeMaxApy = gaugeApyData[gauge.address]?.upperAPR || 0;
         totalApy += gaugeMaxApy;
       }
 
