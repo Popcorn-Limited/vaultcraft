@@ -83,7 +83,7 @@ export default async function handleVaultInteraction({
         case 0:
           return () => handleZapAllowance({ token: inputToken.address, amount, account, zapProvider, clients })
         case 1:
-          return () => zap({ chainId, sellToken: inputToken.address, buyToken: vaultData.asset.address, amount, account, zapProvider, slippage, tradeTimeout, clients })
+          return () => zap({ chainId, sellToken: inputToken, buyToken: vaultData.asset, amount, account, zapProvider, slippage, tradeTimeout, clients })
         case 2:
           postBal = Number(await clients.publicClient.readContract({ address: vaultData.asset.address, abi: erc20ABI, functionName: "balanceOf", args: [account] }))
           return () => handleAllowance({ token: vaultData.asset.address, amount: postBal - vaultData.asset.balance, account, spender: vaultData.vault.address, clients })
@@ -99,14 +99,14 @@ export default async function handleVaultInteraction({
           return () => handleZapAllowance({ token: inputToken.address, amount, account, zapProvider, clients })
         case 2:
           postBal = Number(await clients.publicClient.readContract({ address: vaultData.asset.address, abi: erc20ABI, functionName: "balanceOf", args: [account] }))
-          return () => zap({ chainId, sellToken: vaultData.asset.address, buyToken: outputToken.address, amount: postBal - vaultData.asset.balance, account, zapProvider, slippage, tradeTimeout, clients })
+          return () => zap({ chainId, sellToken: vaultData.asset, buyToken: outputToken, amount: postBal - vaultData.asset.balance, account, zapProvider, slippage, tradeTimeout, clients })
       }
     case SmartVaultActionType.ZapDepositAndStake:
       switch (stepCounter) {
         case 0:
           return () => handleZapAllowance({ token: inputToken.address, amount, account, zapProvider, clients })
         case 1:
-          return () => zap({ chainId, sellToken: inputToken.address, buyToken: vaultData.asset.address, amount, account, zapProvider, slippage, tradeTimeout, clients })
+          return () => zap({ chainId, sellToken: inputToken, buyToken: vaultData.asset, amount, account, zapProvider, slippage, tradeTimeout, clients })
         case 2:
           postBal = Number(await clients.publicClient.readContract({ address: vaultData.asset.address, abi: erc20ABI, functionName: "balanceOf", args: [account] }))
           return () => handleAllowance({ token: vaultData.asset.address, amount: postBal - vaultData.asset.balance, account, spender: VAULT_ROUTER, clients })
@@ -123,7 +123,7 @@ export default async function handleVaultInteraction({
         case 2:
           return () => handleZapAllowance({ token: inputToken.address, amount, account, zapProvider, clients })
         case 3:
-          return () => zap({ chainId, sellToken: vaultData.asset.address, buyToken: outputToken.address, amount, account, zapProvider, slippage, tradeTimeout, clients })
+          return () => zap({ chainId, sellToken: vaultData.asset, buyToken: outputToken, amount, account, zapProvider, slippage, tradeTimeout, clients })
       }
     default:
       // We should never reach this code. This is here just to make ts happy

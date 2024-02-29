@@ -21,7 +21,7 @@ import { MutateTokenBalanceProps } from "@/lib/vault/mutateTokenBalance";
 import { vaultsAtom } from "@/lib/atoms/vaults";
 import { zapAssetsAtom } from "@/lib/atoms";
 import { getZapProvider } from "@/lib/vault/zap";
-import { showErrorToast } from "@/lib/toasts";
+import { showErrorToast, showLoadingToast, showSuccessToast } from "@/lib/toasts";
 
 export interface VaultInputsProps {
   vaultData: VaultData;
@@ -60,6 +60,7 @@ export default function VaultInputs(
   const [isDeposit, setIsDeposit] = useState<boolean>(true);
 
   // Zap Settings
+  const [zapProvider, setZapProvider] = useState(ZapProvider.none)
   const [showModal, setShowModal] = useState<boolean>(false)
   const [tradeTimeout, setTradeTimeout] = useState<number>(300); // number of seconds a cow order is valid for
   const [slippage, setSlippage] = useState<number>(100); // In BPS 0 - 10_000
@@ -178,8 +179,9 @@ export default function VaultInputs(
   }
 
   async function handleMainAction() {
-    const val = Number(inputBalance)
+    let val = Number(inputBalance)
     if (val === 0 || !inputToken || !outputToken || !account || !walletClient) return;
+    val = val * (10 ** inputToken.decimals)
 
     if (chain?.id !== Number(chainId)) {
       try {
@@ -189,19 +191,22 @@ export default function VaultInputs(
       }
     }
 
-    let zapProvider = ZapProvider.none
-    if ([SmartVaultActionType.ZapDeposit, SmartVaultActionType.ZapDepositAndStake].includes(action)) {
-      zapProvider = await getZapProvider({ sellToken: inputToken.address, buyToken: vaultData.asset.address, amount: val, chainId, account })
-
-      if (zapProvider === ZapProvider.none) {
-        showErrorToast("Zap not available. Please try a different token.")
-        return
+    let newZapProvider = zapProvider
+    if (newZapProvider === ZapProvider.none && [SmartVaultActionType.ZapDeposit, SmartVaultActionType.ZapDepositAndStake, SmartVaultActionType.ZapUnstakeAndWithdraw, SmartVaultActionType.ZapWithdrawal].includes(action)) {
+      showLoadingToast("Searching for the best price...")
+      if ([SmartVaultActionType.ZapDeposit, SmartVaultActionType.ZapDepositAndStake].includes(action)) {
+        newZapProvider = await getZapProvider({ sellToken: inputToken, buyToken: vaultData.asset, amount: val, chainId, account })
+      } else {
+        newZapProvider = await getZapProvider({ sellToken: vaultData.asset, buyToken: outputToken, amount: val, chainId, account })
       }
-    } else if ([SmartVaultActionType.ZapUnstakeAndWithdraw, SmartVaultActionType.ZapWithdrawal].includes(action)) {
-      zapProvider = await getZapProvider({ sellToken: vaultData.asset.address, buyToken: outputToken.address, amount: val, chainId, account })
-      if (zapProvider === ZapProvider.none) {
+
+      setZapProvider(newZapProvider)
+
+      if (newZapProvider === ZapProvider.notFound) {
         showErrorToast("Zap not available. Please try a different token.")
         return
+      } else {
+        showSuccessToast(`Using ${String(ZapProvider[newZapProvider])} for your zap`)
       }
     }
 
@@ -214,12 +219,12 @@ export default function VaultInputs(
       action,
       stepCounter,
       chainId,
-      amount: (val * (10 ** inputToken.decimals)),
+      amount: val,
       inputToken,
       outputToken,
       vaultData,
       account,
-      zapProvider,
+      zapProvider: newZapProvider,
       slippage,
       tradeTimeout,
       clients: { publicClient, walletClient },

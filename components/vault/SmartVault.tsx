@@ -42,19 +42,21 @@ export default function SmartVault({
 
   useEffect(() => {
     if (!!vaultData && Object.keys(availableZapAssets).length > 0) {
-      if (availableZapAssets[vaultData.chainId].includes(asset.address)) {
-        setZapAvailable(true)
-        setTokenOptions(getTokenOptions(vaultData, zapAssets[vaultData.chainId]))
-      } else {
-        isDefiPosition({ address: asset.address, chainId: vaultData.chainId }).then(isZapable => {
-          if (isZapable) {
-            setZapAvailable(true)
-            setTokenOptions(getTokenOptions(vaultData, zapAssets[vaultData.chainId]))
-          } else {
-            setTokenOptions(getTokenOptions(vaultData))
-          }
-        })
-      }
+      // if (availableZapAssets[vaultData.chainId].includes(asset.address)) {
+      //   setZapAvailable(true)
+      //   setTokenOptions(getTokenOptions(vaultData, zapAssets[vaultData.chainId]))
+      // } else {
+      //   isDefiPosition({ address: asset.address, chainId: vaultData.chainId }).then(isZapable => {
+      //     if (isZapable) {
+      //       setZapAvailable(true)
+      //       setTokenOptions(getTokenOptions(vaultData, zapAssets[vaultData.chainId]))
+      //     } else {
+      //       setTokenOptions(getTokenOptions(vaultData))
+      //     }
+      //   })
+      // }
+      setZapAvailable(true)
+      setTokenOptions(getTokenOptions(vaultData, zapAssets[vaultData.chainId]))
     }
   }, [availableZapAssets, vaultData])
 

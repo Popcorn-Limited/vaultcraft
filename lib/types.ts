@@ -200,9 +200,12 @@ export type VoteUserSlopes = {
 
 export enum ZapProvider {
   none,
+  notFound,
   enso,
   zeroX,
   oneInch,
+  paraSwap,
+  openOcean
 }
 
 export type AddressByChain = {
