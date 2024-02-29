@@ -14,9 +14,8 @@ export default async function handler(
 ) {
   console.log("moving current file to archive");
 
-  const result = {
-    1: await getApy(mainnet.id),
-  };
+  const result = await getApy(mainnet.id)
+
 
   console.log("return result");
 
