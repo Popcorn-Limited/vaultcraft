@@ -1,16 +1,18 @@
-import { toast } from 'react-hot-toast';
-import { loadingStyle, successStyle, errorStyle } from 'lib/toasts/toastStyles';
+import { toast } from "react-hot-toast";
+import { loadingStyle, successStyle, errorStyle } from "lib/toasts/toastStyles";
 
-export function showLoadingToast(message: string = 'Transaction pending!') {
+export function showLoadingToast(message: string = "Transaction pending!") {
   toast.loading(message, loadingStyle);
 }
 
-export function showSuccessToast(message: string = 'Transaction successful!') {
+export function showSuccessToast(message: string = "Transaction successful!") {
   toast.dismiss();
   toast.success(message, successStyle);
 }
 
-export function showErrorToast(error: any = 'An error occurred while interacting with the contract.') {
+export function showErrorToast(
+  error: any = "An error occurred while interacting with the contract."
+) {
   const errorMessage = extractRevertReason(error);
   toast.dismiss();
   toast.error(errorMessage, errorStyle);

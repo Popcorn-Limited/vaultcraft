@@ -1,6 +1,10 @@
 import StatusWithLabel from "@/components/common/StatusWithLabel";
 import { lockvaultsAtom, vaultsAtom } from "@/lib/atoms/vaults";
-import { Networth, getTotalNetworth, getVaultNetworthByChain } from "@/lib/getNetworth";
+import {
+  Networth,
+  getTotalNetworth,
+  getVaultNetworthByChain,
+} from "@/lib/getNetworth";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import { useAtom } from "jotai";
@@ -10,31 +14,52 @@ import axios from "axios";
 
 export default function Hero(): JSX.Element {
   const { address: account } = useAccount();
-  const [vaults] = useAtom(vaultsAtom)
-  const [lockVaults] = useAtom(lockvaultsAtom)
+  const [vaults] = useAtom(vaultsAtom);
+  const [lockVaults] = useAtom(lockvaultsAtom);
 
-  const [networth, setNetworth] = useState<Networth>({ wallet: 0, stake: 0, vault: 0, total: 0 });
+  const [networth, setNetworth] = useState<Networth>({
+    wallet: 0,
+    stake: 0,
+    vault: 0,
+    total: 0,
+  });
   const [tvl, setTvl] = useState<string>("0");
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     async function fetchNetworth() {
-      const vaultNetworth = SUPPORTED_NETWORKS.map(chain => getVaultNetworthByChain({ vaults, chainId: chain.id })).reduce((a, b) => a + b, 0)
-      const lockVaultNetworth = lockVaults.reduce((a, b) => a + (b.vault.balance * b.vault.price / (10 ** b.vault.decimals)), 0)
-      const totalNetworth = await getTotalNetworth({ account: account as Address })
-      setNetworth({ ...totalNetworth.total, vault: vaultNetworth + lockVaultNetworth, total: totalNetworth.total.total + vaultNetworth + lockVaultNetworth });
+      const vaultNetworth = SUPPORTED_NETWORKS.map((chain) =>
+        getVaultNetworthByChain({ vaults, chainId: chain.id })
+      ).reduce((a, b) => a + b, 0);
+      const lockVaultNetworth = lockVaults.reduce(
+        (a, b) =>
+          a + (b.vault.balance * b.vault.price) / 10 ** b.vault.decimals,
+        0
+      );
+      const totalNetworth = await getTotalNetworth({
+        account: account as Address,
+      });
+      setNetworth({
+        ...totalNetworth.total,
+        vault: vaultNetworth + lockVaultNetworth,
+        total: totalNetworth.total.total + vaultNetworth + lockVaultNetworth,
+      });
       setLoading(false);
     }
-    if (account && vaults.length > 0 && lockVaults.length > 0) fetchNetworth()
+    if (account && vaults.length > 0 && lockVaults.length > 0) fetchNetworth();
   }, [account, vaults, lockVaults]);
 
   useEffect(() => {
-    axios.get("https://api.llama.fi/protocol/vaultcraft").then(res =>
+    axios.get("https://api.llama.fi/protocol/vaultcraft").then((res) =>
       setTvl(
-        // @ts-ignore
-        NumberFormatter.format(Object.values(res.data.currentChainTvls).reduce((a, b) => a + b, 0) - res.data.currentChainTvls["Ethereum-staking"])))
-  }, [vaults, lockVaults])
-
+        NumberFormatter.format(
+          // @ts-ignore
+          Object.values(res.data.currentChainTvls).reduce((a, b) => a + b, 0) -
+          res.data.currentChainTvls["Ethereum-staking"]
+        )
+      )
+    );
+  }, [vaults, lockVaults]);
 
   return (
     <section className="pb-8 pt-8 sm:pb-6 border-b border-[#AFAFAF]">
@@ -44,12 +69,16 @@ export default function Hero(): JSX.Element {
             label={"Deposits"}
             content={
               <p className="text-3xl font-bold text-primary leading-[120%]">
-                $ {loading ?
-                  "..." :
+                ${" "}
+                {loading ? (
+                  "..."
+                ) : (
                   <>
-                    {networth.vault > 0.01 ? NumberFormatter.format(networth.vault) : "0"}
+                    {networth.vault > 0.01
+                      ? NumberFormatter.format(networth.vault)
+                      : "0"}
                   </>
-                }
+                )}
               </p>
             }
             className="md:min-w-[160px] lg:min-w-0"
@@ -59,12 +88,16 @@ export default function Hero(): JSX.Element {
               label={"Staked"}
               content={
                 <p className="text-3xl font-bold text-primary leading-[120%]">
-                  $ {loading ?
-                    "..." :
+                  ${" "}
+                  {loading ? (
+                    "..."
+                  ) : (
                     <>
-                      {networth.stake > 0.01 ? NumberFormatter.format(networth.stake) : "0"}
+                      {networth.stake > 0.01
+                        ? NumberFormatter.format(networth.stake)
+                        : "0"}
                     </>
-                  }
+                  )}
                 </p>
               }
               className="md:min-w-[160px] lg:min-w-0"
@@ -73,12 +106,16 @@ export default function Hero(): JSX.Element {
               label={"VCX in Wallet"}
               content={
                 <p className="text-3xl font-bold text-primary leading-[120%]">
-                  $ {loading ?
-                    "..." :
+                  ${" "}
+                  {loading ? (
+                    "..."
+                  ) : (
                     <>
-                      {networth.wallet > 0.01 ? NumberFormatter.format(networth.wallet) : "0"}
+                      {networth.wallet > 0.01
+                        ? NumberFormatter.format(networth.wallet)
+                        : "0"}
                     </>
-                  }
+                  )}
                 </p>
               }
               className="md:min-w-[160px] lg:min-w-0"
@@ -86,33 +123,53 @@ export default function Hero(): JSX.Element {
           </div>
         </div>
         <div className="w-full md:w-fit-content">
-          <p className="uppercase md:hidden text-[#C8C8C8] text-sm mb-2">Platform</p>
+          <p className="uppercase md:hidden text-[#C8C8C8] text-sm mb-2">
+            Platform
+          </p>
           <div className="flex flex-row items-center w-full space-x-10">
             <StatusWithLabel
               label={"Total Value Locked"}
-              content={<p className="text-3xl font-bold text-primary leading-[120%]">$ {tvl}</p>}
+              content={
+                <p className="text-3xl font-bold text-primary leading-[120%]">
+                  $ {tvl}
+                </p>
+              }
               infoIconProps={{
                 id: "tvl",
                 title: "Total Value Locked",
-                content: <p>Total value locked (TVL) is the amount <br /> of user funds deposited in VaultCraft products.</p>,
+                content: (
+                  <p>
+                    Total value locked (TVL) is the amount <br /> of user funds
+                    deposited in VaultCraft products.
+                  </p>
+                ),
               }}
             />
             <StatusWithLabel
               label={"My Net Worth"}
               content={
                 <p className="text-3xl font-bold text-primary leading-[120%]">
-                  $ {loading ?
-                    "..." :
+                  ${" "}
+                  {loading ? (
+                    "..."
+                  ) : (
                     <>
-                      {networth.total > 0.01 ? NumberFormatter.format(networth.total) : "0"}
+                      {networth.total > 0.01
+                        ? NumberFormatter.format(networth.total)
+                        : "0"}
                     </>
-                  }
+                  )}
                 </p>
               }
               infoIconProps={{
                 id: "networth",
                 title: "My Networth",
-                content: <p>This value aggregates your VaultCraft-related <br /> holdings across all blockchain networks.</p>,
+                content: (
+                  <p>
+                    This value aggregates your VaultCraft-related <br />{" "}
+                    holdings across all blockchain networks.
+                  </p>
+                ),
               }}
             />
           </div>

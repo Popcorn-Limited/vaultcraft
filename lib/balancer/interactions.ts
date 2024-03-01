@@ -1,4 +1,10 @@
-import { Abi, Address, PublicClient, encodeAbiParameters, parseAbiParameters } from "viem";
+import {
+  Abi,
+  Address,
+  PublicClient,
+  encodeAbiParameters,
+  parseAbiParameters,
+} from "viem";
 import { showLoadingToast } from "@/lib/toasts";
 import { getVeAddresses } from "@/lib/constants";
 import { Clients, SimulationResponse } from "@/lib/types";
@@ -8,19 +14,25 @@ import { handleCallResult } from "../utils/helpers";
 type SimulationContract = {
   address: Address;
   abi: Abi;
-}
+};
 
 interface SimulateProps {
   account: Address;
   contract: SimulationContract;
   functionName: string;
   publicClient: PublicClient;
-  args?: any[]
+  args?: any[];
 }
 
-const { VCX, WETH, BalancerVault } = getVeAddresses()
+const { VCX, WETH, BalancerVault } = getVeAddresses();
 
-async function simulateCall({ account, contract, functionName, publicClient, args }: SimulateProps): Promise<SimulationResponse> {
+async function simulateCall({
+  account,
+  contract,
+  functionName,
+  publicClient,
+  args,
+}: SimulateProps): Promise<SimulationResponse> {
   try {
     const { request } = await publicClient.simulateContract({
       account,
@@ -28,22 +40,26 @@ async function simulateCall({ account, contract, functionName, publicClient, arg
       abi: contract.abi,
       // @ts-ignore
       functionName,
-      args
-    })
-    return { request: request, success: true, error: null }
+      args,
+    });
+    return { request: request, success: true, error: null };
   } catch (error: any) {
-    return { request: null, success: false, error: error.shortMessage }
+    return { request: null, success: false, error: error.shortMessage };
   }
 }
 
 interface DepositIntoPoolProps {
   maxAmountsIn: bigint[]; // @dev maxAmountsIn must be [wethAmount, vcxAmount]
   account: Address;
-  clients: Clients
+  clients: Clients;
 }
 
-export async function depositIntoPool({ maxAmountsIn, account, clients }: DepositIntoPoolProps): Promise<boolean> {
-  showLoadingToast("Depositing token into pool...")
+export async function depositIntoPool({
+  maxAmountsIn,
+  account,
+  clients,
+}: DepositIntoPoolProps): Promise<boolean> {
+  showLoadingToast("Depositing token into pool...");
 
   return handleCallResult({
     successMessage: "Deposited into pool succesfully!",
@@ -62,11 +78,14 @@ export async function depositIntoPool({ maxAmountsIn, account, clients }: Deposi
         {
           assets: [WETH, VCX],
           maxAmountsIn: maxAmountsIn,
-          userData: encodeAbiParameters(parseAbiParameters("uint8 joinType, uint256[] memory maxAmountsIn"), [1, maxAmountsIn]),
+          userData: encodeAbiParameters(
+            parseAbiParameters("uint8 joinType, uint256[] memory maxAmountsIn"),
+            [1, maxAmountsIn]
+          ),
           fromInternalBalance: false,
-        }
-      ]
+        },
+      ],
     }),
-    clients
-  })
+    clients,
+  });
 }

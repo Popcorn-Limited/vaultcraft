@@ -1,10 +1,16 @@
-import ProgressBar, { ProgressBarProps } from "@/components/vault/management/creation/ProgressBar";
+import ProgressBar, {
+  ProgressBarProps,
+} from "@/components/vault/management/creation/ProgressBar";
 
 interface VaultCreationCardProps extends ProgressBarProps {
-  children: any
+  children: any;
 }
 
-export default function VaultCreationCard({ activeStage, children, stages }: VaultCreationCardProps): JSX.Element {
+export default function VaultCreationCard({
+  activeStage,
+  children,
+  stages,
+}: VaultCreationCardProps): JSX.Element {
   return (
     <div className="bg-[#141416] md:max-w-[800px] w-full h-full flex flex-col justify-center mx-auto md:px-8 px-6">
       <ProgressBar stages={stages} activeStage={activeStage} />
@@ -12,5 +18,5 @@ export default function VaultCreationCard({ activeStage, children, stages }: Vau
         {children}
       </div>
     </div>
-  )
+  );
 }

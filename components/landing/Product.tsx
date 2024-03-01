@@ -1,5 +1,7 @@
 import React from "react";
-import StatusWithLabel, { StatusWithLabelProps } from "@/components/common/StatusWithLabel";
+import StatusWithLabel, {
+  StatusWithLabelProps,
+} from "@/components/common/StatusWithLabel";
 import Link from "next/link";
 
 export interface ProductProps {
@@ -11,7 +13,14 @@ export interface ProductProps {
   badge?: string;
 }
 
-export default function Product({ title, description, stats, badge, customContent, route }: ProductProps): JSX.Element {
+export default function Product({
+  title,
+  description,
+  stats,
+  badge,
+  customContent,
+  route,
+}: ProductProps): JSX.Element {
   return (
     <Link
       href={route}
@@ -26,16 +35,26 @@ export default function Product({ title, description, stats, badge, customConten
       )}
       <div className="col-span-12 md:col-span-4 xs:self-start flex-1">
         <div className="relative flex flex-row">
-          <h2 className="text-primary text-4xl md:text-[56px] leading-none mb-2">{title}</h2>
+          <h2 className="text-primary text-4xl md:text-[56px] leading-none mb-2">
+            {title}
+          </h2>
         </div>
         <p className="mt-2 text-primary">{description}</p>
       </div>
 
-      <div className="flex absolute flex-grow items-center justify-end w-full top-[50%] translate-y-[-50%] right-8">{customContent}</div>
+      <div className="flex absolute flex-grow items-center justify-end w-full top-[50%] translate-y-[-50%] right-8">
+        {customContent}
+      </div>
       <div className="flex justify-between w-full">
-        {stats && stats.map((stat, i) =>
-          <StatusWithLabel key={i} content={stat.content} label={stat.label} infoIconProps={stat.infoIconProps} />
-        )}
+        {stats &&
+          stats.map((stat, i) => (
+            <StatusWithLabel
+              key={i}
+              content={stat.content}
+              label={stat.label}
+              infoIconProps={stat.infoIconProps}
+            />
+          ))}
       </div>
     </Link>
   );

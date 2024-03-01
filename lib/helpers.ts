@@ -1,8 +1,8 @@
-import { InitParam, InitParamRequirement } from "@/lib/atoms/adapter"
+import { InitParam, InitParamRequirement } from "@/lib/atoms/adapter";
 import { isAddress } from "viem";
 import { ADDRESS_ZERO } from "@/lib/constants";
 
-export function noOp() { }
+export function noOp() {}
 
 export const beautifyAddress = (addr: string) =>
   `${addr.slice(0, 4)}...${addr.slice(-5, 5)}`;
@@ -21,17 +21,24 @@ export function verifyInitParamValidity(
     }
   }
   if (inputParam.requirements && inputParam.requirements.length > 0) {
-    if (inputParam.requirements.includes(InitParamRequirement.NotAddressZero) &&
-      value !== ADDRESS_ZERO) errors.push("Must not be zero address");
+    if (
+      inputParam.requirements.includes(InitParamRequirement.NotAddressZero) &&
+      value !== ADDRESS_ZERO
+    )
+      errors.push("Must not be zero address");
 
-    if (inputParam.requirements.includes(InitParamRequirement.NotZero) && Number(value) === 0) errors.push("Must not be zero");
+    if (
+      inputParam.requirements.includes(InitParamRequirement.NotZero) &&
+      Number(value) === 0
+    )
+      errors.push("Must not be zero");
   }
 
   return errors;
 }
 
 export const validateInput = (value?: string | number) => {
-  let formatted = String(value).replace(/[^0-9.]/g, "")
+  let formatted = String(value).replace(/[^0-9.]/g, "");
   return {
     formatted,
     isValid: value === "" || isFinite(Number(formatted)),
@@ -54,14 +61,13 @@ export function cleanFileName(fileName: string): string {
   return fileName.replace(/ /g, "-").replace(/[^a-zA-Z0-9]/g, "");
 }
 
-
 export function extractRevertReason(error: any): string {
   if (error.reason) {
-      return error.reason;
+    return error.reason;
   }
 
   if (error.data && error.data.message) {
-      return error.data.message;
+    return error.data.message;
   }
 
   return error;

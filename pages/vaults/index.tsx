@@ -2,7 +2,6 @@ import type { NextPage } from "next";
 import { Address } from "wagmi";
 import VaultsContainer from "@/components/vault/VaultsContainer";
 
-
 const FLAGSHIP_VAULTS: Address[] = [
   // eth
   "0x6cE9c05E159F8C4910490D8e8F7a63e95E6CEcAF", // DAI IdleJunior
@@ -18,11 +17,10 @@ const FLAGSHIP_VAULTS: Address[] = [
   "0x4E564bC61Cf97737cE110c7929b17963E9232aE9", // USDC IdleJunior
   // arb
   "0x54d921B6397731222aB0b898bAE58c948d187Cd1", // StakedGlp Beefy
-]
-
+];
 
 const Vaults: NextPage = () => {
-  return <VaultsContainer hiddenVaults={[]} displayVaults={FLAGSHIP_VAULTS} />
+  return <VaultsContainer hiddenVaults={[]} displayVaults={FLAGSHIP_VAULTS} />;
 };
 
 export default Vaults;

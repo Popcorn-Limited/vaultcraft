@@ -4,7 +4,10 @@ import { cleanFileName } from "../helpers";
 export interface IIpfsClient {
   get: <T>(cid: string) => Promise<T>;
   add: <T>(fileName: string, data: T) => Promise<string>;
-  upload: (file: File, setUploadProgress?: (progress: number) => void) => Promise<UploadResult>;
+  upload: (
+    file: File,
+    setUploadProgress?: (progress: number) => void
+  ) => Promise<UploadResult>;
 }
 
 export interface UploadResult {
@@ -16,7 +19,9 @@ export interface UploadResult {
 
 export const IpfsClient: IIpfsClient = {
   get: async <T>(cid: string): Promise<T> => {
-    return fetch(`${process.env.IPFS_URL}${cid}`).then((response) => response.json());
+    return fetch(`${process.env.IPFS_URL}${cid}`).then((response) =>
+      response.json()
+    );
   },
 
   add: async <T>(fileName: string, data: T): Promise<string> => {
@@ -27,20 +32,19 @@ export const IpfsClient: IIpfsClient = {
     };
     let cid = "";
     try {
-      const response = (
-        await axios.post(
-          "https://api.pinata.cloud/pinning/pinJSONToIPFS/",
-          JSON.stringify({
-            "pinataOptions": {
-              "cidVersion": 1
-            },
-            "pinataMetadata": {
-              "name": `${cleanFileName(fileName)}.json`,
-            },
-            "pinataContent": data
-          }),
-          { headers })
-      ) as AxiosResponse<{ IpfsHash: string }>;
+      const response = (await axios.post(
+        "https://api.pinata.cloud/pinning/pinJSONToIPFS/",
+        JSON.stringify({
+          pinataOptions: {
+            cidVersion: 1,
+          },
+          pinataMetadata: {
+            name: `${cleanFileName(fileName)}.json`,
+          },
+          pinataContent: data,
+        }),
+        { headers }
+      )) as AxiosResponse<{ IpfsHash: string }>;
       cid = response.data.IpfsHash;
     } catch (e) {
       console.error(e);
@@ -48,7 +52,10 @@ export const IpfsClient: IIpfsClient = {
     return cid;
   },
 
-  upload: async (file: File, setUploadProgress?: (progress: number) => void): Promise<UploadResult> => {
+  upload: async (
+    file: File,
+    setUploadProgress?: (progress: number) => void
+  ): Promise<UploadResult> => {
     var data = new FormData();
     data.append("file", file, file.name);
     const headers = {
@@ -58,16 +65,18 @@ export const IpfsClient: IIpfsClient = {
     };
     const config = setUploadProgress
       ? {
-        headers,
-        // @ts-ignore
-        onUploadProgress: (progressEvent) => {
-          var percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-          setUploadProgress(percentCompleted);
-        },
-      }
+          headers,
+          // @ts-ignore
+          onUploadProgress: (progressEvent) => {
+            var percentCompleted = Math.round(
+              (progressEvent.loaded * 100) / progressEvent.total
+            );
+            setUploadProgress(percentCompleted);
+          },
+        }
       : {
-        headers,
-      };
+          headers,
+        };
     return await axios
       .post(`${process.env.IPFS_GATEWAY_PIN}`, data, config)
       .then((result) => {

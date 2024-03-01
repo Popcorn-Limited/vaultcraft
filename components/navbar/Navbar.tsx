@@ -16,8 +16,8 @@ export default function Navbar(): JSX.Element {
   const { address } = useAccount();
   const { chain } = useNetwork();
   const [menuVisible, toggleMenu] = useState<boolean>(false);
-  const [logo, setLogo] = useState<string>(networkLogos[1])
-  const [chainName, setChainName] = useState<string>("Ethereum")
+  const [logo, setLogo] = useState<string>(networkLogos[1]);
+  const [chainName, setChainName] = useState<string>("Ethereum");
 
   const handleWalletDisconnect = () => {
     disconnect();
@@ -25,11 +25,10 @@ export default function Navbar(): JSX.Element {
 
   useEffect(() => {
     if (address && chain?.id) {
-      setLogo(networkLogos[chain.id])
-      setChainName(chain.name)
+      setLogo(networkLogos[chain.id]);
+      setChainName(chain.name);
     }
-  }, [chain?.id, address])
-
+  }, [chain?.id, address]);
 
   return (
     <>
@@ -37,7 +36,11 @@ export default function Navbar(): JSX.Element {
         <div className="flex flex-row items-center">
           <div>
             <Link href={`/`} passHref>
-              <img src="/images/icons/popLogo.svg" alt="Logo" className="w-12 h-12 md:w-10 md:h-10 text-white" />
+              <img
+                src="/images/icons/popLogo.svg"
+                alt="Logo"
+                className="w-12 h-12 md:w-10 md:h-10 text-white"
+              />
             </Link>
           </div>
         </div>
@@ -46,18 +49,32 @@ export default function Navbar(): JSX.Element {
             <div className={`relative flex flex-container flex-row z-10`}>
               <div
                 className={`w-fit cursor-pointer h-full py-2 bg-[#141416] md:bg-transparent md:py-[10px] px-4 md:px-6 flex flex-row items-center justify-between border border-customLightGray rounded-4xl text-primary`}
-
               >
-                <img src={logo} alt={chainName} className="w-5 h-5 md:mr-2" onClick={openChainModal} />
+                <img
+                  src={logo}
+                  alt={chainName}
+                  className="w-5 h-5 md:mr-2"
+                  onClick={openChainModal}
+                />
                 <div className="hidden w-2 h-2 bg-[#50C56E] ml-2 rounded-full"></div>
                 <span className="hidden md:inline">|</span>
-                <p className="ml-2 leading-none hidden md:block">{address?.substring(0, 5)}...</p>
+                <p className="ml-2 leading-none hidden md:block">
+                  {address?.substring(0, 5)}...
+                </p>
                 <span className="hidden md:inline">|</span>
-                <PowerIcon className="w-5 h-5 ml-3 text-primary hidden md:block" aria-hidden="true" onClick={handleWalletDisconnect}  />
+                <PowerIcon
+                  className="w-5 h-5 ml-3 text-primary hidden md:block"
+                  aria-hidden="true"
+                  onClick={handleWalletDisconnect}
+                />
               </div>
             </div>
           ) : (
-            <MainActionButton label="Connect Wallet" handleClick={openConnectModal} hidden={address ? true : false} />
+            <MainActionButton
+              label="Connect Wallet"
+              handleClick={openConnectModal}
+              hidden={address ? true : false}
+            />
           )}
           <button
             className={`text-primary w-10 transform transition duration-500 relative focus:outline-none`}
@@ -65,21 +82,31 @@ export default function Navbar(): JSX.Element {
           >
             <span
               aria-hidden="true"
-              className={`block h-0.5 w-8 bg-primary ease-in-out rounded-3xl ${menuVisible ? "rotate-45 translate-y-1" : "-translate-y-2"}`}
+              className={`block h-0.5 w-8 bg-primary ease-in-out rounded-3xl ${
+                menuVisible ? "rotate-45 translate-y-1" : "-translate-y-2"
+              }`}
             ></span>
             <span
               aria-hidden="true"
-              className={`block h-0.5 w-8 bg-primary ease-in-out rounded-3xl ${menuVisible ? "opacity-0" : "opacity-100"}`}
+              className={`block h-0.5 w-8 bg-primary ease-in-out rounded-3xl ${
+                menuVisible ? "opacity-0" : "opacity-100"
+              }`}
             ></span>
             <span
               aria-hidden="true"
-              className={`block h-0.5 w-8 bg-primary ease-in-out rounded-3xl ${menuVisible ? "-rotate-45 -translate-y-1" : "translate-y-2"}`}
+              className={`block h-0.5 w-8 bg-primary ease-in-out rounded-3xl ${
+                menuVisible ? "-rotate-45 -translate-y-1" : "translate-y-2"
+              }`}
             ></span>
           </button>
         </div>
       </div>
       <Transition.Root show={menuVisible} as={Fragment}>
-        <Dialog as="div" className="fixed inset-0 overflow-hidden z-50" onClose={() => toggleMenu(false)}>
+        <Dialog
+          as="div"
+          className="fixed inset-0 overflow-hidden z-50"
+          onClose={() => toggleMenu(false)}
+        >
           <button
             className={`text-gray-500 absolute top-8 right-8 p-6 bg-[#353945] z-50 rounded-full flex justify-center items-center w-12 h-12`}
             onClick={() => toggleMenu(!menuVisible)}
@@ -87,15 +114,21 @@ export default function Navbar(): JSX.Element {
             <div className="block w-10 bg-transparent">
               <span
                 aria-hidden="true"
-                className={`block h-0.5 w-8 bg-white transform transition duration-500 ease-in-out rounded-3xl ${menuVisible ? "rotate-45 translate-y-0.5" : "-translate-y-2"}`}
+                className={`block h-0.5 w-8 bg-white transform transition duration-500 ease-in-out rounded-3xl ${
+                  menuVisible ? "rotate-45 translate-y-0.5" : "-translate-y-2"
+                }`}
               ></span>
               <span
                 aria-hidden="true"
-                className={`block h-0.5 w-8 bg-white transform transition duration-500 ease-in-out rounded-3xl ${menuVisible ? "opacity-0" : "opacity-100"}`}
+                className={`block h-0.5 w-8 bg-white transform transition duration-500 ease-in-out rounded-3xl ${
+                  menuVisible ? "opacity-0" : "opacity-100"
+                }`}
               ></span>
               <span
                 aria-hidden="true"
-                className={`block h-0.5 w-8 bg-white transform transition duration-500 ease-in-out rounded-3xl ${menuVisible ? "-rotate-45 -translate-y-0.5" : "translate-y-2"}`}
+                className={`block h-0.5 w-8 bg-white transform transition duration-500 ease-in-out rounded-3xl ${
+                  menuVisible ? "-rotate-45 -translate-y-0.5" : "translate-y-2"
+                }`}
               ></span>
             </div>
           </button>
@@ -115,19 +148,32 @@ export default function Navbar(): JSX.Element {
                 <div className="flex flex-1 flex-col w-full space-y-4">
                   <div className="mb-6">
                     <Link href={`/`} passHref>
-                      <img src="/images/icons/popLogoBlack.svg" alt="Logo" className="w-12 h-12 md:w-10 md:h-10 text-white" />
+                      <img
+                        src="/images/icons/popLogoBlack.svg"
+                        alt="Logo"
+                        className="w-12 h-12 md:w-10 md:h-10 text-white"
+                      />
                     </Link>
                   </div>
-                  <div className="flex flex-col space-y-6 flex-1" onClick={() => toggleMenu(false)}>
+                  <div
+                    className="flex flex-col space-y-6 flex-1"
+                    onClick={() => toggleMenu(false)}
+                  >
                     <NavbarLinks />
                   </div>
                   <div className="">
                     <p className="text-[#23262F]">
-                      VaultCraft is a DeFi yield-optimizing protocol with customizable asset strategies that
-                      instantly zap your crypto from any chain into the highest yield-generating products across DeFi in 1 click.
+                      VaultCraft is a DeFi yield-optimizing protocol with
+                      customizable asset strategies that instantly zap your
+                      crypto from any chain into the highest yield-generating
+                      products across DeFi in 1 click.
                     </p>
                     <div className="flex justify-between pb-12 mt-12">
-                      <SocialMediaLinks color="#23262F" color2="#dfff1c" size="24" />
+                      <SocialMediaLinks
+                        color="#23262F"
+                        color2="#dfff1c"
+                        size="24"
+                      />
                     </div>
                   </div>
                 </div>

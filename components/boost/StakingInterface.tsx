@@ -23,10 +23,7 @@ function votingPeriodEnd(): number[] {
   return formattedTime;
 }
 
-const {
-  BalancerPool: VCX_LP,
-  VotingEscrow: VOTING_ESCROW,
-} = getVeAddresses();
+const { BalancerPool: VCX_LP, VotingEscrow: VOTING_ESCROW } = getVeAddresses();
 
 interface StakingInterfaceProps {
   setShowLockModal: Dispatch<SetStateAction<boolean>>;
@@ -34,12 +31,30 @@ interface StakingInterfaceProps {
   setShowLpModal: Dispatch<SetStateAction<boolean>>;
 }
 
-export default function StakingInterface({ setShowLockModal, setShowMangementModal, setShowLpModal }: StakingInterfaceProps): JSX.Element {
-  const { address: account } = useAccount()
+export default function StakingInterface({
+  setShowLockModal,
+  setShowMangementModal,
+  setShowLpModal,
+}: StakingInterfaceProps): JSX.Element {
+  const { address: account } = useAccount();
 
-  const { data: lockedBal } = useLockedBalanceOf({ chainId: 1, address: VOTING_ESCROW, account: account as Address })
-  const { data: veBal } = useBalance({ chainId: 1, address: account, token: VOTING_ESCROW, watch: true })
-  const { data: LpBal } = useBalance({ chainId: 1, address: account, token: VCX_LP, watch: true })
+  const { data: lockedBal } = useLockedBalanceOf({
+    chainId: 1,
+    address: VOTING_ESCROW,
+    account: account as Address,
+  });
+  const { data: veBal } = useBalance({
+    chainId: 1,
+    address: account,
+    token: VOTING_ESCROW,
+    watch: true,
+  });
+  const { data: LpBal } = useBalance({
+    chainId: 1,
+    address: account,
+    token: VCX_LP,
+    watch: true,
+  });
 
   return (
     <>
@@ -48,33 +63,64 @@ export default function StakingInterface({ setShowLockModal, setShowMangementMod
         <div className="flex flex-col mt-6 gap-4">
           <span className="flex flex-row items-center justify-between">
             <p className="">My VCX-LP</p>
-            <p className="font-bold">{NumberFormatter.format(Number(formatEther(LpBal?.value || ZERO))) || "0"}</p>
+            <p className="font-bold">
+              {NumberFormatter.format(
+                Number(formatEther(LpBal?.value || ZERO))
+              ) || "0"}
+            </p>
           </span>
           <span className="flex flex-row items-center justify-between">
             <p className="">My Locked VCX-LP</p>
-            <p className="font-bold">{lockedBal ? NumberFormatter.format(Number(formatEther(lockedBal?.amount))) : "0"}</p>
+            <p className="font-bold">
+              {lockedBal
+                ? NumberFormatter.format(Number(formatEther(lockedBal?.amount)))
+                : "0"}
+            </p>
           </span>
           <span className="flex flex-row items-center justify-between">
             <p className="">Locked Until</p>
-            <p className="font-bold">{lockedBal && lockedBal?.end.toString() !== "0" ? new Date(Number(lockedBal?.end) * 1000).toLocaleDateString() : "-"}</p>
+            <p className="font-bold">
+              {lockedBal && lockedBal?.end.toString() !== "0"
+                ? new Date(Number(lockedBal?.end) * 1000).toLocaleDateString()
+                : "-"}
+            </p>
           </span>
           <span className="flex flex-row items-center justify-between">
             <p className="">My veVCX</p>
-            <p className="font-bold">{NumberFormatter.format(Number(formatEther(veBal?.value || ZERO))) || "0"}</p>
+            <p className="font-bold">
+              {NumberFormatter.format(
+                Number(formatEther(veBal?.value || ZERO))
+              ) || "0"}
+            </p>
           </span>
           <span className="flex flex-row items-center justify-between pb-6 border-b border-[#353945]">
             <p className="">Voting period ends</p>
-            <p className="font-bold">{votingPeriodEnd()[0]}d : {votingPeriodEnd()[1]}h<span className="hidden lg:inline">: {votingPeriodEnd()[2]}m</span></p>
+            <p className="font-bold">
+              {votingPeriodEnd()[0]}d : {votingPeriodEnd()[1]}h
+              <span className="hidden lg:inline">
+                : {votingPeriodEnd()[2]}m
+              </span>
+            </p>
           </span>
         </div>
         <div className="lg:flex lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-8 mt-6 lg:max-h-12">
-        {Number(lockedBal?.amount) === 0 ?
-            <MainActionButton label="Lock VCX-LP" handleClick={() => setShowLockModal(true)} /> :
-            <MainActionButton label="Manage Stake" handleClick={() => setShowMangementModal(true)} />
-          }
-          <SecondaryActionButton label="Get VCX-LP" handleClick={() => setShowLpModal(true)} />
+          {Number(lockedBal?.amount) === 0 ? (
+            <MainActionButton
+              label="Lock VCX-LP"
+              handleClick={() => setShowLockModal(true)}
+            />
+          ) : (
+            <MainActionButton
+              label="Manage Stake"
+              handleClick={() => setShowMangementModal(true)}
+            />
+          )}
+          <SecondaryActionButton
+            label="Get VCX-LP"
+            handleClick={() => setShowLpModal(true)}
+          />
         </div>
       </div>
     </>
-  )
+  );
 }

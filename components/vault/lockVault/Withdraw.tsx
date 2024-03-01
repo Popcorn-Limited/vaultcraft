@@ -1,6 +1,6 @@
-import InputTokenWithError from "@/components/input/InputTokenWithError"
-import { LockVaultData, Token } from "@/lib/types"
-import { ArrowDownIcon } from "@heroicons/react/24/outline"
+import InputTokenWithError from "@/components/input/InputTokenWithError";
+import { LockVaultData, Token } from "@/lib/types";
+import { ArrowDownIcon } from "@heroicons/react/24/outline";
 
 interface WithdrawProps {
   vaultData: LockVaultData;
@@ -9,16 +9,21 @@ interface WithdrawProps {
   outputToken: Token;
 }
 
-export default function Withdraw({ vaultData, tokenOptions, handleTokenSelect, outputToken }: WithdrawProps): JSX.Element {
+export default function Withdraw({
+  vaultData,
+  tokenOptions,
+  handleTokenSelect,
+  outputToken,
+}: WithdrawProps): JSX.Element {
   return (
     <>
       <InputTokenWithError
         captionText={"Withdraw Amount"}
-        onSelectToken={option => { }}
-        onMaxClick={() => { }}
+        onSelectToken={(option) => {}}
+        onMaxClick={() => {}}
         chainId={vaultData.chainId}
-        value={vaultData.vault.balance / (10 ** vaultData.vault.decimals)}
-        onChange={() => { }}
+        value={vaultData.vault.balance / 10 ** vaultData.vault.decimals}
+        onChange={() => {}}
         selectedToken={vaultData.vault}
         errorMessage={""}
         tokenList={[]}
@@ -40,24 +45,30 @@ export default function Withdraw({ vaultData, tokenOptions, handleTokenSelect, o
             <ArrowDownIcon
               className="h-10 w-10 p-2 text-customLightGray border border-customLightGray rounded-full cursor-pointer hover:text-primary hover:border-primary"
               aria-hidden="true"
-              onClick={() => { }}
+              onClick={() => {}}
             />
           </span>
         </div>
       </div>
       <InputTokenWithError
         captionText={"Output Amount"}
-        onSelectToken={option => handleTokenSelect(vaultData.vault, option)}
-        onMaxClick={() => { }}
+        onSelectToken={(option) => handleTokenSelect(vaultData.vault, option)}
+        onMaxClick={() => {}}
         chainId={vaultData.chainId}
-        value={((vaultData.vault.balance * vaultData.vault.price) / (10 ** vaultData.vault.decimals)) / vaultData.asset.price}
-        onChange={() => { }}
+        value={
+          (vaultData.vault.balance * vaultData.vault.price) /
+          10 ** vaultData.vault.decimals /
+          vaultData.asset.price
+        }
+        onChange={() => {}}
         selectedToken={outputToken}
         errorMessage={""}
-        tokenList={tokenOptions.filter(option => option.address !== vaultData.address)}
+        tokenList={tokenOptions.filter(
+          (option) => option.address !== vaultData.address
+        )}
         allowSelection
         allowInput={false}
       />
     </>
-  )
+  );
 }

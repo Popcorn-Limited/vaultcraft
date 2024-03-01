@@ -17,5 +17,9 @@ export default function Title({
 }>): JSX.Element {
   const Wrapper = ComponentWraper as any;
   const headingCx = level === 1 ? "text-3xl md:text-4xl" : " text-xl";
-  return <span className={`${headingCx} ${fontWeight} ${className}`}>{children}</span>;
+  return (
+    <span className={`${headingCx} ${fontWeight} ${className}`}>
+      {children}
+    </span>
+  );
 }

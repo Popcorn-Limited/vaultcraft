@@ -17,4 +17,3 @@ const DEFAULT_FEES = {
 };
 
 export const feeAtom = atom<VaultFees>(DEFAULT_FEES);
-

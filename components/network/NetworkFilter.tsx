@@ -10,7 +10,10 @@ interface NetworkFilterProps {
   selectNetwork: (chainId: ChainId) => void;
 }
 
-export default function NetworkFilter({ supportedNetworks, selectNetwork }: NetworkFilterProps): JSX.Element {
+export default function NetworkFilter({
+  supportedNetworks,
+  selectNetwork,
+}: NetworkFilterProps): JSX.Element {
   const [openFilter, setOpenFilter] = useState(false);
   const [activeNetwork, setActiveNetwork] = useState(ChainId.ALL);
 
@@ -23,14 +26,28 @@ export default function NetworkFilter({ supportedNetworks, selectNetwork }: Netw
       <div className="hidden md:flex flex-row items-center space-x-2">
         <PseudoRadioButton
           key={"all"}
-          label={<Image src={networkLogos[ChainId.ALL]} alt={"All"} height="24" width="24" />}
+          label={
+            <Image
+              src={networkLogos[ChainId.ALL]}
+              alt={"All"}
+              height="24"
+              width="24"
+            />
+          }
           handleClick={() => setActiveAndSelectedNetwork(ChainId.ALL)}
           isActive={activeNetwork == ChainId.ALL}
         />
         {supportedNetworks.map((network) => (
           <PseudoRadioButton
             key={network}
-            label={<Image src={networkLogos[network]} alt={ChainId[network]} height="24" width="24" />}
+            label={
+              <Image
+                src={networkLogos[network]}
+                alt={ChainId[network]}
+                height="24"
+                width="24"
+              />
+            }
             handleClick={() => setActiveAndSelectedNetwork(network)}
             isActive={activeNetwork == network}
           />
@@ -46,14 +63,29 @@ export default function NetworkFilter({ supportedNetworks, selectNetwork }: Netw
           className="w-full py-3 px-5 flex flex-row items-center justify-between space-x-1 rounded-4xl border border-primary"
         >
           <div className="flex items-center">
-            <Image src={networkLogos[activeNetwork]} alt={"activeNetwork"} height="24" width="24" />
-            <p className="ml-4 mt-1 text-primary">{activeNetwork === ChainId.ALL ? "All Networks" : ChainId[activeNetwork]}</p>
+            <Image
+              src={networkLogos[activeNetwork]}
+              alt={"activeNetwork"}
+              height="24"
+              width="24"
+            />
+            <p className="ml-4 mt-1 text-primary">
+              {activeNetwork === ChainId.ALL
+                ? "All Networks"
+                : ChainId[activeNetwork]}
+            </p>
           </div>
-          <ChevronDownIcon className="w-5 h-5 text-primary" aria-hidden="true" />
+          <ChevronDownIcon
+            className="w-5 h-5 text-primary"
+            aria-hidden="true"
+          />
         </button>
       </div>
       <div className="no-select-dot absolute left-0">
-        <PopUpModal visible={openFilter} onClosePopUpModal={() => setOpenFilter(false)}>
+        <PopUpModal
+          visible={openFilter}
+          onClosePopUpModal={() => setOpenFilter(false)}
+        >
           <>
             <p className="text-white mb-3 text-center">Select a Network</p>
             <div className="space-y-4 w-full">
@@ -62,11 +94,19 @@ export default function NetworkFilter({ supportedNetworks, selectNetwork }: Netw
                   key={"all"}
                   label={
                     <div className="flex flex-row items-center w-full ml-4">
-                      <Image src={networkLogos[ChainId.ALL]} alt={"All"} height="24" width="24" />
+                      <Image
+                        src={networkLogos[ChainId.ALL]}
+                        alt={"All"}
+                        height="24"
+                        width="24"
+                      />
                       <p className="ml-4 mb-0.5">All Networks</p>
                     </div>
                   }
-                  handleClick={() => { setActiveAndSelectedNetwork(ChainId.ALL); setOpenFilter(false) }}
+                  handleClick={() => {
+                    setActiveAndSelectedNetwork(ChainId.ALL);
+                    setOpenFilter(false);
+                  }}
                   isActive={activeNetwork == ChainId.ALL}
                 />
               </div>
@@ -75,11 +115,19 @@ export default function NetworkFilter({ supportedNetworks, selectNetwork }: Netw
                   <PseudoRadioButton
                     label={
                       <div className="flex flex-row items-center w-full ml-4">
-                        <Image src={networkLogos[network]} alt={ChainId[network]} height="24" width="24" />
+                        <Image
+                          src={networkLogos[network]}
+                          alt={ChainId[network]}
+                          height="24"
+                          width="24"
+                        />
                         <p className="ml-4 mb-0.5">{ChainId[network]}</p>
                       </div>
                     }
-                    handleClick={() => { setActiveAndSelectedNetwork(network); setOpenFilter(false) }}
+                    handleClick={() => {
+                      setActiveAndSelectedNetwork(network);
+                      setOpenFilter(false);
+                    }}
                     isActive={activeNetwork == network}
                   />
                 </div>
@@ -87,7 +135,7 @@ export default function NetworkFilter({ supportedNetworks, selectNetwork }: Netw
             </div>
           </>
         </PopUpModal>
-      </div >
+      </div>
     </>
   );
 }

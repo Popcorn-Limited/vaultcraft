@@ -1,6 +1,13 @@
 import { useRouter } from "next/router";
 import { atom, useAtom } from "jotai";
-import { metadataAtom, assetAtom, protocolAtom, strategyAtom, assetAddressesAtom, strategyConfigAtom } from "@/lib/atoms";
+import {
+  metadataAtom,
+  assetAtom,
+  protocolAtom,
+  strategyAtom,
+  assetAddressesAtom,
+  strategyConfigAtom,
+} from "@/lib/atoms";
 import MainActionButton from "@/components/button/MainActionButton";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import MetadataConfiguration from "@/components/deploymentSections/MetadataConfiguration";
@@ -17,12 +24,12 @@ import { usePublicClient, useWalletClient } from "wagmi";
 import { VaultCreationContainerProps } from ".";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 
-export const basicsAtom = atom(get => ({
+export const basicsAtom = atom((get) => ({
   metadata: get(metadataAtom),
   asset: get(assetAtom),
   protocol: get(protocolAtom),
   strategy: get(strategyAtom),
-}))
+}));
 
 export function isBasicsValid(basics: any): boolean {
   if (basics.metadata.name.length < 3) return false;
@@ -31,38 +38,48 @@ export function isBasicsValid(basics: any): boolean {
   return true;
 }
 
-export default function BasicsContainer({ route, stages, activeStage }: VaultCreationContainerProps): JSX.Element {
+export default function BasicsContainer({
+  route,
+  stages,
+  activeStage,
+}: VaultCreationContainerProps): JSX.Element {
   const router = useRouter();
   const publicClient = usePublicClient();
-  const { data: walletClient } = useWalletClient()
+  const { data: walletClient } = useWalletClient();
 
   const [yieldOptions] = useAtom(yieldOptionsAtom);
 
-  const [basics] = useAtom(basicsAtom)
+  const [basics] = useAtom(basicsAtom);
   const [strategy] = useAtom(strategyAtom);
   const [asset] = useAtom(assetAtom);
 
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
   const [, setStrategyConfig] = useAtom(strategyConfigAtom);
 
-  const [availableAssetAddresses, setAvailableAssetAddresses] = useAtom(assetAddressesAtom);
+  const [availableAssetAddresses, setAvailableAssetAddresses] =
+    useAtom(assetAddressesAtom);
 
   useEffect(() => {
     if (!!yieldOptions && availableAssetAddresses) {
-      const newAvailableAssetAddresses: { [key: number]: Address[] } = {}
-      SUPPORTED_NETWORKS.forEach(async (chain) => newAvailableAssetAddresses[chain.id] = await yieldOptions.getAssets(chain.id))
+      const newAvailableAssetAddresses: { [key: number]: Address[] } = {};
+      SUPPORTED_NETWORKS.forEach(
+        async (chain) =>
+          (newAvailableAssetAddresses[chain.id] = await yieldOptions.getAssets(
+            chain.id
+          ))
+      );
       setAvailableAssetAddresses(newAvailableAssetAddresses);
     }
-  }, [yieldOptions])
+  }, [yieldOptions]);
 
   useEffect(() => {
     // @ts-ignore
     async function getStrategyDefaults() {
-      setLoading(true)
-      const chainId = walletClient?.chain.id || 1
+      setLoading(true);
+      const chainId = walletClient?.chain.id || 1;
 
-      let strategyDefaults = []
+      let strategyDefaults = [];
 
       if (strategy.name.includes("Depositor")) {
         if (strategy.initParams && strategy.initParams.length > 0) {
@@ -70,30 +87,31 @@ export default function BasicsContainer({ route, stages, activeStage }: VaultCre
             chainId: chainId,
             client: publicClient,
             address: getAddress(asset.address),
-            resolver: strategy.resolver
-          })
+            resolver: strategy.resolver,
+          });
         }
       } else {
         strategyDefaults = await resolveStrategyDefaults({
           chainId: chainId,
           client: publicClient,
           address: getAddress(asset.address),
-          resolver: strategy.resolver
-        })
+          resolver: strategy.resolver,
+        });
       }
-      setStrategyConfig(strategyDefaults)
-      setLoading(false)
+      setStrategyConfig(strategyDefaults);
+      setLoading(false);
     }
 
     if (strategy.key !== "none") getStrategyDefaults();
-  }, [strategy])
+  }, [strategy]);
 
   return (
-    <VaultCreationCard activeStage={activeStage} stages={stages} >
+    <VaultCreationCard activeStage={activeStage} stages={stages}>
       <div className="mb-6">
         <h1 className="text-[white] text-2xl mb-2">Set up a new vault</h1>
         <p className="text-white">
-          Choose a name for your vault, than select an asset and see what protocols have to offer.
+          Choose a name for your vault, than select an asset and see what
+          protocols have to offer.
         </p>
       </div>
 
@@ -105,9 +123,12 @@ export default function BasicsContainer({ route, stages, activeStage }: VaultCre
         </div>
         <div>
           <StrategySelection isDisabled={basics.protocol.key === "none"} />
-          <p className="text-gray-500 text-sm mt-1" >
+          <p className="text-gray-500 text-sm mt-1">
             To learn more click
-            <a href="https://docs.vaultcraft.io/products/smart-vaults/strategies" className="text-blue-500">
+            <a
+              href="https://docs.vaultcraft.io/products/smart-vaults/strategies"
+              className="text-blue-500"
+            >
               here
             </a>
           </p>
@@ -115,12 +136,14 @@ export default function BasicsContainer({ route, stages, activeStage }: VaultCre
         <DepositLimitConfiguration />
       </div>
 
-      {strategy.key !== "none" && loading && <p className="text-white mt-6">Loading Configuration, please wait...</p>}
+      {strategy.key !== "none" && loading && (
+        <p className="text-white mt-6">Loading Configuration, please wait...</p>
+      )}
 
       <div className="flex justify-end mt-8 gap-3">
         <SecondaryActionButton
           label="Back"
-          handleClick={() => router.push('/create-vault')}
+          handleClick={() => router.push("/create-vault")}
         />
         <MainActionButton
           label="Next"
@@ -129,5 +152,5 @@ export default function BasicsContainer({ route, stages, activeStage }: VaultCre
         />
       </div>
     </VaultCreationCard>
-  )
+  );
 }
