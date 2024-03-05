@@ -7,6 +7,7 @@ import HandIcon from "@/components/svg/popcorn/HandIcon";
 import PopIcon from "@/components/svg/popcorn/PopIcon";
 import { useAtom } from "jotai";
 import { lockvaultsAtom, vaultsAtom } from "@/lib/atoms/vaults";
+import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 
 export default function Products(): JSX.Element {
   const [vaults] = useAtom(vaultsAtom);
@@ -14,7 +15,7 @@ export default function Products(): JSX.Element {
 
   useEffect(() => {
     if (vaults) {
-      setVaultTvl(vaults.reduce((a, b) => a + b.tvl, 0));
+      setVaultTvl(SUPPORTED_NETWORKS.map(chain => vaults[chain.id]).flat().reduce((a, b) => a + b.tvl, 0));
     }
   }, [vaults]);
 

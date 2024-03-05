@@ -33,7 +33,7 @@ export default function VaultsSorting({
   );
 
   function sortVaults(sortType: VAULT_SORTING_TYPE) {
-    setVaults(sort(sortType, [...vaults]));
+    setVaults(sort(sortType, vaults));
     setSortingType(sortType);
     setOpenSorting((prevState) => !prevState);
   }

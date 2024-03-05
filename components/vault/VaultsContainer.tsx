@@ -47,7 +47,12 @@ export default function VaultsContainer({
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
 
-  const [vaults, setVaults] = useAtom(vaultsAtom);
+  const [vaultsData] = useAtom(vaultsAtom);
+  const [vaults, setVaults] = useState<VaultData[]>([])
+
+  useEffect(() => {
+    if (Object.keys(vaultsData).length > 0) setVaults(SUPPORTED_NETWORKS.map(chain => vaultsData[chain.id]).flat())
+  }, [vaultsData])
 
   const [tvl, setTvl] = useState<number>(0);
   const [networth, setNetworth] = useState<number>(0);
@@ -61,14 +66,15 @@ export default function VaultsContainer({
   });
   const [vcxPrice, setVcxPrice] = useState<number>(0);
 
+
   useEffect(() => {
     async function getAccountData() {
       // get gauge rewards
       if (account) {
         const rewards = await getGaugeRewards({
-          gauges: vaults
-            .filter((vault) => vault.gauge && vault.chainId === 1)
-            .map((vault) => vault.gauge?.address) as Address[],
+          gauges: vaultsData[1]
+            .filter((vault) => !!vault.gauge)
+            .map((vault) => vault.gauge) as Address[],
           account: account as Address,
           publicClient,
         });
@@ -78,10 +84,10 @@ export default function VaultsContainer({
       }
       setNetworth(
         SUPPORTED_NETWORKS.map((chain) =>
-          getVaultNetworthByChain({ vaults, chainId: chain.id })
+          getVaultNetworthByChain({ vaults: vaultsData[chain.id], chainId: chain.id })
         ).reduce((a, b) => a + b, 0)
       );
-      setTvl(vaults.reduce((a, b) => a + b.tvl, 0));
+      setTvl(SUPPORTED_NETWORKS.map(chain => vaultsData[chain.id]).flat().reduce((a, b) => a + b.tvl, 0));
     }
     getAccountData();
   }, [account]);
@@ -135,13 +141,12 @@ export default function VaultsContainer({
                   My oVCX
                 </p>
                 <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
-                  {`$${
-                    oBal && vcxPrice
-                      ? NumberFormatter.format(
-                          (Number(oBal?.value) / 1e18) * (vcxPrice * 0.25)
-                        )
-                      : "0"
-                  }`}
+                  {`$${oBal && vcxPrice
+                    ? NumberFormatter.format(
+                      (Number(oBal?.value) / 1e18) * (vcxPrice * 0.25)
+                    )
+                    : "0"
+                    }`}
                 </div>
               </div>
 
@@ -150,14 +155,13 @@ export default function VaultsContainer({
                   Claimable oVCX
                 </p>
                 <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
-                  {`$${
-                    gaugeRewards && vcxPrice
-                      ? NumberFormatter.format(
-                          (Number(gaugeRewards?.total) / 1e18) *
-                            (vcxPrice * 0.25)
-                        )
-                      : "0"
-                  }`}
+                  {`$${gaugeRewards && vcxPrice
+                    ? NumberFormatter.format(
+                      (Number(gaugeRewards?.total) / 1e18) *
+                      (vcxPrice * 0.25)
+                    )
+                    : "0"
+                    }`}
                 </div>
               </div>
             </div>
