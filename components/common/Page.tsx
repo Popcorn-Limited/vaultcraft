@@ -2,7 +2,7 @@ import Navbar from "@/components/navbar/Navbar";
 import { masaAtom, yieldOptionsAtom } from "@/lib/atoms/sdk";
 import { lockvaultsAtom, vaultsAtom } from "@/lib/atoms/vaults";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
-import { getVaultsByChain } from "@/lib/vault/getVaults";
+import { getVaultsByChain } from "@/lib/getVaults";
 import { useAtom } from "jotai";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { CachedProvider, YieldOptions } from "vaultcraft-sdk";
@@ -11,14 +11,15 @@ import Footer from "@/components/common/Footer";
 import { useMasaAnalyticsReact } from "@masa-finance/analytics-react";
 import { useRouter } from "next/router";
 import getLockVaultsByChain from "@/lib/vault/lockVault/getVaults";
-import { zeroAddress } from "viem";
+import { Address, zeroAddress } from "viem";
 import { arbitrum } from "viem/chains";
 import Modal from "@/components/modal/Modal";
 import MainActionButton from "../button/MainActionButton";
 import { availableZapAssetAtom, zapAssetsAtom } from "@/lib/atoms";
-import { Token } from "@/lib/types";
+import { Token, VaultData } from "@/lib/types";
 import getZapAssets, { getAvailableZapAssets } from "@/lib/utils/getZapAssets";
 import SecondaryActionButton from "../button/SecondaryActionButton";
+import getTokenAndVaultsDataByChain from "@/lib/getTokenAndVaultsData";
 
 async function setUpYieldOptions() {
   const ttl = 360_000;
@@ -206,19 +207,21 @@ export default function Page({
 
   useEffect(() => {
     async function getVaults() {
-      // get vaults
-      const fetchedVaults = (
-        await Promise.all(
-          SUPPORTED_NETWORKS.map(async (chain) =>
-            getVaultsByChain({
-              chain,
-              account: account || zeroAddress,
-              yieldOptions: yieldOptions as YieldOptions,
-            })
-          )
-        )
-      ).flat();
-      setVaults(fetchedVaults);
+      // get vaultsData and tokens
+      const newVaultsData: { [key: number]: { [key: Address]: VaultData } } = {}
+      const newTokens: { [key: number]: { [key: Address]: Token } } = {}
+      await Promise.all(
+        SUPPORTED_NETWORKS.map(async (chain) => {
+          const { vaultsData, tokens } = await getTokenAndVaultsDataByChain({
+            chain,
+            account: account || zeroAddress,
+            yieldOptions: yieldOptions as YieldOptions,
+          })
+          newVaultsData[chain.id] = vaultsData
+          newTokens[chain.id] = tokens;
+        })
+      )
+      setVaults(newVaultsData);
 
       const fetchedLockVaults = await getLockVaultsByChain({
         chain: arbitrum,
@@ -242,36 +245,6 @@ export default function Page({
       }
     }
   }, [termsSigned]);
-
-  const [zapAssets, setZapAssets] = useAtom(zapAssetsAtom);
-  const [availableZapAssets, setAvailableZapAssets] = useAtom(
-    availableZapAssetAtom
-  );
-
-  useEffect(() => {
-    async function getZapData() {
-      const newZapAssets: { [key: number]: Token[] } = {};
-      SUPPORTED_NETWORKS.forEach(
-        async (chain) =>
-          (newZapAssets[chain.id] = await getZapAssets({ chain, account }))
-      );
-      setZapAssets(newZapAssets);
-
-      // get available zapAddresses
-      setAvailableZapAssets({
-        1: await getAvailableZapAssets(1),
-        137: await getAvailableZapAssets(137),
-        10: await getAvailableZapAssets(10),
-        42161: await getAvailableZapAssets(42161),
-        56: await getAvailableZapAssets(56),
-      });
-    }
-    if (
-      Object.keys(zapAssets).length === 0 &&
-      Object.keys(availableZapAssets).length === 0
-    )
-      getZapData();
-  }, []);
 
   return (
     <>
