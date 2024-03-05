@@ -53,24 +53,36 @@ export type FeeConfiguration = {
 
 export type VaultData = {
   address: Address;
-  vault: Token;
-  asset: Token;
-  gauge?: Token;
+  vault: Address;
+  asset: Address;
+  gauge?: Address;
+  chainId: number;
+  fees: FeeConfiguration;
   totalAssets: number;
   totalSupply: number;
-  assetsPerShare: number;
-  assetPrice: number;
-  pricePerShare: number;
-  tvl: number;
-  fees: FeeConfiguration;
   depositLimit: number;
-  metadata: VaultMetadata;
-  chainId: number;
+  tvl: number;
   apy: number;
-  gaugeMinApy?: number;
-  gaugeMaxApy?: number;
   totalApy: number;
+  boostMin: number;
+  boostMax: number;
+  metadata: VaultMetadata;
+  strategies: Strategy[];
 };
+
+type Strategy = {
+  address: Address;
+  metadata: StrategyMetadata;
+  resolver: string;
+  allocation: number;
+  allocationPerc: number;
+  apy: number;
+}
+
+type StrategyMetadata = {
+  name: string;
+  description: string;
+}
 
 type LockVaultLock = {
   unlockTime: number;
@@ -100,17 +112,15 @@ export enum VaultLabel {
 }
 
 export type VaultMetadata = {
-  creator: Address;
-  feeRecipient: Address;
-  cid: string;
-  optionalMetadata: OptionalMetadata;
   vaultName?: string;
   labels?: VaultLabel[];
   description?: string;
   type:
-    | "single-asset-vault-v1"
-    | "single-asset-lock-vault-v1"
-    | "multi-strategy-vault-v1";
+  | "single-asset-vault-v1"
+  | "single-asset-lock-vault-v1"
+  | "multi-strategy-vault-v1";
+  creator: Address;
+  feeRecipient: Address;
 };
 
 export type OptionalMetadata = {
@@ -199,3 +209,12 @@ export type VoteUserSlopes = {
   power: bigint;
   end: bigint;
 };
+
+
+export type TokenByAddress = {
+  [key: Address]: Token;
+}
+
+export type VaultDataByAddress = {
+  [key: Address]: VaultData
+}

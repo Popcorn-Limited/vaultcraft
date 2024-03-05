@@ -2,7 +2,6 @@ import Navbar from "@/components/navbar/Navbar";
 import { masaAtom, yieldOptionsAtom } from "@/lib/atoms/sdk";
 import { lockvaultsAtom, vaultsAtom } from "@/lib/atoms/vaults";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
-import { getVaultsByChain } from "@/lib/getVaults";
 import { useAtom } from "jotai";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { CachedProvider, YieldOptions } from "vaultcraft-sdk";
@@ -16,9 +15,8 @@ import { arbitrum } from "viem/chains";
 import Modal from "@/components/modal/Modal";
 import MainActionButton from "../button/MainActionButton";
 import { availableZapAssetAtom, zapAssetsAtom } from "@/lib/atoms";
-import { Token, VaultData } from "@/lib/types";
+import { Token, TokenByAddress, VaultData, VaultDataByAddress } from "@/lib/types";
 import getZapAssets, { getAvailableZapAssets } from "@/lib/utils/getZapAssets";
-import SecondaryActionButton from "../button/SecondaryActionButton";
 import getTokenAndVaultsDataByChain from "@/lib/getTokenAndVaultsData";
 
 async function setUpYieldOptions() {
@@ -208,8 +206,8 @@ export default function Page({
   useEffect(() => {
     async function getVaults() {
       // get vaultsData and tokens
-      const newVaultsData: { [key: number]: { [key: Address]: VaultData } } = {}
-      const newTokens: { [key: number]: { [key: Address]: Token } } = {}
+      const newVaultsData: { [key: number]: VaultData[] } = {}
+      const newTokens: { [key: number]: TokenByAddress } = {}
       await Promise.all(
         SUPPORTED_NETWORKS.map(async (chain) => {
           const { vaultsData, tokens } = await getTokenAndVaultsDataByChain({
@@ -231,6 +229,27 @@ export default function Page({
     }
     if (yieldOptions) getVaults();
   }, [yieldOptions, account]);
+
+  const [availableZapAssets, setAvailableZapAssets] = useAtom(
+    availableZapAssetAtom
+  );
+
+  useEffect(() => {
+    async function getZapData() {
+      // get available zapAddresses
+      setAvailableZapAssets({
+        1: await getAvailableZapAssets(1),
+        137: await getAvailableZapAssets(137),
+        10: await getAvailableZapAssets(10),
+        42161: await getAvailableZapAssets(42161),
+        56: await getAvailableZapAssets(56),
+      });
+    }
+    if (
+      Object.keys(availableZapAssets).length === 0
+    )
+      getZapData();
+  }, []);
 
   const [showTermsModal, setShowTermsModal] = useState<boolean>(false);
   const [termsSigned, setTermsSigned] = useState<boolean>(false);

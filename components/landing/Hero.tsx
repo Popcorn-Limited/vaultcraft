@@ -29,7 +29,7 @@ export default function Hero(): JSX.Element {
   useEffect(() => {
     async function fetchNetworth() {
       const vaultNetworth = SUPPORTED_NETWORKS.map((chain) =>
-        getVaultNetworthByChain({ vaults, chainId: chain.id })
+        getVaultNetworthByChain({ vaults: vaults[chain.id], chainId: chain.id })
       ).reduce((a, b) => a + b, 0);
       const lockVaultNetworth = lockVaults.reduce(
         (a, b) =>
@@ -46,7 +46,7 @@ export default function Hero(): JSX.Element {
       });
       setLoading(false);
     }
-    if (account && vaults.length > 0 && lockVaults.length > 0) fetchNetworth();
+    if (account && Object.keys(vaults).length > 0 && lockVaults.length > 0) fetchNetworth();
   }, [account, vaults, lockVaults]);
 
   useEffect(() => {

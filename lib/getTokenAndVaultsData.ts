@@ -12,7 +12,7 @@ import {
 import { PublicClient } from "wagmi";
 import axios from "axios";
 import { VaultAbi } from "@/lib/constants/abi/Vault";
-import { GaugeData, Token, VaultData, VaultLabel } from "@/lib/types";
+import { GaugeData, Token, TokenByAddress, VaultData, VaultDataByAddress, VaultLabel } from "@/lib/types";
 import { ADDRESS_ZERO, ERC20Abi, getVeAddresses, zapAssetAddressesByChain } from "@/lib/constants";
 import { RPC_URLS, networkMap } from "@/lib/utils/connectors";
 import getGauges, { Gauge } from "@/lib/gauges/getGauges";
@@ -44,7 +44,7 @@ export default async function getTokenAndVaultsDataByChain({
   chain,
   account,
   yieldOptions,
-}: GetVaultsByChainProps): Promise<{ vaultsData: VaultData[], tokens: { [key: Address]: Token } }> {
+}: GetVaultsByChainProps): Promise<{ vaultsData: VaultData[], tokens: TokenByAddress }> {
   const client = createPublicClient({
     chain,
     transport: http(RPC_URLS[chain.id]),
@@ -62,7 +62,7 @@ export async function getTokenAndVaultsData({
   account = zeroAddress,
   client,
   yieldOptions,
-}: GetVaultsProps): Promise<{ vaultsData: VaultData[], tokens: { [key: Address]: Token } }> {
+}: GetVaultsProps): Promise<{ vaultsData: VaultData[], tokens: TokenByAddress }> {
   const chainId = client.chain.id;
 
   let vaultsData = await prepareVaultsData(chainId, client)
@@ -70,8 +70,8 @@ export async function getTokenAndVaultsData({
 
   const uniqueAssetAdresses: Address[] = zapAssetAddressesByChain[chainId];
   Object.values(vaultsData).forEach((vault) => {
-    if (!uniqueAssetAdresses.includes(vault.asset.address)) {
-      uniqueAssetAdresses.push(vault.asset.address);
+    if (!uniqueAssetAdresses.includes(vault.asset)) {
+      uniqueAssetAdresses.push(vault.asset);
     }
   });
   const assets = await prepareAssets(uniqueAssetAdresses, chainId);
@@ -83,7 +83,7 @@ export async function getTokenAndVaultsData({
     vault.tvl = (vault.totalSupply * vaults[vault.address].price) / (10 ** assets[vault.asset].decimals);
   });
 
-  const gaugeTokens: { [key: Address]: Token } = {}
+  const gaugeTokens: TokenByAddress = {}
   // Add gauges
   if (client.chain.id === 1) {
     const gauges = await getGauges({
@@ -105,8 +105,8 @@ export async function getTokenAndVaultsData({
           // Add gauge to tokens
           gaugeTokens[foundGauge.address] = {
             address: foundGauge.address,
-            name: `${vault.vault.name}-gauge`,
-            symbol: `st-${vault.vault.name}`,
+            name: `${vaults[vault.address].name}-gauge`,
+            symbol: `st-${vaults[vault.address].symbol}`,
             decimals: foundGauge.decimals,
             logoURI: "/images/tokens/vcx.svg", // wont be used, just here for consistency
             balance: 0,
@@ -130,7 +130,7 @@ export async function getTokenAndVaultsData({
   return { vaultsData: Object.values(vaultsData), tokens };
 }
 
-async function prepareVaultsData(chainId: number, client: PublicClient): Promise<{ [key: Address]: any }> {
+async function prepareVaultsData(chainId: number, client: PublicClient): Promise<VaultDataByAddress> {
   const { data: allVaults } = await axios.get(
     `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/vaults/${chainId}.json`
   );
@@ -164,7 +164,7 @@ async function prepareVaultsData(chainId: number, client: PublicClient): Promise
     allowFailure: false,
   });
 
-  let result: { [key: Address]: any } = {};
+  let result: VaultDataByAddress = {};
   filteredVaults.forEach((vault: any, i: number) => {
     if (i > 0) i = i * 3;
 
@@ -185,13 +185,13 @@ async function prepareVaultsData(chainId: number, client: PublicClient): Promise
       boostMax: 0,
       metadata: {
         vaultName: vault.name ? vault.name : undefined,
-        creator: vault.creator,
-        feeRecipient: vault.feeRecipient,
         labels: vault.labels
           ? vault.labels.map((label: string) => <VaultLabel>label)
           : undefined,
         description: vault.description || undefined,
         type: vault.type,
+        creator: vault.creator,
+        feeRecipient: vault.feeRecipient,
       },
       strategies: vault.strategies.map((strategy: Address) => {
         return {
@@ -212,7 +212,7 @@ async function prepareVaultsData(chainId: number, client: PublicClient): Promise
   return result
 }
 
-async function prepareAssets(addresses: Address[], chainId: number): Promise<{ [key: Address]: Token }> {
+async function prepareAssets(addresses: Address[], chainId: number): Promise<TokenByAddress> {
   const { data: assets } = await axios.get(
     `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/assets/tokens/${chainId}.json`
   );
@@ -224,7 +224,7 @@ async function prepareAssets(addresses: Address[], chainId: number): Promise<{ [
       )
     )}`
   );
-  let result: { [key: Address]: Token } = {}
+  let result: TokenByAddress = {}
   addresses.forEach(address => {
     result[address] = {
       ...assets[address],
@@ -236,12 +236,12 @@ async function prepareAssets(addresses: Address[], chainId: number): Promise<{ [
   return result;
 }
 
-async function prepareVaults(vaultsData: { [key: Address]: any }, assets: { [key: Address]: Token }, chainId: number): Promise<{ [key: Address]: Token }> {
+async function prepareVaults(vaultsData: VaultDataByAddress, assets: TokenByAddress, chainId: number): Promise<TokenByAddress> {
   const { data: vaultTokens } = await axios.get(
     `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/vaults/tokens/${chainId}.json`
   );
 
-  let result: { [key: Address]: Token } = {}
+  let result: TokenByAddress = {}
   Object.values(vaultsData).forEach(vault => {
     const assetsPerShare =
       vault.totalSupply > 0 ? (vault.totalAssets + 1) / (vault.totalSupply + 1e9) : Number(1e-9);
@@ -257,7 +257,7 @@ async function prepareVaults(vaultsData: { [key: Address]: any }, assets: { [key
   return result;
 }
 
-async function addStrategyData(vaults: { [key: Address]: any }, chainId: number, client: PublicClient, yieldOptions: YieldOptions): Promise<{ [key: Address]: any }> {
+async function addStrategyData(vaults: VaultDataByAddress, chainId: number, client: PublicClient, yieldOptions: YieldOptions): Promise<VaultDataByAddress> {
   const uniqueStrategyAdresses: Address[] = [];
   Object.values(vaults).forEach((vault) => {
     vault.strategies.forEach((strategy: any) => {
@@ -382,7 +382,7 @@ async function addStrategyData(vaults: { [key: Address]: any }, chainId: number,
 }
 
 
-async function addBalances(tokens: { [key: Address]: Token }, account: Address, client: PublicClient): Promise<{ [key: Address]: Token }> {
+async function addBalances(tokens: TokenByAddress, account: Address, client: PublicClient): Promise<TokenByAddress> {
   const balances = await client.multicall({
     contracts:
       Object.values(tokens)

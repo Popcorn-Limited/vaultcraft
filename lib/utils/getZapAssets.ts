@@ -66,7 +66,7 @@ export default async function getZapAssets({
   });
 }
 
-export async function getAvailableZapAssets(chainId: number) {
+export async function getAvailableZapAssets(chainId: number): Promise<Address[]> {
   const { data } = await axios.get(
     `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/assets/zapAddresses/${chainId}.json`
   );
