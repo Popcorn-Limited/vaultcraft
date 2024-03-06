@@ -128,7 +128,7 @@ export async function repayToAave({ asset, amount, onBehalfOf, chainId, account,
     simulationResponse: await simulateAavePoolCall({
       address: AavePoolByChain[chainId],
       account,
-      args: [asset, amount, 2, 0, onBehalfOf],
+      args: [asset, amount, 2, onBehalfOf],
       functionName: "repay",
       publicClient: clients.publicClient
     }),
@@ -221,7 +221,7 @@ export function calcUserAccountData(reserveData: ReserveData[], ltv: number): Us
 
   const totalSupplyRate = reserveData.map(r => r.supplyAmount * r.asset.price * r.supplyRate).reduce((a, b) => a + b, 0);
   const totalBorrowRate = reserveData.map(r => r.borrowAmount * r.asset.price * r.borrowRate).reduce((a, b) => a + b, 0);
-  const netRate = (totalSupplyRate - totalBorrowRate) / netValue
+  const netRate = (totalSupplyRate - totalBorrowRate) / totalCollateral
 
   const healthFactor = (totalCollateral * ltv) / totalBorrowed;
   return { totalCollateral, totalBorrowed, netValue, totalSupplyRate, totalBorrowRate, netRate, ltv, healthFactor }
