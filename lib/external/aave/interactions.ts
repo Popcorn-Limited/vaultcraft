@@ -155,7 +155,7 @@ export async function fetchAaveReserveData(account: Address, chain: Chain): Prom
   })
 
   const { data: assets } = await axios.get(`https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/assets/tokens/${chain.id}.json`)
- 
+
   let result = reserveData[0].filter(d => !d.isFrozen).map(d => {
     const uData = userData[0].find(e => e.underlyingAsset === d.underlyingAsset)
     const decimals = Number(d.decimals)
@@ -171,7 +171,7 @@ export async function fetchAaveReserveData(account: Address, chain: Chain): Prom
       balance: account === zeroAddress ? 0 : Number(uData?.scaledATokenBalance)
     }
   })
-  
+
   const { data: priceData } = await axios.get(`https://coins.llama.fi/prices/current/${String(result.map(
     e => `${networkMap[chain.id].toLowerCase()}:${e.asset.address}`
   ))}`)
@@ -219,8 +219,8 @@ export function calcUserAccountData(reserveData: ReserveData[], ltv: number): Us
   const totalBorrowed = reserveData.map(r => r.borrowAmount * r.asset.price).reduce((a, b) => a + b, 0);
   const netValue = totalCollateral - totalBorrowed;
 
-  const totalSupplyRate = reserveData.map(r => r.supplyAmount * r.asset.price * (r.supplyRate / 100)).reduce((a, b) => a + b, 0);
-  const totalBorrowRate = reserveData.map(r => r.borrowAmount * r.asset.price * (r.borrowAmount / 100)).reduce((a, b) => a + b, 0);
+  const totalSupplyRate = reserveData.map(r => r.supplyAmount * r.asset.price * r.supplyRate).reduce((a, b) => a + b, 0);
+  const totalBorrowRate = reserveData.map(r => r.borrowAmount * r.asset.price * r.borrowRate).reduce((a, b) => a + b, 0);
   const netRate = (totalSupplyRate - totalBorrowRate) / netValue
 
   const healthFactor = (totalCollateral * ltv) / totalBorrowed;
