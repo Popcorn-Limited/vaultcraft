@@ -275,12 +275,26 @@ export default function LoanInterface({ visibilityState, vaultData }: { visibili
                 chainId={vaultData.chainId}
                 value={inputAmount}
                 onChange={handleChangeInput}
-                selectedToken={inputToken}
+                selectedToken={activeTab === "Withdraw" ?
+                  { ...inputToken, balance: reserveData[vaultData.chainId].find(d => d.asset.address === inputToken?.address)?.balance || 0 }
+                  : inputToken}
                 errorMessage={""}
                 tokenList={tokenList}
                 allowSelection
                 allowInput
               />
+              {(activeTab === "Repay" && repayToken) &&
+                <p className="text-start text-white">
+                  Borrowed: {
+                    // @ts-ignore
+                    (reserveData[vaultData.chainId].find(d => d.asset.address === repayToken?.address)?.borrowAmount < 0.001
+                      // @ts-ignore
+                      && reserveData[vaultData.chainId].find(d => d.asset.address === repayToken?.address)?.borrowAmount > 0)
+                      ? "<0.001"
+                      // @ts-ignore
+                      : `${formatNumber(reserveData[vaultData.chainId].find(d => d.asset.address === repayToken?.address)?.borrowAmount)}`}
+                </p>
+              }
               <div className="mt-8">
                 {(stepCounter === steps.length || steps.some(step => !step.loading && step.error)) ?
                   <MainActionButton label={"Finish"} handleClick={() => setVisible(false)} /> :
