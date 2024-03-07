@@ -49,7 +49,7 @@ export const VeRecipientByChain: AddressByChain = {
 export const OptionTokenByChain: AddressByChain = {
   1: "0xaFa52E3860b4371ab9d8F08E801E9EA1027C0CA2",
   10: "0xD41d34d6b50785fDC025caD971fE940B8AA1bE45",
-  42161: "0xC1A6Db6793967Ff7fb7f211E044A4c285A0eB7FB"
+  42161: "0x59a696bF34Eae5AD8Fd472020e3Bed410694a230"
 }
 
 export const zapAssetAddressesByChain: { [key: number]: Address[] } = {
