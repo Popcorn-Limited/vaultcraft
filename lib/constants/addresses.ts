@@ -1,9 +1,9 @@
 import { Address } from "viem";
+import { AddressByChain } from "@/lib/types";
 
 export const VCX = "0xcE246eEa10988C495B4A90a905Ee9237a0f91543";
 export const WETH_VCX_LP = "0x577A7f7EE659Aa14Dc16FD384B3F8078E23F1920";
 export const VE_VCX = "0x0aB4bC35Ef33089B9082Ca7BB8657D7c4E819a1A";
-export const OVCX = "0xaFa52E3860b4371ab9d8F08E801E9EA1027C0CA2";
 export const POP = "0xD0Cd466b34A24fcB2f87676278AF2005Ca8A78c4";
 export const WETH = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2";
 export const VCX_POOL = "0x577A7f7EE659Aa14Dc16FD384B3F8078E23F1920"; // Same as WETH_VCX_LP
@@ -17,15 +17,16 @@ export const VOTING_ESCROW = "0x0aB4bC35Ef33089B9082Ca7BB8657D7c4E819a1A"; // Sa
 export const GAUGE_CONTROLLER = "0xD57d8EEC36F0Ba7D8Fd693B9D97e02D8353EB1F4";
 export const GAUGE_FACTORY = "0x8133cA3AB91B3FE3792992eA69720Ca6d3A92163";
 export const SMART_WALLET_CHECKER = "0x8427155770f7e6b973249E2f9D140a495aBE4f90";
+export const VE_BEACON = "0x6e220Be8511ACc1db8ACD4e2e66f987CF7529Af6";
 
-export const VaultRegistryByChain: { [key: number]: Address } = {
+export const VaultRegistryByChain: AddressByChain = {
   1: "0x007318Dc89B314b47609C684260CfbfbcD412864",
   137: "0x2246c4c469735bCE95C120939b0C078EC37A08D0",
   10: "0xdD0d135b5b52B7EDd90a83d4A4112C55a1A6D23A",
   42161: "0xB205e94D402742B919E851892f7d515592a7A6cC",
 };
 
-export const VaultControllerByChain: { [key: number]: Address } = {
+export const VaultControllerByChain: AddressByChain = {
   1: "0x7D51BABA56C2CA79e15eEc9ECc4E92d9c0a7dbeb",
   1337: "0x7D51BABA56C2CA79e15eEc9ECc4E92d9c0a7dbeb",
   42161: "0xF40749d72Ab5422CC5d735A373E66d67f7cA9393",
@@ -34,14 +35,22 @@ export const VaultControllerByChain: { [key: number]: Address } = {
   137: "0xCe22Ff6d00c5414E64b9253Dd49a35e0B9Ea8b60",
 };
 
-export const VaultRouterByChain: { [key: number]: Address } = {
+export const VaultRouterByChain: AddressByChain = {
   1: "0x7D51BABA56C2CA79e15eEc9ECc4E92d9c0a7dbeb",
   11155111: "0xd6a81E846725256a910fC51Dce0b67582D4031b4",
   421614: "0xA5537e56fb1Ef1F892E6FeBb74B858B234D0eA7A"
 }
 
+export const VeRecipientByChain: AddressByChain = {
+  10: "0xC1A6Db6793967Ff7fb7f211E044A4c285A0eB7FB",
+  42161: "0xC1A6Db6793967Ff7fb7f211E044A4c285A0eB7FB"
+}
 
-
+export const OptionTokenByChain: AddressByChain = {
+  1: "0xaFa52E3860b4371ab9d8F08E801E9EA1027C0CA2",
+  10: "0xD41d34d6b50785fDC025caD971fE940B8AA1bE45",
+  42161: "0xC1A6Db6793967Ff7fb7f211E044A4c285A0eB7FB"
+}
 
 export const zapAssetAddressesByChain: { [key: number]: Address[] } = {
   1: [
