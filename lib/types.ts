@@ -12,31 +12,6 @@ export type Token = {
   chainId?: number;
 };
 
-export type VeAddresses = {
-  VCX: Address;
-  WETH_VCX_LP: Address;
-  VE_VCX: Address;
-  POP: Address;
-  WETH: Address;
-  BalancerPool: Address;
-  BalancerOracle: Address;
-  BalancerVault: Address;
-  oVCX: Address;
-  VaultRegistry: Address;
-  BoostV2: Address;
-  Minter: Address;
-  TokenAdmin: Address;
-  VotingEscrow: Address;
-  GaugeController: Address;
-  GaugeFactory: Address;
-  SmartWalletChecker: Address;
-  VotingEscrowDelegation: Address;
-  VeBeacon: Address;
-  VeRecipient: Address;
-  ArbitrumBridge: Address;
-  FeeDistributor: Address;
-};
-
 export type Asset = {
   chains: number[];
   address: { [key: string]: Address };
