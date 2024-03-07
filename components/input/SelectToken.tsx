@@ -24,7 +24,7 @@ export default function SelectToken({
   chainId,
 }: SelectTokenProps): JSX.Element {
   const [show, setShow] = useState(false);
-  const selectTokenId = selectedToken?.symbol.split(' ').join('');
+  const selectTokenId = selectedToken?.symbol.split(" ").join("");
 
   return (
     <>
@@ -50,18 +50,28 @@ export default function SelectToken({
       </div>
       <div className="relative w-auto justify-end">
         <span
-          className={`flex flex-row items-center justify-end ${allowSelection ? "cursor-pointer group" : ""}`}
+          className={`flex flex-row items-center justify-end ${
+            allowSelection ? "cursor-pointer group" : ""
+          }`}
           onClick={() => {
             allowSelection && setShow(true);
           }}
         >
           <div className="md:mr-2 relative flex-none w-5 h-5">
-            <TokenIcon token={selectedToken} icon={selectedToken?.logoURI} imageSize="w-5 h-5" chainId={chainId} />
+            <TokenIcon
+              token={selectedToken}
+              icon={selectedToken?.logoURI}
+              imageSize="w-5 h-5"
+              chainId={chainId}
+            />
           </div>
-          <p id={selectTokenId} className="font-medium text-lg leading-none hidden md:block text-white group-hover:text-primary truncate cursor-pointer">
+          <p
+            id={selectTokenId}
+            className="font-medium text-lg leading-none hidden md:block text-white group-hover:text-primary truncate cursor-pointer"
+          >
             {selectedToken?.symbol}
           </p>
-          <div className='hidden md:block'>
+          <div className="hidden md:block">
             <Tooltip
               anchorSelect={`#${selectTokenId}`}
               place="bottom"
@@ -70,7 +80,7 @@ export default function SelectToken({
               {selectedToken?.symbol}
             </Tooltip>
           </div>
-          <div className='md:hidden'>
+          <div className="md:hidden">
             <Tooltip
               anchorSelect={`#${selectedToken?.symbol}`}
               openOnClick
@@ -83,7 +93,9 @@ export default function SelectToken({
           {allowSelection && (
             <ChevronDownIcon
               className={`w-6 h-6 ml-2 text-secondaryLight group-hover:text-primary 
-              transform transition-all ease-in-out duration-200 ${show ? " rotate-180" : ""}`}
+              transform transition-all ease-in-out duration-200 ${
+                show ? " rotate-180" : ""
+              }`}
             />
           )}
         </span>
@@ -95,7 +107,9 @@ export default function SelectToken({
           onClosePopUpModal={() => setShow(false)}
           classNames="w-fit max-w-fit min-w-fit md:hidden"
         >
-          <p className="text-base text-white font-normal mb-2">Select a token</p>
+          <p className="text-base text-white font-normal mb-2">
+            Select a token
+          </p>
           <SearchToken
             chainId={chainId}
             options={options}

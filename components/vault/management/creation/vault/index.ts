@@ -5,12 +5,7 @@ import StrategyContainer from "@/components/vault/management/creation/vault/Stra
 import ReviewContainer from "@/components/vault/management/creation/vault/ReviewContainer";
 
 export interface VaultCreationContainerProps extends ProgressBarProps {
-  route: string
+  route: string;
 }
 
-export {
-  BasicsContainer,
-  FeesContainer,
-  StrategyContainer,
-  ReviewContainer
-}
+export { BasicsContainer, FeesContainer, StrategyContainer, ReviewContainer };

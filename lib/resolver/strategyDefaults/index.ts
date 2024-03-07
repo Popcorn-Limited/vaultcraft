@@ -1,4 +1,3 @@
-
 import { Address } from "viem";
 import {
   alpacaV1,
@@ -24,19 +23,25 @@ import {
   stargate,
   velodrome,
   yearn,
-  yearnFactory
+  yearnFactory,
 } from "./resolver";
 import { PublicClient } from "wagmi";
 
 export type StrategyDefaultResolverParams = {
-  chainId: number,
-  client: PublicClient,
-  address: Address
-}
+  chainId: number;
+  client: PublicClient;
+  address: Address;
+};
 
 export type StrategyDefaultResolvers = typeof StrategyDefaultResolvers;
 
-export const StrategyDefaultResolvers: { [key: string]: ({ chainId, client, address }: StrategyDefaultResolverParams) => Promise<any[]> } = {
+export const StrategyDefaultResolvers: {
+  [key: string]: ({
+    chainId,
+    client,
+    address,
+  }: StrategyDefaultResolverParams) => Promise<any[]>;
+} = {
   alpacaV1,
   alpacaV2,
   aura,
@@ -60,7 +65,7 @@ export const StrategyDefaultResolvers: { [key: string]: ({ chainId, client, addr
   velodrome,
   yearn,
   yearnFactory,
-  default:initDefault,
+  default: initDefault,
 };
 
 export default StrategyDefaultResolvers;

@@ -1,10 +1,15 @@
 import { calcUnlockTime, calculateVeOut } from "@/lib/gauges/utils";
 
-export default function LockPreview({ amount, days }: { amount: string, days: number }): JSX.Element {
+export default function LockPreview({
+  amount,
+  days,
+}: {
+  amount: string;
+  days: number;
+}): JSX.Element {
   const val = Number(amount);
   return (
     <div className="space-y-8 mb-8 text-start">
-
       <h2 className="text-start text-5xl">Preview Lock</h2>
 
       <div className="space-y-2">
@@ -23,9 +28,11 @@ export default function LockPreview({ amount, days }: { amount: string, days: nu
       </div>
 
       <div className="w-full border border-customLightGray rounded-lg p-4">
-        <p className="text-primaryDark">Important: veVCX is not transferrable and unlocking VCX-LP early results in a penalty of up to 25% of your VCX-LP</p>
+        <p className="text-primaryDark">
+          Important: veVCX is not transferrable and unlocking VCX-LP early
+          results in a penalty of up to 25% of your VCX-LP
+        </p>
       </div>
-
-    </div >
-  )
+    </div>
+  );
 }

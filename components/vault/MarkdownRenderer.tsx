@@ -1,9 +1,9 @@
-import MarkedReact from "marked-react"
+import MarkedReact from "marked-react";
 
 function MarkdownRenderer({ content = "" }) {
   const formattedContent = content
     .replace(/---/g, "\n\n---\n")
-    .replace(/ {3,}/g, "")
+    .replace(/ {3,}/g, "");
 
   // Enforce `---` to be in a solo line
   // Remove `   ` large spacing to be null (we asume it's vscode formatting)
@@ -12,7 +12,7 @@ function MarkdownRenderer({ content = "" }) {
     <MarkedReact
       renderer={{
         hr() {
-          return <br />
+          return <br />;
         },
         link(href, text) {
           return (
@@ -24,10 +24,10 @@ function MarkdownRenderer({ content = "" }) {
             >
               {text}
             </a>
-          )
+          );
         },
         heading(children) {
-          return <h3 className="font-medium text-lg mb-1">{children}</h3>
+          return <h3 className="font-medium text-lg mb-1">{children}</h3>;
         },
       }}
       breaks
@@ -35,7 +35,7 @@ function MarkdownRenderer({ content = "" }) {
     >
       {formattedContent}
     </MarkedReact>
-  )
+  );
 }
 
-export default MarkdownRenderer
+export default MarkdownRenderer;

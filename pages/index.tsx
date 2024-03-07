@@ -1,4 +1,3 @@
-// @ts-ignore
 import NoSSR from "react-no-ssr";
 import React, { useEffect } from "react";
 import { useRouter } from "next/router";

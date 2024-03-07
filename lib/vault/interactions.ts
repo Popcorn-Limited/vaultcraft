@@ -13,7 +13,17 @@ interface VaultWriteProps {
   account: Address;
   amount: number;
   clients: Clients;
-  fireEvent?: (type: string, { user_address, network, contract_address, asset_amount, asset_ticker, additionalEventData }: FireEventArgs) => Promise<void>;
+  fireEvent?: (
+    type: string,
+    {
+      user_address,
+      network,
+      contract_address,
+      asset_amount,
+      asset_ticker,
+      additionalEventData,
+    }: FireEventArgs
+  ) => Promise<void>;
   referral?: Address;
 }
 
@@ -38,7 +48,13 @@ interface VaultRouterSimulateProps extends BaseSimulateProps {
   gauge: Address;
 }
 
-async function simulateVaultCall({ address, account, args, functionName, publicClient }: VaultSimulateProps): Promise<SimulationResponse> {
+async function simulateVaultCall({
+  address,
+  account,
+  args,
+  functionName,
+  publicClient,
+}: VaultSimulateProps): Promise<SimulationResponse> {
   try {
     const { request } = await publicClient.simulateContract({
       account,
@@ -47,15 +63,23 @@ async function simulateVaultCall({ address, account, args, functionName, publicC
       // @ts-ignore
       functionName,
       // @ts-ignore
-      args
-    })
-    return { request: request, success: true, error: null }
+      args,
+    });
+    return { request: request, success: true, error: null };
   } catch (error: any) {
-    return { request: null, success: false, error: error.shortMessage }
+    return { request: null, success: false, error: error.shortMessage };
   }
 }
 
-async function simulateVaultRouterCall({ address, account, amount, vault, gauge, functionName, publicClient }: VaultRouterSimulateProps): Promise<SimulationResponse> {
+async function simulateVaultRouterCall({
+  address,
+  account,
+  amount,
+  vault,
+  gauge,
+  functionName,
+  publicClient,
+}: VaultRouterSimulateProps): Promise<SimulationResponse> {
   try {
     const { request } = await publicClient.simulateContract({
       account,
@@ -64,16 +88,31 @@ async function simulateVaultRouterCall({ address, account, amount, vault, gauge,
       // @ts-ignore
       functionName,
       // @dev Since numbers get converted to strings like 1e+21 or similar we need to convert it back to numbers like 10000000000000 and than cast them into BigInts
-      args: [vault, gauge, BigInt(Number(amount).toLocaleString("fullwide", { useGrouping: false })), account]
-    })
-    return { request: request, success: true, error: null }
+      args: [
+        vault,
+        gauge,
+        BigInt(
+          Number(amount).toLocaleString("fullwide", { useGrouping: false })
+        ),
+        account,
+      ],
+    });
+    return { request: request, success: true, error: null };
   } catch (error: any) {
-    return { request: null, success: false, error: error.shortMessage }
+    return { request: null, success: false, error: error.shortMessage };
   }
 }
 
-export async function vaultDeposit({ chainId, vaultData, account, amount, clients, fireEvent, referral }: VaultWriteProps): Promise<boolean> {
-  showLoadingToast("Depositing into the vault...")
+export async function vaultDeposit({
+  chainId,
+  vaultData,
+  account,
+  amount,
+  clients,
+  fireEvent,
+  referral,
+}: VaultWriteProps): Promise<boolean> {
+  showLoadingToast("Depositing into the vault...");
 
   const success = await handleCallResult({
     successMessage: "Deposited into the vault!",
@@ -81,42 +120,57 @@ export async function vaultDeposit({ chainId, vaultData, account, amount, client
       address: vaultData.address,
       account,
       // @dev Since numbers get converted to strings like 1e+21 or similar we need to convert it back to numbers like 10000000000000 and than cast them into BigInts
-      args: [BigInt(Number(amount).toLocaleString("fullwide", { useGrouping: false })), account],
+      args: [
+        BigInt(
+          Number(amount).toLocaleString("fullwide", { useGrouping: false })
+        ),
+        account,
+      ],
       functionName: "deposit",
-      publicClient: clients.publicClient
+      publicClient: clients.publicClient,
     }),
-    clients
-  })
+    clients,
+  });
 
   if (success && fireEvent) {
     void fireEvent("addLiquidity", {
       user_address: account,
       network: networkMap[chainId].toLowerCase(),
       contract_address: vaultData.address,
-      asset_amount: String(amount / (10 ** vaultData.asset.decimals)),
+      asset_amount: String(amount / 10 ** vaultData.asset.decimals),
       asset_ticker: vaultData.asset.symbol,
       additionalEventData: {
         referral: referral,
-        vault_name: vaultData.metadata.vaultName
-      }
+        vault_name: vaultData.metadata.vaultName,
+      },
     });
   }
-  return success
+  return success;
 }
 
-
-export async function vaultRedeem({ chainId, vaultData, account, amount, clients, fireEvent, referral }: VaultWriteProps): Promise<boolean> {
-  showLoadingToast("Withdrawing from the vault...")
+export async function vaultRedeem({
+  chainId,
+  vaultData,
+  account,
+  amount,
+  clients,
+  fireEvent,
+  referral,
+}: VaultWriteProps): Promise<boolean> {
+  showLoadingToast("Withdrawing from the vault...");
 
   const maxRedeem = await clients.publicClient.readContract({
     address: vaultData.address,
     abi: VaultAbi,
-    functionName: 'maxRedeem',
-    args: [account]
+    functionName: "maxRedeem",
+    args: [account],
   });
 
-  if (maxRedeem < BigInt(Number(amount).toLocaleString("fullwide", { useGrouping: false }))) {
-    amount = Number(maxRedeem)
+  if (
+    maxRedeem <
+    BigInt(Number(amount).toLocaleString("fullwide", { useGrouping: false }))
+  ) {
+    amount = Number(maxRedeem);
   }
 
   const success = await handleCallResult({
@@ -125,31 +179,46 @@ export async function vaultRedeem({ chainId, vaultData, account, amount, clients
       address: vaultData.address,
       account,
       // @dev Since numbers get converted to strings like 1e+21 or similar we need to convert it back to numbers like 10000000000000 and than cast them into BigInts
-      args: [BigInt(Number(amount).toLocaleString("fullwide", { useGrouping: false })), account, account],
+      args: [
+        BigInt(
+          Number(amount).toLocaleString("fullwide", { useGrouping: false })
+        ),
+        account,
+        account,
+      ],
       functionName: "redeem",
-      publicClient: clients.publicClient
+      publicClient: clients.publicClient,
     }),
-    clients
-  })
+    clients,
+  });
 
   if (success && fireEvent) {
     void fireEvent("removeLiquidity", {
       user_address: account,
       network: networkMap[chainId].toLowerCase(),
       contract_address: vaultData.address,
-      asset_amount: String(amount / (10 ** vaultData.vault.decimals)),
+      asset_amount: String(amount / 10 ** vaultData.vault.decimals),
       asset_ticker: vaultData.asset.symbol,
       additionalEventData: {
         referral: referral,
-        vault_name: vaultData.metadata.vaultName
-      }
+        vault_name: vaultData.metadata.vaultName,
+      },
     });
   }
-  return success
+  return success;
 }
 
-export async function vaultDepositAndStake({ chainId, router, vaultData, account, amount, clients, fireEvent, referral }: VaultRouterWriteProps): Promise<boolean> {
-  showLoadingToast("Depositing into the vault...")
+export async function vaultDepositAndStake({
+  chainId,
+  router,
+  vaultData,
+  account,
+  amount,
+  clients,
+  fireEvent,
+  referral,
+}: VaultRouterWriteProps): Promise<boolean> {
+  showLoadingToast("Depositing into the vault...");
 
   const gauge = vaultData.gauge;
   console.log({
@@ -171,28 +240,37 @@ export async function vaultDepositAndStake({ chainId, router, vaultData, account
       // @ts-ignore
       gauge: gauge?.childGauge || gauge?.address as Address,
       functionName: "depositAndStake",
-      publicClient: clients.publicClient
+      publicClient: clients.publicClient,
     }),
-    clients
-  })
+    clients,
+  });
   if (success && fireEvent) {
     void fireEvent("addLiquidity", {
       user_address: account,
       network: networkMap[chainId].toLowerCase(),
       contract_address: vaultData.address,
-      asset_amount: String(amount / (10 ** vaultData.asset.decimals)),
+      asset_amount: String(amount / 10 ** vaultData.asset.decimals),
       asset_ticker: vaultData.asset.symbol,
       additionalEventData: {
         referral: referral,
-        vault_name: vaultData.metadata.vaultName
-      }
+        vault_name: vaultData.metadata.vaultName,
+      },
     });
   }
-  return success
+  return success;
 }
 
-export async function vaultUnstakeAndWithdraw({ chainId, router, vaultData, account, amount, clients, fireEvent, referral }: VaultRouterWriteProps): Promise<boolean> {
-  showLoadingToast("Withdrawing from the vault...")
+export async function vaultUnstakeAndWithdraw({
+  chainId,
+  router,
+  vaultData,
+  account,
+  amount,
+  clients,
+  fireEvent,
+  referral,
+}: VaultRouterWriteProps): Promise<boolean> {
+  showLoadingToast("Withdrawing from the vault...");
 
   const gauge = vaultData.gauge;
   const success = await handleCallResult({
@@ -205,22 +283,22 @@ export async function vaultUnstakeAndWithdraw({ chainId, router, vaultData, acco
       // @ts-ignore
       gauge: gauge?.childGauge || gauge?.address as Address,
       functionName: "unstakeAndWithdraw",
-      publicClient: clients.publicClient
+      publicClient: clients.publicClient,
     }),
-    clients
-  })
+    clients,
+  });
   if (success && fireEvent) {
     void fireEvent("removeLiquidity", {
       user_address: account,
       network: networkMap[chainId].toLowerCase(),
       contract_address: vaultData.address,
-      asset_amount: String(amount / (10 ** vaultData.vault.decimals)),
+      asset_amount: String(amount / 10 ** vaultData.vault.decimals),
       asset_ticker: vaultData.asset.symbol,
       additionalEventData: {
         referral: referral,
-        vault_name: vaultData.metadata.vaultName
-      }
+        vault_name: vaultData.metadata.vaultName,
+      },
     });
   }
-  return success
+  return success;
 }

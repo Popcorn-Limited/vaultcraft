@@ -1,4 +1,11 @@
-import { arbitrum, arbitrumSepolia, bsc, localhost, mainnet, optimism, polygon, sepolia } from "viem/chains";
+import {
+  arbitrum,
+  bsc,
+  localhost,
+  mainnet,
+  optimism,
+  polygon,
+} from "viem/chains";
 
 export enum ChainId {
   Ethereum = 1,
@@ -103,4 +110,4 @@ export const RPC_URLS: { [key: number]: string } = {
 
 };
 
-export const SUPPORTED_NETWORKS = [mainnet, polygon, optimism, arbitrum]
+export const SUPPORTED_NETWORKS = [mainnet, polygon, optimism, arbitrum];

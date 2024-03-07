@@ -18,14 +18,17 @@ interface AuraPool {
   };
 }
 
-export default async function getAuraPools(chainId: number): Promise<AuraPool[]> {
-  const res = await (await fetch('https://data.aura.finance/graphql', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      query: `
+export default async function getAuraPools(
+  chainId: number
+): Promise<AuraPool[]> {
+  const res = await (
+    await fetch("https://data.aura.finance/graphql", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: `
         query Pools($chainId: Int = 1) {
           pools(chainId: $chainId){
             id
@@ -48,10 +51,11 @@ export default async function getAuraPools(chainId: number): Promise<AuraPool[]>
           }
         }
       `,
-      variables: {
-        chainId: chainId,
-      },
-    }),
-  })).json()
-  return res.data.pools
+        variables: {
+          chainId: chainId,
+        },
+      }),
+    })
+  ).json();
+  return res.data.pools;
 }

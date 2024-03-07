@@ -1,5 +1,3 @@
 import { curveApiCallToBytes } from "./call";
 
-export {
-  curveApiCallToBytes
-};
+export { curveApiCallToBytes };

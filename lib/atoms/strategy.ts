@@ -25,10 +25,13 @@ export const DEFAULT_STRATEGY = {
   description: "none",
   logoURI: "",
   protocol: "none",
-  chains: [1]
+  chains: [1],
 };
 
 export const strategyAtom = atom<Strategy>(DEFAULT_STRATEGY);
 
 export const strategyConfigAtom = atom<any[]>([]);
-export const strategyDeploymentAtom = atom<AdapterConfig>({ id: stringToHex("", { size: 32 }), data: "0x" });
+export const strategyDeploymentAtom = atom<AdapterConfig>({
+  id: stringToHex("", { size: 32 }),
+  data: "0x",
+});

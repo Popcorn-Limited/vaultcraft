@@ -9,23 +9,23 @@ import { useAtom } from "jotai";
 import { lockvaultsAtom, vaultsAtom } from "@/lib/atoms/vaults";
 
 export default function Products(): JSX.Element {
-  const [vaults] = useAtom(vaultsAtom)
+  const [vaults] = useAtom(vaultsAtom);
   const [vaultTvl, setVaultTvl] = useState<number>(0);
 
   useEffect(() => {
     if (vaults) {
-      setVaultTvl((vaults.reduce((a, b) => a + b.tvl, 0)))
+      setVaultTvl(vaults.reduce((a, b) => a + b.tvl, 0));
     }
-  }, [vaults])
+  }, [vaults]);
 
-  const [lockVaults] = useAtom(lockvaultsAtom)
+  const [lockVaults] = useAtom(lockvaultsAtom);
   const [lockVaultTvl, setLockVaultTvl] = useState<number>(0);
 
   useEffect(() => {
     if (lockVaults) {
-      setLockVaultTvl((lockVaults.reduce((a, b) => a + b.tvl, 0)))
+      setLockVaultTvl(lockVaults.reduce((a, b) => a + b.tvl, 0));
     }
-  }, [lockVaults])
+  }, [lockVaults]);
 
   return (
     <>
@@ -40,7 +40,13 @@ export default function Products(): JSX.Element {
                 Vaults
               </>
             }
-            customContent={<PopSmileyIcon size={"60"} color={"white"} className="group-hover:fill-[#FFA0B4]" />}
+            customContent={
+              <PopSmileyIcon
+                size={"60"}
+                color={"white"}
+                className="group-hover:fill-[#FFA0B4]"
+              />
+            }
             description="Single-asset vaults to earn yield on your digital assets"
             stats={[
               {
@@ -48,10 +54,15 @@ export default function Products(): JSX.Element {
                 content: `$${NumberFormatter.format(vaultTvl)}`,
                 infoIconProps: {
                   title: "Total Value Locked",
-                  content: <p>The total value of assets held <br /> by the underlying smart contracts.</p>,
+                  content: (
+                    <p>
+                      The total value of assets held <br /> by the underlying
+                      smart contracts.
+                    </p>
+                  ),
                   id: "smart-vault-tvl",
                 },
-              }
+              },
             ]}
             route="vaults"
           />
@@ -62,7 +73,13 @@ export default function Products(): JSX.Element {
                 Vaults
               </>
             }
-            customContent={<PopIcon size={"60"} color={"white"} className="group-hover:fill-[#80FF77]" />}
+            customContent={
+              <PopIcon
+                size={"60"}
+                color={"white"}
+                className="group-hover:fill-[#80FF77]"
+              />
+            }
             description="Lock your assets in yield strategies and earn additional rewards on top!"
             stats={[
               {
@@ -70,10 +87,15 @@ export default function Products(): JSX.Element {
                 content: `$${NumberFormatter.format(lockVaultTvl)}`,
                 infoIconProps: {
                   title: "Total Value Locked",
-                  content: <p>The total value of assets held <br /> by the underlying smart contracts.</p>,
+                  content: (
+                    <p>
+                      The total value of assets held <br /> by the underlying
+                      smart contracts.
+                    </p>
+                  ),
                   id: "lock-vault-tvl",
                 },
-              }
+              },
             ]}
             route="vaults/lock"
           />
@@ -84,7 +106,13 @@ export default function Products(): JSX.Element {
                 Vaults
               </>
             }
-            customContent={<SmileyIcon size={"60"} color={"white"} className="group-hover:fill-[#C391FF]" />}
+            customContent={
+              <SmileyIcon
+                size={"60"}
+                color={"white"}
+                className="group-hover:fill-[#C391FF]"
+              />
+            }
             description="Lock stake your VCX-LP to boost your rewards with call options on VCX"
             stats={[]}
             route="boost"
@@ -96,7 +124,13 @@ export default function Products(): JSX.Element {
                 Vaults
               </>
             }
-            customContent={<HandIcon size={"60"} color={"white"} className="group-hover:fill-[#FFE650]" />}
+            customContent={
+              <HandIcon
+                size={"60"}
+                color={"white"}
+                className="group-hover:fill-[#FFE650]"
+              />
+            }
             description="Create automated assets strategies within minutes"
             stats={[]}
             route="/create-vault"
@@ -105,4 +139,4 @@ export default function Products(): JSX.Element {
       </section>
     </>
   );
-};
+}

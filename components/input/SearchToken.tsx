@@ -12,14 +12,23 @@ interface SearchTokenProps {
   chainId: ChainId;
 }
 
-export default function SearchToken({ options, selectToken, selectedToken, chainId }: SearchTokenProps): JSX.Element {
+export default function SearchToken({
+  options,
+  selectToken,
+  selectedToken,
+  chainId,
+}: SearchTokenProps): JSX.Element {
   const [search, setSearch] = useState("");
   const [filteredOptions, setFilteredOptions] = useState<Token[]>(options);
 
   const handleSearchChange = (value: string) => {
     setSearch(value);
     if (value.trim().length > 0) {
-      setFilteredOptions(options.filter((option) => option.name.toLowerCase().includes(value.toLowerCase())));
+      setFilteredOptions(
+        options.filter((option) =>
+          option.name.toLowerCase().includes(value.toLowerCase())
+        )
+      );
     } else {
       setFilteredOptions(options);
     }
@@ -29,7 +38,10 @@ export default function SearchToken({ options, selectToken, selectedToken, chain
     <div className="flex flex-col gap-4">
       <div className="relative mb-4">
         <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-          <MagnifyingGlassIcon className="h-6 w-6 md:h-8 md:w-8 text-white" aria-hidden="true" />
+          <MagnifyingGlassIcon
+            className="h-6 w-6 md:h-8 md:w-8 text-white"
+            aria-hidden="true"
+          />
         </div>
         <input
           type="text"
@@ -42,10 +54,22 @@ export default function SearchToken({ options, selectToken, selectedToken, chain
         />
       </div>
       {options
-        .filter((option) => zapAssetAddressesByChain[chainId].find((address) => address == option.address))
-        .reduce((acc: Token[][], _, i, arr: Token[],) => (i % 2 === 0 ? acc.push(arr.slice(i, i + 2)) : acc, acc), [])
+        .filter((option) =>
+          zapAssetAddressesByChain[chainId].find(
+            (address) => address == option.address
+          )
+        )
+        .reduce(
+          (acc: Token[][], _, i, arr: Token[]) => (
+            i % 2 === 0 ? acc.push(arr.slice(i, i + 2)) : acc, acc
+          ),
+          []
+        )
         .map((quickOption) => (
-          <div className="flex gap-6" key={`quickOption-${quickOption[0].address}`}>
+          <div
+            className="flex gap-6"
+            key={`quickOption-${quickOption[0].address}`}
+          >
             {quickOption.map((option) => (
               <div className="w-fit" key={option?.address}>
                 <button
@@ -55,7 +79,11 @@ export default function SearchToken({ options, selectToken, selectedToken, chain
                   }}
                 >
                   <span className="relative mr-2">
-                    <TokenIcon token={option} imageSize="w-5 h-5" chainId={chainId} />
+                    <TokenIcon
+                      token={option}
+                      imageSize="w-5 h-5"
+                      chainId={chainId}
+                    />
                   </span>
                   <span>{option.name}</span>
                 </button>
@@ -74,13 +102,18 @@ export default function SearchToken({ options, selectToken, selectedToken, chain
               }}
             >
               <span
-                className={`flex items-center py-3 px-3 ${selectedToken.address === option.address
-                  ? "text-[#DFFF1C] font-semibold"
-                  : "text-primary font-normal  cursor-pointer"
-                  }`}
+                className={`flex items-center py-3 px-3 ${
+                  selectedToken.address === option.address
+                    ? "text-[#DFFF1C] font-semibold"
+                    : "text-primary font-normal  cursor-pointer"
+                }`}
               >
                 <span className="w-5 h-5 inline-flex mr-3 flex-shrink-0 cursor-pointer">
-                  <img src={option.logoURI} alt={option.symbol} className="h-full w-full object-contain" />
+                  <img
+                    src={option.logoURI}
+                    alt={option.symbol}
+                    className="h-full w-full object-contain"
+                  />
                 </span>
                 <span className="cursor-pointer">{option.symbol}</span>
               </span>
@@ -90,4 +123,4 @@ export default function SearchToken({ options, selectToken, selectedToken, chain
       </div>
     </div>
   );
-};
+}
