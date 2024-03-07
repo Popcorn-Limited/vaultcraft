@@ -1,11 +1,8 @@
 import { Address, PublicClient, zeroAddress } from "viem";
 import { useContractReads } from "wagmi";
 import { getVotePeriodEndTime } from "@/lib/gauges/utils";
-import { getVeAddresses } from "@/lib/constants";
-import { GaugeControllerAbi } from "@/lib/constants";
+import { GAUGE_CONTROLLER, GaugeControllerAbi } from "@/lib/constants";
 import { VoteUserSlopes } from "@/lib/types";
-
-const { GaugeController: GAUGE_CONTROLLER } = getVeAddresses();
 
 export default function useGaugeWeights({
   address,

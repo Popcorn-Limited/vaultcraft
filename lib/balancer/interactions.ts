@@ -6,10 +6,10 @@ import {
   parseAbiParameters,
 } from "viem";
 import { showLoadingToast } from "@/lib/toasts";
-import { getVeAddresses } from "@/lib/constants";
 import { Clients, SimulationResponse } from "@/lib/types";
-import { BalancerVaultAbi } from "../constants/abi/BalancerVault";
-import { handleCallResult } from "../utils/helpers";
+import { BalancerVaultAbi } from "@/lib/constants/abi/BalancerVault";
+import { handleCallResult } from "@/lib/utils/helpers";
+import { BALANCER_VAULT, VCX, WETH } from "@/lib/constants";
 
 type SimulationContract = {
   address: Address;
@@ -23,8 +23,6 @@ interface SimulateProps {
   publicClient: PublicClient;
   args?: any[];
 }
-
-const { VCX, WETH, BalancerVault } = getVeAddresses();
 
 async function simulateCall({
   account,
@@ -66,7 +64,7 @@ export async function depositIntoPool({
     simulationResponse: await simulateCall({
       account,
       contract: {
-        address: BalancerVault,
+        address: BALANCER_VAULT,
         abi: BalancerVaultAbi,
       },
       functionName: "joinPool",

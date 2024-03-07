@@ -1,5 +1,4 @@
 import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
-import { getVeAddresses } from "@/lib/constants";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import {
@@ -15,13 +14,7 @@ import { claimOPop } from "@/lib/optionToken/interactions";
 import { WalletClient } from "viem";
 import { Token } from "@/lib/types";
 import { llama } from "@/lib/resolver/price/resolver";
-
-const {
-  oVCX: OVCX,
-  VCX,
-  WETH,
-  Minter: MINTER
-} = getVeAddresses();
+import { MinterByChain, OptionTokenByChain, VCX, WETH } from "@/lib/constants";
 
 interface OptionTokenInterfaceProps {
   gauges: Token[];
@@ -45,7 +38,7 @@ export default function OptionTokenInterface({
   const { data: oBal } = useBalance({
     chainId: 1,
     address: account,
-    token: OVCX,
+    token: OptionTokenByChain[1],
     watch: true,
   });
   const { data: wethBal } = useBalance({
@@ -128,7 +121,7 @@ export default function OptionTokenInterface({
                   ?.filter((gauge) => Number(gauge.amount) > 0)
                   .map((gauge) => gauge.address) as Address[],
                 account: account as Address,
-                minter: MINTER,
+                minter: MinterByChain[1],
                 clients: { publicClient, walletClient: walletClient as WalletClient }
               })}
             disabled={gaugeRewards ? Number(gaugeRewards?.total) === 0 : true}

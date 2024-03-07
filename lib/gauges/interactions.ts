@@ -2,17 +2,14 @@ import {
   Abi,
   Address,
   PublicClient,
-  getAddress,
   parseEther,
   zeroAddress,
 } from "viem";
 import { Clients, VaultData } from "@/lib/types";
 import { showLoadingToast } from "@/lib/toasts";
 import { SimulationResponse } from "@/lib/types";
-import { getVeAddresses } from "@/lib/constants";
-import { GaugeAbi, GaugeControllerAbi, VotingEscrowAbi } from "@/lib/constants";
+import { GAUGE_CONTROLLER, GaugeAbi, GaugeControllerAbi, VOTING_ESCROW, VotingEscrowAbi } from "@/lib/constants";
 import { handleCallResult } from "@/lib/utils/helpers";
-import { voteUserSlopes } from "@/lib/gauges/useGaugeWeights";
 
 type SimulationContract = {
   address: Address;
@@ -26,9 +23,6 @@ interface SimulateProps {
   publicClient: PublicClient;
   args?: any[];
 }
-
-const { GaugeController: GAUGE_CONTROLLER, VotingEscrow: VOTING_ESCROW } =
-  getVeAddresses();
 
 async function simulateCall({
   account,

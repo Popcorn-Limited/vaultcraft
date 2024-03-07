@@ -7,7 +7,6 @@ import {
 } from "wagmi";
 import { Address, WalletClient } from "viem";
 import { useEffect, useState } from "react";
-import { getVeAddresses } from "@/lib/constants";
 import { hasAlreadyVoted } from "@/lib/gauges/hasAlreadyVoted";
 import { Token, VaultData } from "@/lib/types";
 import StakingInterface from "@/components/boost/StakingInterface";
@@ -26,8 +25,7 @@ import NetworkFilter from "@/components/network/NetworkFilter";
 import SearchBar from "@/components/input/SearchBar";
 import VaultsSorting from "@/components/vault/VaultsSorting";
 import useNetworkFilter from "@/lib/useNetworkFilter";
-
-const { VotingEscrow: VOTING_ESCROW } = getVeAddresses();
+import { VOTING_ESCROW } from "@/lib/constants";
 
 const HIDDEN_VAULTS = [
   // eth

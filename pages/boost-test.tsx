@@ -2,7 +2,7 @@ import NoSSR from "react-no-ssr";
 import { sepolia, useAccount, useBalance, usePublicClient, useWalletClient } from "wagmi";
 import { Address, PublicClient, ReadContractParameters, WalletClient, createPublicClient, http, maxUint256, parseEther, parseUnits, zeroAddress } from "viem";
 import { useEffect, useState } from "react";
-import { GaugeAbi, GaugeControllerAbi, VaultAbi, ZERO, getVeAddresses } from "@/lib/constants";
+import { GaugeAbi, GaugeControllerAbi, MinterByChain, OptionTokenByChain, VCX_LP, VOTING_ESCROW, VaultAbi, ZERO } from "@/lib/constants";
 import { hasAlreadyVoted } from "@/lib/gauges/hasAlreadyVoted";
 import { Token, VaultData } from "@/lib/types";
 import { sendVotes } from "@/lib/gauges/interactions";
@@ -34,8 +34,6 @@ import { showLoadingToast } from "@/lib/toasts";
 import { handleCallResult } from "@/lib/utils/helpers";
 import { claimOPop } from "@/lib/optionToken/interactions";
 import SmartVault from "@/components/vault/SmartVault";
-
-const { VotingEscrow: VOTING_ESCROW, WETH_VCX_LP, oVCX: OVCX, GaugeController: GAUGE_CONTROLLER, Minter: MINTER, VeBeacon: VE_BEACON } = getVeAddresses()
 
 export const ETH_SEPOLIA_CHAIN_ID = 11155111;
 export const ARB_SEPOLIA_CHAIN_ID = 421614;
@@ -651,7 +649,7 @@ export function StakingInterface({ setShowLockModal, setShowMangementModal, setS
 
   const { data: lockedBal } = useLockedBalanceOf({ chainId: ETH_SEPOLIA_CHAIN_ID, address: VOTING_ESCROW, account: account as Address })
   const { data: veBal } = useBalance({ chainId: ETH_SEPOLIA_CHAIN_ID, address: account, token: VOTING_ESCROW, watch: true })
-  const { data: LpBal } = useBalance({ chainId: ETH_SEPOLIA_CHAIN_ID, address: account, token: WETH_VCX_LP, watch: true })
+  const { data: LpBal } = useBalance({ chainId: ETH_SEPOLIA_CHAIN_ID, address: account, token: VCX_LP, watch: true })
 
   return (
     <>
@@ -710,7 +708,7 @@ export function OptionTokenInterface({ gauges, setShowOptionTokenModal }: Option
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient()
 
-  const { data: oBalEth } = useBalance({ chainId: ETH_SEPOLIA_CHAIN_ID, address: account, token: OVCX, watch: true })
+  const { data: oBalEth } = useBalance({ chainId: ETH_SEPOLIA_CHAIN_ID, address: account, token: OptionTokenByChain[1], watch: true })
   const { data: oBalArb } = useBalance({ chainId: ARB_SEPOLIA_CHAIN_ID, address: account, token: "0x14Fd0C07234bF22B90eC9d68995799a9EdCD35b7", watch: true })
 
   const [vcxPrice, setVcxPrice] = useState<number>(0)
@@ -765,7 +763,7 @@ export function OptionTokenInterface({ gauges, setShowOptionTokenModal }: Option
             claimOPop({
               gauges: gaugeRewards?.amounts?.filter(gauge => gauge.chainId === ETH_SEPOLIA_CHAIN_ID).filter(gauge => Number(gauge.amount) > 0).map(gauge => gauge.address) as Address[],
               account: account as Address,
-              minter: MINTER,
+              minter: MinterByChain[1],
               clients: { publicClient: ETH_CLIENT, walletClient: walletClient as WalletClient }
             })}
           disabled={gaugeRewards ? Number(gaugeRewards?.total) === 0 : true}

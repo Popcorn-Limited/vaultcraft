@@ -1,15 +1,12 @@
 import MainActionButton from "@/components/button/MainActionButton";
 import InputNumber from "@/components/input/InputNumber";
-import { BalancerOracleAbi } from "@/lib/constants";
+import { BalancerOracleAbi, OVCX_ORACLE } from "@/lib/constants";
 import { showLoadingToast } from "@/lib/toasts";
 import { SimulationResponse } from "@/lib/types";
-import { getVeAddresses } from "@/lib/constants";
 import { handleCallResult } from "@/lib/utils/helpers";
 import { useEffect, useState } from "react";
 import NoSSR from "react-no-ssr";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
-
-const { BalancerOracle } = getVeAddresses();
 
 async function simulateCall({
   address,
@@ -50,22 +47,22 @@ function SetOptionTokenOracleParams(): JSX.Element {
     const res = await publicClient.multicall({
       contracts: [
         {
-          address: BalancerOracle,
+          address: OVCX_ORACLE,
           abi: BalancerOracleAbi,
           functionName: "multiplier",
         },
         {
-          address: BalancerOracle,
+          address: OVCX_ORACLE,
           abi: BalancerOracleAbi,
           functionName: "secs",
         },
         {
-          address: BalancerOracle,
+          address: OVCX_ORACLE,
           abi: BalancerOracleAbi,
           functionName: "ago",
         },
         {
-          address: BalancerOracle,
+          address: OVCX_ORACLE,
           abi: BalancerOracleAbi,
           functionName: "minPrice",
         },
@@ -102,7 +99,7 @@ function SetOptionTokenOracleParams(): JSX.Element {
       successMessage: "Adjusted OptionToken-Oracle values!",
       simulationResponse: await simulateCall({
         account,
-        address: BalancerOracle,
+        address: OVCX_ORACLE,
         abi: BalancerOracleAbi,
         args: [values.multiplier, values.secs, values.ago, values.minPrice],
         functionName: "setParams",

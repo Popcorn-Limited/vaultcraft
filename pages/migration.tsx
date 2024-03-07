@@ -1,14 +1,13 @@
 import MainActionButton from "@/components/button/MainActionButton";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import { handleAllowance } from "@/lib/approve";
-import { ROUNDING_VALUE, VCXAbi, ZERO } from "@/lib/constants";
+import { POP, ROUNDING_VALUE, VCX, VCXAbi, ZERO } from "@/lib/constants";
 import {
   showErrorToast,
   showLoadingToast,
   showSuccessToast,
 } from "@/lib/toasts";
 import { SimulationResponse } from "@/lib/types";
-import { getVeAddresses } from "@/lib/constants";
 import { validateInput } from "@/lib/utils/helpers";
 import { ArrowDownIcon } from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
@@ -29,8 +28,6 @@ import {
   useWalletClient,
 } from "wagmi";
 import { multiplyDecimals } from "@/lib/utils/formatBigNumber";
-
-const { VCX, POP } = getVeAddresses();
 
 interface SimulateProps {
   address: Address;

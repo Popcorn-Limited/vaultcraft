@@ -19,7 +19,7 @@ import {
   http,
   zeroAddress,
 } from "viem";
-import { VaultAbi, getVeAddresses } from "@/lib/constants";
+import { MinterByChain, OptionTokenByChain, VCX, VaultAbi } from "@/lib/constants";
 import { yieldOptionsAtom } from "@/lib/atoms/sdk";
 import {
   NumberFormatter,
@@ -43,8 +43,6 @@ import {
   getKelpVaultData,
   mutateKelpTokenBalance,
 } from "@/components/vault/KelpVault";
-
-const { oVCX: OVCX, VCX, Minter: MINTER } = getVeAddresses();
 
 export default function Index() {
   const router = useRouter();
@@ -122,7 +120,7 @@ export default function Index() {
   const { data: oBal } = useBalance({
     chainId: 1,
     address: account,
-    token: OVCX,
+    token: OptionTokenByChain[1],
     watch: true,
   });
   const [vcxPrice, setVcxPrice] = useState<number>(0);
@@ -280,7 +278,7 @@ export default function Index() {
                           ?.filter((gauge) => Number(gauge.amount) > 0)
                           .map((gauge) => gauge.address) as Address[],
                         account: account as Address,
-                        minter: MINTER,
+                        minter: MinterByChain[1],
                         clients: { publicClient, walletClient: walletClient as WalletClient }
                       })}
                   />
@@ -295,7 +293,7 @@ export default function Index() {
                         ?.filter((gauge) => Number(gauge.amount) > 0)
                         .map((gauge) => gauge.address) as Address[],
                       account: account as Address,
-                      minter: MINTER,
+                      minter: MinterByChain[1],
                       clients: { publicClient, walletClient: walletClient as WalletClient }
                     })}
                 />
