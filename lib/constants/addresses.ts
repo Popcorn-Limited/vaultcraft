@@ -55,14 +55,19 @@ export const OptionTokenByChain: AddressByChain = {
 
 export const GaugeFactoryByChain: AddressByChain = {
   1: "0x8133cA3AB91B3FE3792992eA69720Ca6d3A92163",
-  10: "0xD41d34d6b50785fDC025caD971fE940B8AA1bE45", // Same as Minter
-  42161: "0x59a696bF34Eae5AD8Fd472020e3Bed410694a230" // Same as Minter
+  10: "", // Same as Minter
+  42161: "" // Same as Minter
 }
 
 export const MinterByChain: AddressByChain = {
   1: "0x49f095B38eE6d8541758af51c509332e7793D4b0",
-  10: "0xD41d34d6b50785fDC025caD971fE940B8AA1bE45", // Same as GaugeFactory
-  42161: "0x59a696bF34Eae5AD8Fd472020e3Bed410694a230" // Same as GaugeFactory
+  10: "", // Same as GaugeFactory
+  42161: "" // Same as GaugeFactory
+}
+
+export const BridgerByDestination: AddressByChain = {
+  10: "",
+  42161: ""
 }
 
 export const zapAssetAddressesByChain: { [key: number]: Address[] } = {
