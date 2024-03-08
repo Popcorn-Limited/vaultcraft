@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import NoSSR from "react-no-ssr";
 import { useAccount, useBalance, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
-import { Address, WalletClient, createPublicClient, extractChain, formatUnits, getAddress, http, zeroAddress } from "viem";
+import { Address, WalletClient, createPublicClient, extractChain, formatUnits, getAddress, http, maxUint256, zeroAddress } from "viem";
 import { NumberFormatter, formatAndRoundNumber, formatNumber, formatToFixedDecimals, safeRound } from "@/lib/utils/formatBigNumber";
 import { roundToTwoDecimalPlaces, validateInput } from "@/lib/utils/helpers";
 import MainActionButton from "@/components/button/MainActionButton";
@@ -22,7 +22,7 @@ import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { ActionStep, getAaveActionSteps } from "@/lib/getActionSteps";
 import handleAaveInteraction, { AaveActionType } from "@/lib/external/aave/handleAaveInteractions";
 import { calcUserAccountData, fetchAaveData } from "@/lib/external/aave/interactions";
-import { ERC20Abi } from "@/lib/constants";
+import { ERC20Abi, ZERO } from "@/lib/constants";
 
 const LOAN_TABS = ["Supply", "Borrow", "Repay", "Withdraw"]
 
@@ -166,18 +166,42 @@ export default function LoanInterface({ visibilityState, vaultData }: { visibili
   const [inputAmount, setInputAmount] = useState<string>("0");
 
   function handleChangeInput(e: any) {
-    const value = e.currentTarget.value
-    setInputAmount(validateInput(value).isValid ? value : "0");
+    let value = e.currentTarget.value
+    value = validateInput(value).isValid ? value : "0"
+
+    if (activeTab === "Repay") {
+      const reserveTokenData = reserveData[vaultData.chainId].find(d => d.asset.address === inputToken?.address)
+      if (reserveTokenData && reserveTokenData.borrowAmount < Number(value)) {
+        value = String(reserveTokenData.borrowAmount)
+      }
+    }
+
+    setInputAmount(value);
   };
 
   function handleMaxClick() {
     if (!inputToken) return
-    const bal = activeTab === "Withdraw" ? reserveData[vaultData.chainId].find(d => d.asset.address === inputToken?.address)?.balance : inputToken.balance
-    // @ts-ignore
-    const stringBal = bal.toLocaleString("fullwide", { useGrouping: false })
-    const rounded = safeRound(BigInt(stringBal), inputToken.decimals)
-    const formatted = formatUnits(rounded, inputToken.decimals)
-    handleChangeInput({ currentTarget: { value: formatted } })
+    switch (activeTab) {
+      case "Withdraw":
+        handleChangeInput({
+          currentTarget: {
+            value:
+              String((reserveData[vaultData.chainId].find(d => d.asset.address === inputToken?.address)?.balance || 0) * (10 ** inputToken.decimals))
+          }
+        })
+      case "Repay":
+        handleChangeInput({
+          currentTarget: {
+            value:
+              String((reserveData[vaultData.chainId].find(d => d.asset.address === inputToken?.address)?.borrowAmount || 0) * (10 ** inputToken.decimals))
+          }
+        })
+      default:
+        const stringBal = inputToken.balance.toLocaleString("fullwide", { useGrouping: false })
+        const rounded = safeRound(BigInt(stringBal), inputToken.decimals)
+        const formatted = formatUnits(rounded, inputToken.decimals)
+        handleChangeInput({ currentTarget: { value: formatted } })
+    }
   }
 
   async function handleMainAction() {
@@ -197,10 +221,13 @@ export default function LoanInterface({ visibilityState, vaultData }: { visibili
     setSteps(stepsCopy)
 
     let val = (Number(inputAmount) * (10 ** inputToken.decimals))
-    // console.log({ val, inputAmount, bal: inputToken.balance })
-    // if([AaveActionType.Repay,AaveActionType.Withdraw].includes(action) && val === inputToken){
-
-    // }
+    if (AaveActionType.Repay === action &&
+      val >= ((reserveData[vaultData.chainId].find(d => d.asset.address === repayToken?.address)?.borrowAmount || 0) * (10 ** inputToken.decimals))) {
+      val = Number(maxUint256)
+    } else if (AaveActionType.Withdraw === action &&
+      val === ((reserveData[vaultData.chainId].find(d => d.asset.address === repayToken?.address)?.balance || 0) * (10 ** inputToken.decimals))) {
+      val = Number(maxUint256)
+    }
 
     const aaveInteraction = await handleAaveInteraction({
       action,

@@ -6,7 +6,7 @@ import {
   SimulationResponse,
   UserAccountData,
 } from "@/lib/types";
-import { Address, Chain, createPublicClient, formatUnits, getAddress, http, PublicClient, zeroAddress } from "viem";
+import { Address, Chain, createPublicClient, formatUnits, getAddress, http, maxUint256, PublicClient, zeroAddress } from "viem";
 import { handleCallResult } from "@/lib/utils/helpers";
 import { RPC_URLS, networkMap } from "@/lib/utils/connectors";
 import { AavePoolAbi, AavePoolUiAbi } from "@/lib/constants/abi/Aave";
@@ -128,7 +128,7 @@ export async function repayToAave({ asset, amount, onBehalfOf, chainId, account,
     simulationResponse: await simulateAavePoolCall({
       address: AavePoolByChain[chainId],
       account,
-      args: [asset, amount, 2, onBehalfOf],
+      args: [asset, amount === Number(maxUint256) ? -1 : amount, 2, onBehalfOf],
       functionName: "repay",
       publicClient: clients.publicClient
     }),
