@@ -168,7 +168,7 @@ export async function fetchAaveReserveData(account: Address, chain: Chain): Prom
       asset: assets[getAddress(d.underlyingAsset)],
       supplyAmount: account === zeroAddress ? 0 : Number(formatUnits(uData?.scaledATokenBalance || BigInt(0), decimals)) * Number(formatUnits(d.liquidityIndex, 27)),
       borrowAmount: account === zeroAddress ? 0 : Number(formatUnits(uData?.scaledVariableDebt || BigInt(0), decimals)),
-      balance: account === zeroAddress ? 0 : Number(uData?.scaledATokenBalance)
+      balance: account === zeroAddress ? 0 : Math.floor(Number(formatUnits(uData?.scaledATokenBalance || BigInt(0), decimals)) * Number(formatUnits(d.liquidityIndex, 27)) * (10 ** decimals))
     }
   })
 

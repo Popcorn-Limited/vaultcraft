@@ -172,7 +172,9 @@ export default function LoanInterface({ visibilityState, vaultData }: { visibili
 
   function handleMaxClick() {
     if (!inputToken) return
-    const stringBal = inputToken.balance.toLocaleString("fullwide", { useGrouping: false })
+    const bal = activeTab === "Withdraw" ? reserveData[vaultData.chainId].find(d => d.asset.address === inputToken?.address)?.balance : inputToken.balance
+    // @ts-ignore
+    const stringBal = bal.toLocaleString("fullwide", { useGrouping: false })
     const rounded = safeRound(BigInt(stringBal), inputToken.decimals)
     const formatted = formatUnits(rounded, inputToken.decimals)
     handleChangeInput({ currentTarget: { value: formatted } })
@@ -266,7 +268,19 @@ export default function LoanInterface({ visibilityState, vaultData }: { visibili
             activeTab={activeTab}
             setActiveTab={changeTab}
           />
-          {(account && inputToken) ?
+          {!account &&
+            <div>
+              <MainActionButton
+                label="Connect Wallet"
+                handleClick={openConnectModal}
+              />
+            </div>
+          }
+          {
+            (account && !inputToken) && 
+            <p className="text-white">Nothing to do here</p>
+          }
+          {(account && inputToken) &&
             <>
               <InputTokenWithError
                 captionText={`${activeTab} Amount`}
@@ -276,7 +290,10 @@ export default function LoanInterface({ visibilityState, vaultData }: { visibili
                 value={inputAmount}
                 onChange={handleChangeInput}
                 selectedToken={activeTab === "Withdraw" ?
-                  { ...inputToken, balance: reserveData[vaultData.chainId].find(d => d.asset.address === inputToken?.address)?.balance || 0 }
+                  {
+                    ...inputToken,
+                    balance: reserveData[vaultData.chainId].find(d => d.asset.address === inputToken?.address)?.balance || 0
+                  }
                   : inputToken}
                 errorMessage={""}
                 tokenList={tokenList}
@@ -302,12 +319,6 @@ export default function LoanInterface({ visibilityState, vaultData }: { visibili
                 }
               </div>
             </>
-            : <div>
-              <MainActionButton
-                label="Connect Wallet"
-                handleClick={openConnectModal}
-              />
-            </div>
           }
         </div>
         <div className="w-2/3">
@@ -427,16 +438,16 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
             </div>
 
             <div className="w-1/3">
-              <p className="text-start text-primary font-normal md:text-[14px]">Lending Networth</p>
+              <p className="text-start text-primary font-normal md:text-[14px]">Available Credit</p>
               <span className="flex flex-row items-center space-x-1">
                 <Title as="p" level={2} fontWeight="font-normal" className="text-primary">
-                  $ {formatNumber(userAccountData[chainId].netValue || 0)}
+                  $ ?
                 </Title>
                 {inputAmount > 0 &&
                   <>
                     <ArrowRightIcon className="w-4 h-3 text-white" />
                     <Title as="p" level={2} fontWeight="font-normal" className="text-primary">
-                      $ {formatNumber(newUserAccountData.netValue || 0)}
+                      $ ?
                     </Title>
                   </>
                 }
@@ -460,7 +471,69 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
               </span>
             </div>
           </div>
+
+          <div className="w-full flex flex-row justify-between mt-4">
+
+            <div className="w-1/3">
+              <p className="text-start text-primary font-normal md:text-[14px]">Collateral</p>
+              <span className="flex flex-row items-center space-x-1">
+                <Title
+                  as="p"
+                  level={2}
+                  fontWeight="font-normal"
+                >
+                  {formatToFixedDecimals(userAccountData[chainId].totalCollateral || 0, 2)}
+                </Title>
+                {inputAmount > 0 &&
+                  <>
+                    <ArrowRightIcon className="w-4 h-3 text-white" />
+                    <Title
+                      as="p"
+                      level={2}
+                      fontWeight="font-normal"
+                    >
+                      {formatToFixedDecimals(newUserAccountData.totalCollateral || 0, 2)}
+                    </Title>
+                  </>}
+              </span>
+            </div>
+
+            <div className="w-1/3">
+              <p className="text-start text-primary font-normal md:text-[14px]">Borrowed</p>
+              <span className="flex flex-row items-center space-x-1">
+                <Title as="p" level={2} fontWeight="font-normal" className="text-primary">
+                  $ {formatNumber(userAccountData[chainId].totalBorrowed || 0)}
+                </Title>
+                {inputAmount > 0 &&
+                  <>
+                    <ArrowRightIcon className="w-4 h-3 text-white" />
+                    <Title as="p" level={2} fontWeight="font-normal" className="text-primary">
+                      $ {formatNumber(newUserAccountData.totalBorrowed || 0)}
+                    </Title>
+                  </>
+                }
+              </span>
+            </div>
+
+            <div className="w-1/3">
+              <p className="text-start text-primary font-normal md:text-[14px]">Net Loan Value</p>
+              <span className="flex flex-row items-center space-x-1">
+                <Title as="p" level={2} fontWeight="font-normal" className="text-primary">
+                  $ {formatNumber(userAccountData[chainId].netValue || 0)}
+                </Title>
+                {inputAmount > 0 &&
+                  <>
+                    <ArrowRightIcon className="w-4 h-3 text-white" />
+                    <Title as="p" level={2} fontWeight="font-normal" className="text-primary">
+                      $ {formatNumber(newUserAccountData.netValue || 0)}
+                    </Title>
+                  </>
+                }
+              </span>
+            </div>
+          </div>
         </div>
+
 
         <div className="border border-[#353945] rounded-lg p-4">
           <div className="w-full flex flex-row justify-between">
