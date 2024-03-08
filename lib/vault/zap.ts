@@ -28,7 +28,7 @@ async function getZapTransaction({ chainId, sellToken, buyToken, amount, account
   switch (zapProvider) {
     case ZapProvider.enso:
       const ensoRes = (await axios.get(
-        `https://api.enso.finance/api/v1/shortcuts/route?chainId=${chainId}&fromAddress=${account}&spender=${account}&receiver=${account}&amountIn=${amount.toLocaleString("fullwide", { useGrouping: false })}&slippage=${slippage}&tokenIn=${sellToken.address}&tokenOut=${buyToken.address}`,
+        `https://api.enso.finance/api/v1/shortcuts/route?chainId=${chainId}&fromAddress=${account}&spender=${account}&receiver=${account}&amountIn=${amount.toLocaleString("fullwide", { useGrouping: false })}&slippage=${slippage}&tokenIn=${sellToken.address}&tokenOut=${buyToken.address}&routingStrategy=router`,
         { headers: { Authorization: `Bearer ${process.env.ENSO_API_KEY}` } }
       )).data
       return ensoRes.tx
@@ -94,6 +94,13 @@ interface HandleZapAllowanceProps {
   clients: Clients;
 }
 
+const EnsoRouterByChain: AddressByChain = {
+  1: "0x80EbA3855878739F4710233A8a19d89Bdd2ffB8E",
+  137: "0x80EbA3855878739F4710233A8a19d89Bdd2ffB8E",
+  10: "0x80EbA3855878739F4710233A8a19d89Bdd2ffB8E",
+  42161: "0x80EbA3855878739F4710233A8a19d89Bdd2ffB8E"
+}
+
 const OneInchRouterByChain: AddressByChain = {
   1: "0x1111111254EEB25477B68fb85Ed929f73A960582",
   137: "0x1111111254EEB25477B68fb85Ed929f73A960582",
@@ -111,11 +118,7 @@ const ParaSwapRouterByChain: AddressByChain = {
 async function getZapSpender({ account, chainId, zapProvider }: { account: Address, chainId: number, zapProvider: ZapProvider }): Promise<Address> {
   switch (zapProvider) {
     case ZapProvider.enso:
-      const ensoWallet = (await axios.get(
-        `https://api.enso.finance/api/v1/wallet?chainId=${chainId}&fromAddress=${account}`,
-        { headers: { Authorization: `Bearer ${process.env.ENSO_API_KEY}` } })
-      ).data
-      return getAddress(ensoWallet.address)
+      return getAddress(EnsoRouterByChain[chainId])
     case ZapProvider.zeroX:
       return zeroAddress
     case ZapProvider.oneInch:
@@ -153,7 +156,7 @@ async function getZapQuote({ sellToken, buyToken, amount, chainId, account, zapP
   switch (zapProvider) {
     case ZapProvider.enso:
       try {
-        const ensoRes = (await axios.get(`https://api.enso.finance/api/v1/shortcuts/quote?chainId=${chainId}&fromAddress=${account}&tokenIn=${sellToken.address}&tokenOut=${buyToken.address}&amountIn=${amount.toLocaleString("fullwide", { useGrouping: false })}`,
+        const ensoRes = (await axios.get(`https://api.enso.finance/api/v1/shortcuts/quote?chainId=${chainId}&routingStrategy=router&fromAddress=${account}&tokenIn=${sellToken.address}&tokenOut=${buyToken.address}&amountIn=${amount.toLocaleString("fullwide", { useGrouping: false })}`,
           { headers: { Authorization: `Bearer ${process.env.ENSO_API_KEY}` } })
         ).data
         return { zapProvider, out: Number(ensoRes.amountOut) }
