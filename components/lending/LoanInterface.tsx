@@ -277,7 +277,7 @@ export default function LoanInterface({ visibilityState, vaultData }: { visibili
             </div>
           }
           {
-            (account && !inputToken) && 
+            (account && !inputToken) &&
             <p className="text-white">Nothing to do here</p>
           }
           {(account && inputToken) &&
@@ -441,13 +441,13 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
               <p className="text-start text-primary font-normal md:text-[14px]">Available Credit</p>
               <span className="flex flex-row items-center space-x-1">
                 <Title as="p" level={2} fontWeight="font-normal" className="text-primary">
-                  $ ?
+                  $ {formatToFixedDecimals(((userAccountData[chainId].ltv * userAccountData[chainId].totalCollateral) - userAccountData[chainId].totalBorrowed) || 0, 2)}
                 </Title>
                 {inputAmount > 0 &&
                   <>
                     <ArrowRightIcon className="w-4 h-3 text-white" />
                     <Title as="p" level={2} fontWeight="font-normal" className="text-primary">
-                      $ ?
+                      $ {formatToFixedDecimals(((newUserAccountData.ltv * newUserAccountData.totalCollateral) - newUserAccountData.totalBorrowed) || 0, 2)}
                     </Title>
                   </>
                 }
@@ -532,6 +532,7 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
               </span>
             </div>
           </div>
+
         </div>
 
 
