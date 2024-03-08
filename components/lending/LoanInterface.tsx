@@ -56,7 +56,7 @@ export default function LoanInterface({ visibilityState, vaultData }: { visibili
   const [inputToken, setInputToken] = useState<Token | null>(null)
 
   useEffect(() => {
-    if (reserveData) {
+    if (reserveData && reserveData[vaultData.chainId]) {
       let sorted = reserveData[vaultData.chainId].sort((a, b) => a.balance - b.balance)
       setTokenList(sorted.map(e => e.asset))
 
