@@ -67,11 +67,12 @@ export default function Navbar(): JSX.Element {
         <div className="flex flex-container h-full flex-row w-fit-content items-center gap-x-6">
           {(chain && userAccountData[chain?.id]?.healthFactor > 0) &&
             <div
-              className={`w-11 h-11 flex justify-center items-center cursor-pointer rounded-full border ${getHealthFactorColor("border", userAccountData[chain.id].healthFactor)}`}
-              id="global-health-factor"
+              className={`w-fit cursor-pointer h-full py-2 bg-[#141416] md:bg-transparent md:py-[10px] px-4 md:px-6 flex flex-row items-center justify-between border border-customLightGray rounded-4xl text-primary`}
               onClick={() => setShowLendModal(true)}
+              id="global-health-factor"
             >
-              <p className={`text-sm ${getHealthFactorColor("text", userAccountData[chain.id].healthFactor)}`}>
+              <p className="mr-2 leading-none hidden md:block">Health Factor</p>
+              <p className={`ml-2 ${getHealthFactorColor("text", userAccountData[chain.id].healthFactor)}`}>
                 {formatToFixedDecimals(userAccountData[chain.id].healthFactor || 0, 2)}
               </p>
               <ResponsiveTooltip
