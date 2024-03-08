@@ -1,6 +1,8 @@
 import { Address } from "viem";
 import { veAddresses } from "lib/types";
 
+export const ENSO_ROUTER:Address = "0x80EbA3855878739F4710233A8a19d89Bdd2ffB8E"
+
 export const VaultRegistryByChain: { [key: number]: Address } = {
   1: "0x007318Dc89B314b47609C684260CfbfbcD412864",
   137: "0x2246c4c469735bCE95C120939b0C078EC37A08D0",
