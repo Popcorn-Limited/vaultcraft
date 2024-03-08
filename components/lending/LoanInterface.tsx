@@ -250,6 +250,8 @@ export default function LoanInterface({ visibilityState, vaultData }: { visibili
     }
   }
 
+  if (reserveData && reserveData[vaultData.chainId]) console.log(reserveData[vaultData.chainId])
+
   return <>
     <Modal
       visibility={visibilityState}
@@ -280,7 +282,7 @@ export default function LoanInterface({ visibilityState, vaultData }: { visibili
             (account && !inputToken) &&
             <p className="text-white">Nothing to do here</p>
           }
-          {(account && inputToken) &&
+          {(account && inputToken && reserveData && reserveData[vaultData.chainId]) &&
             <>
               <InputTokenWithError
                 captionText={`${activeTab} Amount`}
@@ -300,7 +302,7 @@ export default function LoanInterface({ visibilityState, vaultData }: { visibili
                 allowSelection
                 allowInput
               />
-              {(activeTab === "Repay" && repayToken) &&
+              {(activeTab === "Repay" && repayToken && reserveData && reserveData[vaultData.chainId]) &&
                 <p className="text-start text-white">
                   Borrowed: {
                     // @ts-ignore
