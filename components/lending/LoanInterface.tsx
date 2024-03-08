@@ -124,7 +124,7 @@ export default function LoanInterface({ visibilityState, vaultData }: { visibili
         setSteps(getAaveActionSteps(AaveActionType.Repay))
         return;
       case "Withdraw":
-        sorted = reserveData[vaultData.chainId].filter(e => e.borrowAmount === 0).filter(e => e.balance > 0).sort((a, b) => b.balance - a.balance)
+        sorted = reserveData[vaultData.chainId].filter(e => e.supplyAmount > 0).sort((a, b) => b.supplyAmount - a.supplyAmount)
         setTokenList(!account || sorted.length === 0 ? [] : sorted.map(e => e.asset))
 
         if (!withdrawToken) {
