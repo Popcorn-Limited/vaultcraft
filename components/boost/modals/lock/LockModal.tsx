@@ -19,7 +19,6 @@ import { handleAllowance } from "@/lib/approve";
 import { createLock } from "@/lib/gauges/interactions";
 import ActionSteps from "@/components/vault/ActionSteps";
 import { ActionStep, LOCK_VCX_LP_STEPS } from "@/lib/getActionSteps";
-import { ETH_SEPOLIA_CHAIN_ID } from "pages/boost-test";
 import { VCX_LP, VOTING_ESCROW } from "@/lib/constants";
 
 interface LockModalProps {
@@ -71,9 +70,9 @@ export default function LockModal({
     // Early exit if value is ZERO
     if (val == 0) return;
 
-    if (chain?.id !== Number(ETH_SEPOLIA_CHAIN_ID)) {
+    if (chain?.id !== Number(1)) {
       try {
-        await switchNetworkAsync?.(Number(ETH_SEPOLIA_CHAIN_ID));
+        await switchNetworkAsync?.(Number(1));
       } catch (error) {
         return;
       }

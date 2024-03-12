@@ -12,9 +12,8 @@ import { PublicClient } from "wagmi";
 import axios from "axios";
 import { VaultAbi } from "@/lib/constants/abi/Vault";
 import { GaugeData, VaultData, VaultLabel } from "@/lib/types";
-import { ADDRESS_ZERO, GAUGE_CONTROLLER } from "@/lib/constants";
+import { ADDRESS_ZERO, ERC20Abi, GAUGE_CONTROLLER, GaugeAbi } from "@/lib/constants";
 import { RPC_URLS, networkMap } from "@/lib/utils/connectors";
-import getGauges, { Gauge } from "@/lib/gauges/getGauges";
 import { ProtocolName, YieldOptions } from "vaultcraft-sdk";
 
 const HIDDEN_VAULTS: Address[] = [
@@ -29,6 +28,8 @@ const HIDDEN_VAULTS: Address[] = [
   "0xBae30fBD558A35f147FDBaeDbFF011557d3C8bd2", // 50OHM - 50 DAI
   "0xa6fcC7813d9D394775601aD99874c9f8e95BAd78", // Automated Pool Token - Oracle Vault 3
 ];
+
+const NETWORKS_WITH_GAUGES = [1, 10, 42161]
 
 function prepareVaultContract(
   vault: Address,
@@ -235,19 +236,14 @@ export async function getVaults({
           asset: vault.asset.address,
         });
         apy = vaultYield.total;
-      } catch (e) {}
+      } catch (e) { }
       vault.apy = apy;
       vault.totalApy = apy;
     })
   );
 
   // Add gauges
-  if (client.chain.id === 1) {
-    const gauges = await getGauges({
-      address: GAUGE_CONTROLLER,
-      account: account,
-      publicClient: client,
-    });
+  if (NETWORKS_WITH_GAUGES.includes(client.chain.id)) {
     const gaugeApyData = (
       await axios.get(
         `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/gauge-apy-data.json`
@@ -255,35 +251,35 @@ export async function getVaults({
     ).data as GaugeData;
     await Promise.all(
       result.map(async (vault, i) => {
-        const foundGauge = gauges.find(
-          (gauge: Gauge) => gauge.lpToken === vault.address
+        const gauge = Object.values(gaugeApyData).find(
+          gauge => gauge.vault === vault.address
         );
-        const gauge = foundGauge
-          ? {
-              address: foundGauge.address,
-              name: `${vault.vault.name}-gauge`,
-              symbol: `st-${vault.vault.name}`,
-              decimals: foundGauge.decimals,
-              logoURI: "/images/tokens/vcx.svg", // wont be used, just here for consistency
-              balance: account === zeroAddress ? 0 : foundGauge.balance,
-              price: vault.pricePerShare * 1e9,
-            }
-          : undefined;
-
-        let gaugeMinApy;
-        let gaugeMaxApy;
-        let totalApy = vault.totalApy;
 
         if (!!gauge) {
-          gaugeMinApy = gaugeApyData[gauge.address]?.lowerAPR || 0;
-          gaugeMaxApy = gaugeApyData[gauge.address]?.upperAPR || 0;
-          totalApy += gaugeMaxApy;
-        }
+          vault.gauge = {
+            address: gauge.address,
+            name: `${vault.vault.name}-gauge`,
+            symbol: `st-${vault.vault.name}`,
+            decimals: 18,
+            logoURI: "/images/tokens/vcx.svg", // wont be used, just here for consistency
+            balance: 0,
+            price: vault.pricePerShare * 1e9,
+            chainId: vault.chainId
+          }
 
-        vault.gauge = gauge;
-        vault.totalApy = totalApy;
-        vault.gaugeMinApy = gaugeMinApy;
-        vault.gaugeMaxApy = gaugeMaxApy;
+          if (account !== zeroAddress) {
+            vault.gauge.balance = Number(await client.readContract({
+              address: gauge.address,
+              abi: ERC20Abi,
+              functionName: "balanceOf",
+              args: [account]
+            }));
+          }
+
+          vault.gaugeMinApy = gaugeApyData[gauge.address]?.lowerAPR || 0;
+          vault.gaugeMaxApy = gaugeApyData[gauge.address]?.upperAPR || 0;
+          vault.totalApy += gaugeApyData[gauge.address]?.upperAPR || 0
+        }
       })
     );
   }
