@@ -19,6 +19,7 @@ export const GAUGE_FACTORY: Address = "0x8133cA3AB91B3FE3792992eA69720Ca6d3A9216
 export const SMART_WALLET_CHECKER: Address = "0x8427155770f7e6b973249E2f9D140a495aBE4f90";
 export const VE_BEACON: Address = "0x6e220Be8511ACc1db8ACD4e2e66f987CF7529Af6";
 export const FEE_DISTRIBUTOR = zeroAddress; // Change once deployed
+export const ROOT_GAUGE_FACTORY:Address = "0x6aa03ebAb1e9CB8d44Fd79153d3a258FFd48169A"
 
 export const VaultRegistryByChain: AddressByChain = {
   1: "0x007318Dc89B314b47609C684260CfbfbcD412864",
@@ -55,19 +56,19 @@ export const OptionTokenByChain: AddressByChain = {
 
 export const GaugeFactoryByChain: AddressByChain = {
   1: "0x8133cA3AB91B3FE3792992eA69720Ca6d3A92163",
-  10: "", // Same as Minter
-  42161: "" // Same as Minter
+  10: "0x6aa03ebAb1e9CB8d44Fd79153d3a258FFd48169A", // Same as Minter
+  42161: "0x6aa03ebAb1e9CB8d44Fd79153d3a258FFd48169A" // Same as Minter
 }
 
 export const MinterByChain: AddressByChain = {
   1: "0x49f095B38eE6d8541758af51c509332e7793D4b0",
-  10: "", // Same as GaugeFactory
-  42161: "" // Same as GaugeFactory
+  10: "0x6aa03ebAb1e9CB8d44Fd79153d3a258FFd48169A", // Same as GaugeFactory
+  42161: "0x6aa03ebAb1e9CB8d44Fd79153d3a258FFd48169A" // Same as GaugeFactory
 }
 
 export const BridgerByDestination: AddressByChain = {
-  10: "",
-  42161: ""
+  10: "0xae167C59FB601260A317A803b5879D47621b1379",
+  42161: "0x44E6FD99a6df3E3D1792a71C1575519293894Ee2"
 }
 
 export const zapAssetAddressesByChain: { [key: number]: Address[] } = {

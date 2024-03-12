@@ -27,11 +27,13 @@ import IncreaseTimeInterface from "@/components/boost/modals/manage/IncreaseTime
 import IncreaseTimePreview from "@/components/boost/modals/manage/IncreaseTimePreview";
 import UnstakePreview from "@/components/boost/modals/manage/UnstakePreview";
 import { VCX_LP, VOTING_ESCROW } from "@/lib/constants";
+import BroadcastVeBalanceInterface from "./BroadcastVeBalanceInterface";
 
 export enum ManagementOption {
   IncreaseLock,
   IncreaseTime,
   Unlock,
+  BroadcastVeBalance
 }
 
 export default function ManageLockModal({
@@ -203,6 +205,14 @@ export default function ManageLockModal({
               isExpired={isExpired}
             />
             <MainActionButton label="Unlock" handleClick={handleMainAction} />
+          </>
+        )}
+        {mangementOption === ManagementOption.BroadcastVeBalance && (
+          <>
+            <BroadcastVeBalanceInterface
+              amount={Number(lockedBal?.amount) / 1e18}
+              setShowModal={setShowModal}
+            />
           </>
         )}
       </>

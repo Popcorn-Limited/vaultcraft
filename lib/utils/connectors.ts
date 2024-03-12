@@ -1,7 +1,5 @@
 import {
   arbitrum,
-  bsc,
-  localhost,
   mainnet,
   optimism,
   polygon,
