@@ -118,6 +118,7 @@ export default function Gauge({
                 </>
               )}
             </div>
+
             <div className="w-full mt-6 xs:mt-0">
               {gaugeApr.length > 0 && (
                 <>
@@ -209,7 +210,7 @@ export default function Gauge({
                     }}
                     value={amount}
                     onChange={
-                      canVote ? (val: any) => onChange(Number(val)) : () => {}
+                      canVote ? (val: any) => onChange(Number(val)) : () => { }
                     }
                     max={10000}
                   />

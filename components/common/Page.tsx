@@ -264,7 +264,7 @@ export default function Page({
         10: await getAvailableZapAssets(10),
         42161: await getAvailableZapAssets(42161),
         56: await getAvailableZapAssets(56),
-      });
+      })
     }
     if (
       Object.keys(zapAssets).length === 0 &&

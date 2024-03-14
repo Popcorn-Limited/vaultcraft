@@ -13,14 +13,12 @@ import OptionInfo from "@/components/boost/modals/optionToken/OptionInfo";
 import ExerciseOptionTokenInterface from "@/components/boost/modals/optionToken/ExerciseOptionTokenInterface";
 import MainActionButton from "@/components/button/MainActionButton";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
-import { getVeAddresses } from "@/lib/constants";
 import { handleAllowance } from "@/lib/approve";
 import { parseEther } from "viem";
 import { exerciseOPop } from "@/lib/optionToken/interactions";
 import ActionSteps from "@/components/vault/ActionSteps";
 import { ActionStep, EXERCISE_OVCX_STEPS } from "@/lib/getActionSteps";
-
-const { WETH, oVCX } = getVeAddresses();
+import { OptionTokenByChain, WETH } from "@/lib/constants";
 
 export default function OptionTokenModal({
   show,
@@ -76,7 +74,7 @@ export default function OptionTokenModal({
           token: WETH,
           amount: Number(amount) * 10 ** 18 || 0,
           account: account as Address,
-          spender: oVCX,
+          spender: OptionTokenByChain[1],
           clients: {
             publicClient,
             walletClient: walletClient as WalletClient,

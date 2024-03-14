@@ -9,29 +9,7 @@ export type Token = {
   logoURI: string;
   balance: number;
   price: number;
-};
-
-export type veAddresses = {
-  VCX: Address;
-  WETH_VCX_LP: Address;
-  VE_VCX: Address;
-  POP: Address;
-  WETH: Address;
-  BalancerPool: Address;
-  BalancerOracle: Address;
-  BalancerVault: Address;
-  oVCX: Address;
-  VaultRegistry: Address;
-  BoostV2: Address;
-  Minter: Address;
-  TokenAdmin: Address;
-  VotingEscrow: Address;
-  GaugeController: Address;
-  GaugeFactory: Address;
-  SmartWalletChecker: Address;
-  VotingEscrowDelegation: Address;
-  VaultRouter: Address;
-  FeeDistributor: Address;
+  chainId?: number;
 };
 
 export type Asset = {
@@ -155,7 +133,7 @@ export type GaugeData = {
     lowerAPR: number;
     upperAPR: number;
   };
-};
+}
 
 export enum SmartVaultActionType {
   Deposit,
@@ -195,9 +173,13 @@ export type DuneQueryResult<T> = {
 };
 
 export type VoteUserSlopes = {
-  slope: bigint,
-  power: bigint,
-  end: bigint,
+  slope: bigint;
+  power: bigint;
+  end: bigint;
+};
+
+export type AddressByChain = {
+  [key: number]: Address
 }
 
 export enum ZapProvider {
@@ -208,8 +190,4 @@ export enum ZapProvider {
   oneInch,
   paraSwap,
   openOcean
-}
-
-export type AddressByChain = {
-  [key: number]: Address
 }

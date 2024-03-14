@@ -19,7 +19,7 @@ import {
   http,
   zeroAddress,
 } from "viem";
-import { VaultAbi, getVeAddresses } from "@/lib/constants";
+import { MinterByChain, OptionTokenByChain, VCX, VaultAbi } from "@/lib/constants";
 import { yieldOptionsAtom } from "@/lib/atoms/sdk";
 import {
   NumberFormatter,
@@ -38,8 +38,6 @@ import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
 import { availableZapAssetAtom, zapAssetsAtom } from "@/lib/atoms";
 import { getTokenOptions, isDefiPosition } from "@/lib/vault/utils";
 import LeftArrowIcon from "@/components/svg/LeftArrowIcon";
-
-const { oVCX: OVCX, VCX } = getVeAddresses();
 
 export default function Index() {
   const router = useRouter();
@@ -92,7 +90,7 @@ export default function Index() {
   const { data: oBal } = useBalance({
     chainId: 1,
     address: account,
-    token: OVCX,
+    token: OptionTokenByChain[1],
     watch: true,
   });
   const [vcxPrice, setVcxPrice] = useState<number>(0);
@@ -104,11 +102,12 @@ export default function Index() {
           .filter((vault) => vault.gauge && vault.chainId === 1)
           .map((vault) => vault.gauge?.address) as Address[],
         account: account as Address,
-        publicClient,
-      });
-      setGaugeRewards(rewards);
-      const vcxPriceInUsd = await llama({ address: VCX, chainId: 1 });
-      setVcxPrice(vcxPriceInUsd);
+        chainId: 1,
+        publicClient
+      })
+      setGaugeRewards(rewards)
+      const vcxPriceInUsd = await llama({ address: VCX, chainId: 1 })
+      setVcxPrice(vcxPriceInUsd)
     }
     if (account) getRewardsData();
   }, [account]);
@@ -247,12 +246,9 @@ export default function Index() {
                           ?.filter((gauge) => Number(gauge.amount) > 0)
                           .map((gauge) => gauge.address) as Address[],
                         account: account as Address,
-                        clients: {
-                          publicClient,
-                          walletClient: walletClient as WalletClient,
-                        },
-                      })
-                    }
+                        minter: MinterByChain[1],
+                        clients: { publicClient, walletClient: walletClient as WalletClient }
+                      })}
                   />
                 </div>
               </div>
@@ -265,12 +261,9 @@ export default function Index() {
                         ?.filter((gauge) => Number(gauge.amount) > 0)
                         .map((gauge) => gauge.address) as Address[],
                       account: account as Address,
-                      clients: {
-                        publicClient,
-                        walletClient: walletClient as WalletClient,
-                      },
-                    })
-                  }
+                      minter: MinterByChain[1],
+                      clients: { publicClient, walletClient: walletClient as WalletClient }
+                    })}
                 />
               </div>
             </div>

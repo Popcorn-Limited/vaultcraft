@@ -2,11 +2,9 @@ import { createPublicClient, http } from "viem";
 import { Chain, arbitrum, optimism, polygon } from "viem/chains";
 import { Address, mainnet } from "wagmi";
 import { ChainId, RPC_URLS } from "@/lib/utils/connectors";
-import { ERC20Abi, VotingEscrowAbi, getVeAddresses } from "@/lib/constants";
+import { ERC20Abi, VCX, VCX_LP, VE_VCX, VotingEscrowAbi } from "@/lib/constants";
 import { resolvePrice } from "@/lib/resolver/price/price";
 import { VaultData } from "@/lib/types";
-
-const { VCX, VE_VCX, WETH_VCX_LP } = getVeAddresses();
 
 type TotalNetworth = {
   [key: number]: Networth;
@@ -68,7 +66,7 @@ export async function getNetworthByChain({
       args: [account],
     });
     const lpBal = await client.readContract({
-      address: WETH_VCX_LP,
+      address: VCX_LP,
       abi: ERC20Abi,
       functionName: "balanceOf",
       args: [account],
@@ -88,7 +86,7 @@ export async function getNetworthByChain({
       resolver: "llama",
     });
     const lpPrice = await resolvePrice({
-      address: WETH_VCX_LP,
+      address: VCX_LP,
       chainId: 1,
       client: undefined,
       resolver: "llama",

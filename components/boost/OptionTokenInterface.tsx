@@ -1,5 +1,4 @@
 import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
-import { getVeAddresses } from "@/lib/constants";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import {
@@ -15,8 +14,8 @@ import { claimOPop } from "@/lib/optionToken/interactions";
 import { WalletClient } from "viem";
 import { Token } from "@/lib/types";
 import { llama } from "@/lib/resolver/price/resolver";
-
-const { oVCX: OVCX, VCX, WETH } = getVeAddresses();
+import { MinterByChain, OptionTokenByChain, VCX, WETH } from "@/lib/constants";
+import { GAUGE_NETWORKS } from "pages/boost";
 
 interface OptionTokenInterfaceProps {
   gauges: Token[];
@@ -40,7 +39,7 @@ export default function OptionTokenInterface({
   const { data: oBal } = useBalance({
     chainId: 1,
     address: account,
-    token: OVCX,
+    token: OptionTokenByChain[1],
     watch: true,
   });
   const { data: wethBal } = useBalance({
@@ -60,16 +59,20 @@ export default function OptionTokenInterface({
     );
   }, []);
 
-  const [gaugeRewards, setGaugeRewards] = useState<GaugeRewards>();
+  const [gaugeRewards, setGaugeRewards] = useState<{ [key: number]: GaugeRewards }>();
 
   useEffect(() => {
     async function getValues() {
-      const rewards = await getGaugeRewards({
-        gauges: gauges.map((gauge) => gauge.address) as Address[],
-        account: account as Address,
-        publicClient,
-      });
-      setGaugeRewards(rewards);
+      const newRewards: { [key: number]: GaugeRewards } = {}
+      await Promise.all(GAUGE_NETWORKS.map(async (chain) =>
+        newRewards[chain] = await getGaugeRewards({
+          gauges: gauges.filter(gauge => gauge.chainId === chain).map((gauge) => gauge.address) as Address[],
+          account: account as Address,
+          chainId: chain,
+          publicClient
+        })
+      ))
+      setGaugeRewards(newRewards)
     }
     if (account && gauges.length > 0) getValues();
   }, [gauges, account]);
@@ -78,67 +81,97 @@ export default function OptionTokenInterface({
     <div className="w-full lg:w-1/2 bg-transparent border border-[#353945] rounded-3xl p-8 text-primary md:h-fit">
       <h3 className="text-2xl pb-6 border-b border-[#353945]">oVCX</h3>
       <span className="flex flex-row items-center justify-between mt-6">
-        <p className="">Claimable oVCX</p>
-        <p className="font-bold">{`$${
-          gaugeRewards && vcxPrice > 0
-            ? NumberFormatter.format(
-                (Number(gaugeRewards?.total) * (vcxPrice * 0.25)) / 1e18
-              )
-            : "0"
-        }`}</p>
+        <p className="">Mainnet Claimable oVCX</p>
+        <p className="font-bold">{`$${(gaugeRewards && gaugeRewards[1] && vcxPrice > 0)
+          ? NumberFormatter.format(
+            (Number(gaugeRewards[1].total) * (vcxPrice * 0.25)) / 1e18
+          )
+          : "0"
+          }`}</p>
       </span>
       <span className="flex flex-row items-center justify-between mt-6">
-        <p className="">My VCX</p>
-        <p className="font-bold">{`$${
-          vcxBal && vcxPrice > 0
-            ? NumberFormatter.format((Number(vcxBal?.value) * vcxPrice) / 1e18)
-            : "0"
-        }`}</p>
+        <p className="">Optimism Claimable oVCX</p>
+        <p className="font-bold">{`$${(gaugeRewards && gaugeRewards[10] && vcxPrice > 0)
+          ? NumberFormatter.format(
+            (Number(gaugeRewards[10].total) * (vcxPrice * 0.25)) / 1e18
+          )
+          : "0"
+          }`}</p>
+      </span>
+      <span className="flex flex-row items-center justify-between mt-6">
+        <p className="">Arbitrum Claimable oVCX</p>
+        <p className="font-bold">{`$${(gaugeRewards && gaugeRewards[42161] && vcxPrice > 0)
+          ? NumberFormatter.format(
+            (Number(gaugeRewards[42161].total) * (vcxPrice * 0.25)) / 1e18
+          )
+          : "0"
+          }`}</p>
       </span>
       <span className="flex flex-row items-center justify-between mt-6">
         <p className="">My oVCX</p>
-        <p className="font-bold">{`$${
-          oBal && vcxPrice > 0
-            ? NumberFormatter.format(
-                (Number(oBal?.value) * (vcxPrice * 0.25)) / 1e18
-              )
-            : "0"
-        }`}</p>
-      </span>
-      <span className="flex flex-row items-center justify-between mt-6">
-        <p className="">My WETH</p>
-        <p className="font-bold">{`$${
-          wethBal && wethPrice > 0
-            ? NumberFormatter.format(
-                (Number(wethBal?.value) * wethPrice) / 1e18
-              )
-            : "0"
-        }`}</p>
+        <p className="font-bold">{`$${oBal && vcxPrice > 0
+          ? NumberFormatter.format(
+            (Number(oBal?.value) * (vcxPrice * 0.25)) / 1e18
+          )
+          : "0"
+          }`}</p>
       </span>
       <span className="flex flex-row items-center justify-between mt-6 pb-6 border-b border-[#353945]"></span>
       <div className="lg:flex lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-8 mt-6">
-        <div className="w-full md:w-60">
-          <MainActionButton
-            label="Claim oVCX"
-            handleClick={() =>
-              claimOPop({
-                gauges: gaugeRewards?.amounts
-                  ?.filter((gauge) => Number(gauge.amount) > 0)
-                  .map((gauge) => gauge.address) as Address[],
-                account: account as Address,
-                clients: {
-                  publicClient,
-                  walletClient: walletClient as WalletClient,
-                },
-              })
-            }
-            disabled={gaugeRewards ? Number(gaugeRewards?.total) === 0 : true}
-          />
-        </div>
+        {(gaugeRewards && Object.keys(gaugeRewards).length > 0) &&
+          <>
+            <div className="w-full md:w-60">
+              <MainActionButton
+                label="Claim ETH oVCX"
+                handleClick={() =>
+                  claimOPop({
+                    gauges: gaugeRewards[1].amounts
+                      ?.filter((gauge) => Number(gauge.amount) > 0)
+                      .map((gauge) => gauge.address) as Address[],
+                    account: account as Address,
+                    minter: MinterByChain[1],
+                    clients: { publicClient, walletClient: walletClient as WalletClient }
+                  })}
+                disabled={gaugeRewards ? Number(gaugeRewards[1].total) === 0 : true}
+              />
+            </div>
+            <div className="w-full md:w-60">
+              <MainActionButton
+                label="Claim OP oVCX"
+                handleClick={() =>
+                  claimOPop({
+                    gauges: gaugeRewards[10].amounts
+                      ?.filter((gauge) => Number(gauge.amount) > 0)
+                      .map((gauge) => gauge.address) as Address[],
+                    account: account as Address,
+                    minter: MinterByChain[10],
+                    clients: { publicClient, walletClient: walletClient as WalletClient }
+                  })}
+                disabled={gaugeRewards ? Number(gaugeRewards[10].total) === 0 : true}
+              />
+            </div>
+            <div className="w-full md:w-60">
+              <MainActionButton
+                label="Claim ARB oVCX"
+                handleClick={() =>
+                  claimOPop({
+                    gauges: gaugeRewards[42161].amounts
+                      ?.filter((gauge) => Number(gauge.amount) > 0)
+                      .map((gauge) => gauge.address) as Address[],
+                    account: account as Address,
+                    minter: MinterByChain[42161],
+                    clients: { publicClient, walletClient: walletClient as WalletClient }
+                  })}
+                disabled={gaugeRewards ? Number(gaugeRewards[42161].total) === 0 : true}
+              />
+            </div>
+          </>
+        }
         <div className="w-full md:w-60">
           <SecondaryActionButton
             label="Exercise oVCX"
-            handleClick={() => setShowOptionTokenModal(true)} //disabled={oBal ? Number(oBal?.value) === 0 : true}
+            handleClick={() => setShowOptionTokenModal(true)} 
+            disabled={oBal ? Number(oBal?.value) === 0 : true}
           />
         </div>
       </div>

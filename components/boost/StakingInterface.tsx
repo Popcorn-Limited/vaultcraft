@@ -4,10 +4,9 @@ import { Address, useAccount, useBalance } from "wagmi";
 import { getVotePeriodEndTime } from "@/lib/gauges/utils";
 import MainActionButton from "@/components/button/MainActionButton";
 import useLockedBalanceOf from "@/lib/gauges/useLockedBalanceOf";
-import { getVeAddresses } from "@/lib/constants";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import { formatEther } from "viem";
-import { ZERO } from "@/lib/constants";
+import { VCX_LP, VOTING_ESCROW, ZERO } from "@/lib/constants";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 
 function votingPeriodEnd(): number[] {
@@ -22,9 +21,6 @@ function votingPeriodEnd(): number[] {
   ];
   return formattedTime;
 }
-
-const { BalancerPool: VCX_LP, VotingEscrow: VOTING_ESCROW } = getVeAddresses();
-
 interface StakingInterfaceProps {
   setShowLockModal: Dispatch<SetStateAction<boolean>>;
   setShowMangementModal: Dispatch<SetStateAction<boolean>>;

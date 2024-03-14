@@ -1,24 +1,20 @@
 import NoSSR from "react-no-ssr";
 import axios from "axios";
 import { differenceInCalendarWeeks } from "date-fns";
-
-// import { BalancerSDK, Network } from '@balancer-labs/sdk';
 import { useEffect, useRef, useState } from "react";
 import Highcharts from "highcharts";
 import SelectField from "@/components/input/SelectField";
-import { erc20ABI, usePublicClient } from "wagmi";
-import { getVeAddresses } from "@/lib/constants";
+import { usePublicClient } from "wagmi";
 import {
+  BALANCER_VAULT,
   BalancerVaultAbi,
   VCX_POOL_ID,
+  VOTING_ESCROW,
   VotingEscrowAbi,
 } from "@/lib/constants";
 import { formatToFixedDecimals } from "@/lib/utils/formatBigNumber";
-import { bigint } from "zod";
 import { DuneQueryResult } from "@/lib/types";
 
-const { VCX, VotingEscrow, WETH, WETH_VCX_LP, oVCX, BalancerVault } =
-  getVeAddresses();
 
 const vaultTvlChartColors = [
   "#FFE650",
@@ -356,7 +352,7 @@ export default function Vaults() {
         `https://coins.llama.fi/prices/current/ethereum:0xcE246eEa10988C495B4A90a905Ee9237a0f91543,ethereum:0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2,ethereum:0x577A7f7EE659Aa14Dc16FD384B3F8078E23F1920?searchWidth=24h`
       ),
       publicClient.readContract({
-        address: BalancerVault,
+        address: BALANCER_VAULT,
         abi: BalancerVaultAbi,
         functionName: "getPoolTokens",
         args: [VCX_POOL_ID],
@@ -402,7 +398,7 @@ export default function Vaults() {
         }>
       >("https://api.dune.com/api/v1/query/3237039/results", duneOpts),
       publicClient.readContract({
-        address: VotingEscrow,
+        address: VOTING_ESCROW,
         abi: VotingEscrowAbi,
         functionName: "supply",
       }),

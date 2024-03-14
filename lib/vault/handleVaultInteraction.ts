@@ -6,9 +6,7 @@ import zap, { handleZapAllowance } from "@/lib/vault/zap";
 import { gaugeDeposit, gaugeWithdraw } from "@/lib/gauges/interactions";
 import { erc20ABI } from "wagmi";
 import { FireEventArgs } from "@masa-finance/analytics-sdk";
-import { ENSO_ROUTER, getVeAddresses } from "@/lib/constants";
-
-const { VaultRouter: VAULT_ROUTER } = getVeAddresses();
+import { VaultRouterByChain } from "@/lib/constants";
 
 interface HandleVaultInteractionProps {
   stepCounter: number;
@@ -114,50 +112,16 @@ export default async function handleVaultInteraction({
     case SmartVaultActionType.DepositAndStake:
       switch (stepCounter) {
         case 0:
-          return () =>
-            handleAllowance({
-              token: inputToken.address,
-              amount,
-              account,
-              spender: VAULT_ROUTER,
-              clients,
-            });
+          return () => handleAllowance({ token: inputToken.address, amount, account, spender: VaultRouterByChain[chainId], clients })
         case 1:
-          return () =>
-            vaultDepositAndStake({
-              chainId,
-              router: VAULT_ROUTER,
-              vaultData,
-              account,
-              amount,
-              clients,
-              fireEvent,
-              referral,
-            });
+          return () => vaultDepositAndStake({ chainId, router: VaultRouterByChain[chainId], vaultData, account, amount, clients, fireEvent, referral })
       }
     case SmartVaultActionType.UnstakeAndWithdraw:
       switch (stepCounter) {
         case 0:
-          return () =>
-            handleAllowance({
-              token: inputToken.address,
-              amount,
-              account,
-              spender: VAULT_ROUTER,
-              clients,
-            });
+          return () => handleAllowance({ token: inputToken.address, amount, account, spender: VaultRouterByChain[chainId], clients })
         case 1:
-          return () =>
-            vaultUnstakeAndWithdraw({
-              chainId,
-              router: VAULT_ROUTER,
-              vaultData,
-              account,
-              amount,
-              clients,
-              fireEvent,
-              referral,
-            });
+          return () => vaultUnstakeAndWithdraw({ chainId, router: VaultRouterByChain[chainId], vaultData, account, amount, clients, fireEvent, referral })
       }
     case SmartVaultActionType.ZapDeposit:
       switch (stepCounter) {
@@ -218,62 +182,18 @@ export default async function handleVaultInteraction({
         case 1:
           return () => zap({ chainId, sellToken: inputToken, buyToken: vaultData.asset, amount, account, zapProvider, slippage, tradeTimeout, clients })
         case 2:
-          postBal = Number(
-            await clients.publicClient.readContract({
-              address: vaultData.asset.address,
-              abi: erc20ABI,
-              functionName: "balanceOf",
-              args: [account],
-            })
-          );
-          return () =>
-            handleAllowance({
-              token: vaultData.asset.address,
-              amount: postBal - vaultData.asset.balance,
-              account,
-              spender: VAULT_ROUTER,
-              clients,
-            });
+          postBal = Number(await clients.publicClient.readContract({ address: vaultData.asset.address, abi: erc20ABI, functionName: "balanceOf", args: [account] }))
+          return () => handleAllowance({ token: vaultData.asset.address, amount: postBal - vaultData.asset.balance, account, spender: VaultRouterByChain[chainId], clients })
         case 3:
-          postBal = Number(
-            await clients.publicClient.readContract({
-              address: vaultData.asset.address,
-              abi: erc20ABI,
-              functionName: "balanceOf",
-              args: [account],
-            })
-          );
-          return () =>
-            vaultDepositAndStake({
-              chainId,
-              router: VAULT_ROUTER,
-              vaultData,
-              account,
-              amount: postBal - vaultData.asset.balance,
-              clients,
-            });
+          postBal = Number(await clients.publicClient.readContract({ address: vaultData.asset.address, abi: erc20ABI, functionName: "balanceOf", args: [account] }))
+          return () => vaultDepositAndStake({ chainId, router: VaultRouterByChain[chainId], vaultData, account, amount: postBal - vaultData.asset.balance, clients })
       }
     case SmartVaultActionType.ZapUnstakeAndWithdraw:
       switch (stepCounter) {
         case 0:
-          return () =>
-            handleAllowance({
-              token: inputToken.address,
-              amount,
-              account,
-              spender: VAULT_ROUTER,
-              clients,
-            });
+          return () => handleAllowance({ token: inputToken.address, amount, account, spender: VaultRouterByChain[chainId], clients })
         case 1:
-          return () =>
-            vaultUnstakeAndWithdraw({
-              chainId,
-              router: VAULT_ROUTER,
-              vaultData,
-              account,
-              amount,
-              clients,
-            });
+          return () => vaultUnstakeAndWithdraw({ chainId, router: VaultRouterByChain[chainId], vaultData, account, amount, clients })
         case 2:
           return () => handleZapAllowance({ token: inputToken.address, amount, account, zapProvider, clients })
         case 3:
