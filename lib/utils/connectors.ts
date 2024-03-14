@@ -17,6 +17,7 @@ export enum ChainId {
   EthSepolia = 11155111,
   ArbSepolia = 421614,
   ALL = 0,
+  polygonMumbai = 80001
 }
 
 export enum named {
@@ -108,4 +109,4 @@ export const RPC_URLS: { [key: number]: string } = {
 
 };
 
-export const SUPPORTED_NETWORKS = [mainnet, polygon, optimism, arbitrum];
+export const SUPPORTED_NETWORKS = [mainnet, polygon, optimism, arbitrum]

@@ -1,24 +1,26 @@
 import Navbar from "@/components/navbar/Navbar";
 import { masaAtom, yieldOptionsAtom } from "@/lib/atoms/sdk";
 import { lockvaultsAtom, vaultsAtom } from "@/lib/atoms/vaults";
-import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
+import { RPC_URLS, SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { getVaultsByChain } from "@/lib/vault/getVaults";
 import { useAtom } from "jotai";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { CachedProvider, YieldOptions } from "vaultcraft-sdk";
-import { useAccount } from "wagmi";
+import { useAccount, usePublicClient } from "wagmi";
 import Footer from "@/components/common/Footer";
 import { useMasaAnalyticsReact } from "@masa-finance/analytics-react";
 import { useRouter } from "next/router";
 import getLockVaultsByChain from "@/lib/vault/lockVault/getVaults";
-import { zeroAddress } from "viem";
-import { arbitrum } from "viem/chains";
+import { createPublicClient, http, zeroAddress } from "viem";
+import { arbitrum, optimism } from "viem/chains";
 import Modal from "@/components/modal/Modal";
 import MainActionButton from "../button/MainActionButton";
 import { availableZapAssetAtom, zapAssetsAtom } from "@/lib/atoms";
-import { Token } from "@/lib/types";
+import { ReserveData, Token, UserAccountData } from "@/lib/types";
 import getZapAssets, { getAvailableZapAssets } from "@/lib/utils/getZapAssets";
-import SecondaryActionButton from "../button/SecondaryActionButton";
+import { aaveAccountDataAtom, aaveReserveDataAtom } from "@/lib/atoms/lending";
+import { AavePoolAbi } from "@/lib/constants/abi/Aave";
+import { AavePoolByChain, calcUserAccountData, fetchAaveData } from "@/lib/external/aave/interactions";
 
 async function setUpYieldOptions() {
   const ttl = 360_000;
@@ -272,6 +274,26 @@ export default function Page({
     )
       getZapData();
   }, []);
+
+  const [, setAaveReserveData] = useAtom(aaveReserveDataAtom)
+  const [, setAaveAccountData] = useAtom(aaveAccountDataAtom)
+
+  useEffect(() => {
+    async function setAaveData() {
+      const newReserveData: { [key: number]: ReserveData[] } = {}
+      const newUserAccountData: { [key: number]: UserAccountData } = {}
+
+      SUPPORTED_NETWORKS.forEach(async (chain) => {
+        const res = await fetchAaveData(account || zeroAddress, chain)
+        newReserveData[chain.id] = res.reserveData
+        newUserAccountData[chain.id] = res.userAccountData
+      })
+      
+      setAaveReserveData(newReserveData)
+      setAaveAccountData(newUserAccountData)
+    }
+    setAaveData()
+  }, [account])
 
   return (
     <>
