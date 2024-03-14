@@ -1,17 +1,22 @@
-import { Dispatch, Fragment, SetStateAction } from 'react'
-import { Dialog, Transition } from '@headlessui/react'
-import { XMarkIcon } from '@heroicons/react/24/outline'
+import { Dispatch, Fragment, SetStateAction } from "react";
+import { Dialog, Transition } from "@headlessui/react";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 
 interface ModalProps {
-  visibility: [boolean, Dispatch<SetStateAction<boolean>>],
-  children: any,
-  title?: any,
-  classNames?: string
+  visibility: [boolean, Dispatch<SetStateAction<boolean>>];
+  children: any;
+  title?: any;
+  classNames?: string;
 }
 
-export default function Modal({ visibility, children, title, classNames = "" }: ModalProps): JSX.Element {
+export default function Modal({
+  visibility,
+  children,
+  title,
+  classNames = "",
+}: ModalProps): JSX.Element {
   const [show, setShowModal] = visibility;
-  
+
   return (
     <Transition.Root show={show} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={setShowModal}>
@@ -43,7 +48,11 @@ export default function Modal({ visibility, children, title, classNames = "" }: 
               >
                 <div className="flex flex-row justify-between font-medium md:items-center mb-8">
                   <>{title}</>
-                  <XMarkIcon className="w-10 h-10 text-white" onClick={() => setShowModal(false)} role="button" />
+                  <XMarkIcon
+                    className="w-10 h-10 text-white"
+                    onClick={() => setShowModal(false)}
+                    role="button"
+                  />
                 </div>
                 {children}
               </Dialog.Panel>
@@ -52,5 +61,5 @@ export default function Modal({ visibility, children, title, classNames = "" }: 
         </div>
       </Dialog>
     </Transition.Root>
-  )
+  );
 }

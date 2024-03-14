@@ -28,73 +28,102 @@ import LoanInterface from "@/components/lending/LoanInterface";
 
 const { oVCX: OVCX, VCX } = getVeAddresses();
 
-
 export default function Index() {
   const router = useRouter();
   const { query } = router;
 
   const { address: account } = useAccount();
-  const publicClient = usePublicClient()
-  const { data: walletClient } = useWalletClient()
+  const publicClient = usePublicClient();
+  const { data: walletClient } = useWalletClient();
 
-  const [yieldOptions] = useAtom(yieldOptionsAtom)
+  const [yieldOptions] = useAtom(yieldOptionsAtom);
 
-  const [vaults] = useAtom(vaultsAtom)
-  const [vaultData, setVaultData] = useState<VaultData>()
+  const [vaults] = useAtom(vaultsAtom);
+  const [vaultData, setVaultData] = useState<VaultData>();
 
   useEffect(() => {
     if (!vaultData && query && yieldOptions && vaults.length > 0) {
       if (query?.id === "0x7CEbA0cAeC8CbE74DB35b26D7705BA68Cb38D725") {
-        getKelpVaultData(account || zeroAddress, publicClient, yieldOptions).then(res => {
+        getKelpVaultData(
+          account || zeroAddress,
+          publicClient,
+          yieldOptions
+        ).then((res) => {
           setVaultData(res.vaultData);
-          setTokenOptions(res.tokenOptions)
-        })
+          setTokenOptions(res.tokenOptions);
+        });
       } else {
-        setVaultData(vaults.find(vault => vault.address === query?.id && vault.chainId === Number(query?.chainId)))
+        setVaultData(
+          vaults.find(
+            (vault) =>
+              vault.address === query?.id &&
+              vault.chainId === Number(query?.chainId)
+          )
+        );
       }
     }
-  }, [vaults, query, vaultData])
+  }, [vaults, query, vaultData]);
 
-  const [zapAssets] = useAtom(zapAssetsAtom)
-  const [availableZapAssets] = useAtom(availableZapAssetAtom)
-  const [zapAvailable, setZapAvailable] = useState<boolean>(false)
-  const [tokenOptions, setTokenOptions] = useState<Token[]>([])
+  const [zapAssets] = useAtom(zapAssetsAtom);
+  const [availableZapAssets] = useAtom(availableZapAssetAtom);
+  const [zapAvailable, setZapAvailable] = useState<boolean>(false);
+  const [tokenOptions, setTokenOptions] = useState<Token[]>([]);
 
   useEffect(() => {
-    if (!!vaultData && Object.keys(availableZapAssets).length > 0 && vaultData.address !== "0x7CEbA0cAeC8CbE74DB35b26D7705BA68Cb38D725") {
-      if (availableZapAssets[vaultData.chainId].includes(vaultData.asset.address)) {
-        setZapAvailable(true)
-        setTokenOptions(getTokenOptions(vaultData, zapAssets[vaultData.chainId]))
+    if (
+      !!vaultData &&
+      Object.keys(availableZapAssets).length > 0 &&
+      vaultData.address !== "0x7CEbA0cAeC8CbE74DB35b26D7705BA68Cb38D725"
+    ) {
+      if (
+        availableZapAssets[vaultData.chainId].includes(vaultData.asset.address)
+      ) {
+        setZapAvailable(true);
+        setTokenOptions(
+          getTokenOptions(vaultData, zapAssets[vaultData.chainId])
+        );
       } else {
-        isDefiPosition({ address: vaultData.asset.address, chainId: vaultData.chainId }).then(isZapable => {
+        isDefiPosition({
+          address: vaultData.asset.address,
+          chainId: vaultData.chainId,
+        }).then((isZapable) => {
           if (isZapable) {
-            setZapAvailable(true)
-            setTokenOptions(getTokenOptions(vaultData, zapAssets[vaultData.chainId]))
+            setZapAvailable(true);
+            setTokenOptions(
+              getTokenOptions(vaultData, zapAssets[vaultData.chainId])
+            );
           } else {
-            setTokenOptions(getTokenOptions(vaultData))
+            setTokenOptions(getTokenOptions(vaultData));
           }
-        })
+        });
       }
     }
-  }, [availableZapAssets, vaultData])
+  }, [availableZapAssets, vaultData]);
 
-  const [gaugeRewards, setGaugeRewards] = useState<GaugeRewards>()
-  const { data: oBal } = useBalance({ chainId: 1, address: account, token: OVCX, watch: true })
-  const [vcxPrice, setVcxPrice] = useState<number>(0)
+  const [gaugeRewards, setGaugeRewards] = useState<GaugeRewards>();
+  const { data: oBal } = useBalance({
+    chainId: 1,
+    address: account,
+    token: OVCX,
+    watch: true,
+  });
+  const [vcxPrice, setVcxPrice] = useState<number>(0);
 
   useEffect(() => {
     async function getRewardsData() {
       const rewards = await getGaugeRewards({
-        gauges: vaults.filter(vault => vault.gauge && vault.chainId === 1).map(vault => vault.gauge?.address) as Address[],
+        gauges: vaults
+          .filter((vault) => vault.gauge && vault.chainId === 1)
+          .map((vault) => vault.gauge?.address) as Address[],
         account: account as Address,
-        publicClient
-      })
-      setGaugeRewards(rewards)
-      const vcxPriceInUsd = await llama({ address: VCX, chainId: 1 })
-      setVcxPrice(vcxPriceInUsd)
+        publicClient,
+      });
+      setGaugeRewards(rewards);
+      const vcxPriceInUsd = await llama({ address: VCX, chainId: 1 });
+      setVcxPrice(vcxPriceInUsd);
     }
     if (account) getRewardsData();
-  }, [account])
+  }, [account]);
 
   const [showLendModal, setShowLendModal] = useState(false)
 
@@ -208,10 +237,16 @@ export default function Index() {
                     label="Claim oVCX"
                     handleClick={() =>
                       claimOPop({
-                        gauges: gaugeRewards?.amounts?.filter(gauge => Number(gauge.amount) > 0).map(gauge => gauge.address) as Address[],
+                        gauges: gaugeRewards?.amounts
+                          ?.filter((gauge) => Number(gauge.amount) > 0)
+                          .map((gauge) => gauge.address) as Address[],
                         account: account as Address,
-                        clients: { publicClient, walletClient: walletClient as WalletClient }
-                      })}
+                        clients: {
+                          publicClient,
+                          walletClient: walletClient as WalletClient,
+                        },
+                      })
+                    }
                   />
                 </div>
               </div>

@@ -6,11 +6,11 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import NoSSR from "react-no-ssr";
 import { useAccount } from "wagmi";
-import axios from "axios"
+import axios from "axios";
 import { createPublicClient, extractChain, http, zeroAddress } from "viem";
 import { VaultAbi } from "@/lib/constants";
 import { RPC_URLS } from "@/lib/utils/connectors";
-import * as chains from 'viem/chains'
+import * as chains from "viem/chains";
 import { ProtocolName, YieldOptions } from "vaultcraft-sdk";
 import { yieldOptionsAtom } from "@/lib/atoms/sdk";
 import TabSelector from "@/components/common/TabSelector";
@@ -26,7 +26,7 @@ export type Strategy = {
   description: string;
   resolver: string;
   apy: number;
-}
+};
 
 export interface VaultSettings {
   proposedAdapter: Strategy;
@@ -38,8 +38,13 @@ export interface VaultSettings {
   accruedFees: number;
 }
 
-async function getVaultSettings(vault: VaultData, yieldOptions: YieldOptions): Promise<VaultSettings> {
-  const { data: strategyDescriptions } = await axios.get(`https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/descriptions/strategies/${vault.chainId}.json`)
+async function getVaultSettings(
+  vault: VaultData,
+  yieldOptions: YieldOptions
+): Promise<VaultSettings> {
+  const { data: strategyDescriptions } = await axios.get(
+    `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/descriptions/strategies/${vault.chainId}.json`
+  );
 
   const client = createPublicClient({
     chain: extractChain({
@@ -47,71 +52,73 @@ async function getVaultSettings(vault: VaultData, yieldOptions: YieldOptions): P
       // @ts-ignore
       id: vault.chainId,
     }),
-    transport: http(RPC_URLS[vault.chainId])
-  })
+    transport: http(RPC_URLS[vault.chainId]),
+  });
 
   const vaultContract = {
     address: vault.address,
-    abi: VaultAbi
-  }
+    abi: VaultAbi,
+  };
 
   const res = await client.multicall({
     contracts: [
       {
         ...vaultContract,
-        functionName: "proposedAdapter"
+        functionName: "proposedAdapter",
       },
       {
         ...vaultContract,
-        functionName: "proposedAdapterTime"
+        functionName: "proposedAdapterTime",
       },
       {
         ...vaultContract,
-        functionName: "proposedFees"
+        functionName: "proposedFees",
       },
       {
         ...vaultContract,
-        functionName: "proposedFeeTime"
+        functionName: "proposedFeeTime",
       },
       {
         ...vaultContract,
-        functionName: "paused"
+        functionName: "paused",
       },
       {
         ...vaultContract,
         functionName: "balanceOf",
-        args: [vault.metadata.feeRecipient]
+        args: [vault.metadata.feeRecipient],
       },
       {
         ...vaultContract,
-        functionName: "accruedManagementFee"
+        functionName: "accruedManagementFee",
       },
       {
         ...vaultContract,
-        functionName: "accruedPerformanceFee"
+        functionName: "accruedPerformanceFee",
       },
     ],
-    allowFailure: false
-  })
+    allowFailure: false,
+  });
 
   let proposedAdapter = {
     name: "None",
     description: "None",
     resolver: "None",
-    apy: 0
-  }
+    apy: 0,
+  };
 
   if (res[0] !== zeroAddress) {
     proposedAdapter = {
       name: strategyDescriptions[res[0]].name,
       description: strategyDescriptions[res[0]].description,
       resolver: strategyDescriptions[res[0]].resolver,
-      apy: (await yieldOptions.getApy({
-        chainId: vault.chainId,
-        protocol: strategyDescriptions[res[0]].resolver as ProtocolName,
-        asset: vault.asset.address
-      })).total
-    }
+      apy: (
+        await yieldOptions.getApy({
+          chainId: vault.chainId,
+          protocol: strategyDescriptions[res[0]].resolver as ProtocolName,
+          asset: vault.asset.address,
+        })
+      ).total,
+    };
   }
 
   return {
@@ -121,78 +128,121 @@ async function getVaultSettings(vault: VaultData, yieldOptions: YieldOptions): P
       deposit: Number(res[2][0]),
       withdrawal: Number(res[2][1]),
       management: Number(res[2][2]),
-      performance: Number(res[2][3])
+      performance: Number(res[2][3]),
     },
     proposedFeeTime: Number(res[3]),
     paused: res[4],
     feeBalance: Number(res[5]),
-    accruedFees: Number(res[6]) + Number(res[7])
-  }
+    accruedFees: Number(res[6]) + Number(res[7]),
+  };
 }
 
 export default function Index() {
   const router = useRouter();
   const { query } = router;
 
-  const [yieldOptions] = useAtom(yieldOptionsAtom)
+  const [yieldOptions] = useAtom(yieldOptionsAtom);
 
   const { address: account } = useAccount();
 
-  const [vaults, setVaults] = useAtom(vaultsAtom)
-  const [vault, setVault] = useState<VaultData>()
+  const [vaults, setVaults] = useAtom(vaultsAtom);
+  const [vault, setVault] = useState<VaultData>();
 
   useEffect(() => {
     if (!vault && query && vaults.length > 0) {
-      setVault(vaults.find(vault => vault.address === query?.id && vault.chainId === Number(query?.chainId)))
+      setVault(
+        vaults.find(
+          (vault) =>
+            vault.address === query?.id &&
+            vault.chainId === Number(query?.chainId)
+        )
+      );
     }
-  }, [vaults, query, vault])
+  }, [vaults, query, vault]);
 
-  const [settings, setSettings] = useState<VaultSettings>()
+  const [settings, setSettings] = useState<VaultSettings>();
 
   useEffect(() => {
     if (vault && yieldOptions && !settings) {
-      getVaultSettings(vault, yieldOptions).then(res => setSettings(res))
+      getVaultSettings(vault, yieldOptions).then((res) => setSettings(res));
     }
-  }, [vault, yieldOptions, settings])
+  }, [vault, yieldOptions, settings]);
 
-  const [tab, setTab] = useState<string>("Strategy")
+  const [tab, setTab] = useState<string>("Strategy");
 
   function changeTab(tab: string) {
-    setTab(tab)
+    setTab(tab);
   }
 
-  return <NoSSR>
-    {
-      vault ? (
+  return (
+    <NoSSR>
+      {vault ? (
         <section className="py-10 px-4 md:px-8 text-white">
           <AssetWithName vault={vault} />
           <>
-            {account === vault.metadata.creator ?
+            {account === vault.metadata.creator ? (
               <>
                 <TabSelector
                   className="mt-6 mb-12"
-                  availableTabs={["Strategy", "Fee Configuration", "Fee Recipient", "Take Fees", "Deposit Limit", "Pausing"]}
+                  availableTabs={[
+                    "Strategy",
+                    "Fee Configuration",
+                    "Fee Recipient",
+                    "Take Fees",
+                    "Deposit Limit",
+                    "Pausing",
+                  ]}
                   activeTab={tab}
                   setActiveTab={changeTab}
                 />
-                {
-                  settings ? <div>
-                    {tab === "Strategy" && <VaultStrategyConfiguration vaultData={vault} settings={settings} />}
-                    {tab === "Fee Configuration" && <VaultFeeConfiguration vaultData={vault} settings={settings} />}
-                    {tab === "Fee Recipient" && <VaultFeeRecipient vaultData={vault} settings={settings} />}
-                    {tab === "Deposit Limit" && <VaultDepositLimit vaultData={vault} settings={settings} />}
-                    {tab === "Take Fees" && <VaultFees vaultData={vault} settings={settings} />}
-                    {tab === "Pausing" && <VaultPausing vaultData={vault} settings={settings} />}
+                {settings ? (
+                  <div>
+                    {tab === "Strategy" && (
+                      <VaultStrategyConfiguration
+                        vaultData={vault}
+                        settings={settings}
+                      />
+                    )}
+                    {tab === "Fee Configuration" && (
+                      <VaultFeeConfiguration
+                        vaultData={vault}
+                        settings={settings}
+                      />
+                    )}
+                    {tab === "Fee Recipient" && (
+                      <VaultFeeRecipient
+                        vaultData={vault}
+                        settings={settings}
+                      />
+                    )}
+                    {tab === "Deposit Limit" && (
+                      <VaultDepositLimit
+                        vaultData={vault}
+                        settings={settings}
+                      />
+                    )}
+                    {tab === "Take Fees" && (
+                      <VaultFees vaultData={vault} settings={settings} />
+                    )}
+                    {tab === "Pausing" && (
+                      <VaultPausing vaultData={vault} settings={settings} />
+                    )}
                   </div>
-                    : <p className="text-white">Loading...</p>
-                }
+                ) : (
+                  <p className="text-white">Loading...</p>
+                )}
               </>
-              : <p className="text-white">Only the Vault Creator ({vault.metadata.creator}) has access to this page.</p>
-            }
+            ) : (
+              <p className="text-white">
+                Only the Vault Creator ({vault.metadata.creator}) has access to
+                this page.
+              </p>
+            )}
           </>
         </section>
-      ) :
+      ) : (
         <p className="text-white">Loading...</p>
-    }
-  </NoSSR>
+      )}
+    </NoSSR>
+  );
 }

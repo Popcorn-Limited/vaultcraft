@@ -6,6 +6,10 @@ export type Protocol = {
   logoURI: string;
 };
 
-export const DEFAULT_PROTOCOL: Protocol = { name: "Choose a Protocol", key: "none", logoURI: "" }
+export const DEFAULT_PROTOCOL: Protocol = {
+  name: "Choose a Protocol",
+  key: "none",
+  logoURI: "",
+};
 
 export const protocolAtom = atom<Protocol>(DEFAULT_PROTOCOL);

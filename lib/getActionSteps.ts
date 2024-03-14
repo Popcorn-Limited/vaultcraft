@@ -1,4 +1,4 @@
-import { DepositVaultActionType, KelpVaultActionType, LockVaultActionType, SmartVaultActionType } from "@/lib/types";
+import { KelpVaultActionType, LockVaultActionType, SmartVaultActionType } from "@/lib/types";
 import { AaveActionType } from "./external/aave/handleAaveInteractions";
 
 export interface ActionStep {
@@ -12,311 +12,388 @@ export interface ActionStep {
 const BaseStepInfo = {
   success: false,
   error: false,
-  loading: false
-}
+  loading: false,
+};
 
-export function getSmartVaultActionSteps(action: SmartVaultActionType): ActionStep[] {
+export function getSmartVaultActionSteps(
+  action: SmartVaultActionType
+): ActionStep[] {
   switch (action) {
     case SmartVaultActionType.Deposit:
-      return [{
-        step: 1,
-        label: "Handle Allowance",
-        ...BaseStepInfo
-      },
-      {
-        step: 2,
-        label: "Deposit into Vault",
-        ...BaseStepInfo
-      }]
+      return [
+        {
+          step: 1,
+          label: "Handle Allowance",
+          ...BaseStepInfo,
+        },
+        {
+          step: 2,
+          label: "Deposit into Vault",
+          ...BaseStepInfo,
+        },
+      ];
     case SmartVaultActionType.Withdrawal:
-      return [{
-        step: 1,
-        label: "Withdraw from Vault",
-        ...BaseStepInfo
-      }]
+      return [
+        {
+          step: 1,
+          label: "Withdraw from Vault",
+          ...BaseStepInfo,
+        },
+      ];
     case SmartVaultActionType.Stake:
-      return [{
-        step: 1,
-        label: "Handle Allowance",
-        ...BaseStepInfo
-      },
-      {
-        step: 2,
-        label: "Stake into Gauge",
-        ...BaseStepInfo
-      }]
+      return [
+        {
+          step: 1,
+          label: "Handle Allowance",
+          ...BaseStepInfo,
+        },
+        {
+          step: 2,
+          label: "Stake into Gauge",
+          ...BaseStepInfo,
+        },
+      ];
     case SmartVaultActionType.Unstake:
-      return [{
-        step: 1,
-        label: "Unstake from Gauge",
-        ...BaseStepInfo
-      }]
+      return [
+        {
+          step: 1,
+          label: "Unstake from Gauge",
+          ...BaseStepInfo,
+        },
+      ];
     case SmartVaultActionType.DepositAndStake:
-      return [{
-        step: 1,
-        label: "Handle Allowance",
-        ...BaseStepInfo
-      },
-      {
-        step: 2,
-        label: "Deposit and Stake",
-        ...BaseStepInfo
-      }]
+      return [
+        {
+          step: 1,
+          label: "Handle Allowance",
+          ...BaseStepInfo,
+        },
+        {
+          step: 2,
+          label: "Deposit and Stake",
+          ...BaseStepInfo,
+        },
+      ];
     case SmartVaultActionType.UnstakeAndWithdraw:
-      return [{
-        step: 1,
-        label: "Handle Allowance",
-        ...BaseStepInfo
-      },
-      {
-        step: 2,
-        label: "Unstake and Withdraw",
-        ...BaseStepInfo
-      }]
+      return [
+        {
+          step: 1,
+          label: "Handle Allowance",
+          ...BaseStepInfo,
+        },
+        {
+          step: 2,
+          label: "Unstake and Withdraw",
+          ...BaseStepInfo,
+        },
+      ];
     case SmartVaultActionType.ZapDeposit:
-      return [{
-        step: 1,
-        label: "Handle Zap Allowance",
-        ...BaseStepInfo
-      }, {
-        step: 2,
-        label: "Zap",
-        ...BaseStepInfo
-      }, {
-        step: 3,
-        label: "Handle Allowance",
-        ...BaseStepInfo
-      }, {
-        step: 4,
-        label: "Deposit",
-        ...BaseStepInfo
-      }]
+      return [
+        {
+          step: 1,
+          label: "Handle Zap Allowance",
+          ...BaseStepInfo,
+        },
+        {
+          step: 2,
+          label: "Zap",
+          ...BaseStepInfo,
+        },
+        {
+          step: 3,
+          label: "Handle Allowance",
+          ...BaseStepInfo,
+        },
+        {
+          step: 4,
+          label: "Deposit",
+          ...BaseStepInfo,
+        },
+      ];
     case SmartVaultActionType.ZapWithdrawal:
-      return [{
-        step: 1,
-        label: "Withdraw",
-        ...BaseStepInfo
-      }, {
-        step: 2,
-        label: "Handle Zap Allowance",
-        ...BaseStepInfo
-      }, {
-        step: 3,
-        label: "Zap",
-        ...BaseStepInfo
-      }]
+      return [
+        {
+          step: 1,
+          label: "Withdraw",
+          ...BaseStepInfo,
+        },
+        {
+          step: 2,
+          label: "Handle Zap Allowance",
+          ...BaseStepInfo,
+        },
+        {
+          step: 3,
+          label: "Zap",
+          ...BaseStepInfo,
+        },
+      ];
     case SmartVaultActionType.ZapDepositAndStake:
-      return [{
-        step: 1,
-        label: "Handle Zap Allowance",
-        ...BaseStepInfo
-      }, {
-        step: 2,
-        label: "Zap",
-        ...BaseStepInfo
-      }, {
-        step: 3,
-        label: "Handle Allowance",
-        ...BaseStepInfo
-      }, {
-        step: 4,
-        label: "Deposit and Stake",
-        ...BaseStepInfo
-      }]
+      return [
+        {
+          step: 1,
+          label: "Handle Zap Allowance",
+          ...BaseStepInfo,
+        },
+        {
+          step: 2,
+          label: "Zap",
+          ...BaseStepInfo,
+        },
+        {
+          step: 3,
+          label: "Handle Allowance",
+          ...BaseStepInfo,
+        },
+        {
+          step: 4,
+          label: "Deposit and Stake",
+          ...BaseStepInfo,
+        },
+      ];
     case SmartVaultActionType.ZapUnstakeAndWithdraw:
-      return [{
-        step: 1,
-        label: "Handle Allowance",
-        ...BaseStepInfo
-      }, {
-        step: 2,
-        label: "Unstake and Withdraw",
-        ...BaseStepInfo
-      }, {
-        step: 3,
-        label: "Handle Zap Allowance",
-        ...BaseStepInfo
-      }, {
-        step: 4,
-        label: "Zap",
-        ...BaseStepInfo
-      }]
+      return [
+        {
+          step: 1,
+          label: "Handle Allowance",
+          ...BaseStepInfo,
+        },
+        {
+          step: 2,
+          label: "Unstake and Withdraw",
+          ...BaseStepInfo,
+        },
+        {
+          step: 3,
+          label: "Handle Zap Allowance",
+          ...BaseStepInfo,
+        },
+        {
+          step: 4,
+          label: "Zap",
+          ...BaseStepInfo,
+        },
+      ];
   }
 }
 
-
-export function getLockVaultActionSteps(action: LockVaultActionType): ActionStep[] {
+export function getLockVaultActionSteps(
+  action: LockVaultActionType
+): ActionStep[] {
   switch (action) {
     case LockVaultActionType.Deposit:
-      return [{
-        step: 1,
-        label: "Handle Allowance",
-        ...BaseStepInfo
-      },
-      {
-        step: 2,
-        label: "Deposit",
-        ...BaseStepInfo
-      }]
+      return [
+        {
+          step: 1,
+          label: "Handle Allowance",
+          ...BaseStepInfo,
+        },
+        {
+          step: 2,
+          label: "Deposit",
+          ...BaseStepInfo,
+        },
+      ];
     case LockVaultActionType.IncreaseAmount:
-      return [{
-        step: 1,
-        label: "Handle Allowance",
-        ...BaseStepInfo
-      },
-      {
-        step: 2,
-        label: "Deposit",
-        ...BaseStepInfo
-      }]
+      return [
+        {
+          step: 1,
+          label: "Handle Allowance",
+          ...BaseStepInfo,
+        },
+        {
+          step: 2,
+          label: "Deposit",
+          ...BaseStepInfo,
+        },
+      ];
     case LockVaultActionType.Withdrawal:
-      return [{
-        step: 1,
-        label: "Withdraw",
-        ...BaseStepInfo
-      }]
+      return [
+        {
+          step: 1,
+          label: "Withdraw",
+          ...BaseStepInfo,
+        },
+      ];
     case LockVaultActionType.Claim:
       return [
         {
           step: 1,
           label: "Claim Rewards",
-          ...BaseStepInfo
-        }]
+          ...BaseStepInfo,
+        },
+      ];
     case LockVaultActionType.ZapDeposit:
-      return [{
-        step: 1,
-        label: "Handle Zap Allowance",
-        ...BaseStepInfo
-      }, {
-        step: 2,
-        label: "Zap",
-        ...BaseStepInfo
-      }, {
-        step: 3,
-        label: "Handle Allowance",
-        ...BaseStepInfo
-      }, {
-        step: 4,
-        label: "Deposit",
-        ...BaseStepInfo
-      }]
+      return [
+        {
+          step: 1,
+          label: "Handle Zap Allowance",
+          ...BaseStepInfo,
+        },
+        {
+          step: 2,
+          label: "Zap",
+          ...BaseStepInfo,
+        },
+        {
+          step: 3,
+          label: "Handle Allowance",
+          ...BaseStepInfo,
+        },
+        {
+          step: 4,
+          label: "Deposit",
+          ...BaseStepInfo,
+        },
+      ];
     case LockVaultActionType.ZapIncreaseAmount:
-      return [{
-        step: 1,
-        label: "Handle Zap Allowance",
-        ...BaseStepInfo
-      }, {
-        step: 2,
-        label: "Zap",
-        ...BaseStepInfo
-      }, {
-        step: 3,
-        label: "Handle Allowance",
-        ...BaseStepInfo
-      }, {
-        step: 4,
-        label: "Deposit",
-        ...BaseStepInfo
-      }]
+      return [
+        {
+          step: 1,
+          label: "Handle Zap Allowance",
+          ...BaseStepInfo,
+        },
+        {
+          step: 2,
+          label: "Zap",
+          ...BaseStepInfo,
+        },
+        {
+          step: 3,
+          label: "Handle Allowance",
+          ...BaseStepInfo,
+        },
+        {
+          step: 4,
+          label: "Deposit",
+          ...BaseStepInfo,
+        },
+      ];
     case LockVaultActionType.ZapWithdrawal:
-      return [{
-        step: 1,
-        label: "Withdraw",
-        ...BaseStepInfo
-      }, {
-        step: 2,
-        label: "Handle Zap Allowance",
-        ...BaseStepInfo
-      }, {
-        step: 3,
-        label: "Zap",
-        ...BaseStepInfo
-      }]
+      return [
+        {
+          step: 1,
+          label: "Withdraw",
+          ...BaseStepInfo,
+        },
+        {
+          step: 2,
+          label: "Handle Zap Allowance",
+          ...BaseStepInfo,
+        },
+        {
+          step: 3,
+          label: "Zap",
+          ...BaseStepInfo,
+        },
+      ];
   }
 }
 
-export function getKelpVaultActionSteps(action: KelpVaultActionType): ActionStep[] {
+export function getKelpVaultActionSteps(
+  action: KelpVaultActionType
+): ActionStep[] {
   switch (action) {
     case KelpVaultActionType.Deposit:
-      return [{
-        step: 1,
-        label: "Handle Vault Allowance",
-        ...BaseStepInfo
-      },
-      {
-        step: 2,
-        label: "Deposit and Stake",
-        ...BaseStepInfo
-      }]
+      return [
+        {
+          step: 1,
+          label: "Handle Vault Allowance",
+          ...BaseStepInfo,
+        },
+        {
+          step: 2,
+          label: "Deposit and Stake",
+          ...BaseStepInfo,
+        },
+      ];
     case KelpVaultActionType.Withdrawal:
-      return [{
-        step: 1,
-        label: "Handle Router Allowance",
-        ...BaseStepInfo
-      },
-      {
-        step: 2,
-        label: "Unstake and Withdraw",
-        ...BaseStepInfo
-      }]
+      return [
+        {
+          step: 1,
+          label: "Handle Router Allowance",
+          ...BaseStepInfo,
+        },
+        {
+          step: 2,
+          label: "Unstake and Withdraw",
+          ...BaseStepInfo,
+        },
+      ];
     case KelpVaultActionType.ZapDeposit:
-      return [{
-        step: 1,
-        label: "Mint ETHx",
-        ...BaseStepInfo
-      }, {
-        step: 3,
-        label: "Handle rsETH Allowance",
-        ...BaseStepInfo
-      }, {
-        step: 3,
-        label: "Mint rsETH",
-        ...BaseStepInfo
-      }, {
-        step: 4,
-        label: "Handle Vault Allowance",
-        ...BaseStepInfo
-      }, {
-        step: 5,
-        label: "Deposit and Stake",
-        ...BaseStepInfo
-      }]
+      return [
+        {
+          step: 1,
+          label: "Mint ETHx",
+          ...BaseStepInfo,
+        },
+        {
+          step: 3,
+          label: "Handle rsETH Allowance",
+          ...BaseStepInfo,
+        },
+        {
+          step: 3,
+          label: "Mint rsETH",
+          ...BaseStepInfo,
+        },
+        {
+          step: 4,
+          label: "Handle Vault Allowance",
+          ...BaseStepInfo,
+        },
+        {
+          step: 5,
+          label: "Deposit and Stake",
+          ...BaseStepInfo,
+        },
+      ];
     case KelpVaultActionType.EthxZapDeposit:
-      return [{
-        step: 1,
-        label: "Handle rsETH Allowance",
-        ...BaseStepInfo
-      }, {
-        step: 2,
-        label: "Mint rsETH",
-        ...BaseStepInfo
-      }, {
-        step: 3,
-        label: "Handle Vault Allowance",
-        ...BaseStepInfo
-      }, {
-        step: 4,
-        label: "Deposit and Stake",
-        ...BaseStepInfo
-      }]
+      return [
+        {
+          step: 1,
+          label: "Handle rsETH Allowance",
+          ...BaseStepInfo,
+        },
+        {
+          step: 2,
+          label: "Mint rsETH",
+          ...BaseStepInfo,
+        },
+        {
+          step: 3,
+          label: "Handle Vault Allowance",
+          ...BaseStepInfo,
+        },
+        {
+          step: 4,
+          label: "Deposit and Stake",
+          ...BaseStepInfo,
+        },
+      ];
     case KelpVaultActionType.ZapWithdrawal:
-      return [{
-        step: 1,
-        label: "Handle Router Allowance",
-        ...BaseStepInfo
-      }, {
-        step: 2,
-        label: "Unstake and Withdraw",
-        ...BaseStepInfo
-      }, {
-        step: 3,
-        label: "Handle Zap Allowance",
-        ...BaseStepInfo
-      }, {
-        step: 4,
-        label: "Zap",
-        ...BaseStepInfo
-      }]
+      return [
+        {
+          step: 1,
+          label: "Handle Router Allowance",
+          ...BaseStepInfo,
+        },
+        {
+          step: 2,
+          label: "Unstake and Withdraw",
+          ...BaseStepInfo,
+        },
+        {
+          step: 3,
+          label: "Handle Zap Allowance",
+          ...BaseStepInfo,
+        },
+        {
+          step: 4,
+          label: "Zap",
+          ...BaseStepInfo,
+        },
+      ];
   }
 }
 
@@ -324,39 +401,38 @@ export const POOL_DEPOSIT_STEPS = [
   {
     step: 1,
     label: "Handle WETH Allowance",
-    ...BaseStepInfo
+    ...BaseStepInfo,
   },
   {
     step: 2,
     label: "Handle VCX Allowance",
-    ...BaseStepInfo
+    ...BaseStepInfo,
   },
   {
     step: 3,
     label: "Deposit into Pool",
-    ...BaseStepInfo
-  }
-]
+    ...BaseStepInfo,
+  },
+];
 
 export const LOCK_VCX_LP_STEPS = [
   {
     step: 1,
     label: "Handle VCX-LP Allowance",
-    ...BaseStepInfo
+    ...BaseStepInfo,
   },
   {
     step: 2,
     label: "Lock VCX-LP",
-    ...BaseStepInfo
-  }
-]
-
+    ...BaseStepInfo,
+  },
+];
 
 export const EXERCISE_OVCX_STEPS = [
   {
     step: 1,
     label: "Handle WETH Allowance",
-    ...BaseStepInfo
+    ...BaseStepInfo,
   },
   {
     step: 2,

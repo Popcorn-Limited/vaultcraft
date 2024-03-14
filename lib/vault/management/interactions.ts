@@ -1,8 +1,8 @@
-import { VaultAbi, VaultControllerAbi } from "@/lib/constants"
-import { showLoadingToast } from "@/lib/toasts"
-import { Clients, SimulationResponse, VaultData } from "@/lib/types"
-import { handleCallResult } from "@/lib/utils/helpers"
-import { Address, PublicClient } from "viem"
+import { VaultAbi, VaultControllerAbi } from "@/lib/constants";
+import { showLoadingToast } from "@/lib/toasts";
+import { Clients, SimulationResponse, VaultData } from "@/lib/types";
+import { handleCallResult } from "@/lib/utils/helpers";
+import { Address, PublicClient } from "viem";
 
 interface BaseWriteProps {
   vaultData: VaultData;
@@ -15,7 +15,7 @@ interface VaultControllerSimulateProps {
   args: any[];
   functionName: string;
   publicClient: PublicClient;
-  chainId: number
+  chainId: number;
 }
 
 interface VaultSimulateProps {
@@ -26,10 +26,16 @@ interface VaultSimulateProps {
 }
 
 const VAULT_CONTROLLER_ADDRESS: { [key: number]: Address } = {
-  1: "0x7D51BABA56C2CA79e15eEc9ECc4E92d9c0a7dbeb"
-}
+  1: "0x7D51BABA56C2CA79e15eEc9ECc4E92d9c0a7dbeb",
+};
 
-async function simulateCall({ account, args, functionName, publicClient, chainId }: VaultControllerSimulateProps): Promise<SimulationResponse> {
+async function simulateCall({
+  account,
+  args,
+  functionName,
+  publicClient,
+  chainId,
+}: VaultControllerSimulateProps): Promise<SimulationResponse> {
   try {
     const { request } = await publicClient.simulateContract({
       account: account as Address,
@@ -38,15 +44,20 @@ async function simulateCall({ account, args, functionName, publicClient, chainId
       // @ts-ignore
       functionName,
       // @ts-ignore
-      args
-    })
-    return { request: request, success: true, error: null }
+      args,
+    });
+    return { request: request, success: true, error: null };
   } catch (error: any) {
-    return { request: null, success: false, error: error.shortMessage }
+    return { request: null, success: false, error: error.shortMessage };
   }
 }
 
-async function simulateVaultCall({ address, account, functionName, publicClient }: VaultSimulateProps): Promise<SimulationResponse> {
+async function simulateVaultCall({
+  address,
+  account,
+  functionName,
+  publicClient,
+}: VaultSimulateProps): Promise<SimulationResponse> {
   try {
     const { request } = await publicClient.simulateContract({
       account: account as Address,
@@ -55,16 +66,21 @@ async function simulateVaultCall({ address, account, functionName, publicClient 
       // @ts-ignore
       functionName,
       // @ts-ignore
-      args
-    })
-    return { request: request, success: true, error: null }
+      args,
+    });
+    return { request: request, success: true, error: null };
   } catch (error: any) {
-    return { request: null, success: false, error: error.shortMessage }
+    return { request: null, success: false, error: error.shortMessage };
   }
 }
 
-export async function proposeStrategy({ strategy, vaultData, account, clients }: BaseWriteProps & { strategy: Address }): Promise<boolean> {
-  showLoadingToast("Proposing new strategy...")
+export async function proposeStrategy({
+  strategy,
+  vaultData,
+  account,
+  clients,
+}: BaseWriteProps & { strategy: Address }): Promise<boolean> {
+  showLoadingToast("Proposing new strategy...");
 
   const success = await handleCallResult({
     successMessage: "Proposed new strategy!",
@@ -73,16 +89,20 @@ export async function proposeStrategy({ strategy, vaultData, account, clients }:
       functionName: "proposeVaultAdapters",
       args: [[vaultData.address], [strategy]],
       publicClient: clients.publicClient,
-      chainId: vaultData.chainId
+      chainId: vaultData.chainId,
     }),
-    clients
-  })
+    clients,
+  });
 
-  return success
+  return success;
 }
 
-export async function acceptStrategy({ vaultData, account, clients }: BaseWriteProps): Promise<boolean> {
-  showLoadingToast("Accepting new strategy...")
+export async function acceptStrategy({
+  vaultData,
+  account,
+  clients,
+}: BaseWriteProps): Promise<boolean> {
+  showLoadingToast("Accepting new strategy...");
 
   const success = await handleCallResult({
     successMessage: "Accepted new strategy!",
@@ -91,16 +111,28 @@ export async function acceptStrategy({ vaultData, account, clients }: BaseWriteP
       functionName: "changeVaultAdapters",
       args: [vaultData.address],
       publicClient: clients.publicClient,
-      chainId: vaultData.chainId
+      chainId: vaultData.chainId,
     }),
-    clients
-  })
+    clients,
+  });
 
-  return success
+  return success;
 }
 
-export async function proposeFees({ fees, vaultData, account, clients }: BaseWriteProps & { fees: { deposit: bigint, withdrawal: bigint, management: bigint, performance: bigint } }): Promise<boolean> {
-  showLoadingToast("Proposing new fees...")
+export async function proposeFees({
+  fees,
+  vaultData,
+  account,
+  clients,
+}: BaseWriteProps & {
+  fees: {
+    deposit: bigint;
+    withdrawal: bigint;
+    management: bigint;
+    performance: bigint;
+  };
+}): Promise<boolean> {
+  showLoadingToast("Proposing new fees...");
 
   const success = await handleCallResult({
     successMessage: "Proposed new fees!",
@@ -109,16 +141,20 @@ export async function proposeFees({ fees, vaultData, account, clients }: BaseWri
       functionName: "proposeVaultFees",
       args: [[vaultData.address], [fees]],
       publicClient: clients.publicClient,
-      chainId: vaultData.chainId
+      chainId: vaultData.chainId,
     }),
-    clients
-  })
+    clients,
+  });
 
-  return success
+  return success;
 }
 
-export async function acceptFees({ vaultData, account, clients }: BaseWriteProps): Promise<boolean> {
-  showLoadingToast("Accepting new fees...")
+export async function acceptFees({
+  vaultData,
+  account,
+  clients,
+}: BaseWriteProps): Promise<boolean> {
+  showLoadingToast("Accepting new fees...");
 
   const success = await handleCallResult({
     successMessage: "Accepted new fees!",
@@ -127,16 +163,21 @@ export async function acceptFees({ vaultData, account, clients }: BaseWriteProps
       functionName: "changeVaultFees",
       args: [vaultData.address],
       publicClient: clients.publicClient,
-      chainId: vaultData.chainId
+      chainId: vaultData.chainId,
     }),
-    clients
-  })
+    clients,
+  });
 
-  return success
+  return success;
 }
 
-export async function changeFeeRecipient({ feeRecipient, vaultData, account, clients }: BaseWriteProps & { feeRecipient: Address }): Promise<boolean> {
-  showLoadingToast("Changing fee recipient...")
+export async function changeFeeRecipient({
+  feeRecipient,
+  vaultData,
+  account,
+  clients,
+}: BaseWriteProps & { feeRecipient: Address }): Promise<boolean> {
+  showLoadingToast("Changing fee recipient...");
 
   const success = await handleCallResult({
     successMessage: "Changed fee recipient!",
@@ -145,16 +186,21 @@ export async function changeFeeRecipient({ feeRecipient, vaultData, account, cli
       functionName: "setVaultFeeRecipients",
       args: [[vaultData.address], [feeRecipient]],
       publicClient: clients.publicClient,
-      chainId: vaultData.chainId
+      chainId: vaultData.chainId,
     }),
-    clients
-  })
+    clients,
+  });
 
-  return success
+  return success;
 }
 
-export async function changeDepositLimit({ depositLimit, vaultData, account, clients }: BaseWriteProps & { depositLimit: number }): Promise<boolean> {
-  showLoadingToast("Changing deposit limit...")
+export async function changeDepositLimit({
+  depositLimit,
+  vaultData,
+  account,
+  clients,
+}: BaseWriteProps & { depositLimit: number }): Promise<boolean> {
+  showLoadingToast("Changing deposit limit...");
 
   const success = await handleCallResult({
     successMessage: "Changed deposit limit!",
@@ -163,16 +209,20 @@ export async function changeDepositLimit({ depositLimit, vaultData, account, cli
       functionName: "setVaultDepositLimits",
       args: [[vaultData.address], [depositLimit]],
       publicClient: clients.publicClient,
-      chainId: vaultData.chainId
+      chainId: vaultData.chainId,
     }),
-    clients
-  })
+    clients,
+  });
 
-  return success
+  return success;
 }
 
-export async function pauseVault({ vaultData, account, clients }: BaseWriteProps): Promise<boolean> {
-  showLoadingToast("Pausing vault...")
+export async function pauseVault({
+  vaultData,
+  account,
+  clients,
+}: BaseWriteProps): Promise<boolean> {
+  showLoadingToast("Pausing vault...");
 
   const success = await handleCallResult({
     successMessage: "Paused vault!",
@@ -181,16 +231,20 @@ export async function pauseVault({ vaultData, account, clients }: BaseWriteProps
       functionName: "pauseVaults",
       args: [[vaultData.address]],
       publicClient: clients.publicClient,
-      chainId: vaultData.chainId
+      chainId: vaultData.chainId,
     }),
-    clients
-  })
+    clients,
+  });
 
-  return success
+  return success;
 }
 
-export async function unpauseVault({ vaultData, account, clients }: BaseWriteProps): Promise<boolean> {
-  showLoadingToast("Unpausing vault...")
+export async function unpauseVault({
+  vaultData,
+  account,
+  clients,
+}: BaseWriteProps): Promise<boolean> {
+  showLoadingToast("Unpausing vault...");
 
   const success = await handleCallResult({
     successMessage: "Unpaused vault!",
@@ -199,27 +253,29 @@ export async function unpauseVault({ vaultData, account, clients }: BaseWritePro
       functionName: "unpauseVaults",
       args: [[vaultData.address]],
       publicClient: clients.publicClient,
-      chainId: vaultData.chainId
+      chainId: vaultData.chainId,
     }),
-    clients
-  })
+    clients,
+  });
 
-  return success
+  return success;
 }
 
-
-export async function takeFees({ vaultData, account, clients }: BaseWriteProps): Promise<boolean> {
-  showLoadingToast("Taking fees...")
+export async function takeFees({
+  vaultData,
+  account,
+  clients,
+}: BaseWriteProps): Promise<boolean> {
+  showLoadingToast("Taking fees...");
 
   return handleCallResult({
     successMessage: "Took fees!",
-    simulationResponse: await simulateVaultCall(
-      {
-        address: vaultData.address,
-        account: account as Address,
-        functionName: "takeManagementAndPerformanceFees",
-        publicClient: clients.publicClient
-      }),
-    clients
-  })
+    simulationResponse: await simulateVaultCall({
+      address: vaultData.address,
+      account: account as Address,
+      functionName: "takeManagementAndPerformanceFees",
+      publicClient: clients.publicClient,
+    }),
+    clients,
+  });
 }

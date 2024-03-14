@@ -1,4 +1,4 @@
-import {arbitrum, bsc, localhost, mainnet, optimism, polygon, polygonMumbai} from "viem/chains";
+import { arbitrum, bsc, localhost, mainnet, optimism, polygon, polygonMumbai } from "viem/chains";
 
 export enum ChainId {
   Ethereum = 1,

@@ -1,7 +1,13 @@
 import { toast } from "react-hot-toast";
 import { Address, parseUnits } from "viem";
 import { PublicClient, WalletClient } from "wagmi";
-import { ADDRESS_ZERO, EMPTY_BYTES, MAX_UINT256, VaultControllerByChain, ZERO } from "@/lib/constants";
+import {
+  ADDRESS_ZERO,
+  EMPTY_BYTES,
+  MAX_UINT256,
+  VaultControllerByChain,
+  ZERO,
+} from "@/lib/constants";
 import { AdapterConfig } from "@/lib/atoms";
 
 async function simulateDeployVault(
@@ -14,10 +20,15 @@ async function simulateDeployVault(
   adapterData: AdapterConfig,
   strategyData: AdapterConfig,
   ipfsHash: string
-): Promise<{ request: any | null, success: boolean, error: string | null }> {
-  const [account] = await walletClient.getAddresses()
+): Promise<{ request: any | null; success: boolean; error: string | null }> {
+  const [account] = await walletClient.getAddresses();
 
-  if (VaultControllerByChain[chain.id] === undefined) return { request: null, success: false, error: "Connected to the wrong network" }
+  if (VaultControllerByChain[chain.id] === undefined)
+    return {
+      request: null,
+      success: false,
+      error: "Connected to the wrong network",
+    };
   try {
     const { request } = await publicClient.simulateContract({
       account,
@@ -35,7 +46,15 @@ async function simulateDeployVault(
             performance: parseUnits(String(Number(fees.performance) / 100), 18),
           },
           feeRecipient: fees.recipient,
-          depositLimit: Number(limit.maximum) === 0 ? MAX_UINT256 : BigInt((Number(limit.maximum) * (10 ** asset.decimals)).toLocaleString('fullwide', { useGrouping: false })),
+          depositLimit:
+            Number(limit.maximum) === 0
+              ? MAX_UINT256
+              : BigInt(
+                  (Number(limit.maximum) * 10 ** asset.decimals).toLocaleString(
+                    "fullwide",
+                    { useGrouping: false }
+                  )
+                ),
           owner: account,
         },
         // @ts-ignore // TODO --> for some reason viem interprets this as needing Address and Address instead of the actual types bytes32 and bytes
@@ -62,12 +81,12 @@ async function simulateDeployVault(
           swapAddress: ADDRESS_ZERO,
           exchange: ZERO,
         },
-        ZERO
+        ZERO,
       ],
     });
-    return { request: request, success: true, error: null }
+    return { request: request, success: true, error: null };
   } catch (error: any) {
-    return { request: null, success: false, error: error.shortMessage }
+    return { request: null, success: false, error: error.shortMessage };
   }
 }
 
@@ -82,196 +101,210 @@ export async function deployVault(
   strategyData: AdapterConfig,
   ipfsHash: string
 ): Promise<boolean> {
-  toast.loading("Deploying Vault...")
+  toast.loading("Deploying Vault...");
 
-  const { request, success, error: simulationError } = await simulateDeployVault(chain, walletClient, publicClient, fees, asset, limit, adapterData, strategyData, ipfsHash)
+  const {
+    request,
+    success,
+    error: simulationError,
+  } = await simulateDeployVault(
+    chain,
+    walletClient,
+    publicClient,
+    fees,
+    asset,
+    limit,
+    adapterData,
+    strategyData,
+    ipfsHash
+  );
   if (success) {
     try {
-      const hash = await walletClient.writeContract(request)
-      const receipt = await publicClient.waitForTransactionReceipt({ hash })
-      toast.dismiss()
+      const hash = await walletClient.writeContract(request);
+      const receipt = await publicClient.waitForTransactionReceipt({ hash });
+      toast.dismiss();
       toast.success("Vault Deployed!");
 
       return true;
     } catch (error: any) {
-      console.log({ error })
-      toast.dismiss()
-      toast.error(error.shortMessage)
+      console.log({ error });
+      toast.dismiss();
+      toast.error(error.shortMessage);
 
       return false;
     }
   } else {
-    console.log({ simulationError })
-    toast.dismiss()
-    toast.error(simulationError)
+    console.log({ simulationError });
+    toast.dismiss();
+    toast.error(simulationError);
 
     return false;
   }
-};
+}
 
 const abi = [
   {
-    "inputs": [
+    inputs: [
       {
-        "components": [
+        components: [
           {
-            "internalType": "contract IERC20Upgradeable",
-            "name": "asset",
-            "type": "address"
+            internalType: "contract IERC20Upgradeable",
+            name: "asset",
+            type: "address",
           },
           {
-            "internalType": "contract IERC4626Upgradeable",
-            "name": "adapter",
-            "type": "address"
+            internalType: "contract IERC4626Upgradeable",
+            name: "adapter",
+            type: "address",
           },
           {
-            "components": [
+            components: [
               {
-                "internalType": "uint64",
-                "name": "deposit",
-                "type": "uint64"
+                internalType: "uint64",
+                name: "deposit",
+                type: "uint64",
               },
               {
-                "internalType": "uint64",
-                "name": "withdrawal",
-                "type": "uint64"
+                internalType: "uint64",
+                name: "withdrawal",
+                type: "uint64",
               },
               {
-                "internalType": "uint64",
-                "name": "management",
-                "type": "uint64"
+                internalType: "uint64",
+                name: "management",
+                type: "uint64",
               },
               {
-                "internalType": "uint64",
-                "name": "performance",
-                "type": "uint64"
-              }
+                internalType: "uint64",
+                name: "performance",
+                type: "uint64",
+              },
             ],
-            "internalType": "struct VaultFees",
-            "name": "fees",
-            "type": "tuple"
+            internalType: "struct VaultFees",
+            name: "fees",
+            type: "tuple",
           },
           {
-            "internalType": "address",
-            "name": "feeRecipient",
-            "type": "address"
+            internalType: "address",
+            name: "feeRecipient",
+            type: "address",
           },
           {
-            "internalType": "uint256",
-            "name": "depositLimit",
-            "type": "uint256"
+            internalType: "uint256",
+            name: "depositLimit",
+            type: "uint256",
           },
           {
-            "internalType": "address",
-            "name": "owner",
-            "type": "address"
-          }
+            internalType: "address",
+            name: "owner",
+            type: "address",
+          },
         ],
-        "internalType": "struct VaultInitParams",
-        "name": "vaultData",
-        "type": "tuple"
+        internalType: "struct VaultInitParams",
+        name: "vaultData",
+        type: "tuple",
       },
       {
-        "components": [
+        components: [
           {
-            "internalType": "bytes32",
-            "name": "id",
-            "type": "bytes32"
+            internalType: "bytes32",
+            name: "id",
+            type: "bytes32",
           },
           {
-            "internalType": "bytes",
-            "name": "data",
-            "type": "bytes"
-          }
+            internalType: "bytes",
+            name: "data",
+            type: "bytes",
+          },
         ],
-        "internalType": "struct DeploymentArgs",
-        "name": "adapterData",
-        "type": "tuple"
+        internalType: "struct DeploymentArgs",
+        name: "adapterData",
+        type: "tuple",
       },
       {
-        "components": [
+        components: [
           {
-            "internalType": "bytes32",
-            "name": "id",
-            "type": "bytes32"
+            internalType: "bytes32",
+            name: "id",
+            type: "bytes32",
           },
           {
-            "internalType": "bytes",
-            "name": "data",
-            "type": "bytes"
-          }
+            internalType: "bytes",
+            name: "data",
+            type: "bytes",
+          },
         ],
-        "internalType": "struct DeploymentArgs",
-        "name": "strategyData",
-        "type": "tuple"
+        internalType: "struct DeploymentArgs",
+        name: "strategyData",
+        type: "tuple",
       },
       {
-        "internalType": "bool",
-        "name": "deployStaking",
-        "type": "bool"
+        internalType: "bool",
+        name: "deployStaking",
+        type: "bool",
       },
       {
-        "internalType": "bytes",
-        "name": "rewardsData",
-        "type": "bytes"
+        internalType: "bytes",
+        name: "rewardsData",
+        type: "bytes",
       },
       {
-        "components": [
+        components: [
           {
-            "internalType": "address",
-            "name": "vault",
-            "type": "address"
+            internalType: "address",
+            name: "vault",
+            type: "address",
           },
           {
-            "internalType": "address",
-            "name": "staking",
-            "type": "address"
+            internalType: "address",
+            name: "staking",
+            type: "address",
           },
           {
-            "internalType": "address",
-            "name": "creator",
-            "type": "address"
+            internalType: "address",
+            name: "creator",
+            type: "address",
           },
           {
-            "internalType": "string",
-            "name": "metadataCID",
-            "type": "string"
+            internalType: "string",
+            name: "metadataCID",
+            type: "string",
           },
           {
-            "internalType": "address[8]",
-            "name": "swapTokenAddresses",
-            "type": "address[8]"
+            internalType: "address[8]",
+            name: "swapTokenAddresses",
+            type: "address[8]",
           },
           {
-            "internalType": "address",
-            "name": "swapAddress",
-            "type": "address"
+            internalType: "address",
+            name: "swapAddress",
+            type: "address",
           },
           {
-            "internalType": "uint256",
-            "name": "exchange",
-            "type": "uint256"
-          }
+            internalType: "uint256",
+            name: "exchange",
+            type: "uint256",
+          },
         ],
-        "internalType": "struct VaultMetadata",
-        "name": "metadata",
-        "type": "tuple"
+        internalType: "struct VaultMetadata",
+        name: "metadata",
+        type: "tuple",
       },
       {
-        "internalType": "uint256",
-        "name": "initialDeposit",
-        "type": "uint256"
-      }
+        internalType: "uint256",
+        name: "initialDeposit",
+        type: "uint256",
+      },
     ],
-    "name": "deployVault",
-    "outputs": [
+    name: "deployVault",
+    outputs: [
       {
-        "internalType": "address",
-        "name": "vault",
-        "type": "address"
-      }
+        internalType: "address",
+        name: "vault",
+        type: "address",
+      },
     ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  }
+    stateMutability: "nonpayable",
+    type: "function",
+  },
 ] as const;

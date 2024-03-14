@@ -1,23 +1,31 @@
-import InputTokenWithError from "@/components/input/InputTokenWithError"
-import { LockVaultData } from "@/lib/types"
+import InputTokenWithError from "@/components/input/InputTokenWithError";
+import { LockVaultData } from "@/lib/types";
 
-export default function Claim({ vaultData }: { vaultData: LockVaultData }): JSX.Element {
+export default function Claim({
+  vaultData,
+}: {
+  vaultData: LockVaultData;
+}): JSX.Element {
   return (
     <>
-      {vaultData.rewards.map(reward =>
+      {vaultData.rewards.map((reward) => (
         <InputTokenWithError
           key={reward.address}
-          onSelectToken={option => { }}
-          onMaxClick={() => { }}
+          onSelectToken={(option) => {}}
+          onMaxClick={() => {}}
           chainId={vaultData.chainId}
-          value={reward.rewardBalance > 0 ? reward.rewardBalance / (10 ** reward.decimals) : 0}
-          onChange={() => { }}
+          value={
+            reward.rewardBalance > 0
+              ? reward.rewardBalance / 10 ** reward.decimals
+              : 0
+          }
+          onChange={() => {}}
           selectedToken={reward}
           errorMessage={""}
           tokenList={[]}
           allowSelection={false}
         />
-      )}
+      ))}
     </>
-  )
+  );
 }

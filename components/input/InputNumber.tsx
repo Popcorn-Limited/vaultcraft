@@ -1,6 +1,8 @@
 import type { HTMLProps } from "react";
 
-export default function InputNumber(props: HTMLProps<HTMLInputElement>): JSX.Element {
+export default function InputNumber(
+  props: HTMLProps<HTMLInputElement>
+): JSX.Element {
   return (
     <input
       {...props}

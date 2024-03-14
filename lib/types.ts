@@ -49,7 +49,7 @@ export type FeeConfiguration = {
   withdrawal: number;
   management: number;
   performance: number;
-}
+};
 
 export type VaultData = {
   address: Address;
@@ -70,32 +70,33 @@ export type VaultData = {
   gaugeMinApy?: number;
   gaugeMaxApy?: number;
   totalApy: number;
-}
+};
 
 type LockVaultLock = {
   unlockTime: number;
   amount: number;
   rewardShares: number;
   daysToUnlock: number;
-}
+};
 
 export type LockVaultData = VaultData & {
   strategyShares: bigint;
   rewardAddresses: Address[];
   rewards: RewardToken[];
   lock: LockVaultLock;
-}
+};
 
 export type RewardToken = Token & {
   rewardBalance: number;
   userIndex: number;
   globalIndex: number;
   rewardApy: number;
-}
+};
 
 export enum VaultLabel {
   experimental = "Experimental",
-  deprecated = "Deprecated"
+  deprecated = "Deprecated",
+  new = "New",
 }
 
 export type VaultMetadata = {
@@ -106,8 +107,11 @@ export type VaultMetadata = {
   vaultName?: string;
   labels?: VaultLabel[];
   description?: string;
-  type: "single-asset-vault-v1" | "single-asset-lock-vault-v1" | "multi-strategy-vault-v1"
-}
+  type:
+  | "single-asset-vault-v1"
+  | "single-asset-lock-vault-v1"
+  | "multi-strategy-vault-v1";
+};
 
 export type OptionalMetadata = {
   token: {
@@ -117,20 +121,20 @@ export type OptionalMetadata = {
   protocol: {
     name: string;
     description: string;
-  }
+  };
   strategy: {
     name: string;
     description: string;
-  },
+  };
   getTokenUrl?: string;
   resolver?: ProtocolName;
-}
+};
 
 export type SimulationResponse = {
   request: any | null;
   success: boolean;
   error: string | null;
-}
+};
 
 export interface IconProps {
   color: string;
@@ -151,8 +155,7 @@ export type GaugeData = {
     lowerAPR: number;
     upperAPR: number;
   };
-}
-
+};
 
 export enum SmartVaultActionType {
   Deposit,
@@ -164,7 +167,7 @@ export enum SmartVaultActionType {
   ZapDeposit,
   ZapWithdrawal,
   ZapDepositAndStake,
-  ZapUnstakeAndWithdraw
+  ZapUnstakeAndWithdraw,
 }
 
 export enum LockVaultActionType {
@@ -174,7 +177,7 @@ export enum LockVaultActionType {
   Claim,
   ZapDeposit,
   ZapIncreaseAmount,
-  ZapWithdrawal
+  ZapWithdrawal,
 }
 
 export enum KelpVaultActionType {
@@ -182,7 +185,7 @@ export enum KelpVaultActionType {
   Withdrawal,
   ZapDeposit,
   EthxZapDeposit,
-  ZapWithdrawal
+  ZapWithdrawal,
 }
 
 export enum DepositVaultActionType {
@@ -193,9 +196,9 @@ export enum DepositVaultActionType {
 
 export type DuneQueryResult<T> = {
   result: {
-    rows: T[]
-  }
-}
+    rows: T[];
+  };
+};
 
 export type VoteUserSlopes = {
   slope: bigint,

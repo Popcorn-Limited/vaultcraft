@@ -2,7 +2,12 @@ import { ButtonProps } from "@/components/button/MainActionButton";
 import RightArrowIcon from "@/components/svg/RightArrowIcon";
 import { useState } from "react";
 
-export default function TertiaryActionButton({ label, handleClick, disabled = false, hidden = false }: ButtonProps): JSX.Element {
+export default function TertiaryActionButton({
+  label,
+  handleClick,
+  disabled = false,
+  hidden = false,
+}: ButtonProps): JSX.Element {
   const [arrowColor, setArrowColor] = useState("FFFFFF");
   const [arrowClass, setArrowClass] = useState("transform translate-x-0");
 
@@ -17,16 +22,18 @@ export default function TertiaryActionButton({ label, handleClick, disabled = fa
 
   return (
     <button
-      className={`${hidden ? "hidden" : ""
-        } w-full flex justify-between items-center text-gray-500 hover:text-white transition-all ease-in-out font-medium leading-4 md:leading-7 relative`}
+      className={`${
+        hidden ? "hidden" : ""
+      } w-full flex justify-between items-center text-gray-500 hover:text-white transition-all ease-in-out font-medium leading-4 md:leading-7 relative`}
       onMouseEnter={animateArrow}
       onClick={handleClick}
     >
       <span className="">{label}</span>
-      <div className={`'absolute right-0 transition-all ease-in-out duration-500 ${arrowClass}`}>
+      <div
+        className={`'absolute right-0 transition-all ease-in-out duration-500 ${arrowClass}`}
+      >
         <RightArrowIcon color={arrowColor} />
       </div>
     </button>
   );
-};
-
+}

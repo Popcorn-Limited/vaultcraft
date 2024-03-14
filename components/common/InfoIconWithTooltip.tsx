@@ -1,5 +1,5 @@
 import React from "react";
-import ResponsiveTooltip from './Tooltip';
+import ResponsiveTooltip from "./Tooltip";
 
 export interface InfoIconWithTooltipProps {
   title?: string;
@@ -8,7 +8,12 @@ export interface InfoIconWithTooltipProps {
   classExtras?: string;
 }
 
-export default function InfoIconWithTooltip({ title, content, id, classExtras }: InfoIconWithTooltipProps): JSX.Element {
+export default function InfoIconWithTooltip({
+  title,
+  content,
+  id,
+  classExtras,
+}: InfoIconWithTooltipProps): JSX.Element {
   return (
     <>
       <div className="flex items-center" id={id}>
@@ -20,4 +25,4 @@ export default function InfoIconWithTooltip({ title, content, id, classExtras }:
       <ResponsiveTooltip id={id} content={content} />
     </>
   );
-};
+}

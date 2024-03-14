@@ -1,12 +1,14 @@
 import { Address } from "viem";
 import { AddressByChain, veAddresses } from "lib/types";
 
+export const ENSO_ROUTER: Address = "0x80EbA3855878739F4710233A8a19d89Bdd2ffB8E"
+
 export const VaultRegistryByChain: AddressByChain = {
   1: "0x007318Dc89B314b47609C684260CfbfbcD412864",
   137: "0x2246c4c469735bCE95C120939b0C078EC37A08D0",
   10: "0xdD0d135b5b52B7EDd90a83d4A4112C55a1A6D23A",
   42161: "0xB205e94D402742B919E851892f7d515592a7A6cC",
-}
+};
 
 export const VaultControllerByChain: AddressByChain = {
   1: "0x7D51BABA56C2CA79e15eEc9ECc4E92d9c0a7dbeb",
@@ -14,8 +16,8 @@ export const VaultControllerByChain: AddressByChain = {
   42161: "0xF40749d72Ab5422CC5d735A373E66d67f7cA9393",
   10: "0x757D953c53aD28748aCf94AD2d59C13955E09c08",
   56: "0x815B4A955169Ba1D66944A4d8F18B69bc9553a62",
-  137: "0xCe22Ff6d00c5414E64b9253Dd49a35e0B9Ea8b60"
-}
+  137: "0xCe22Ff6d00c5414E64b9253Dd49a35e0B9Ea8b60",
+};
 
 const VeAddresses = {
   VCX: "0xcE246eEa10988C495B4A90a905Ee9237a0f91543",
@@ -33,7 +35,7 @@ const VeAddresses = {
   TokenAdmin: "0x03d103c547B43b5a76df7e652BD0Bb61bE0BD70d",
   VotingEscrow: "0x0aB4bC35Ef33089B9082Ca7BB8657D7c4E819a1A", // Same as VE_VCX
   GaugeController: "0xD57d8EEC36F0Ba7D8Fd693B9D97e02D8353EB1F4",
-  GaugeFactory: "0x3bd6418e90653945f781e3717D8F9404565444F6",
+  GaugeFactory: "0x8133cA3AB91B3FE3792992eA69720Ca6d3A92163",
   SmartWalletChecker: "0x8427155770f7e6b973249E2f9D140a495aBE4f90",
   VotingEscrowDelegation: "0xafE32869CAf311585647ADcD79050B83DbCF94C8",
   VaultRouter: "0x4995F3bb85E1381D02699e2164bC1C6c6Fa243cd",
@@ -76,11 +78,5 @@ export const zapAssetAddressesByChain: { [key: number]: Address[] } = {
     "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1", // WETH
     "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f", // WBTC
   ],
-  56: [],
-  80001: [
-    "0xc8c0Cf9436F4862a8F60Ce680Ca5a9f0f99b5ded", //DAI
-    "0x52D800ca262522580CeBAD275395ca6e7598C014", //USDC
-    "0x1fdE0eCc619726f4cD597887C9F3b4c8740e19e2", //USDT
-    "0x00DF377c2C82a65A8bAe2Ff04a9434a721Bc5aEB", //BAL
-  ]
+  56: []
 }

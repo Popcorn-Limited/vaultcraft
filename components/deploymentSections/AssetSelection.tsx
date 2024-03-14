@@ -1,4 +1,11 @@
-import { DEFAULT_PROTOCOL, DEFAULT_STRATEGY, assetAddressesAtom, assetAtom, protocolAtom, strategyAtom } from "@/lib/atoms";
+import {
+  DEFAULT_PROTOCOL,
+  DEFAULT_STRATEGY,
+  assetAddressesAtom,
+  assetAtom,
+  protocolAtom,
+  strategyAtom,
+} from "@/lib/atoms";
 import Input from "@/components/input/Input";
 import Selector, { Option } from "@/components/input/Selector";
 import { useEffect, useState } from "react";
@@ -10,50 +17,63 @@ import { useWalletClient } from "wagmi";
 import { getAssetsByChain, zapAssetAddressesByChain } from "@/lib/constants";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
-
 function AssetSelection() {
-  const { data: walletClient } = useWalletClient()
-  const chainId = walletClient?.chain.id || 1
+  const { data: walletClient } = useWalletClient();
+  const chainId = walletClient?.chain.id || 1;
 
   const [, setStrategy] = useAtom(strategyAtom);
   const [protocol, setProtocol] = useAtom(protocolAtom);
   const [asset, setAsset] = useAtom(assetAtom);
 
   const [availableAssetAddresses] = useAtom(assetAddressesAtom);
-  const networkAssetsAvailable = (availableAssetAddresses[chainId] && Object.keys(availableAssetAddresses[chainId]).length > 0) || false
+  const networkAssetsAvailable =
+    (availableAssetAddresses[chainId] &&
+      Object.keys(availableAssetAddresses[chainId]).length > 0) ||
+    false;
 
-  const [assetsByChain, setAssetsByChain] = useState<{ [key: number]: Token[] }>({});
+  const [assetsByChain, setAssetsByChain] = useState<{
+    [key: number]: Token[];
+  }>({});
   const [availableAssets, setAvailableAssets] = useState<Token[]>([]);
 
   useEffect(() => {
     async function addAssetsByChain() {
       // @ts-ignore
-      const newAssets: { [key: number]: Token[] } = { ...availableAssets, [chainId]: await getAssetsByChain(chainId) }
-      setAssetsByChain(newAssets)
-      setAvailableAssets(newAssets[chainId].filter(asset => zapAssetAddressesByChain[chainId].includes(asset.address)))
+      const newAssets: { [key: number]: Token[] } = {
+        ...availableAssets,
+        [chainId]: await getAssetsByChain(chainId),
+      };
+      setAssetsByChain(newAssets);
+      setAvailableAssets(
+        newAssets[chainId].filter((asset) =>
+          zapAssetAddressesByChain[chainId].includes(asset.address)
+        )
+      );
     }
-    if (!Object.keys(availableAssets).includes(String(chainId))) addAssetsByChain();
-  }, [chainId])
+    if (!Object.keys(availableAssets).includes(String(chainId)))
+      addAssetsByChain();
+  }, [chainId]);
 
-  const [searchTerm, setSearchTerm] = useState<string>("")
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
   function handleSearch() {
-    const avAssets = assetsByChain[chainId].filter(
-      item => searchTerm === "" ? true :
-        item.address.toLowerCase().includes(searchTerm) ||
+    const avAssets = assetsByChain[chainId].filter((item) =>
+      searchTerm === ""
+        ? true
+        : item.address.toLowerCase().includes(searchTerm) ||
         item.name.toLowerCase().includes(searchTerm) ||
         item.symbol.toLowerCase().includes(searchTerm)
-    )
+    );
 
-    setAvailableAssets(avAssets)
+    setAvailableAssets(avAssets);
   }
 
   function selectAsset(newAsset: any) {
     if (asset !== newAsset) {
-      setProtocol(DEFAULT_PROTOCOL)
-      setStrategy(DEFAULT_STRATEGY)
+      setProtocol(DEFAULT_PROTOCOL);
+      setStrategy(DEFAULT_STRATEGY);
     }
-    setAsset(newAsset)
+    setAsset(newAsset);
   }
 
   return (
@@ -66,21 +86,32 @@ function AssetSelection() {
         <div className="h-12 flex flex-row items-center">
           <div className="w-10/12">
             <Input
-              onChange={(e) => setSearchTerm((e.target as HTMLInputElement).value.toLowerCase())}
-              placeholder={networkAssetsAvailable ? "Search by name, symbol or address" : "Loading more assets..."}
+              onChange={(e) =>
+                setSearchTerm(
+                  (e.target as HTMLInputElement).value.toLowerCase()
+                )
+              }
+              placeholder={
+                networkAssetsAvailable
+                  ? "Search by name, symbol or address"
+                  : "Loading more assets..."
+              }
               defaultValue={searchTerm}
               autoComplete="off"
               autoCorrect="off"
               disabled={!networkAssetsAvailable}
             />
           </div>
-          <button className="w-2/12 ml-2 rounded-md border-2 border-[#353945] bg-[#23262F] hover:bg-[#353945] h-14 justify-center" onClick={handleSearch}>
+          <button
+            className="w-2/12 ml-2 rounded-md border-2 border-[#353945] bg-[#23262F] hover:bg-[#353945] h-14 justify-center"
+            onClick={handleSearch}
+          >
             <MagnifyingGlassIcon className="w-6 h-6 text-white mx-auto" />
           </button>
         </div>
       }
     >
-      {availableAssets.length > 0 ?
+      {availableAssets.length > 0 ? (
         availableAssets.map((assetIter) => (
           <Option
             // @ts-ignore
@@ -88,11 +119,13 @@ function AssetSelection() {
             selected={asset.address === assetIter.address}
             value={assetIter}
           >
+            <></>
           </Option>
-        )) :
+        ))
+      ) : (
         <p className="text-white">Asset not available...</p>
-      }
-    </Selector >
+      )}
+    </Selector>
   );
 }
 

@@ -1,4 +1,11 @@
-import { Dispatch, FormEventHandler, SetStateAction, useEffect, useMemo, useState } from "react";
+import {
+  Dispatch,
+  FormEventHandler,
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { useAccount, useBalance, usePublicClient, useToken } from "wagmi";
 import { getVeAddresses } from "@/lib/constants";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
@@ -13,28 +20,33 @@ import TokenIcon from "@/components/common/TokenIcon";
 import { Token } from "@/lib/types";
 import { PlusIcon } from "@heroicons/react/24/outline";
 
-const {
-  BalancerOracle,
-  BalancerPool,
-  WETH_VCX_LP,
-  VCX,
-  WETH
-} = getVeAddresses()
-
+const { BalancerOracle, BalancerPool, WETH_VCX_LP, VCX, WETH } =
+  getVeAddresses();
 
 interface LpInterfaceInterfaceProps {
   vcxAmountState: [string, Dispatch<SetStateAction<string>>];
   wethAmountState: [string, Dispatch<SetStateAction<string>>];
 }
 
-export default function LpInterface({ vcxAmountState, wethAmountState }: LpInterfaceInterfaceProps): JSX.Element {
-  const { address: account } = useAccount()
+export default function LpInterface({
+  vcxAmountState,
+  wethAmountState,
+}: LpInterfaceInterfaceProps): JSX.Element {
+  const { address: account } = useAccount();
 
   const [vcxAmount, setVcxAmount] = vcxAmountState;
   const [wethAmount, setWethAmount] = wethAmountState;
 
-  const { data: vcxBal } = useBalance({ chainId: 1, address: account, token: VCX })
-  const { data: wethBal } = useBalance({ chainId: 1, address: account, token: WETH })
+  const { data: vcxBal } = useBalance({
+    chainId: 1,
+    address: account,
+    token: VCX,
+  });
+  const { data: wethBal } = useBalance({
+    chainId: 1,
+    address: account,
+    token: WETH,
+  });
 
   const { data: lp } = useToken({ chainId: 1, address: WETH_VCX_LP });
   const { data: vcx } = useToken({ chainId: 1, address: VCX });
@@ -43,33 +55,33 @@ export default function LpInterface({ vcxAmountState, wethAmountState }: LpInter
   const [vcxPrice, setVCXPrice] = useState<number>(0);
   const [wethPrice, setWethPrice] = useState<number>(0);
 
-  const [initialLoad, setInitialLoad] = useState<boolean>(false)
+  const [initialLoad, setInitialLoad] = useState<boolean>(false);
 
   useEffect(() => {
     async function setUpPrices() {
-      setInitialLoad(true)
+      setInitialLoad(true);
 
-      const wethInUsd = await llama({ address: WETH, chainId: 1 })
-      const vcxInUsd = await llama({ address: VCX, chainId: 1 })
+      const wethInUsd = await llama({ address: WETH, chainId: 1 });
+      const vcxInUsd = await llama({ address: VCX, chainId: 1 });
       setWethPrice(wethInUsd);
       setVCXPrice(vcxInUsd);
     }
-    if (!initialLoad) setUpPrices()
-  }, [initialLoad])
+    if (!initialLoad) setUpPrices();
+  }, [initialLoad]);
 
   function handleMaxWeth() {
     const maxEth = formatEther(safeRound(wethBal?.value || ZERO, 18));
 
     setWethAmount(maxEth);
-    setVcxAmount(getVcxAmount(Number(maxEth)))
-  };
+    setVcxAmount(getVcxAmount(Number(maxEth)));
+  }
 
   function handleMaxOPop() {
     const maxOPop = formatEther(safeRound(vcxBal?.value || ZERO, 18));
 
     setWethAmount(getWethAmount(Number(maxOPop)));
-    setVcxAmount(maxOPop)
-  };
+    setVcxAmount(maxOPop);
+  }
 
   function getWethAmount(oVcxAmount: number) {
     const vcxValue = oVcxAmount * vcxPrice;
@@ -83,14 +95,18 @@ export default function LpInterface({ vcxAmountState, wethAmountState }: LpInter
     return String((wethValue * 4) / vcxPrice);
   }
 
-  const handleVcxInput: FormEventHandler<HTMLInputElement> = ({ currentTarget: { value } }) => {
-    const amount = validateInput(value).isValid ? value : "0"
+  const handleVcxInput: FormEventHandler<HTMLInputElement> = ({
+    currentTarget: { value },
+  }) => {
+    const amount = validateInput(value).isValid ? value : "0";
     setVcxAmount(amount);
     setWethAmount(getWethAmount(Number(amount)));
   };
 
-  const handleWethInput: FormEventHandler<HTMLInputElement> = ({ currentTarget: { value } }) => {
-    const amount = validateInput(value).isValid ? value : "0"
+  const handleWethInput: FormEventHandler<HTMLInputElement> = ({
+    currentTarget: { value },
+  }) => {
+    const amount = validateInput(value).isValid ? value : "0";
     setWethAmount(amount);
     setVcxAmount(getVcxAmount(Number(amount)));
   };
@@ -101,7 +117,7 @@ export default function LpInterface({ vcxAmountState, wethAmountState }: LpInter
       <div className="mt-8">
         <InputTokenWithError
           captionText={"Amount VCX"}
-          onSelectToken={() => { }}
+          onSelectToken={() => {}}
           onMaxClick={handleMaxOPop}
           chainId={1}
           value={vcxAmount}
@@ -117,7 +133,11 @@ export default function LpInterface({ vcxAmountState, wethAmountState }: LpInter
               balance: vcxBal?.value || ZERO,
             } as any
           }
-          errorMessage={Number(vcxAmount) > (Number(vcxBal?.value) / 1e18) ? "Insufficient Balance" : ""}
+          errorMessage={
+            Number(vcxAmount) > Number(vcxBal?.value) / 1e18
+              ? "Insufficient Balance"
+              : ""
+          }
           tokenList={[]}
         />
         <div className="flex justify-center -mt-2 mb-4">
@@ -126,7 +146,7 @@ export default function LpInterface({ vcxAmountState, wethAmountState }: LpInter
 
         <InputTokenWithError
           captionText={"Amount WETH"}
-          onSelectToken={() => { }}
+          onSelectToken={() => {}}
           onMaxClick={handleMaxWeth}
           chainId={1}
           value={wethAmount}
@@ -143,13 +163,23 @@ export default function LpInterface({ vcxAmountState, wethAmountState }: LpInter
             } as any
           }
           tokenList={[]}
-          errorMessage={Number(wethAmount) > (Number(wethBal?.value) / 1e18) ? "Insufficient Balance" : ""}
+          errorMessage={
+            Number(wethAmount) > Number(wethBal?.value) / 1e18
+              ? "Insufficient Balance"
+              : ""
+          }
         />
       </div>
       <p className="mt-1">
-        Or Deposit via the {" "}
-        <a className="text-blue-500" href="https://app.balancer.fi/#/ethereum/pool/0x577a7f7ee659aa14dc16fd384b3f8078e23f1920000200000000000000000633" target="_blank">balancer app</a>
+        Or Deposit via the{" "}
+        <a
+          className="text-blue-500"
+          href="https://app.balancer.fi/#/ethereum/pool/0x577a7f7ee659aa14dc16fd384b3f8078e23f1920000200000000000000000633"
+          target="_blank"
+        >
+          balancer app
+        </a>
       </p>
     </div>
-  )
+  );
 }

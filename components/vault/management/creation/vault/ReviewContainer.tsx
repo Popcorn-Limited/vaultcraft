@@ -1,11 +1,28 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { useAtom } from "jotai";
-import { WalletClient, mainnet, useAccount, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
+import {
+  WalletClient,
+  mainnet,
+  useAccount,
+  useNetwork,
+  usePublicClient,
+  useSwitchNetwork,
+  useWalletClient,
+} from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import Image from "next/image";
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
-import { metadataAtom, adapterAtom, strategyDeploymentAtom, conditionsAtom, adapterDeploymentAtom, feeAtom, limitAtom, assetAtom } from "@/lib/atoms";
+import {
+  metadataAtom,
+  adapterAtom,
+  strategyDeploymentAtom,
+  conditionsAtom,
+  adapterDeploymentAtom,
+  feeAtom,
+  limitAtom,
+  assetAtom,
+} from "@/lib/atoms";
 import Review from "@/components/review/Review";
 import MainActionButton from "@/components/button/MainActionButton";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
@@ -16,14 +33,18 @@ import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { VaultCreationContainerProps } from ".";
 import VaultCreationCard from "@/components/vault/management/creation/VaultCreationCard";
 
-export default function ReviewContainer({ route, stages, activeStage }: VaultCreationContainerProps): JSX.Element {
+export default function ReviewContainer({
+  route,
+  stages,
+  activeStage,
+}: VaultCreationContainerProps): JSX.Element {
   const router = useRouter();
   const publicClient = usePublicClient();
-  const { data: walletClient } = useWalletClient()
+  const { data: walletClient } = useWalletClient();
   const { address: account } = useAccount();
   const { openConnectModal } = useConnectModal();
   const { switchNetwork } = useSwitchNetwork();
-  const { chain } = useNetwork()
+  const { chain } = useNetwork();
 
   const [adapter] = useAtom(adapterAtom);
   const [strategyData] = useAtom(strategyDeploymentAtom);
@@ -46,33 +67,46 @@ export default function ReviewContainer({ route, stages, activeStage }: VaultCre
   }
 
   function deploy() {
-    if (!chain) return
+    if (!chain) return;
     // Deploy is currently only available on mainnet
     // @ts-ignore
-    if (!SUPPORTED_NETWORKS.map(network => network.id).includes(chain.id)) switchNetwork?.(Number(mainnet.id));
+    if (!SUPPORTED_NETWORKS.map((network) => network.id).includes(chain.id))
+      switchNetwork?.(Number(mainnet.id));
 
-    setIsLoading(true)
-    deployVault(chain, walletClient as WalletClient, publicClient, fees, asset, limit, adapterData, strategyData, "").then(res => {
+    setIsLoading(true);
+    deployVault(
+      chain,
+      walletClient as WalletClient,
+      publicClient,
+      fees,
+      asset,
+      limit,
+      adapterData,
+      strategyData,
+      ""
+    ).then((res) => {
       !!res ? setIsSuccess(true) : setIsError(true);
-      setIsLoading(false)
-    })
+      setIsLoading(false);
+    });
   }
 
-  return (metadata && adapter ?
-    <VaultCreationCard activeStage={activeStage} stages={stages} >
+  return metadata && adapter ? (
+    <VaultCreationCard activeStage={activeStage} stages={stages}>
       <div>
         <h1 className="text-white text-2xl mb-2">Review</h1>
         <p className="text-white">
-          Please review your configuration carefully.
-          You can interact with vaults that you created
+          Please review your configuration carefully. You can interact with
+          vaults that you created
           <a
             href="/experimental/vaults"
             rel="noopener noreferrer"
             target="_blank"
             className="text-customPurple"
           >
-            {" "} here
-          </a>.
+            {" "}
+            here
+          </a>
+          .
         </p>
       </div>
 
@@ -90,38 +124,50 @@ export default function ReviewContainer({ route, stages, activeStage }: VaultCre
         />
       </div>
 
-      {<Modal visibility={[showModal, setShowModal]}>
-        <div>
-          <p className="text-[white] text-2xl mb-4">Creating Vault</p>
-          <span className="flex flex-row">
-            <p className="text-white mr-2">Creating Vault... </p>
-            {(metadata.ipfsHash === "" || isLoading) &&
-              <figure className="relative w-5 h-5 mt-0.5">
-                <Image
-                  fill
-                  className="object-contain"
-                  alt="loader"
-                  src={"/images/loader/spinner.svg"}
-                />
-              </figure>
-            }
-            {metadata.ipfsHash !== "" && !isLoading && isSuccess &&
-              <CheckCircleIcon className="w-6 h-6 text-green-500" />
-            }
-            {metadata.ipfsHash !== "" && !isLoading && isError &&
-              <XCircleIcon className="w-6 h-6 text-red-500" />
-            }
-          </span>
-          <div className="mt-8">
-            <MainActionButton
-              label="Done"
-              handleClick={() => isSuccess ? router.push("/vaults/factory") : setShowModal(false)}
-              disabled={metadata.ipfsHash === "" || isLoading || (strategyData.id !== stringToHex("", { size: 32 }) && strategyData.data === "0x")}
-            />
+      {
+        <Modal visibility={[showModal, setShowModal]}>
+          <div>
+            <p className="text-[white] text-2xl mb-4">Creating Vault</p>
+            <span className="flex flex-row">
+              <p className="text-white mr-2">Creating Vault... </p>
+              {(metadata.ipfsHash === "" || isLoading) && (
+                <figure className="relative w-5 h-5 mt-0.5">
+                  <Image
+                    fill
+                    className="object-contain"
+                    alt="loader"
+                    src={"/images/loader/spinner.svg"}
+                  />
+                </figure>
+              )}
+              {metadata.ipfsHash !== "" && !isLoading && isSuccess && (
+                <CheckCircleIcon className="w-6 h-6 text-green-500" />
+              )}
+              {metadata.ipfsHash !== "" && !isLoading && isError && (
+                <XCircleIcon className="w-6 h-6 text-red-500" />
+              )}
+            </span>
+            <div className="mt-8">
+              <MainActionButton
+                label="Done"
+                handleClick={() =>
+                  isSuccess
+                    ? router.push("/vaults/factory")
+                    : setShowModal(false)
+                }
+                disabled={
+                  metadata.ipfsHash === "" ||
+                  isLoading ||
+                  (strategyData.id !== stringToHex("", { size: 32 }) &&
+                    strategyData.data === "0x")
+                }
+              />
+            </div>
           </div>
-        </div>
-      </Modal>}
-    </VaultCreationCard> :
+        </Modal>
+      }
+    </VaultCreationCard>
+  ) : (
     <></>
-  )
+  );
 }

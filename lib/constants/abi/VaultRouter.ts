@@ -1,63 +1,63 @@
 export const VaultRouterAbi = [
   {
-    "inputs": [],
-    "stateMutability": "nonpayable",
-    "type": "constructor"
+    inputs: [],
+    stateMutability: "nonpayable",
+    type: "constructor",
   },
   {
-    "inputs": [
+    inputs: [
       {
-        "internalType": "contract IERC4626Upgradeable",
-        "name": "vault",
-        "type": "address"
+        internalType: "contract IERC4626Upgradeable",
+        name: "vault",
+        type: "address",
       },
       {
-        "internalType": "contract ICurveGauge",
-        "name": "gauge",
-        "type": "address"
+        internalType: "contract ICurveGauge",
+        name: "gauge",
+        type: "address",
       },
       {
-        "internalType": "uint256",
-        "name": "assetAmount",
-        "type": "uint256"
+        internalType: "uint256",
+        name: "assetAmount",
+        type: "uint256",
       },
       {
-        "internalType": "address",
-        "name": "receiver",
-        "type": "address"
-      }
+        internalType: "address",
+        name: "receiver",
+        type: "address",
+      },
     ],
-    "name": "depositAndStake",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
+    name: "depositAndStake",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
   },
   {
-    "inputs": [
+    inputs: [
       {
-        "internalType": "contract IERC4626Upgradeable",
-        "name": "vault",
-        "type": "address"
+        internalType: "contract IERC4626Upgradeable",
+        name: "vault",
+        type: "address",
       },
       {
-        "internalType": "contract ICurveGauge",
-        "name": "gauge",
-        "type": "address"
+        internalType: "contract ICurveGauge",
+        name: "gauge",
+        type: "address",
       },
       {
-        "internalType": "uint256",
-        "name": "burnAmount",
-        "type": "uint256"
+        internalType: "uint256",
+        name: "burnAmount",
+        type: "uint256",
       },
       {
-        "internalType": "address",
-        "name": "receiver",
-        "type": "address"
-      }
+        internalType: "address",
+        name: "receiver",
+        type: "address",
+      },
     ],
-    "name": "unstakeAndWithdraw",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  }
+    name: "unstakeAndWithdraw",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
 ] as const;
