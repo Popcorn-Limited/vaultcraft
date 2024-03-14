@@ -1,15 +1,25 @@
 import { Fragment, useState, useEffect } from "react";
 import Link from "next/link";
 import { Dialog, Transition } from "@headlessui/react";
-import { ChevronDownIcon, PowerIcon } from "@heroicons/react/24/solid";
+import { PowerIcon } from "@heroicons/react/24/solid";
 import { useNetwork, useAccount, useDisconnect } from "wagmi";
 import { useChainModal, useConnectModal } from "@rainbow-me/rainbowkit";
 import { networkLogos } from "@/lib/utils/connectors";
 import MainActionButton from "@/components/button/MainActionButton";
 import SocialMediaLinks from "@/components/common/SocialMediaLinks";
 import NavbarLinks from "@/components/navbar/NavbarLinks";
+import { aaveAccountDataAtom } from "@/lib/atoms/lending";
+import { useAtom } from "jotai";
+import { formatToFixedDecimals } from "@/lib/utils/formatBigNumber";
+import LoanInterface, { getHealthFactorColor } from "@/components/lending/LoanInterface";
+import { vaultsAtom } from "@/lib/atoms/vaults";
+import { useRouter } from "next/router";
+import ResponsiveTooltip from "@/components/common/Tooltip";
+import { VaultData } from "@/lib/types";
 
 export default function Navbar(): JSX.Element {
+  const router = useRouter();
+  const { query } = router;
   const { disconnect } = useDisconnect();
   const { openConnectModal } = useConnectModal();
   const { openChainModal } = useChainModal();
@@ -28,10 +38,24 @@ export default function Navbar(): JSX.Element {
       setLogo(networkLogos[chain.id]);
       setChainName(chain.name);
     }
-  }, [chain?.id, address]);
+  }, [chain?.id, address])
+
+  const [userAccountData] = useAtom(aaveAccountDataAtom)
+  const [vaults] = useAtom(vaultsAtom)
+  const [showLendModal, setShowLendModal] = useState(false)
 
   return (
     <>
+      {(chain && vaults.length > 0) &&
+        <LoanInterface
+          visibilityState={[showLendModal, setShowLendModal]}
+          vaultData={query?.id && query?.chainId ?
+            (vaults.find(vault => vault.address === query?.id && vault.chainId === Number(query?.chainId))
+              || ({ chainId: chain.id || 1, asset: { address: "" } } as unknown as VaultData))
+            : ({ chainId: chain.id || 1, asset: { address: "" } } as unknown as VaultData)
+          }
+        />
+      }
       <div className="flex flex-row items-center justify-between w-full py-8 px-4 md:px-8 z-10">
         <div className="flex flex-row items-center">
           <div>
@@ -44,7 +68,23 @@ export default function Navbar(): JSX.Element {
             </Link>
           </div>
         </div>
-        <div className="flex flex-container h-full flex-row w-fit-content gap-x-6">
+        <div className="flex flex-container h-full flex-row w-fit-content items-center gap-x-6">
+          {(chain && userAccountData[chain?.id]?.healthFactor > 0) &&
+            <div
+              className={`w-fit cursor-pointer h-full py-2 bg-[#141416] md:bg-transparent md:py-[10px] px-4 md:px-6 flex flex-row items-center justify-between border border-customLightGray rounded-4xl text-primary`}
+              onClick={() => setShowLendModal(true)}
+              id="global-health-factor"
+            >
+              <p className="mr-2 leading-none hidden md:block">Health Factor</p>
+              <p className={`ml-2 ${getHealthFactorColor("text", userAccountData[chain.id].healthFactor)}`}>
+                {formatToFixedDecimals(userAccountData[chain.id].healthFactor || 0, 2)}
+              </p>
+              <ResponsiveTooltip
+                id="global-health-factor"
+                content={<p className="max-w-52">Health Factor of your Aave Account. (Click to manage)</p>}
+              />
+            </div>
+          }
           {address ? (
             <div className={`relative flex flex-container flex-row z-10`}>
               <div
@@ -82,25 +122,22 @@ export default function Navbar(): JSX.Element {
           >
             <span
               aria-hidden="true"
-              className={`block h-0.5 w-8 bg-primary ease-in-out rounded-3xl ${
-                menuVisible ? "rotate-45 translate-y-1" : "-translate-y-2"
-              }`}
+              className={`block h-0.5 w-8 bg-primary ease-in-out rounded-3xl ${menuVisible ? "rotate-45 translate-y-1" : "-translate-y-2"
+                }`}
             ></span>
             <span
               aria-hidden="true"
-              className={`block h-0.5 w-8 bg-primary ease-in-out rounded-3xl ${
-                menuVisible ? "opacity-0" : "opacity-100"
-              }`}
+              className={`block h-0.5 w-8 bg-primary ease-in-out rounded-3xl ${menuVisible ? "opacity-0" : "opacity-100"
+                }`}
             ></span>
             <span
               aria-hidden="true"
-              className={`block h-0.5 w-8 bg-primary ease-in-out rounded-3xl ${
-                menuVisible ? "-rotate-45 -translate-y-1" : "translate-y-2"
-              }`}
+              className={`block h-0.5 w-8 bg-primary ease-in-out rounded-3xl ${menuVisible ? "-rotate-45 -translate-y-1" : "translate-y-2"
+                }`}
             ></span>
           </button>
         </div>
-      </div>
+      </div >
       <Transition.Root show={menuVisible} as={Fragment}>
         <Dialog
           as="div"
@@ -114,21 +151,18 @@ export default function Navbar(): JSX.Element {
             <div className="block w-10 bg-transparent">
               <span
                 aria-hidden="true"
-                className={`block h-0.5 w-8 bg-white transform transition duration-500 ease-in-out rounded-3xl ${
-                  menuVisible ? "rotate-45 translate-y-0.5" : "-translate-y-2"
-                }`}
+                className={`block h-0.5 w-8 bg-white transform transition duration-500 ease-in-out rounded-3xl ${menuVisible ? "rotate-45 translate-y-0.5" : "-translate-y-2"
+                  }`}
               ></span>
               <span
                 aria-hidden="true"
-                className={`block h-0.5 w-8 bg-white transform transition duration-500 ease-in-out rounded-3xl ${
-                  menuVisible ? "opacity-0" : "opacity-100"
-                }`}
+                className={`block h-0.5 w-8 bg-white transform transition duration-500 ease-in-out rounded-3xl ${menuVisible ? "opacity-0" : "opacity-100"
+                  }`}
               ></span>
               <span
                 aria-hidden="true"
-                className={`block h-0.5 w-8 bg-white transform transition duration-500 ease-in-out rounded-3xl ${
-                  menuVisible ? "-rotate-45 -translate-y-0.5" : "translate-y-2"
-                }`}
+                className={`block h-0.5 w-8 bg-white transform transition duration-500 ease-in-out rounded-3xl ${menuVisible ? "-rotate-45 -translate-y-0.5" : "translate-y-2"
+                  }`}
               ></span>
             </div>
           </button>

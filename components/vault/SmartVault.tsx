@@ -8,11 +8,13 @@ import { Token, VaultData } from "@/lib/types";
 import Modal from "@/components/modal/Modal";
 import VaultStats from "@/components/vault/VaultStats";
 import { Square2StackIcon } from "@heroicons/react/24/outline";
-import { showSuccessToast } from "@/lib/toasts";
-import { useAtom } from "jotai";
-import { availableZapAssetAtom, zapAssetsAtom } from "@/lib/atoms";
-import { getTokenOptions, isDefiPosition } from "@/lib/vault/utils";
-import { MutateTokenBalanceProps } from "@/lib/vault/mutateTokenBalance";
+import { showSuccessToast } from '@/lib/toasts';
+import { useAtom } from 'jotai';
+import { availableZapAssetAtom, zapAssetsAtom } from '@/lib/atoms';
+import { getTokenOptions, isDefiPosition } from '@/lib/vault/utils';
+import { MutateTokenBalanceProps } from '@/lib/vault/mutateTokenBalance';
+import { useRouter } from 'next/router';
+
 
 interface SmartVaultsProps {
   vaultData: VaultData;
@@ -27,6 +29,7 @@ export default function SmartVault({
   mutateTokenBalance,
   description,
 }: SmartVaultsProps) {
+  const router = useRouter();
   const { address: account } = useAccount();
 
   const asset = vaultData.asset;
@@ -158,7 +161,7 @@ export default function SmartVault({
           </div>
         </div>
       </Modal>
-      <Accordion handleClick={() => setShowModal(true)}>
+      <Accordion handleClick={() => router.push(`/vaults/${vaultData.address}?chainId=${vaultData.chainId}`)}>
         <div className="w-full flex flex-wrap items-center justify-between flex-col gap-4">
           <div className="flex items-center justify-between select-none w-full">
             <AssetWithName vault={vaultData} />

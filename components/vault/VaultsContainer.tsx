@@ -91,7 +91,8 @@ export default function VaultsContainer({
   }
 
   return (
-    <NoSSR>
+    // @ts-ignore
+    <NoSSR >
       <section className="md:border-b border-[#353945] md:flex md:flex-row items-center justify-between py-10 px-4 md:px-8 md:gap-4">
         <div className="w-full md:w-max">
           <h1 className="text-5xl font-normal m-0 mb-4 md:mb-2 leading-0 text-primary md:text-3xl leading-none">
@@ -231,6 +232,6 @@ export default function VaultsContainer({
           <p className="text-white">Loading Vaults...</p>
         )}
       </section>
-    </NoSSR>
-  );
+    </NoSSR >
+  )
 }

@@ -20,9 +20,8 @@ function LockTimeButton({
 }): JSX.Element {
   return (
     <button
-      className={`w-10 h-10 border border-[#C8C8C8] hover:bg-[#23262f] rounded-lg ${
-        isActive ? "bg-white text-black" : "text-white"
-      }`}
+      className={`w-10 h-10 border border-[#C8C8C8] hover:bg-[#23262f] rounded-lg ${isActive ? "bg-white text-black" : "text-white"
+        }`}
       onClick={() => handleClick()}
     >
       {label}
@@ -182,8 +181,8 @@ export default function Deposit({
           <p>
             {Number(days) > 0
               ? new Date(
-                  Number(new Date()) + Number(days) * 86400000
-                ).toLocaleDateString()
+                Number(new Date()) + Number(days) * 86400000
+              ).toLocaleDateString()
               : "DD.MM.YYYY"}
           </p>
         </div>
@@ -197,21 +196,21 @@ export default function Deposit({
             <ArrowDownIcon
               className="h-10 w-10 p-2 text-customLightGray border border-customLightGray rounded-full cursor-pointer hover:text-primary hover:border-primary"
               aria-hidden="true"
-              onClick={() => {}}
+              onClick={() => { }}
             />
           </span>
         </div>
       </div>
       <InputTokenWithError
         captionText={"Output Amount"}
-        onSelectToken={(option) => {}}
-        onMaxClick={() => {}}
+        onSelectToken={(option) => { }}
+        onMaxClick={() => { }}
         chainId={vaultData.chainId}
         value={
           (Number(inputBalance) * Number(vaultData.asset?.price)) /
-            Number(vaultData.vault?.price) || 0
+          Number(vaultData.vault?.price) || 0
         }
-        onChange={() => {}}
+        onChange={() => { }}
         selectedToken={vaultData.vault}
         errorMessage={""}
         tokenList={[]}
@@ -220,15 +219,15 @@ export default function Deposit({
       />
       <InputTokenWithError
         captionText={"Reward Shares"}
-        onSelectToken={(option) => {}}
-        onMaxClick={() => {}}
+        onSelectToken={(option) => { }}
+        onMaxClick={() => { }}
         chainId={vaultData.chainId}
         value={
           ((Number(inputBalance) * Number(vaultData.asset?.price)) /
             Number(vaultData.vault?.price)) *
-            (Number(days) / 180) || 0
+          (Number(days) / 180) || 0
         }
-        onChange={() => {}}
+        onChange={() => { }}
         selectedToken={vaultData.vault}
         errorMessage={""}
         tokenList={[]}
