@@ -19,7 +19,9 @@ export const GAUGE_FACTORY: Address = "0x8133cA3AB91B3FE3792992eA69720Ca6d3A9216
 export const SMART_WALLET_CHECKER: Address = "0x8427155770f7e6b973249E2f9D140a495aBE4f90";
 export const VE_BEACON: Address = "0x6e220Be8511ACc1db8ACD4e2e66f987CF7529Af6";
 export const FEE_DISTRIBUTOR = zeroAddress; // Change once deployed
-export const ROOT_GAUGE_FACTORY:Address = "0x6aa03ebAb1e9CB8d44Fd79153d3a258FFd48169A"
+export const ROOT_GAUGE_FACTORY: Address = "0x6aa03ebAb1e9CB8d44Fd79153d3a258FFd48169A"
+
+export const ENSO_ROUTER: Address = "0x80EbA3855878739F4710233A8a19d89Bdd2ffB8E"
 
 export const VaultRegistryByChain: AddressByChain = {
   1: "0x007318Dc89B314b47609C684260CfbfbcD412864",

@@ -130,22 +130,12 @@ export default async function handleVaultInteraction({
     case SmartVaultActionType.ZapDeposit:
       switch (stepCounter) {
         case 0:
-          const ensoWallet = (
-            await axios.get(
-              `https://api.enso.finance/api/v1/wallet?chainId=${chainId}&fromAddress=${account}`,
-              {
-                headers: {
-                  Authorization: `Bearer ${process.env.ENSO_API_KEY}`,
-                },
-              }
-            )
-          ).data;
           return () =>
             handleAllowance({
               token: inputToken.address,
               amount,
               account,
-              spender: getAddress(ensoWallet.address),
+              spender: ENSO_ROUTER,
               clients,
             });
         case 1:
@@ -201,22 +191,12 @@ export default async function handleVaultInteraction({
           return () =>
             vaultRedeem({ chainId, vaultData, account, amount, clients });
         case 1:
-          const ensoWallet = (
-            await axios.get(
-              `https://api.enso.finance/api/v1/wallet?chainId=${chainId}&fromAddress=${account}`,
-              {
-                headers: {
-                  Authorization: `Bearer ${process.env.ENSO_API_KEY}`,
-                },
-              }
-            )
-          ).data;
           return () =>
             handleAllowance({
               token: vaultData.asset.address,
               amount,
               account,
-              spender: getAddress(ensoWallet.address),
+              spender: ENSO_ROUTER,
               clients,
             });
         case 2:
@@ -243,22 +223,12 @@ export default async function handleVaultInteraction({
     case SmartVaultActionType.ZapDepositAndStake:
       switch (stepCounter) {
         case 0:
-          const ensoWallet = (
-            await axios.get(
-              `https://api.enso.finance/api/v1/wallet?chainId=${chainId}&fromAddress=${account}`,
-              {
-                headers: {
-                  Authorization: `Bearer ${process.env.ENSO_API_KEY}`,
-                },
-              }
-            )
-          ).data;
           return () =>
             handleAllowance({
               token: inputToken.address,
               amount,
               account,
-              spender: getAddress(ensoWallet.address),
+              spender: ENSO_ROUTER,
               clients,
             });
         case 1:
@@ -287,22 +257,12 @@ export default async function handleVaultInteraction({
         case 1:
           return () => vaultUnstakeAndWithdraw({ chainId, router: VaultRouterByChain[chainId], vaultData, account, amount, clients })
         case 2:
-          const ensoWallet = (
-            await axios.get(
-              `https://api.enso.finance/api/v1/wallet?chainId=${chainId}&fromAddress=${account}`,
-              {
-                headers: {
-                  Authorization: `Bearer ${process.env.ENSO_API_KEY}`,
-                },
-              }
-            )
-          ).data;
           return () =>
             handleAllowance({
               token: vaultData.asset.address,
               amount,
               account,
-              spender: getAddress(ensoWallet.address),
+              spender: ENSO_ROUTER,
               clients,
             });
         case 3:
