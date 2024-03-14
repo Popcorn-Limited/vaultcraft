@@ -2,14 +2,11 @@ import { Address } from "viem";
 import { convex } from "./convex";
 import { ZERO } from "@/lib/constants";
 import { StrategyDefaultResolverParams } from "..";
+import { AddressByChain } from "@/lib/types";
 
 // @dev Make sure the addresses here are correct checksum addresses
-const CRV: { [key: number]: Address } = {
-  1: "0xD533a949740bb3306d119CC777fa900bA034cd52",
-};
-const CVX: { [key: number]: Address } = {
-  1: "0x4e3FBD56CD56c3e72c1403e103b45Db9da5B9D2B",
-};
+const CRV: AddressByChain = { 1: "0xD533a949740bb3306d119CC777fa900bA034cd52" }
+const CVX: AddressByChain = { 1: "0x4e3FBD56CD56c3e72c1403e103b45Db9da5B9D2B" }
 
 export async function convexCompounder({
   chainId,

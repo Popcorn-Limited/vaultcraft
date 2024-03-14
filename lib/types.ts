@@ -243,3 +243,13 @@ export type ReserveData = {
 export type AddressByChain = {
   [key: number]: Address
 }
+
+export enum ZapProvider {
+  none,
+  notFound,
+  enso,
+  zeroX,
+  oneInch,
+  paraSwap,
+  openOcean
+}

@@ -21,8 +21,7 @@ import { vaultsAtom } from "@/lib/atoms/vaults";
 import { getVaultNetworthByChain } from "@/lib/getNetworth";
 import VaultsSorting from "@/components/vault/VaultsSorting";
 import { llama } from "@/lib/resolver/price/resolver";
-import SearchBar from "../input/SearchBar";
-import KelpVault from "./KelpVault";
+import SearchBar from "@/components/input/SearchBar";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
 import { MinterByChain, OptionTokenByChain, VCX } from "@/lib/constants";
 
@@ -212,21 +211,15 @@ export default function VaultsContainer({
               .filter((vault) => !hiddenVaults.includes(vault.address))
               .sort((a, b) => b.tvl - a.tvl)
               .map((vault) => {
-                return vault.address ===
-                  "0x7CEbA0cAeC8CbE74DB35b26D7705BA68Cb38D725" ? (
-                  <KelpVault searchTerm={searchTerm} />
-                ) : (
-                  <SmartVault
-                    key={`sv-${vault.address}-${vault.chainId}`}
-                    vaultData={vault}
-                    mutateTokenBalance={mutateTokenBalance}
-                    searchTerm={searchTerm}
-                    description={
-                      showDescription ? vault.metadata.description : undefined
-                    }
-                  />
-                );
-              })}
+                return <SmartVault
+                  key={`sv-${vault.address}-${vault.chainId}`}
+                  vaultData={vault}
+                  mutateTokenBalance={mutateTokenBalance}
+                  searchTerm={searchTerm}
+                  description={showDescription ? vault.metadata.description : undefined}
+                />
+              })
+            }
           </>
         ) : (
           <p className="text-white">Loading Vaults...</p>

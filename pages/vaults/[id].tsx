@@ -41,24 +41,7 @@ export default function Index() {
 
   useEffect(() => {
     if (!vaultData && query && yieldOptions && vaults.length > 0) {
-      if (query?.id === "0x7CEbA0cAeC8CbE74DB35b26D7705BA68Cb38D725") {
-        getKelpVaultData(
-          account || zeroAddress,
-          publicClient,
-          yieldOptions
-        ).then((res) => {
-          setVaultData(res.vaultData);
-          setTokenOptions(res.tokenOptions);
-        });
-      } else {
-        setVaultData(
-          vaults.find(
-            (vault) =>
-              vault.address === query?.id &&
-              vault.chainId === Number(query?.chainId)
-          )
-        );
-      }
+      setVaultData(vaults.find(vault => vault.address === query?.id && vault.chainId === Number(query?.chainId)))
     }
   }, [vaults, query, vaultData]);
 
@@ -68,18 +51,10 @@ export default function Index() {
   const [tokenOptions, setTokenOptions] = useState<Token[]>([]);
 
   useEffect(() => {
-    if (
-      !!vaultData &&
-      Object.keys(availableZapAssets).length > 0 &&
-      vaultData.address !== "0x7CEbA0cAeC8CbE74DB35b26D7705BA68Cb38D725"
-    ) {
-      if (
-        availableZapAssets[vaultData.chainId].includes(vaultData.asset.address)
-      ) {
-        setZapAvailable(true);
-        setTokenOptions(
-          getTokenOptions(vaultData, zapAssets[vaultData.chainId])
-        );
+    if (!!vaultData && Object.keys(availableZapAssets).length > 0) {
+      if (availableZapAssets[vaultData.chainId].includes(vaultData.asset.address)) {
+        setZapAvailable(true)
+        setTokenOptions(getTokenOptions(vaultData, zapAssets[vaultData.chainId]))
       } else {
         isDefiPosition({
           address: vaultData.asset.address,
@@ -152,16 +127,31 @@ export default function Index() {
                 <div className="flex flex-wrap md:flex-row md:items-center md:pr-10 gap-4 md:gap-10 md:w-fit">
 
                   <div className="w-[120px] md:w-max">
-                    <p className="leading-6 text-base text-primaryDark md:text-primary">Your Wallet</p>
-                    <div className="text-3xl font-bold whitespace-nowrap text-primary">
-                      {`${formatAndRoundNumber(vaultData.asset.balance, vaultData.asset.decimals)}`}
+                    <p className="w-max leading-6 text-base text-primaryDark md:text-primary">
+                      My oVCX
+                    </p>
+                    <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
+                      {`$${oBal && vcxPrice
+                        ? NumberFormatter.format(
+                          (Number(oBal?.value) / 1e18) * (vcxPrice * 0.25)
+                        )
+                        : "0"
+                        }`}
                     </div>
                   </div>
 
                   <div className="w-[120px] md:w-max">
-                    <p className="leading-6 text-base text-primaryDark md:text-primary">Deposits</p>
-                    <div className="text-3xl font-bold whitespace-nowrap text-primary">
-                      {`${formatAndRoundNumber(vaultData.vault.balance, vaultData.vault.decimals)}`}
+                    <p className="w-max leading-6 text-base text-primaryDark md:text-primary">
+                      Claimable oVCX
+                    </p>
+                    <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
+                      {`$${gaugeRewards && vcxPrice
+                        ? NumberFormatter.format(
+                          (Number(gaugeRewards?.total) / 1e18) *
+                          (vcxPrice * 0.25)
+                        )
+                        : "0"
+                        }`}
                     </div>
                   </div>
 
@@ -250,32 +240,15 @@ export default function Index() {
             </section>
 
             <section className="w-full md:flex md:flex-row md:justify-between md:space-x-8 py-10 px-4 md:px-8">
-
-              <div className="w-full md:w-1/3 space-y-4">
+              <div className="w-full md:w-1/3">
                 <div className="bg-[#23262f] p-6 rounded-lg">
                   <div className="bg-[#141416] px-6 py-6 rounded-lg">
-                    {vaultData.address === "0x7CEbA0cAeC8CbE74DB35b26D7705BA68Cb38D725" ?
-                      <KelpVaultInputs
-                        vaultData={vaultData}
-                        tokenOptions={tokenOptions}
-                        chainId={vaultData.chainId}
-                        hideModal={() => router.reload()}
-                        mutateTokenBalance={mutateKelpTokenBalance}
-                        setVaultData={setVaultData}
-                        setTokenOptions={setTokenOptions}
-                      /> :
-                      <VaultInputs
-                        vaultData={vaultData}
-                        tokenOptions={tokenOptions}
-                        chainId={vaultData.chainId}
-                        hideModal={() => router.reload()}
-                        mutateTokenBalance={mutateTokenBalance}
-                      />}
-                  </div>
-                  <div className="mt-4">
-                    <MainActionButton
-                      label="Open Loan Modal"
-                      handleClick={() => setShowLendModal(true)}
+                    <VaultInputs
+                      vaultData={vaultData}
+                      tokenOptions={tokenOptions}
+                      chainId={vaultData.chainId}
+                      hideModal={() => router.reload()}
+                      mutateTokenBalance={mutateTokenBalance}
                     />
                   </div>
                 </div>
