@@ -1,6 +1,7 @@
 import MainActionButton from "@/components/button/MainActionButton";
 import InputNumber from "@/components/input/InputNumber";
-import { BalancerOracleAbi, OVCX_ORACLE } from "@/lib/constants";
+import { BalancerOracleAbi, OVCX_ORACLE, ROOT_GAUGE_FACTORY } from "@/lib/constants";
+import { transmitRewards } from "@/lib/gauges/interactions";
 import { showLoadingToast } from "@/lib/toasts";
 import { SimulationResponse } from "@/lib/types";
 import { handleCallResult } from "@/lib/utils/helpers";
@@ -171,19 +172,37 @@ function SetOptionTokenOracleParams(): JSX.Element {
 }
 
 export default function Misc(): JSX.Element {
+  const { address: account } = useAccount();
+  const publicClient = usePublicClient({ chainId: 1 });
+  const { data: walletClient } = useWalletClient();
+
   return (
     <NoSSR>
-      <section className="md:border-b border-[#353945] md:flex md:flex-row items-center justify-between py-10 px-4 md:px-8 md:gap-4">
-        <div className="w-full md:w-max">
-          <h1 className="text-5xl font-normal m-0 mb-4 md:mb-2 leading-0 text-primary md:text-3xl leading-none">
-            Smart Vaults
-          </h1>
-          <p className="text-primaryDark md:text-primary md:opacity-80">
-            Automate your returns in single-asset deposit yield strategies.
-          </p>
-        </div>
-      </section>
-      <SetOptionTokenOracleParams />
+      {(account && walletClient) &&
+        <>
+          <section className="md:border-b border-[#353945] md:flex md:flex-row items-center justify-between py-10 px-4 md:px-8 md:gap-4">
+            <div className="w-full md:w-max">
+              <h1 className="text-5xl font-normal m-0 mb-4 md:mb-2 leading-0 text-primary md:text-3xl leading-none">
+                Smart Vaults
+              </h1>
+              <p className="text-primaryDark md:text-primary md:opacity-80">
+                Automate your returns in single-asset deposit yield strategies.
+              </p>
+            </div>
+          </section>
+          <SetOptionTokenOracleParams />
+          <div className="border-b border-white pb-4 py-10 px-4 md:px-8">
+            <h2 className="text-white text-xl">OptionToken-Oracle Values</h2>
+            <div className="flex md:flex-row md:space-x-4 mt-4">
+              <MainActionButton
+                label="Transmit Rewards"
+                handleClick={() => transmitRewards({ gauges: ["0xb5DC74CBF45A53a7E0920885ed506D5B862B119D"], account, address: ROOT_GAUGE_FACTORY, publicClient, walletClient })}
+                disabled={!account}
+              />
+            </div>
+          </div>
+        </>
+      }
     </NoSSR>
   );
 }

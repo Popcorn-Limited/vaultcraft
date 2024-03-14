@@ -15,7 +15,7 @@ export default function useGaugeWeights({
 }) {
   const contract = {
     address: GAUGE_CONTROLLER,
-    chainId: Number(chainId),
+    chainId: Number(1),
     abi: GaugeControllerAbi
   }
 
