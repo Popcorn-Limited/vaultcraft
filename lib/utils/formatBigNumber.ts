@@ -4,7 +4,10 @@ import { ZERO } from "@/lib/constants";
 const MILLION = 1e6;
 const THOUSAND = 1e3;
 
-export function formatAndRoundBigNumber(value: BigInt, decimals: number): string {
+export function formatAndRoundBigNumber(
+  value: BigInt,
+  decimals: number
+): string {
   if (typeof value === "bigint") {
     const formatedValue = Number(formatUnits(value, decimals));
 
@@ -29,8 +32,8 @@ export function formatAndRoundBigNumber(value: BigInt, decimals: number): string
 }
 
 export function formatAndRoundNumber(value: number, decimals: number): string {
-  if (value === 0) return "0"
-  return formatNumber(value / (10 ** decimals))
+  if (value === 0) return "0";
+  return formatNumber(value / 10 ** decimals);
 }
 
 export function formatNumber(value: number): string {
@@ -54,8 +57,8 @@ export function formatNumber(value: number): string {
 
 export function multiplyDecimals(value: number, multiplier: number): number {
   function countDecimalPlaces(value: number): number {
-    if ((value % 1) !== 0) {
-      let decimalString = value.toString().split('.')[1];
+    if (value % 1 !== 0) {
+      let decimalString = value.toString().split(".")[1];
       if (decimalString) {
         return decimalString.length;
       }
@@ -67,7 +70,9 @@ export function multiplyDecimals(value: number, multiplier: number): number {
 }
 
 export function formatToFixedDecimals(value: number, decimals: number): string {
-  return Number(Number.parseFloat(value.toString()).toFixed(decimals)).toLocaleString()
+  return Number(
+    Number.parseFloat(value.toString()).toFixed(decimals)
+  ).toLocaleString();
 }
 
 export const NumberFormatter = Intl.NumberFormat("en", {
@@ -82,10 +87,10 @@ export function safeRound(bn: bigint, decimals = 18): bigint {
   } else if (decimals <= 8) {
     roundingDecimals = 2;
   } else if (decimals <= 18) {
-    roundingDecimals = 8
+    roundingDecimals = 8;
   } else if (decimals === 27) {
-    roundingDecimals = 12
+    roundingDecimals = 12;
   }
-  const roundingValue = parseUnits("1", roundingDecimals)
-  return (bn / roundingValue) * roundingValue
+  const roundingValue = parseUnits("1", roundingDecimals);
+  return (bn / roundingValue) * roundingValue;
 }

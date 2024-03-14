@@ -1,12 +1,15 @@
 import { Tooltip } from "react-tooltip";
 
-export default function ResponsiveTooltip({ id, content }: {
+export default function ResponsiveTooltip({
+  id,
+  content,
+}: {
   id: string;
   content: JSX.Element | React.ReactElement;
 }): JSX.Element {
   return (
     <>
-      <div className='hidden md:block'>
+      <div className="hidden md:block">
         <Tooltip
           anchorSelect={`#${id}`}
           place="bottom"
@@ -15,7 +18,7 @@ export default function ResponsiveTooltip({ id, content }: {
           {content}
         </Tooltip>
       </div>
-      <div className='md:hidden'>
+      <div className="md:hidden">
         <Tooltip
           anchorSelect={`#${id}`}
           openOnClick
@@ -26,5 +29,5 @@ export default function ResponsiveTooltip({ id, content }: {
         </Tooltip>
       </div>
     </>
-  )
+  );
 }

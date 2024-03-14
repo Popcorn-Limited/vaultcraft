@@ -1,7 +1,7 @@
-import { useRouter } from "next/router"
-import NavbarLink from "@/components/navbar/NavbarLink"
+import { useRouter } from "next/router";
+import NavbarLink from "@/components/navbar/NavbarLink";
 
-const links: { label: string, url: string, onClick?: Function }[] = [
+const links: { label: string; url: string; onClick?: Function }[] = [
   {
     label: "Smart Vaults",
     url: "/vaults",
@@ -20,20 +20,30 @@ const links: { label: string, url: string, onClick?: Function }[] = [
   },
   {
     label: "Stats",
-    url: "/stats"
+    url: "/stats",
   },
   {
     label: "Pop to VCX Migration",
-    url: "/migration"
+    url: "/migration",
   },
   {
     label: "Archive",
-    url: "https://archive.pop.network/"
-  }
-]
-
+    url: "https://archive.pop.network/",
+  },
+];
 
 export default function NavbarLinks(): JSX.Element {
-  const router = useRouter()
-  return <>{links.map(link => <NavbarLink key={link.label} label={link.label} url={link.url} isActive={router.pathname === link.url} />)}</>
+  const router = useRouter();
+  return (
+    <>
+      {links.map((link) => (
+        <NavbarLink
+          key={link.label}
+          label={link.label}
+          url={link.url}
+          isActive={router.pathname === link.url}
+        />
+      ))}
+    </>
+  );
 }

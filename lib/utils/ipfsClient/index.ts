@@ -3,7 +3,10 @@ import axios, { AxiosResponse } from "axios";
 export interface IIpfsClient {
   get: <T>(cid: string) => Promise<T>;
   add: <T>(object: T) => Promise<string>;
-  upload: (file: File, setUploadProgress?: (progress: number) => void) => Promise<UploadResult>;
+  upload: (
+    file: File,
+    setUploadProgress?: (progress: number) => void
+  ) => Promise<UploadResult>;
 }
 
 export interface UploadResult {
@@ -15,7 +18,9 @@ export interface UploadResult {
 
 export const IpfsClient: IIpfsClient = {
   get: async <T>(cid: string): Promise<T> => {
-    return fetch(`${process.env.IPFS_URL}${cid}`).then((response) => response.json());
+    return fetch(`${process.env.IPFS_URL}${cid}`).then((response) =>
+      response.json()
+    );
   },
 
   add: async <T>(object: T): Promise<string> => {
@@ -26,9 +31,13 @@ export const IpfsClient: IIpfsClient = {
     };
     let cid = "";
     try {
-      const response = (await axios.post("https://api.pinata.cloud/pinning/pinJSONToIPFS/", JSON.stringify(object), {
-        headers,
-      })) as AxiosResponse<{ IpfsHash: string }>;
+      const response = (await axios.post(
+        "https://api.pinata.cloud/pinning/pinJSONToIPFS/",
+        JSON.stringify(object),
+        {
+          headers,
+        }
+      )) as AxiosResponse<{ IpfsHash: string }>;
       cid = response.data.IpfsHash;
     } catch (e) {
       console.error(e);
@@ -36,7 +45,10 @@ export const IpfsClient: IIpfsClient = {
     return cid;
   },
 
-  upload: async (file: File, setUploadProgress?: (progress: number) => void): Promise<UploadResult> => {
+  upload: async (
+    file: File,
+    setUploadProgress?: (progress: number) => void
+  ): Promise<UploadResult> => {
     var data = new FormData();
     data.append("file", file, file.name);
     const headers = {
@@ -46,15 +58,17 @@ export const IpfsClient: IIpfsClient = {
     };
     const config = setUploadProgress
       ? {
-        headers,
-        onUploadProgress: (progressEvent: any) => {
-          var percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-          setUploadProgress(percentCompleted);
-        },
-      }
+          headers,
+          onUploadProgress: (progressEvent: any) => {
+            var percentCompleted = Math.round(
+              (progressEvent.loaded * 100) / progressEvent.total
+            );
+            setUploadProgress(percentCompleted);
+          },
+        }
       : {
-        headers,
-      };
+          headers,
+        };
     return await axios
       .post(`${process.env.IPFS_GATEWAY_PIN}`, data, config)
       .then((result) => {

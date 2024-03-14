@@ -7,10 +7,15 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const duneRes = await axios.get<DuneQueryResult<any>>('https://api.dune.com/api/v1/query/3238349/results', {
-    headers: {
-      'x-dune-api-key': process.env.DUNE_API_KEY
+  const duneRes = await axios.get<DuneQueryResult<any>>(
+    "https://api.dune.com/api/v1/query/3238349/results",
+    {
+      headers: {
+        "x-dune-api-key": process.env.DUNE_API_KEY,
+      },
     }
-  })
-  return res.status(200).json(duneRes?.data?.result?.rows[0]?.circulatingsupply)
+  );
+  return res
+    .status(200)
+    .json(duneRes?.data?.result?.rows[0]?.circulatingsupply);
 }

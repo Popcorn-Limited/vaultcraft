@@ -6,7 +6,15 @@ export interface LockedBalance {
   end: bigint;
 }
 
-export default function useLockedBalanceOf({ chainId, address, account }: { chainId: number, address: Address, account: Address }) {
+export default function useLockedBalanceOf({
+  chainId,
+  address,
+  account,
+}: {
+  chainId: number;
+  address: Address;
+  account: Address;
+}) {
   return useContractRead({
     address,
     chainId: Number(chainId),
@@ -15,6 +23,6 @@ export default function useLockedBalanceOf({ chainId, address, account }: { chai
     args: (!!account && [account]) || [],
     scopeKey: `lockedBalanceOf:${chainId}:${address}:${account}`,
     enabled: !!(chainId && address && account),
-    watch: true
-  })
+    watch: true,
+  });
 }

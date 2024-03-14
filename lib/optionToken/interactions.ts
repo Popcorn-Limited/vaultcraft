@@ -7,19 +7,25 @@ import { handleCallResult } from "@/lib/utils/helpers";
 type SimulationContract = {
   address: Address;
   abi: Abi;
-}
+};
 
 interface SimulateProps {
   account: Address;
   contract: SimulationContract;
   functionName: string;
   publicClient: PublicClient;
-  args?: any[]
+  args?: any[];
 }
 
-const { oVCX, Minter: OVCX_MINTER } = getVeAddresses()
+const { oVCX, Minter: OVCX_MINTER } = getVeAddresses();
 
-async function simulateCall({ account, contract, functionName, publicClient, args }: SimulateProps): Promise<SimulationResponse> {
+async function simulateCall({
+  account,
+  contract,
+  functionName,
+  publicClient,
+  args,
+}: SimulateProps): Promise<SimulationResponse> {
   try {
     const { request } = await publicClient.simulateContract({
       account,
@@ -27,21 +33,26 @@ async function simulateCall({ account, contract, functionName, publicClient, arg
       abi: contract.abi,
       // @ts-ignore
       functionName,
-      args
-    })
-    return { request: request, success: true, error: null }
+      args,
+    });
+    return { request: request, success: true, error: null };
   } catch (error: any) {
-    return { request: null, success: false, error: error.shortMessage }
+    return { request: null, success: false, error: error.shortMessage };
   }
 }
 interface ExerciseOPopProps {
   amount: bigint;
   maxPaymentAmount: bigint;
   account: Address;
-  clients: Clients
+  clients: Clients;
 }
 
-export async function exerciseOPop({ amount, maxPaymentAmount, account, clients }: ExerciseOPopProps): Promise<boolean> {
+export async function exerciseOPop({
+  amount,
+  maxPaymentAmount,
+  account,
+  clients,
+}: ExerciseOPopProps): Promise<boolean> {
   return handleCallResult({
     successMessage: "oVCX exercised successfully!",
     simulationResponse: await simulateCall({
@@ -52,20 +63,23 @@ export async function exerciseOPop({ amount, maxPaymentAmount, account, clients 
       },
       functionName: "exercise",
       publicClient: clients.publicClient,
-      args: [amount, maxPaymentAmount, account]
+      args: [amount, maxPaymentAmount, account],
     }),
-    clients
+    clients,
   });
 }
-
 
 interface ClaimOPopProps {
   gauges: Address[];
   account: Address;
-  clients: Clients
+  clients: Clients;
 }
 
-export async function claimOPop({ gauges, account, clients }: ClaimOPopProps): Promise<boolean> {
+export async function claimOPop({
+  gauges,
+  account,
+  clients,
+}: ClaimOPopProps): Promise<boolean> {
   return handleCallResult({
     successMessage: "oVCX Succesfully Claimed!",
     simulationResponse: await simulateCall({
@@ -76,8 +90,8 @@ export async function claimOPop({ gauges, account, clients }: ClaimOPopProps): P
       },
       functionName: "mintMany",
       publicClient: clients.publicClient,
-      args: [gauges]
+      args: [gauges],
     }),
-    clients
-  })
+    clients,
+  });
 }

@@ -31,9 +31,19 @@ export interface AdapterConfig {
   data: string;
 }
 
-export const DEFAULT_ADAPTER: Adapter = { name: "Choose an Adapter", key: "none", logoURI: "", protocol: "none", description: "none", chains: [] }
+export const DEFAULT_ADAPTER: Adapter = {
+  name: "Choose an Adapter",
+  key: "none",
+  logoURI: "",
+  protocol: "none",
+  description: "none",
+  chains: [],
+};
 
 export const adapterAtom = atom<Adapter>(DEFAULT_ADAPTER);
 
 export const adapterConfigAtom = atom<Array<string>>([]);
-export const adapterDeploymentAtom = atom<AdapterConfig>({ id: stringToHex("", { size: 32 }), data: "0x" });
+export const adapterDeploymentAtom = atom<AdapterConfig>({
+  id: stringToHex("", { size: 32 }),
+  data: "0x",
+});

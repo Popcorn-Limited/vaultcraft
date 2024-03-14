@@ -6,12 +6,13 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { query } = req
-  const { chainId } = query
-  const vaults = (await
-    axios.get(`https://api.yexporter.io/v1/chains/${chainId}/vaults/all`,
+  const { query } = req;
+  const { chainId } = query;
+  const vaults = (
+    await axios.get(
+      `https://api.yexporter.io/v1/chains/${chainId}/vaults/all`,
       { timeout: 30000, httpsAgent: new https.Agent({ keepAlive: true }) }
     )
   ).data;
-  return res.status(200).json(vaults)
+  return res.status(200).json(vaults);
 }
