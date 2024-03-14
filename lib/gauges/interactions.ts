@@ -2,17 +2,18 @@ import {
   Abi,
   Address,
   PublicClient,
-  getAddress,
+  WalletClient,
   parseEther,
   zeroAddress,
 } from "viem";
 import { Clients, VaultData } from "@/lib/types";
 import { showLoadingToast } from "@/lib/toasts";
 import { SimulationResponse } from "@/lib/types";
-import { getVeAddresses } from "@/lib/constants";
-import { GaugeAbi, GaugeControllerAbi, VotingEscrowAbi } from "@/lib/constants";
+import { GAUGE_CONTROLLER, GaugeAbi, GaugeControllerAbi, VOTING_ESCROW, VotingEscrowAbi } from "@/lib/constants";
 import { handleCallResult } from "@/lib/utils/helpers";
-import { voteUserSlopes } from "@/lib/gauges/useGaugeWeights";
+import { networkMap } from "@/lib/utils/connectors";
+import { VeBeaconAbi } from "@/lib/constants/abi/VeBeacon";
+import { RootGaugeFactoryAbi } from "../constants/abi/RootGaugeFactory";
 
 type SimulationContract = {
   address: Address;
@@ -26,9 +27,6 @@ interface SimulateProps {
   publicClient: PublicClient;
   args?: any[];
 }
-
-const { GaugeController: GAUGE_CONTROLLER, VotingEscrow: VOTING_ESCROW } =
-  getVeAddresses();
 
 async function simulateCall({
   account,
@@ -292,4 +290,74 @@ export async function gaugeWithdraw({
     }),
     clients,
   });
+}
+
+export async function broadcastVeBalance({ targetChain, account, address, publicClient, walletClient }
+  : { targetChain: number, account: Address, address: Address, publicClient: PublicClient, walletClient: WalletClient }) {
+
+  if (walletClient.chain?.id !== Number(1)) {
+    try {
+      await walletClient.switchChain({ id: 1 });
+    } catch (error) {
+      return
+    }
+  }
+
+  showLoadingToast(`Broadcasting VeBalance to ${networkMap[targetChain]}...`)
+
+  let simRes;
+  try {
+    const { request } = await publicClient.simulateContract({
+      account,
+      address,
+      abi: VeBeaconAbi,
+      functionName: "broadcastVeBalance",
+      args: [account, BigInt(String(targetChain)), BigInt("500000"), BigInt("100000000")],
+      value: parseEther("0.01")
+    })
+    simRes = { request: request, success: true, error: null }
+  } catch (error: any) {
+    simRes = { request: null, success: false, error: error.shortMessage }
+  }
+
+  return handleCallResult({
+    successMessage: "VeBalance broadcasted!",
+    simulationResponse: simRes,
+    clients: { publicClient, walletClient }
+  })
+}
+
+export async function transmitRewards({ gauges, account, address, publicClient, walletClient }
+  : { gauges: Address[], account: Address, address: Address, publicClient: PublicClient, walletClient: WalletClient }) {
+
+  if (walletClient.chain?.id !== Number(1)) {
+    try {
+      await walletClient.switchChain({ id: 1 });
+    } catch (error) {
+      return
+    }
+  }
+
+  showLoadingToast("Bridging Rewards...")
+
+  let simRes;
+  try {
+    const { request } = await publicClient.simulateContract({
+      account,
+      address,
+      abi: RootGaugeFactoryAbi,
+      functionName: "transmit_emissions_multiple",
+      args: [gauges],
+      value: parseEther("0.01")
+    })
+    simRes = { request: request, success: true, error: null }
+  } catch (error: any) {
+    simRes = { request: null, success: false, error: error.shortMessage }
+  }
+
+  return handleCallResult({
+    successMessage: "Bridged Rewards!",
+    simulationResponse: simRes,
+    clients: { publicClient, walletClient }
+  })
 }

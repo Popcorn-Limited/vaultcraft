@@ -9,20 +9,12 @@ import { useAccount, useBalance, usePublicClient, useToken } from "wagmi";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import TokenIcon from "@/components/common/TokenIcon";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
-import { BalancerOracleAbi, ZERO } from "@/lib/constants";
-import { getVeAddresses } from "@/lib/constants";
+import { BalancerOracleAbi, OVCX_ORACLE, OptionTokenByChain, VCX, WETH, ZERO } from "@/lib/constants";
 import { formatNumber, safeRound } from "@/lib/utils/formatBigNumber";
 import { validateInput } from "@/lib/utils/helpers";
 import { Token } from "@/lib/types";
 import { llama } from "@/lib/resolver/price/resolver";
 import { formatEther } from "viem";
-
-const {
-  VCX,
-  oVCX: OVCX,
-  BalancerOracle: OVCX_ORACLE,
-  WETH: WETH,
-} = getVeAddresses();
 
 const SLIPPAGE = 0.01; // @dev adding some slippage to the call -- TODO -> we should later allow users to change that
 
@@ -44,7 +36,7 @@ export default function ExerciseOptionTokenInterface({
   const { data: oVcxBal } = useBalance({
     chainId: 1,
     address: account,
-    token: OVCX,
+    token: OptionTokenByChain[1],
   });
   const { data: wethBal } = useBalance({
     chainId: 1,
@@ -52,7 +44,7 @@ export default function ExerciseOptionTokenInterface({
     token: WETH,
   });
 
-  const { data: oVcx } = useToken({ chainId: 1, address: OVCX });
+  const { data: oVcx } = useToken({ chainId: 1, address: OptionTokenByChain[1] });
   const { data: vcx } = useToken({ chainId: 1, address: VCX });
   const { data: weth } = useToken({ chainId: 1, address: WETH });
 

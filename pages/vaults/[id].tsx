@@ -7,7 +7,6 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import NoSSR from "react-no-ssr";
 import { useAccount, useBalance, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
 import { Address, WalletClient, createPublicClient, extractChain, formatUnits, getAddress, http, zeroAddress } from "viem";
-import { VaultAbi, getVeAddresses } from "@/lib/constants";
 import { yieldOptionsAtom } from "@/lib/atoms/sdk";
 import { NumberFormatter, formatAndRoundNumber, formatNumber, formatToFixedDecimals, safeRound } from "@/lib/utils/formatBigNumber";
 import { roundToTwoDecimalPlaces, validateInput } from "@/lib/utils/helpers";
@@ -25,8 +24,7 @@ import { getTokenOptions, isDefiPosition } from "@/lib/vault/utils";
 import LeftArrowIcon from "@/components/svg/LeftArrowIcon";
 import { KelpVaultInputs, getKelpVaultData, mutateKelpTokenBalance } from "@/components/vault/KelpVault";
 import LoanInterface from "@/components/lending/LoanInterface";
-
-const { oVCX: OVCX, VCX } = getVeAddresses();
+import { MinterByChain, OptionTokenByChain, VCX } from "@/lib/constants";
 
 export default function Index() {
   const router = useRouter();
@@ -104,7 +102,7 @@ export default function Index() {
   const { data: oBal } = useBalance({
     chainId: 1,
     address: account,
-    token: OVCX,
+    token: OptionTokenByChain[1],
     watch: true,
   });
   const [vcxPrice, setVcxPrice] = useState<number>(0);
@@ -116,11 +114,12 @@ export default function Index() {
           .filter((vault) => vault.gauge && vault.chainId === 1)
           .map((vault) => vault.gauge?.address) as Address[],
         account: account as Address,
-        publicClient,
-      });
-      setGaugeRewards(rewards);
-      const vcxPriceInUsd = await llama({ address: VCX, chainId: 1 });
-      setVcxPrice(vcxPriceInUsd);
+        chainId: 1,
+        publicClient
+      })
+      setGaugeRewards(rewards)
+      const vcxPriceInUsd = await llama({ address: VCX, chainId: 1 })
+      setVcxPrice(vcxPriceInUsd)
     }
     if (account) getRewardsData();
   }, [account]);
@@ -227,6 +226,7 @@ export default function Index() {
                         claimOPop({
                           gauges: gaugeRewards?.amounts?.filter(gauge => Number(gauge.amount) > 0).map(gauge => gauge.address) as Address[],
                           account: account as Address,
+                          minter: MinterByChain[1],
                           clients: { publicClient, walletClient: walletClient as WalletClient }
                         })}
                     />
@@ -241,12 +241,9 @@ export default function Index() {
                           ?.filter((gauge) => Number(gauge.amount) > 0)
                           .map((gauge) => gauge.address) as Address[],
                         account: account as Address,
-                        clients: {
-                          publicClient,
-                          walletClient: walletClient as WalletClient,
-                        },
-                      })
-                    }
+                        minter: MinterByChain[1],
+                        clients: { publicClient, walletClient: walletClient as WalletClient }
+                      })}
                   />
                 </div>
               </div>

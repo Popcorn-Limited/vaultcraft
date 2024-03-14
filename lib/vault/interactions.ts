@@ -220,6 +220,16 @@ export async function vaultDepositAndStake({
 }: VaultRouterWriteProps): Promise<boolean> {
   showLoadingToast("Depositing into the vault...");
 
+  const gauge = vaultData.gauge;
+  console.log({
+    address: router,
+    account,
+    amount,
+    vault: vaultData.address,
+    // @ts-ignore
+    gauge: gauge?.childGauge || gauge?.address as Address,
+    functionName: "depositAndStake",
+  })
   const success = await handleCallResult({
     successMessage: "Deposited into the vault and staked into Gauge!",
     simulationResponse: await simulateVaultRouterCall({
@@ -227,7 +237,8 @@ export async function vaultDepositAndStake({
       account,
       amount,
       vault: vaultData.address,
-      gauge: vaultData.gauge?.address as Address,
+      // @ts-ignore
+      gauge: gauge?.childGauge || gauge?.address as Address,
       functionName: "depositAndStake",
       publicClient: clients.publicClient,
     }),
@@ -261,6 +272,7 @@ export async function vaultUnstakeAndWithdraw({
 }: VaultRouterWriteProps): Promise<boolean> {
   showLoadingToast("Withdrawing from the vault...");
 
+  const gauge = vaultData.gauge;
   const success = await handleCallResult({
     successMessage: "Unstaked from Gauge and withdrawn from Vault!",
     simulationResponse: await simulateVaultRouterCall({
@@ -268,7 +280,8 @@ export async function vaultUnstakeAndWithdraw({
       account,
       amount,
       vault: vaultData.address,
-      gauge: vaultData.gauge?.address as Address,
+      // @ts-ignore
+      gauge: gauge?.childGauge || gauge?.address as Address,
       functionName: "unstakeAndWithdraw",
       publicClient: clients.publicClient,
     }),

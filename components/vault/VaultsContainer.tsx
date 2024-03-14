@@ -10,11 +10,8 @@ import {
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import useNetworkFilter from "@/lib/useNetworkFilter";
-import { VaultData } from "@/lib/types";
 import SmartVault from "@/components/vault/SmartVault";
 import NetworkFilter from "@/components/network/NetworkFilter";
-import { getVeAddresses } from "@/lib/constants";
-import { ERC20Abi, VaultAbi } from "@/lib/constants";
 import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
 import MainActionButton from "@/components/button/MainActionButton";
 import { claimOPop } from "@/lib/optionToken/interactions";
@@ -22,21 +19,18 @@ import { WalletClient } from "viem";
 import { useAtom } from "jotai";
 import { vaultsAtom } from "@/lib/atoms/vaults";
 import { getVaultNetworthByChain } from "@/lib/getNetworth";
-import VaultsSorting, {
-  VAULT_SORTING_TYPE,
-} from "@/components/vault/VaultsSorting";
+import VaultsSorting from "@/components/vault/VaultsSorting";
 import { llama } from "@/lib/resolver/price/resolver";
 import SearchBar from "../input/SearchBar";
 import KelpVault from "./KelpVault";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
+import { MinterByChain, OptionTokenByChain, VCX } from "@/lib/constants";
 
 interface VaultsContainerProps {
   hiddenVaults: Address[];
   displayVaults: Address[];
   showDescription?: boolean;
 }
-
-const { oVCX: OVCX, VCX } = getVeAddresses();
 
 export default function VaultsContainer({
   hiddenVaults,
@@ -56,7 +50,7 @@ export default function VaultsContainer({
   const { data: oBal } = useBalance({
     chainId: 1,
     address: account,
-    token: OVCX,
+    token: OptionTokenByChain[1],
     watch: true,
   });
   const [vcxPrice, setVcxPrice] = useState<number>(0);
@@ -70,11 +64,12 @@ export default function VaultsContainer({
             .filter((vault) => vault.gauge && vault.chainId === 1)
             .map((vault) => vault.gauge?.address) as Address[],
           account: account as Address,
-          publicClient,
-        });
-        setGaugeRewards(rewards);
-        const vcxPriceInUsd = await llama({ address: VCX, chainId: 1 });
-        setVcxPrice(vcxPriceInUsd);
+          chainId: 1,
+          publicClient
+        })
+        setGaugeRewards(rewards)
+        const vcxPriceInUsd = await llama({ address: VCX, chainId: 1 })
+        setVcxPrice(vcxPriceInUsd)
       }
       setNetworth(
         SUPPORTED_NETWORKS.map((chain) =>
@@ -170,12 +165,9 @@ export default function VaultsContainer({
                       ?.filter((gauge) => Number(gauge.amount) > 0)
                       .map((gauge) => gauge.address) as Address[],
                     account: account as Address,
-                    clients: {
-                      publicClient,
-                      walletClient: walletClient as WalletClient,
-                    },
-                  })
-                }
+                    minter: MinterByChain[1],
+                    clients: { publicClient, walletClient: walletClient as WalletClient }
+                  })}
               />
             </div>
           </div>
@@ -188,12 +180,9 @@ export default function VaultsContainer({
                     ?.filter((gauge) => Number(gauge.amount) > 0)
                     .map((gauge) => gauge.address) as Address[],
                   account: account as Address,
-                  clients: {
-                    publicClient,
-                    walletClient: walletClient as WalletClient,
-                  },
-                })
-              }
+                  minter: MinterByChain[1],
+                  clients: { publicClient, walletClient: walletClient as WalletClient }
+                })}
             />
           </div>
         </div>
