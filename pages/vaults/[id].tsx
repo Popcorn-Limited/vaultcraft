@@ -22,7 +22,6 @@ import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
 import { availableZapAssetAtom, zapAssetsAtom } from "@/lib/atoms";
 import { getTokenOptions, isDefiPosition } from "@/lib/vault/utils";
 import LeftArrowIcon from "@/components/svg/LeftArrowIcon";
-import { KelpVaultInputs, getKelpVaultData, mutateKelpTokenBalance } from "@/components/vault/KelpVault";
 import LoanInterface from "@/components/lending/LoanInterface";
 import { MinterByChain, OptionTokenByChain, VCX } from "@/lib/constants";
 
