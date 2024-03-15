@@ -73,7 +73,12 @@ export async function sendVotes({
     (vote, index) =>
       Math.abs(vote[1] - Number(prevVotes[vote[0] as Address])) > 0 &&
       canVoteOnGauges[index]
-  ).sort((a, b) => b[1] - a[1])
+  )
+    .map((vote, index) => [...vote, vote[1] - Number(prevVotes[vote[0] as Address])])
+    // @ts-ignore
+    .sort((a, b) => a[2] - b[2])
+
+  console.log({ votesCleaned })
 
   let addr = new Array<string>(8);
   let v = new Array<number>(8);
@@ -88,8 +93,8 @@ export async function sendVotes({
         addr[n] = zeroAddress;
         v[n] = 0;
       } else {
-        addr[n] = votesCleaned[n + l][0];
-        v[n] = votesCleaned[n + l][1];
+        addr[n] = votesCleaned[n + l][0] as string;
+        v[n] = votesCleaned[n + l][1] as number;
       }
     }
 

@@ -20,6 +20,6 @@ export async function hasAlreadyVoted(
     })
     const latest = data.sort((a, b) => Number(b) - Number(a))[0]
     const limitTimestamp = BigInt(Math.floor(Date.now() / 1000) - (DAYS * 10));
-    const canVoteOnGauges = data.map((voteTimestamp: bigint) => voteTimestamp < limitTimestamp);
-    return { canCastVote: latest < limitTimestamp, canVoteOnGauges };
+    console.log({ latest, limitTimestamp })
+    return { canCastVote: latest < limitTimestamp, canVoteOnGauges: data.map((voteTimestamp: bigint) => voteTimestamp < limitTimestamp) };
 }
