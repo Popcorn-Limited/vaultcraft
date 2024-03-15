@@ -353,7 +353,7 @@ export default function Vaults() {
         }>
       >("https://api.dune.com/api/v1/query/3238349/results", duneOpts),
       axios.get(
-        `https://coins.llama.fi/prices/current/ethereum:0xcE246eEa10988C495B4A90a905Ee9237a0f91543,ethereum:0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2,ethereum:0x577A7f7EE659Aa14Dc16FD384B3F8078E23F1920`
+        `https://coins.llama.fi/prices/current/ethereum:0xcE246eEa10988C495B4A90a905Ee9237a0f91543,ethereum:0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2,ethereum:0x577A7f7EE659Aa14Dc16FD384B3F8078E23F1920?searchWidth=24h`
       ),
       publicClient.readContract({
         address: BalancerVault,

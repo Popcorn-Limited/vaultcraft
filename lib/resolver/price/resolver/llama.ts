@@ -10,7 +10,7 @@ export async function llama({
   client,
 }: PriceResolverParams): Promise<number> {
   const key = `${networkMap[chainId].toLowerCase()}:${address}`;
-  const { data } = await axios.get(`${BASE_URL}${key}`);
+  const { data } = await axios.get(`${BASE_URL}${key}?searchWidth=24h`);
 
   return Object.keys(data.coins).length === 0
     ? // Llama didnt find the token, return 0

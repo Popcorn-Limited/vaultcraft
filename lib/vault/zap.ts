@@ -29,7 +29,7 @@ export default async function zap({
       `https://api.enso.finance/api/v1/shortcuts/route?chainId=${chainId}&fromAddress=${account}&spender=${account}&receiver=${account}&amountIn=${amount.toLocaleString(
         "fullwide",
         { useGrouping: false }
-      )}&slippage=${slippage}&tokenIn=${sellToken}&tokenOut=${buyToken}`,
+      )}&slippage=${slippage}&tokenIn=${sellToken}&tokenOut=${buyToken}&routingStrategy=router`,
       { headers: { Authorization: `Bearer ${process.env.ENSO_API_KEY}` } }
     )
   ).data;
