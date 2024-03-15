@@ -4,6 +4,7 @@ import { BatchSwapStep } from "@/lib/external/balancer/router/interfaces";
 import { Address, encodeAbiParameters, getAddress, parseUnits } from "viem";
 import { PublicClient } from "wagmi";
 import { StrategyEncodingResolverParams } from "@/lib/resolver/strategyEncoding";
+import { AddressByChain } from "@/lib/types";
 
 interface BalancerRoute {
   swaps: BatchSwapStep[];
@@ -17,9 +18,7 @@ const toAssetRoute: BalancerRoute = {
   limits: [],
 };
 
-const BALANCER_VAULT: { [key: number]: Address } = {
-  1: "0xBA12222222228d8Ba445958a75a0704d566BF2C8",
-};
+const BALANCER_VAULT: AddressByChain = { 1: "0xBA12222222228d8Ba445958a75a0704d566BF2C8" }
 
 async function createRoute(
   sellToken: Address,

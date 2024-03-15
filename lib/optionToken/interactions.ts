@@ -1,6 +1,5 @@
 import { Abi, Address, PublicClient } from "viem";
-import { MinterAbi, OptionTokenAbi } from "@/lib/constants";
-import { getVeAddresses } from "@/lib/constants";
+import { MinterAbi, MinterByChain, OptionTokenAbi, OptionTokenByChain } from "@/lib/constants";
 import { Clients, SimulationResponse } from "@/lib/types";
 import { handleCallResult } from "@/lib/utils/helpers";
 
@@ -16,8 +15,6 @@ interface SimulateProps {
   publicClient: PublicClient;
   args?: any[];
 }
-
-const { oVCX, Minter: OVCX_MINTER } = getVeAddresses();
 
 async function simulateCall({
   account,
@@ -58,7 +55,7 @@ export async function exerciseOPop({
     simulationResponse: await simulateCall({
       account,
       contract: {
-        address: oVCX,
+        address: OptionTokenByChain[1],
         abi: OptionTokenAbi,
       },
       functionName: "exercise",
@@ -72,20 +69,17 @@ export async function exerciseOPop({
 interface ClaimOPopProps {
   gauges: Address[];
   account: Address;
-  clients: Clients;
+  minter: Address;
+  clients: Clients
 }
 
-export async function claimOPop({
-  gauges,
-  account,
-  clients,
-}: ClaimOPopProps): Promise<boolean> {
+export async function claimOPop({ gauges, account, minter, clients }: ClaimOPopProps): Promise<boolean> {
   return handleCallResult({
     successMessage: "oVCX Succesfully Claimed!",
     simulationResponse: await simulateCall({
       account,
       contract: {
-        address: OVCX_MINTER,
+        address: minter,
         abi: MinterAbi,
       },
       functionName: "mintMany",

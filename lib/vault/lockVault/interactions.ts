@@ -220,8 +220,8 @@ export async function handleDistributeRewards({
     vaultData.rewards.map((reward) =>
       reward.address === token
         ? BigInt(
-            Number(amount).toLocaleString("fullwide", { useGrouping: false })
-          )
+          Number(amount).toLocaleString("fullwide", { useGrouping: false })
+        )
         : ZERO
     ),
   ];
@@ -234,7 +234,7 @@ export async function handleDistributeRewards({
       functionName: "distributeRewards",
       publicClient: clients.publicClient,
     }),
-    clients,
-  });
-  return success;
+    clients
+  })
+  return success
 }

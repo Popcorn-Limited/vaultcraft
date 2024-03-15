@@ -1,10 +1,8 @@
 import { PublicClient, zeroAddress } from "viem";
 import { Address } from "wagmi";
-import { GaugeControllerAbi, getVeAddresses } from "@/lib/constants";
+import { GAUGE_CONTROLLER, GaugeControllerAbi } from "@/lib/constants";
 
 const DAYS = 24 * 60 * 60;
-
-const { GaugeController: GAUGE_CONTROLLER } = getVeAddresses();
 
 export async function hasAlreadyVoted(
     { addresses, publicClient, account = zeroAddress }: { addresses: Address[], publicClient: PublicClient, account?: Address }

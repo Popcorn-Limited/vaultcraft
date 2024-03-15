@@ -1,8 +1,5 @@
 import { Address } from "viem";
-import {
-  NumberFormatter,
-  formatAndRoundNumber,
-} from "@/lib/utils/formatBigNumber";
+import { NumberFormatter, formatAndRoundNumber } from "@/lib/utils/formatBigNumber";
 import Title from "@/components/common/Title";
 import { LockVaultData, VaultData } from "@/lib/types";
 import { roundToTwoDecimalPlaces } from "@/lib/utils/helpers";
@@ -69,13 +66,13 @@ export default function VaultStats({
               {account
                 ? isLockVault
                   ? formatAndRoundNumber(
-                      (vaultData as LockVaultData).lock.amount * asset.price,
-                      asset.decimals
-                    )
+                    (vaultData as LockVaultData).lock.amount * asset.price,
+                    asset.decimals
+                  )
                   : formatAndRoundNumber(
-                      (!!gauge ? gauge.balance : vault.balance) * vault.price,
-                      vault.decimals
-                    )
+                    (!!gauge ? gauge.balance : vault.balance) * vault.price,
+                    vault.decimals
+                  )
                 : "-"}
             </Title>
           </div>

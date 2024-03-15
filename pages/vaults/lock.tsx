@@ -73,7 +73,7 @@ export default function Index(): JSX.Element {
       </section>
 
       <section className="my-10 px-4 md:px-8 md:flex flex-row items-center justify-between">
-        <NetworkFilter supportedNetworks={[42161]} selectNetwork={() => {}} />
+        <NetworkFilter supportedNetworks={[42161]} selectNetwork={() => { }} />
         <div className="flex flex-row space-x-4">
           <SearchBar searchTerm={searchTerm} handleSearch={handleSearch} />
           <VaultsSorting className="" vaultState={[vaults, setVaults]} />
@@ -94,6 +94,6 @@ export default function Index(): JSX.Element {
           <p className="text-white">Loading Vaults...</p>
         )}
       </section>
-    </NoSSR>
-  );
+    </NoSSR >
+  )
 }

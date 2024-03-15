@@ -10,7 +10,6 @@ import {
   useSwitchNetwork,
   useWalletClient,
 } from "wagmi";
-import ActionSteps from "../ActionSteps";
 import MainActionButton from "@/components/button/MainActionButton";
 import Deposit from "./Deposit";
 import Withdraw from "./Withdraw";
@@ -23,6 +22,7 @@ import { ActionStep, getLockVaultActionSteps } from "@/lib/getActionSteps";
 import { MutateTokenBalanceProps } from "@/lib/vault/mutateTokenBalance";
 import { zapAssetsAtom } from "@/lib/atoms";
 import { lockvaultsAtom } from "@/lib/atoms/vaults";
+import ActionSteps from "@/components/vault/ActionSteps";
 
 interface VaultInteractionProps {
   vaultData: LockVaultData;
@@ -264,7 +264,7 @@ export default function VaultInteraction({
         {account ? (
           <>
             {stepCounter === steps.length ||
-            steps.some((step) => !step.loading && step.error) ? (
+              steps.some((step) => !step.loading && step.error) ? (
               <MainActionButton label={"Close Modal"} handleClick={hideModal} />
             ) : (
               <MainActionButton

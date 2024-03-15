@@ -1,8 +1,5 @@
-import {
-  KelpVaultActionType,
-  LockVaultActionType,
-  SmartVaultActionType,
-} from "@/lib/types";
+import { KelpVaultActionType, LockVaultActionType, SmartVaultActionType } from "@/lib/types";
+import { AaveActionType } from "./external/aave/handleAaveInteractions";
 
 export interface ActionStep {
   step: number;
@@ -440,6 +437,46 @@ export const EXERCISE_OVCX_STEPS = [
   {
     step: 2,
     label: "Exercise oVCX",
-    ...BaseStepInfo,
-  },
-];
+    ...BaseStepInfo
+  }
+]
+
+export function getAaveActionSteps(action: AaveActionType): ActionStep[] {
+  switch (action) {
+    case AaveActionType.Supply:
+      return [{
+        step: 1,
+        label: "Handle Allowance",
+        ...BaseStepInfo
+      },
+      {
+        step: 2,
+        label: "Supply Asset",
+        ...BaseStepInfo
+      }]
+    case AaveActionType.Withdraw:
+      return [
+        {
+          step: 1,
+          label: "Withdraw Asset",
+          ...BaseStepInfo
+        }]
+    case AaveActionType.Borrow:
+      return [{
+        step: 1,
+        label: "Borrow Asset",
+        ...BaseStepInfo
+      }]
+    case AaveActionType.Repay:
+      return [{
+        step: 1,
+        label: "Handle Allowance",
+        ...BaseStepInfo
+      },
+      {
+        step: 2,
+        label: "Repay Loan",
+        ...BaseStepInfo
+      }]
+  }
+}

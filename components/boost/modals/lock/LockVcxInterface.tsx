@@ -1,14 +1,11 @@
 import { Dispatch, FormEventHandler, SetStateAction, useMemo } from "react";
 import { useAccount, useBalance, useToken } from "wagmi";
-import { getVeAddresses } from "@/lib/constants";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import InputNumber from "@/components/input/InputNumber";
 import { calcUnlockTime, calculateVeOut } from "@/lib/gauges/utils";
-import { ZERO } from "@/lib/constants";
+import { VCX_LP, ZERO } from "@/lib/constants";
 import { validateInput } from "@/lib/utils/helpers";
 import { formatEther } from "viem";
-
-const { BalancerPool: VCX_LP } = getVeAddresses();
 
 function LockTimeButton({
   label,

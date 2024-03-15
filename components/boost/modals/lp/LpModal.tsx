@@ -10,16 +10,13 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { WalletClient } from "viem";
 import Modal from "@/components/modal/Modal";
 import MainActionButton from "@/components/button/MainActionButton";
-import SecondaryActionButton from "@/components/button/SecondaryActionButton";
-import { getVeAddresses } from "@/lib/constants";
 import LpInfo from "@/components/boost/modals/lp/LpInfo";
 import LpInterface from "@/components/boost/modals/lp/LpInterface";
 import { handleAllowance } from "@/lib/approve";
 import ActionSteps from "@/components/vault/ActionSteps";
 import { depositIntoPool } from "@/lib/balancer/interactions";
 import { ActionStep, POOL_DEPOSIT_STEPS } from "@/lib/getActionSteps";
-
-const { BalancerPool: VCX_LP, BalancerVault, VCX, WETH } = getVeAddresses();
+import { BALANCER_VAULT, VCX, WETH } from "@/lib/constants";
 
 export default function LpModal({
   show,
@@ -79,7 +76,7 @@ export default function LpModal({
           token: WETH,
           amount: wethVal,
           account: account as Address,
-          spender: BalancerVault,
+          spender: BALANCER_VAULT,
           clients: {
             publicClient,
             walletClient: walletClient as WalletClient,
@@ -91,7 +88,7 @@ export default function LpModal({
           token: VCX,
           amount: vcxVal,
           account: account as Address,
-          spender: BalancerVault,
+          spender: BALANCER_VAULT,
           clients: {
             publicClient,
             walletClient: walletClient as WalletClient,

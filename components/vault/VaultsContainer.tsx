@@ -10,11 +10,8 @@ import {
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import useNetworkFilter from "@/lib/useNetworkFilter";
-import { VaultData } from "@/lib/types";
 import SmartVault from "@/components/vault/SmartVault";
 import NetworkFilter from "@/components/network/NetworkFilter";
-import { getVeAddresses } from "@/lib/constants";
-import { ERC20Abi, VaultAbi } from "@/lib/constants";
 import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
 import MainActionButton from "@/components/button/MainActionButton";
 import { claimOPop } from "@/lib/optionToken/interactions";
@@ -22,21 +19,18 @@ import { WalletClient } from "viem";
 import { useAtom } from "jotai";
 import { vaultsAtom } from "@/lib/atoms/vaults";
 import { getVaultNetworthByChain } from "@/lib/getNetworth";
-import VaultsSorting, {
-  VAULT_SORTING_TYPE,
-} from "@/components/vault/VaultsSorting";
+import VaultsSorting from "@/components/vault/VaultsSorting";
 import { llama } from "@/lib/resolver/price/resolver";
-import SearchBar from "../input/SearchBar";
-import KelpVault from "./KelpVault";
+import SearchBar from "@/components/input/SearchBar";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
+import { MinterByChain, OptionTokenByChain, VCX } from "@/lib/constants";
+import { VaultData } from "@/lib/types";
 
 interface VaultsContainerProps {
   hiddenVaults: Address[];
   displayVaults: Address[];
   showDescription?: boolean;
 }
-
-const { oVCX: OVCX, VCX } = getVeAddresses();
 
 export default function VaultsContainer({
   hiddenVaults,
@@ -61,7 +55,7 @@ export default function VaultsContainer({
   const { data: oBal } = useBalance({
     chainId: 1,
     address: account,
-    token: OVCX,
+    token: OptionTokenByChain[1],
     watch: true,
   });
   const [vcxPrice, setVcxPrice] = useState<number>(0);
@@ -76,11 +70,12 @@ export default function VaultsContainer({
             .filter((vault) => !!vault.gauge)
             .map((vault) => vault.gauge) as Address[],
           account: account as Address,
-          publicClient,
-        });
-        setGaugeRewards(rewards);
-        const vcxPriceInUsd = await llama({ address: VCX, chainId: 1 });
-        setVcxPrice(vcxPriceInUsd);
+          chainId: 1,
+          publicClient
+        })
+        setGaugeRewards(rewards)
+        const vcxPriceInUsd = await llama({ address: VCX, chainId: 1 })
+        setVcxPrice(vcxPriceInUsd)
       }
       setNetworth(
         SUPPORTED_NETWORKS.map((chain) =>
@@ -102,7 +97,8 @@ export default function VaultsContainer({
   }
 
   return (
-    <NoSSR>
+    // @ts-ignore
+    <NoSSR >
       <section className="md:border-b border-[#353945] md:flex md:flex-row items-center justify-between py-10 px-4 md:px-8 md:gap-4">
         <div className="w-full md:w-max">
           <h1 className="text-5xl font-normal m-0 mb-4 md:mb-2 leading-0 text-primary md:text-3xl leading-none">
@@ -175,12 +171,9 @@ export default function VaultsContainer({
                       ?.filter((gauge) => Number(gauge.amount) > 0)
                       .map((gauge) => gauge.address) as Address[],
                     account: account as Address,
-                    clients: {
-                      publicClient,
-                      walletClient: walletClient as WalletClient,
-                    },
-                  })
-                }
+                    minter: MinterByChain[1],
+                    clients: { publicClient, walletClient: walletClient as WalletClient }
+                  })}
               />
             </div>
           </div>
@@ -193,12 +186,9 @@ export default function VaultsContainer({
                     ?.filter((gauge) => Number(gauge.amount) > 0)
                     .map((gauge) => gauge.address) as Address[],
                   account: account as Address,
-                  clients: {
-                    publicClient,
-                    walletClient: walletClient as WalletClient,
-                  },
-                })
-              }
+                  minter: MinterByChain[1],
+                  clients: { publicClient, walletClient: walletClient as WalletClient }
+                })}
             />
           </div>
         </div>
@@ -228,26 +218,20 @@ export default function VaultsContainer({
               .filter((vault) => !hiddenVaults.includes(vault.address))
               .sort((a, b) => b.tvl - a.tvl)
               .map((vault) => {
-                return vault.address ===
-                  "0x7CEbA0cAeC8CbE74DB35b26D7705BA68Cb38D725" ? (
-                  <KelpVault searchTerm={searchTerm} />
-                ) : (
-                  <SmartVault
-                    key={`sv-${vault.address}-${vault.chainId}`}
-                    vaultData={vault}
-                    mutateTokenBalance={mutateTokenBalance}
-                    searchTerm={searchTerm}
-                    description={
-                      showDescription ? vault.metadata.description : undefined
-                    }
-                  />
-                );
-              })}
+                return <SmartVault
+                  key={`sv-${vault.address}-${vault.chainId}`}
+                  vaultData={vault}
+                  mutateTokenBalance={mutateTokenBalance}
+                  searchTerm={searchTerm}
+                  description={showDescription ? vault.metadata.description : undefined}
+                />
+              })
+            }
           </>
         ) : (
           <p className="text-white">Loading Vaults...</p>
         )}
       </section>
-    </NoSSR>
-  );
+    </NoSSR >
+  )
 }

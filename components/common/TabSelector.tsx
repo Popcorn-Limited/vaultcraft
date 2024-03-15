@@ -2,7 +2,7 @@ import { Dispatch } from "react";
 
 interface TabSelectorProps {
   activeTab: any;
-  setActiveTab: Dispatch<any>;
+  setActiveTab: Function;
   availableTabs: any[];
   className?: string;
 }

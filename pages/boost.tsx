@@ -7,7 +7,6 @@ import {
 } from "wagmi";
 import { Address, WalletClient } from "viem";
 import { useEffect, useState } from "react";
-import { getVeAddresses } from "@/lib/constants";
 import { hasAlreadyVoted } from "@/lib/gauges/hasAlreadyVoted";
 import { Token, VaultData } from "@/lib/types";
 import StakingInterface from "@/components/boost/StakingInterface";
@@ -26,8 +25,7 @@ import NetworkFilter from "@/components/network/NetworkFilter";
 import SearchBar from "@/components/input/SearchBar";
 import VaultsSorting from "@/components/vault/VaultsSorting";
 import useNetworkFilter from "@/lib/useNetworkFilter";
-
-const { VotingEscrow: VOTING_ESCROW } = getVeAddresses();
+import { VOTING_ESCROW } from "@/lib/constants";
 
 const HIDDEN_VAULTS = [
   // eth
@@ -37,6 +35,8 @@ const HIDDEN_VAULTS = [
   "0x4658eC64b99cAd7F939b3bf87c345738A04310A9", // mim
   "0xDCd86dDDE7B49C46292Aa7B699b10BF98248D4b5", // yCRV
 ];
+
+export const GAUGE_NETWORKS = [1, 10, 42161]
 
 function VePopContainer() {
   const { address: account } = useAccount();
@@ -126,7 +126,7 @@ function VePopContainer() {
     setVotes((prevVotes) => updatedVotes);
   }
 
-  const [selectedNetworks, selectNetwork] = useNetworkFilter([1]);
+  const [selectedNetworks, selectNetwork] = useNetworkFilter(GAUGE_NETWORKS);
   const [searchTerm, setSearchTerm] = useState("");
 
   function handleSearch(value: string) {
@@ -178,8 +178,8 @@ function VePopContainer() {
             gauges={
               vaults?.length > 0
                 ? vaults
-                    .filter((vault) => !!vault.gauge?.address)
-                    .map((vault: VaultData) => vault.gauge as Token)
+                  .filter((vault) => !!vault.gauge?.address)
+                  .map((vault: VaultData) => vault.gauge as Token)
                 : []
             }
             setShowOptionTokenModal={setShowOptionTokenModal}
@@ -187,7 +187,7 @@ function VePopContainer() {
         </section>
 
         <section className="my-10 px-4 md:px-8 md:flex flex-row items-center justify-between">
-          <NetworkFilter supportedNetworks={[1]} selectNetwork={() => {}} />
+          <NetworkFilter supportedNetworks={[1, 10, 42161]} selectNetwork={selectNetwork} />
           <div className="flex flex-row space-x-4">
             <SearchBar searchTerm={searchTerm} handleSearch={handleSearch} />
             <VaultsSorting className="" vaultState={[vaults, setVaults]} />
@@ -224,8 +224,8 @@ function VePopContainer() {
               <span className="font-bold">
                 {veBal && veBal.value && Object.keys(votes).length > 0
                   ? (
-                      Object.values(votes).reduce((a, b) => a + b, 0) / 100
-                    ).toFixed(2)
+                    Object.values(votes).reduce((a, b) => a + b, 0) / 100
+                  ).toFixed(2)
                   : "0"}
                 %
               </span>

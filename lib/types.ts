@@ -9,29 +9,7 @@ export type Token = {
   logoURI: string;
   balance: number;
   price: number;
-};
-
-export type veAddresses = {
-  VCX: Address;
-  WETH_VCX_LP: Address;
-  VE_VCX: Address;
-  POP: Address;
-  WETH: Address;
-  BalancerPool: Address;
-  BalancerOracle: Address;
-  BalancerVault: Address;
-  oVCX: Address;
-  VaultRegistry: Address;
-  BoostV2: Address;
-  Minter: Address;
-  TokenAdmin: Address;
-  VotingEscrow: Address;
-  GaugeController: Address;
-  GaugeFactory: Address;
-  SmartWalletChecker: Address;
-  VotingEscrowDelegation: Address;
-  VaultRouter: Address;
-  FeeDistributor: Address;
+  chainId?: number;
 };
 
 export type Asset = {
@@ -183,7 +161,7 @@ export type GaugeData = {
     lowerAPR: number;
     upperAPR: number;
   };
-};
+}
 
 export enum SmartVaultActionType {
   Deposit,
@@ -216,6 +194,12 @@ export enum KelpVaultActionType {
   ZapWithdrawal,
 }
 
+export enum DepositVaultActionType {
+  Supply,
+  Borrow,
+  Deposit
+}
+
 export type DuneQueryResult<T> = {
   result: {
     rows: T[];
@@ -223,11 +207,76 @@ export type DuneQueryResult<T> = {
 };
 
 export type VoteUserSlopes = {
-  slope: bigint;
-  power: bigint;
-  end: bigint;
-};
+  slope: bigint,
+  power: bigint,
+  end: bigint,
+}
 
+export type UserAccountData = {
+  totalCollateral: number;
+  totalBorrowed: number;
+  netValue: number;
+  totalSupplyRate: number;
+  totalBorrowRate: number;
+  netRate: number;
+  ltv: number;
+  healthFactor: number;
+}
+
+export type ReserveDataResponse = {
+  id: bigint;
+  underlyingAsset: string;
+  aTokenAddress: string;
+  stableDebtTokenAddress: string;
+  variableDebtTokenAddress: string;
+  interestRateStrategyAddress: string;
+  liquidityIndex: bigint;
+  variableBorrowIndex: bigint;
+  currentLiquidityRate: bigint;
+  currentVariableBorrowRate: bigint;
+  currentStableBorrowRate: bigint;
+  lastUpdateTimestamp: bigint;
+  configuration: bigint;
+  liquidityRate: bigint;
+  stableBorrowRate: bigint;
+  averageStableBorrowRate: bigint;
+  variableBorrowRate: bigint;
+  totalPrincipalStableDebt: bigint;
+  totalScaledVariableDebt: bigint;
+  totalDeposits: bigint;
+  totalLiquidity: bigint;
+  utilizationRate: bigint;
+  reserveFactor: bigint;
+  accruedToTreasury: bigint;
+  unbacked: bigint;
+  isolationModeTotalDebt: bigint;
+  eModeCategoryId: bigint;
+  debtCeiling: bigint;
+  debtOutstanding: bigint;
+  coverageRatio: bigint;
+}
+
+export type ReserveData = {
+  ltv: number;
+  liquidationThreshold: number;
+  liquidationPenalty: number;
+  supplyRate: number;
+  borrowRate: number;
+  asset: Token;
+  supplyAmount: number;
+  borrowAmount: number;
+  balance: number;
+}
+
+export enum ZapProvider {
+  none,
+  notFound,
+  enso,
+  zeroX,
+  oneInch,
+  paraSwap,
+  openOcean
+}
 
 export type TokenByAddress = {
   [key: Address]: Token;
@@ -236,3 +285,4 @@ export type TokenByAddress = {
 export type VaultDataByAddress = {
   [key: Address]: VaultData
 }
+

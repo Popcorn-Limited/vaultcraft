@@ -1,9 +1,6 @@
-import { Address } from "viem";
+import { AddressByChain } from "@/lib/types"
 
-export const CONVEX_BOOSTER_ADDRESS: { [key: number]: Address } = {
-  1: "0xF403C135812408BFbE8713b5A23a04b3D48AAE31",
-  42161: "0xF403C135812408BFbE8713b5A23a04b3D48AAE31",
-};
+export const CONVEX_BOOSTER_ADDRESS: AddressByChain = { 1: "0xF403C135812408BFbE8713b5A23a04b3D48AAE31", 42161: "0xF403C135812408BFbE8713b5A23a04b3D48AAE31" }
 
 export const convexBoosterAbi = [
   {
