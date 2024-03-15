@@ -14,7 +14,7 @@ export default function Products(): JSX.Element {
   const [vaultTvl, setVaultTvl] = useState<number>(0);
 
   useEffect(() => {
-    if (vaults) {
+    if (Object.keys(vaults).length > 0) {
       setVaultTvl(SUPPORTED_NETWORKS.map(chain => vaults[chain.id]).flat().reduce((a, b) => a + b.tvl, 0));
     }
   }, [vaults]);

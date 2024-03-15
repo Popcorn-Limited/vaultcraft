@@ -70,7 +70,7 @@ export default function VaultsContainer({
   useEffect(() => {
     async function getAccountData() {
       // get gauge rewards
-      if (account) {
+      if (account && vaults.length > 0) {
         const rewards = await getGaugeRewards({
           gauges: vaultsData[1]
             .filter((vault) => !!vault.gauge)
