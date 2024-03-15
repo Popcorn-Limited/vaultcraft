@@ -14,7 +14,7 @@ import { claimOPop } from "@/lib/optionToken/interactions";
 import { WalletClient } from "viem";
 import { Token } from "@/lib/types";
 import { llama } from "@/lib/resolver/price/resolver";
-import { MinterByChain, OptionTokenByChain, VCX, WETH } from "@/lib/constants";
+import { MinterByChain, OptionTokenByChain, VCX } from "@/lib/constants";
 import { GAUGE_NETWORKS } from "pages/boost";
 
 interface OptionTokenInterfaceProps {
@@ -30,33 +30,17 @@ export default function OptionTokenInterface({
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
 
-  const { data: vcxBal } = useBalance({
-    chainId: 1,
-    address: account,
-    token: VCX,
-    watch: true,
-  });
   const { data: oBal } = useBalance({
     chainId: 1,
     address: account,
     token: OptionTokenByChain[1],
     watch: true,
   });
-  const { data: wethBal } = useBalance({
-    chainId: 1,
-    address: account,
-    token: WETH,
-    watch: true,
-  });
 
   const [vcxPrice, setVcxPrice] = useState<number>(0);
-  const [wethPrice, setWethPrice] = useState<number>(0);
 
   useEffect(() => {
     llama({ address: VCX, chainId: 1 }).then((res: number) => setVcxPrice(res));
-    llama({ address: WETH, chainId: 1 }).then((res: number) =>
-      setWethPrice(res)
-    );
   }, []);
 
   const [gaugeRewards, setGaugeRewards] = useState<{ [key: number]: GaugeRewards }>();

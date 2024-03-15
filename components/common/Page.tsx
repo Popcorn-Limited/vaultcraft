@@ -20,6 +20,8 @@ import getZapAssets, { getAvailableZapAssets } from "@/lib/utils/getZapAssets";
 import getTokenAndVaultsDataByChain from "@/lib/getTokenAndVaultsData";
 import { aaveAccountDataAtom, aaveReserveDataAtom } from "@/lib/atoms/lending";
 import { AavePoolByChain, calcUserAccountData, fetchAaveData } from "@/lib/external/aave/interactions";
+import { GAUGE_NETWORKS } from "pages/boost";
+import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
 
 async function setUpYieldOptions() {
   const ttl = 360_000;
@@ -165,6 +167,7 @@ export default function Page({
   const router = useRouter();
   const { query, asPath } = router;
   const { address: account } = useAccount();
+  const publicClient = usePublicClient();
 
   const [yieldOptions, setYieldOptions] = useAtom(yieldOptionsAtom);
   const [masaSdk, setMasaSdk] = useAtom(masaAtom);
@@ -206,7 +209,7 @@ export default function Page({
   }, []);
 
   useEffect(() => {
-    async function getVaults() {
+    async function getData() {
       // get vaultsData and tokens
       const newVaultsData: { [key: number]: VaultData[] } = {}
       const newTokens: { [key: number]: TokenByAddress } = {}
@@ -223,13 +226,23 @@ export default function Page({
       )
       setVaults(newVaultsData);
 
+      const newRewards: { [key: number]: GaugeRewards } = {}
+      await Promise.all(GAUGE_NETWORKS.map(async (chain) =>
+        newRewards[chain] = await getGaugeRewards({
+          gauges: newVaultsData[chain].filter(vault => !!vault.gauge).map(vault => vault.gauge) as Address[],
+          account: account as Address,
+          chainId: chain,
+          publicClient
+        })
+      ))
+
       const fetchedLockVaults = await getLockVaultsByChain({
         chain: arbitrum,
         account: account || zeroAddress,
       });
       setLockVaults(fetchedLockVaults);
     }
-    if (yieldOptions) getVaults();
+    if (yieldOptions) getData();
   }, [yieldOptions, account]);
 
   const [availableZapAssets, setAvailableZapAssets] = useAtom(

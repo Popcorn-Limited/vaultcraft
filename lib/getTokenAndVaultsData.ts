@@ -13,9 +13,8 @@ import { PublicClient } from "wagmi";
 import axios from "axios";
 import { VaultAbi } from "@/lib/constants/abi/Vault";
 import { GaugeData, Token, TokenByAddress, VaultData, VaultDataByAddress, VaultLabel } from "@/lib/types";
-import { ADDRESS_ZERO, ERC20Abi, getVeAddresses, zapAssetAddressesByChain } from "@/lib/constants";
+import { ADDRESS_ZERO, ERC20Abi, GAUGE_CONTROLLER, zapAssetAddressesByChain } from "@/lib/constants";
 import { RPC_URLS, networkMap } from "@/lib/utils/connectors";
-import getGauges, { Gauge } from "@/lib/gauges/getGauges";
 import { ProtocolName, YieldOptions } from "vaultcraft-sdk";
 
 const HIDDEN_VAULTS: Address[] = [
@@ -31,8 +30,7 @@ const HIDDEN_VAULTS: Address[] = [
   "0xa6fcC7813d9D394775601aD99874c9f8e95BAd78", // Automated Pool Token - Oracle Vault 3
 ];
 
-const { GaugeController: GAUGE_CONTROLLER } = getVeAddresses();
-
+const NETWORKS_WITH_GAUGES = [1, 10, 42161]
 
 interface GetVaultsByChainProps {
   chain: Chain;
@@ -84,39 +82,38 @@ export async function getTokenAndVaultsData({
   });
 
   const gaugeTokens: TokenByAddress = {}
+
   // Add gauges
-  if (client.chain.id === 1) {
-    const gauges = await getGauges({
-      address: GAUGE_CONTROLLER,
-      account: account,
-      publicClient: client,
-    });
-    const gaugeApyData = (
+  if (NETWORKS_WITH_GAUGES.includes(client.chain.id)) {
+
+    const gauges = (
       await axios.get(
         `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/gauge-apy-data.json`
       )
     ).data as GaugeData;
+
     await Promise.all(
       Object.values(vaultsData).map(async (vault, i) => {
-        const foundGauge = gauges.find(
-          (gauge: Gauge) => gauge.lpToken === vault.address
+        const foundGauge = Object.values(vaultsData).find(
+          (gauge) => gauge.vault === vault.address
         );
+
         if (!!foundGauge) {
           // Add gauge to tokens
           gaugeTokens[foundGauge.address] = {
             address: foundGauge.address,
             name: `${vaults[vault.address].name}-gauge`,
             symbol: `st-${vaults[vault.address].symbol}`,
-            decimals: foundGauge.decimals,
+            decimals: 18,
             logoURI: "/images/tokens/vcx.svg", // wont be used, just here for consistency
             balance: 0,
             price: vaults[vault.address].price,
           }
 
           vault.gauge = foundGauge.address;
-          vault.boostMin = gaugeApyData[foundGauge.address]?.lowerAPR || 0;;
-          vault.boostMax = gaugeApyData[foundGauge.address]?.upperAPR || 0;;
-          vault.totalApy += gaugeApyData[foundGauge.address]?.upperAPR || 0;;
+          vault.boostMin = gauges[foundGauge.address]?.lowerAPR || 0;;
+          vault.boostMax = gauges[foundGauge.address]?.upperAPR || 0;;
+          vault.totalApy += gauges[foundGauge.address]?.upperAPR || 0;;
         }
       })
     );

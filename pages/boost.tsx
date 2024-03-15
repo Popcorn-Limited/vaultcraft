@@ -71,7 +71,7 @@ function VePopContainer() {
       setInitalLoad(true);
       if (account) setAccountLoad(true);
 
-      const vaultsWithGauges = vaults.filter((vault) => !!vault.gauge);
+      const vaultsWithGauges = Object.values(vaults).flat().filter((vault) => !!vault.gauge);
       setVaults(vaultsWithGauges);
 
       if (
@@ -82,14 +82,13 @@ function VePopContainer() {
         const initialVotes: { [key: Address]: number } = {};
         const voteUserSlopesData = await voteUserSlopes({
           gaugeAddresses: vaultsWithGauges?.map(
-            (vault: VaultData) => vault.gauge?.address as Address
+            (vault: VaultData) => vault.gauge as Address
           ),
           publicClient,
           account: account as Address,
         });
         vaultsWithGauges.forEach((vault, index) => {
-          // @ts-ignore
-          initialVotes[vault.gauge?.address] = Number(
+          initialVotes[vault.gauge as Address] = Number(
             voteUserSlopesData[index].power
           );
         });
@@ -98,7 +97,7 @@ function VePopContainer() {
 
         const { canCastVote, canVoteOnGauges } = await hasAlreadyVoted({
           addresses: vaultsWithGauges?.map(
-            (vault: VaultData) => vault.gauge?.address as Address
+            (vault: VaultData) => vault.gauge as Address
           ),
           publicClient,
           account: account as Address,
