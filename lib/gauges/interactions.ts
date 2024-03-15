@@ -75,7 +75,7 @@ export async function sendVotes({
     (vote, index) =>
       Math.abs(vote[1] - Number(prevVotes[vote[0] as Address])) > 0 &&
       canVoteOnGauges[index]
-  );
+  ).sort((a, b) => b[1] - a[1])
 
   let addr = new Array<string>(8);
   let v = new Array<number>(8);
