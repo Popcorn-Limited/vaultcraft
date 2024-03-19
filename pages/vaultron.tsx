@@ -92,8 +92,8 @@ export default function Test() {
 
   return (
     <NoSSR>
-      <section className="md:flex md:flex-row w-full md:w-9/12 px-4 md:mx-auto text-white">
-        <div className="w-full md:w-2/3">
+      <section className="md:flex md:flex-row md:justify-between w-full lg:w-9/12 px-4 md:mx-auto text-white">
+        <div className="w-full md:w-1/2 xl:w-2/3">
           {vaultronStats.animation === "" ?
             <img
               alt="Placeholder Vaultron"
@@ -103,11 +103,11 @@ export default function Test() {
             :
             <iframe
               src={vaultronStats.animation}
-              className="w-full h-84 rounded-2xl md:w-[50rem] md:h-[50rem]"
+              className="w-full h-84 rounded-2xl xl:w-[50rem] lg:h-[50rem]"
             />
           }
         </div>
-        <div className="w-full md:w-1/3 mt-8 md:mt-0">
+        <div className="w-1/3 mt-8 md:mt-0">
           <h1 className="text-3xl md:text-5xl font-bold">
             {LevelNameByValue[vaultronStats.level]} Vaultron
           </h1>
