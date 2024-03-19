@@ -14,3 +14,4 @@ export * from "./VCX";
 export * from "./VotingEscrow";
 export * from "./StakingVault";
 export * from "./FraxLend";
+export * from "./Vaultron";
