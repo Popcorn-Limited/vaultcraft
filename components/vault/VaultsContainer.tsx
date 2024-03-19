@@ -90,7 +90,6 @@ export default function VaultsContainer({
   }
 
   return (
-    // @ts-ignore
     <NoSSR >
       <section className="md:border-b border-[#353945] md:flex md:flex-row items-center justify-between py-10 px-4 md:px-8 md:gap-4">
         <div className="w-full md:w-max">
@@ -131,10 +130,10 @@ export default function VaultsContainer({
                 </p>
                 <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
                   {`$${oBal && vcxPrice
-                      ? NumberFormatter.format(
-                        (Number(oBal?.value) / 1e18) * (vcxPrice * 0.25)
-                      )
-                      : "0"
+                    ? NumberFormatter.format(
+                      (Number(oBal?.value) / 1e18) * (vcxPrice * 0.25)
+                    )
+                    : "0"
                     }`}
                 </div>
               </div>
@@ -145,11 +144,11 @@ export default function VaultsContainer({
                 </p>
                 <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
                   {`$${gaugeRewards && vcxPrice
-                      ? NumberFormatter.format(
-                        (Number(gaugeRewards?.total) / 1e18) *
-                        (vcxPrice * 0.25)
-                      )
-                      : "0"
+                    ? NumberFormatter.format(
+                      (Number(gaugeRewards?.total) / 1e18) *
+                      (vcxPrice * 0.25)
+                    )
+                    : "0"
                     }`}
                 </div>
               </div>
