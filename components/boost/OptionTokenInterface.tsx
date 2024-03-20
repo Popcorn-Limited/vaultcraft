@@ -19,7 +19,7 @@ import { GAUGE_NETWORKS } from "pages/boost";
 
 interface OptionTokenInterfaceProps {
   gauges: Token[];
-  setShowOptionTokenModal: Dispatch<SetStateAction<boolean>>;
+  setShowOptionTokenModal?: Dispatch<SetStateAction<boolean>>;
 }
 
 export default function OptionTokenInterface({
@@ -78,7 +78,7 @@ export default function OptionTokenInterface({
   }, [gauges, account]);
 
   return (
-    <div className="w-full lg:w-1/2 bg-transparent border border-[#353945] rounded-3xl p-8 text-primary md:h-fit">
+    <div className="w-full bg-transparent border border-[#353945] rounded-3xl p-8 text-primary md:h-fit">
       <h3 className="text-2xl pb-6 border-b border-[#353945]">oVCX</h3>
       <span className="flex flex-row items-center justify-between mt-6">
         <p className="">Mainnet Claimable oVCX</p>
@@ -167,13 +167,16 @@ export default function OptionTokenInterface({
             </div>
           </>
         }
-        <div className="w-full md:w-60">
-          <SecondaryActionButton
-            label="Exercise oVCX"
-            handleClick={() => setShowOptionTokenModal(true)} 
-            disabled={oBal ? Number(oBal?.value) === 0 : true}
-          />
-        </div>
+        {
+          setShowOptionTokenModal && (
+            <div className="w-full md:w-60">
+              <SecondaryActionButton
+                label="Exercise oVCX"
+                handleClick={() => setShowOptionTokenModal(true)}
+                disabled={oBal ? Number(oBal?.value) === 0 : true}
+              />
+            </div>
+          )}
       </div>
     </div>
   );

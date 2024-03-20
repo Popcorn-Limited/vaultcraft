@@ -174,16 +174,18 @@ function VePopContainer() {
             setShowMangementModal={setShowMangementModal}
             setShowLpModal={setShowLpModal}
           />
-          <OptionTokenInterface
-            gauges={
-              vaults?.length > 0
-                ? vaults
-                  .filter((vault) => !!vault.gauge?.address)
-                  .map((vault: VaultData) => vault.gauge as Token)
-                : []
-            }
-            setShowOptionTokenModal={setShowOptionTokenModal}
-          />
+          <div className="w-full lg:w-1/2">
+            <OptionTokenInterface
+              gauges={
+                vaults?.length > 0
+                  ? vaults
+                    .filter((vault) => !!vault.gauge?.address)
+                    .map((vault: VaultData) => vault.gauge as Token)
+                  : []
+              }
+              setShowOptionTokenModal={setShowOptionTokenModal}
+            />
+          </div>
         </section>
 
         <section className="my-10 px-4 md:px-8 md:flex flex-row items-center justify-between">

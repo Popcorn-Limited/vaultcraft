@@ -14,8 +14,6 @@ import SmartVault from "@/components/vault/SmartVault";
 import NetworkFilter from "@/components/network/NetworkFilter";
 import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
 import MainActionButton from "@/components/button/MainActionButton";
-import { claimOPop } from "@/lib/optionToken/interactions";
-import { WalletClient } from "viem";
 import { useAtom } from "jotai";
 import { vaultsAtom } from "@/lib/atoms/vaults";
 import { getVaultNetworthByChain } from "@/lib/getNetworth";
@@ -24,6 +22,9 @@ import { llama } from "@/lib/resolver/price/resolver";
 import SearchBar from "@/components/input/SearchBar";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
 import { MinterByChain, OptionTokenByChain, VCX } from "@/lib/constants";
+import Modal from "@/components/modal/Modal";
+import OptionTokenInterface from "@/components/boost/OptionTokenInterface";
+import { Token, VaultData } from "@/lib/types";
 
 interface VaultsContainerProps {
   hiddenVaults: Address[];
@@ -84,6 +85,7 @@ export default function VaultsContainer({
     SUPPORTED_NETWORKS.map((network) => network.id)
   );
   const [searchTerm, setSearchTerm] = useState("");
+  const [showOptionTokenModal, setShowOptionTokenModal] = useState(false);
 
   function handleSearch(value: string) {
     setSearchTerm(value);
@@ -91,6 +93,17 @@ export default function VaultsContainer({
 
   return (
     <NoSSR >
+      <Modal visibility={[showOptionTokenModal, setShowOptionTokenModal]}>
+        <OptionTokenInterface
+          gauges={
+            vaults?.length > 0
+              ? vaults
+                .filter((vault) => !!vault.gauge?.address)
+                .map((vault: VaultData) => vault.gauge as Token)
+              : []
+          }
+        />
+      </Modal>
       <section className="md:border-b border-[#353945] md:flex md:flex-row items-center justify-between py-10 px-4 md:px-8 md:gap-4">
         <div className="w-full md:w-max">
           <h1 className="text-5xl font-normal m-0 mb-4 md:mb-2 leading-0 text-primary md:text-3xl leading-none">
@@ -157,30 +170,14 @@ export default function VaultsContainer({
             <div className="hidden align-bottom md:block md:mt-auto w-fit">
               <MainActionButton
                 label="Claim oVCX"
-                handleClick={() =>
-                  claimOPop({
-                    gauges: gaugeRewards?.amounts
-                      ?.filter((gauge) => Number(gauge.amount) > 0)
-                      .map((gauge) => gauge.address) as Address[],
-                    account: account as Address,
-                    minter: MinterByChain[1],
-                    clients: { publicClient, walletClient: walletClient as WalletClient }
-                  })}
+                handleClick={() => setShowOptionTokenModal(true)}
               />
             </div>
           </div>
           <div className="md:hidden">
             <MainActionButton
               label="Claim oVCX"
-              handleClick={() =>
-                claimOPop({
-                  gauges: gaugeRewards?.amounts
-                    ?.filter((gauge) => Number(gauge.amount) > 0)
-                    .map((gauge) => gauge.address) as Address[],
-                  account: account as Address,
-                  minter: MinterByChain[1],
-                  clients: { publicClient, walletClient: walletClient as WalletClient }
-                })}
+              handleClick={() => setShowOptionTokenModal(true)}
             />
           </div>
         </div>
