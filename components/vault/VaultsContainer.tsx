@@ -26,9 +26,11 @@ import VaultsSorting, {
   VAULT_SORTING_TYPE,
 } from "@/components/vault/VaultsSorting";
 import { llama } from "@/lib/resolver/price/resolver";
-import SearchBar from "../input/SearchBar";
-import KelpVault from "./KelpVault";
+import SearchBar from "@/components/input/SearchBar";
+import KelpVault from "@/components/vault/KelpVault";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
+import OptionTokenModal from "@/components/boost/modals/optionToken/OptionTokenModal";
+import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 
 interface VaultsContainerProps {
   hiddenVaults: Address[];
@@ -95,8 +97,13 @@ export default function VaultsContainer({
     setSearchTerm(value);
   }
 
+  const [showOptionTokenModal, setShowOptionTokenModal] = useState(false);
+
   return (
     <NoSSR>
+      <OptionTokenModal
+        show={[showOptionTokenModal, setShowOptionTokenModal]}
+      />
       <section className="md:border-b border-[#353945] md:flex md:flex-row items-center justify-between py-10 px-4 md:px-8 md:gap-4">
         <div className="w-full md:w-max">
           <h1 className="text-5xl font-normal m-0 mb-4 md:mb-2 leading-0 text-primary md:text-3xl leading-none">
@@ -160,7 +167,7 @@ export default function VaultsContainer({
               </div>
             </div>
 
-            <div className="hidden align-bottom md:block md:mt-auto w-fit">
+            <div className="hidden align-bottom md:block md:mt-auto w-60 space-y-4">
               <MainActionButton
                 label="Claim oVCX"
                 handleClick={() =>
@@ -175,6 +182,10 @@ export default function VaultsContainer({
                     },
                   })
                 }
+              />
+              <SecondaryActionButton
+                label="Exercise oVCX"
+                handleClick={() => setShowOptionTokenModal(true)}
               />
             </div>
           </div>
