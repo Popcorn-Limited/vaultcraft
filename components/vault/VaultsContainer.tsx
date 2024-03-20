@@ -135,13 +135,12 @@ export default function VaultsContainer({
                   My oVCX
                 </p>
                 <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
-                  {`$${
-                    oBal && vcxPrice
-                      ? NumberFormatter.format(
-                          (Number(oBal?.value) / 1e18) * (vcxPrice * 0.25)
-                        )
-                      : "0"
-                  }`}
+                  {`$${oBal && vcxPrice
+                    ? NumberFormatter.format(
+                      (Number(oBal?.value) / 1e18) * (vcxPrice * 0.25)
+                    )
+                    : "0"
+                    }`}
                 </div>
               </div>
 
@@ -150,14 +149,13 @@ export default function VaultsContainer({
                   Claimable oVCX
                 </p>
                 <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
-                  {`$${
-                    gaugeRewards && vcxPrice
-                      ? NumberFormatter.format(
-                          (Number(gaugeRewards?.total) / 1e18) *
-                            (vcxPrice * 0.25)
-                        )
-                      : "0"
-                  }`}
+                  {`$${gaugeRewards && vcxPrice
+                    ? NumberFormatter.format(
+                      (Number(gaugeRewards?.total) / 1e18) *
+                      (vcxPrice * 0.25)
+                    )
+                    : "0"
+                    }`}
                 </div>
               </div>
             </div>
@@ -168,7 +166,7 @@ export default function VaultsContainer({
                 handleClick={() =>
                   claimOPop({
                     gauges: gaugeRewards?.amounts
-                      ?.filter((gauge) => Number(gauge.amount) > 0)
+                      ?.filter((gauge) => Number(gauge.amount) > 1000e18) // only use gauges with 1000 or more oVCX claimable
                       .map((gauge) => gauge.address) as Address[],
                     account: account as Address,
                     clients: {
@@ -186,7 +184,7 @@ export default function VaultsContainer({
               handleClick={() =>
                 claimOPop({
                   gauges: gaugeRewards?.amounts
-                    ?.filter((gauge) => Number(gauge.amount) > 0)
+                    ?.filter((gauge) => Number(gauge.amount) > 1000e18) // only use gauges with 1000 or more oVCX claimable
                     .map((gauge) => gauge.address) as Address[],
                   account: account as Address,
                   clients: {

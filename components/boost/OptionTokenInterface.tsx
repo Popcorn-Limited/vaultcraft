@@ -74,46 +74,43 @@ export default function OptionTokenInterface({
     if (account && gauges.length > 0) getValues();
   }, [gauges, account]);
 
+
   return (
     <div className="w-full lg:w-1/2 bg-transparent border border-[#353945] rounded-3xl p-8 text-primary md:h-fit">
       <h3 className="text-2xl pb-6 border-b border-[#353945]">oVCX</h3>
       <span className="flex flex-row items-center justify-between mt-6">
         <p className="">Claimable oVCX</p>
-        <p className="font-bold">{`$${
-          gaugeRewards && vcxPrice > 0
+        <p className="font-bold">{`$${gaugeRewards && vcxPrice > 0
             ? NumberFormatter.format(
-                (Number(gaugeRewards?.total) * (vcxPrice * 0.25)) / 1e18
-              )
+              (Number(gaugeRewards?.total) * (vcxPrice * 0.25)) / 1e18
+            )
             : "0"
-        }`}</p>
+          }`}</p>
       </span>
       <span className="flex flex-row items-center justify-between mt-6">
         <p className="">My VCX</p>
-        <p className="font-bold">{`$${
-          vcxBal && vcxPrice > 0
+        <p className="font-bold">{`$${vcxBal && vcxPrice > 0
             ? NumberFormatter.format((Number(vcxBal?.value) * vcxPrice) / 1e18)
             : "0"
-        }`}</p>
+          }`}</p>
       </span>
       <span className="flex flex-row items-center justify-between mt-6">
         <p className="">My oVCX</p>
-        <p className="font-bold">{`$${
-          oBal && vcxPrice > 0
+        <p className="font-bold">{`$${oBal && vcxPrice > 0
             ? NumberFormatter.format(
-                (Number(oBal?.value) * (vcxPrice * 0.25)) / 1e18
-              )
+              (Number(oBal?.value) * (vcxPrice * 0.25)) / 1e18
+            )
             : "0"
-        }`}</p>
+          }`}</p>
       </span>
       <span className="flex flex-row items-center justify-between mt-6">
         <p className="">My WETH</p>
-        <p className="font-bold">{`$${
-          wethBal && wethPrice > 0
+        <p className="font-bold">{`$${wethBal && wethPrice > 0
             ? NumberFormatter.format(
-                (Number(wethBal?.value) * wethPrice) / 1e18
-              )
+              (Number(wethBal?.value) * wethPrice) / 1e18
+            )
             : "0"
-        }`}</p>
+          }`}</p>
       </span>
       <span className="flex flex-row items-center justify-between mt-6 pb-6 border-b border-[#353945]"></span>
       <div className="lg:flex lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-8 mt-6">
@@ -123,7 +120,7 @@ export default function OptionTokenInterface({
             handleClick={() =>
               claimOPop({
                 gauges: gaugeRewards?.amounts
-                  ?.filter((gauge) => Number(gauge.amount) > 0)
+                  ?.filter((gauge) => Number(gauge.amount) > 1000e18) // only use gauges with 1000 or more oVCX claimable
                   .map((gauge) => gauge.address) as Address[],
                 account: account as Address,
                 clients: {

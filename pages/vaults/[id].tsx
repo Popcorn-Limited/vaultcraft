@@ -243,13 +243,12 @@ export default function Index() {
                       My oVCX
                     </p>
                     <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
-                      {`$${
-                        oBal && vcxPrice
-                          ? NumberFormatter.format(
-                              (Number(oBal?.value) / 1e18) * (vcxPrice * 0.25)
-                            )
-                          : "0"
-                      }`}
+                      {`$${oBal && vcxPrice
+                        ? NumberFormatter.format(
+                          (Number(oBal?.value) / 1e18) * (vcxPrice * 0.25)
+                        )
+                        : "0"
+                        }`}
                     </div>
                   </div>
 
@@ -258,14 +257,13 @@ export default function Index() {
                       Claimable oVCX
                     </p>
                     <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
-                      {`$${
-                        gaugeRewards && vcxPrice
-                          ? NumberFormatter.format(
-                              (Number(gaugeRewards?.total) / 1e18) *
-                                (vcxPrice * 0.25)
-                            )
-                          : "0"
-                      }`}
+                      {`$${gaugeRewards && vcxPrice
+                        ? NumberFormatter.format(
+                          (Number(gaugeRewards?.total) / 1e18) *
+                          (vcxPrice * 0.25)
+                        )
+                        : "0"
+                        }`}
                     </div>
                   </div>
                 </div>
@@ -276,7 +274,7 @@ export default function Index() {
                     handleClick={() =>
                       claimOPop({
                         gauges: gaugeRewards?.amounts
-                          ?.filter((gauge) => Number(gauge.amount) > 0)
+                          ?.filter((gauge) => Number(gauge.amount) > 1000e18) // only use gauges with 1000 or more oVCX claimable
                           .map((gauge) => gauge.address) as Address[],
                         account: account as Address,
                         clients: {
@@ -294,7 +292,7 @@ export default function Index() {
                   handleClick={() =>
                     claimOPop({
                       gauges: gaugeRewards?.amounts
-                        ?.filter((gauge) => Number(gauge.amount) > 0)
+                        ?.filter((gauge) => Number(gauge.amount) > 1000e18) // only use gauges with 1000 or more oVCX claimable
                         .map((gauge) => gauge.address) as Address[],
                       account: account as Address,
                       clients: {
@@ -313,7 +311,7 @@ export default function Index() {
               <div className="bg-[#23262f] p-6 rounded-lg">
                 <div className="bg-[#141416] px-6 py-6 rounded-lg">
                   {vaultData.address ===
-                  "0x7CEbA0cAeC8CbE74DB35b26D7705BA68Cb38D725" ? (
+                    "0x7CEbA0cAeC8CbE74DB35b26D7705BA68Cb38D725" ? (
                     <KelpVaultInputs
                       vaultData={vaultData}
                       tokenOptions={tokenOptions}
