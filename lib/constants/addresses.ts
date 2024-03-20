@@ -21,6 +21,8 @@ export const VE_BEACON: Address = "0x6e220Be8511ACc1db8ACD4e2e66f987CF7529Af6";
 export const FEE_DISTRIBUTOR = zeroAddress; // Change once deployed
 export const ROOT_GAUGE_FACTORY: Address = "0x6aa03ebAb1e9CB8d44Fd79153d3a258FFd48169A"
 
+export const VAULTRON: Address = "0x590e3A9260ffb7887ffD54A57d1FACf7db59c751"
+
 export const ENSO_ROUTER: Address = "0x80EbA3855878739F4710233A8a19d89Bdd2ffB8E"
 
 export const VaultRegistryByChain: AddressByChain = {

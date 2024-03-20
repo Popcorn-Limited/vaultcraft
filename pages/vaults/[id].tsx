@@ -84,9 +84,7 @@ export default function Index() {
   useEffect(() => {
     async function getRewardsData() {
       const rewards = await getGaugeRewards({
-        gauges: vaults
-          .filter((vault) => vault.gauge && vault.chainId === 1)
-          .map((vault) => vault.gauge?.address) as Address[],
+        gauges: [vaultData?.gauge?.address as Address],
         account: account as Address,
         chainId: 1,
         publicClient
@@ -95,7 +93,7 @@ export default function Index() {
       const vcxPriceInUsd = await llama({ address: VCX, chainId: 1 })
       setVcxPrice(vcxPriceInUsd)
     }
-    if (account) getRewardsData();
+    if (account && vaultData?.gauge?.address) getRewardsData();
   }, [account]);
 
   const [showLendModal, setShowLendModal] = useState(false)
@@ -213,11 +211,12 @@ export default function Index() {
                       label="Claim oVCX"
                       handleClick={() =>
                         claimOPop({
-                          gauges: gaugeRewards?.amounts?.filter(gauge => Number(gauge.amount) > 0).map(gauge => gauge.address) as Address[],
+                          gauges: [vaultData.gauge?.address || zeroAddress],
                           account: account as Address,
                           minter: MinterByChain[1],
                           clients: { publicClient, walletClient: walletClient as WalletClient }
                         })}
+                      disabled={!gaugeRewards || gaugeRewards?.total < 1000e18}
                     />
                   </div>
                 </div>
