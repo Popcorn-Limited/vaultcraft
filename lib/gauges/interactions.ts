@@ -69,6 +69,8 @@ export async function sendVotes({
 }: SendVotesProps): Promise<boolean> {
   showLoadingToast("Sending votes...");
 
+  console.log({ votes })
+
   const votesCleaned = Object.entries(votes).filter(
     (vote, index) =>
       Math.abs(vote[1] - Number(prevVotes[vote[0] as Address])) > 0 &&
@@ -97,6 +99,8 @@ export async function sendVotes({
         v[n] = votesCleaned[n + l][1] as number;
       }
     }
+
+    console.log({ addr, v })
 
     const success = await handleCallResult({
       successMessage: "Voted for gauges!",
