@@ -92,7 +92,7 @@ export default function Test() {
 
   return (
     <NoSSR>
-      <section className="md:flex md:flex-row md:justify-between w-full lg:w-9/12 px-4 md:mx-auto text-white">
+      <section className="md:flex md:flex-row md:justify-between w-full lg:w-10/12 px-4 md:mx-auto text-white">
         <div className="w-full md:w-1/2 xl:w-2/3">
           {vaultronStats.animation === "" ?
             <img
@@ -107,7 +107,7 @@ export default function Test() {
             />
           }
         </div>
-        <div className="w-1/3 mt-8 md:mt-0">
+        <div className="w-full md:w-5/12 xl:w-1/3 mt-8 md:mt-0">
           <h1 className="text-3xl md:text-5xl font-bold">
             {LevelNameByValue[vaultronStats.level]} Vaultron
           </h1>
@@ -174,7 +174,7 @@ function InfoRow({ label, value }: { label: string, value: number }): JSX.Elemen
 
 function VaultronLevel({ label, active }: { label: string, active: boolean }): JSX.Element {
   return (
-    <div className={`px-2 py-1 rounded-full w-20 text-center font-bold ${active ? "text-black bg-white" : "text-white"}`}>
+    <div className={`px-2 py-1 rounded-full w-20 text-center font-bold ${active ? "text-black bg-white" : "text-gray-400"}`}>
       <p className="mt-0.5">{label}</p>
     </div>
   )
