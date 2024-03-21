@@ -39,8 +39,9 @@ export default function Index() {
   const [vaultData, setVaultData] = useState<VaultData>();
 
   useEffect(() => {
-    if (!vaultData && query && yieldOptions && vaults.length > 0) {
-      setVaultData(vaults.find(vault => vault.address === query?.id && vault.chainId === Number(query?.chainId)))
+    if (!vaultData && query && yieldOptions && Object.keys(vaults).length > 0) {
+      const foundVault = vaults[Number(query?.chainId)].find(vault => vault.address === query?.id)
+      if (foundVault) setVaultData(foundVault)
     }
   }, [vaults, query, vaultData]);
 
@@ -49,29 +50,6 @@ export default function Index() {
   const [zapAvailable, setZapAvailable] = useState<boolean>(false);
   const [tokenOptions, setTokenOptions] = useState<Token[]>([]);
 
-  useEffect(() => {
-    if (!!vaultData && Object.keys(availableZapAssets).length > 0) {
-      if (availableZapAssets[vaultData.chainId].includes(vaultData.asset.address)) {
-        setZapAvailable(true)
-        setTokenOptions(getTokenOptions(vaultData, zapAssets[vaultData.chainId]))
-      } else {
-        isDefiPosition({
-          address: vaultData.asset.address,
-          chainId: vaultData.chainId,
-        }).then((isZapable) => {
-          if (isZapable) {
-            setZapAvailable(true);
-            setTokenOptions(
-              getTokenOptions(vaultData, zapAssets[vaultData.chainId])
-            );
-          } else {
-            setTokenOptions(getTokenOptions(vaultData));
-          }
-        });
-      }
-    }
-  }, [availableZapAssets, vaultData]);
-
   const [gaugeRewards, setGaugeRewards] = useState<GaugeRewards>();
   const { data: oBal } = useBalance({
     chainId: 1,
@@ -79,22 +57,6 @@ export default function Index() {
     token: OptionTokenByChain[1],
     watch: true,
   });
-  const [vcxPrice, setVcxPrice] = useState<number>(0);
-
-  useEffect(() => {
-    async function getRewardsData() {
-      const rewards = await getGaugeRewards({
-        gauges: [vaultData?.gauge?.address as Address],
-        account: account as Address,
-        chainId: 1,
-        publicClient
-      })
-      setGaugeRewards(rewards)
-      const vcxPriceInUsd = await llama({ address: VCX, chainId: 1 })
-      setVcxPrice(vcxPriceInUsd)
-    }
-    if (account && vaultData?.gauge?.address) getRewardsData();
-  }, [account]);
 
   const [showLendModal, setShowLendModal] = useState(false)
 
@@ -166,22 +128,22 @@ export default function Index() {
                     </div>
                   </div>
                   {
-                    vaultData.gaugeMinApy ? (
+                    vaultData.boostMin ? (
                       <div className="w-[120px] md:w-max">
                         <p className="w-max leading-6 text-base text-primaryDark md:text-primary">Min Boost</p>
                         <div className="text-3xl font-bold whitespace-nowrap text-primary">
-                          {vaultData.gaugeMinApy.toFixed(2)} %
+                          {vaultData.boostMin.toFixed(2)} %
                         </div>
                       </div>
                     )
                       : <></>
                   }
                   {
-                    vaultData.gaugeMaxApy ? (
+                    vaultData.boostMax ? (
                       <div className="w-[120px] md:w-max">
                         <p className="w-max leading-6 text-base text-primaryDark md:text-primary">Max Boost</p>
                         <div className="text-3xl font-bold whitespace-nowrap text-primary">
-                          {vaultData.gaugeMaxApy.toFixed(2)} %
+                          {vaultData.boostMax.toFixed(2)} %
                         </div>
                       </div>
                     )
@@ -211,7 +173,7 @@ export default function Index() {
                       label="Claim oVCX"
                       handleClick={() =>
                         claimOPop({
-                          gauges: [vaultData.gauge?.address || zeroAddress],
+                          gauges: [vaultData.gauge || zeroAddress],
                           account: account as Address,
                           minter: MinterByChain[1],
                           clients: { publicClient, walletClient: walletClient as WalletClient }
@@ -295,10 +257,10 @@ export default function Index() {
                       <p className="text-primary font-normal">Asset address:</p>
                       <div className="flex flex-row items-center justify-between">
                         <p className="font-bold text-primary">
-                          {vaultData.asset.address.slice(0, 6)}...{vaultData.asset.address.slice(-4)}
+                          {vaultData.asset.slice(0, 6)}...{vaultData.asset.slice(-4)}
                         </p>
                         <div className='w-6 h-6 group/vaultAddress'>
-                          <CopyToClipboard text={vaultData.asset.address} onCopy={() => showSuccessToast("Asset address copied!")}>
+                          <CopyToClipboard text={vaultData.asset} onCopy={() => showSuccessToast("Asset address copied!")}>
                             <Square2StackIcon className="text-white group-hover/vaultAddress:text-[#DFFF1C]" />
                           </CopyToClipboard>
                         </div>
@@ -310,10 +272,10 @@ export default function Index() {
                         <p className="text-primary font-normal">Gauge address:</p>
                         <div className="flex flex-row items-center justify-between">
                           <p className="font-bold text-primary">
-                            {vaultData.gauge.address.slice(0, 6)}...{vaultData.gauge.address.slice(-4)}
+                            {vaultData.gauge.slice(0, 6)}...{vaultData.gauge.slice(-4)}
                           </p>
                           <div className='w-6 h-6 group/gaugeAddress'>
-                            <CopyToClipboard text={vaultData.gauge.address} onCopy={() => showSuccessToast("Gauge address copied!")}>
+                            <CopyToClipboard text={vaultData.gauge} onCopy={() => showSuccessToast("Gauge address copied!")}>
                               <Square2StackIcon className="text-white group-hover/gaugeAddress:text-[#DFFF1C]" />
                             </CopyToClipboard>
                           </div>

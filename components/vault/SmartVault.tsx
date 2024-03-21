@@ -10,7 +10,7 @@ import VaultStats from "@/components/vault/VaultStats";
 import { Square2StackIcon } from "@heroicons/react/24/outline";
 import { showSuccessToast } from '@/lib/toasts';
 import { useAtom } from 'jotai';
-import { availableZapAssetAtom, zapAssetsAtom } from '@/lib/atoms';
+import { availableZapAssetAtom, tokensAtom, zapAssetsAtom } from '@/lib/atoms';
 import { getTokenOptions, isDefiPosition } from '@/lib/vault/utils';
 import { MutateTokenBalanceProps } from '@/lib/vault/mutateTokenBalance';
 import { useRouter } from 'next/router';
@@ -32,34 +32,35 @@ export default function SmartVault({
   const router = useRouter();
   const { address: account } = useAccount();
 
-  const asset = vaultData.asset;
-  const vault = vaultData.vault;
-  const gauge = vaultData.gauge;
+  const [tokens] = useAtom(tokensAtom)
 
-  const [zapAssets] = useAtom(zapAssetsAtom);
-  const [availableZapAssets] = useAtom(availableZapAssetAtom);
-
-  const [zapAvailable, setZapAvailable] = useState<boolean>(false);
-  const [tokenOptions, setTokenOptions] = useState<Token[]>([]);
+  const [asset, setAsset] = useState<Token>();
+  const [vault, setVault] = useState<Token>();
+  const [gauge, setGauge] = useState<Token>();
 
   useEffect(() => {
-    if (!!vaultData && Object.keys(availableZapAssets).length > 0) {
-      setZapAvailable(true)
-      setTokenOptions(getTokenOptions(vaultData, zapAssets[vaultData.chainId]))
+    if (vaultData) {
+      setAsset(tokens[vaultData.chainId][vaultData.asset])
+      setVault(tokens[vaultData.chainId][vaultData.vault])
+
+      if (vaultData.gauge) {
+        setGauge(tokens[vaultData.chainId][vaultData.gauge])
+      }
     }
-  }, [availableZapAssets, vaultData]);
+  }, [vaultData])
 
   const [showModal, setShowModal] = useState(false);
 
   // Is loading / error
-  if (!vaultData || tokenOptions.length === 0) return <></>;
+  if (!vaultData) return <></>;
   // Vault is not in search term
   if (
     searchTerm !== "" &&
-    !vault.name.toLowerCase().includes(searchTerm) &&
-    !vault.symbol.toLowerCase().includes(searchTerm) &&
-    !vaultData.metadata.optionalMetadata.protocol?.name
-      .toLowerCase()
+    !vault?.name.toLowerCase().includes(searchTerm) &&
+    !vault?.symbol.toLowerCase().includes(searchTerm) &&
+    !asset?.symbol.toLowerCase().includes(searchTerm) &&
+    !vaultData.strategies.map(strategy =>
+      strategy.metadata.name.toLowerCase())
       .includes(searchTerm)
   )
     return <></>;
@@ -75,7 +76,7 @@ export default function SmartVault({
               <VaultStats
                 vaultData={vaultData}
                 account={account}
-                zapAvailable={zapAvailable}
+                zapAvailable={true}
               />
             </div>
 
@@ -84,11 +85,11 @@ export default function SmartVault({
                 <p className="text-primary font-normal">Asset address:</p>
                 <div className="flex flex-row items-center justify-between">
                   <p className="font-bold text-primary">
-                    {asset.address.slice(0, 6)}...{asset.address.slice(-4)}
+                    {vaultData.asset.slice(0, 6)}...{vaultData.asset.slice(-4)}
                   </p>
                   <div className="w-6 h-6 group/assetAddress">
                     <CopyToClipboard
-                      text={asset.address}
+                      text={vaultData.asset}
                       onCopy={() => showSuccessToast("Asset address copied!")}
                     >
                       <Square2StackIcon className="text-white group-hover/assetAddress:text-[#DFFF1C]" />
@@ -100,11 +101,11 @@ export default function SmartVault({
                 <p className="text-primary font-normal">Vault address:</p>
                 <div className="flex flex-row items-center justify-between">
                   <p className="font-bold text-primary">
-                    {vault.address.slice(0, 6)}...{vault.address.slice(-4)}
+                    {vaultData.vault.slice(0, 6)}...{vaultData.vault.slice(-4)}
                   </p>
                   <div className="w-6 h-6 group/vaultAddress">
                     <CopyToClipboard
-                      text={vault.address}
+                      text={vaultData.vault}
                       onCopy={() => showSuccessToast("Vault address copied!")}
                     >
                       <Square2StackIcon className="text-white group-hover/vaultAddress:text-[#DFFF1C]" />
@@ -112,16 +113,16 @@ export default function SmartVault({
                   </div>
                 </div>
               </div>
-              {gauge && (
+              {vaultData.gauge && (
                 <div className="w-10/12 border border-[#353945] rounded-lg p-4">
                   <p className="text-primary font-normal">Gauge address:</p>
                   <div className="flex flex-row items-center justify-between">
                     <p className="font-bold text-primary">
-                      {gauge.address.slice(0, 6)}...{gauge.address.slice(-4)}
+                      {vaultData.gauge.slice(0, 6)}...{vaultData.gauge.slice(-4)}
                     </p>
                     <div className="w-6 h-6 group/gaugeAddress">
                       <CopyToClipboard
-                        text={gauge.address}
+                        text={vaultData.gauge}
                         onCopy={() => showSuccessToast("Gauge address copied!")}
                       >
                         <Square2StackIcon className="text-white group-hover/gaugeAddress:text-[#DFFF1C]" />
@@ -143,7 +144,7 @@ export default function SmartVault({
           </div>
         </div>
       </Modal>
-      <Accordion handleClick={() => router.push(`/vaults/${vaultData.address}?chainId=${vaultData.chainId}`)}>
+      <Accordion handleClick={() => router.push(`/vaults/${vaultData.vault}?chainId=${vaultData.chainId}`)}>
         <div className="w-full flex flex-wrap items-center justify-between flex-col gap-4">
           <div className="flex items-center justify-between select-none w-full">
             <AssetWithName vault={vaultData} />
@@ -152,7 +153,7 @@ export default function SmartVault({
           <VaultStats
             vaultData={vaultData}
             account={account}
-            zapAvailable={zapAvailable}
+            zapAvailable={true}
           />
 
           {description && (

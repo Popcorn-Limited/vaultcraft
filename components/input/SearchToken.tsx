@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { ChainId } from "@/lib/utils/connectors";
 import { Token } from "@/lib/types";
 import TokenIcon from "@/components/common/TokenIcon";
-import { getAssetsByChain, zapAssetAddressesByChain } from "@/lib/constants";
+import { getAssetsByChain, ZapAssetAddressesByChain } from "@/lib/constants";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
 interface SearchTokenProps {
@@ -55,7 +55,7 @@ export default function SearchToken({
       </div>
       {options
         .filter((option) =>
-          zapAssetAddressesByChain[chainId].find(
+          ZapAssetAddressesByChain[chainId].find(
             (address) => address == option.address
           )
         )

@@ -2,7 +2,7 @@ import { Token } from "@/lib/types";
 import { Address, Chain, createPublicClient, http } from "viem";
 import axios from "axios";
 import { RPC_URLS, networkMap } from "@/lib/utils/connectors";
-import { ERC20Abi, zapAssetAddressesByChain } from "@/lib/constants";
+import { ERC20Abi, ZapAssetAddressesByChain } from "@/lib/constants";
 
 export default async function getZapAssets({
   chain,
@@ -16,7 +16,7 @@ export default async function getZapAssets({
   );
   const selected: Token[] = Object.values(assets)
     .filter((asset: any) =>
-      zapAssetAddressesByChain[chain.id].includes(asset.address)
+      ZapAssetAddressesByChain[chain.id].includes(asset.address)
     )
     .map((asset) => {
       return { ...(asset as Token), balance: 0 };

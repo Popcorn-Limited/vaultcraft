@@ -14,7 +14,7 @@ import { Address, getAddress, isAddress } from "viem";
 import { Asset, Token } from "@/lib/types";
 import { RPC_URLS } from "@/lib/utils/connectors";
 import { useWalletClient } from "wagmi";
-import { getAssetsByChain, zapAssetAddressesByChain } from "@/lib/constants";
+import { getAssetsByChain, ZapAssetAddressesByChain } from "@/lib/constants";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
 function AssetSelection() {
@@ -46,7 +46,7 @@ function AssetSelection() {
       setAssetsByChain(newAssets);
       setAvailableAssets(
         newAssets[chainId].filter((asset) =>
-          zapAssetAddressesByChain[chainId].includes(asset.address)
+          ZapAssetAddressesByChain[chainId].includes(asset.address)
         )
       );
     }

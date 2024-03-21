@@ -13,7 +13,7 @@ import { PublicClient } from "wagmi";
 import axios from "axios";
 import { VaultAbi } from "@/lib/constants/abi/Vault";
 import { GaugeData, Token, TokenByAddress, VaultData, VaultDataByAddress, VaultLabel } from "@/lib/types";
-import { ADDRESS_ZERO, ERC20Abi, GAUGE_CONTROLLER, zapAssetAddressesByChain } from "@/lib/constants";
+import { ADDRESS_ZERO, ERC20Abi, GAUGE_CONTROLLER, ZapAssetAddressesByChain } from "@/lib/constants";
 import { RPC_URLS, networkMap } from "@/lib/utils/connectors";
 import { ProtocolName, YieldOptions } from "vaultcraft-sdk";
 
@@ -66,7 +66,7 @@ export async function getTokenAndVaultsData({
   let vaultsData = await prepareVaultsData(chainId, client)
   vaultsData = await addStrategyData(vaultsData, chainId, client, yieldOptions)
 
-  const uniqueAssetAdresses: Address[] = zapAssetAddressesByChain[chainId];
+  const uniqueAssetAdresses: Address[] = ZapAssetAddressesByChain[chainId];
   Object.values(vaultsData).forEach((vault) => {
     if (!uniqueAssetAdresses.includes(vault.asset)) {
       uniqueAssetAdresses.push(vault.asset);

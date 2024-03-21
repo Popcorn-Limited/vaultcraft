@@ -63,20 +63,9 @@ export default function VaultsContainer({
 
   useEffect(() => {
     async function getAccountData() {
-      // get gauge rewards
-      if (account && vaults.length > 0) {
-        const rewards = await getGaugeRewards({
-          gauges: vaultsData[1]
-            .filter((vault) => !!vault.gauge)
-            .map((vault) => vault.gauge) as Address[],
-          account: account as Address,
-          chainId: 1,
-          publicClient
-        })
-        setGaugeRewards(rewards)
-        const vcxPriceInUsd = await llama({ address: VCX, chainId: 1 })
-        setVcxPrice(vcxPriceInUsd)
-      }
+      const vcxPriceInUsd = await llama({ address: VCX, chainId: 1 })
+      setVcxPrice(vcxPriceInUsd)
+
       setNetworth(
         SUPPORTED_NETWORKS.map((chain) =>
           getVaultNetworthByChain({ vaults: vaultsData[chain.id], chainId: chain.id })
@@ -100,15 +89,7 @@ export default function VaultsContainer({
   return (
     <NoSSR >
       <Modal visibility={[showOptionTokenModal, setShowOptionTokenModal]}>
-        <OptionTokenInterface
-          gauges={
-            vaults?.length > 0
-              ? vaults
-                .filter((vault) => !!vault.gauge?.address)
-                .map((vault: VaultData) => vault.gauge as Token)
-              : []
-          }
-        />
+        <OptionTokenInterface />
       </Modal>
       <section className="md:border-b border-[#353945] md:flex md:flex-row items-center justify-between py-10 px-4 md:px-8 md:gap-4">
         <div className="w-full md:w-max">
@@ -213,13 +194,15 @@ export default function VaultsContainer({
               .filter((vault) => !hiddenVaults.includes(vault.address))
               .sort((a, b) => b.tvl - a.tvl)
               .map((vault) => {
-                return <SmartVault
-                  key={`sv-${vault.address}-${vault.chainId}`}
-                  vaultData={vault}
-                  mutateTokenBalance={mutateTokenBalance}
-                  searchTerm={searchTerm}
-                  description={showDescription ? vault.metadata.description : undefined}
-                />
+                return (
+                  <SmartVault
+                    key={`sv-${vault.address}-${vault.chainId}`}
+                    vaultData={vault}
+                    mutateTokenBalance={mutateTokenBalance}
+                    searchTerm={searchTerm}
+                    description={showDescription ? vault.metadata.description : undefined}
+                  />
+                )
               })
             }
           </>

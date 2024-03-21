@@ -286,3 +286,6 @@ export type VaultDataByAddress = {
   [key: Address]: VaultData
 }
 
+export type AddressByChain = {
+  [key: number]: Address
+}

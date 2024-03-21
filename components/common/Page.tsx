@@ -14,7 +14,7 @@ import { Address, zeroAddress } from "viem";
 import { arbitrum } from "viem/chains";
 import Modal from "@/components/modal/Modal";
 import MainActionButton from "../button/MainActionButton";
-import { availableZapAssetAtom, zapAssetsAtom } from "@/lib/atoms";
+import { availableZapAssetAtom, gaugeRewardsAtom, tokensAtom, zapAssetsAtom } from "@/lib/atoms";
 import { ReserveData, Token, TokenByAddress, UserAccountData, VaultData, VaultDataByAddress } from "@/lib/types";
 import getZapAssets, { getAvailableZapAssets } from "@/lib/utils/getZapAssets";
 import getTokenAndVaultsDataByChain from "@/lib/getTokenAndVaultsData";
@@ -173,7 +173,9 @@ export default function Page({
   const [masaSdk, setMasaSdk] = useAtom(masaAtom);
 
   const [, setVaults] = useAtom(vaultsAtom);
+  const [, setTokens] = useAtom(tokensAtom);
   const [, setLockVaults] = useAtom(lockvaultsAtom);
+  const [, setGaugeRewards] = useAtom(gaugeRewardsAtom);
 
   const {
     fireEvent,
@@ -225,6 +227,7 @@ export default function Page({
         })
       )
       setVaults(newVaultsData);
+      setTokens(newTokens);
 
       const newRewards: { [key: number]: GaugeRewards } = {}
       await Promise.all(GAUGE_NETWORKS.map(async (chain) =>
@@ -235,6 +238,7 @@ export default function Page({
           publicClient
         })
       ))
+      setGaugeRewards(newRewards)
 
       const fetchedLockVaults = await getLockVaultsByChain({
         chain: arbitrum,
@@ -244,27 +248,6 @@ export default function Page({
     }
     if (yieldOptions) getData();
   }, [yieldOptions, account]);
-
-  const [availableZapAssets, setAvailableZapAssets] = useAtom(
-    availableZapAssetAtom
-  );
-
-  useEffect(() => {
-    async function getZapData() {
-      // get available zapAddresses
-      setAvailableZapAssets({
-        1: await getAvailableZapAssets(1),
-        137: await getAvailableZapAssets(137),
-        10: await getAvailableZapAssets(10),
-        42161: await getAvailableZapAssets(42161),
-        56: await getAvailableZapAssets(56),
-      });
-    }
-    if (
-      Object.keys(availableZapAssets).length === 0
-    )
-      getZapData();
-  }, []);
 
   const [showTermsModal, setShowTermsModal] = useState<boolean>(false);
   const [termsSigned, setTermsSigned] = useState<boolean>(false);

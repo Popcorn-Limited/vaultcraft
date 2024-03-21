@@ -1,4 +1,3 @@
-import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import {
@@ -12,23 +11,21 @@ import MainActionButton from "@/components/button/MainActionButton";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import { claimOPop } from "@/lib/optionToken/interactions";
 import { WalletClient } from "viem";
-import { Token } from "@/lib/types";
 import { llama } from "@/lib/resolver/price/resolver";
 import { MinterByChain, OptionTokenByChain, VCX } from "@/lib/constants";
-import { GAUGE_NETWORKS } from "pages/boost";
+import { useAtom } from "jotai";
+import { gaugeRewardsAtom } from "@/lib/atoms";
 
 interface OptionTokenInterfaceProps {
-  gauges: Token[];
   setShowOptionTokenModal?: Dispatch<SetStateAction<boolean>>;
 }
 
-export default function OptionTokenInterface({
-  gauges,
-  setShowOptionTokenModal,
-}: OptionTokenInterfaceProps): JSX.Element {
+export default function OptionTokenInterface({ setShowOptionTokenModal }: OptionTokenInterfaceProps): JSX.Element {
   const { address: account } = useAccount();
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
+
+  const [gaugeRewards, setGaugeRewards] = useAtom(gaugeRewardsAtom);
 
   const { data: oBal } = useBalance({
     chainId: 1,
@@ -43,23 +40,6 @@ export default function OptionTokenInterface({
     llama({ address: VCX, chainId: 1 }).then((res: number) => setVcxPrice(res));
   }, []);
 
-  const [gaugeRewards, setGaugeRewards] = useState<{ [key: number]: GaugeRewards }>();
-
-  useEffect(() => {
-    async function getValues() {
-      const newRewards: { [key: number]: GaugeRewards } = {}
-      await Promise.all(GAUGE_NETWORKS.map(async (chain) =>
-        newRewards[chain] = await getGaugeRewards({
-          gauges: gauges.filter(gauge => gauge.chainId === chain).map((gauge) => gauge.address) as Address[],
-          account: account as Address,
-          chainId: chain,
-          publicClient
-        })
-      ))
-      setGaugeRewards(newRewards)
-    }
-    if (account && gauges.length > 0) getValues();
-  }, [gauges, account]);
 
   return (
     <div className="w-full bg-transparent border border-[#353945] rounded-3xl p-8 text-primary md:h-fit">
