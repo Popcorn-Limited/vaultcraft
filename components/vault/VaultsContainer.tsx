@@ -104,7 +104,7 @@ export default function VaultsContainer({
       <OptionTokenModal
         show={[showOptionTokenModal, setShowOptionTokenModal]}
       />
-      <section className="md:border-b border-[#353945] md:flex md:flex-row items-center justify-between py-10 px-4 md:px-8 md:gap-4">
+      <section className="w-full md:border-b border-[#353945] md:flex md:flex-wrap items-center justify-between py-10 px-4 md:px-8 md:gap-4">
         <div className="w-full md:w-max">
           <h1 className="text-5xl font-normal m-0 mb-4 md:mb-2 leading-0 text-primary md:text-3xl leading-none">
             Smart Vaults
@@ -114,7 +114,7 @@ export default function VaultsContainer({
           </p>
         </div>
 
-        <div className="w-full md:justify-end md:w-8/12 md:divide-x md:flex md:flex-row space-y-4 md:space-y-0 mt-4 md:mt-0">
+        <div className="w-full lg:justify-end lg:w-8/12 md:divide-x md:flex md:flex-row space-y-4 md:space-y-0 mt-4 md:mt-0">
           <div className="flex flex-row items-center md:pr-10 gap-10 md:w-fit">
             <div className="w-[120px] md:w-max">
               <p className="leading-6 text-base text-primaryDark md:text-primary">
@@ -167,7 +167,7 @@ export default function VaultsContainer({
               </div>
             </div>
 
-            <div className="hidden align-bottom md:block md:mt-auto w-60 space-y-4">
+            <div className="hidden md:flex flex-row items-center w-100 space-x-4">
               <MainActionButton
                 label="Claim oVCX"
                 handleClick={() =>
@@ -189,7 +189,7 @@ export default function VaultsContainer({
               />
             </div>
           </div>
-          <div className="md:hidden">
+          <div className="md:hidden space-y-4">
             <MainActionButton
               label="Claim oVCX"
               handleClick={() =>
@@ -204,6 +204,10 @@ export default function VaultsContainer({
                   },
                 })
               }
+            />
+            <SecondaryActionButton
+              label="Exercise oVCX"
+              handleClick={() => setShowOptionTokenModal(true)}
             />
           </div>
         </div>
