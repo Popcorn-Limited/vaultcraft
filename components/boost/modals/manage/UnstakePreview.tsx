@@ -31,12 +31,18 @@ export default function UnstakePreview({
         </div>
       </div>
 
-      <div className="w-full bg-[#fa5a6e26] border border-customRed rounded-lg p-4">
-        <p className="text-customRed">
-          Important: Unlocking your VCX-LP early will results in a penalty of{" "}
-          {(amount * 0.25).toFixed(2)} VCX-LP
-        </p>
-      </div>
+      {isExpired ?
+        <div className="w-full bg-green-500 bg-opacity-30 border border-green-500 rounded-lg p-4">
+          <p className="text-green-500">
+            You can unlock without any penalty
+          </p>
+        </div>
+        : <div className="w-full bg-[#fa5a6e26] border border-customRed rounded-lg p-4">
+          <p className="text-customRed">
+            Important: Unlocking your VCX-LP early will results in a penalty of{" "}
+            {(amount * 0.25).toFixed(2)} VCX-LP
+          </p>
+        </div>}
     </div>
   );
 }
