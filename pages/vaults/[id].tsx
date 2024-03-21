@@ -124,31 +124,26 @@ export default function Index() {
                 <div className="flex flex-wrap md:flex-row md:items-center md:pr-10 gap-4 md:gap-10 md:w-fit">
 
                   <div className="w-[120px] md:w-max">
-                    <p className="w-max leading-6 text-base text-primaryDark md:text-primary">
-                      My oVCX
+                    <p className="leading-6 text-base text-primaryDark md:text-primary">
+                      Your Wallet
                     </p>
-                    <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
-                      {`$${oBal && vcxPrice
-                        ? NumberFormatter.format(
-                          (Number(oBal?.value) / 1e18) * (vcxPrice * 0.25)
-                        )
-                        : "0"
-                        }`}
+                    <div className="text-3xl font-bold whitespace-nowrap text-primary">
+                      {`${formatAndRoundNumber(
+                        vaultData.asset.balance,
+                        vaultData.asset.decimals
+                      )}`}
                     </div>
                   </div>
 
                   <div className="w-[120px] md:w-max">
-                    <p className="w-max leading-6 text-base text-primaryDark md:text-primary">
-                      Claimable oVCX
+                    <p className="leading-6 text-base text-primaryDark md:text-primary">
+                      Deposits
                     </p>
-                    <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
-                      {`$${gaugeRewards && vcxPrice
-                        ? NumberFormatter.format(
-                          (Number(gaugeRewards?.total) / 1e18) *
-                          (vcxPrice * 0.25)
-                        )
-                        : "0"
-                        }`}
+                    <div className="text-3xl font-bold whitespace-nowrap text-primary">
+                      {`${formatAndRoundNumber(
+                        (!!vaultData.gauge ? vaultData.gauge.balance : vaultData.vault.balance) * vaultData.vault.price,
+                        vaultData.vault.decimals
+                      )}`}
                     </div>
                   </div>
 
