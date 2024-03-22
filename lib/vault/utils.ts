@@ -10,7 +10,12 @@ export async function isDefiPosition({
   chainId: number;
 }): Promise<boolean> {
   const { data } = await axios.get(
-    `https://shortcuts-backend-dynamic-int.herokuapp.com/api/v1/tokens?address=${address}&chainId=${chainId}&page=1`
+    `https://api.enso.finance/api/v1/tokens?underlyingTokens=&address=${address}&chainId=${chainId}&type=defi&page=1`,
+    {
+      headers: {
+        Authorization: `Bearer ${process.env.ENSO_API_KEY}`,
+      },
+    }
   );
   return data.data.length > 0;
 }
