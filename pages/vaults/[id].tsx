@@ -74,9 +74,9 @@ export default function Index() {
 
   const [gaugeRewards, setGaugeRewards] = useState<GaugeRewards>();
   const { data: oBal } = useBalance({
-    chainId: 1,
+    chainId: vaultData?.chainId,
     address: account,
-    token: OptionTokenByChain[1],
+    token: OptionTokenByChain[vaultData?.chainId],
     watch: true,
   });
   const [vcxPrice, setVcxPrice] = useState<number>(0);
@@ -86,7 +86,7 @@ export default function Index() {
       const rewards = await getGaugeRewards({
         gauges: [vaultData?.gauge?.address as Address],
         account: account as Address,
-        chainId: 1,
+        chainId: vaultData?.chainId,
         publicClient
       })
       setGaugeRewards(rewards)
@@ -97,6 +97,8 @@ export default function Index() {
   }, [account]);
 
   const [showLendModal, setShowLendModal] = useState(false)
+
+  console.log({ gaugeRewards })
 
   return <NoSSR>
     {
@@ -208,10 +210,10 @@ export default function Index() {
                         claimOPop({
                           gauges: [vaultData.gauge?.address || zeroAddress],
                           account: account as Address,
-                          minter: MinterByChain[1],
+                          minter: MinterByChain[vaultData?.chainId],
                           clients: { publicClient, walletClient: walletClient as WalletClient }
                         })}
-                      disabled={!gaugeRewards || gaugeRewards?.total < 1000e18}
+                      disabled={!gaugeRewards || gaugeRewards?.total < 0}
                     />
                   </div>
                 </div>
@@ -224,7 +226,7 @@ export default function Index() {
                           ?.filter((gauge) => Number(gauge.amount) > 0)
                           .map((gauge) => gauge.address) as Address[],
                         account: account as Address,
-                        minter: MinterByChain[1],
+                        minter: MinterByChain[vaultData?.chainId],
                         clients: { publicClient, walletClient: walletClient as WalletClient }
                       })}
                   />

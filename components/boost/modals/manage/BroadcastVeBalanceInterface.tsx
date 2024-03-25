@@ -1,25 +1,40 @@
 import MainActionButton from "@/components/button/MainActionButton";
-import { GaugeFactoryByChain, VE_BEACON } from "@/lib/constants";
+import { VE_BEACON, VeRecipientByChain } from "@/lib/constants";
 import { broadcastVeBalance } from "@/lib/gauges/interactions";
-import { useAccount, useBalance, usePublicClient, useWalletClient } from "wagmi";
+import { formatNumber } from "@/lib/utils/formatBigNumber";
+import { useEffect, useState } from "react";
+import { createPublicClient, http } from "viem";
+import { arbitrum, optimism } from "viem/chains";
+import { Address, Chain, erc20ABI, useAccount, usePublicClient, useWalletClient } from "wagmi";
+
+async function getVeBalance(account: Address, chain: Chain): Promise<number> {
+  const client = createPublicClient({
+    chain: chain,
+    transport: http(),
+  })
+  const veBal = await client.readContract({
+    address: VeRecipientByChain[chain.id],
+    abi: erc20ABI,
+    functionName: "balanceOf",
+    args: [account]
+  });
+  return Number(veBal) / 1e18
+}
 
 export default function BroadcastVeBalanceInterface({ amount, setShowModal }: { amount: number, setShowModal: Function }): JSX.Element {
   const { address: account } = useAccount();
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
 
-  const { data: opVeBal } = useBalance({
-    chainId: 10,
-    address: account,
-    token: GaugeFactoryByChain[10],
-    watch: true,
-  });
-  const { data: arbVeBal } = useBalance({
-    chainId: 42161,
-    address: account,
-    token: GaugeFactoryByChain[42161],
-    watch: true,
-  });
+  const [opVeBal, setOpVeBal] = useState<number>(0)
+  const [arbVeBal, setArbVeBal] = useState<number>(0)
+
+  useEffect(() => {
+    if (account) {
+      getVeBalance(account, optimism).then(res => setOpVeBal(res))
+      getVeBalance(account, arbitrum).then(res => setArbVeBal(res))
+    }
+  }, [account])
 
   async function handleBroadcast(chainId: number) {
     if (!account || !walletClient) return
@@ -40,15 +55,15 @@ export default function BroadcastVeBalanceInterface({ amount, setShowModal }: { 
         <div className="mt-10">
           <span className="flex flex-row items-center justify-between">
             <p className="text-primary font-semibold mb-1">Mainnet VeBalance:</p>
-            <p className="w-32 text-secondaryLight">{amount}</p>
+            <p className="w-32 text-secondaryLight">{formatNumber(amount)}</p>
           </span>
           <span className="flex flex-row items-center justify-between">
             <p className="text-primary font-semibold mb-1">Optimism VeBalance:</p>
-            <p className="w-32 text-secondaryLight">{opVeBal ? Number(opVeBal) / 1e18 : "0"}</p>
+            <p className="w-32 text-secondaryLight">{formatNumber(opVeBal)}</p>
           </span>
           <span className="flex flex-row items-center justify-between">
             <p className="text-primary font-semibold mb-1">Arbitrum VeBalance:</p>
-            <p className="w-32 text-secondaryLight">{arbVeBal ? Number(arbVeBal) / 1e18 : "0"}</p>
+            <p className="w-32 text-secondaryLight">{formatNumber(arbVeBal)}</p>
           </span>
         </div>
         <div className="flex flex-row space-x-4 mt-10">
