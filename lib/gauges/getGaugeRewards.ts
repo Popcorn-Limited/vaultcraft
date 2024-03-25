@@ -16,7 +16,6 @@ export type GaugeRewards = {
 }
 
 export default async function getGaugeRewards({ gauges, account, publicClient, chainId }: GetGaugeRewardsProps): Promise<GaugeRewards> {
-  console.log(gauges, account, chainId)
   const client = createPublicClient({
     chain: ChainById[chainId],
     transport: http(),
@@ -33,7 +32,6 @@ export default async function getGaugeRewards({ gauges, account, publicClient, c
     }),
     allowFailure: true,
   });
-  console.log(data)
   const successfullCalls = data.filter((d) => d.status !== "failure");
   if (successfullCalls.length === 0) return { total: ZERO, amounts: [] };
 

@@ -39,12 +39,10 @@ export default function SmartVault({
   const [zapAssets] = useAtom(zapAssetsAtom);
   const [availableZapAssets] = useAtom(availableZapAssetAtom);
 
-  const [zapAvailable, setZapAvailable] = useState<boolean>(false);
   const [tokenOptions, setTokenOptions] = useState<Token[]>([]);
 
   useEffect(() => {
-    if (!!vaultData && Object.keys(availableZapAssets).length > 0) {
-      setZapAvailable(true)
+    if (!!vaultData) {
       setTokenOptions(getTokenOptions(vaultData, zapAssets[vaultData.chainId]))
     }
   }, [availableZapAssets, vaultData]);
@@ -75,7 +73,7 @@ export default function SmartVault({
               <VaultStats
                 vaultData={vaultData}
                 account={account}
-                zapAvailable={zapAvailable}
+                zapAvailable={false}
               />
             </div>
 
@@ -152,7 +150,7 @@ export default function SmartVault({
           <VaultStats
             vaultData={vaultData}
             account={account}
-            zapAvailable={zapAvailable}
+            zapAvailable={false}
           />
 
           {description && (

@@ -5,7 +5,7 @@ import { useAtom } from "jotai";
 import { useRouter } from "next/router";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import NoSSR from "react-no-ssr";
-import { useAccount, useBalance, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
+import { erc20ABI, useAccount, useBalance, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
 import { Address, WalletClient, createPublicClient, extractChain, formatUnits, getAddress, http, zeroAddress } from "viem";
 import { yieldOptionsAtom } from "@/lib/atoms/sdk";
 import { NumberFormatter, formatAndRoundNumber, formatNumber, formatToFixedDecimals, safeRound } from "@/lib/utils/formatBigNumber";
@@ -24,11 +24,14 @@ import { getTokenOptions, isDefiPosition } from "@/lib/vault/utils";
 import LeftArrowIcon from "@/components/svg/LeftArrowIcon";
 import LoanInterface from "@/components/lending/LoanInterface";
 import { MinterByChain, OptionTokenByChain, VCX } from "@/lib/constants";
+import { ChainById } from "@/lib/utils/connectors";
 
 export default function Index() {
   const router = useRouter();
   const { query } = router;
 
+  const { chain } = useNetwork();
+  const { switchNetworkAsync } = useSwitchNetwork();
   const { address: account } = useAccount();
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
@@ -46,59 +49,70 @@ export default function Index() {
 
   const [zapAssets] = useAtom(zapAssetsAtom);
   const [availableZapAssets] = useAtom(availableZapAssetAtom);
-  const [zapAvailable, setZapAvailable] = useState<boolean>(false);
   const [tokenOptions, setTokenOptions] = useState<Token[]>([]);
 
   useEffect(() => {
-    if (!!vaultData && Object.keys(availableZapAssets).length > 0) {
-      if (availableZapAssets[vaultData.chainId].includes(vaultData.asset.address)) {
-        setZapAvailable(true)
-        setTokenOptions(getTokenOptions(vaultData, zapAssets[vaultData.chainId]))
-      } else {
-        isDefiPosition({
-          address: vaultData.asset.address,
-          chainId: vaultData.chainId,
-        }).then((isZapable) => {
-          if (isZapable) {
-            setZapAvailable(true);
-            setTokenOptions(
-              getTokenOptions(vaultData, zapAssets[vaultData.chainId])
-            );
-          } else {
-            setTokenOptions(getTokenOptions(vaultData));
-          }
-        });
-      }
+    if (!!vaultData) {
+      setTokenOptions(getTokenOptions(vaultData, zapAssets[vaultData.chainId]))
     }
   }, [availableZapAssets, vaultData]);
 
-  const [gaugeRewards, setGaugeRewards] = useState<GaugeRewards>();
-  const { data: oBal } = useBalance({
-    chainId: vaultData?.chainId,
-    address: account,
-    token: OptionTokenByChain[vaultData?.chainId],
-    watch: true,
-  });
   const [vcxPrice, setVcxPrice] = useState<number>(0);
+  const [oBal, setOBal] = useState<number>(0)
+
+  useEffect(() => {
+    async function getOToken() {
+      const client = createPublicClient({
+        chain: ChainById[vaultData?.chainId!],
+        transport: http(),
+      })
+      const newOBal = client.readContract({
+        address: OptionTokenByChain[vaultData?.chainId!],
+        abi: erc20ABI,
+        functionName: "balanceOf",
+        args: [account!]
+      })
+      setOBal(Number(newOBal) / 1e18)
+      setVcxPrice(await llama({ address: VCX, chainId: 1 }))
+    }
+    if (account && vaultData) getOToken()
+  }, [account])
+
+  const [gaugeRewards, setGaugeRewards] = useState<GaugeRewards>();
 
   useEffect(() => {
     async function getRewardsData() {
       const rewards = await getGaugeRewards({
-        gauges: [vaultData?.gauge?.address as Address],
-        account: account as Address,
-        chainId: vaultData?.chainId,
+        gauges: [vaultData?.gauge?.address!],
+        account: account!,
+        chainId: vaultData?.chainId!,
         publicClient
       })
       setGaugeRewards(rewards)
-      const vcxPriceInUsd = await llama({ address: VCX, chainId: 1 })
-      setVcxPrice(vcxPriceInUsd)
     }
     if (account && vaultData?.gauge?.address) getRewardsData();
   }, [account]);
 
   const [showLendModal, setShowLendModal] = useState(false)
 
-  console.log({ gaugeRewards })
+  async function handleClaim() {
+    if (!vaultData) return
+
+    if (chain?.id !== vaultData?.chainId) {
+      try {
+        await switchNetworkAsync?.(vaultData?.chainId);
+      } catch (error) {
+        return;
+      }
+    }
+
+    claimOPop({
+      gauges: [vaultData.gauge?.address || zeroAddress],
+      account: account as Address,
+      minter: MinterByChain[vaultData?.chainId],
+      clients: { publicClient, walletClient: walletClient as WalletClient }
+    })
+  }
 
   return <NoSSR>
     {
@@ -165,9 +179,9 @@ export default function Index() {
                   {
                     vaultData.gaugeMinApy ? (
                       <div className="w-[120px] md:w-max">
-                        <p className="w-max leading-6 text-base text-primaryDark md:text-primary">Min Boost</p>
+                        <p className="w-max leading-6 text-base text-primaryDark md:text-primary">Min Rewards</p>
                         <div className="text-3xl font-bold whitespace-nowrap text-primary">
-                          {vaultData.gaugeMinApy.toFixed(2)} %
+                          {`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.gaugeMinApy))} %`}
                         </div>
                       </div>
                     )
@@ -176,9 +190,9 @@ export default function Index() {
                   {
                     vaultData.gaugeMaxApy ? (
                       <div className="w-[120px] md:w-max">
-                        <p className="w-max leading-6 text-base text-primaryDark md:text-primary">Max Boost</p>
+                        <p className="w-max leading-6 text-base text-primaryDark md:text-primary">Max Rewards</p>
                         <div className="text-3xl font-bold whitespace-nowrap text-primary">
-                          {vaultData.gaugeMaxApy.toFixed(2)} %
+                          {`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.gaugeMaxApy))} %`}
                         </div>
                       </div>
                     )
@@ -191,7 +205,7 @@ export default function Index() {
                     <div className="w-[120px] md:w-max">
                       <p className="w-max leading-6 text-base text-primaryDark md:text-primary">My oVCX</p>
                       <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
-                        {`$${oBal && vcxPrice ? NumberFormatter.format((Number(oBal?.value) / 1e18) * (vcxPrice * 0.25)) : "0"}`}
+                        {`$${oBal && vcxPrice ? NumberFormatter.format(oBal * (vcxPrice * 0.25)) : "0"}`}
                       </div>
                     </div>
 
@@ -206,13 +220,7 @@ export default function Index() {
                   <div className="hidden align-bottom md:block md:mt-auto w-fit mb-2">
                     <MainActionButton
                       label="Claim oVCX"
-                      handleClick={() =>
-                        claimOPop({
-                          gauges: [vaultData.gauge?.address || zeroAddress],
-                          account: account as Address,
-                          minter: MinterByChain[vaultData?.chainId],
-                          clients: { publicClient, walletClient: walletClient as WalletClient }
-                        })}
+                      handleClick={handleClaim}
                       disabled={!gaugeRewards || gaugeRewards?.total < 0}
                     />
                   </div>
@@ -220,15 +228,8 @@ export default function Index() {
                 <div className="md:hidden">
                   <MainActionButton
                     label="Claim oVCX"
-                    handleClick={() =>
-                      claimOPop({
-                        gauges: gaugeRewards?.amounts
-                          ?.filter((gauge) => Number(gauge.amount) > 1000e18) // only use gauges with 1000 or more oVCX claimable
-                          .map((gauge) => gauge.address) as Address[],
-                        account: account as Address,
-                        minter: MinterByChain[vaultData?.chainId],
-                        clients: { publicClient, walletClient: walletClient as WalletClient }
-                      })}
+                    handleClick={handleClaim}
+                    disabled={!gaugeRewards || gaugeRewards?.total < 0}
                   />
                 </div>
               </div>
