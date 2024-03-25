@@ -223,7 +223,7 @@ export default function Index() {
                     handleClick={() =>
                       claimOPop({
                         gauges: gaugeRewards?.amounts
-                          ?.filter((gauge) => Number(gauge.amount) > 0)
+                          ?.filter((gauge) => Number(gauge.amount) > 1000e18) // only use gauges with 1000 or more oVCX claimable
                           .map((gauge) => gauge.address) as Address[],
                         account: account as Address,
                         minter: MinterByChain[vaultData?.chainId],
