@@ -18,7 +18,6 @@ import MainActionButton from "../button/MainActionButton";
 import { availableZapAssetAtom, zapAssetsAtom } from "@/lib/atoms";
 import { Token } from "@/lib/types";
 import getZapAssets, { getAvailableZapAssets } from "@/lib/utils/getZapAssets";
-import SecondaryActionButton from "../button/SecondaryActionButton";
 
 async function setUpYieldOptions() {
   const ttl = 360_000;

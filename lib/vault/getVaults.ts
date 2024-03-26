@@ -30,6 +30,11 @@ const HIDDEN_VAULTS: Address[] = [
   "0xa6fcC7813d9D394775601aD99874c9f8e95BAd78", // Automated Pool Token - Oracle Vault 3
 ];
 
+const VAULT_TO_ALTERNATE_ASSET: { [key: Address]: Address } = {
+  "0x434E7EA9BC77C93c3F4680862281603338c7aE02": "0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee",
+  "0xa48d49F63Dfc185cDD409B65f042955f509d9658": "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7"
+}
+
 const { GaugeController: GAUGE_CONTROLLER } = getVeAddresses();
 
 function prepareVaultContract(
@@ -230,14 +235,19 @@ export async function getVaults({
   await Promise.all(
     result.map(async (vault, i) => {
       let apy = 0;
+
+      let assetAddress = vault.asset.address
+      if (Object.keys(VAULT_TO_ALTERNATE_ASSET).includes(vault.address)) {
+        assetAddress = VAULT_TO_ALTERNATE_ASSET[vault.address]
+      }
       try {
         const vaultYield = await yieldOptions.getApy({
           chainId: vault.chainId,
           protocol: vault.metadata.optionalMetadata.resolver as ProtocolName,
-          asset: vault.asset.address,
+          asset: assetAddress,
         });
         apy = vaultYield.total;
-      } catch (e) {}
+      } catch (e) { }
       vault.apy = apy;
       vault.totalApy = apy;
     })
@@ -262,14 +272,14 @@ export async function getVaults({
         );
         const gauge = foundGauge
           ? {
-              address: foundGauge.address,
-              name: `${vault.vault.name}-gauge`,
-              symbol: `st-${vault.vault.name}`,
-              decimals: foundGauge.decimals,
-              logoURI: "/images/tokens/vcx.svg", // wont be used, just here for consistency
-              balance: account === zeroAddress ? 0 : foundGauge.balance,
-              price: vault.pricePerShare * 1e9,
-            }
+            address: foundGauge.address,
+            name: `${vault.vault.name}-gauge`,
+            symbol: `st-${vault.vault.name}`,
+            decimals: foundGauge.decimals,
+            logoURI: "/images/tokens/vcx.svg", // wont be used, just here for consistency
+            balance: account === zeroAddress ? 0 : foundGauge.balance,
+            price: vault.pricePerShare * 1e9,
+          }
           : undefined;
 
         let gaugeMinApy;
