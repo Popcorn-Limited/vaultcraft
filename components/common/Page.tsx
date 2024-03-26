@@ -19,8 +19,7 @@ import { availableZapAssetAtom, zapAssetsAtom } from "@/lib/atoms";
 import { ReserveData, Token, UserAccountData } from "@/lib/types";
 import getZapAssets, { getAvailableZapAssets } from "@/lib/utils/getZapAssets";
 import { aaveAccountDataAtom, aaveReserveDataAtom } from "@/lib/atoms/lending";
-import { AavePoolAbi } from "@/lib/constants/abi/Aave";
-import { AavePoolByChain, calcUserAccountData, fetchAaveData } from "@/lib/external/aave/interactions";
+import { fetchAaveData } from "@/lib/external/aave/interactions";
 
 async function setUpYieldOptions() {
   const ttl = 360_000;
