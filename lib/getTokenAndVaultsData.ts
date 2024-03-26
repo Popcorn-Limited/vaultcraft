@@ -30,6 +30,11 @@ const HIDDEN_VAULTS: Address[] = [
   "0xa6fcC7813d9D394775601aD99874c9f8e95BAd78", // Automated Pool Token - Oracle Vault 3
 ];
 
+const STRATEGY_TO_ALTERNATE_ASSET: { [key: Address]: Address } = {
+  "0x9E0c5d524dc3Ff0aa734c52aa57ab623436364e6": "0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee",
+  "0xA84397004Abe8229CC481cE91BA850ECd8204822": "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7"
+}
+
 const NETWORKS_WITH_GAUGES = [1, 10, 42161]
 
 interface GetVaultsByChainProps {
@@ -302,11 +307,17 @@ async function addStrategyData(vaults: VaultDataByAddress, chainId: number, clie
 
       const desc = strategyDescriptions[address]
       let apy = 0;
+
+      let assetAddress = desc.asset
+      if (Object.keys(STRATEGY_TO_ALTERNATE_ASSET).includes(address)) {
+        assetAddress = STRATEGY_TO_ALTERNATE_ASSET[address]
+      }
+
       try {
         const vaultYield = await yieldOptions.getApy({
           chainId: chainId,
           protocol: desc.resolver as ProtocolName,
-          asset: desc.asset,
+          asset: assetAddress,
         });
         apy = vaultYield.total;
       } catch (e) { }

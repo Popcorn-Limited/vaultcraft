@@ -10,8 +10,7 @@ import VaultStats from "@/components/vault/VaultStats";
 import { Square2StackIcon } from "@heroicons/react/24/outline";
 import { showSuccessToast } from '@/lib/toasts';
 import { useAtom } from 'jotai';
-import { availableZapAssetAtom, tokensAtom, zapAssetsAtom } from '@/lib/atoms';
-import { getTokenOptions, isDefiPosition } from '@/lib/vault/utils';
+import { tokensAtom, zapAssetsAtom } from '@/lib/atoms';
 import { MutateTokenBalanceProps } from '@/lib/vault/mutateTokenBalance';
 import { useRouter } from 'next/router';
 
@@ -33,19 +32,25 @@ export default function SmartVault({
   const { address: account } = useAccount();
 
   const [tokens] = useAtom(tokensAtom)
+  const [zapAssets] = useAtom(zapAssetsAtom);
 
+  const [tokenOptions, setTokenOptions] = useState<Token[]>([]);
   const [asset, setAsset] = useState<Token>();
   const [vault, setVault] = useState<Token>();
   const [gauge, setGauge] = useState<Token>();
 
   useEffect(() => {
     if (vaultData) {
+      const newTokenOptions = [tokens[vaultData.chainId][vaultData.asset], tokens[vaultData.chainId][vaultData.vault], ...zapAssets[vaultData.chainId]]
+
       setAsset(tokens[vaultData.chainId][vaultData.asset])
       setVault(tokens[vaultData.chainId][vaultData.vault])
 
       if (vaultData.gauge) {
         setGauge(tokens[vaultData.chainId][vaultData.gauge])
+        newTokenOptions.push(tokens[vaultData.chainId][vaultData.gauge])
       }
+      setTokenOptions(newTokenOptions)
     }
   }, [vaultData])
 
@@ -76,7 +81,7 @@ export default function SmartVault({
               <VaultStats
                 vaultData={vaultData}
                 account={account}
-                zapAvailable={true}
+                zapAvailable={false}
               />
             </div>
 
@@ -153,7 +158,7 @@ export default function SmartVault({
           <VaultStats
             vaultData={vaultData}
             account={account}
-            zapAvailable={true}
+            zapAvailable={false}
           />
 
           {description && (

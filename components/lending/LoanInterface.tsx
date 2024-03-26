@@ -277,8 +277,6 @@ export default function LoanInterface({ visibilityState, vaultData }: { visibili
     }
   }
 
-  if (reserveData && reserveData[vaultData.chainId]) console.log(reserveData[vaultData.chainId])
-
   return <>
     <Modal
       visibility={visibilityState}

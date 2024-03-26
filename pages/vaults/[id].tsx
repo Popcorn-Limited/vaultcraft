@@ -5,7 +5,7 @@ import { useAtom } from "jotai";
 import { useRouter } from "next/router";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import NoSSR from "react-no-ssr";
-import { useAccount, useBalance, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
+import { erc20ABI, useAccount, useBalance, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
 import { Address, WalletClient, createPublicClient, extractChain, formatUnits, getAddress, http, zeroAddress } from "viem";
 import { yieldOptionsAtom } from "@/lib/atoms/sdk";
 import { NumberFormatter, formatAndRoundNumber, formatNumber, formatToFixedDecimals, safeRound } from "@/lib/utils/formatBigNumber";
@@ -24,11 +24,14 @@ import { getTokenOptions, isDefiPosition } from "@/lib/vault/utils";
 import LeftArrowIcon from "@/components/svg/LeftArrowIcon";
 import LoanInterface from "@/components/lending/LoanInterface";
 import { MinterByChain, OptionTokenByChain, VCX } from "@/lib/constants";
+import { ChainById } from "@/lib/utils/connectors";
 
 export default function Index() {
   const router = useRouter();
   const { query } = router;
 
+  const { chain } = useNetwork();
+  const { switchNetworkAsync } = useSwitchNetwork();
   const { address: account } = useAccount();
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
@@ -47,18 +50,70 @@ export default function Index() {
 
   const [zapAssets] = useAtom(zapAssetsAtom);
   const [availableZapAssets] = useAtom(availableZapAssetAtom);
-  const [zapAvailable, setZapAvailable] = useState<boolean>(false);
   const [tokenOptions, setTokenOptions] = useState<Token[]>([]);
 
+  useEffect(() => {
+    if (!!vaultData) {
+      setTokenOptions(getTokenOptions(vaultData, zapAssets[vaultData.chainId]))
+    }
+  }, [availableZapAssets, vaultData]);
+
+  const [vcxPrice, setVcxPrice] = useState<number>(0);
+  const [oBal, setOBal] = useState<number>(0)
+
+  useEffect(() => {
+    async function getOToken() {
+      const client = createPublicClient({
+        chain: ChainById[vaultData?.chainId!],
+        transport: http(),
+      })
+      const newOBal = client.readContract({
+        address: OptionTokenByChain[vaultData?.chainId!],
+        abi: erc20ABI,
+        functionName: "balanceOf",
+        args: [account!]
+      })
+      setOBal(Number(newOBal) / 1e18)
+      setVcxPrice(await llama({ address: VCX, chainId: 1 }))
+    }
+    if (account && vaultData) getOToken()
+  }, [account])
+
   const [gaugeRewards, setGaugeRewards] = useState<GaugeRewards>();
-  const { data: oBal } = useBalance({
-    chainId: 1,
-    address: account,
-    token: OptionTokenByChain[1],
-    watch: true,
-  });
+
+  useEffect(() => {
+    async function getRewardsData() {
+      const rewards = await getGaugeRewards({
+        gauges: [vaultData?.gauge?.address!],
+        account: account!,
+        chainId: vaultData?.chainId!,
+        publicClient
+      })
+      setGaugeRewards(rewards)
+    }
+    if (account && vaultData?.gauge?.address) getRewardsData();
+  }, [account]);
 
   const [showLendModal, setShowLendModal] = useState(false)
+
+  async function handleClaim() {
+    if (!vaultData) return
+
+    if (chain?.id !== vaultData?.chainId) {
+      try {
+        await switchNetworkAsync?.(vaultData?.chainId);
+      } catch (error) {
+        return;
+      }
+    }
+
+    claimOPop({
+      gauges: [vaultData.gauge?.address || zeroAddress],
+      account: account as Address,
+      minter: MinterByChain[vaultData?.chainId],
+      clients: { publicClient, walletClient: walletClient as WalletClient }
+    })
+  }
 
   return <NoSSR>
     {
@@ -86,31 +141,26 @@ export default function Index() {
                 <div className="flex flex-wrap md:flex-row md:items-center md:pr-10 gap-4 md:gap-10 md:w-fit">
 
                   <div className="w-[120px] md:w-max">
-                    <p className="w-max leading-6 text-base text-primaryDark md:text-primary">
-                      My oVCX
+                    <p className="leading-6 text-base text-primaryDark md:text-primary">
+                      Your Wallet
                     </p>
-                    <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
-                      {`$${oBal && vcxPrice
-                        ? NumberFormatter.format(
-                          (Number(oBal?.value) / 1e18) * (vcxPrice * 0.25)
-                        )
-                        : "0"
-                        }`}
+                    <div className="text-3xl font-bold whitespace-nowrap text-primary">
+                      {`${formatAndRoundNumber(
+                        vaultData.asset.balance,
+                        vaultData.asset.decimals
+                      )}`}
                     </div>
                   </div>
 
                   <div className="w-[120px] md:w-max">
-                    <p className="w-max leading-6 text-base text-primaryDark md:text-primary">
-                      Claimable oVCX
+                    <p className="leading-6 text-base text-primaryDark md:text-primary">
+                      Deposits
                     </p>
-                    <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
-                      {`$${gaugeRewards && vcxPrice
-                        ? NumberFormatter.format(
-                          (Number(gaugeRewards?.total) / 1e18) *
-                          (vcxPrice * 0.25)
-                        )
-                        : "0"
-                        }`}
+                    <div className="text-3xl font-bold whitespace-nowrap text-primary">
+                      {`${formatAndRoundNumber(
+                        (!!vaultData.gauge ? vaultData.gauge.balance : vaultData.vault.balance) * vaultData.vault.price,
+                        vaultData.vault.decimals
+                      )}`}
                     </div>
                   </div>
 
@@ -130,9 +180,9 @@ export default function Index() {
                   {
                     vaultData.boostMin ? (
                       <div className="w-[120px] md:w-max">
-                        <p className="w-max leading-6 text-base text-primaryDark md:text-primary">Min Boost</p>
+                        <p className="w-max leading-6 text-base text-primaryDark md:text-primary">Min Rewards</p>
                         <div className="text-3xl font-bold whitespace-nowrap text-primary">
-                          {vaultData.boostMin.toFixed(2)} %
+                          {`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.boostMin))} %`}
                         </div>
                       </div>
                     )
@@ -141,9 +191,9 @@ export default function Index() {
                   {
                     vaultData.boostMax ? (
                       <div className="w-[120px] md:w-max">
-                        <p className="w-max leading-6 text-base text-primaryDark md:text-primary">Max Boost</p>
+                        <p className="w-max leading-6 text-base text-primaryDark md:text-primary">Max Rewards</p>
                         <div className="text-3xl font-bold whitespace-nowrap text-primary">
-                          {vaultData.boostMax.toFixed(2)} %
+                          {`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.boostMax))} %`}
                         </div>
                       </div>
                     )
@@ -156,7 +206,7 @@ export default function Index() {
                     <div className="w-[120px] md:w-max">
                       <p className="w-max leading-6 text-base text-primaryDark md:text-primary">My oVCX</p>
                       <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
-                        {`$${oBal && vcxPrice ? NumberFormatter.format((Number(oBal?.value) / 1e18) * (vcxPrice * 0.25)) : "0"}`}
+                        {`$${oBal && vcxPrice ? NumberFormatter.format(oBal * (vcxPrice * 0.25)) : "0"}`}
                       </div>
                     </div>
 
@@ -171,29 +221,16 @@ export default function Index() {
                   <div className="hidden align-bottom md:block md:mt-auto w-fit mb-2">
                     <MainActionButton
                       label="Claim oVCX"
-                      handleClick={() =>
-                        claimOPop({
-                          gauges: [vaultData.gauge || zeroAddress],
-                          account: account as Address,
-                          minter: MinterByChain[1],
-                          clients: { publicClient, walletClient: walletClient as WalletClient }
-                        })}
-                      disabled={!gaugeRewards || gaugeRewards?.total < 1000e18}
+                      handleClick={handleClaim}
+                      disabled={!gaugeRewards || gaugeRewards?.total < 0}
                     />
                   </div>
                 </div>
                 <div className="md:hidden">
                   <MainActionButton
                     label="Claim oVCX"
-                    handleClick={() =>
-                      claimOPop({
-                        gauges: gaugeRewards?.amounts
-                          ?.filter((gauge) => Number(gauge.amount) > 0)
-                          .map((gauge) => gauge.address) as Address[],
-                        account: account as Address,
-                        minter: MinterByChain[1],
-                        clients: { publicClient, walletClient: walletClient as WalletClient }
-                      })}
+                    handleClick={handleClaim}
+                    disabled={!gaugeRewards || gaugeRewards?.total < 0}
                   />
                 </div>
               </div>

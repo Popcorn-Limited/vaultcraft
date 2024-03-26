@@ -1,4 +1,5 @@
 import {
+  Chain,
   arbitrum,
   mainnet,
   optimism,
@@ -110,3 +111,10 @@ export const RPC_URLS: { [key: number]: string } = {
 };
 
 export const SUPPORTED_NETWORKS = [mainnet, polygon, optimism, arbitrum]
+
+export const ChainById: { [key: number]: Chain } = {
+  1: mainnet,
+  137: polygon,
+  10: optimism,
+  42161: arbitrum
+}

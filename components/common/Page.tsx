@@ -16,12 +16,11 @@ import Modal from "@/components/modal/Modal";
 import MainActionButton from "../button/MainActionButton";
 import { availableZapAssetAtom, gaugeRewardsAtom, tokensAtom, zapAssetsAtom } from "@/lib/atoms";
 import { ReserveData, Token, TokenByAddress, UserAccountData, VaultData, VaultDataByAddress } from "@/lib/types";
-import getZapAssets, { getAvailableZapAssets } from "@/lib/utils/getZapAssets";
 import getTokenAndVaultsDataByChain from "@/lib/getTokenAndVaultsData";
 import { aaveAccountDataAtom, aaveReserveDataAtom } from "@/lib/atoms/lending";
-import { AavePoolByChain, calcUserAccountData, fetchAaveData } from "@/lib/external/aave/interactions";
 import { GAUGE_NETWORKS } from "pages/boost";
 import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
+import { fetchAaveData } from "@/lib/external/aave/interactions";
 
 async function setUpYieldOptions() {
   const ttl = 360_000;

@@ -1,25 +1,25 @@
-import { Address } from "viem";
 import ResponsiveTooltip from "./Tooltip";
 
-const protocolNameToLlamaProtocol: { [key: string]: string } = {
-  Aave: "aave",
-  Aura: "aura",
-  Balancer: "balancer",
-  Beefy: "beefy",
-  Compound: "compound",
-  Convex: "convex-finance",
-  Curve: "curve",
-  Flux: "flux-finance",
-  Idle: "idle",
-  Origin: "origin-defi",
-  Stargate: "stargate",
-  Yearn: "yearn-finance",
-  Pirex: "pirex",
-  Sommelier: "sommelier",
-  Frax: "frax",
-  Velodrome: "velodrome",
-  Stader: "stader",
-  KelpDAO: "kelp-dao",
+const IconByProtocol: { [key: string]: string } = {
+  Aave: "https://icons.llamao.fi/icons/protocols/aave?w=48&h=48",
+  Aura: "https://icons.llamao.fi/icons/protocols/aura?w=48&h=48",
+  Balancer: "https://icons.llamao.fi/icons/protocols/balancer?w=48&h=48",
+  Beefy: "https://icons.llamao.fi/icons/protocols/beefy?w=48&h=48",
+  Compound: "https://icons.llamao.fi/icons/protocols/compound?w=48&h=48",
+  Convex: "https://icons.llamao.fi/icons/protocols/convex-finance?w=48&h=48",
+  Curve: "https://icons.llamao.fi/icons/protocols/curve?w=48&h=48",
+  Flux: "https://icons.llamao.fi/icons/protocols/flux-finance?w=48&h=48",
+  Idle: "https://icons.llamao.fi/icons/protocols/idle?w=48&h=48",
+  Origin: "https://icons.llamao.fi/icons/protocols/origin-defi?w=48&h=48",
+  Stargate: "https://icons.llamao.fi/icons/protocols/stargate?w=48&h=48",
+  Yearn: "https://icons.llamao.fi/icons/protocols/yearn-finance?w=48&h=48",
+  Pirex: "https://icons.llamao.fi/icons/protocols/pirex?w=48&h=48",
+  Sommelier: "https://icons.llamao.fi/icons/protocols/sommelier?w=48&h=48",
+  Frax: "https://icons.llamao.fi/icons/protocols/frax?w=48&h=48",
+  Velodrome: "https://icons.llamao.fi/icons/protocols/velodrome?w=48&h=48",
+  Stader: "https://icons.llamao.fi/icons/protocols/stader?w=48&h=48",
+  KelpDAO: "https://icons.llamao.fi/icons/protocols/kelp-dao?w=48&h=48",
+  Ion: "https://www.app.ionprotocol.io/logo.svg"
 };
 
 const iconSize: { [key: number]: string } = {
@@ -43,9 +43,7 @@ export default function ProtocolIcon({
   tooltip?: { id: string; content: JSX.Element };
   size?: number;
 }): JSX.Element {
-  const protocolIcon = protocolName
-    ? protocolNameToLlamaProtocol[protocolName]
-    : "popcorn";
+
   return (
     <>
       <div
@@ -55,8 +53,8 @@ export default function ProtocolIcon({
         <div className="bg-gray-700 bg-opacity-40 rounded-lg py-1 px-3 flex flex-row items-center gap-2">
           <img
             src={
-              protocolIcon
-                ? `https://icons.llamao.fi/icons/protocols/${protocolIcon}?w=48&h=48`
+              protocolName
+                ? IconByProtocol[protocolName]
                 : "/images/tokens/vcx.svg"
             }
             className={`${iconSize[size]} mr-1 rounded-full border border-[#ebe7d4cc]`}

@@ -22,7 +22,7 @@ export default function VaultStats({
 
   return (
     <>
-      <div className="w-full flex justify-between gap-8 md:gap-4">
+      <div className="w-full flex flex-row justify-between gap-8 md:gap-4">
         <div className="w-full mt-6 md:mt-0">
           <p
             className="text-primary font-normal md:text-[14px]"
@@ -97,15 +97,15 @@ export default function VaultStats({
           >
             $ {vaultData.tvl < 1 ? "0" : NumberFormatter.format(vaultData.tvl)}
           </Title>
+          <ResponsiveTooltip
+            id={`${baseTooltipId}-tvl`}
+            content={
+              <p className="max-w-52">
+                Total value of all assets deposited into the vault
+              </p>
+            }
+          />
         </div>
-        <ResponsiveTooltip
-          id={`${baseTooltipId}-tvl`}
-          content={
-            <p className="max-w-52">
-              Total value of all assets deposited into the vault
-            </p>
-          }
-        />
       </div>
 
       <div className="w-full flex flex-row justify-between gap-8 md:gap-4">
@@ -237,7 +237,7 @@ function GaugeRewards({
           className="font-normal text-primary md:text-[14px]"
           id={`${baseTooltipId}-minBoost`}
         >
-          Min Boost
+          Min Rewards
         </p>
         <Title
           as="span"
@@ -245,7 +245,7 @@ function GaugeRewards({
           fontWeight="font-normal"
           className="text-primary"
         >
-          {vaultData.gaugeMinApy?.toFixed(2) || "-"} %
+          {vaultData?.gaugeMinApy ? NumberFormatter.format(roundToTwoDecimalPlaces(vaultData?.gaugeMinApy)) : "-"} %
         </Title>
         <ResponsiveTooltip
           id={`${baseTooltipId}-minBoost`}
@@ -263,7 +263,7 @@ function GaugeRewards({
           className="font-normal text-primary md:text-[14px]"
           id={`${baseTooltipId}-maxBoost`}
         >
-          Max Boost
+          Max Rewards
         </p>
         <Title
           as="span"
@@ -271,7 +271,7 @@ function GaugeRewards({
           fontWeight="font-normal"
           className="text-primary"
         >
-          {vaultData.gaugeMaxApy?.toFixed(2) || "-"} %
+          {vaultData?.gaugeMaxApy ? NumberFormatter.format(roundToTwoDecimalPlaces(vaultData?.gaugeMaxApy)) : "-"} %
         </Title>
         <ResponsiveTooltip
           id={`${baseTooltipId}-maxBoost`}

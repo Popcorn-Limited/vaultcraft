@@ -25,6 +25,7 @@ import { MinterByChain, OptionTokenByChain, VCX } from "@/lib/constants";
 import Modal from "@/components/modal/Modal";
 import OptionTokenInterface from "@/components/boost/OptionTokenInterface";
 import { Token, VaultData } from "@/lib/types";
+import SecondaryActionButton from "../button/SecondaryActionButton";
 
 interface VaultsContainerProps {
   hiddenVaults: Address[];
@@ -101,7 +102,7 @@ export default function VaultsContainer({
           </p>
         </div>
 
-        <div className="w-full md:justify-end md:w-8/12 md:divide-x md:flex md:flex-row space-y-4 md:space-y-0 mt-4 md:mt-0">
+        <div className="w-full lg:justify-end lg:w-8/12 md:divide-x md:flex md:flex-row space-y-4 md:space-y-0 mt-4 md:mt-0">
           <div className="flex flex-row items-center md:pr-10 gap-10 md:w-fit">
             <div className="w-[120px] md:w-max">
               <p className="leading-6 text-base text-primaryDark md:text-primary">
@@ -154,16 +155,24 @@ export default function VaultsContainer({
               </div>
             </div>
 
-            <div className="hidden align-bottom md:block md:mt-auto w-fit">
+            <div className="hidden md:flex flex-row items-center w-100 space-x-4">
               <MainActionButton
                 label="Claim oVCX"
                 handleClick={() => setShowOptionTokenModal(true)}
               />
+              <SecondaryActionButton
+                label="Exercise oVCX"
+                handleClick={() => setShowOptionTokenModal(true)}
+              />
             </div>
           </div>
-          <div className="md:hidden">
+          <div className="md:hidden space-y-4">
             <MainActionButton
               label="Claim oVCX"
+              handleClick={() => setShowOptionTokenModal(true)}
+            />
+            <SecondaryActionButton
+              label="Exercise oVCX"
               handleClick={() => setShowOptionTokenModal(true)}
             />
           </div>

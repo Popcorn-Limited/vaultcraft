@@ -5,9 +5,9 @@ import ProtocolIcon from "@/components/common/ProtocolIcon";
 import ResponsiveTooltip from "../common/Tooltip";
 
 const vaultLabelColor: { [key: string]: string } = {
-  Experimental: "bg-orange-500 bg-opacity-90",
-  Deprecated: "bg-red-500 bg-opacity-80",
-  New: "bg-amber-400",
+  Experimental: "text-white bg-orange-500 bg-opacity-90",
+  Deprecated: "text-white bg-red-500 bg-opacity-80",
+  New: "text-[#DFFF1C] bg-[#DFFF1C] bg-opacity-30",
 };
 
 const vaultLabelTooltip: { [key: string]: string } = {
@@ -55,7 +55,7 @@ function VaultLabelPill({
             vaultLabelColor[String(label)]
           } rounded-lg py-1 px-3 flex flex-row items-center gap-2`}
         >
-          <p className={`text-primary ${textSize[size]}`}>{String(label)}</p>
+          <p className={`${textSize[size]}`}>{String(label)}</p>
         </div>
       </div>
       <ResponsiveTooltip
