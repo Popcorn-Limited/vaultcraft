@@ -260,7 +260,7 @@ export async function getVaults({
             address: gauge.address,
             name: `${vault.vault.name}-gauge`,
             symbol: `st-${vault.vault.name}`,
-            decimals: 18,
+            decimals: vault.vault.decimals,
             logoURI: "/images/tokens/vcx.svg", // wont be used, just here for consistency
             balance: 0,
             price: vault.pricePerShare * 1e9,
