@@ -57,7 +57,7 @@ export default function SmartVault({
   const [showModal, setShowModal] = useState(false);
 
   // Is loading / error
-  if (!vaultData) return <></>;
+  if (!vaultData || !asset || !vault) return <></>;
   // Vault is not in search term
   if (
     searchTerm !== "" &&
@@ -80,6 +80,9 @@ export default function SmartVault({
             <div className="space-y-4">
               <VaultStats
                 vaultData={vaultData}
+                asset={asset}
+                vault={vault}
+                gauge={gauge}
                 account={account}
                 zapAvailable={false}
               />
@@ -157,6 +160,9 @@ export default function SmartVault({
 
           <VaultStats
             vaultData={vaultData}
+            asset={asset}
+            vault={vault}
+            gauge={gauge}
             account={account}
             zapAvailable={false}
           />

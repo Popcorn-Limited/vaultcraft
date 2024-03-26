@@ -1,26 +1,24 @@
 import AssetWithName from "@/components/vault/AssetWithName";
 import { vaultsAtom } from "@/lib/atoms/vaults";
-import { FeeConfiguration, ReserveData, Token, UserAccountData, VaultData } from "@/lib/types";
+import { Token, VaultData } from "@/lib/types";
 import { useAtom } from "jotai";
 import { useRouter } from "next/router";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import NoSSR from "react-no-ssr";
-import { erc20ABI, useAccount, useBalance, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
-import { Address, WalletClient, createPublicClient, extractChain, formatUnits, getAddress, http, zeroAddress } from "viem";
+import { erc20ABI, useAccount, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
+import { Address, WalletClient, createPublicClient, http, zeroAddress } from "viem";
 import { yieldOptionsAtom } from "@/lib/atoms/sdk";
-import { NumberFormatter, formatAndRoundNumber, formatNumber, formatToFixedDecimals, safeRound } from "@/lib/utils/formatBigNumber";
-import { roundToTwoDecimalPlaces, validateInput } from "@/lib/utils/helpers";
+import { NumberFormatter, formatAndRoundNumber } from "@/lib/utils/formatBigNumber";
+import { roundToTwoDecimalPlaces } from "@/lib/utils/helpers";
 import MainActionButton from "@/components/button/MainActionButton";
 import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
 import { claimOPop } from "@/lib/optionToken/interactions";
-import { llama } from "@/lib/resolver/price/resolver";
 import VaultInputs from "@/components/vault/VaultInputs";
 import { showSuccessToast } from "@/lib/toasts";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { Square2StackIcon } from "@heroicons/react/24/outline";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
-import { availableZapAssetAtom, zapAssetsAtom } from "@/lib/atoms";
-import { getTokenOptions, isDefiPosition } from "@/lib/vault/utils";
+import { tokensAtom, zapAssetsAtom } from "@/lib/atoms";
 import LeftArrowIcon from "@/components/svg/LeftArrowIcon";
 import LoanInterface from "@/components/lending/LoanInterface";
 import { MinterByChain, OptionTokenByChain, VCX } from "@/lib/constants";
@@ -38,25 +36,34 @@ export default function Index() {
 
   const [yieldOptions] = useAtom(yieldOptionsAtom);
 
+  const [tokens] = useAtom(tokensAtom)
+  const [zapAssets] = useAtom(zapAssetsAtom);
   const [vaults] = useAtom(vaultsAtom);
   const [vaultData, setVaultData] = useState<VaultData>();
+
+  const [tokenOptions, setTokenOptions] = useState<Token[]>([]);
+  const [asset, setAsset] = useState<Token>();
+  const [vault, setVault] = useState<Token>();
+  const [gauge, setGauge] = useState<Token>();
 
   useEffect(() => {
     if (!vaultData && query && yieldOptions && Object.keys(vaults).length > 0) {
       const foundVault = vaults[Number(query?.chainId)].find(vault => vault.address === query?.id)
-      if (foundVault) setVaultData(foundVault)
+      if (foundVault) {
+        const newTokenOptions = [tokens[foundVault.chainId][foundVault.asset], tokens[foundVault.chainId][foundVault.vault], ...zapAssets[foundVault.chainId]]
+
+        setAsset(tokens[foundVault.chainId][foundVault.asset])
+        setVault(tokens[foundVault.chainId][foundVault.vault])
+
+        if (foundVault.gauge) {
+          setGauge(tokens[foundVault.chainId][foundVault.gauge])
+          newTokenOptions.push(tokens[foundVault.chainId][foundVault.gauge])
+        }
+        setTokenOptions(newTokenOptions)
+        setVaultData(foundVault)
+      }
     }
   }, [vaults, query, vaultData]);
-
-  const [zapAssets] = useAtom(zapAssetsAtom);
-  const [availableZapAssets] = useAtom(availableZapAssetAtom);
-  const [tokenOptions, setTokenOptions] = useState<Token[]>([]);
-
-  useEffect(() => {
-    if (!!vaultData) {
-      setTokenOptions(getTokenOptions(vaultData, zapAssets[vaultData.chainId]))
-    }
-  }, [availableZapAssets, vaultData]);
 
   const [vcxPrice, setVcxPrice] = useState<number>(0);
   const [oBal, setOBal] = useState<number>(0)
@@ -74,7 +81,7 @@ export default function Index() {
         args: [account!]
       })
       setOBal(Number(newOBal) / 1e18)
-      setVcxPrice(await llama({ address: VCX, chainId: 1 }))
+      setVcxPrice(tokens[1][VCX].price)
     }
     if (account && vaultData) getOToken()
   }, [account])
@@ -84,14 +91,14 @@ export default function Index() {
   useEffect(() => {
     async function getRewardsData() {
       const rewards = await getGaugeRewards({
-        gauges: [vaultData?.gauge?.address!],
+        gauges: [vaultData?.gauge!],
         account: account!,
         chainId: vaultData?.chainId!,
         publicClient
       })
       setGaugeRewards(rewards)
     }
-    if (account && vaultData?.gauge?.address) getRewardsData();
+    if (account && vaultData?.gauge) getRewardsData();
   }, [account]);
 
   const [showLendModal, setShowLendModal] = useState(false)
@@ -108,7 +115,7 @@ export default function Index() {
     }
 
     claimOPop({
-      gauges: [vaultData.gauge?.address || zeroAddress],
+      gauges: [vaultData.gauge || zeroAddress],
       account: account as Address,
       minter: MinterByChain[vaultData?.chainId],
       clients: { publicClient, walletClient: walletClient as WalletClient }
@@ -145,10 +152,10 @@ export default function Index() {
                       Your Wallet
                     </p>
                     <div className="text-3xl font-bold whitespace-nowrap text-primary">
-                      {`${formatAndRoundNumber(
-                        vaultData.asset.balance,
-                        vaultData.asset.decimals
-                      )}`}
+                      {asset ? `${formatAndRoundNumber(
+                        asset.balance,
+                        asset.decimals
+                      )}` : "0"}
                     </div>
                   </div>
 
@@ -157,10 +164,10 @@ export default function Index() {
                       Deposits
                     </p>
                     <div className="text-3xl font-bold whitespace-nowrap text-primary">
-                      {`${formatAndRoundNumber(
-                        (!!vaultData.gauge ? vaultData.gauge.balance : vaultData.vault.balance) * vaultData.vault.price,
-                        vaultData.vault.decimals
-                      )}`}
+                      {vaultData ? `${formatAndRoundNumber(
+                        (!!gauge ? gauge.balance : vault?.balance!) * vault?.price!,
+                        vault?.decimals!
+                      )}` : "0"}
                     </div>
                   </div>
 
@@ -265,10 +272,12 @@ export default function Index() {
                 </div>
 
                 <div className="bg-[#23262f] p-6 rounded-lg">
-                  <p className="text-white text-2xl font-bold mb-8">Strategy</p>
-                  <p className='text-white'>
-                    {vaultData.metadata.optionalMetadata.protocol.description.split("** - ")[1]}
-                  </p>
+                  <p className="text-white text-2xl font-bold mb-8">Strategies</p>
+                  {vaultData.strategies.map(strategy =>
+                    <p className='text-white'>
+                      {strategy.metadata.name} {strategy.allocationPerc} %
+                    </p>
+                  )}
 
                   <div className="mt-8">
 

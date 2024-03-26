@@ -39,8 +39,6 @@ export default function VaultsContainer({
   showDescription = false,
 }: VaultsContainerProps): JSX.Element {
   const { address: account } = useAccount();
-  const publicClient = usePublicClient();
-  const { data: walletClient } = useWalletClient();
 
   const [vaultsData] = useAtom(vaultsAtom);
   const [vaults, setVaults] = useState<VaultData[]>([])

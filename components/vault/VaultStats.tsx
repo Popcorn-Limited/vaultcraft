@@ -1,24 +1,29 @@
 import { Address } from "viem";
 import { NumberFormatter, formatAndRoundNumber } from "@/lib/utils/formatBigNumber";
 import Title from "@/components/common/Title";
-import { LockVaultData, VaultData } from "@/lib/types";
+import { LockVaultData, Token, VaultData } from "@/lib/types";
 import { roundToTwoDecimalPlaces } from "@/lib/utils/helpers";
 import ResponsiveTooltip from "@/components/common/Tooltip";
 
 interface VaultStatProps {
-  vaultData: VaultData | LockVaultData;
+  vaultData: VaultData;
+  asset:Token;
+  vault:Token;
+  gauge?:Token;
   account?: Address;
   zapAvailable?: boolean;
 }
 
 export default function VaultStats({
   vaultData,
+  asset,
+  vault,
+  gauge,
   account,
   zapAvailable,
 }: VaultStatProps): JSX.Element {
-  const { asset, vault, gauge, apy, gaugeMinApy, gaugeMaxApy } = vaultData;
+  const { apy, boostMin, boostMax } = vaultData;
   const baseTooltipId = vault.address.slice(1);
-  const isLockVault = vaultData.metadata.type === "single-asset-lock-vault-v1";
 
   return (
     <>
@@ -64,12 +69,7 @@ export default function VaultStats({
             >
               $
               {account
-                ? isLockVault
-                  ? formatAndRoundNumber(
-                    (vaultData as LockVaultData).lock.amount * asset.price,
-                    asset.decimals
-                  )
-                  : formatAndRoundNumber(
+                ? formatAndRoundNumber(
                     (!!gauge ? gauge.balance : vault.balance) * vault.price,
                     vault.decimals
                   )
@@ -133,21 +133,8 @@ export default function VaultStats({
             }
           />
         </div>
-        {isLockVault ? (
-          <LockRewards
-            vaultData={vaultData as LockVaultData}
-            baseTooltipId={baseTooltipId}
-          />
-        ) : (
-          <GaugeRewards vaultData={vaultData} baseTooltipId={baseTooltipId} />
-        )}
+        <GaugeRewards vaultData={vaultData} baseTooltipId={baseTooltipId} />
       </div>
-      {isLockVault && !!gauge && (
-        <div className="w-full flex flex-row justify-between gap-8 md:gap-4">
-          <GaugeRewards vaultData={vaultData} baseTooltipId={baseTooltipId} />
-        </div>
-      )}
-
       {zapAvailable && (
         <div className="w-full h-fit mt-auto">
           <p className="font-normal text-primary text-[15px] mb-1">
@@ -227,7 +214,7 @@ function GaugeRewards({
   vaultData,
   baseTooltipId,
 }: {
-  vaultData: VaultData | LockVaultData;
+  vaultData: VaultData;
   baseTooltipId: string;
 }): JSX.Element {
   return (
@@ -245,7 +232,7 @@ function GaugeRewards({
           fontWeight="font-normal"
           className="text-primary"
         >
-          {vaultData?.gaugeMinApy ? NumberFormatter.format(roundToTwoDecimalPlaces(vaultData?.gaugeMinApy)) : "-"} %
+          {vaultData?.boostMin ? NumberFormatter.format(roundToTwoDecimalPlaces(vaultData?.boostMin)) : "-"} %
         </Title>
         <ResponsiveTooltip
           id={`${baseTooltipId}-minBoost`}
@@ -271,7 +258,7 @@ function GaugeRewards({
           fontWeight="font-normal"
           className="text-primary"
         >
-          {vaultData?.gaugeMaxApy ? NumberFormatter.format(roundToTwoDecimalPlaces(vaultData?.gaugeMaxApy)) : "-"} %
+          {vaultData?.boostMax ? NumberFormatter.format(roundToTwoDecimalPlaces(vaultData?.boostMax)) : "-"} %
         </Title>
         <ResponsiveTooltip
           id={`${baseTooltipId}-maxBoost`}
