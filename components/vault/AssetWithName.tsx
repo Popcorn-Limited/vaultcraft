@@ -3,6 +3,8 @@ import TokenIcon from "@/components/common/TokenIcon";
 import { VaultData, VaultLabel } from "@/lib/types";
 import ProtocolIcon from "@/components/common/ProtocolIcon";
 import ResponsiveTooltip from "../common/Tooltip";
+import { useAtom } from "jotai";
+import { tokensAtom } from "@/lib/atoms";
 
 const vaultLabelColor: { [key: string]: string } = {
   Experimental: "text-white bg-orange-500 bg-opacity-90",
@@ -51,9 +53,8 @@ function VaultLabelPill({
         id={tooltipId}
       >
         <div
-          className={`${
-            vaultLabelColor[String(label)]
-          } rounded-lg py-1 px-3 flex flex-row items-center gap-2`}
+          className={`${vaultLabelColor[String(label)]
+            } rounded-lg py-1 px-3 flex flex-row items-center gap-2`}
         >
           <p className={`${textSize[size]}`}>{String(label)}</p>
         </div>
@@ -75,6 +76,7 @@ export default function AssetWithName({
   vault: VaultData;
   size?: number;
 }) {
+  const [tokens] = useAtom(tokensAtom);
   const tooltipId = vault.address.slice(1);
 
   return (
@@ -82,8 +84,8 @@ export default function AssetWithName({
       <div className="relative">
         <NetworkSticker chainId={vault.chainId} size={size} />
         <TokenIcon
-          token={vault.asset}
-          icon={vault.asset.logoURI}
+          token={tokens[vault.chainId][vault.asset]}
+          icon={tokens[vault.chainId][vault.asset].logoURI}
           chainId={vault.chainId}
           imageSize={iconSize[size]}
         />
@@ -91,16 +93,17 @@ export default function AssetWithName({
       <h2
         className={`${vaultTextSize[size]} font-bold text-primary mr-1 text-ellipsis overflow-hidden whitespace-nowrap smmd:flex-1 smmd:flex-nowrap xs:max-w-[80%] smmd:max-w-fit smmd:block`}
       >
-        {vault.metadata.vaultName || vault.asset.name}
+        {vault.metadata.vaultName || tokens[vault.chainId][vault.asset].name}
       </h2>
       <ProtocolIcon
-        protocolName={vault.metadata.optionalMetadata?.protocol?.name}
+        protocolName={vault.strategies.length > 0 ? "Multistrategy" : vault.strategies[0].metadata.name}
         tooltip={{
           id: tooltipId,
           content: (
             <p className="w-60">
-              {
-                vault.metadata.optionalMetadata?.protocol?.description.split(
+              {vault.strategies.length > 0 ?
+                "This vault allocates between multiple strategies"
+                : vault.strategies[0].metadata.description.split(
                   "** - "
                 )[1]
               }

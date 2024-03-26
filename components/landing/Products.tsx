@@ -1,33 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Product from "@/components/landing/Product";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import PopSmileyIcon from "@/components/svg/popcorn/PopSmileyIcon";
 import SmileyIcon from "@/components/svg/popcorn/SmileyIcon";
 import PopIcon from "@/components/svg/popcorn/PopIcon";
 import { useAtom } from "jotai";
-import { lockvaultsAtom, vaultsAtom } from "@/lib/atoms/vaults";
-import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import Link from "next/link";
+import { tvlAtom } from "@/lib/atoms";
 
 export default function Products(): JSX.Element {
-  const [vaults] = useAtom(vaultsAtom);
-  const [vaultTvl, setVaultTvl] = useState<number>(0);
-
-  useEffect(() => {
-    if (Object.keys(vaults).length > 0) {
-      setVaultTvl(SUPPORTED_NETWORKS.map(chain => vaults[chain.id]).flat().reduce((a, b) => a + b.tvl, 0));
-    }
-  }, [vaults]);
-
-  const [lockVaults] = useAtom(lockvaultsAtom);
-  const [lockVaultTvl, setLockVaultTvl] = useState<number>(0);
-
-  useEffect(() => {
-    if (lockVaults) {
-      setLockVaultTvl(lockVaults.reduce((a, b) => a + b.tvl, 0));
-    }
-  }, [lockVaults]);
-
+  const [tvl] = useAtom(tvlAtom);
+ 
   return (
     <>
       {/* @dev Product.tsx has `md:mx-2` so with `md:mx-6` that adds up to consistent mx-8*/}
@@ -52,7 +35,7 @@ export default function Products(): JSX.Element {
             stats={[
               {
                 label: "TVL",
-                content: `$${NumberFormatter.format(vaultTvl)}`,
+                content: `$${NumberFormatter.format(tvl.vault)}`,
                 infoIconProps: {
                   title: "Total Value Locked",
                   content: (
@@ -85,7 +68,7 @@ export default function Products(): JSX.Element {
             stats={[
               {
                 label: "TVL",
-                content: `$${NumberFormatter.format(lockVaultTvl)}`,
+                content: `$${NumberFormatter.format(tvl.lockVault)}`,
                 infoIconProps: {
                   title: "Total Value Locked",
                   content: (

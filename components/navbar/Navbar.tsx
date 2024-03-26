@@ -46,11 +46,11 @@ export default function Navbar(): JSX.Element {
 
   return (
     <>
-      {(chain && vaults.length > 0) &&
+      {(chain && Object.keys(vaults).length > 0) &&
         <LoanInterface
           visibilityState={[showLendModal, setShowLendModal]}
           vaultData={query?.id && query?.chainId ?
-            (vaults.find(vault => vault.address === query?.id && vault.chainId === Number(query?.chainId))
+            (vaults[Number(query?.chainId)].find(vault => vault.address === query?.id)
               || ({ chainId: chain.id || 1, asset: { address: "" } } as unknown as VaultData))
             : ({ chainId: chain.id || 1, asset: { address: "" } } as unknown as VaultData)
           }

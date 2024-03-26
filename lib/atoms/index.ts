@@ -8,3 +8,4 @@ export * from "./protocols";
 export * from "./strategy";
 export * from "./gauges";
 export * from "./tokens";
+export * from "./networth";

@@ -10,7 +10,14 @@ export type Token = {
   balance: number;
   price: number;
   chainId?: number;
+  type?: TokenType;
 };
+
+export enum TokenType {
+  Vault,
+  Gauge,
+  Asset,
+}
 
 export type Asset = {
   chains: number[];

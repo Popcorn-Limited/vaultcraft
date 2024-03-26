@@ -18,7 +18,8 @@ import { showSuccessToast } from "@/lib/toasts";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { Square2StackIcon } from "@heroicons/react/24/outline";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
-import { tokensAtom, zapAssetsAtom } from "@/lib/atoms";
+import { availableZapAssetAtom, tokensAtom, zapAssetsAtom } from "@/lib/atoms";
+import { getTokenOptions, isDefiPosition } from "@/lib/vault/utils";
 import LeftArrowIcon from "@/components/svg/LeftArrowIcon";
 import LoanInterface from "@/components/lending/LoanInterface";
 import { MinterByChain, OptionTokenByChain, VCX } from "@/lib/constants";
@@ -213,14 +214,14 @@ export default function Index() {
                     <div className="w-[120px] md:w-max">
                       <p className="w-max leading-6 text-base text-primaryDark md:text-primary">My oVCX</p>
                       <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
-                        {`$${oBal && vcxPrice ? NumberFormatter.format(oBal * (vcxPrice * 0.25)) : "0"}`}
+                        {`$${oBal && tokens[1][VCX] ? NumberFormatter.format(oBal * (tokens[1][VCX].price * 0.25)) : "0"}`}
                       </div>
                     </div>
 
                     <div className="w-[120px] md:w-max">
                       <p className="w-max leading-6 text-base text-primaryDark md:text-primary">Claimable oVCX</p>
                       <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
-                        {`$${gaugeRewards && vcxPrice ? NumberFormatter.format((Number(gaugeRewards?.total) / 1e18) * (vcxPrice * 0.25)) : "0"}`}
+                        {`$${gaugeRewards && tokens[1][VCX] ? NumberFormatter.format((Number(gaugeRewards?.total) / 1e18) * (tokens[1][VCX].price * 0.25)) : "0"}`}
                       </div>
                     </div>
                   </div>

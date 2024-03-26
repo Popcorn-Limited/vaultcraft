@@ -14,13 +14,14 @@ import { Address, zeroAddress } from "viem";
 import { arbitrum } from "viem/chains";
 import Modal from "@/components/modal/Modal";
 import MainActionButton from "../button/MainActionButton";
-import { availableZapAssetAtom, gaugeRewardsAtom, tokensAtom, zapAssetsAtom } from "@/lib/atoms";
-import { ReserveData, Token, TokenByAddress, UserAccountData, VaultData, VaultDataByAddress } from "@/lib/types";
+import { availableZapAssetAtom, gaugeRewardsAtom, networthAtom, tokensAtom, tvlAtom, zapAssetsAtom } from "@/lib/atoms";
+import { ReserveData, Token, TokenByAddress, TokenType, UserAccountData, VaultData, VaultDataByAddress } from "@/lib/types";
+import getZapAssets, { getAvailableZapAssets } from "@/lib/utils/getZapAssets";
 import getTokenAndVaultsDataByChain from "@/lib/getTokenAndVaultsData";
 import { aaveAccountDataAtom, aaveReserveDataAtom } from "@/lib/atoms/lending";
 import { GAUGE_NETWORKS } from "pages/boost";
 import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
-import { fetchAaveData } from "@/lib/external/aave/interactions";
+import axios from "axios";
 
 async function setUpYieldOptions() {
   const ttl = 360_000;
@@ -175,6 +176,8 @@ export default function Page({
   const [, setTokens] = useAtom(tokensAtom);
   const [, setLockVaults] = useAtom(lockvaultsAtom);
   const [, setGaugeRewards] = useAtom(gaugeRewardsAtom);
+  const [, setTVL] = useAtom(tvlAtom);
+  const [, setNetworth] = useAtom(networthAtom);
 
   const {
     fireEvent,
@@ -225,8 +228,6 @@ export default function Page({
           newTokens[chain.id] = tokens;
         })
       )
-      setVaults(newVaultsData);
-      setTokens(newTokens);
 
       const newRewards: { [key: number]: GaugeRewards } = {}
       await Promise.all(GAUGE_NETWORKS.map(async (chain) =>
@@ -237,13 +238,48 @@ export default function Page({
           publicClient
         })
       ))
-      setGaugeRewards(newRewards)
 
       const fetchedLockVaults = await getLockVaultsByChain({
         chain: arbitrum,
         account: account || zeroAddress,
       });
+
+      console.log({ newVaultsData })
+
+      const vaultTVL = SUPPORTED_NETWORKS.map(chain => newVaultsData[chain.id]).flat().reduce((a, b) => a + b.tvl, 0)
+      const lockVaultTVL = fetchedLockVaults.reduce((a, b) => a + b.tvl, 0)
+      const stakingTVL = await axios.get("https://api.llama.fi/protocol/vaultcraft").then(res => res.data.currentChainTvls["staking"])
+
+      const vaultNetworth = SUPPORTED_NETWORKS.map(chain =>
+        Object.values(newTokens[chain.id])).flat().filter(t => t.type === TokenType.Vault || t.type === TokenType.Gauge)
+        .reduce((a, b) => a + ((b.balance / (10 ** b.decimals)) * b.price), 0)
+      const assetNetworth = SUPPORTED_NETWORKS.map(chain =>
+        Object.values(newTokens[chain.id])).flat().filter(t => t.type === TokenType.Asset)
+        .reduce((a, b) => a + ((b.balance / (10 ** b.decimals)) * b.price), 0)
+      const stakeNetworth = 0;
+      const lockVaultNetworth = fetchedLockVaults.reduce(
+        (a, b) =>
+          a + ((b.vault.balance / (10 ** b.vault.decimals)) * b.vault.price),
+        0
+      )
+
+      setNetworth({
+        vault: vaultNetworth,
+        lockVault: lockVaultNetworth,
+        wallet: assetNetworth,
+        stake: stakeNetworth,
+        total: vaultNetworth + assetNetworth + stakeNetworth + lockVaultNetworth
+      })
+      setTVL({
+        vault: vaultTVL,
+        lockVault: lockVaultTVL,
+        stake: stakingTVL,
+        total: vaultTVL + lockVaultTVL + stakingTVL
+      });
+      setVaults(newVaultsData);
+      setTokens(newTokens);
       setLockVaults(fetchedLockVaults);
+      setGaugeRewards(newRewards);
     }
     if (yieldOptions) getData();
   }, [yieldOptions, account]);

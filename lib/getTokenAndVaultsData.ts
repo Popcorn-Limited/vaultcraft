@@ -12,8 +12,8 @@ import {
 import { PublicClient } from "wagmi";
 import axios from "axios";
 import { VaultAbi } from "@/lib/constants/abi/Vault";
-import { GaugeData, Token, TokenByAddress, VaultData, VaultDataByAddress, VaultLabel } from "@/lib/types";
-import { ADDRESS_ZERO, ERC20Abi, GAUGE_CONTROLLER, ZapAssetAddressesByChain } from "@/lib/constants";
+import { GaugeData, Token, TokenByAddress, TokenType, VaultData, VaultDataByAddress, VaultLabel } from "@/lib/types";
+import { ADDRESS_ZERO, ERC20Abi, GAUGE_CONTROLLER, VCX, ZapAssetAddressesByChain } from "@/lib/constants";
 import { RPC_URLS, networkMap } from "@/lib/utils/connectors";
 import { ProtocolName, YieldOptions } from "vaultcraft-sdk";
 
@@ -72,6 +72,7 @@ export async function getTokenAndVaultsData({
   vaultsData = await addStrategyData(vaultsData, chainId, client, yieldOptions)
 
   const uniqueAssetAdresses: Address[] = ZapAssetAddressesByChain[chainId];
+  if (chainId === 1) uniqueAssetAdresses.push(VCX)
   Object.values(vaultsData).forEach((vault) => {
     if (!uniqueAssetAdresses.includes(vault.asset)) {
       uniqueAssetAdresses.push(vault.asset);
@@ -113,6 +114,8 @@ export async function getTokenAndVaultsData({
             logoURI: "/images/tokens/vcx.svg", // wont be used, just here for consistency
             balance: 0,
             price: vaults[vault.address].price,
+            chainId: vault.chainId,
+            type: TokenType.Gauge
           }
 
           vault.gauge = foundGauge.address;
@@ -230,8 +233,10 @@ async function prepareAssets(addresses: Address[], chainId: number): Promise<Tok
   addresses.forEach(address => {
     result[address] = {
       ...assets[address],
-      price: Number(priceData.coins[`${networkMap[chainId].toLowerCase()}:${address}`]?.price),
-      balance: 0
+      price: Number(priceData.coins[`${networkMap[chainId].toLowerCase()}:${address}`]?.price) || 0,
+      balance: 0,
+      chainId: chainId,
+      type: TokenType.Asset
     }
   })
 
@@ -247,12 +252,14 @@ async function prepareVaults(vaultsData: VaultDataByAddress, assets: TokenByAddr
   Object.values(vaultsData).forEach(vault => {
     const assetsPerShare =
       vault.totalSupply > 0 ? (vault.totalAssets + 1) / (vault.totalSupply + 1e9) : Number(1e-9);
-    const price = (assetsPerShare * assets[vault.asset].price) * 1e9; // @dev normalize vault price for previews (watch this if errors occur)
+    const price = (assetsPerShare * assets[vault.asset].price); // @dev normalize vault price for previews (watch this if errors occur)
 
     result[vault.address] = {
       ...vaultTokens[vault.address],
       price,
-      balance: 0
+      balance: 0,
+      chainId: chainId,
+      type: TokenType.Vault
     }
   })
 

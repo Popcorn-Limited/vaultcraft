@@ -3,32 +3,18 @@ import { useAtom } from "jotai";
 import { lockvaultsAtom } from "@/lib/atoms/vaults";
 import NoSSR from "react-no-ssr";
 import NetworkFilter from "@/components/network/NetworkFilter";
-import VaultsSorting, {
-  VAULT_SORTING_TYPE,
-} from "@/components/vault/VaultsSorting";
-import { useEffect, useState } from "react";
+import VaultsSorting from "@/components/vault/VaultsSorting";
+import { useState } from "react";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import SearchBar from "@/components/input/SearchBar";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
+import { networthAtom, tvlAtom } from "@/lib/atoms";
 
 export default function Index(): JSX.Element {
   const [vaults, setVaults] = useAtom(lockvaultsAtom);
 
-  const [tvl, setTvl] = useState<number>(0);
-  const [networth, setNetworth] = useState<number>(0);
-
-  useEffect(() => {
-    if (vaults.length > 0) {
-      setTvl(vaults.reduce((a, b) => a + b.tvl, 0));
-      setNetworth(
-        vaults.reduce(
-          (a, b) =>
-            a + (b.vault.balance * b.vault.price) / 10 ** b.vault.decimals,
-          0
-        )
-      );
-    }
-  }, [vaults]);
+  const [tvl] = useAtom(tvlAtom)
+  const [networth] = useAtom(networthAtom);
 
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -56,7 +42,7 @@ export default function Index(): JSX.Element {
                 TVL
               </p>
               <div className="text-3xl font-bold whitespace-nowrap text-primary">
-                {`$${NumberFormatter.format(tvl)}`}
+                {`$${NumberFormatter.format(tvl.lockVault)}`}
               </div>
             </div>
 
@@ -65,7 +51,7 @@ export default function Index(): JSX.Element {
                 Deposits
               </p>
               <div className="text-3xl font-bold whitespace-nowrap text-primary">
-                {`$${NumberFormatter.format(networth)}`}
+                {`$${NumberFormatter.format(networth.lockVault)}`}
               </div>
             </div>
           </div>

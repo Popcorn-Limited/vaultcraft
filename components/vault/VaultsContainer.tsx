@@ -25,7 +25,7 @@ import { MinterByChain, OptionTokenByChain, VCX } from "@/lib/constants";
 import Modal from "@/components/modal/Modal";
 import OptionTokenInterface from "@/components/boost/OptionTokenInterface";
 import { Token, VaultData } from "@/lib/types";
-import SecondaryActionButton from "../button/SecondaryActionButton";
+import { networthAtom, tokensAtom, tvlAtom } from "@/lib/atoms";
 
 interface VaultsContainerProps {
   hiddenVaults: Address[];
@@ -47,8 +47,9 @@ export default function VaultsContainer({
     if (Object.keys(vaultsData).length > 0) setVaults(SUPPORTED_NETWORKS.map(chain => vaultsData[chain.id]).flat())
   }, [vaultsData])
 
-  const [tvl, setTvl] = useState<number>(0);
-  const [networth, setNetworth] = useState<number>(0);
+  const [tvl] = useAtom(tvlAtom)
+  const [networth] = useAtom(networthAtom)
+  const [tokens] = useAtom(tokensAtom)
 
   const [gaugeRewards, setGaugeRewards] = useState<GaugeRewards>();
   const { data: oBal } = useBalance({
@@ -57,23 +58,6 @@ export default function VaultsContainer({
     token: OptionTokenByChain[1],
     watch: true,
   });
-  const [vcxPrice, setVcxPrice] = useState<number>(0);
-
-
-  useEffect(() => {
-    async function getAccountData() {
-      const vcxPriceInUsd = await llama({ address: VCX, chainId: 1 })
-      setVcxPrice(vcxPriceInUsd)
-
-      setNetworth(
-        SUPPORTED_NETWORKS.map((chain) =>
-          getVaultNetworthByChain({ vaults: vaultsData[chain.id], chainId: chain.id })
-        ).reduce((a, b) => a + b, 0)
-      );
-      setTvl(SUPPORTED_NETWORKS.map(chain => vaultsData[chain.id]).flat().reduce((a, b) => a + b.tvl, 0));
-    }
-    getAccountData();
-  }, [account]);
 
   const [selectedNetworks, selectNetwork] = useNetworkFilter(
     SUPPORTED_NETWORKS.map((network) => network.id)
@@ -107,7 +91,7 @@ export default function VaultsContainer({
                 TVL
               </p>
               <div className="text-3xl font-bold whitespace-nowrap text-primary">
-                {`$${NumberFormatter.format(tvl)}`}
+                {`$${NumberFormatter.format(tvl.total)}`}
               </div>
             </div>
 
@@ -116,7 +100,7 @@ export default function VaultsContainer({
                 Deposits
               </p>
               <div className="text-3xl font-bold whitespace-nowrap text-primary">
-                {`$${NumberFormatter.format(networth)}`}
+                {`$${NumberFormatter.format(networth.vault)}`}
               </div>
             </div>
           </div>
@@ -128,9 +112,9 @@ export default function VaultsContainer({
                   My oVCX
                 </p>
                 <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
-                  {`$${oBal && vcxPrice
+                  {`$${oBal && tokens[1] && tokens[1][VCX]
                     ? NumberFormatter.format(
-                      (Number(oBal?.value) / 1e18) * (vcxPrice * 0.25)
+                      (Number(oBal?.value) / 1e18) * (tokens[1][VCX].price * 0.25)
                     )
                     : "0"
                     }`}
@@ -142,10 +126,10 @@ export default function VaultsContainer({
                   Claimable oVCX
                 </p>
                 <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
-                  {`$${gaugeRewards && vcxPrice
+                  {`$${gaugeRewards && tokens[1] && tokens[1][VCX]
                     ? NumberFormatter.format(
                       (Number(gaugeRewards?.total) / 1e18) *
-                      (vcxPrice * 0.25)
+                      (tokens[1][VCX].price * 0.25)
                     )
                     : "0"
                     }`}
