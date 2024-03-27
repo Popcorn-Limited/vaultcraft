@@ -1,24 +1,29 @@
 import NetworkFilter from "@/components/network/NetworkFilter";
 import AssetWithName from "@/components/vault/AssetWithName";
 import VaultStats from "@/components/vault/VaultStats";
+import { tokensAtom } from "@/lib/atoms";
 import { vaultsAtom } from "@/lib/atoms/vaults";
+import { VaultData } from "@/lib/types";
 import useNetworkFilter from "@/lib/useNetworkFilter";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { useAtom } from "jotai";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import NoSSR from "react-no-ssr";
-import { useAccount, usePublicClient, useWalletClient } from "wagmi";
+import { useAccount } from "wagmi";
 
 export default function ManageVault() {
   const { address: account } = useAccount();
-  const publicClient = usePublicClient();
-  const { data: walletClient } = useWalletClient();
-
   const router = useRouter();
 
-  const [vaults, setVaults] = useAtom(vaultsAtom);
+  const [tokens] = useAtom(tokensAtom);
+  const [vaultsData] = useAtom(vaultsAtom);
+  const [vaults, setVaults] = useState<VaultData[]>([])
+
+  useEffect(() => {
+    if (Object.keys(vaultsData).length > 0) setVaults(SUPPORTED_NETWORKS.map(chain => vaultsData[chain.id]).flat())
+  }, [vaultsData])
 
   const [selectedNetworks, selectNetwork] = useNetworkFilter(
     SUPPORTED_NETWORKS.map((network) => network.id)
@@ -68,6 +73,9 @@ export default function ManageVault() {
 
                   <VaultStats
                     vaultData={vault}
+                    asset={tokens[vault.chainId][vault.asset]}
+                    vault={tokens[vault.chainId][vault.vault]}
+                    gauge={vault.gauge ? tokens[vault.chainId][vault.gauge] : undefined}
                     account={account}
                     zapAvailable={false}
                   />

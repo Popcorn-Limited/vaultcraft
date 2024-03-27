@@ -253,7 +253,6 @@ export default function Index() {
                       tokenOptions={tokenOptions}
                       chainId={vaultData.chainId}
                       hideModal={() => router.reload()}
-                      mutateTokenBalance={mutateTokenBalance}
                     />
                   </div>
                 </div>
@@ -275,7 +274,10 @@ export default function Index() {
                 <div className="bg-[#23262f] p-6 rounded-lg">
                   <p className="text-white text-2xl font-bold mb-8">Strategies</p>
                   {vaultData.strategies.map(strategy =>
-                    <p className='text-white'>
+                    <p
+                      key={strategy.metadata.name}
+                      className='text-white'
+                    >
                       {strategy.metadata.name} {strategy.apy}% {strategy.allocationPerc * 100} %
                     </p>
                   )}

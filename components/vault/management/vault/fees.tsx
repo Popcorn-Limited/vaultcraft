@@ -1,6 +1,8 @@
 import MainActionButton from "@/components/button/MainActionButton";
+import { tokensAtom } from "@/lib/atoms";
 import { VaultData } from "@/lib/types";
 import { takeFees } from "@/lib/vault/management/interactions";
+import { useAtom } from "jotai";
 import { VaultSettings } from "pages/manage/vaults/[id]";
 import { WalletClient } from "viem";
 import { Address, useAccount, usePublicClient, useWalletClient } from "wagmi";
@@ -16,6 +18,7 @@ export default function VaultFees({
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
 
+  const [tokens] = useAtom(tokensAtom)
   return (
     <div className="flex flex-row justify-center">
       <div className="w-1/2">
@@ -29,8 +32,8 @@ export default function VaultFees({
           <div className="w-full">
             <p>
               Accumulated Fees:{" "}
-              {settings?.accruedFees / 10 ** vaultData.asset.decimals}{" "}
-              {vaultData.asset.symbol}
+              {settings?.accruedFees / 10 ** tokens[vaultData.chainId][vaultData.asset].decimals}{" "}
+              {tokens[vaultData.chainId][vaultData.asset].symbol}
             </p>
             <div className="w-40 mt-4">
               <MainActionButton
