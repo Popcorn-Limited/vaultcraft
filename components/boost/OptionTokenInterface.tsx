@@ -14,7 +14,8 @@ import { WalletClient } from "viem";
 import { llama } from "@/lib/resolver/price/resolver";
 import { MinterByChain, OptionTokenByChain, VCX } from "@/lib/constants";
 import { useAtom } from "jotai";
-import { gaugeRewardsAtom } from "@/lib/atoms";
+import { gaugeRewardsAtom, tokensAtom } from "@/lib/atoms";
+import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
 
 interface OptionTokenInterfaceProps {
   setShowOptionTokenModal?: Dispatch<SetStateAction<boolean>>;
@@ -25,6 +26,7 @@ export default function OptionTokenInterface({ setShowOptionTokenModal }: Option
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
 
+  const [tokens, setTokens] = useAtom(tokensAtom)
   const [gaugeRewards, setGaugeRewards] = useAtom(gaugeRewardsAtom);
 
   const { data: oBal } = useBalance({
@@ -39,6 +41,27 @@ export default function OptionTokenInterface({ setShowOptionTokenModal }: Option
   useEffect(() => {
     llama({ address: VCX, chainId: 1 }).then((res: number) => setVcxPrice(res));
   }, []);
+
+  async function handleClaim(chainId: number) {
+    if (!account) return
+
+    const success = await claimOPop({
+      gauges: gaugeRewards[chainId].amounts
+        ?.filter((gauge) => Number(gauge.amount) > 0)
+        .map((gauge) => gauge.address) as Address[],
+      account: account,
+      minter: MinterByChain[chainId],
+      clients: { publicClient, walletClient: walletClient as WalletClient }
+    })
+    if (success) {
+      await mutateTokenBalance({
+        tokensToUpdate: [OptionTokenByChain[chainId]],
+        account,
+        tokensAtom: [tokens, setTokens],
+        chainId
+      })
+    }
+  }
 
   return (
     <div className="w-full bg-transparent border border-[#353945] rounded-3xl p-8 text-primary md:h-fit">
@@ -86,45 +109,21 @@ export default function OptionTokenInterface({ setShowOptionTokenModal }: Option
             <div className="w-full md:w-60">
               <MainActionButton
                 label="Claim ETH oVCX"
-                handleClick={() =>
-                  claimOPop({
-                    gauges: gaugeRewards[1].amounts
-                      ?.filter((gauge) => Number(gauge.amount) > 0)
-                      .map((gauge) => gauge.address) as Address[],
-                    account: account as Address,
-                    minter: MinterByChain[1],
-                    clients: { publicClient, walletClient: walletClient as WalletClient }
-                  })}
+                handleClick={() => () => handleClaim(1)}
                 disabled={gaugeRewards ? Number(gaugeRewards[1].total) === 0 : true}
               />
             </div>
             <div className="w-full md:w-60">
               <MainActionButton
                 label="Claim OP oVCX"
-                handleClick={() =>
-                  claimOPop({
-                    gauges: gaugeRewards[10].amounts
-                      ?.filter((gauge) => Number(gauge.amount) > 0)
-                      .map((gauge) => gauge.address) as Address[],
-                    account: account as Address,
-                    minter: MinterByChain[10],
-                    clients: { publicClient, walletClient: walletClient as WalletClient }
-                  })}
+                handleClick={() => () => handleClaim(10)}
                 disabled={gaugeRewards ? Number(gaugeRewards[10].total) === 0 : true}
               />
             </div>
             <div className="w-full md:w-60">
               <MainActionButton
                 label="Claim ARB oVCX"
-                handleClick={() =>
-                  claimOPop({
-                    gauges: gaugeRewards[42161].amounts
-                      ?.filter((gauge) => Number(gauge.amount) > 0)
-                      .map((gauge) => gauge.address) as Address[],
-                    account: account as Address,
-                    minter: MinterByChain[42161],
-                    clients: { publicClient, walletClient: walletClient as WalletClient }
-                  })}
+                handleClick={() => handleClaim(42161)}
                 disabled={gaugeRewards ? Number(gaugeRewards[42161].total) === 0 : true}
               />
             </div>
