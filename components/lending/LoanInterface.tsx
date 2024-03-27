@@ -57,11 +57,12 @@ export default function LoanInterface({ visibilityState, vaultData }: { visibili
   const [inputToken, setInputToken] = useState<Token | null>(null)
 
   useEffect(() => {
-    if (reserveData && reserveData[vaultData.chainId]) {
+    if (Object.keys(reserveData).length > 0 && Object.keys(vaultData).length > 0 && Object.keys(tokens).length > 0) {
       let sorted = reserveData[vaultData.chainId].sort((a, b) => a.balance - b.balance)
       setTokenList(sorted.map(e => tokens[vaultData.chainId][e.asset]))
 
       const _supplyToken = sorted[0].asset === vaultData.asset ? reserveData[vaultData.chainId][1].asset : reserveData[vaultData.chainId][0].asset
+      console.log(_supplyToken)
       setSupplyToken(tokens[vaultData.chainId][_supplyToken])
       setInputToken(tokens[vaultData.chainId][_supplyToken])
       setBorrowToken(
@@ -76,7 +77,7 @@ export default function LoanInterface({ visibilityState, vaultData }: { visibili
       sorted = reserveData[vaultData.chainId].filter(e => e.borrowAmount === 0).filter(e => e.balance > 0).sort((a, b) => b.balance - a.balance)
       setWithdrawToken(!account || sorted.length === 0 ? null : tokens[vaultData.chainId][sorted[0].asset])
     }
-  }, [reserveData])
+  }, [reserveData, vaultData, tokens])
 
   function changeTab(newTab: string) {
     setActiveTab(newTab);
@@ -267,6 +268,8 @@ export default function LoanInterface({ visibilityState, vaultData }: { visibili
       setAaveAccountData({ ...aaveAccountData, [chain.id]: newAaveData.userAccountData })
     }
   }
+
+  console.log(reserveData, supplyToken, borrowToken)
 
   return <>
     <Modal
