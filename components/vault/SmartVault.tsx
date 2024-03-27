@@ -32,25 +32,19 @@ export default function SmartVault({
   const { address: account } = useAccount();
 
   const [tokens] = useAtom(tokensAtom)
-  const [zapAssets] = useAtom(zapAssetsAtom);
 
-  const [tokenOptions, setTokenOptions] = useState<Token[]>([]);
   const [asset, setAsset] = useState<Token>();
   const [vault, setVault] = useState<Token>();
   const [gauge, setGauge] = useState<Token>();
 
   useEffect(() => {
     if (vaultData) {
-      const newTokenOptions = [tokens[vaultData.chainId][vaultData.asset], tokens[vaultData.chainId][vaultData.vault], ...zapAssets[vaultData.chainId]]
-
       setAsset(tokens[vaultData.chainId][vaultData.asset])
       setVault(tokens[vaultData.chainId][vaultData.vault])
 
       if (vaultData.gauge) {
         setGauge(tokens[vaultData.chainId][vaultData.gauge])
-        newTokenOptions.push(tokens[vaultData.chainId][vaultData.gauge])
       }
-      setTokenOptions(newTokenOptions)
     }
   }, [vaultData])
 

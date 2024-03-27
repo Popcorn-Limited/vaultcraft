@@ -19,19 +19,3 @@ export async function isDefiPosition({
   );
   return data.data.length > 0;
 }
-
-export function getTokenOptions(
-  vaultData: VaultData,
-  zapAssets?: Token[]
-): Token[] {
-  const tokenOptions = [vaultData.vault, vaultData.asset];
-  if (!!vaultData.gauge) tokenOptions.push(vaultData.gauge);
-  if (zapAssets)
-    tokenOptions.push(
-      ...zapAssets.filter(
-        (asset) =>
-          getAddress(asset.address) !== getAddress(vaultData.asset.address)
-      )
-    );
-  return tokenOptions;
-}

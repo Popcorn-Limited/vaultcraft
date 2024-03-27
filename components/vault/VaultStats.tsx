@@ -1,7 +1,7 @@
 import { Address } from "viem";
 import { NumberFormatter, formatAndRoundNumber } from "@/lib/utils/formatBigNumber";
 import Title from "@/components/common/Title";
-import { LockVaultData, Token, VaultData } from "@/lib/types";
+import { Token, VaultData } from "@/lib/types";
 import { roundToTwoDecimalPlaces } from "@/lib/utils/helpers";
 import ResponsiveTooltip from "@/components/common/Tooltip";
 
@@ -142,70 +142,6 @@ export default function VaultStats({
           </p>
         </div>
       )}
-    </>
-  );
-}
-
-function LockRewards({
-  vaultData,
-  baseTooltipId,
-}: {
-  vaultData: LockVaultData;
-  baseTooltipId: string;
-}): JSX.Element {
-  const totalRewardApy = vaultData.rewards.reduce((a, b) => a + b.rewardApy, 0);
-
-  return (
-    <>
-      <div className="w-full mt-6 md:mt-0">
-        <p
-          className="font-normal text-primary md:text-[14px]"
-          id={`${baseTooltipId}-minReward`}
-        >
-          Min Rewards
-        </p>
-        <Title
-          as="span"
-          level={2}
-          fontWeight="font-normal"
-          className="text-primary"
-        >
-          {totalRewardApy ? (totalRewardApy / 4).toFixed(2) : "-"} %
-        </Title>
-        <ResponsiveTooltip
-          id={`${baseTooltipId}-minReward`}
-          content={
-            <p className="max-w-52">
-              Minimum reward APR based on most recent distribution event
-            </p>
-          }
-        />
-      </div>
-
-      <div className="w-full mt-6 md:mt-0">
-        <p
-          className="font-normal text-primary md:text-[14px]"
-          id={`${baseTooltipId}-maxReward`}
-        >
-          Max Rewards
-        </p>
-        <Title
-          as="span"
-          level={2}
-          fontWeight="font-normal"
-          className="text-primary"
-        >
-          {totalRewardApy ? totalRewardApy.toFixed(2) : "-"} %
-        </Title>
-        <ResponsiveTooltip
-          id={`${baseTooltipId}-maxReward`}
-          content={
-            <p className="max-w-52">
-              Maximum reward APR based on most recent distribution event
-            </p>
-          }
-        />
-      </div>
     </>
   );
 }

@@ -18,8 +18,7 @@ import { showSuccessToast } from "@/lib/toasts";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { Square2StackIcon } from "@heroicons/react/24/outline";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
-import { availableZapAssetAtom, tokensAtom, zapAssetsAtom } from "@/lib/atoms";
-import { getTokenOptions, isDefiPosition } from "@/lib/vault/utils";
+import { tokensAtom, zapAssetsAtom } from "@/lib/atoms";
 import LeftArrowIcon from "@/components/svg/LeftArrowIcon";
 import LoanInterface from "@/components/lending/LoanInterface";
 import { MinterByChain, OptionTokenByChain, VCX } from "@/lib/constants";
@@ -51,7 +50,8 @@ export default function Index() {
     if (!vaultData && query && yieldOptions && Object.keys(vaults).length > 0) {
       const foundVault = vaults[Number(query?.chainId)].find(vault => vault.address === query?.id)
       if (foundVault) {
-        const newTokenOptions = [tokens[foundVault.chainId][foundVault.asset], tokens[foundVault.chainId][foundVault.vault], ...zapAssets[foundVault.chainId]]
+        console.log(zapAssets)
+        const newTokenOptions = [tokens[foundVault.chainId][foundVault.asset], tokens[foundVault.chainId][foundVault.vault]]
 
         setAsset(tokens[foundVault.chainId][foundVault.asset])
         setVault(tokens[foundVault.chainId][foundVault.vault])
@@ -125,7 +125,7 @@ export default function Index() {
 
   return <NoSSR>
     {
-      vaultData ? (
+      (vaultData && tokenOptions.length > 0) ? (
         <>
           <LoanInterface visibilityState={[showLendModal, setShowLendModal]} vaultData={vaultData} />
           <div className="min-h-screen">
@@ -276,7 +276,7 @@ export default function Index() {
                   <p className="text-white text-2xl font-bold mb-8">Strategies</p>
                   {vaultData.strategies.map(strategy =>
                     <p className='text-white'>
-                      {strategy.metadata.name} {strategy.allocationPerc} %
+                      {strategy.metadata.name} {strategy.apy}% {strategy.allocationPerc * 100} %
                     </p>
                   )}
 

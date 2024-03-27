@@ -4,28 +4,25 @@ import {
   Address,
   useAccount,
   useBalance,
-  usePublicClient,
-  useWalletClient,
 } from "wagmi";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import useNetworkFilter from "@/lib/useNetworkFilter";
 import SmartVault from "@/components/vault/SmartVault";
 import NetworkFilter from "@/components/network/NetworkFilter";
-import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
+import { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
 import MainActionButton from "@/components/button/MainActionButton";
 import { useAtom } from "jotai";
 import { vaultsAtom } from "@/lib/atoms/vaults";
-import { getVaultNetworthByChain } from "@/lib/getNetworth";
 import VaultsSorting from "@/components/vault/VaultsSorting";
-import { llama } from "@/lib/resolver/price/resolver";
 import SearchBar from "@/components/input/SearchBar";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
-import { MinterByChain, OptionTokenByChain, VCX } from "@/lib/constants";
+import { OptionTokenByChain, VCX } from "@/lib/constants";
 import Modal from "@/components/modal/Modal";
 import OptionTokenInterface from "@/components/boost/OptionTokenInterface";
-import { Token, VaultData } from "@/lib/types";
+import { VaultData } from "@/lib/types";
 import { networthAtom, tokensAtom, tvlAtom } from "@/lib/atoms";
+import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 
 interface VaultsContainerProps {
   hiddenVaults: Address[];

@@ -96,12 +96,12 @@ export default function AssetWithName({
         {vault.metadata.vaultName || tokens[vault.chainId][vault.asset].name}
       </h2>
       <ProtocolIcon
-        protocolName={vault.strategies.length > 0 ? "Multistrategy" : vault.strategies[0].metadata.name}
+        protocolName={vault.strategies.length > 1 ? "Multistrategy" : vault.strategies[0].metadata.name}
         tooltip={{
           id: tooltipId,
           content: (
             <p className="w-60">
-              {vault.strategies.length > 0 ?
+              {vault.strategies.length > 1 ?
                 "This vault allocates between multiple strategies"
                 : vault.strategies[0].metadata.description.split(
                   "** - "

@@ -45,9 +45,11 @@ export default function VaultInputs({
 }: VaultInputsProps & {
   mutateTokenBalance: (props: MutateTokenBalanceProps) => void;
 }): JSX.Element {
-  const { asset, vault, gauge } = vaultData;
-  const { query } = useRouter();
+  const asset = tokenOptions.find(t => t.address === vaultData.asset)
+  const vault = tokenOptions.find(t => t.address === vaultData.vault)
+  const gauge = tokenOptions.find(t => t.address === vaultData.gauge)
 
+  const { query } = useRouter();
   const publicClient = usePublicClient({ chainId });
   const { data: walletClient } = useWalletClient();
   const { address: account } = useAccount();
@@ -124,12 +126,12 @@ export default function VaultInputs({
     setOutputToken(output);
 
     switch (input.address) {
-      case asset.address:
+      case asset?.address!:
         switch (output.address) {
-          case asset.address:
+          case asset?.address!:
             // error
             return;
-          case vault.address:
+          case vault?.address!:
             setAction(SmartVaultActionType.Deposit);
             setSteps(getSmartVaultActionSteps(SmartVaultActionType.Deposit));
             return;
@@ -143,13 +145,13 @@ export default function VaultInputs({
             // error
             return;
         }
-      case vault.address:
+      case vault?.address:
         switch (output.address) {
-          case asset.address:
+          case asset?.address!:
             setAction(SmartVaultActionType.Withdrawal);
             setSteps(getSmartVaultActionSteps(SmartVaultActionType.Withdrawal));
             return;
-          case vault.address:
+          case vault?.address!:
             // error
             return;
           case gauge?.address:
@@ -165,13 +167,13 @@ export default function VaultInputs({
         }
       case gauge?.address:
         switch (output.address) {
-          case asset.address:
+          case asset?.address!:
             setAction(SmartVaultActionType.UnstakeAndWithdraw);
             setSteps(
               getSmartVaultActionSteps(SmartVaultActionType.UnstakeAndWithdraw)
             );
             return;
-          case vault.address:
+          case vault?.address!:
             setAction(SmartVaultActionType.Unstake);
             setSteps(getSmartVaultActionSteps(SmartVaultActionType.Unstake));
             return;
@@ -189,10 +191,10 @@ export default function VaultInputs({
         }
       default:
         switch (output.address) {
-          case asset.address:
+          case asset?.address!:
             // error
             return;
-          case vault.address:
+          case vault?.address!:
             setAction(SmartVaultActionType.ZapDeposit);
             setSteps(getSmartVaultActionSteps(SmartVaultActionType.ZapDeposit));
             return;
@@ -211,7 +213,7 @@ export default function VaultInputs({
 
   async function handleMainAction() {
     let val = Number(inputBalance)
-    if (val === 0 || !inputToken || !outputToken || !account || !walletClient) return;
+    if (val === 0 || !inputToken || !outputToken || !asset || !account || !walletClient) return;
     val = val * (10 ** inputToken.decimals)
 
     if (chain?.id !== Number(chainId)) {
@@ -226,9 +228,9 @@ export default function VaultInputs({
     if (newZapProvider === ZapProvider.none && [SmartVaultActionType.ZapDeposit, SmartVaultActionType.ZapDepositAndStake, SmartVaultActionType.ZapUnstakeAndWithdraw, SmartVaultActionType.ZapWithdrawal].includes(action)) {
       showLoadingToast("Searching for the best price...")
       if ([SmartVaultActionType.ZapDeposit, SmartVaultActionType.ZapDepositAndStake].includes(action)) {
-        newZapProvider = await getZapProvider({ sellToken: inputToken, buyToken: vaultData.asset, amount: val, chainId, account })
+        newZapProvider = await getZapProvider({ sellToken: inputToken, buyToken: asset, amount: val, chainId, account })
       } else {
-        newZapProvider = await getZapProvider({ sellToken: vaultData.asset, buyToken: outputToken, amount: val, chainId, account })
+        newZapProvider = await getZapProvider({ sellToken: asset, buyToken: outputToken, amount: val, chainId, account })
       }
 
       setZapProvider(newZapProvider)
@@ -278,7 +280,7 @@ export default function VaultInputs({
       mutateTokenBalance({
         inputToken: inputToken.address,
         outputToken: outputToken.address,
-        vault: vault.address,
+        vault: vaultData.address,
         chainId,
         account,
         zapAssetState: [zapAssets, setZapAssets],
@@ -297,7 +299,7 @@ export default function VaultInputs({
     handleChangeInput({ currentTarget: { value: formatted } });
   }
 
-  if (!inputToken || !outputToken) return <></>;
+  if (!inputToken || !outputToken || !asset || !vault) return <></>;
   return (
     <>
       <Modal visibility={[showModal, setShowModal]}>
@@ -331,7 +333,7 @@ export default function VaultInputs({
         tokenList={tokenOptions.filter((token) =>
           gauge?.address
             ? token.address !== gauge?.address
-            : token.address !== vault.address
+            : token.address !== vault?.address
         )}
         allowSelection={isDeposit}
         allowInput
@@ -357,13 +359,13 @@ export default function VaultInputs({
         onSelectToken={(option) =>
           handleTokenSelect(!!gauge ? gauge : vault, option)
         }
-        onMaxClick={() => {}}
+        onMaxClick={() => { }}
         chainId={chainId}
         value={
           (Number(inputBalance) * Number(inputToken?.price)) /
-            Number(outputToken?.price) || 0
+          Number(outputToken?.price) || 0
         }
-        onChange={() => {}}
+        onChange={() => { }}
         selectedToken={outputToken}
         errorMessage={""}
         tokenList={tokenOptions.filter((token) =>
@@ -378,19 +380,19 @@ export default function VaultInputs({
         ![asset.address, vault.address].includes(inputToken.address)) ||
         (!isDeposit &&
           ![asset.address, vault.address].includes(outputToken.address))) && (
-        <div
-          className="group/zap flex flex-row items-center cursor-pointer"
-          onClick={() => setShowModal(true)}
-        >
-          <Cog6ToothIcon
-            className="h-5 w-5 mt-1 mr-2 text-secondaryLight group-hover/zap:text-primary"
-            aria-hidden="true"
-          />
-          <p className="text-secondaryLight group-hover/zap:text-primary">
-            Zap Settings
-          </p>
-        </div>
-      )}
+          <div
+            className="group/zap flex flex-row items-center cursor-pointer"
+            onClick={() => setShowModal(true)}
+          >
+            <Cog6ToothIcon
+              className="h-5 w-5 mt-1 mr-2 text-secondaryLight group-hover/zap:text-primary"
+              aria-hidden="true"
+            />
+            <p className="text-secondaryLight group-hover/zap:text-primary">
+              Zap Settings
+            </p>
+          </div>
+        )}
 
       <div className="mt-6">
         <p className="text-white font-bold mb-2 text-start">Fee Breakdown</p>
@@ -422,7 +424,7 @@ export default function VaultInputs({
         {account ? (
           <>
             {stepCounter === steps.length ||
-            steps.some((step) => !step.loading && step.error) ? (
+              steps.some((step) => !step.loading && step.error) ? (
               <MainActionButton label={"Finish"} handleClick={hideModal} />
             ) : (
               <MainActionButton

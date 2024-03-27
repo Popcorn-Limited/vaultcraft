@@ -360,7 +360,7 @@ async function addStrategyData(vaults: VaultDataByAddress, chainId: number, clie
   Object.keys(vaults).forEach((address: any) => {
     let apy = 0;
 
-    vaults[address].strategies.forEach((strategy: any) => {
+    vaults[address].strategies.forEach((strategy: any, i: number) => {
       const strategyData = strategies[strategy.address]
 
       // calc allocation in assets
@@ -370,7 +370,7 @@ async function addStrategyData(vaults: VaultDataByAddress, chainId: number, clie
       const allocationPerc = allocation / vaults[address].totalAssets
 
       // add strategy metadata
-      strategy = {
+      vaults[address].strategies[i] = {
         address: strategy.address,
         metadata: {
           name: strategyData.name,

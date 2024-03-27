@@ -2,7 +2,7 @@ import PseudoRadioButton from "@/components/button/PseudoRadioButton";
 import { useMemo, useRef, useState } from "react";
 import PopUpModal from "@/components/modal/PopUpModal";
 import SwitchIcon from "@/components/svg/SwitchIcon";
-import { LockVaultData, VaultData } from "@/lib/types";
+import { VaultData } from "@/lib/types";
 
 export enum VAULT_SORTING_TYPE {
   none = "none",
@@ -14,7 +14,7 @@ export enum VAULT_SORTING_TYPE {
 
 interface VaultSortingProps {
   className?: string;
-  vaultState: [VaultData[] | LockVaultData[], Function];
+  vaultState: [VaultData[], Function];
 }
 
 export default function VaultsSorting({
@@ -40,7 +40,7 @@ export default function VaultsSorting({
 
   function sort(
     sortType: VAULT_SORTING_TYPE,
-    vaults: VaultData[] | LockVaultData[]
+    vaults: VaultData[]
   ) {
     switch (sortType) {
       case VAULT_SORTING_TYPE.mostTvl:

@@ -1,7 +1,7 @@
 import { Address, PublicClient } from "viem";
 import { erc20ABI } from "wagmi";
 import { VaultAbi } from "@/lib/constants";
-import { LockVaultData, Token, VaultData } from "@/lib/types";
+import { Token, VaultData } from "@/lib/types";
 
 export interface MutateTokenBalanceProps {
   inputToken: Address;
@@ -10,7 +10,7 @@ export interface MutateTokenBalanceProps {
   chainId: number;
   account: Address;
   zapAssetState: [{ [key: number]: Token[] }, Function];
-  vaultsState: [VaultData[] | LockVaultData[], Function];
+  vaultsState: [VaultData[], Function];
   publicClient: PublicClient;
 }
 

@@ -69,45 +69,6 @@ type StrategyMetadata = {
   description: string;
 }
 
-type LockVaultLock = {
-  unlockTime: number;
-  amount: number;
-  rewardShares: number;
-  daysToUnlock: number;
-};
-
-export type LockVaultData = {
-  address: Address;
-  vault: Token;
-  asset: Token;
-  gauge?: Token;
-  totalAssets: number;
-  totalSupply: number;
-  assetsPerShare: number;
-  assetPrice: number;
-  pricePerShare: number;
-  tvl: number;
-  fees: FeeConfiguration;
-  depositLimit: number;
-  metadata: VaultMetadata;
-  chainId: number;
-  apy: number;
-  gaugeMinApy?: number;
-  gaugeMaxApy?: number;
-  totalApy: number;
-  strategyShares: bigint;
-  rewardAddresses: Address[];
-  rewards: RewardToken[];
-  lock: LockVaultLock;
-};
-
-export type RewardToken = Token & {
-  rewardBalance: number;
-  userIndex: number;
-  globalIndex: number;
-  rewardApy: number;
-};
-
 export enum VaultLabel {
   experimental = "Experimental",
   deprecated = "Deprecated",

@@ -1,6 +1,6 @@
 import Navbar from "@/components/navbar/Navbar";
 import { masaAtom, yieldOptionsAtom } from "@/lib/atoms/sdk";
-import { lockvaultsAtom, vaultsAtom } from "@/lib/atoms/vaults";
+import { vaultsAtom } from "@/lib/atoms/vaults";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { useAtom } from "jotai";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
@@ -9,19 +9,17 @@ import { useAccount, usePublicClient } from "wagmi";
 import Footer from "@/components/common/Footer";
 import { useMasaAnalyticsReact } from "@masa-finance/analytics-react";
 import { useRouter } from "next/router";
-import getLockVaultsByChain from "@/lib/vault/lockVault/getVaults";
 import { Address, zeroAddress } from "viem";
-import { arbitrum } from "viem/chains";
 import Modal from "@/components/modal/Modal";
 import MainActionButton from "../button/MainActionButton";
 import { availableZapAssetAtom, gaugeRewardsAtom, networthAtom, tokensAtom, tvlAtom, zapAssetsAtom } from "@/lib/atoms";
 import { ReserveData, Token, TokenByAddress, TokenType, UserAccountData, VaultData, VaultDataByAddress } from "@/lib/types";
-import getZapAssets, { getAvailableZapAssets } from "@/lib/utils/getZapAssets";
 import getTokenAndVaultsDataByChain from "@/lib/getTokenAndVaultsData";
 import { aaveAccountDataAtom, aaveReserveDataAtom } from "@/lib/atoms/lending";
 import { GAUGE_NETWORKS } from "pages/boost";
 import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
 import axios from "axios";
+import { fetchAaveData } from "@/lib/external/aave/interactions";
 
 async function setUpYieldOptions() {
   const ttl = 360_000;
@@ -174,7 +172,6 @@ export default function Page({
 
   const [, setVaults] = useAtom(vaultsAtom);
   const [, setTokens] = useAtom(tokensAtom);
-  const [, setLockVaults] = useAtom(lockvaultsAtom);
   const [, setGaugeRewards] = useAtom(gaugeRewardsAtom);
   const [, setTVL] = useAtom(tvlAtom);
   const [, setNetworth] = useAtom(networthAtom);
@@ -239,15 +236,8 @@ export default function Page({
         })
       ))
 
-      const fetchedLockVaults = await getLockVaultsByChain({
-        chain: arbitrum,
-        account: account || zeroAddress,
-      });
-
-      console.log({ newVaultsData })
-
       const vaultTVL = SUPPORTED_NETWORKS.map(chain => newVaultsData[chain.id]).flat().reduce((a, b) => a + b.tvl, 0)
-      const lockVaultTVL = fetchedLockVaults.reduce((a, b) => a + b.tvl, 0)
+      const lockVaultTVL = 520000 // @dev hardcoded since we removed lock vaults
       const stakingTVL = await axios.get("https://api.llama.fi/protocol/vaultcraft").then(res => res.data.currentChainTvls["staking"])
 
       const vaultNetworth = SUPPORTED_NETWORKS.map(chain =>
@@ -257,11 +247,7 @@ export default function Page({
         Object.values(newTokens[chain.id])).flat().filter(t => t.type === TokenType.Asset)
         .reduce((a, b) => a + ((b.balance / (10 ** b.decimals)) * b.price), 0)
       const stakeNetworth = 0;
-      const lockVaultNetworth = fetchedLockVaults.reduce(
-        (a, b) =>
-          a + ((b.vault.balance / (10 ** b.vault.decimals)) * b.vault.price),
-        0
-      )
+      const lockVaultNetworth = 0 // @dev hardcoded since we removed lock vaults
 
       setNetworth({
         vault: vaultNetworth,
@@ -278,7 +264,6 @@ export default function Page({
       });
       setVaults(newVaultsData);
       setTokens(newTokens);
-      setLockVaults(fetchedLockVaults);
       setGaugeRewards(newRewards);
     }
     if (yieldOptions) getData();
