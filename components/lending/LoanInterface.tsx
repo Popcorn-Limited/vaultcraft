@@ -262,7 +262,7 @@ export default function LoanInterface({ visibilityState, vaultData }: { visibili
         chainId: chain.id
       })
 
-      const newAaveData = await fetchAaveData(account || zeroAddress, tokens, chain)
+      const newAaveData = await fetchAaveData(account || zeroAddress, tokens[chain.id], chain)
       setAaveReserveData({ ...reserveData, [chain.id]: newAaveData.reserveData })
       setAaveAccountData({ ...aaveAccountData, [chain.id]: newAaveData.userAccountData })
     }
@@ -402,22 +402,22 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
       case "Supply":
         newReserveData[newReserveData.findIndex(e => e.asset === inputToken.address)].supplyAmount += value
 
-        setNewUserAccountData({ ...calcUserAccountData(newReserveData, tokens, userAccountData[chainId].ltv) })
+        setNewUserAccountData({ ...calcUserAccountData(newReserveData, tokens[chainId], userAccountData[chainId].ltv) })
         return;
       case "Borrow":
         newReserveData[newReserveData.findIndex(e => e.asset === inputToken.address)].borrowAmount += value
 
-        setNewUserAccountData({ ...calcUserAccountData(newReserveData, tokens, userAccountData[chainId].ltv) })
+        setNewUserAccountData({ ...calcUserAccountData(newReserveData, tokens[chainId], userAccountData[chainId].ltv) })
         return;
       case "Repay":
         newReserveData[newReserveData.findIndex(e => e.asset === inputToken.address)].borrowAmount -= value
 
-        setNewUserAccountData(calcUserAccountData(newReserveData, tokens, userAccountData[chainId].ltv))
+        setNewUserAccountData(calcUserAccountData(newReserveData, tokens[chainId], userAccountData[chainId].ltv))
         return;
       case "Withdraw":
         newReserveData[newReserveData.findIndex(e => e.asset === inputToken.address)].supplyAmount -= value
 
-        setNewUserAccountData(calcUserAccountData(newReserveData, tokens, userAccountData[chainId].ltv))
+        setNewUserAccountData(calcUserAccountData(newReserveData, tokens[chainId], userAccountData[chainId].ltv))
         return;
       default:
         return;
