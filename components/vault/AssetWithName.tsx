@@ -103,9 +103,7 @@ export default function AssetWithName({
             <p className="w-60">
               {vault.strategies.length > 1 ?
                 "This vault allocates between multiple strategies"
-                : vault.strategies[0].metadata.description.split(
-                  "** - "
-                )[1]
+                : vault.strategies[0].metadata.description
               }
             </p>
           ),

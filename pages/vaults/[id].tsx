@@ -52,7 +52,7 @@ export default function Index() {
         const newTokenOptions = [
           tokens[chainId][foundVault.asset],
           tokens[chainId][foundVault.vault],
-          ...ZapAssetAddressesByChain[chainId].map(addr => tokens[chainId][addr])
+          ...ZapAssetAddressesByChain[chainId].filter(addr => foundVault.asset !== addr).map(addr => tokens[chainId][addr])
         ]
 
         setAsset(tokens[chainId][foundVault.asset])
@@ -68,7 +68,6 @@ export default function Index() {
     }
   }, [vaults, query, vaultData]);
 
-  const [vcxPrice, setVcxPrice] = useState<number>(0);
   const [oBal, setOBal] = useState<number>(0)
 
   useEffect(() => {
@@ -84,7 +83,6 @@ export default function Index() {
         args: [account!]
       })
       setOBal(Number(newOBal) / 1e18)
-      setVcxPrice(tokens[1][VCX].price)
     }
     if (account && vaultData) getOToken()
   }, [account])
