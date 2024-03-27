@@ -167,10 +167,11 @@ export default function Index() {
                       Deposits
                     </p>
                     <div className="text-3xl font-bold whitespace-nowrap text-primary">
-                      {vaultData ? `${formatAndRoundNumber(
-                        (!!gauge ? gauge.balance : vault?.balance!) * vault?.price!,
-                        vault?.decimals!
-                      )}` : "0"}
+                      {vaultData ?
+                        `${!!gauge ?
+                          formatAndRoundNumber(gauge.balance * gauge.price, gauge.decimals)
+                          : formatAndRoundNumber(vault?.balance! * vault?.price!, vault?.decimals!)
+                        }` : "0"}
                     </div>
                   </div>
 

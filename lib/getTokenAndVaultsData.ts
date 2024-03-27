@@ -100,7 +100,7 @@ export async function getTokenAndVaultsData({
 
   // calc vault tvl
   Object.values(vaultsData).forEach(vault => {
-    vault.tvl = (vault.totalSupply * vaults[vault.address].price) / (10 ** assets[vault.asset].decimals);
+    vault.tvl = (vault.totalSupply * vaults[vault.address].price) / (10 ** vaults[vault.address].decimals);
   });
 
   const gaugeTokens: TokenByAddress = {}
@@ -126,7 +126,7 @@ export async function getTokenAndVaultsData({
             address: foundGauge.address,
             name: `${vaults[vault.address].name}-gauge`,
             symbol: `st-${vaults[vault.address].symbol}`,
-            decimals: 18,
+            decimals: vaults[vault.address].decimals,
             logoURI: "/images/tokens/vcx.svg", // wont be used, just here for consistency
             balance: 0,
             price: vaults[vault.address].price,
@@ -268,7 +268,7 @@ async function prepareVaults(vaultsData: VaultDataByAddress, assets: TokenByAddr
   Object.values(vaultsData).forEach(vault => {
     const assetsPerShare =
       vault.totalSupply > 0 ? (vault.totalAssets + 1) / (vault.totalSupply + 1e9) : Number(1e-9);
-    const price = (assetsPerShare * assets[vault.asset].price); // @dev normalize vault price for previews (watch this if errors occur)
+    const price = (assetsPerShare * assets[vault.asset].price) * 1e9; // @dev normalize vault price for previews (watch this if errors occur)
 
     result[vault.address] = {
       ...vaultTokens[vault.address],

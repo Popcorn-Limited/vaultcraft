@@ -21,7 +21,7 @@ import { OptionTokenByChain, VCX } from "@/lib/constants";
 import Modal from "@/components/modal/Modal";
 import OptionTokenInterface from "@/components/boost/OptionTokenInterface";
 import { VaultData } from "@/lib/types";
-import { networthAtom, tokensAtom, tvlAtom } from "@/lib/atoms";
+import { gaugeRewardsAtom, networthAtom, tokensAtom, tvlAtom } from "@/lib/atoms";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 
 interface VaultsContainerProps {
@@ -47,8 +47,8 @@ export default function VaultsContainer({
   const [tvl] = useAtom(tvlAtom)
   const [networth] = useAtom(networthAtom)
   const [tokens] = useAtom(tokensAtom)
+  const [gaugeRewards] = useAtom(gaugeRewardsAtom)
 
-  const [gaugeRewards, setGaugeRewards] = useState<GaugeRewards>();
   const { data: oBal } = useBalance({
     chainId: 1,
     address: account,
@@ -125,7 +125,7 @@ export default function VaultsContainer({
                 <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
                   {`$${gaugeRewards && tokens[1] && tokens[1][VCX]
                     ? NumberFormatter.format(
-                      (Number(gaugeRewards?.total) / 1e18) *
+                      Number(gaugeRewards?.[1]?.total + gaugeRewards?.[10]?.total + gaugeRewards?.[42161]?.total) / 1e18 *
                       (tokens[1][VCX].price * 0.25)
                     )
                     : "0"
