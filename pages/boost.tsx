@@ -103,6 +103,9 @@ function VePopContainer() {
           publicClient,
           account: account as Address,
         });
+        
+        console.log({ canCastVote, canVoteOnGauges, state: !!account && Number(veBal?.value) > 0 && canCastVote })
+
         setCanVoteOnGauges(canVoteOnGauges);
         setCanCastVote(!!account && Number(veBal?.value) > 0 && canCastVote);
       }
