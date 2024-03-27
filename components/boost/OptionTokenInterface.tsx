@@ -40,8 +40,6 @@ export default function OptionTokenInterface({ setShowOptionTokenModal }: Option
     llama({ address: VCX, chainId: 1 }).then((res: number) => setVcxPrice(res));
   }, []);
 
-
-
   return (
     <div className="w-full bg-transparent border border-[#353945] rounded-3xl p-8 text-primary md:h-fit">
       <h3 className="text-2xl pb-6 border-b border-[#353945]">oVCX</h3>
