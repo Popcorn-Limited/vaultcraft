@@ -351,7 +351,7 @@ async function addStrategyData(vaults: VaultDataByAddress, chainId: number, clie
         assetsPerShare,
         asset: desc.asset,
         name: desc.name,
-        description: desc.description,
+        description: desc.description.split("** - ")[1],
         resolver: desc.resolver,
         apy
       }

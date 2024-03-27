@@ -277,12 +277,24 @@ export default function Index() {
                 <div className="bg-[#23262f] p-6 rounded-lg">
                   <p className="text-white text-2xl font-bold mb-8">Strategies</p>
                   {vaultData.strategies.map(strategy =>
-                    <p
+                    <div
                       key={strategy.metadata.name}
-                      className='text-white'
                     >
-                      {strategy.metadata.name} {strategy.apy}% {strategy.allocationPerc * 100} %
-                    </p>
+                      <h2 className="text-lg font-bold text-white">
+                        {strategy.metadata.name}
+                      </h2>
+                      <p className='text-white'>
+                        {strategy.metadata.description}
+                      </p>
+                      <div className="flex flex-row items-center space-x-4 mt-1">
+                        <p className='text-gray-400'>
+                          Allocation: $ {formatAndRoundNumber(strategy.allocation * asset?.price!, asset?.decimals!)} | {strategy.allocationPerc * 100} %
+                        </p>
+                        <p className='text-gray-400'>
+                          Apy: {`${NumberFormatter.format(roundToTwoDecimalPlaces(strategy.apy))} %`}
+                        </p>
+                      </div>
+                    </div>
                   )}
 
                   <div className="mt-8">
