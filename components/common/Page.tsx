@@ -1,15 +1,15 @@
 import Navbar from "@/components/navbar/Navbar";
 import { masaAtom, yieldOptionsAtom } from "@/lib/atoms/sdk";
 import { vaultsAtom } from "@/lib/atoms/vaults";
-import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
+import { RPC_URLS, SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { useAtom } from "jotai";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { CachedProvider, YieldOptions } from "vaultcraft-sdk";
-import { useAccount, usePublicClient } from "wagmi";
+import { mainnet, useAccount, usePublicClient } from "wagmi";
 import Footer from "@/components/common/Footer";
 import { useMasaAnalyticsReact } from "@masa-finance/analytics-react";
 import { useRouter } from "next/router";
-import { Address, zeroAddress } from "viem";
+import { Address, createPublicClient, http, zeroAddress } from "viem";
 import Modal from "@/components/modal/Modal";
 import MainActionButton from "../button/MainActionButton";
 import { availableZapAssetAtom, gaugeRewardsAtom, networthAtom, tokensAtom, tvlAtom, zapAssetsAtom } from "@/lib/atoms";
@@ -20,6 +20,7 @@ import { GAUGE_NETWORKS } from "pages/boost";
 import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
 import axios from "axios";
 import { fetchAaveData } from "@/lib/external/aave/interactions";
+import { VCX_LP, VE_VCX, VotingEscrowAbi } from "@/lib/constants";
 
 async function setUpYieldOptions() {
   const ttl = 360_000;
@@ -251,6 +252,7 @@ export default function Page({
       setTokens(newTokens);
       setAaveReserveData(newReserveData)
       setAaveAccountData(newUserAccountData)
+
       if (account) {
         const vaultNetworth = SUPPORTED_NETWORKS.map(chain =>
           Object.values(newTokens[chain.id])).flat().filter(t => t.type === TokenType.Vault || t.type === TokenType.Gauge)
@@ -258,7 +260,18 @@ export default function Page({
         const assetNetworth = SUPPORTED_NETWORKS.map(chain =>
           Object.values(newTokens[chain.id])).flat().filter(t => t.type === TokenType.Asset)
           .reduce((a, b) => a + ((b.balance / (10 ** b.decimals)) * b.price), 0)
-        const stakeNetworth = 0;
+
+        const stake = await createPublicClient({
+          chain: mainnet,
+          transport: http(RPC_URLS[1]),
+        }).readContract({
+          address: VE_VCX,
+          abi: VotingEscrowAbi,
+          functionName: "locked",
+          args: [account],
+        });
+
+        const stakeNetworth = (Number(stake.amount) / 1e18) * newTokens[1][VCX_LP].price;
         const lockVaultNetworth = 0 // @dev hardcoded since we removed lock vaults
 
         const newRewards: { [key: number]: GaugeRewards } = {}

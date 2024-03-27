@@ -22,7 +22,7 @@ import { tokensAtom, zapAssetsAtom } from "@/lib/atoms";
 import LeftArrowIcon from "@/components/svg/LeftArrowIcon";
 import LoanInterface from "@/components/lending/LoanInterface";
 import { MinterByChain, OptionTokenByChain, VCX } from "@/lib/constants";
-import { ChainById } from "@/lib/utils/connectors";
+import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 
 export default function Index() {
   const router = useRouter();
@@ -73,7 +73,7 @@ export default function Index() {
     async function getOToken() {
       const client = createPublicClient({
         chain: ChainById[vaultData?.chainId!],
-        transport: http(),
+        transport: http(RPC_URLS[vaultData?.chainId!]),
       })
       const newOBal = client.readContract({
         address: OptionTokenByChain[vaultData?.chainId!],

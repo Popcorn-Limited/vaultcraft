@@ -1,7 +1,7 @@
 import { Address, createPublicClient, http } from "viem";
 import { erc20ABI } from "wagmi";
 import { TokenByAddress } from "@/lib/types";
-import { ChainById } from "@/lib/utils/connectors";
+import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 
 export interface MutateTokenBalanceProps {
   tokensToUpdate: Address[],
@@ -19,7 +19,7 @@ export default async function mutateTokenBalance({
   const [tokens, setTokens] = tokensAtom
   const client = createPublicClient({
     chain: ChainById[chainId],
-    transport: http(),
+    transport: http(RPC_URLS[chainId]),
   })
   const data = await client.multicall({
     contracts: tokensToUpdate.map(address => {
