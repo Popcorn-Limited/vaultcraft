@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ChainId } from "@/lib/utils/connectors";
 import { Token } from "@/lib/types";
 import TokenIcon from "@/components/common/TokenIcon";
-import { getAssetsByChain, ZapAssetAddressesByChain } from "@/lib/constants";
+import { ZapAssetAddressesByChain } from "@/lib/constants";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
 interface SearchTokenProps {

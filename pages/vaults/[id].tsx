@@ -17,11 +17,10 @@ import VaultInputs from "@/components/vault/VaultInputs";
 import { showSuccessToast } from "@/lib/toasts";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { Square2StackIcon } from "@heroicons/react/24/outline";
-import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
-import { tokensAtom, zapAssetsAtom } from "@/lib/atoms";
+import { tokensAtom } from "@/lib/atoms";
 import LeftArrowIcon from "@/components/svg/LeftArrowIcon";
 import LoanInterface from "@/components/lending/LoanInterface";
-import { MinterByChain, OptionTokenByChain, VCX } from "@/lib/constants";
+import { MinterByChain, OptionTokenByChain, VCX, ZapAssetAddressesByChain } from "@/lib/constants";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 
 export default function Index() {
@@ -37,7 +36,6 @@ export default function Index() {
   const [yieldOptions] = useAtom(yieldOptionsAtom);
 
   const [tokens] = useAtom(tokensAtom)
-  const [zapAssets] = useAtom(zapAssetsAtom);
   const [vaults] = useAtom(vaultsAtom);
   const [vaultData, setVaultData] = useState<VaultData>();
 
@@ -48,17 +46,21 @@ export default function Index() {
 
   useEffect(() => {
     if (!vaultData && query && yieldOptions && Object.keys(vaults).length > 0) {
-      const foundVault = vaults[Number(query?.chainId)].find(vault => vault.address === query?.id)
+      const chainId = Number(query?.chainId)
+      const foundVault = vaults[chainId].find(vault => vault.address === query?.id)
       if (foundVault) {
-        console.log(zapAssets)
-        const newTokenOptions = [tokens[foundVault.chainId][foundVault.asset], tokens[foundVault.chainId][foundVault.vault]]
+        const newTokenOptions = [
+          tokens[chainId][foundVault.asset],
+          tokens[chainId][foundVault.vault],
+          ...ZapAssetAddressesByChain[chainId].map(addr => tokens[chainId][addr])
+        ]
 
-        setAsset(tokens[foundVault.chainId][foundVault.asset])
-        setVault(tokens[foundVault.chainId][foundVault.vault])
+        setAsset(tokens[chainId][foundVault.asset])
+        setVault(tokens[chainId][foundVault.vault])
 
         if (foundVault.gauge) {
-          setGauge(tokens[foundVault.chainId][foundVault.gauge])
-          newTokenOptions.push(tokens[foundVault.chainId][foundVault.gauge])
+          setGauge(tokens[chainId][foundVault.gauge])
+          newTokenOptions.push(tokens[chainId][foundVault.gauge])
         }
         setTokenOptions(newTokenOptions)
         setVaultData(foundVault)

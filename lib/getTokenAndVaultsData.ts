@@ -13,7 +13,7 @@ import { PublicClient } from "wagmi";
 import axios from "axios";
 import { VaultAbi } from "@/lib/constants/abi/Vault";
 import { GaugeData, Token, TokenByAddress, TokenType, VaultData, VaultDataByAddress, VaultLabel } from "@/lib/types";
-import { ADDRESS_ZERO, ERC20Abi, GAUGE_CONTROLLER, VCX, VCX_LP, VE_VCX, ZapAssetAddressesByChain } from "@/lib/constants";
+import { ERC20Abi, VCX, VCX_LP, ZapAssetAddressesByChain } from "@/lib/constants";
 import { RPC_URLS, networkMap } from "@/lib/utils/connectors";
 import { ProtocolName, YieldOptions } from "vaultcraft-sdk";
 import { AavePoolAddressProviderByChain, AaveUiPoolProviderByChain } from "./external/aave/interactions";
@@ -74,7 +74,7 @@ export async function getTokenAndVaultsData({
   vaultsData = await addStrategyData(vaultsData, chainId, client, yieldOptions)
 
   // Create token array
-  const uniqueAssetAdresses: Address[] = ZapAssetAddressesByChain[chainId];
+  const uniqueAssetAdresses: Address[] = [...ZapAssetAddressesByChain[chainId]];
   if (chainId === 1) uniqueAssetAdresses.push(...[VCX, VCX_LP])
 
   // Add vault assets
@@ -116,7 +116,7 @@ export async function getTokenAndVaultsData({
 
     await Promise.all(
       Object.values(vaultsData).map(async (vault, i) => {
-        const foundGauge = Object.values(vaultsData).find(
+        const foundGauge = Object.values(gauges).find(
           (gauge) => gauge.vault === vault.address
         );
 
