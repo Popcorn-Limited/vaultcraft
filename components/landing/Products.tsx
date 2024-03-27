@@ -10,13 +10,26 @@ import { tvlAtom } from "@/lib/atoms";
 
 export default function Products(): JSX.Element {
   const [tvl] = useAtom(tvlAtom);
- 
+
   return (
     <>
       {/* @dev Product.tsx has `md:mx-2` so with `md:mx-6` that adds up to consistent mx-8*/}
       <section className="py-12 md:py-10 mx-4 md:mx-6">
         <p className="text-2xl mb-6 text-primary smmd:hidden"> Our products </p>
         <div className="flex flex-col gap-6 smmd:flex-wrap lg:flex-nowrap space-y-4 md:space-y-0 md:flex-row md:justify-between">
+          <div
+            className="group border rounded w-full lg:max-w-full h-[600px] relative flex flex-col bg-[#141416] border-[#353945] border-opacity-75 smmd:items-center py-6 px-8 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:bg-[#23262f]"
+          >
+            <div className="col-span-12 md:col-span-4 xs:self-start flex-1">
+              <div className="relative flex flex-row">
+                <h2 className="text-primary text-4xl md:text-[56px] leading-none mb-2">
+                  TUTORIAL
+                </h2>
+              </div>
+              <p className="mt-2 text-primary">Help Text</p>
+            </div>
+          </div>
+
           <Product
             title={
               <>
@@ -49,39 +62,6 @@ export default function Products(): JSX.Element {
               },
             ]}
             route="vaults"
-          />
-          <Product
-            title={
-              <>
-                Lock <br className="hidden md:inline" />
-                Vaults
-              </>
-            }
-            customContent={
-              <PopIcon
-                size={"60"}
-                color={"white"}
-                className="group-hover:fill-[#80FF77]"
-              />
-            }
-            description="Lock your assets in yield strategies and earn additional rewards on top!"
-            stats={[
-              {
-                label: "TVL",
-                content: `$${NumberFormatter.format(tvl.lockVault)}`,
-                infoIconProps: {
-                  title: "Total Value Locked",
-                  content: (
-                    <p>
-                      The total value of assets held <br /> by the underlying
-                      smart contracts.
-                    </p>
-                  ),
-                  id: "lock-vault-tvl",
-                },
-              },
-            ]}
-            route="vaults/lock"
           />
           <Product
             title={
