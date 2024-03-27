@@ -62,7 +62,6 @@ export default function LoanInterface({ visibilityState, vaultData }: { visibili
       setTokenList(sorted.map(e => tokens[vaultData.chainId][e.asset]))
 
       const _supplyToken = sorted[0].asset === vaultData.asset ? reserveData[vaultData.chainId][1].asset : reserveData[vaultData.chainId][0].asset
-      console.log(_supplyToken)
       setSupplyToken(tokens[vaultData.chainId][_supplyToken])
       setInputToken(tokens[vaultData.chainId][_supplyToken])
       setBorrowToken(
@@ -269,7 +268,6 @@ export default function LoanInterface({ visibilityState, vaultData }: { visibili
     }
   }
 
-  console.log(reserveData, supplyToken, borrowToken)
 
   return <>
     <Modal
