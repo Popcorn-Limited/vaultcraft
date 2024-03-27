@@ -10,13 +10,11 @@ import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import useNetworkFilter from "@/lib/useNetworkFilter";
 import SmartVault from "@/components/vault/SmartVault";
 import NetworkFilter from "@/components/network/NetworkFilter";
-import { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
 import MainActionButton from "@/components/button/MainActionButton";
 import { useAtom } from "jotai";
 import { vaultsAtom } from "@/lib/atoms/vaults";
 import VaultsSorting from "@/components/vault/VaultsSorting";
 import SearchBar from "@/components/input/SearchBar";
-import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
 import { OptionTokenByChain, VCX } from "@/lib/constants";
 import Modal from "@/components/modal/Modal";
 import OptionTokenInterface from "@/components/boost/OptionTokenInterface";
@@ -186,7 +184,6 @@ export default function VaultsContainer({
                   <SmartVault
                     key={`sv-${vault.address}-${vault.chainId}`}
                     vaultData={vault}
-                    mutateTokenBalance={mutateTokenBalance}
                     searchTerm={searchTerm}
                     description={showDescription ? vault.metadata.description : undefined}
                   />

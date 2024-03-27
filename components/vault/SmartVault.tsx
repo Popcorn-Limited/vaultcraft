@@ -1,31 +1,23 @@
-import { CopyToClipboard } from "react-copy-to-clipboard";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import AssetWithName from "@/components/vault/AssetWithName";
-import VaultInputs from "@/components/vault/VaultInputs";
 import Accordion from "@/components/common/Accordion";
 import { Token, VaultData } from "@/lib/types";
-import Modal from "@/components/modal/Modal";
 import VaultStats from "@/components/vault/VaultStats";
-import { Square2StackIcon } from "@heroicons/react/24/outline";
-import { showSuccessToast } from '@/lib/toasts';
 import { useAtom } from 'jotai';
-import { tokensAtom, zapAssetsAtom } from '@/lib/atoms';
-import { MutateTokenBalanceProps } from '@/lib/vault/mutateTokenBalance';
+import { tokensAtom } from '@/lib/atoms';
 import { useRouter } from 'next/router';
 
 
 interface SmartVaultsProps {
   vaultData: VaultData;
   searchTerm: string;
-  mutateTokenBalance: (props: MutateTokenBalanceProps) => void;
   description?: string;
 }
 
 export default function SmartVault({
   vaultData,
   searchTerm,
-  mutateTokenBalance,
   description,
 }: SmartVaultsProps) {
   const router = useRouter();
