@@ -4,6 +4,8 @@ import {
   Clients,
   ReserveData,
   SimulationResponse,
+  Token,
+  TokenByAddress,
   UserAccountData,
 } from "@/lib/types";
 import { Address, Chain, createPublicClient, formatUnits, getAddress, http, maxUint256, PublicClient, zeroAddress } from "viem";
@@ -153,9 +155,7 @@ export async function fetchAaveReserveData(account: Address, chain: Chain): Prom
     functionName: 'getReservesData',
     args: [AavePoolAddressProviderByChain[chain.id]],
   })
-
-  const { data: assets } = await axios.get(`https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/assets/tokens/${chain.id}.json`)
-
+  
   let result = reserveData[0].filter(d => !d.isFrozen).map(d => {
     const uData = userData[0].find(e => e.underlyingAsset === d.underlyingAsset)
     const decimals = Number(d.decimals)
@@ -165,43 +165,17 @@ export async function fetchAaveReserveData(account: Address, chain: Chain): Prom
       liquidationPenalty: (Number(d.reserveLiquidationBonus) - 10000) / 100,
       supplyRate: (((1 + (Number(formatUnits(d.liquidityRate, 27)) / secondsPerYear)) ** secondsPerYear) - 1) * 100,
       borrowRate: (((1 + (Number(formatUnits(d.variableBorrowRate, 27)) / secondsPerYear)) ** secondsPerYear) - 1) * 100,
-      asset: assets[getAddress(d.underlyingAsset)],
+      asset: d.underlyingAsset,
       supplyAmount: account === zeroAddress ? 0 : Number(formatUnits(uData?.scaledATokenBalance || BigInt(0), decimals)) * Number(formatUnits(d.liquidityIndex, 27)),
       borrowAmount: account === zeroAddress ? 0 : Number(formatUnits(uData?.scaledVariableDebt || BigInt(0), decimals)),
       balance: account === zeroAddress ? 0 : Math.floor(Number(formatUnits(uData?.scaledATokenBalance || BigInt(0), decimals)) * Number(formatUnits(d.liquidityIndex, 27)) * (10 ** decimals))
     }
   })
 
-  const { data: priceData } = await axios.get(`https://coins.llama.fi/prices/current/${String(result.map(
-    e => `${networkMap[chain.id].toLowerCase()}:${e.asset.address}`
-  ))}`)
-
-  result.forEach((e, i) => {
-    e.asset.balance = 0;
-    e.asset.price = Number(priceData.coins[`${networkMap[chain.id].toLowerCase()}:${e.asset.address}`]?.price);
-  })
-
-  if (account !== zeroAddress) {
-    const bals = await client.multicall({
-      contracts: result.map((e: any) => {
-        return {
-          address: e.asset.address,
-          abi: erc20ABI,
-          functionName: 'balanceOf',
-          args: [account]
-        }
-      }),
-      allowFailure: false
-    })
-    result.forEach((e, i) => {
-      e.asset.balance = Number(bals[i])
-    })
-  }
-
   return result
 }
 
-export async function fetchAaveData(account: Address, chain: Chain): Promise<{ reserveData: ReserveData[], userAccountData: UserAccountData }> {
+export async function fetchAaveData(account: Address, tokens: TokenByAddress, chain: Chain): Promise<{ reserveData: ReserveData[], userAccountData: UserAccountData }> {
   const reserveData = await fetchAaveReserveData(account || zeroAddress, chain);
 
   const client = createPublicClient({ chain, transport: http(RPC_URLS[chain.id]) })
@@ -211,16 +185,16 @@ export async function fetchAaveData(account: Address, chain: Chain): Promise<{ r
     functionName: 'getUserAccountData',
     args: [account || zeroAddress],
   })
-  return { reserveData, userAccountData: calcUserAccountData(reserveData, (Number(accountData[3]) / 10_000)) }
+  return { reserveData, userAccountData: calcUserAccountData(reserveData, tokens, (Number(accountData[3]) / 10_000)) }
 }
 
-export function calcUserAccountData(reserveData: ReserveData[], ltv: number): UserAccountData {
-  const totalCollateral = reserveData.map(r => r.supplyAmount * r.asset.price).reduce((a, b) => a + b, 0);
-  const totalBorrowed = reserveData.map(r => r.borrowAmount * r.asset.price).reduce((a, b) => a + b, 0);
+export function calcUserAccountData(reserveData: ReserveData[], tokens: TokenByAddress, ltv: number): UserAccountData {
+  const totalCollateral = reserveData.map(r => r.supplyAmount * tokens[r.asset].price).reduce((a, b) => a + b, 0);
+  const totalBorrowed = reserveData.map(r => r.borrowAmount * tokens[r.asset].price).reduce((a, b) => a + b, 0);
   const netValue = totalCollateral - totalBorrowed;
 
-  const totalSupplyRate = reserveData.map(r => r.supplyAmount * r.asset.price * r.supplyRate).reduce((a, b) => a + b, 0);
-  const totalBorrowRate = reserveData.map(r => r.borrowAmount * r.asset.price * r.borrowRate).reduce((a, b) => a + b, 0);
+  const totalSupplyRate = reserveData.map(r => r.supplyAmount * tokens[r.asset].price * r.supplyRate).reduce((a, b) => a + b, 0);
+  const totalBorrowRate = reserveData.map(r => r.borrowAmount * tokens[r.asset].price * r.borrowRate).reduce((a, b) => a + b, 0);
   const netRate = (totalSupplyRate - totalBorrowRate) / totalCollateral
 
   const healthFactor = (totalCollateral * ltv) / totalBorrowed;

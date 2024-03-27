@@ -11,7 +11,7 @@ import { NumberFormatter, formatAndRoundNumber, formatNumber, formatToFixedDecim
 import { roundToTwoDecimalPlaces, validateInput } from "@/lib/utils/helpers";
 import MainActionButton from "@/components/button/MainActionButton";
 import { ArrowRightIcon, Square2StackIcon } from "@heroicons/react/24/outline";
-import { DEFAULT_ASSET, availableZapAssetAtom, zapAssetsAtom } from "@/lib/atoms";
+import { DEFAULT_ASSET, availableZapAssetAtom, tokensAtom, zapAssetsAtom } from "@/lib/atoms";
 import TabSelector from "@/components/common/TabSelector";
 import Modal from "@/components/modal/Modal";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
@@ -23,6 +23,7 @@ import { ActionStep, getAaveActionSteps } from "@/lib/getActionSteps";
 import handleAaveInteraction, { AaveActionType } from "@/lib/external/aave/handleAaveInteractions";
 import { calcUserAccountData, fetchAaveData } from "@/lib/external/aave/interactions";
 import { ERC20Abi, ZERO } from "@/lib/constants";
+import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
 
 const LOAN_TABS = ["Supply", "Borrow", "Repay", "Withdraw"]
 
@@ -38,8 +39,8 @@ export default function LoanInterface({ visibilityState, vaultData }: { visibili
 
   const [reserveData, setAaveReserveData] = useAtom(aaveReserveDataAtom)
   const [aaveAccountData, setAaveAccountData] = useAtom(aaveAccountDataAtom)
-  const [zapAssets, setZapAssets] = useAtom(zapAssetsAtom)
   const [vaults, setVaults] = useAtom(vaultsAtom)
+  const [tokens, setTokens] = useAtom(tokensAtom)
 
   const [activeTab, setActiveTab] = useState<string>("Supply")
 
@@ -58,18 +59,22 @@ export default function LoanInterface({ visibilityState, vaultData }: { visibili
   useEffect(() => {
     if (reserveData && reserveData[vaultData.chainId]) {
       let sorted = reserveData[vaultData.chainId].sort((a, b) => a.balance - b.balance)
-      setTokenList(sorted.map(e => e.asset))
+      setTokenList(sorted.map(e => tokens[vaultData.chainId][e.asset]))
 
-      const _supplyToken = sorted[0].asset.address === vaultData.asset.address ? reserveData[vaultData.chainId][1].asset : reserveData[vaultData.chainId][0].asset
-      setSupplyToken(_supplyToken)
-      setInputToken(_supplyToken)
-      setBorrowToken(!!reserveData[vaultData.chainId].find(e => e.asset.address === vaultData.asset.address) ? vaultData.asset : reserveData[vaultData.chainId][0].asset)
+      const _supplyToken = sorted[0].asset === vaultData.asset ? reserveData[vaultData.chainId][1].asset : reserveData[vaultData.chainId][0].asset
+      setSupplyToken(tokens[vaultData.chainId][_supplyToken])
+      setInputToken(tokens[vaultData.chainId][_supplyToken])
+      setBorrowToken(
+        !!reserveData[vaultData.chainId].find(e => e.asset === vaultData.asset) ?
+          tokens[vaultData.chainId][vaultData.asset] :
+          tokens[vaultData.chainId][reserveData[vaultData.chainId][0].asset]
+      )
 
       sorted = reserveData[vaultData.chainId].filter(e => e.borrowAmount > 0).sort((a, b) => b.borrowAmount - a.borrowAmount)
-      setRepayToken(sorted.length === 0 ? null : sorted[0].asset)
+      setRepayToken(sorted.length === 0 ? null : tokens[vaultData.chainId][sorted[0].asset])
 
       sorted = reserveData[vaultData.chainId].filter(e => e.borrowAmount === 0).filter(e => e.balance > 0).sort((a, b) => b.balance - a.balance)
-      setWithdrawToken(!account || sorted.length === 0 ? null : sorted[0].asset)
+      setWithdrawToken(!account || sorted.length === 0 ? null : tokens[vaultData.chainId][sorted[0].asset])
     }
   }, [reserveData])
 
@@ -78,17 +83,17 @@ export default function LoanInterface({ visibilityState, vaultData }: { visibili
     setInputAmount("0");
     setStepCounter(0);
 
-    const assetBorrowable = !!reserveData[vaultData.chainId].find(e => e.asset.address === vaultData.asset.address);
+    const assetBorrowable = !!reserveData[vaultData.chainId].find(e => e.asset === vaultData.asset);
     let sorted: ReserveData[]
     let _inputToken: Token
 
     switch (newTab) {
       case "Supply":
-        sorted = reserveData[vaultData.chainId].filter(e => e.asset.address !== vaultData.asset.address).sort((a, b) => b.balance - a.balance)
-        setTokenList(sorted.map(e => e.asset))
+        sorted = reserveData[vaultData.chainId].filter(e => e.asset !== vaultData.asset).sort((a, b) => b.balance - a.balance)
+        setTokenList(sorted.map(e => tokens[vaultData.chainId][e.asset]))
 
         if (!supplyToken) {
-          _inputToken = sorted[0].asset
+          _inputToken = tokens[vaultData.chainId][sorted[0].asset]
           setSupplyToken(_inputToken)
           setInputToken(_inputToken)
         } else {
@@ -99,10 +104,12 @@ export default function LoanInterface({ visibilityState, vaultData }: { visibili
         return;
       case "Borrow":
         sorted = reserveData[vaultData.chainId].sort((a, b) => b.borrowRate - a.borrowRate)
-        setTokenList(sorted.map(e => e.asset))
+        setTokenList(sorted.map(e => tokens[vaultData.chainId][e.asset]))
 
         if (!borrowToken) {
-          _inputToken = assetBorrowable ? vaultData.asset : sorted[0].asset
+          _inputToken = assetBorrowable ?
+            tokens[vaultData.chainId][vaultData.asset]
+            : tokens[vaultData.chainId][sorted[0].asset]
           setBorrowToken(_inputToken)
           setInputToken(_inputToken)
         } else {
@@ -113,10 +120,10 @@ export default function LoanInterface({ visibilityState, vaultData }: { visibili
         return;
       case "Repay":
         sorted = reserveData[vaultData.chainId].filter(e => e.borrowAmount > 0).sort((a, b) => b.borrowAmount - a.borrowAmount)
-        setTokenList(sorted.length === 0 ? [] : sorted.map(e => e.asset))
+        setTokenList(sorted.length === 0 ? [] : sorted.map(e => tokens[vaultData.chainId][e.asset]))
 
         if (!repayToken) {
-          setInputToken(sorted.length === 0 ? null : sorted[0].asset)
+          setInputToken(sorted.length === 0 ? null : tokens[vaultData.chainId][sorted[0].asset])
         } else {
           setInputToken(repayToken)
         }
@@ -125,10 +132,10 @@ export default function LoanInterface({ visibilityState, vaultData }: { visibili
         return;
       case "Withdraw":
         sorted = reserveData[vaultData.chainId].filter(e => e.supplyAmount > 0).sort((a, b) => b.supplyAmount - a.supplyAmount)
-        setTokenList(!account || sorted.length === 0 ? [] : sorted.map(e => e.asset))
+        setTokenList(!account || sorted.length === 0 ? [] : sorted.map(e => tokens[vaultData.chainId][e.asset]))
 
         if (!withdrawToken) {
-          setInputToken(!account || sorted.length === 0 ? null : sorted[0].asset)
+          setInputToken(!account || sorted.length === 0 ? null : tokens[vaultData.chainId][sorted[0].asset])
         } else {
           setInputToken(withdrawToken)
         }
@@ -170,7 +177,7 @@ export default function LoanInterface({ visibilityState, vaultData }: { visibili
     value = validateInput(value).isValid ? value : "0"
 
     if (activeTab === "Repay") {
-      const reserveTokenData = reserveData[vaultData.chainId].find(d => d.asset.address === inputToken?.address)
+      const reserveTokenData = reserveData[vaultData.chainId].find(d => d.asset === inputToken?.address)
       if (reserveTokenData && reserveTokenData.borrowAmount < Number(value)) {
         value = String(reserveTokenData.borrowAmount)
       }
@@ -186,14 +193,14 @@ export default function LoanInterface({ visibilityState, vaultData }: { visibili
         handleChangeInput({
           currentTarget: {
             value:
-              String((reserveData[vaultData.chainId].find(d => d.asset.address === inputToken?.address)?.balance || 0) * (10 ** inputToken.decimals))
+              String((reserveData[vaultData.chainId].find(d => d.asset === inputToken?.address)?.balance || 0) * (10 ** inputToken.decimals))
           }
         })
       case "Repay":
         handleChangeInput({
           currentTarget: {
             value:
-              String((reserveData[vaultData.chainId].find(d => d.asset.address === inputToken?.address)?.borrowAmount || 0) * (10 ** inputToken.decimals))
+              String((reserveData[vaultData.chainId].find(d => d.asset === inputToken?.address)?.borrowAmount || 0) * (10 ** inputToken.decimals))
           }
         })
       default:
@@ -222,10 +229,10 @@ export default function LoanInterface({ visibilityState, vaultData }: { visibili
 
     let val = (Number(inputAmount) * (10 ** inputToken.decimals))
     if (AaveActionType.Repay === action &&
-      val >= ((reserveData[vaultData.chainId].find(d => d.asset.address === repayToken?.address)?.borrowAmount || 0) * (10 ** inputToken.decimals))) {
+      val >= ((reserveData[vaultData.chainId].find(d => d.asset === repayToken?.address)?.borrowAmount || 0) * (10 ** inputToken.decimals))) {
       val = Number(maxUint256)
     } else if (AaveActionType.Withdraw === action &&
-      val === ((reserveData[vaultData.chainId].find(d => d.asset.address === repayToken?.address)?.balance || 0) * (10 ** inputToken.decimals))) {
+      val === ((reserveData[vaultData.chainId].find(d => d.asset === repayToken?.address)?.balance || 0) * (10 ** inputToken.decimals))) {
       val = Number(maxUint256)
     }
 
@@ -247,31 +254,15 @@ export default function LoanInterface({ visibilityState, vaultData }: { visibili
     setSteps(stepsCopy)
     setStepCounter(newStepCounter)
 
-    if (newStepCounter === steps.length) {
-      const newBalance = await publicClient.readContract({
-        address: inputToken.address,
-        abi: ERC20Abi,
-        functionName: "balanceOf",
-        args: [account]
+    if (newStepCounter === steps.length && success) {
+      await mutateTokenBalance({
+        tokensToUpdate: [inputToken.address],
+        account,
+        tokensAtom: [tokens, setTokens],
+        chainId: chain.id
       })
 
-      // Modify zap assets
-      const zapAssetFound = zapAssets[chain.id].find(asset => asset.address === inputToken.address)
-      if (zapAssetFound) {
-        zapAssetFound.balance = Number(newBalance)
-        setZapAssets({ ...zapAssets, [chain.id]: [...zapAssets[chain.id], zapAssetFound] })
-      }
-
-      // Modify vaults, assets and gauges
-      const newVaultState: VaultData[] = [...vaults]
-      newVaultState.forEach(vaultData => {
-        if (vaultData.chainId === chain.id && vaultData.asset.address === inputToken.address) {
-          vaultData.asset.balance = Number(newBalance)
-        }
-      })
-      setVaults(newVaultState)
-
-      const newAaveData = await fetchAaveData(account || zeroAddress, chain)
+      const newAaveData = await fetchAaveData(account || zeroAddress, tokens, chain)
       setAaveReserveData({ ...reserveData, [chain.id]: newAaveData.reserveData })
       setAaveAccountData({ ...aaveAccountData, [chain.id]: newAaveData.userAccountData })
     }
@@ -319,7 +310,7 @@ export default function LoanInterface({ visibilityState, vaultData }: { visibili
                 selectedToken={activeTab === "Withdraw" ?
                   {
                     ...inputToken,
-                    balance: reserveData[vaultData.chainId].find(d => d.asset.address === inputToken?.address)?.balance || 0
+                    balance: reserveData[vaultData.chainId].find(d => d.asset === inputToken?.address)?.balance || 0
                   }
                   : inputToken}
                 errorMessage={""}
@@ -380,6 +371,7 @@ export function getHealthFactorColor(suffix: string, healthFactor: number): stri
 
 export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inputAmount, activeTab, chainId }
   : { supplyToken: Token, borrowToken: Token, inputToken: Token, inputAmount: number, activeTab: string, chainId: number }): JSX.Element {
+  const [tokens, setTokens] = useAtom(tokensAtom)
   const [reserveData] = useAtom(aaveReserveDataAtom)
   const [userAccountData] = useAtom(aaveAccountDataAtom)
 
@@ -389,10 +381,10 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
   useEffect(() => {
     if (reserveData) {
       if (supplyToken) {
-        setSupplyReserve(reserveData[chainId].find(e => e.asset.address === supplyToken.address))
+        setSupplyReserve(reserveData[chainId].find(e => e.asset === supplyToken.address))
       }
       if (reserveData) {
-        setBorrowReserve(reserveData[chainId].find(e => e.asset.address === borrowToken.address))
+        setBorrowReserve(reserveData[chainId].find(e => e.asset === borrowToken.address))
       }
     }
   }, [supplyToken, borrowToken, reserveData])
@@ -408,24 +400,24 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
 
     switch (activeTab) {
       case "Supply":
-        newReserveData[newReserveData.findIndex(e => e.asset.address === inputToken.address)].supplyAmount += value
+        newReserveData[newReserveData.findIndex(e => e.asset === inputToken.address)].supplyAmount += value
 
-        setNewUserAccountData({ ...calcUserAccountData(newReserveData, userAccountData[chainId].ltv) })
+        setNewUserAccountData({ ...calcUserAccountData(newReserveData, tokens, userAccountData[chainId].ltv) })
         return;
       case "Borrow":
-        newReserveData[newReserveData.findIndex(e => e.asset.address === inputToken.address)].borrowAmount += value
+        newReserveData[newReserveData.findIndex(e => e.asset === inputToken.address)].borrowAmount += value
 
-        setNewUserAccountData({ ...calcUserAccountData(newReserveData, userAccountData[chainId].ltv) })
+        setNewUserAccountData({ ...calcUserAccountData(newReserveData, tokens, userAccountData[chainId].ltv) })
         return;
       case "Repay":
-        newReserveData[newReserveData.findIndex(e => e.asset.address === inputToken.address)].borrowAmount -= value
+        newReserveData[newReserveData.findIndex(e => e.asset === inputToken.address)].borrowAmount -= value
 
-        setNewUserAccountData(calcUserAccountData(newReserveData, userAccountData[chainId].ltv))
+        setNewUserAccountData(calcUserAccountData(newReserveData, tokens, userAccountData[chainId].ltv))
         return;
       case "Withdraw":
-        newReserveData[newReserveData.findIndex(e => e.asset.address === inputToken.address)].supplyAmount -= value
+        newReserveData[newReserveData.findIndex(e => e.asset === inputToken.address)].supplyAmount -= value
 
-        setNewUserAccountData(calcUserAccountData(newReserveData, userAccountData[chainId].ltv))
+        setNewUserAccountData(calcUserAccountData(newReserveData, tokens, userAccountData[chainId].ltv))
         return;
       default:
         return;

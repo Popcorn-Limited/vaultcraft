@@ -24,19 +24,59 @@ export default async function handleAaveInteraction({ action, stepCounter, chain
   switch (action) {
     case AaveActionType.Supply:
       if (stepCounter === 0) {
-        return () => handleAllowance({ token: inputToken.address, amount, account, spender: AavePoolByChain[chainId], clients })
+        return () => handleAllowance({
+          token: inputToken.address,
+          amount,
+          account,
+          spender: AavePoolByChain[chainId],
+          clients
+        })
       } else {
-        return () => supplyToAave({ asset: inputToken.address, amount, onBehalfOf: account, chainId, account, clients })
+        return () => supplyToAave({
+          asset: inputToken.address,
+          amount,
+          onBehalfOf: account,
+          chainId,
+          account,
+          clients
+        })
       }
     case AaveActionType.Withdraw:
-      return () => withdrawFromAave({ asset: inputToken.address, amount, onBehalfOf: account, chainId, account, clients })
+      return () => withdrawFromAave({
+        asset: inputToken.address,
+        amount,
+        onBehalfOf: account,
+        chainId,
+        account,
+        clients
+      })
     case AaveActionType.Borrow:
-      return () => borrowFromAave({ asset: inputToken.address, amount, onBehalfOf: account, chainId, account, clients })
+      return () => borrowFromAave({
+        asset: inputToken.address,
+        amount,
+        onBehalfOf: account,
+        chainId,
+        account,
+        clients
+      })
     case AaveActionType.Repay:
       if (stepCounter === 0) {
-        return () => handleAllowance({ token: inputToken.address, amount, account, spender: AavePoolByChain[chainId], clients })
+        return () => handleAllowance({
+          token: inputToken.address,
+          amount,
+          account,
+          spender: AavePoolByChain[chainId],
+          clients
+        })
       } else {
-        return () => repayToAave({ asset: inputToken.address, amount, onBehalfOf: account, chainId, account, clients })
+        return () => repayToAave({
+          asset: inputToken.address,
+          amount,
+          onBehalfOf: account,
+          chainId,
+          account,
+          clients
+        })
       }
     default:
       // We should never reach this code. This is here just to make ts happy

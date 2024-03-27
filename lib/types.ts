@@ -144,30 +144,6 @@ export enum SmartVaultActionType {
   ZapUnstakeAndWithdraw,
 }
 
-export enum LockVaultActionType {
-  Deposit,
-  IncreaseAmount,
-  Withdrawal,
-  Claim,
-  ZapDeposit,
-  ZapIncreaseAmount,
-  ZapWithdrawal,
-}
-
-export enum KelpVaultActionType {
-  Deposit,
-  Withdrawal,
-  ZapDeposit,
-  EthxZapDeposit,
-  ZapWithdrawal,
-}
-
-export enum DepositVaultActionType {
-  Supply,
-  Borrow,
-  Deposit
-}
-
 export type DuneQueryResult<T> = {
   result: {
     rows: T[];
@@ -230,7 +206,7 @@ export type ReserveData = {
   liquidationPenalty: number;
   supplyRate: number;
   borrowRate: number;
-  asset: Token;
+  asset: Address;
   supplyAmount: number;
   borrowAmount: number;
   balance: number;

@@ -6,14 +6,15 @@ import {
   parseEther,
   zeroAddress,
 } from "viem";
-import { Clients, VaultData } from "@/lib/types";
+import { Clients, TokenByAddress, VaultData } from "@/lib/types";
 import { showLoadingToast } from "@/lib/toasts";
 import { SimulationResponse } from "@/lib/types";
 import { GAUGE_CONTROLLER, GaugeAbi, GaugeControllerAbi, VOTING_ESCROW, VotingEscrowAbi } from "@/lib/constants";
 import { handleCallResult } from "@/lib/utils/helpers";
 import { networkMap } from "@/lib/utils/connectors";
 import { VeBeaconAbi } from "@/lib/constants/abi/VeBeacon";
-import { RootGaugeFactoryAbi } from "../constants/abi/RootGaugeFactory";
+import { RootGaugeFactoryAbi } from "@/lib/constants/abi/RootGaugeFactory";
+import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
 
 type SimulationContract = {
   address: Address;
@@ -244,28 +245,28 @@ export async function withdrawLock({
 }
 
 interface GaugeInteractionProps {
-  chainId: number;
-  address: Address;
+  vaultData: VaultData,
   amount: number;
   account: Address;
   clients: Clients;
+  tokensAtom: [{ [key: number]: TokenByAddress }, Function]
 }
 
 export async function gaugeDeposit({
-  chainId,
-  address,
+  vaultData,
   amount,
   account,
   clients,
+  tokensAtom
 }: GaugeInteractionProps): Promise<boolean> {
   showLoadingToast("Staking into Gauge...");
 
-  return handleCallResult({
+  const success = await handleCallResult({
     successMessage: "Staked into Gauge successful!",
     simulationResponse: await simulateCall({
       account,
       contract: {
-        address,
+        address: vaultData.gauge!,
         abi: GaugeAbi,
       },
       functionName: "deposit",
@@ -274,23 +275,34 @@ export async function gaugeDeposit({
     }),
     clients,
   });
+
+  if (success) {
+    mutateTokenBalance({
+      tokensToUpdate: [vaultData.address, vaultData.gauge!],
+      account,
+      tokensAtom,
+      chainId: vaultData.chainId
+    })
+  }
+
+  return success
 }
 
 export async function gaugeWithdraw({
-  chainId,
-  address,
+  vaultData,
   amount,
   account,
   clients,
+  tokensAtom
 }: GaugeInteractionProps): Promise<boolean> {
   showLoadingToast("Unstaking from Gauge...");
 
-  return handleCallResult({
+  const success = await handleCallResult({
     successMessage: "Unstaked from Gauge successful!",
     simulationResponse: await simulateCall({
       account,
       contract: {
-        address,
+        address: vaultData.gauge!,
         abi: GaugeAbi,
       },
       functionName: "withdraw",
@@ -299,6 +311,16 @@ export async function gaugeWithdraw({
     }),
     clients,
   });
+
+  if (success) {
+    mutateTokenBalance({
+      tokensToUpdate: [vaultData.address, vaultData.gauge!],
+      account,
+      tokensAtom,
+      chainId: vaultData.chainId
+    })
+  }
+  return success
 }
 
 export async function broadcastVeBalance({ targetChain, account, address, publicClient, walletClient }

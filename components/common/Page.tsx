@@ -170,12 +170,6 @@ export default function Page({
   const [yieldOptions, setYieldOptions] = useAtom(yieldOptionsAtom);
   const [masaSdk, setMasaSdk] = useAtom(masaAtom);
 
-  const [, setVaults] = useAtom(vaultsAtom);
-  const [, setTokens] = useAtom(tokensAtom);
-  const [, setGaugeRewards] = useAtom(gaugeRewardsAtom);
-  const [, setTVL] = useAtom(tvlAtom);
-  const [, setNetworth] = useAtom(networthAtom);
-
   const {
     fireEvent,
     fireLoginEvent,
@@ -209,6 +203,14 @@ export default function Page({
     }
   }, []);
 
+  const [, setVaults] = useAtom(vaultsAtom);
+  const [, setTokens] = useAtom(tokensAtom);
+  const [, setGaugeRewards] = useAtom(gaugeRewardsAtom);
+  const [, setTVL] = useAtom(tvlAtom);
+  const [, setNetworth] = useAtom(networthAtom);
+  const [, setAaveReserveData] = useAtom(aaveReserveDataAtom)
+  const [, setAaveAccountData] = useAtom(aaveAccountDataAtom)
+
   useEffect(() => {
     async function getData() {
       // get vaultsData and tokens
@@ -226,36 +228,19 @@ export default function Page({
         })
       )
 
-      const newRewards: { [key: number]: GaugeRewards } = {}
-      await Promise.all(GAUGE_NETWORKS.map(async (chain) =>
-        newRewards[chain] = await getGaugeRewards({
-          gauges: newVaultsData[chain].filter(vault => !!vault.gauge).map(vault => vault.gauge) as Address[],
-          account: account as Address,
-          chainId: chain,
-          publicClient
-        })
-      ))
+      const newReserveData: { [key: number]: ReserveData[] } = {}
+      const newUserAccountData: { [key: number]: UserAccountData } = {}
+
+      SUPPORTED_NETWORKS.forEach(async (chain) => {
+        const res = await fetchAaveData(account || zeroAddress, newTokens[chain.id], chain)
+        newReserveData[chain.id] = res.reserveData
+        newUserAccountData[chain.id] = res.userAccountData
+      })
 
       const vaultTVL = SUPPORTED_NETWORKS.map(chain => newVaultsData[chain.id]).flat().reduce((a, b) => a + b.tvl, 0)
       const lockVaultTVL = 520000 // @dev hardcoded since we removed lock vaults
       const stakingTVL = await axios.get("https://api.llama.fi/protocol/vaultcraft").then(res => res.data.currentChainTvls["staking"])
 
-      const vaultNetworth = SUPPORTED_NETWORKS.map(chain =>
-        Object.values(newTokens[chain.id])).flat().filter(t => t.type === TokenType.Vault || t.type === TokenType.Gauge)
-        .reduce((a, b) => a + ((b.balance / (10 ** b.decimals)) * b.price), 0)
-      const assetNetworth = SUPPORTED_NETWORKS.map(chain =>
-        Object.values(newTokens[chain.id])).flat().filter(t => t.type === TokenType.Asset)
-        .reduce((a, b) => a + ((b.balance / (10 ** b.decimals)) * b.price), 0)
-      const stakeNetworth = 0;
-      const lockVaultNetworth = 0 // @dev hardcoded since we removed lock vaults
-
-      setNetworth({
-        vault: vaultNetworth,
-        lockVault: lockVaultNetworth,
-        wallet: assetNetworth,
-        stake: stakeNetworth,
-        total: vaultNetworth + assetNetworth + stakeNetworth + lockVaultNetworth
-      })
       setTVL({
         vault: vaultTVL,
         lockVault: lockVaultTVL,
@@ -264,7 +249,37 @@ export default function Page({
       });
       setVaults(newVaultsData);
       setTokens(newTokens);
-      setGaugeRewards(newRewards);
+      setAaveReserveData(newReserveData)
+      setAaveAccountData(newUserAccountData)
+      if (account) {
+        const vaultNetworth = SUPPORTED_NETWORKS.map(chain =>
+          Object.values(newTokens[chain.id])).flat().filter(t => t.type === TokenType.Vault || t.type === TokenType.Gauge)
+          .reduce((a, b) => a + ((b.balance / (10 ** b.decimals)) * b.price), 0)
+        const assetNetworth = SUPPORTED_NETWORKS.map(chain =>
+          Object.values(newTokens[chain.id])).flat().filter(t => t.type === TokenType.Asset)
+          .reduce((a, b) => a + ((b.balance / (10 ** b.decimals)) * b.price), 0)
+        const stakeNetworth = 0;
+        const lockVaultNetworth = 0 // @dev hardcoded since we removed lock vaults
+
+        const newRewards: { [key: number]: GaugeRewards } = {}
+        await Promise.all(GAUGE_NETWORKS.map(async (chain) =>
+          newRewards[chain] = await getGaugeRewards({
+            gauges: newVaultsData[chain].filter(vault => !!vault.gauge).map(vault => vault.gauge) as Address[],
+            account: account as Address,
+            chainId: chain,
+            publicClient
+          })
+        ))
+
+        setNetworth({
+          vault: vaultNetworth,
+          lockVault: lockVaultNetworth,
+          wallet: assetNetworth,
+          stake: stakeNetworth,
+          total: vaultNetworth + assetNetworth + stakeNetworth + lockVaultNetworth
+        })
+        setGaugeRewards(newRewards);
+      }
     }
     if (yieldOptions) getData();
   }, [yieldOptions, account]);
@@ -282,27 +297,6 @@ export default function Page({
       }
     }
   }, [termsSigned]);
-
-
-  const [, setAaveReserveData] = useAtom(aaveReserveDataAtom)
-  const [, setAaveAccountData] = useAtom(aaveAccountDataAtom)
-
-  useEffect(() => {
-    async function setAaveData() {
-      const newReserveData: { [key: number]: ReserveData[] } = {}
-      const newUserAccountData: { [key: number]: UserAccountData } = {}
-
-      SUPPORTED_NETWORKS.forEach(async (chain) => {
-        const res = await fetchAaveData(account || zeroAddress, chain)
-        newReserveData[chain.id] = res.reserveData
-        newUserAccountData[chain.id] = res.userAccountData
-      })
-
-      setAaveReserveData(newReserveData)
-      setAaveAccountData(newUserAccountData)
-    }
-    setAaveData()
-  }, [account])
 
   return (
     <>

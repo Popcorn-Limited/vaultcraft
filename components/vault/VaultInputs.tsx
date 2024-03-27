@@ -23,9 +23,8 @@ import { useAtom } from "jotai";
 import { masaAtom } from "@/lib/atoms/sdk";
 import { useRouter } from "next/router";
 import { ActionStep, getSmartVaultActionSteps } from "@/lib/getActionSteps";
-import { MutateTokenBalanceProps } from "@/lib/vault/mutateTokenBalance";
 import { vaultsAtom } from "@/lib/atoms/vaults";
-import { zapAssetsAtom } from "@/lib/atoms";
+import { tokensAtom } from "@/lib/atoms";
 import { getZapProvider } from "@/lib/vault/zap";
 import { showErrorToast, showLoadingToast, showSuccessToast } from "@/lib/toasts";
 
@@ -41,10 +40,7 @@ export default function VaultInputs({
   tokenOptions,
   chainId,
   hideModal,
-  mutateTokenBalance,
-}: VaultInputsProps & {
-  mutateTokenBalance: (props: MutateTokenBalanceProps) => void;
-}): JSX.Element {
+}: VaultInputsProps): JSX.Element {
   const asset = tokenOptions.find(t => t.address === vaultData.asset)
   const vault = tokenOptions.find(t => t.address === vaultData.vault)
   const gauge = tokenOptions.find(t => t.address === vaultData.gauge)
@@ -58,7 +54,7 @@ export default function VaultInputs({
   const { openConnectModal } = useConnectModal();
 
   const [masaSdk] = useAtom(masaAtom);
-  const [zapAssets, setZapAssets] = useAtom(zapAssetsAtom);
+  const [tokens, setTokens] = useAtom(tokensAtom);
   const [vaults, setVaults] = useAtom(vaultsAtom);
 
   const [inputToken, setInputToken] = useState<Token>();
@@ -213,7 +209,7 @@ export default function VaultInputs({
 
   async function handleMainAction() {
     let val = Number(inputBalance)
-    if (val === 0 || !inputToken || !outputToken || !asset || !account || !walletClient) return;
+    if (val === 0 || !inputToken || !outputToken || !asset || !vault || !account || !walletClient) return;
     val = val * (10 ** inputToken.decimals)
 
     if (chain?.id !== Number(chainId)) {
@@ -256,6 +252,9 @@ export default function VaultInputs({
       inputToken,
       outputToken,
       vaultData,
+      asset,
+      vault,
+      gauge,
       account,
       zapProvider: newZapProvider,
       slippage,
@@ -266,27 +265,21 @@ export default function VaultInputs({
         !!query?.ref && isAddress(query.ref as string)
           ? getAddress(query.ref as string)
           : undefined,
+      tokensAtom: [tokens, setTokens]
     });
     const success = await vaultInteraction();
 
     currentStep.loading = false;
     currentStep.success = success;
     currentStep.error = !success;
+
     const newStepCounter = stepCounter + 1;
     setSteps(stepsCopy);
     setStepCounter(newStepCounter);
 
-    if (newStepCounter === steps.length)
-      mutateTokenBalance({
-        inputToken: inputToken.address,
-        outputToken: outputToken.address,
-        vault: vaultData.address,
-        chainId,
-        account,
-        zapAssetState: [zapAssets, setZapAssets],
-        vaultsState: [vaults, setVaults],
-        publicClient,
-      });
+    if (newStepCounter === steps.length || success) {
+      // TODO adjust TVL
+    }
   }
 
   function handleMaxClick() {
