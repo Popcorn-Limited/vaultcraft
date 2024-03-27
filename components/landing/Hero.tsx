@@ -66,7 +66,11 @@ export default function Hero(): JSX.Element {
               label={"Total Value Locked"}
               content={
                 <p className="text-3xl font-bold text-primary leading-[120%]">
-                  $ {tvl.total}
+                  {
+                    tvl.total > 0.01
+                      ? NumberFormatter.format(tvl.total)
+                      : "0"
+                  }
                 </p>
               }
               infoIconProps={{

@@ -88,7 +88,7 @@ export default function VaultsContainer({
                 TVL
               </p>
               <div className="text-3xl font-bold whitespace-nowrap text-primary">
-                {`$${NumberFormatter.format(tvl.total)}`}
+                {`$${NumberFormatter.format(tvl.vault)}`}
               </div>
             </div>
 

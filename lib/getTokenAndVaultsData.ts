@@ -16,6 +16,8 @@ import { GaugeData, Token, TokenByAddress, TokenType, VaultData, VaultDataByAddr
 import { ADDRESS_ZERO, ERC20Abi, GAUGE_CONTROLLER, VCX, VCX_LP, VE_VCX, ZapAssetAddressesByChain } from "@/lib/constants";
 import { RPC_URLS, networkMap } from "@/lib/utils/connectors";
 import { ProtocolName, YieldOptions } from "vaultcraft-sdk";
+import { AavePoolAddressProviderByChain, AaveUiPoolProviderByChain } from "./external/aave/interactions";
+import { AavePoolUiAbi } from "./constants/abi/Aave";
 
 const HIDDEN_VAULTS: Address[] = [
   "0xb6cED1C0e5d26B815c3881038B88C829f39CE949",
@@ -71,13 +73,27 @@ export async function getTokenAndVaultsData({
   let vaultsData = await prepareVaultsData(chainId, client)
   vaultsData = await addStrategyData(vaultsData, chainId, client, yieldOptions)
 
+  // Create token array
   const uniqueAssetAdresses: Address[] = ZapAssetAddressesByChain[chainId];
   if (chainId === 1) uniqueAssetAdresses.push(...[VCX, VCX_LP])
+
+  // Add vault assets
   Object.values(vaultsData).forEach((vault) => {
     if (!uniqueAssetAdresses.includes(vault.asset)) {
       uniqueAssetAdresses.push(vault.asset);
     }
   });
+
+  // Add aave assets
+  const reserveData = await client.readContract({
+    address: AaveUiPoolProviderByChain[chainId],
+    abi: AavePoolUiAbi,
+    functionName: 'getReservesData',
+    args: [AavePoolAddressProviderByChain[chainId]],
+  })
+  reserveData[0].filter(d => !d.isFrozen && !uniqueAssetAdresses.includes(d.underlyingAsset))
+    .forEach(d => uniqueAssetAdresses.push(d.underlyingAsset))
+
   const assets = await prepareAssets(uniqueAssetAdresses, chainId);
 
   const vaults = await prepareVaults(vaultsData, assets, chainId)
