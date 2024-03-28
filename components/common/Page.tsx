@@ -1,25 +1,26 @@
 import Navbar from "@/components/navbar/Navbar";
 import { masaAtom, yieldOptionsAtom } from "@/lib/atoms/sdk";
-import { lockvaultsAtom, vaultsAtom } from "@/lib/atoms/vaults";
+import { vaultsAtom } from "@/lib/atoms/vaults";
 import { RPC_URLS, SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
-import { getVaultsByChain } from "@/lib/vault/getVaults";
 import { useAtom } from "jotai";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { CachedProvider, YieldOptions } from "vaultcraft-sdk";
-import { useAccount, usePublicClient } from "wagmi";
+import { mainnet, useAccount, usePublicClient } from "wagmi";
 import Footer from "@/components/common/Footer";
 import { useMasaAnalyticsReact } from "@masa-finance/analytics-react";
 import { useRouter } from "next/router";
-import getLockVaultsByChain from "@/lib/vault/lockVault/getVaults";
-import { createPublicClient, http, zeroAddress } from "viem";
-import { arbitrum, optimism } from "viem/chains";
+import { Address, createPublicClient, http, zeroAddress } from "viem";
 import Modal from "@/components/modal/Modal";
 import MainActionButton from "../button/MainActionButton";
-import { availableZapAssetAtom, zapAssetsAtom } from "@/lib/atoms";
-import { ReserveData, Token, UserAccountData } from "@/lib/types";
-import getZapAssets, { getAvailableZapAssets } from "@/lib/utils/getZapAssets";
+import { availableZapAssetAtom, gaugeRewardsAtom, networthAtom, tokensAtom, tvlAtom, zapAssetsAtom } from "@/lib/atoms";
+import { ReserveData, Token, TokenByAddress, TokenType, UserAccountData, VaultData, VaultDataByAddress } from "@/lib/types";
+import getTokenAndVaultsDataByChain from "@/lib/getTokenAndVaultsData";
 import { aaveAccountDataAtom, aaveReserveDataAtom } from "@/lib/atoms/lending";
+import { GAUGE_NETWORKS } from "pages/boost";
+import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
+import axios from "axios";
 import { fetchAaveData } from "@/lib/external/aave/interactions";
+import { VCX_LP, VE_VCX, VotingEscrowAbi } from "@/lib/constants";
 
 async function setUpYieldOptions() {
   const ttl = 360_000;
@@ -165,12 +166,10 @@ export default function Page({
   const router = useRouter();
   const { query, asPath } = router;
   const { address: account } = useAccount();
+  const publicClient = usePublicClient();
 
   const [yieldOptions, setYieldOptions] = useAtom(yieldOptionsAtom);
   const [masaSdk, setMasaSdk] = useAtom(masaAtom);
-
-  const [, setVaults] = useAtom(vaultsAtom);
-  const [, setLockVaults] = useAtom(lockvaultsAtom);
 
   const {
     fireEvent,
@@ -205,29 +204,97 @@ export default function Page({
     }
   }, []);
 
-  useEffect(() => {
-    async function getVaults() {
-      // get vaults
-      const fetchedVaults = (
-        await Promise.all(
-          SUPPORTED_NETWORKS.map(async (chain) =>
-            getVaultsByChain({
-              chain,
-              account: account || zeroAddress,
-              yieldOptions: yieldOptions as YieldOptions,
-            })
-          )
-        )
-      ).flat();
-      setVaults(fetchedVaults);
+  const [, setVaults] = useAtom(vaultsAtom);
+  const [, setTokens] = useAtom(tokensAtom);
+  const [, setGaugeRewards] = useAtom(gaugeRewardsAtom);
+  const [, setTVL] = useAtom(tvlAtom);
+  const [, setNetworth] = useAtom(networthAtom);
+  const [, setAaveReserveData] = useAtom(aaveReserveDataAtom)
+  const [, setAaveAccountData] = useAtom(aaveAccountDataAtom)
 
-      const fetchedLockVaults = await getLockVaultsByChain({
-        chain: arbitrum,
-        account: account || zeroAddress,
+  useEffect(() => {
+    async function getData() {
+      // get vaultsData and tokens
+      const newVaultsData: { [key: number]: VaultData[] } = {}
+      const newTokens: { [key: number]: TokenByAddress } = {}
+      await Promise.all(
+        SUPPORTED_NETWORKS.map(async (chain) => {
+          const { vaultsData, tokens } = await getTokenAndVaultsDataByChain({
+            chain,
+            account: account || zeroAddress,
+            yieldOptions: yieldOptions as YieldOptions,
+          })
+          newVaultsData[chain.id] = vaultsData
+          newTokens[chain.id] = tokens;
+        })
+      )
+
+      const newReserveData: { [key: number]: ReserveData[] } = {}
+      const newUserAccountData: { [key: number]: UserAccountData } = {}
+
+      SUPPORTED_NETWORKS.forEach(async (chain) => {
+        const res = await fetchAaveData(account || zeroAddress, newTokens[chain.id], chain)
+        newReserveData[chain.id] = res.reserveData
+        newUserAccountData[chain.id] = res.userAccountData
+      })
+
+      const vaultTVL = SUPPORTED_NETWORKS.map(chain => newVaultsData[chain.id]).flat().reduce((a, b) => a + b.tvl, 0)
+      const lockVaultTVL = 520000 // @dev hardcoded since we removed lock vaults
+      const stakingTVL = await axios.get("https://api.llama.fi/protocol/vaultcraft").then(res => res.data.currentChainTvls["staking"])
+
+      setTVL({
+        vault: vaultTVL,
+        lockVault: lockVaultTVL,
+        stake: stakingTVL,
+        total: vaultTVL + lockVaultTVL + stakingTVL
       });
-      setLockVaults(fetchedLockVaults);
+      setVaults(newVaultsData);
+      setTokens(newTokens);
+      setAaveReserveData(newReserveData)
+      setAaveAccountData(newUserAccountData)
+
+      if (account) {
+        const vaultNetworth = SUPPORTED_NETWORKS.map(chain =>
+          Object.values(newTokens[chain.id])).flat().filter(t => t.type === TokenType.Vault || t.type === TokenType.Gauge)
+          .reduce((a, b) => a + ((b.balance / (10 ** b.decimals)) * b.price), 0)
+        const assetNetworth = SUPPORTED_NETWORKS.map(chain =>
+          Object.values(newTokens[chain.id])).flat().filter(t => t.type === TokenType.Asset)
+          .reduce((a, b) => a + ((b.balance / (10 ** b.decimals)) * b.price), 0)
+
+        const stake = await createPublicClient({
+          chain: mainnet,
+          transport: http(RPC_URLS[1]),
+        }).readContract({
+          address: VE_VCX,
+          abi: VotingEscrowAbi,
+          functionName: "locked",
+          args: [account],
+        });
+
+        const stakeNetworth = (Number(stake.amount) / 1e18) * newTokens[1][VCX_LP].price;
+        const lockVaultNetworth = 0 // @dev hardcoded since we removed lock vaults
+
+        const newRewards: { [key: number]: GaugeRewards } = {}
+        await Promise.all(GAUGE_NETWORKS.map(async (chain) =>
+          newRewards[chain] = await getGaugeRewards({
+            gauges: newVaultsData[chain].filter(vault => !!vault.gauge).map(vault => vault.gauge) as Address[],
+            account: account as Address,
+            chainId: chain,
+            publicClient
+          })
+        ))
+
+        setNetworth({
+          vault: vaultNetworth,
+          lockVault: lockVaultNetworth,
+          wallet: assetNetworth,
+          stake: stakeNetworth,
+          total: vaultNetworth + assetNetworth + stakeNetworth + lockVaultNetworth
+        })
+        setGaugeRewards(newRewards);
+      }
     }
-    if (yieldOptions) getVaults();
+    if (yieldOptions) getData();
   }, [yieldOptions, account]);
 
   const [showTermsModal, setShowTermsModal] = useState<boolean>(false);
@@ -243,56 +310,6 @@ export default function Page({
       }
     }
   }, [termsSigned]);
-
-  const [zapAssets, setZapAssets] = useAtom(zapAssetsAtom);
-  const [availableZapAssets, setAvailableZapAssets] = useAtom(
-    availableZapAssetAtom
-  );
-
-  useEffect(() => {
-    async function getZapData() {
-      const newZapAssets: { [key: number]: Token[] } = {};
-      SUPPORTED_NETWORKS.forEach(
-        async (chain) =>
-          (newZapAssets[chain.id] = await getZapAssets({ chain, account }))
-      );
-      setZapAssets(newZapAssets);
-
-      // get available zapAddresses
-      setAvailableZapAssets({
-        1: await getAvailableZapAssets(1),
-        137: await getAvailableZapAssets(137),
-        10: await getAvailableZapAssets(10),
-        42161: await getAvailableZapAssets(42161),
-        56: await getAvailableZapAssets(56),
-      })
-    }
-    if (
-      Object.keys(zapAssets).length === 0 &&
-      Object.keys(availableZapAssets).length === 0
-    )
-      getZapData();
-  }, []);
-
-  const [, setAaveReserveData] = useAtom(aaveReserveDataAtom)
-  const [, setAaveAccountData] = useAtom(aaveAccountDataAtom)
-
-  useEffect(() => {
-    async function setAaveData() {
-      const newReserveData: { [key: number]: ReserveData[] } = {}
-      const newUserAccountData: { [key: number]: UserAccountData } = {}
-
-      SUPPORTED_NETWORKS.forEach(async (chain) => {
-        const res = await fetchAaveData(account || zeroAddress, chain)
-        newReserveData[chain.id] = res.reserveData
-        newUserAccountData[chain.id] = res.userAccountData
-      })
-      
-      setAaveReserveData(newReserveData)
-      setAaveAccountData(newUserAccountData)
-    }
-    setAaveData()
-  }, [account])
 
   return (
     <>

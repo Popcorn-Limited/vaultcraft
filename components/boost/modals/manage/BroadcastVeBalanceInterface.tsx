@@ -1,6 +1,7 @@
 import MainActionButton from "@/components/button/MainActionButton";
 import { VE_BEACON, VeRecipientByChain } from "@/lib/constants";
 import { broadcastVeBalance } from "@/lib/gauges/interactions";
+import { RPC_URLS } from "@/lib/utils/connectors";
 import { formatNumber } from "@/lib/utils/formatBigNumber";
 import { useEffect, useState } from "react";
 import { createPublicClient, http } from "viem";
@@ -10,7 +11,7 @@ import { Address, Chain, erc20ABI, useAccount, usePublicClient, useWalletClient 
 async function getVeBalance(account: Address, chain: Chain): Promise<number> {
   const client = createPublicClient({
     chain: chain,
-    transport: http(),
+    transport: http(RPC_URLS[chain.id]),
   })
   const veBal = await client.readContract({
     address: VeRecipientByChain[chain.id],

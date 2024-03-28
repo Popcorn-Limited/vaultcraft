@@ -1,4 +1,3 @@
-import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import {
@@ -12,71 +11,69 @@ import MainActionButton from "@/components/button/MainActionButton";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import { claimOPop } from "@/lib/optionToken/interactions";
 import { WalletClient } from "viem";
-import { Token } from "@/lib/types";
 import { llama } from "@/lib/resolver/price/resolver";
-import { MinterByChain, OptionTokenByChain, VCX, WETH } from "@/lib/constants";
-import { GAUGE_NETWORKS } from "pages/boost";
+import { MinterByChain, OptionTokenByChain, VCX } from "@/lib/constants";
+import { useAtom } from "jotai";
+import { gaugeRewardsAtom, tokensAtom } from "@/lib/atoms";
+import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
+import getGaugeRewards from "@/lib/gauges/getGaugeRewards";
+import { vaultsAtom } from "@/lib/atoms/vaults";
 
 interface OptionTokenInterfaceProps {
-  gauges: Token[];
   setShowOptionTokenModal?: Dispatch<SetStateAction<boolean>>;
 }
 
-export default function OptionTokenInterface({
-  gauges,
-  setShowOptionTokenModal,
-}: OptionTokenInterfaceProps): JSX.Element {
+export default function OptionTokenInterface({ setShowOptionTokenModal }: OptionTokenInterfaceProps): JSX.Element {
   const { address: account } = useAccount();
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
 
-  const { data: vcxBal } = useBalance({
-    chainId: 1,
-    address: account,
-    token: VCX,
-    watch: true,
-  });
+  const [tokens, setTokens] = useAtom(tokensAtom)
+  const [vaults, setVaults] = useAtom(vaultsAtom)
+  const [gaugeRewards, setGaugeRewards] = useAtom(gaugeRewardsAtom);
+
   const { data: oBal } = useBalance({
     chainId: 1,
     address: account,
     token: OptionTokenByChain[1],
     watch: true,
   });
-  const { data: wethBal } = useBalance({
-    chainId: 1,
-    address: account,
-    token: WETH,
-    watch: true,
-  });
 
   const [vcxPrice, setVcxPrice] = useState<number>(0);
-  const [wethPrice, setWethPrice] = useState<number>(0);
 
   useEffect(() => {
     llama({ address: VCX, chainId: 1 }).then((res: number) => setVcxPrice(res));
-    llama({ address: WETH, chainId: 1 }).then((res: number) =>
-      setWethPrice(res)
-    );
   }, []);
 
-  const [gaugeRewards, setGaugeRewards] = useState<{ [key: number]: GaugeRewards }>();
+  async function handleClaim(chainId: number) {
+    if (!account) return
 
-  useEffect(() => {
-    async function getValues() {
-      const newRewards: { [key: number]: GaugeRewards } = {}
-      await Promise.all(GAUGE_NETWORKS.map(async (chain) =>
-        newRewards[chain] = await getGaugeRewards({
-          gauges: gauges.filter(gauge => gauge.chainId === chain).map((gauge) => gauge.address) as Address[],
+    const success = await claimOPop({
+      gauges: gaugeRewards[chainId].amounts
+        ?.filter((gauge) => Number(gauge.amount) > 0)
+        .map((gauge) => gauge.address) as Address[],
+      account: account,
+      minter: MinterByChain[chainId],
+      clients: { publicClient, walletClient: walletClient as WalletClient }
+    })
+    if (success) {
+      await mutateTokenBalance({
+        tokensToUpdate: [OptionTokenByChain[chainId]],
+        account,
+        tokensAtom: [tokens, setTokens],
+        chainId
+      })
+      setGaugeRewards({
+        ...gaugeRewards,
+        [chainId]: await getGaugeRewards({
+          gauges: vaults[chainId].filter(vault => !!vault.gauge).map(vault => vault.gauge) as Address[],
           account: account as Address,
-          chainId: chain,
+          chainId: chainId,
           publicClient
         })
-      ))
-      setGaugeRewards(newRewards)
+      })
     }
-    if (account && gauges.length > 0) getValues();
-  }, [gauges, account]);
-
+  }
 
   return (
     <div className="w-full bg-transparent border border-[#353945] rounded-3xl p-8 text-primary md:h-fit">
@@ -124,45 +121,21 @@ export default function OptionTokenInterface({
             <div className="w-full md:w-60">
               <MainActionButton
                 label="Claim ETH oVCX"
-                handleClick={() =>
-                  claimOPop({
-                    gauges: gaugeRewards[1].amounts
-                      ?.filter((gauge) => Number(gauge.amount) > 0)
-                      .map((gauge) => gauge.address) as Address[],
-                    account: account as Address,
-                    minter: MinterByChain[1],
-                    clients: { publicClient, walletClient: walletClient as WalletClient }
-                  })}
+                handleClick={() => () => handleClaim(1)}
                 disabled={gaugeRewards ? Number(gaugeRewards[1].total) === 0 : true}
               />
             </div>
             <div className="w-full md:w-60">
               <MainActionButton
                 label="Claim OP oVCX"
-                handleClick={() =>
-                  claimOPop({
-                    gauges: gaugeRewards[10].amounts
-                      ?.filter((gauge) => Number(gauge.amount) > 0)
-                      .map((gauge) => gauge.address) as Address[],
-                    account: account as Address,
-                    minter: MinterByChain[10],
-                    clients: { publicClient, walletClient: walletClient as WalletClient }
-                  })}
+                handleClick={() => () => handleClaim(10)}
                 disabled={gaugeRewards ? Number(gaugeRewards[10].total) === 0 : true}
               />
             </div>
             <div className="w-full md:w-60">
               <MainActionButton
                 label="Claim ARB oVCX"
-                handleClick={() =>
-                  claimOPop({
-                    gauges: gaugeRewards[42161].amounts
-                      ?.filter((gauge) => Number(gauge.amount) > 0)
-                      .map((gauge) => gauge.address) as Address[],
-                    account: account as Address,
-                    minter: MinterByChain[42161],
-                    clients: { publicClient, walletClient: walletClient as WalletClient }
-                  })}
+                handleClick={() => handleClaim(42161)}
                 disabled={gaugeRewards ? Number(gaugeRewards[42161].total) === 0 : true}
               />
             </div>

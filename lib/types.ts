@@ -10,7 +10,14 @@ export type Token = {
   balance: number;
   price: number;
   chainId?: number;
+  type?: TokenType;
 };
+
+export enum TokenType {
+  Vault,
+  Gauge,
+  Asset,
+}
 
 export type Asset = {
   chains: number[];
@@ -31,45 +38,36 @@ export type FeeConfiguration = {
 
 export type VaultData = {
   address: Address;
-  vault: Token;
-  asset: Token;
-  gauge?: Token;
+  vault: Address;
+  asset: Address;
+  gauge?: Address;
+  chainId: number;
+  fees: FeeConfiguration;
   totalAssets: number;
   totalSupply: number;
-  assetsPerShare: number;
-  assetPrice: number;
-  pricePerShare: number;
-  tvl: number;
-  fees: FeeConfiguration;
   depositLimit: number;
-  metadata: VaultMetadata;
-  chainId: number;
+  tvl: number;
   apy: number;
-  gaugeMinApy?: number;
-  gaugeMaxApy?: number;
   totalApy: number;
+  boostMin: number;
+  boostMax: number;
+  metadata: VaultMetadata;
+  strategies: Strategy[];
 };
 
-type LockVaultLock = {
-  unlockTime: number;
-  amount: number;
-  rewardShares: number;
-  daysToUnlock: number;
-};
+type Strategy = {
+  address: Address;
+  metadata: StrategyMetadata;
+  resolver: string;
+  allocation: number;
+  allocationPerc: number;
+  apy: number;
+}
 
-export type LockVaultData = VaultData & {
-  strategyShares: bigint;
-  rewardAddresses: Address[];
-  rewards: RewardToken[];
-  lock: LockVaultLock;
-};
-
-export type RewardToken = Token & {
-  rewardBalance: number;
-  userIndex: number;
-  globalIndex: number;
-  rewardApy: number;
-};
+type StrategyMetadata = {
+  name: string;
+  description: string;
+}
 
 export enum VaultLabel {
   experimental = "Experimental",
@@ -78,10 +76,6 @@ export enum VaultLabel {
 }
 
 export type VaultMetadata = {
-  creator: Address;
-  feeRecipient: Address;
-  cid: string;
-  optionalMetadata: OptionalMetadata;
   vaultName?: string;
   labels?: VaultLabel[];
   description?: string;
@@ -89,6 +83,8 @@ export type VaultMetadata = {
   | "single-asset-vault-v1"
   | "single-asset-lock-vault-v1"
   | "multi-strategy-vault-v1";
+  creator: Address;
+  feeRecipient: Address;
 };
 
 export type OptionalMetadata = {
@@ -146,30 +142,6 @@ export enum SmartVaultActionType {
   ZapWithdrawal,
   ZapDepositAndStake,
   ZapUnstakeAndWithdraw,
-}
-
-export enum LockVaultActionType {
-  Deposit,
-  IncreaseAmount,
-  Withdrawal,
-  Claim,
-  ZapDeposit,
-  ZapIncreaseAmount,
-  ZapWithdrawal,
-}
-
-export enum KelpVaultActionType {
-  Deposit,
-  Withdrawal,
-  ZapDeposit,
-  EthxZapDeposit,
-  ZapWithdrawal,
-}
-
-export enum DepositVaultActionType {
-  Supply,
-  Borrow,
-  Deposit
 }
 
 export type DuneQueryResult<T> = {
@@ -234,14 +206,10 @@ export type ReserveData = {
   liquidationPenalty: number;
   supplyRate: number;
   borrowRate: number;
-  asset: Token;
+  asset: Address;
   supplyAmount: number;
   borrowAmount: number;
   balance: number;
-}
-
-export type AddressByChain = {
-  [key: number]: Address
 }
 
 export enum ZapProvider {
@@ -252,4 +220,16 @@ export enum ZapProvider {
   oneInch,
   paraSwap,
   openOcean
+}
+
+export type TokenByAddress = {
+  [key: Address]: Token;
+}
+
+export type VaultDataByAddress = {
+  [key: Address]: VaultData
+}
+
+export type AddressByChain = {
+  [key: number]: Address
 }

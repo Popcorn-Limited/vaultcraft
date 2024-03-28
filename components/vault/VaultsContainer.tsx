@@ -4,28 +4,23 @@ import {
   Address,
   useAccount,
   useBalance,
-  usePublicClient,
-  useWalletClient,
 } from "wagmi";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import useNetworkFilter from "@/lib/useNetworkFilter";
 import SmartVault from "@/components/vault/SmartVault";
 import NetworkFilter from "@/components/network/NetworkFilter";
-import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
 import MainActionButton from "@/components/button/MainActionButton";
 import { useAtom } from "jotai";
 import { vaultsAtom } from "@/lib/atoms/vaults";
-import { getVaultNetworthByChain } from "@/lib/getNetworth";
 import VaultsSorting from "@/components/vault/VaultsSorting";
-import { llama } from "@/lib/resolver/price/resolver";
 import SearchBar from "@/components/input/SearchBar";
-import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
-import { MinterByChain, OptionTokenByChain, VCX } from "@/lib/constants";
+import { OptionTokenByChain, VCX } from "@/lib/constants";
 import Modal from "@/components/modal/Modal";
 import OptionTokenInterface from "@/components/boost/OptionTokenInterface";
-import { Token, VaultData } from "@/lib/types";
-import SecondaryActionButton from "../button/SecondaryActionButton";
+import { VaultData } from "@/lib/types";
+import { gaugeRewardsAtom, networthAtom, tokensAtom, tvlAtom } from "@/lib/atoms";
+import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 
 interface VaultsContainerProps {
   hiddenVaults: Address[];
@@ -39,48 +34,25 @@ export default function VaultsContainer({
   showDescription = false,
 }: VaultsContainerProps): JSX.Element {
   const { address: account } = useAccount();
-  const publicClient = usePublicClient();
-  const { data: walletClient } = useWalletClient();
 
-  const [vaults, setVaults] = useAtom(vaultsAtom);
+  const [vaultsData] = useAtom(vaultsAtom);
+  const [vaults, setVaults] = useState<VaultData[]>([])
 
-  const [tvl, setTvl] = useState<number>(0);
-  const [networth, setNetworth] = useState<number>(0);
+  useEffect(() => {
+    if (Object.keys(vaultsData).length > 0) setVaults(SUPPORTED_NETWORKS.map(chain => vaultsData[chain.id]).flat())
+  }, [vaultsData])
 
-  const [gaugeRewards, setGaugeRewards] = useState<GaugeRewards>();
+  const [tvl] = useAtom(tvlAtom)
+  const [networth] = useAtom(networthAtom)
+  const [tokens] = useAtom(tokensAtom)
+  const [gaugeRewards] = useAtom(gaugeRewardsAtom)
+
   const { data: oBal } = useBalance({
     chainId: 1,
     address: account,
     token: OptionTokenByChain[1],
     watch: true,
   });
-  const [vcxPrice, setVcxPrice] = useState<number>(0);
-
-  useEffect(() => {
-    async function getAccountData() {
-      // get gauge rewards
-      if (account) {
-        const rewards = await getGaugeRewards({
-          gauges: vaults
-            .filter((vault) => vault.gauge && vault.chainId === 1)
-            .map((vault) => vault.gauge?.address) as Address[],
-          account: account as Address,
-          chainId: 1,
-          publicClient
-        })
-        setGaugeRewards(rewards)
-        const vcxPriceInUsd = await llama({ address: VCX, chainId: 1 })
-        setVcxPrice(vcxPriceInUsd)
-      }
-      setNetworth(
-        SUPPORTED_NETWORKS.map((chain) =>
-          getVaultNetworthByChain({ vaults, chainId: chain.id })
-        ).reduce((a, b) => a + b, 0)
-      );
-      setTvl(vaults.reduce((a, b) => a + b.tvl, 0));
-    }
-    getAccountData();
-  }, [account]);
 
   const [selectedNetworks, selectNetwork] = useNetworkFilter(
     SUPPORTED_NETWORKS.map((network) => network.id)
@@ -95,15 +67,7 @@ export default function VaultsContainer({
   return (
     <NoSSR >
       <Modal visibility={[showOptionTokenModal, setShowOptionTokenModal]}>
-        <OptionTokenInterface
-          gauges={
-            vaults?.length > 0
-              ? vaults
-                .filter((vault) => !!vault.gauge?.address)
-                .map((vault: VaultData) => vault.gauge as Token)
-              : []
-          }
-        />
+        <OptionTokenInterface />
       </Modal>
       <section className="md:border-b border-[#353945] md:flex md:flex-row items-center justify-between py-10 px-4 md:px-8 md:gap-4">
         <div className="w-full md:w-max">
@@ -122,7 +86,7 @@ export default function VaultsContainer({
                 TVL
               </p>
               <div className="text-3xl font-bold whitespace-nowrap text-primary">
-                {`$${NumberFormatter.format(tvl)}`}
+                {`$${NumberFormatter.format(tvl.vault)}`}
               </div>
             </div>
 
@@ -131,7 +95,7 @@ export default function VaultsContainer({
                 Deposits
               </p>
               <div className="text-3xl font-bold whitespace-nowrap text-primary">
-                {`$${NumberFormatter.format(networth)}`}
+                {`$${NumberFormatter.format(networth.vault)}`}
               </div>
             </div>
           </div>
@@ -143,9 +107,9 @@ export default function VaultsContainer({
                   My oVCX
                 </p>
                 <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
-                  {`$${oBal && vcxPrice
+                  {`$${oBal && tokens[1] && tokens[1][VCX]
                     ? NumberFormatter.format(
-                      (Number(oBal?.value) / 1e18) * (vcxPrice * 0.25)
+                      (Number(oBal?.value) / 1e18) * (tokens[1][VCX].price * 0.25)
                     )
                     : "0"
                     }`}
@@ -157,10 +121,10 @@ export default function VaultsContainer({
                   Claimable oVCX
                 </p>
                 <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
-                  {`$${gaugeRewards && vcxPrice
+                  {`$${gaugeRewards && tokens[1] && tokens[1][VCX]
                     ? NumberFormatter.format(
-                      (Number(gaugeRewards?.total) / 1e18) *
-                      (vcxPrice * 0.25)
+                      Number(gaugeRewards?.[1]?.total + gaugeRewards?.[10]?.total + gaugeRewards?.[42161]?.total) / 1e18 *
+                      (tokens[1][VCX].price * 0.25)
                     )
                     : "0"
                     }`}
@@ -216,13 +180,14 @@ export default function VaultsContainer({
               .filter((vault) => !hiddenVaults.includes(vault.address))
               .sort((a, b) => b.tvl - a.tvl)
               .map((vault) => {
-                return <SmartVault
-                  key={`sv-${vault.address}-${vault.chainId}`}
-                  vaultData={vault}
-                  mutateTokenBalance={mutateTokenBalance}
-                  searchTerm={searchTerm}
-                  description={showDescription ? vault.metadata.description : undefined}
-                />
+                return (
+                  <SmartVault
+                    key={`sv-${vault.address}-${vault.chainId}`}
+                    vaultData={vault}
+                    searchTerm={searchTerm}
+                    description={showDescription ? vault.metadata.description : undefined}
+                  />
+                )
               })
             }
           </>

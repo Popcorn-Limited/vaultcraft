@@ -1,8 +1,9 @@
 import axios from "axios"
 import { Address, getAddress, zeroAddress } from "viem";
 import { showErrorToast, showSuccessToast } from "@/lib/toasts";
-import { AddressByChain, Clients, Token, ZapProvider } from "@/lib/types";
+import { AddressByChain, Clients, Token, TokenByAddress, ZapProvider } from "@/lib/types";
 import { handleAllowance } from "@/lib/approve";
+import mutateTokenBalance from "./mutateTokenBalance";
 
 
 interface BaseProps {
@@ -18,6 +19,7 @@ interface BaseProps {
 
 interface ZapProps extends BaseProps {
   clients: Clients;
+  tokensAtom: [{ [key: number]: TokenByAddress }, Function]
 }
 
 const ZeroXBaseUrlByChain: { [key: number]: string } = {
@@ -72,13 +74,33 @@ async function getZapTransaction({ chainId, sellToken, buyToken, amount, account
   }
 }
 
-export default async function zap({ chainId, sellToken, buyToken, amount, account, zapProvider, slippage = 100, tradeTimeout = 60, clients }: ZapProps): Promise<boolean> {
+export default async function zap({
+  chainId,
+  sellToken,
+  buyToken,
+  amount,
+  account,
+  zapProvider,
+  slippage = 100,
+  tradeTimeout = 60,
+  clients,
+  tokensAtom }: ZapProps): Promise<boolean> {
   const transaction = await getZapTransaction({ chainId, sellToken, buyToken, amount, account, zapProvider, slippage, tradeTimeout })
   console.log({ transaction })
+  
   try {
     const hash = await clients.walletClient.sendTransaction(transaction)
     const receipt = await clients.publicClient.waitForTransactionReceipt({ hash })
+
     showSuccessToast("Zapped successfully")
+
+    mutateTokenBalance({
+      tokensToUpdate: [sellToken.address, buyToken.address],
+      account,
+      tokensAtom,
+      chainId
+    })
+
     return true;
   } catch (error: any) {
     showErrorToast(error.shortMessage);

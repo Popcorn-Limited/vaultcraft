@@ -54,6 +54,7 @@ function VePopContainer() {
   const [accountLoad, setAccountLoad] = useState<boolean>(false);
 
   const [vaults, setVaults] = useAtom(vaultsAtom);
+  const [gaugeVaults, setGaugeVaults] = useState<VaultData[]>([])
   const [initialVotes, setInitialVotes] = useState<{ [key: Address]: number }>(
     {}
   );
@@ -71,8 +72,8 @@ function VePopContainer() {
       setInitalLoad(true);
       if (account) setAccountLoad(true);
 
-      const vaultsWithGauges = vaults.filter((vault) => !!vault.gauge);
-      setVaults(vaultsWithGauges);
+      const vaultsWithGauges = Object.values(vaults).flat().filter((vault) => !!vault.gauge);
+      setGaugeVaults(vaultsWithGauges);
 
       if (
         vaultsWithGauges.length > 0 &&
@@ -82,14 +83,13 @@ function VePopContainer() {
         const initialVotes: { [key: Address]: number } = {};
         const voteUserSlopesData = await voteUserSlopes({
           gaugeAddresses: vaultsWithGauges?.map(
-            (vault: VaultData) => vault.gauge?.address as Address
+            (vault: VaultData) => vault.gauge as Address
           ),
           publicClient,
           account: account as Address,
         });
         vaultsWithGauges.forEach((vault, index) => {
-          // @ts-ignore
-          initialVotes[vault.gauge?.address] = Number(
+          initialVotes[vault.gauge as Address] = Number(
             voteUserSlopesData[index].power
           );
         });
@@ -98,7 +98,7 @@ function VePopContainer() {
 
         const { canCastVote, canVoteOnGauges } = await hasAlreadyVoted({
           addresses: vaultsWithGauges?.map(
-            (vault: VaultData) => vault.gauge?.address as Address
+            (vault: VaultData) => vault.gauge as Address
           ),
           publicClient,
           account: account as Address,
@@ -110,8 +110,8 @@ function VePopContainer() {
         setCanCastVote(!!account && Number(veBal?.value) > 0 && canCastVote);
       }
     }
-    if (!account && !initalLoad && vaults.length > 0) initialSetup();
-    if (account && !accountLoad && !!veBal && vaults.length > 0) initialSetup();
+    if (!account && !initalLoad && Object.keys(vaults).length > 0) initialSetup();
+    if (account && !accountLoad && !!veBal && Object.keys(vaults).length > 0) initialSetup();
   }, [account, initalLoad, accountLoad, vaults]);
 
   function handleVotes(val: number, index: Address) {
@@ -178,16 +178,7 @@ function VePopContainer() {
             setShowLpModal={setShowLpModal}
           />
           <div className="w-full lg:w-1/2">
-            <OptionTokenInterface
-              gauges={
-                vaults?.length > 0
-                  ? vaults
-                    .filter((vault) => !!vault.gauge?.address)
-                    .map((vault: VaultData) => vault.gauge as Token)
-                  : []
-              }
-              setShowOptionTokenModal={setShowOptionTokenModal}
-            />
+            <OptionTokenInterface setShowOptionTokenModal={setShowOptionTokenModal} />
           </div>
         </section>
 
@@ -195,22 +186,21 @@ function VePopContainer() {
           <NetworkFilter supportedNetworks={[1, 10, 42161]} selectNetwork={selectNetwork} />
           <div className="flex flex-row space-x-4">
             <SearchBar searchTerm={searchTerm} handleSearch={handleSearch} />
-            <VaultsSorting className="" vaultState={[vaults, setVaults]} />
+            <VaultsSorting className="" vaultState={[gaugeVaults, setGaugeVaults]} />
           </div>
         </section>
 
         <section className="grid grid-cols-1 md:grid-cols-3 gap-4 px-4 md:px-8">
-          {vaults?.length > 0 ? (
-            vaults
+          {gaugeVaults?.length > 0 ? (
+            gaugeVaults
               .filter((vault) => selectedNetworks.includes(vault.chainId))
-              .filter((vault) => !!vault.gauge?.address)
               .filter((vault) => !HIDDEN_VAULTS.includes(vault.address))
               .sort((a, b) => b.tvl - a.tvl)
               .map((vault: VaultData, index: number) => (
                 <Gauge
                   key={vault.address}
                   vaultData={vault}
-                  index={vault.gauge?.address as Address}
+                  index={vault.gauge as Address}
                   votes={votes}
                   handleVotes={handleVotes}
                   canVote={canVoteOnGauges[index]}
@@ -241,7 +231,7 @@ function VePopContainer() {
                 disabled={!canCastVote}
                 handleClick={() =>
                   sendVotes({
-                    vaults,
+                    vaults: gaugeVaults,
                     votes,
                     prevVotes: initialVotes,
                     account: account as Address,

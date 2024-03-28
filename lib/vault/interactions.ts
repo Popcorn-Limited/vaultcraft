@@ -1,15 +1,18 @@
 import { showLoadingToast } from "@/lib/toasts";
-import { Clients, SimulationResponse, VaultData } from "@/lib/types";
+import { Clients, SimulationResponse, Token, TokenByAddress, VaultData } from "@/lib/types";
 import { VaultAbi } from "@/lib/constants";
 import { Address, PublicClient } from "viem";
 import { VaultRouterAbi } from "@/lib/constants/abi/VaultRouter";
 import { handleCallResult } from "@/lib/utils/helpers";
 import { FireEventArgs } from "@masa-finance/analytics-sdk";
 import { networkMap } from "@/lib/utils/connectors";
+import mutateTokenBalance from "./mutateTokenBalance";
 
 interface VaultWriteProps {
   chainId: number;
   vaultData: VaultData;
+  asset: Token;
+  vault: Token;
   account: Address;
   amount: number;
   clients: Clients;
@@ -25,6 +28,7 @@ interface VaultWriteProps {
     }: FireEventArgs
   ) => Promise<void>;
   referral?: Address;
+  tokensAtom: [{ [key: number]: TokenByAddress }, Function]
 }
 
 interface VaultRouterWriteProps extends VaultWriteProps {
@@ -106,11 +110,14 @@ async function simulateVaultRouterCall({
 export async function vaultDeposit({
   chainId,
   vaultData,
+  asset,
+  vault,
   account,
   amount,
   clients,
   fireEvent,
   referral,
+  tokensAtom
 }: VaultWriteProps): Promise<boolean> {
   showLoadingToast("Depositing into the vault...");
 
@@ -132,13 +139,20 @@ export async function vaultDeposit({
     clients,
   });
 
-  if (success && fireEvent) {
-    void fireEvent("addLiquidity", {
+  if (success) {
+    mutateTokenBalance({
+      tokensToUpdate: [vault.address, asset.address],
+      account,
+      tokensAtom,
+      chainId
+    })
+
+    if (fireEvent) void fireEvent("addLiquidity", {
       user_address: account,
       network: networkMap[chainId].toLowerCase(),
       contract_address: vaultData.address,
-      asset_amount: String(amount / 10 ** vaultData.asset.decimals),
-      asset_ticker: vaultData.asset.symbol,
+      asset_amount: String(amount / 10 ** asset.decimals),
+      asset_ticker: asset.symbol,
       additionalEventData: {
         referral: referral,
         vault_name: vaultData.metadata.vaultName,
@@ -151,11 +165,14 @@ export async function vaultDeposit({
 export async function vaultRedeem({
   chainId,
   vaultData,
+  asset,
+  vault,
   account,
   amount,
   clients,
   fireEvent,
   referral,
+  tokensAtom
 }: VaultWriteProps): Promise<boolean> {
   showLoadingToast("Withdrawing from the vault...");
 
@@ -192,13 +209,20 @@ export async function vaultRedeem({
     clients,
   });
 
-  if (success && fireEvent) {
-    void fireEvent("removeLiquidity", {
+  if (success) {
+    mutateTokenBalance({
+      tokensToUpdate: [vault.address, asset.address],
+      account,
+      tokensAtom,
+      chainId
+    })
+
+    if (fireEvent) void fireEvent("removeLiquidity", {
       user_address: account,
       network: networkMap[chainId].toLowerCase(),
       contract_address: vaultData.address,
-      asset_amount: String(amount / 10 ** vaultData.vault.decimals),
-      asset_ticker: vaultData.asset.symbol,
+      asset_amount: String(amount / 10 ** vault.decimals),
+      asset_ticker: asset.symbol,
       additionalEventData: {
         referral: referral,
         vault_name: vaultData.metadata.vaultName,
@@ -212,24 +236,17 @@ export async function vaultDepositAndStake({
   chainId,
   router,
   vaultData,
+  asset,
+  vault,
   account,
   amount,
   clients,
   fireEvent,
   referral,
+  tokensAtom
 }: VaultRouterWriteProps): Promise<boolean> {
   showLoadingToast("Depositing into the vault...");
 
-  const gauge = vaultData.gauge;
-  console.log({
-    address: router,
-    account,
-    amount,
-    vault: vaultData.address,
-    // @ts-ignore
-    gauge: gauge?.childGauge || gauge?.address as Address,
-    functionName: "depositAndStake",
-  })
   const success = await handleCallResult({
     successMessage: "Deposited into the vault and staked into Gauge!",
     simulationResponse: await simulateVaultRouterCall({
@@ -237,20 +254,26 @@ export async function vaultDepositAndStake({
       account,
       amount,
       vault: vaultData.address,
-      // @ts-ignore
-      gauge: gauge?.childGauge || gauge?.address as Address,
+      gauge: vaultData.gauge!,
       functionName: "depositAndStake",
       publicClient: clients.publicClient,
     }),
     clients,
   });
-  if (success && fireEvent) {
-    void fireEvent("addLiquidity", {
+  if (success) {
+    mutateTokenBalance({
+      tokensToUpdate: [vaultData.asset, vaultData.gauge!],
+      account,
+      tokensAtom,
+      chainId
+    })
+
+    if (fireEvent) void fireEvent("addLiquidity", {
       user_address: account,
       network: networkMap[chainId].toLowerCase(),
       contract_address: vaultData.address,
-      asset_amount: String(amount / 10 ** vaultData.asset.decimals),
-      asset_ticker: vaultData.asset.symbol,
+      asset_amount: String(amount / 10 ** asset.decimals),
+      asset_ticker: asset.symbol,
       additionalEventData: {
         referral: referral,
         vault_name: vaultData.metadata.vaultName,
@@ -264,15 +287,17 @@ export async function vaultUnstakeAndWithdraw({
   chainId,
   router,
   vaultData,
+  asset,
+  vault,
   account,
   amount,
   clients,
   fireEvent,
   referral,
+  tokensAtom
 }: VaultRouterWriteProps): Promise<boolean> {
   showLoadingToast("Withdrawing from the vault...");
 
-  const gauge = vaultData.gauge;
   const success = await handleCallResult({
     successMessage: "Unstaked from Gauge and withdrawn from Vault!",
     simulationResponse: await simulateVaultRouterCall({
@@ -280,20 +305,26 @@ export async function vaultUnstakeAndWithdraw({
       account,
       amount,
       vault: vaultData.address,
-      // @ts-ignore
-      gauge: gauge?.childGauge || gauge?.address as Address,
+      gauge: vaultData.gauge!,
       functionName: "unstakeAndWithdraw",
       publicClient: clients.publicClient,
     }),
     clients,
   });
-  if (success && fireEvent) {
-    void fireEvent("removeLiquidity", {
+  if (success) {
+    mutateTokenBalance({
+      tokensToUpdate: [vaultData.gauge!, vaultData.asset],
+      account,
+      tokensAtom,
+      chainId
+    })
+
+    if (fireEvent) void fireEvent("removeLiquidity", {
       user_address: account,
       network: networkMap[chainId].toLowerCase(),
       contract_address: vaultData.address,
-      asset_amount: String(amount / 10 ** vaultData.vault.decimals),
-      asset_ticker: vaultData.asset.symbol,
+      asset_amount: String(amount / 10 ** vault.decimals),
+      asset_ticker: asset.symbol,
       additionalEventData: {
         referral: referral,
         vault_name: vaultData.metadata.vaultName,

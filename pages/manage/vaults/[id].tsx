@@ -115,7 +115,7 @@ async function getVaultSettings(
         await yieldOptions.getApy({
           chainId: vault.chainId,
           protocol: strategyDescriptions[res[0]].resolver as ProtocolName,
-          asset: vault.asset.address,
+          asset: vault.asset,
         })
       ).total,
     };
@@ -149,13 +149,9 @@ export default function Index() {
   const [vault, setVault] = useState<VaultData>();
 
   useEffect(() => {
-    if (!vault && query && vaults.length > 0) {
+    if (!vault && query && Object.keys(vaults).length > 0) {
       setVault(
-        vaults.find(
-          (vault) =>
-            vault.address === query?.id &&
-            vault.chainId === Number(query?.chainId)
-        )
+        vaults[Number(query?.chainId)].find(vault => vault.address === query?.id)
       );
     }
   }, [vaults, query, vault]);

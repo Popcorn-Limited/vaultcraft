@@ -75,7 +75,7 @@ export const BridgerByDestination: AddressByChain = {
   42161: "0x44E6FD99a6df3E3D1792a71C1575519293894Ee2"
 }
 
-export const zapAssetAddressesByChain: { [key: number]: Address[] } = {
+export const ZapAssetAddressesByChain: { [key: number]: Address[] } = {
   1: [
     "0x6B175474E89094C44Da98b954EedeAC495271d0F", // DAI
     "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // USDC

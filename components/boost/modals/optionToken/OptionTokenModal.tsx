@@ -18,7 +18,10 @@ import { parseEther } from "viem";
 import { exerciseOPop } from "@/lib/optionToken/interactions";
 import ActionSteps from "@/components/vault/ActionSteps";
 import { ActionStep, EXERCISE_OVCX_STEPS } from "@/lib/getActionSteps";
-import { OptionTokenByChain, WETH } from "@/lib/constants";
+import { OptionTokenByChain, VCX, WETH } from "@/lib/constants";
+import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
+import { tokensAtom } from "@/lib/atoms";
+import { useAtom } from "jotai";
 
 export default function OptionTokenModal({
   show,
@@ -30,6 +33,8 @@ export default function OptionTokenModal({
   const { address: account } = useAccount();
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
+
+  const [tokens, setTokens] = useAtom(tokensAtom);
 
   const [modalStep, setModalStep] = useState(0);
   const [showModal, setShowModal] = show;
@@ -51,8 +56,7 @@ export default function OptionTokenModal({
   }, [showModal]);
 
   async function handleExerciseOptionToken() {
-    // Early exit if value is ZERO
-    // if ((Number(amount) || 0) == 0) return;
+    if (!account) return;
 
     if (chain?.id !== Number(1)) {
       try {
@@ -90,6 +94,14 @@ export default function OptionTokenModal({
           maxPaymentAmount: parseEther(maxPaymentAmount),
           clients: { publicClient, walletClient: walletClient as WalletClient },
         });
+        if (success) {
+          await mutateTokenBalance({
+            tokensToUpdate: [VCX, WETH, OptionTokenByChain[1]],
+            account,
+            tokensAtom: [tokens, setTokens],
+            chainId: 1
+          })
+        }
         break;
     }
 
@@ -133,7 +145,8 @@ export default function OptionTokenModal({
               {stepCounter < 2 ? (
                 <MainActionButton
                   label={steps[stepCounter].label}
-                  handleClick={handleExerciseOptionToken} //disabled={amount === "0" || maxPaymentAmount === "0"}
+                  handleClick={handleExerciseOptionToken} 
+                  //disabled={amount === "0" || maxPaymentAmount === "0"}
                 />
               ) : (
                 <MainActionButton

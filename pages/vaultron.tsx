@@ -7,7 +7,6 @@ import { useEffect, useState } from "react";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import MainActionButton from "@/components/button/MainActionButton";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
-import { useRouter } from "next/router";
 
 const LevelNameByValue: { [key: number]: string } = {
   1: "Bronze",
