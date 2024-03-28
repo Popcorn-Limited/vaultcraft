@@ -3,6 +3,7 @@ import InputTokenWithError from "@/components/input/InputTokenWithError";
 import MainActionButton from "@/components/button/MainActionButton";
 import { useEffect, useState } from "react";
 import {
+  erc20ABI,
   useAccount,
   useNetwork,
   usePublicClient,
@@ -10,7 +11,7 @@ import {
   useWalletClient,
 } from "wagmi";
 import TabSelector from "@/components/common/TabSelector";
-import { SmartVaultActionType, Token, VaultData, ZapProvider } from "@/lib/types";
+import { SmartVaultActionType, Token, TokenType, VaultData, ZapProvider } from "@/lib/types";
 import { validateInput } from "@/lib/utils/helpers";
 import Modal from "@/components/modal/Modal";
 import InputNumber from "@/components/input/InputNumber";
@@ -24,9 +25,10 @@ import { masaAtom } from "@/lib/atoms/sdk";
 import { useRouter } from "next/router";
 import { ActionStep, getSmartVaultActionSteps } from "@/lib/getActionSteps";
 import { vaultsAtom } from "@/lib/atoms/vaults";
-import { tokensAtom } from "@/lib/atoms";
+import { networthAtom, tokensAtom, tvlAtom } from "@/lib/atoms";
 import { getZapProvider } from "@/lib/vault/zap";
 import { showErrorToast, showLoadingToast, showSuccessToast } from "@/lib/toasts";
+import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 
 export interface VaultInputsProps {
   vaultData: VaultData;
@@ -56,6 +58,8 @@ export default function VaultInputs({
   const [masaSdk] = useAtom(masaAtom);
   const [tokens, setTokens] = useAtom(tokensAtom);
   const [vaults, setVaults] = useAtom(vaultsAtom);
+  const [tvl, setTVL] = useAtom(tvlAtom);
+  const [networth, setNetworth] = useAtom(networthAtom);
 
   const [inputToken, setInputToken] = useState<Token>();
   const [outputToken, setOutputToken] = useState<Token>();
@@ -277,8 +281,45 @@ export default function VaultInputs({
     setSteps(stepsCopy);
     setStepCounter(newStepCounter);
 
-    if (newStepCounter === steps.length || success) {
-      // TODO adjust TVL
+    if (newStepCounter === steps.length && success) {
+      const newSupply = await publicClient.readContract({
+        address: vaultData.address,
+        abi: erc20ABI,
+        functionName: "totalSupply"
+      })
+      const index = vaults[vaultData.chainId].findIndex(v => v.address === vaultData.address)
+      const newNetworkVaults = [...vaults[vaultData.chainId]]
+      newNetworkVaults[index] = {
+        ...vaultData,
+        totalSupply: Number(newSupply),
+        tvl: (Number(newSupply) * vault.price) / (10 ** vault.decimals)
+      }
+      const newVaults = { ...vaults, [vaultData.chainId]: newNetworkVaults }
+
+      setVaults(newVaults)
+
+      const vaultTVL = SUPPORTED_NETWORKS.map(chain => newVaults[chain.id]).flat().reduce((a, b) => a + b.tvl, 0)
+      setTVL({
+        vault: vaultTVL,
+        lockVault: tvl.lockVault,
+        stake: tvl.stake,
+        total: vaultTVL + tvl.lockVault + tvl.stake
+      });
+
+      const vaultNetworth = SUPPORTED_NETWORKS.map(chain =>
+        Object.values(tokens[chain.id])).flat().filter(t => t.type === TokenType.Vault || t.type === TokenType.Gauge)
+        .reduce((a, b) => a + ((b.balance / (10 ** b.decimals)) * b.price), 0)
+      const assetNetworth = SUPPORTED_NETWORKS.map(chain =>
+        Object.values(tokens[chain.id])).flat().filter(t => t.type === TokenType.Asset)
+        .reduce((a, b) => a + ((b.balance / (10 ** b.decimals)) * b.price), 0)
+
+      setNetworth({
+        vault: vaultNetworth,
+        lockVault: networth.lockVault,
+        wallet: assetNetworth,
+        stake: networth.stake,
+        total: vaultNetworth + assetNetworth + networth.lockVault + networth.stake
+      })
     }
   }
 
