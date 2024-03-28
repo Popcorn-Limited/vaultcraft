@@ -1,5 +1,5 @@
 import { Address, PublicClient, WalletClient } from "viem";
-import { ERC20Abi, ZERO, getVeAddresses } from "@/lib/constants";
+import { ERC20Abi, POP, ZERO } from "@/lib/constants";
 import {
   showErrorToast,
   showLoadingToast,
@@ -31,8 +31,6 @@ interface ApproveProps extends SimulateApproveProps {
 const MAX_APPROVAL_AMOUNT = BigInt(
   "115792089237316195423570985008687907853269984665640"
 );
-
-const { POP } = getVeAddresses();
 
 export async function handleAllowance({
   token,

@@ -4,32 +4,22 @@ import {
   Address,
   useAccount,
   useBalance,
-  usePublicClient,
-  useWalletClient,
 } from "wagmi";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import useNetworkFilter from "@/lib/useNetworkFilter";
-import { VaultData } from "@/lib/types";
 import SmartVault from "@/components/vault/SmartVault";
 import NetworkFilter from "@/components/network/NetworkFilter";
-import { getVeAddresses } from "@/lib/constants";
-import { ERC20Abi, VaultAbi } from "@/lib/constants";
-import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
 import MainActionButton from "@/components/button/MainActionButton";
-import { claimOPop } from "@/lib/optionToken/interactions";
-import { WalletClient } from "viem";
 import { useAtom } from "jotai";
 import { vaultsAtom } from "@/lib/atoms/vaults";
-import { getVaultNetworthByChain } from "@/lib/getNetworth";
-import VaultsSorting, {
-  VAULT_SORTING_TYPE,
-} from "@/components/vault/VaultsSorting";
-import { llama } from "@/lib/resolver/price/resolver";
+import VaultsSorting from "@/components/vault/VaultsSorting";
 import SearchBar from "@/components/input/SearchBar";
-import KelpVault from "@/components/vault/KelpVault";
-import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
-import OptionTokenModal from "@/components/boost/modals/optionToken/OptionTokenModal";
+import { OptionTokenByChain, VCX } from "@/lib/constants";
+import Modal from "@/components/modal/Modal";
+import OptionTokenInterface from "@/components/boost/OptionTokenInterface";
+import { VaultData } from "@/lib/types";
+import { gaugeRewardsAtom, networthAtom, tokensAtom, tvlAtom } from "@/lib/atoms";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 
 interface VaultsContainerProps {
@@ -38,73 +28,48 @@ interface VaultsContainerProps {
   showDescription?: boolean;
 }
 
-const { oVCX: OVCX, VCX } = getVeAddresses();
-
 export default function VaultsContainer({
   hiddenVaults,
   displayVaults,
   showDescription = false,
 }: VaultsContainerProps): JSX.Element {
   const { address: account } = useAccount();
-  const publicClient = usePublicClient();
-  const { data: walletClient } = useWalletClient();
 
-  const [vaults, setVaults] = useAtom(vaultsAtom);
+  const [vaultsData] = useAtom(vaultsAtom);
+  const [vaults, setVaults] = useState<VaultData[]>([])
 
-  const [tvl, setTvl] = useState<number>(0);
-  const [networth, setNetworth] = useState<number>(0);
+  useEffect(() => {
+    if (Object.keys(vaultsData).length > 0) setVaults(SUPPORTED_NETWORKS.map(chain => vaultsData[chain.id]).flat())
+  }, [vaultsData])
 
-  const [gaugeRewards, setGaugeRewards] = useState<GaugeRewards>();
+  const [tvl] = useAtom(tvlAtom)
+  const [networth] = useAtom(networthAtom)
+  const [tokens] = useAtom(tokensAtom)
+  const [gaugeRewards] = useAtom(gaugeRewardsAtom)
+
   const { data: oBal } = useBalance({
     chainId: 1,
     address: account,
-    token: OVCX,
+    token: OptionTokenByChain[1],
     watch: true,
   });
-  const [vcxPrice, setVcxPrice] = useState<number>(0);
-
-  useEffect(() => {
-    async function getAccountData() {
-      // get gauge rewards
-      if (account) {
-        const rewards = await getGaugeRewards({
-          gauges: vaults
-            .filter((vault) => vault.gauge && vault.chainId === 1)
-            .map((vault) => vault.gauge?.address) as Address[],
-          account: account as Address,
-          publicClient,
-        });
-        setGaugeRewards(rewards);
-        const vcxPriceInUsd = await llama({ address: VCX, chainId: 1 });
-        setVcxPrice(vcxPriceInUsd);
-      }
-      setNetworth(
-        SUPPORTED_NETWORKS.map((chain) =>
-          getVaultNetworthByChain({ vaults, chainId: chain.id })
-        ).reduce((a, b) => a + b, 0)
-      );
-      setTvl(vaults.reduce((a, b) => a + b.tvl, 0));
-    }
-    getAccountData();
-  }, [account]);
 
   const [selectedNetworks, selectNetwork] = useNetworkFilter(
     SUPPORTED_NETWORKS.map((network) => network.id)
   );
   const [searchTerm, setSearchTerm] = useState("");
+  const [showOptionTokenModal, setShowOptionTokenModal] = useState(false);
 
   function handleSearch(value: string) {
     setSearchTerm(value);
   }
 
-  const [showOptionTokenModal, setShowOptionTokenModal] = useState(false);
-
   return (
-    <NoSSR>
-      <OptionTokenModal
-        show={[showOptionTokenModal, setShowOptionTokenModal]}
-      />
-      <section className="w-full md:border-b border-[#353945] md:flex md:flex-wrap items-center justify-between py-10 px-4 md:px-8 md:gap-4">
+    <NoSSR >
+      <Modal visibility={[showOptionTokenModal, setShowOptionTokenModal]}>
+        <OptionTokenInterface />
+      </Modal>
+      <section className="md:border-b border-[#353945] md:flex md:flex-row items-center justify-between py-10 px-4 md:px-8 md:gap-4">
         <div className="w-full md:w-max">
           <h1 className="text-5xl font-normal m-0 mb-4 md:mb-2 leading-0 text-primary md:text-3xl leading-none">
             Smart Vaults
@@ -121,7 +86,7 @@ export default function VaultsContainer({
                 TVL
               </p>
               <div className="text-3xl font-bold whitespace-nowrap text-primary">
-                {`$${NumberFormatter.format(tvl)}`}
+                {`$${NumberFormatter.format(tvl.vault)}`}
               </div>
             </div>
 
@@ -130,7 +95,7 @@ export default function VaultsContainer({
                 Deposits
               </p>
               <div className="text-3xl font-bold whitespace-nowrap text-primary">
-                {`$${NumberFormatter.format(networth)}`}
+                {`$${NumberFormatter.format(networth.vault)}`}
               </div>
             </div>
           </div>
@@ -142,9 +107,9 @@ export default function VaultsContainer({
                   My oVCX
                 </p>
                 <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
-                  {`$${oBal && vcxPrice
+                  {`$${oBal && tokens[1] && tokens[1][VCX]
                     ? NumberFormatter.format(
-                      (Number(oBal?.value) / 1e18) * (vcxPrice * 0.25)
+                      (Number(oBal?.value) / 1e18) * (tokens[1][VCX].price * 0.25)
                     )
                     : "0"
                     }`}
@@ -156,10 +121,10 @@ export default function VaultsContainer({
                   Claimable oVCX
                 </p>
                 <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
-                  {`$${gaugeRewards && vcxPrice
+                  {`$${gaugeRewards && tokens[1] && tokens[1][VCX]
                     ? NumberFormatter.format(
-                      (Number(gaugeRewards?.total) / 1e18) *
-                      (vcxPrice * 0.25)
+                      Number(gaugeRewards?.[1]?.total + gaugeRewards?.[10]?.total + gaugeRewards?.[42161]?.total) / 1e18 *
+                      (tokens[1][VCX].price * 0.25)
                     )
                     : "0"
                     }`}
@@ -170,18 +135,7 @@ export default function VaultsContainer({
             <div className="hidden md:flex flex-row items-center w-100 space-x-4">
               <MainActionButton
                 label="Claim oVCX"
-                handleClick={() =>
-                  claimOPop({
-                    gauges: gaugeRewards?.amounts
-                      ?.filter((gauge) => Number(gauge.amount) > 1000e18) // only use gauges with 1000 or more oVCX claimable
-                      .map((gauge) => gauge.address) as Address[],
-                    account: account as Address,
-                    clients: {
-                      publicClient,
-                      walletClient: walletClient as WalletClient,
-                    },
-                  })
-                }
+                handleClick={() => setShowOptionTokenModal(true)}
               />
               <SecondaryActionButton
                 label="Exercise oVCX"
@@ -192,18 +146,7 @@ export default function VaultsContainer({
           <div className="md:hidden space-y-4">
             <MainActionButton
               label="Claim oVCX"
-              handleClick={() =>
-                claimOPop({
-                  gauges: gaugeRewards?.amounts
-                    ?.filter((gauge) => Number(gauge.amount) > 1000e18) // only use gauges with 1000 or more oVCX claimable
-                    .map((gauge) => gauge.address) as Address[],
-                  account: account as Address,
-                  clients: {
-                    publicClient,
-                    walletClient: walletClient as WalletClient,
-                  },
-                })
-              }
+              handleClick={() => setShowOptionTokenModal(true)}
             />
             <SecondaryActionButton
               label="Exercise oVCX"
@@ -237,26 +180,21 @@ export default function VaultsContainer({
               .filter((vault) => !hiddenVaults.includes(vault.address))
               .sort((a, b) => b.tvl - a.tvl)
               .map((vault) => {
-                return vault.address ===
-                  "0x7CEbA0cAeC8CbE74DB35b26D7705BA68Cb38D725" ? (
-                  <KelpVault searchTerm={searchTerm} />
-                ) : (
+                return (
                   <SmartVault
                     key={`sv-${vault.address}-${vault.chainId}`}
                     vaultData={vault}
-                    mutateTokenBalance={mutateTokenBalance}
                     searchTerm={searchTerm}
-                    description={
-                      showDescription ? vault.metadata.description : undefined
-                    }
+                    description={showDescription ? vault.metadata.description : undefined}
                   />
-                );
-              })}
+                )
+              })
+            }
           </>
         ) : (
           <p className="text-white">Loading Vaults...</p>
         )}
       </section>
-    </NoSSR>
-  );
+    </NoSSR >
+  )
 }

@@ -1,31 +1,33 @@
 import { Address } from "viem";
-import {
-  NumberFormatter,
-  formatAndRoundNumber,
-} from "@/lib/utils/formatBigNumber";
+import { NumberFormatter, formatAndRoundNumber } from "@/lib/utils/formatBigNumber";
 import Title from "@/components/common/Title";
-import { LockVaultData, VaultData } from "@/lib/types";
+import { Token, VaultData } from "@/lib/types";
 import { roundToTwoDecimalPlaces } from "@/lib/utils/helpers";
 import ResponsiveTooltip from "@/components/common/Tooltip";
 
 interface VaultStatProps {
-  vaultData: VaultData | LockVaultData;
+  vaultData: VaultData;
+  asset:Token;
+  vault:Token;
+  gauge?:Token;
   account?: Address;
   zapAvailable?: boolean;
 }
 
 export default function VaultStats({
   vaultData,
+  asset,
+  vault,
+  gauge,
   account,
   zapAvailable,
 }: VaultStatProps): JSX.Element {
-  const { asset, vault, gauge, apy, gaugeMinApy, gaugeMaxApy } = vaultData;
+  const { apy, boostMin, boostMax } = vaultData;
   const baseTooltipId = vault.address.slice(1);
-  const isLockVault = vaultData.metadata.type === "single-asset-lock-vault-v1";
 
   return (
     <>
-      <div className="w-full flex justify-between gap-8 md:gap-4">
+      <div className="w-full flex flex-row justify-between gap-8 md:gap-4">
         <div className="w-full mt-6 md:mt-0">
           <p
             className="text-primary font-normal md:text-[14px]"
@@ -67,15 +69,10 @@ export default function VaultStats({
             >
               $
               {account
-                ? isLockVault
-                  ? formatAndRoundNumber(
-                      (vaultData as LockVaultData).lock.amount * asset.price,
-                      asset.decimals
-                    )
-                  : formatAndRoundNumber(
-                      (!!gauge ? gauge.balance : vault.balance) * vault.price,
-                      vault.decimals
-                    )
+                ? formatAndRoundNumber(
+                    (!!gauge ? gauge.balance : vault.balance) * vault.price,
+                    vault.decimals
+                  )
                 : "-"}
             </Title>
           </div>
@@ -100,15 +97,15 @@ export default function VaultStats({
           >
             $ {vaultData.tvl < 1 ? "0" : NumberFormatter.format(vaultData.tvl)}
           </Title>
+          <ResponsiveTooltip
+            id={`${baseTooltipId}-tvl`}
+            content={
+              <p className="max-w-52">
+                Total value of all assets deposited into the vault
+              </p>
+            }
+          />
         </div>
-        <ResponsiveTooltip
-          id={`${baseTooltipId}-tvl`}
-          content={
-            <p className="max-w-52">
-              Total value of all assets deposited into the vault
-            </p>
-          }
-        />
       </div>
 
       <div className="w-full flex flex-row justify-between gap-8 md:gap-4">
@@ -136,21 +133,8 @@ export default function VaultStats({
             }
           />
         </div>
-        {isLockVault ? (
-          <LockRewards
-            vaultData={vaultData as LockVaultData}
-            baseTooltipId={baseTooltipId}
-          />
-        ) : (
-          <GaugeRewards vaultData={vaultData} baseTooltipId={baseTooltipId} />
-        )}
+        <GaugeRewards vaultData={vaultData} baseTooltipId={baseTooltipId} />
       </div>
-      {isLockVault && !!gauge && (
-        <div className="w-full flex flex-row justify-between gap-8 md:gap-4">
-          <GaugeRewards vaultData={vaultData} baseTooltipId={baseTooltipId} />
-        </div>
-      )}
-
       {zapAvailable && (
         <div className="w-full h-fit mt-auto">
           <p className="font-normal text-primary text-[15px] mb-1">
@@ -162,75 +146,11 @@ export default function VaultStats({
   );
 }
 
-function LockRewards({
-  vaultData,
-  baseTooltipId,
-}: {
-  vaultData: LockVaultData;
-  baseTooltipId: string;
-}): JSX.Element {
-  const totalRewardApy = vaultData.rewards.reduce((a, b) => a + b.rewardApy, 0);
-
-  return (
-    <>
-      <div className="w-full mt-6 md:mt-0">
-        <p
-          className="font-normal text-primary md:text-[14px]"
-          id={`${baseTooltipId}-minReward`}
-        >
-          Min Rewards
-        </p>
-        <Title
-          as="span"
-          level={2}
-          fontWeight="font-normal"
-          className="text-primary"
-        >
-          {totalRewardApy ? (totalRewardApy / 4).toFixed(2) : "-"} %
-        </Title>
-        <ResponsiveTooltip
-          id={`${baseTooltipId}-minReward`}
-          content={
-            <p className="max-w-52">
-              Minimum reward APR based on most recent distribution event
-            </p>
-          }
-        />
-      </div>
-
-      <div className="w-full mt-6 md:mt-0">
-        <p
-          className="font-normal text-primary md:text-[14px]"
-          id={`${baseTooltipId}-maxReward`}
-        >
-          Max Rewards
-        </p>
-        <Title
-          as="span"
-          level={2}
-          fontWeight="font-normal"
-          className="text-primary"
-        >
-          {totalRewardApy ? totalRewardApy.toFixed(2) : "-"} %
-        </Title>
-        <ResponsiveTooltip
-          id={`${baseTooltipId}-maxReward`}
-          content={
-            <p className="max-w-52">
-              Maximum reward APR based on most recent distribution event
-            </p>
-          }
-        />
-      </div>
-    </>
-  );
-}
-
 function GaugeRewards({
   vaultData,
   baseTooltipId,
 }: {
-  vaultData: VaultData | LockVaultData;
+  vaultData: VaultData;
   baseTooltipId: string;
 }): JSX.Element {
   return (
@@ -240,7 +160,7 @@ function GaugeRewards({
           className="font-normal text-primary md:text-[14px]"
           id={`${baseTooltipId}-minBoost`}
         >
-          Min Boost
+          Min Rewards
         </p>
         <Title
           as="span"
@@ -248,7 +168,7 @@ function GaugeRewards({
           fontWeight="font-normal"
           className="text-primary"
         >
-          {vaultData.gaugeMinApy?.toFixed(2) || "-"} %
+          {vaultData?.boostMin ? NumberFormatter.format(roundToTwoDecimalPlaces(vaultData?.boostMin)) : "-"} %
         </Title>
         <ResponsiveTooltip
           id={`${baseTooltipId}-minBoost`}
@@ -266,7 +186,7 @@ function GaugeRewards({
           className="font-normal text-primary md:text-[14px]"
           id={`${baseTooltipId}-maxBoost`}
         >
-          Max Boost
+          Max Rewards
         </p>
         <Title
           as="span"
@@ -274,7 +194,7 @@ function GaugeRewards({
           fontWeight="font-normal"
           className="text-primary"
         >
-          {vaultData.gaugeMaxApy?.toFixed(2) || "-"} %
+          {vaultData?.boostMax ? NumberFormatter.format(roundToTwoDecimalPlaces(vaultData?.boostMax)) : "-"} %
         </Title>
         <ResponsiveTooltip
           id={`${baseTooltipId}-maxBoost`}

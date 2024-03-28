@@ -1,5 +1,4 @@
 import { atom } from "jotai";
-import { LockVaultData, VaultData } from "@/lib/types";
+import { VaultData } from "@/lib/types";
 
-export const vaultsAtom = atom<VaultData[]>([]);
-export const lockvaultsAtom = atom<LockVaultData[]>([]);
+export const vaultsAtom = atom<{ [key: number]: VaultData[] }>({});

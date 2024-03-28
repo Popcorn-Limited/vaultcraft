@@ -6,11 +6,9 @@ import MainActionButton from "@/components/button/MainActionButton";
 import getClaimableVeReward from "@/lib/feeDistributor/getClaimableVeReward";
 import getVeApy from "@/lib/feeDistributor/getVeApy";
 import { useClaimTokens } from "@/lib/feeDistributor/useClaimToken";
-import { getVeAddresses } from "@/lib/constants";
+import { FEE_DISTRIBUTOR, WETH } from "@/lib/constants";
 
 function noOp() {}
-
-const { WETH: WETH, FeeDistributor: FEE_DISTRIBUTOR } = getVeAddresses();
 
 export default function VeRewards(): JSX.Element {
   const { address: account } = useAccount();

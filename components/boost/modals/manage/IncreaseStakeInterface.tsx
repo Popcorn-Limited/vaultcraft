@@ -1,17 +1,14 @@
 import { Dispatch, FormEventHandler, SetStateAction, useMemo } from "react";
-import { getVeAddresses } from "@/lib/constants";
 import { Address, useAccount, useBalance, useToken } from "wagmi";
 import {
   formatAndRoundBigNumber,
   safeRound,
 } from "@/lib/utils/formatBigNumber";
-import { ZERO } from "@/lib/constants";
+import { VCX_LP, ZERO } from "@/lib/constants";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import { calcDaysToUnlock, calculateVeOut } from "@/lib/gauges/utils";
 import { validateInput } from "@/lib/utils/helpers";
 import { formatEther } from "viem";
-
-const { WETH_VCX_LP } = getVeAddresses();
 
 interface IncreaseStakeInterfaceProps {
   amountState: [string, Dispatch<SetStateAction<string>>];
@@ -27,12 +24,12 @@ export default function IncreaseStakeInterface({
   const { address: account } = useAccount();
   const { data: lpToken } = useToken({
     chainId: 1,
-    address: WETH_VCX_LP as Address,
+    address: VCX_LP,
   });
   const { data: lpBal } = useBalance({
     chainId: 1,
     address: account,
-    token: WETH_VCX_LP,
+    token: VCX_LP,
   });
 
   const [amount, setAmount] = amountState;

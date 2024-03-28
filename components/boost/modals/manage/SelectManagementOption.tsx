@@ -61,6 +61,15 @@ export default function SelectManagementOption({
             }}
           />
         </div>
+        <div className="w-full px-4 py-4 border border-gray-500 rounded-lg">
+          <TertiaryActionButton
+            label="Broadcast VeBalance"
+            handleClick={() => {
+              setManagementOption(ManagementOption.BroadcastVeBalance);
+              setStep(1);
+            }}
+          />
+        </div>
       </div>
     </div>
   );

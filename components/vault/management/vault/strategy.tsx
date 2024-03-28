@@ -21,7 +21,7 @@ async function getStrategies(vaultData: VaultData, yieldOptions: YieldOptions) {
   );
   return await Promise.all(
     Object.values(strategyDescriptions)
-      .filter((strategy: any) => strategy.asset === vaultData.asset.address)
+      .filter((strategy: any) => strategy.asset === vaultData.asset)
       .map(async (strategy: any) => {
         return {
           ...strategy,
@@ -29,7 +29,7 @@ async function getStrategies(vaultData: VaultData, yieldOptions: YieldOptions) {
             await yieldOptions.getApy({
               chainId: vaultData.chainId,
               protocol: strategy.resolver as ProtocolName,
-              asset: vaultData.asset.address,
+              asset: vaultData.asset,
             })
           ).total,
         };
@@ -122,7 +122,7 @@ export default function VaultStrategyConfiguration({
                 <span className="flex flex-row items-center gap-x-4 mb-2">
                   <ProtocolIcon
                     protocolName={
-                      vaultData.metadata.optionalMetadata.protocol.name
+                      vaultData.strategies[0].metadata.name
                     }
                   />
                   <p>
@@ -133,7 +133,7 @@ export default function VaultStrategyConfiguration({
                 </span>
                 <p>
                   {
-                    vaultData.metadata.optionalMetadata.protocol.description.split(
+                    vaultData.strategies[0].metadata.description.split(
                       "** - "
                     )[1]
                   }
