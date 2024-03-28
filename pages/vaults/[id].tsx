@@ -17,11 +17,12 @@ import VaultInputs from "@/components/vault/VaultInputs";
 import { showSuccessToast } from "@/lib/toasts";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { Square2StackIcon } from "@heroicons/react/24/outline";
-import { tokensAtom } from "@/lib/atoms";
+import { gaugeRewardsAtom, tokensAtom } from "@/lib/atoms";
 import LeftArrowIcon from "@/components/svg/LeftArrowIcon";
 import LoanInterface from "@/components/lending/LoanInterface";
 import { MinterByChain, OptionTokenByChain, VCX, ZapAssetAddressesByChain } from "@/lib/constants";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
+import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
 
 export default function Index() {
   const router = useRouter();
@@ -35,7 +36,7 @@ export default function Index() {
 
   const [yieldOptions] = useAtom(yieldOptionsAtom);
 
-  const [tokens] = useAtom(tokensAtom)
+  const [tokens, setTokens] = useAtom(tokensAtom)
   const [vaults] = useAtom(vaultsAtom);
   const [vaultData, setVaultData] = useState<VaultData>();
 
@@ -87,25 +88,12 @@ export default function Index() {
     if (account && vaultData) getOToken()
   }, [account])
 
-  const [gaugeRewards, setGaugeRewards] = useState<GaugeRewards>();
-
-  useEffect(() => {
-    async function getRewardsData() {
-      const rewards = await getGaugeRewards({
-        gauges: [vaultData?.gauge!],
-        account: account!,
-        chainId: vaultData?.chainId!,
-        publicClient
-      })
-      setGaugeRewards(rewards)
-    }
-    if (account && vaultData?.gauge) getRewardsData();
-  }, [account]);
+  const [gaugeRewards, setGaugeRewards] = useAtom(gaugeRewardsAtom);
 
   const [showLendModal, setShowLendModal] = useState(false)
 
   async function handleClaim() {
-    if (!vaultData) return
+    if (!vaultData || !account) return
 
     if (chain?.id !== vaultData?.chainId) {
       try {
@@ -115,12 +103,30 @@ export default function Index() {
       }
     }
 
-    claimOPop({
+    const success = await claimOPop({
       gauges: [vaultData.gauge || zeroAddress],
       account: account as Address,
       minter: MinterByChain[vaultData?.chainId],
       clients: { publicClient, walletClient: walletClient as WalletClient }
     })
+
+    if (success) {
+      await mutateTokenBalance({
+        tokensToUpdate: [OptionTokenByChain[vaultData?.chainId]],
+        account,
+        tokensAtom: [tokens, setTokens],
+        chainId: vaultData?.chainId
+      })
+      setGaugeRewards({
+        ...gaugeRewards,
+        [vaultData?.chainId]: await getGaugeRewards({
+          gauges: vaults[vaultData?.chainId].filter(vault => !!vault.gauge).map(vault => vault.gauge) as Address[],
+          account: account,
+          chainId: vaultData?.chainId,
+          publicClient
+        })
+      })
+    }
   }
 
   return <NoSSR>
@@ -222,7 +228,8 @@ export default function Index() {
                     <div className="w-[120px] md:w-max">
                       <p className="w-max leading-6 text-base text-primaryDark md:text-primary">Claimable oVCX</p>
                       <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
-                        {`$${gaugeRewards && tokens[1][VCX] ? NumberFormatter.format((Number(gaugeRewards?.total) / 1e18) * (tokens[1][VCX].price * 0.25)) : "0"}`}
+                        {`$${gaugeRewards && tokens[1][VCX] ?
+                          NumberFormatter.format((Number(gaugeRewards?.[vaultData.chainId].total) / 1e18) * (tokens[1][VCX].price * 0.25)) : "0"}`}
                       </div>
                     </div>
                   </div>
@@ -231,7 +238,7 @@ export default function Index() {
                     <MainActionButton
                       label="Claim oVCX"
                       handleClick={handleClaim}
-                      disabled={!gaugeRewards || gaugeRewards?.total < 0}
+                      disabled={!gaugeRewards || gaugeRewards?.[vaultData.chainId].total < 0}
                     />
                   </div>
                 </div>
@@ -239,7 +246,7 @@ export default function Index() {
                   <MainActionButton
                     label="Claim oVCX"
                     handleClick={handleClaim}
-                    disabled={!gaugeRewards || gaugeRewards?.total < 0}
+                    disabled={!gaugeRewards || gaugeRewards?.[vaultData.chainId].total < 0}
                   />
                 </div>
               </div>

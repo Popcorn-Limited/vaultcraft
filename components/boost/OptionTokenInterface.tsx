@@ -16,6 +16,8 @@ import { MinterByChain, OptionTokenByChain, VCX } from "@/lib/constants";
 import { useAtom } from "jotai";
 import { gaugeRewardsAtom, tokensAtom } from "@/lib/atoms";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
+import getGaugeRewards from "@/lib/gauges/getGaugeRewards";
+import { vaultsAtom } from "@/lib/atoms/vaults";
 
 interface OptionTokenInterfaceProps {
   setShowOptionTokenModal?: Dispatch<SetStateAction<boolean>>;
@@ -27,6 +29,7 @@ export default function OptionTokenInterface({ setShowOptionTokenModal }: Option
   const { data: walletClient } = useWalletClient();
 
   const [tokens, setTokens] = useAtom(tokensAtom)
+  const [vaults, setVaults] = useAtom(vaultsAtom)
   const [gaugeRewards, setGaugeRewards] = useAtom(gaugeRewardsAtom);
 
   const { data: oBal } = useBalance({
@@ -59,6 +62,15 @@ export default function OptionTokenInterface({ setShowOptionTokenModal }: Option
         account,
         tokensAtom: [tokens, setTokens],
         chainId
+      })
+      setGaugeRewards({
+        ...gaugeRewards,
+        [chainId]: await getGaugeRewards({
+          gauges: vaults[chainId].filter(vault => !!vault.gauge).map(vault => vault.gauge) as Address[],
+          account: account as Address,
+          chainId: chainId,
+          publicClient
+        })
       })
     }
   }
