@@ -15,7 +15,7 @@ import { validateInput } from "@/lib/utils/helpers";
 import Modal from "@/components/modal/Modal";
 import InputNumber from "@/components/input/InputNumber";
 import { safeRound } from "@/lib/utils/formatBigNumber";
-import { formatUnits, getAddress, isAddress } from "viem";
+import { formatUnits, getAddress, isAddress, maxUint256 } from "viem";
 import handleVaultInteraction from "@/lib/vault/handleVaultInteraction";
 import ActionSteps from "@/components/vault/ActionSteps";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
@@ -314,6 +314,13 @@ export default function VaultInputs({
         allowInput
       />
 
+      {vaultData.depositLimit < maxUint256 &&
+        <span className="flex flex-row items-center justify-between text-[#D7D7D7]">
+          <p>Deposit Limit:</p>
+          <p>{vaultData.depositLimit / (10 ** vaultData.asset.decimals)} {vaultData.asset.symbol}</p>
+        </span>
+      }
+
       <div className="relative py-4">
         <div className="absolute inset-0 flex items-center" aria-hidden="true">
           <div className="w-full border-t border-gray-500" />
@@ -334,13 +341,13 @@ export default function VaultInputs({
         onSelectToken={(option) =>
           handleTokenSelect(!!gauge ? gauge : vault, option)
         }
-        onMaxClick={() => {}}
+        onMaxClick={() => { }}
         chainId={chainId}
         value={
           (Number(inputBalance) * Number(inputToken?.price)) /
-            Number(outputToken?.price) || 0
+          Number(outputToken?.price) || 0
         }
-        onChange={() => {}}
+        onChange={() => { }}
         selectedToken={outputToken}
         errorMessage={""}
         tokenList={tokenOptions.filter((token) =>
@@ -355,21 +362,21 @@ export default function VaultInputs({
         ![asset.address, vault.address].includes(inputToken.address)) ||
         (!isDeposit &&
           ![asset.address, vault.address].includes(outputToken.address))) && (
-        <div
-          className="group/zap flex flex-row items-center cursor-pointer"
-          onClick={() => setShowModal(true)}
-        >
-          <Cog6ToothIcon
-            className="h-5 w-5 mt-1 mr-2 text-secondaryLight group-hover/zap:text-primary"
-            aria-hidden="true"
-          />
-          <p className="text-secondaryLight group-hover/zap:text-primary">
-            Zap Settings
-          </p>
-        </div>
-      )}
+          <div
+            className="group/zap flex flex-row items-center cursor-pointer"
+            onClick={() => setShowModal(true)}
+          >
+            <Cog6ToothIcon
+              className="h-5 w-5 mt-1 mr-2 text-secondaryLight group-hover/zap:text-primary"
+              aria-hidden="true"
+            />
+            <p className="text-secondaryLight group-hover/zap:text-primary">
+              Zap Settings
+            </p>
+          </div>
+        )}
 
-      <div className="mt-6">
+      <div className="mt-4">
         <p className="text-white font-bold mb-2 text-start">Fee Breakdown</p>
         <div className="bg-[#23262f] py-2 px-4 rounded-lg space-y-2">
           <span className="flex flex-row items-center justify-between text-white">
@@ -399,7 +406,7 @@ export default function VaultInputs({
         {account ? (
           <>
             {stepCounter === steps.length ||
-            steps.some((step) => !step.loading && step.error) ? (
+              steps.some((step) => !step.loading && step.error) ? (
               <MainActionButton label={"Finish"} handleClick={hideModal} />
             ) : (
               <MainActionButton
