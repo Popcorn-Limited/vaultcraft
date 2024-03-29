@@ -265,6 +265,7 @@ export async function getVaults({
         `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/gauge-apy-data.json`
       )
     ).data as GaugeData;
+    console.log({ gaugeApyData })
     await Promise.all(
       result.map(async (vault, i) => {
         const foundGauge = gauges.find(
