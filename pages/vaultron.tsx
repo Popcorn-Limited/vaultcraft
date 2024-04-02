@@ -1,12 +1,10 @@
-import { VAULTRON, VaultronAbi } from "@/lib/constants";
-import { Address, PublicClient } from "viem";
-import { useAccount, usePublicClient } from "wagmi";
-import axios from "axios"
+import { useAccount } from "wagmi";
 import NoSSR from "react-no-ssr";
-import { useEffect, useState } from "react";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import MainActionButton from "@/components/button/MainActionButton";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
+import { useAtom } from "jotai";
+import { vaultronAtom } from "@/lib/atoms";
 
 const LevelNameByValue: { [key: number]: string } = {
   1: "Bronze",
@@ -14,58 +12,11 @@ const LevelNameByValue: { [key: number]: string } = {
   3: "Gold"
 }
 
-const DEFAULT_VAULTRON: VaultronStats = {
-  level: 0,
-  xp: 0,
-  animation: "",
-  image: "",
-  tokenId: 0
-}
-
-interface VaultronStats {
-  level: number;
-  xp: number;
-  animation: string;
-  image: string;
-  tokenId: number;
-}
-
-async function fetchVaultron(account: Address, client: PublicClient): Promise<VaultronStats> {
-  try {
-    const tokenId = await client.readContract({
-      address: VAULTRON,
-      abi: VaultronAbi,
-      functionName: "getActiveTokenId",
-      args: [account]
-    })
-    const tokenURI = await client.readContract({
-      address: VAULTRON,
-      abi: VaultronAbi,
-      functionName: "tokenURI",
-      args: [tokenId]
-    })
-    const { data } = await axios.get(tokenURI)
-    console.log(data)
-    return { level: Number(data.properties.Level.value), xp: Number(data.properties.XP?.value || 0), animation: data.animation_url, image: data.image, tokenId: Number(tokenId) }
-  } catch (e) {
-    console.log(e)
-    return DEFAULT_VAULTRON
-  }
-}
-
-export default function Test() {
+export default function Vaultron() {
   const { address: account } = useAccount()
-  const publicClient = usePublicClient({ chainId: 137 })
   const { openConnectModal } = useConnectModal();
 
-  const [vaultronStats, setVaultronStats] = useState<VaultronStats>(DEFAULT_VAULTRON)
-
-  useEffect(() => {
-    if (account) {
-      fetchVaultron(account, publicClient)
-        .then(res => setVaultronStats(res))
-    }
-  }, [account])
+  const [vaultronStats] = useAtom(vaultronAtom)
 
   function handleMercle(tokenId: number) {
     if (!window) return
@@ -119,7 +70,7 @@ export default function Test() {
           </div>
 
           <p className="mt-16">
-            Your Vaultron NFT gives you access to XP points, airdrops and oVCX rewards.
+            Your Vaultron NFT gives you access to XP points, airdrops, and oVCX rewards.
           </p>
 
           <div className="mt-16">

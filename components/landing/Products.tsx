@@ -23,10 +23,10 @@ export default function Products(): JSX.Element {
             <div className="col-span-12 md:col-span-4 xs:self-start flex-1">
               <div className="relative flex flex-row">
                 <h2 className="text-primary text-4xl md:text-[56px] leading-none mb-2">
-                  TUTORIAL
+                  Instruction Manual
                 </h2>
               </div>
-              <p className="mt-2 text-primary">Help Text</p>
+              <p className="mt-2 text-primary">Learn how to use VaultCraft and optimize your yield with our perpetual call options</p>
             </div>
           </div>
 
@@ -44,7 +44,7 @@ export default function Products(): JSX.Element {
                 className="group-hover:fill-[#FFA0B4]"
               />
             }
-            description="Single-asset vaults to earn yield on your digital assets"
+            description="Deposit and optimize your yield with automated, non-custodial DeFi strategies"
             stats={[
               {
                 label: "TVL",
@@ -77,7 +77,7 @@ export default function Products(): JSX.Element {
                 className="group-hover:fill-[#C391FF]"
               />
             }
-            description="Lock stake your VCX-LP to boost your rewards with call options on VCX"
+            description="Lock your VCX LP token to earn additional perpetual call options on your Smart Vault deposits"
             stats={[]}
             route="boost"
           />
@@ -101,7 +101,7 @@ export default function Products(): JSX.Element {
                     Create Vaults
                   </h2>
                 </div>
-                <p className="mt-2 text-primary">Create automated assets strategies within minutes</p>
+                <p className="mt-2 text-primary">Customize and deploy your own Smart Vault</p>
               </div>
             </Link>
             <Link

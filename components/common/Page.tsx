@@ -12,7 +12,7 @@ import { useRouter } from "next/router";
 import { Address, createPublicClient, http, zeroAddress } from "viem";
 import Modal from "@/components/modal/Modal";
 import MainActionButton from "../button/MainActionButton";
-import { availableZapAssetAtom, gaugeRewardsAtom, networthAtom, tokensAtom, tvlAtom, zapAssetsAtom } from "@/lib/atoms";
+import { availableZapAssetAtom, gaugeRewardsAtom, networthAtom, tokensAtom, tvlAtom, vaultronAtom, zapAssetsAtom } from "@/lib/atoms";
 import { ReserveData, Token, TokenByAddress, TokenType, UserAccountData, VaultData, VaultDataByAddress } from "@/lib/types";
 import getTokenAndVaultsDataByChain from "@/lib/getTokenAndVaultsData";
 import { aaveAccountDataAtom, aaveReserveDataAtom } from "@/lib/atoms/lending";
@@ -21,6 +21,8 @@ import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
 import axios from "axios";
 import { fetchAaveData } from "@/lib/external/aave/interactions";
 import { VCX_LP, VE_VCX, VotingEscrowAbi } from "@/lib/constants";
+import fetchVaultron from "@/lib/vaultron";
+import { polygon } from "viem/chains";
 
 async function setUpYieldOptions() {
   const ttl = 360_000;
@@ -211,6 +213,7 @@ export default function Page({
   const [, setNetworth] = useAtom(networthAtom);
   const [, setAaveReserveData] = useAtom(aaveReserveDataAtom)
   const [, setAaveAccountData] = useAtom(aaveAccountDataAtom)
+  const [, setVaultronStats] = useAtom(vaultronAtom)
 
   useEffect(() => {
     async function getData() {
@@ -292,6 +295,12 @@ export default function Page({
           total: vaultNetworth + assetNetworth + stakeNetworth + lockVaultNetworth
         })
         setGaugeRewards(newRewards);
+
+        const newVaultronStats = await fetchVaultron(account, createPublicClient({
+          chain: polygon,
+          transport: http(RPC_URLS[137]),
+        }))
+        setVaultronStats(newVaultronStats)
       }
     }
     if (yieldOptions) getData();

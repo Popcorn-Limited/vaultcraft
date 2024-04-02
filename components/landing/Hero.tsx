@@ -1,12 +1,12 @@
 import StatusWithLabel from "@/components/common/StatusWithLabel";
-import { networthAtom, tvlAtom } from "@/lib/atoms";
+import { networthAtom, tvlAtom, vaultronAtom } from "@/lib/atoms";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import { useAtom } from "jotai";
 
 export default function Hero(): JSX.Element {
   const [networth] = useAtom(networthAtom)
   const [tvl] = useAtom(tvlAtom)
-
+  const [vaultronStats] = useAtom(vaultronAtom)
 
   return (
     <section className="pb-8 pt-8 sm:pb-6 border-b border-[#AFAFAF]">
@@ -55,6 +55,46 @@ export default function Hero(): JSX.Element {
               }
               className="md:min-w-[160px] lg:min-w-0"
             />
+            <StatusWithLabel
+              label={"My Net Worth"}
+              content={
+                <p className="text-3xl font-bold text-primary leading-[120%]">
+                  ${" "}
+                  {
+                    networth.total > 0.01
+                      ? NumberFormatter.format(networth.total)
+                      : "0"
+                  }
+                </p>
+              }
+              infoIconProps={{
+                id: "networth",
+                title: "My Networth",
+                content: (
+                  <p>
+                    This value aggregates your VaultCraft-related <br />{" "}
+                    holdings across all blockchain networks.
+                  </p>
+                ),
+              }}
+            />
+            <StatusWithLabel
+              label={"My XP"}
+              content={
+                <p className="text-3xl font-bold text-primary leading-[120%]">
+                  {vaultronStats.xp}
+                </p>
+              }
+              infoIconProps={{
+                id: "vaultronXp",
+                title: "My XP",
+                content: (
+                  <p>
+                    This value shows your Vaultron XP
+                  </p>
+                ),
+              }}
+            />
           </div>
         </div>
         <div className="w-full md:w-fit-content">
@@ -80,29 +120,6 @@ export default function Hero(): JSX.Element {
                   <p>
                     Total value locked (TVL) is the amount <br /> of user funds
                     deposited in VaultCraft products.
-                  </p>
-                ),
-              }}
-            />
-            <StatusWithLabel
-              label={"My Net Worth"}
-              content={
-                <p className="text-3xl font-bold text-primary leading-[120%]">
-                  ${" "}
-                  {
-                    networth.total > 0.01
-                      ? NumberFormatter.format(networth.total)
-                      : "0"
-                  }
-                </p>
-              }
-              infoIconProps={{
-                id: "networth",
-                title: "My Networth",
-                content: (
-                  <p>
-                    This value aggregates your VaultCraft-related <br />{" "}
-                    holdings across all blockchain networks.
                   </p>
                 ),
               }}

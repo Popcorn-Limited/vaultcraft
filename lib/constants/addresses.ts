@@ -42,7 +42,7 @@ export const VaultControllerByChain: AddressByChain = {
 };
 
 export const VaultRouterByChain: AddressByChain = {
-  1: "0x7D51BABA56C2CA79e15eEc9ECc4E92d9c0a7dbeb",
+  1: "0x4995F3bb85E1381D02699e2164bC1C6c6Fa243cd",
   10: "0x3828845F4d7212b6a0Dc3D67482AFf4544002919",
   42161: "0x48943F145686bF5c4580D545CDA405844D1f777b"
 }

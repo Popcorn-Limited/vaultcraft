@@ -229,7 +229,7 @@ export default function Index() {
                       <p className="w-max leading-6 text-base text-primaryDark md:text-primary">Claimable oVCX</p>
                       <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
                         {`$${gaugeRewards && tokens[1][VCX] ?
-                          NumberFormatter.format((Number(gaugeRewards?.[vaultData.chainId].total) / 1e18) * (tokens[1][VCX].price * 0.25)) : "0"}`}
+                          NumberFormatter.format((Number(gaugeRewards?.[vaultData.chainId]?.total) / 1e18) * (tokens[1][VCX].price * 0.25)) : "0"}`}
                       </div>
                     </div>
                   </div>
@@ -238,7 +238,7 @@ export default function Index() {
                     <MainActionButton
                       label="Claim oVCX"
                       handleClick={handleClaim}
-                      disabled={!gaugeRewards || gaugeRewards?.[vaultData.chainId].total < 0}
+                      disabled={!gaugeRewards || gaugeRewards?.[vaultData.chainId]?.total < 0}
                     />
                   </div>
                 </div>
@@ -246,7 +246,7 @@ export default function Index() {
                   <MainActionButton
                     label="Claim oVCX"
                     handleClick={handleClaim}
-                    disabled={!gaugeRewards || gaugeRewards?.[vaultData.chainId].total < 0}
+                    disabled={!gaugeRewards || gaugeRewards?.[vaultData.chainId]?.total < 0}
                   />
                 </div>
               </div>

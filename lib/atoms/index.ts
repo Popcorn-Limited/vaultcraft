@@ -9,3 +9,4 @@ export * from "./strategy";
 export * from "./gauges";
 export * from "./tokens";
 export * from "./networth";
+export * from "./vaulton";

@@ -233,3 +233,11 @@ export type VaultDataByAddress = {
 export type AddressByChain = {
   [key: number]: Address
 }
+
+export type VaultronStats = {
+  level: number;
+  xp: number;
+  animation: string;
+  image: string;
+  tokenId: number;
+}
