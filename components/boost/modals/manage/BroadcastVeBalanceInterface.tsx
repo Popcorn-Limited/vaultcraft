@@ -45,26 +45,26 @@ export default function BroadcastVeBalanceInterface({ amount, setShowModal }: { 
 
   return (
     <div className="text-start">
-      <h2 className="text-start text-5xl">Broadcast VeBalance</h2>
+      <h2 className="text-start text-5xl">Sync VeBalance</h2>
 
       <div>
         <p className="text-start">
-          In order to earn oVCX via gauges on other chains than ethereum you need to broadcast your ve balance.
-          You will only earn oVCX If you have vault shares staked on other chains and broadcasted your ve balance.
-          Therefore make sure to broadcast everytime you lock, increase your lock amount or lock time.
+          Broadcasting your veVCX balance on Ethereum mainnet to other chains (e.g. Arbitrum) enables you to boost your oVCX rewards on those chains.<br />
+          Whenever you create a new lock or increase your veVCX balance by increasing your lock amount or extending your lock duration, you should broadcast your increased veVCX balance to L2s.
+          If you aren&apos;t planning to, or don&apos;t already, deposit into vaults on L2&apos;s then there is no need to broadcast your veVCX balance. However, if you do decide to deposit on L2&apos;s and would like to boost your oVCX rewards, you will need to broadcast your veVCX balance.
         </p>
         <div className="mt-10">
           <span className="flex flex-row items-center justify-between">
             <p className="text-primary font-semibold mb-1">Mainnet VeBalance:</p>
-            <p className="w-32 text-secondaryLight">{formatNumber(amount)}</p>
+            <p className="w-32 text-secondaryLight">{formatNumber(amount || 0)}</p>
           </span>
           <span className="flex flex-row items-center justify-between">
             <p className="text-primary font-semibold mb-1">Optimism VeBalance:</p>
-            <p className="w-32 text-secondaryLight">{formatNumber(opVeBal)}</p>
+            <p className="w-32 text-secondaryLight">{formatNumber(opVeBal || 0)}</p>
           </span>
           <span className="flex flex-row items-center justify-between">
             <p className="text-primary font-semibold mb-1">Arbitrum VeBalance:</p>
-            <p className="w-32 text-secondaryLight">{formatNumber(arbVeBal)}</p>
+            <p className="w-32 text-secondaryLight">{formatNumber(arbVeBal || 0)}</p>
           </span>
         </div>
         <div className="flex flex-row space-x-4 mt-10">

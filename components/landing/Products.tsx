@@ -1,24 +1,64 @@
-import React from "react";
+import React, { useState } from "react";
 import Product from "@/components/landing/Product";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import PopSmileyIcon from "@/components/svg/popcorn/PopSmileyIcon";
 import SmileyIcon from "@/components/svg/popcorn/SmileyIcon";
-import PopIcon from "@/components/svg/popcorn/PopIcon";
 import { useAtom } from "jotai";
 import Link from "next/link";
 import { tvlAtom } from "@/lib/atoms";
+import Modal from "@/components/modal/Modal";
 
 export default function Products(): JSX.Element {
   const [tvl] = useAtom(tvlAtom);
+  const [showModal, setShowModal] = useState<boolean>(false);
 
   return (
     <>
+      <Modal
+        visibility={[showModal, setShowModal]}
+        title="How to use VaultCraft"
+      >
+        <div className="text-start space-y-4">
+          <div className="">
+            <h2>Step 1</h2>
+            <ul className="list-inside list-disc	">
+              <li>Deposit into Smart Vaults 🪙</li>
+              <li>Borrow and deposit more ♻️</li>
+              <li>Earn 10%+ base APY 🙂</li>
+              <li>Earn 25%+ APY with perpetual call options (oVCX) 😏</li>
+            </ul>
+          </div>
+          <div>
+            <h2>Step 2</h2>
+            <ul className="list-inside list-disc	">
+              <li>Provide liquidity in the 80 VCX 20 WETH Balancer Pool 🤓</li>
+              <li>Lock the VCX LP token on app.vaultcraft.io for voting power 🗳️</li>
+              <li>Earn multiples on you oVCX 🚀</li>
+            </ul>
+          </div>
+          <div>
+            <h2>Step 3</h2>
+            <ul className="list-inside list-disc	">
+              <li>Claim your oVCX rewards 🫴 </li>
+              <li>
+                Exercise for VCX, and then you can either
+                <ul className="list-inside list-disc	ml-6">
+                  <li>HODL </li>
+                  <li>Provide more liquidity to earn higher multiples on oVCX 😝</li>
+                  <li>Arbitrage instantly for 33% ROI on Balancer 🤪</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </Modal>
       {/* @dev Product.tsx has `md:mx-2` so with `md:mx-6` that adds up to consistent mx-8*/}
       <section className="py-12 md:py-10 mx-4 md:mx-6">
         <p className="text-2xl mb-6 text-primary smmd:hidden"> Our products </p>
         <div className="flex flex-col gap-6 smmd:flex-wrap lg:flex-nowrap space-y-4 md:space-y-0 md:flex-row md:justify-between">
           <div
-            className="group border rounded w-full lg:max-w-full h-[600px] relative flex flex-col bg-[#141416] border-[#353945] border-opacity-75 smmd:items-center py-6 px-8 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:bg-[#23262f]"
+            className="group cursor-pointer border rounded w-full lg:max-w-full h-[600px] relative flex flex-col bg-[#141416] border-[#353945] border-opacity-75 smmd:items-center py-6 px-8 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:bg-[#23262f]"
+            onClick={() => setShowModal(true)}
           >
             <div className="col-span-12 md:col-span-4 xs:self-start flex-1">
               <div className="relative flex flex-row">
@@ -83,11 +123,11 @@ export default function Products(): JSX.Element {
           />
           <div className="w-full lg:max-w-full h-[600px] relative flex flex-col space-y-4 md:mx-2">
             <Link href="vaultron">
-              <div className="rounded w-full md:h-[200px] h-[300px] bg-[#141416] border border-[#353945] border-opacity-75 py-6 px-8 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:bg-[#23262f] flex flex-col justify-end bg-local"
-                style={{ backgroundImage: "url('images/vaultron.jpg')" }}
+              <div className="rounded w-full md:h-[200px] h-[300px] bg-[#141416] border border-[#353945] border-opacity-75 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:bg-[#23262f] flex flex-col justify-start bg-cover"
+                style={{ backgroundImage: "url('https://resolve.mercle.xyz/ipfs/bafkreibn26tzshouo6ayr33uhwwqzxpp5h6zgzitzgxwhsacsuuxoo7fuq')" }}
               >
-                <h2 className="text-primary text-3xl leading-none mb-2">
-                  Vaultron NFT
+                <h2 className="text-primary text-3xl leading-none mb-2 py-6 px-8">
+                  Vaultron
                 </h2>
               </div>
             </Link>
