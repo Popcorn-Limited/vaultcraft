@@ -271,7 +271,7 @@ export default function Index() {
                 <div className="bg-[#23262f] p-6 rounded-lg">
                   <p className="text-white text-2xl font-bold mb-8">Farm with any Token</p>
                   <p className='text-white'>
-                    Explanation / Marketing text....
+                    
                   </p>
                   <MainActionButton
                     label="Open Loan Modal"
@@ -280,10 +280,11 @@ export default function Index() {
                 </div>
 
                 <div className="bg-[#23262f] p-6 rounded-lg">
-                  <p className="text-white text-2xl font-bold mb-8">Strategies</p>
-                  {vaultData.strategies.map(strategy =>
+                  <p className="text-white text-2xl font-bold">Strategies</p>
+                  {vaultData.strategies.map((strategy, i) =>
                     <div
                       key={strategy.metadata.name}
+                      className={`py-4 ${i + 1 < vaultData.strategies.length ? "border-b border-gray-500" : ""}`}
                     >
                       <h2 className="text-lg font-bold text-white">
                         {strategy.metadata.name}
@@ -291,7 +292,7 @@ export default function Index() {
                       <p className='text-white'>
                         {strategy.metadata.description}
                       </p>
-                      <div className="flex flex-row items-center space-x-4 mt-1">
+                      <div className="mt-1">
                         <p className='text-gray-400'>
                           Allocation: $ {formatAndRoundNumber(strategy.allocation * asset?.price!, asset?.decimals!)} | {strategy.allocationPerc * 100} %
                         </p>
@@ -302,11 +303,7 @@ export default function Index() {
                     </div>
                   )}
 
-                  <div className="mt-8">
-
-                  </div>
-
-                  <div className="md:flex md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4 mt-8">
+                  <div className="md:flex md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4 mt-4">
 
                     <div className="w-10/12 border border-[#353945] rounded-lg p-4">
                       <p className="text-primary font-normal">Vault address:</p>
