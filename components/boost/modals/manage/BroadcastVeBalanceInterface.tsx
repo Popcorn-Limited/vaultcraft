@@ -52,6 +52,8 @@ export default function BroadcastVeBalanceInterface({ amount, setShowModal }: { 
           Broadcasting your veVCX balance on Ethereum mainnet to other chains (e.g. Arbitrum) enables you to boost your oVCX rewards on those chains.<br />
           Whenever you create a new lock or increase your veVCX balance by increasing your lock amount or extending your lock duration, you should broadcast your increased veVCX balance to L2s.
           If you aren&apos;t planning to, or don&apos;t already, deposit into vaults on L2&apos;s then there is no need to broadcast your veVCX balance. However, if you do decide to deposit on L2&apos;s and would like to boost your oVCX rewards, you will need to broadcast your veVCX balance.
+          <br/>
+          You will need to wait 15-30min before the veVCX balance is synced successfully.
         </p>
         <div className="mt-10">
           <span className="flex flex-row items-center justify-between">
