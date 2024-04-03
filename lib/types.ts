@@ -244,4 +244,5 @@ export type VaultronStats = {
   animation: string;
   image: string;
   tokenId: number;
+  totalXp: number;
 }

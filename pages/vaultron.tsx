@@ -6,6 +6,8 @@ import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import { useAtom } from "jotai";
 import { vaultronAtom } from "@/lib/atoms";
 
+const AIRDROP_VCX = 1_000_000
+
 const LevelNameByValue: { [key: number]: string } = {
   1: "Bronze",
   2: "Silver",
@@ -78,7 +80,7 @@ export default function Vaultron() {
             {account ?
               <div className="space-y-4 mt-2">
                 <InfoRow label="Your XP" value={vaultronStats.xp} />
-                <InfoRow label="Airdrop Boost" value={10_000} />
+                <InfoRow label="Airdrop Boost" value={vaultronStats.totalXp > 0 ? (vaultronStats.xp / vaultronStats.totalXp) * AIRDROP_VCX : 0} />
               </div>
               : <MainActionButton
                 label="Connect Wallet"

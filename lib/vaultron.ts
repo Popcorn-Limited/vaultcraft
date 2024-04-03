@@ -9,7 +9,8 @@ export const DEFAULT_VAULTRON: VaultronStats = {
   xp: 0,
   animation: "",
   image: "",
-  tokenId: 0
+  tokenId: 0,
+  totalXp: 0,
 }
 
 export default async function fetchVaultron(account: Address, client: PublicClient): Promise<VaultronStats> {
@@ -27,12 +28,23 @@ export default async function fetchVaultron(account: Address, client: PublicClie
       args: [tokenId]
     })
     const { data } = await axios.get(tokenURI)
+
+    const datas = await client.readContract({
+      address: VAULTRON,
+      abi: VaultronAbi,
+      functionName: "getTokenDetailsBulk",
+      args: [BigInt(1), BigInt(620)]
+    })
+    const res = await Promise.all(datas.map(async (d) => axios.get(d.tokenUri)))
+    const totalXp = res.map(r => Number(r.data.properties.XP?.value || 0)).reduce((a, b) => a + b, 0)
+
     return {
       level: Number(data.properties.Level.value),
       xp: Number(data.properties.XP?.value || 0),
       animation: data.animation_url,
       image: data.image,
-      tokenId: Number(tokenId)
+      tokenId: Number(tokenId),
+      totalXp: totalXp,
     }
   } catch (e) {
     console.log(e)
