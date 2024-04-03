@@ -137,9 +137,9 @@ export async function getTokenAndVaultsData({
           }
 
           vault.gauge = foundGauge.address;
-          vault.boostMin = gauges[foundGauge.address]?.lowerAPR || 0;;
-          vault.boostMax = gauges[foundGauge.address]?.upperAPR || 0;;
-          vault.totalApy += gauges[foundGauge.address]?.upperAPR || 0;;
+          vault.boostMin = gauges[foundGauge.address]?.lowerAPR || 0;
+          vault.boostMax = gauges[foundGauge.address]?.upperAPR || 0;
+          vault.totalApy += gauges[foundGauge.address]?.upperAPR || 0;
         }
       })
     );
@@ -206,6 +206,8 @@ async function prepareVaultsData(chainId: number, client: PublicClient): Promise
       totalApy: 0,
       boostMin: 0,
       boostMax: 0,
+      workingBalance:0,
+      workingSupply:0,
       metadata: {
         vaultName: vault.name ? vault.name : undefined,
         labels: vault.labels

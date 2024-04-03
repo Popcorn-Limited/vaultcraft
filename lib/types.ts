@@ -51,6 +51,8 @@ export type VaultData = {
   totalApy: number;
   boostMin: number;
   boostMax: number;
+  workingBalance: number;
+  workingSupply: number;
   metadata: VaultMetadata;
   strategies: Strategy[];
 };
