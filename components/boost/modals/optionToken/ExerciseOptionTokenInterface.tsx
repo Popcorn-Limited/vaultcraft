@@ -129,7 +129,7 @@ export default function ExerciseOptionTokenInterface({
       <h2 className="text-start text-5xl">Exercise oVCX</h2>
       <p className="text-primary font-semibold">
         Strike Price: $ {formatNumber(strikePrice)} | oVCX Price: ${" "}
-        {vcxPrice - strikePrice} | VCX Price: $ {vcxPrice} | Discount:{" "}
+        {formatNumber(vcxPrice - strikePrice)} | VCX Price: $ {formatNumber(vcxPrice)} | Discount:{" "}
         {((10_000 - oVcxDiscount) / 100).toFixed(2)} %
       </p>
       <div className="mt-8">
