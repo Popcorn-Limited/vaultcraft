@@ -7,6 +7,8 @@ import { useAtom } from "jotai";
 import Link from "next/link";
 import { tvlAtom } from "@/lib/atoms";
 import Modal from "@/components/modal/Modal";
+import RightArrowIcon from "../svg/RightArrowIcon";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 
 export default function Products(): JSX.Element {
   const [tvl] = useAtom(tvlAtom);
@@ -18,52 +20,7 @@ export default function Products(): JSX.Element {
         visibility={[showModal, setShowModal]}
         title="How to use VaultCraft"
       >
-        <div className="">
-          <div className="text-start space-y-4 pr-8">
-            <div className="">
-              <h2 className="text-lg font-bold text-[#DFFF1C] border-b border-gray-500 pb-2">Step 1</h2>
-              <div className="flex flex-row justify-between">
-                <ul className="list-inside list-disc mt-2 ml-4 w-1/2">
-                  <li>Deposit into Smart Vaults 🪙</li>
-                  <li>Borrow and deposit more ♻️</li>
-                  <li>Earn 10%+ base APY 🙂</li>
-                  <li>Earn 25%+ APY with perpetual call options (oVCX) 😏</li>
-                </ul>
-                <img src="/images/tutorial-step1.png" className="w-1/3 rounded-md border border-gray-500 mt-2" />
-              </div>
-            </div>
-            <div>
-              <h2 className="text-lg font-bold text-[#DFFF1C] border-b border-gray-500 pb-2">Step 2</h2>
-              <div className="flex flex-row justify-between">
-                <ul className="list-inside list-disc mt-2 ml-4 w-1/2">
-                <li>Provide liquidity in the 80 VCX 20 WETH Balancer Pool 🤓</li>
-                <li>Lock the VCX LP token on app.vaultcraft.io for voting power 🗳️</li>
-                <li>Earn multiples on you oVCX 🚀</li>
-              </ul>
-              <img src="/images/tutorial-step2.png" className="w-1/3 rounded-md border border-gray-500 mt-2" />
-              </div>
-
-            </div>
-            <div>
-              <h2 className="text-lg font-bold text-[#DFFF1C] border-b border-gray-500 pb-2">Step 3</h2>
-              <div className="flex flex-row justify-between">
-                <ul className="list-inside list-disc mt-2 ml-4 w-1/2">
-                <li>Claim your oVCX rewards 🫴 </li>
-                <li>
-                  Exercise for VCX, and then you can either
-                  <ul className="list-inside list-disc	ml-6">
-                    <li>HODL </li>
-                    <li>Provide more liquidity to earn higher multiples on oVCX 😝</li>
-                    <li>Arbitrage instantly for 25% ROI on Balancer 🤪</li>
-                  </ul>
-                </li>
-              </ul>
-              <img src="/images/tutorial-step3.png" className="w-1/3 rounded-md border border-gray-500 mt-2" />
-              </div>
-            </div>
-          </div>
-          <img src="/images/image.png" className="w-full rounded-md border border-gray-500 mt-2" />
-        </div>
+        <Tutorial />
       </Modal>
       {/* @dev Product.tsx has `md:mx-2` so with `md:mx-6` that adds up to consistent mx-8*/}
       <section className="py-12 md:py-10 mx-4 md:mx-6">
@@ -175,4 +132,82 @@ export default function Products(): JSX.Element {
       </section>
     </>
   );
+}
+
+const TutorialImageByStep: { [key: number]: string } = {
+  1: "/images/tutorial/desktop/1.png",
+  2: "/images/tutorial/desktop/2.png",
+  3: "/images/tutorial/desktop/3.png",
+}
+
+const TutorialTitleByStep: { [key: number]: string } = {
+  1: "Deposit into a Smart Vault",
+  2: "Get and Lock VCX-LP",
+  3: "Vote on Gauges",
+}
+
+function Tutorial(): JSX.Element {
+  const [step, setStep] = useState<number>(1)
+
+  function handleStep(newStep: number) {
+    if (newStep === 0) newStep = 3
+    if (newStep === 4) newStep = 1
+    setStep(newStep)
+  }
+
+  return <div className="flex flex-row justify-between">
+    <div className="text-start space-y-4 w-full md:w-1/2 md:pr-8">
+      <div className="">
+        <h2 className="text-lg font-bold text-[#DFFF1C] border-b border-gray-500 pb-2">Step 1</h2>
+        <div className="flex flex-row justify-between">
+          <ul className="list-inside list-disc mt-2 ml-4">
+            <li>Deposit into Smart Vaults 🪙</li>
+            <li>Borrow and deposit more ♻️</li>
+            <li>Earn 10%+ base APY 🙂</li>
+            <li>Earn 25%+ APY with perpetual call options (oVCX) 😏</li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <h2 className="text-lg font-bold text-[#DFFF1C] border-b border-gray-500 pb-2">Step 2</h2>
+        <div className="flex flex-row justify-between">
+          <ul className="list-inside list-disc mt-2 ml-4">
+            <li>Provide liquidity in the 80 VCX 20 WETH Balancer Pool 🤓</li>
+            <li>Lock the VCX LP token on app.vaultcraft.io for voting power 🗳️</li>
+            <li>Earn multiples on you oVCX 🚀</li>
+          </ul>
+        </div>
+
+      </div>
+      <div>
+        <h2 className="text-lg font-bold text-[#DFFF1C] border-b border-gray-500 pb-2">Step 3</h2>
+        <div className="flex flex-row justify-between">
+          <ul className="list-inside list-disc mt-2 ml-4">
+            <li>Claim your oVCX rewards 🫴 </li>
+            <li>
+              Exercise for VCX, and then you can either
+              <ul className="list-inside list-disc	ml-6">
+                <li>HODL </li>
+                <li>Provide more liquidity to earn higher multiples on oVCX 😝</li>
+                <li>Arbitrage instantly for 25% ROI on Balancer 🤪</li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div className="hidden md:block w-1/2 rounded-md border border-gray-500 bg-[#141416] px-4 pb-16 pt-4">
+      <div className="flex flex-row justify-between mb-2">
+        <div className="flex flex-row items-end">
+          <p className="mb-1 mr-2">{step}/3</p>
+          <h2 className="text-3xl">{TutorialTitleByStep[step]}</h2>
+        </div>
+        <div className="w-1/5 flex flex-row justify-end items-center">
+          <ChevronLeftIcon className="opacity-100 text-[#DFFF1C] h-8 cursor-pointer hover:opacity-50" onClick={() => handleStep(step - 1)} />
+          <ChevronRightIcon className="opacity-100 text-[#DFFF1C] h-8 cursor-pointer hover:opacity-50" onClick={() => handleStep(step + 1)} />
+        </div>
+      </div>
+      <img src={TutorialImageByStep[step]} className="rounded-md" />
+    </div>
+  </div>
 }
