@@ -76,7 +76,7 @@ export default function Navbar(): JSX.Element {
               id="global-health-factor"
             >
               <p className="mr-2 leading-none hidden md:block">Health Factor</p>
-              <p className={`ml-2 ${getHealthFactorColor("text", userAccountData[chain.id].healthFactor)}`}>
+              <p className={`md:ml-2 ${getHealthFactorColor("text", userAccountData[chain.id].healthFactor)}`}>
                 {formatToFixedDecimals(userAccountData[chain.id].healthFactor || 0, 2)}
               </p>
               <ResponsiveTooltip

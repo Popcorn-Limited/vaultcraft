@@ -49,7 +49,7 @@ function VaultLabelPill({
   return (
     <>
       <div
-        className="flex align-middle justify-between w-full md:block md:w-max cursor-pointer"
+        className="flex align-middle justify-between md:block md:w-max cursor-pointer"
         id={tooltipId}
       >
         <div
@@ -95,30 +95,32 @@ export default function AssetWithName({
       >
         {vault.metadata.vaultName || tokens[vault.chainId][vault.asset].name}
       </h2>
-      <ProtocolIcon
-        protocolName={vault.strategies.length > 1 ? "Multistrategy" : vault.strategies[0].metadata.name}
-        tooltip={{
-          id: tooltipId,
-          content: (
-            <p className="w-60">
-              {vault.strategies.length > 1 ?
-                "This vault allocates between multiple strategies"
-                : vault.strategies[0].metadata.description
-              }
-            </p>
-          ),
-        }}
-        size={size}
-      />
-      {vault.metadata.labels &&
-        vault.metadata.labels.length > 0 &&
-        vault.metadata.labels.map((label) => (
-          <VaultLabelPill
-            key={`${tooltipId}-${label}`}
-            label={label}
-            id={tooltipId}
-          />
-        ))}
+      <div className="flex flex-row flex-wrap w-max space-x-2">
+        <ProtocolIcon
+          protocolName={vault.strategies.length > 1 ? "Multistrategy" : vault.strategies[0].metadata.name}
+          tooltip={{
+            id: tooltipId,
+            content: (
+              <p className="w-60">
+                {vault.strategies.length > 1 ?
+                  "This vault allocates between multiple strategies"
+                  : vault.strategies[0].metadata.description
+                }
+              </p>
+            ),
+          }}
+          size={size}
+        />
+        {vault.metadata.labels &&
+          vault.metadata.labels.length > 0 &&
+          vault.metadata.labels.map((label) => (
+            <VaultLabelPill
+              key={`${tooltipId}-${label}`}
+              label={label}
+              id={tooltipId}
+            />
+          ))}
+      </div>
     </div>
   );
 }

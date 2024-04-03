@@ -1,23 +1,20 @@
 import {
   Address,
   Chain,
-  ReadContractParameters,
   createPublicClient,
-  getAddress,
   http,
-  maxUint256,
-  validateTypedData,
   zeroAddress,
 } from "viem";
-import { PublicClient } from "wagmi";
+import { PublicClient, erc20ABI } from "wagmi";
 import axios from "axios";
 import { VaultAbi } from "@/lib/constants/abi/Vault";
 import { GaugeData, Token, TokenByAddress, TokenType, VaultData, VaultDataByAddress, VaultLabel } from "@/lib/types";
-import { ERC20Abi, OptionTokenByChain, VCX, VCX_LP, ZapAssetAddressesByChain } from "@/lib/constants";
+import { ERC20Abi, GaugeAbi, OptionTokenByChain, VCX, VCX_LP, VeTokenByChain, ZapAssetAddressesByChain } from "@/lib/constants";
 import { RPC_URLS, networkMap } from "@/lib/utils/connectors";
 import { ProtocolName, YieldOptions } from "vaultcraft-sdk";
-import { AavePoolAddressProviderByChain, AaveUiPoolProviderByChain } from "./external/aave/interactions";
-import { AavePoolUiAbi } from "./constants/abi/Aave";
+import { AavePoolAddressProviderByChain, AaveUiPoolProviderByChain } from "@/lib/external/aave/interactions";
+import { AavePoolUiAbi } from "@/lib/constants/abi/Aave";
+import { GAUGE_NETWORKS } from "pages/boost";
 
 const HIDDEN_VAULTS: Address[] = [
   "0xb6cED1C0e5d26B815c3881038B88C829f39CE949",
@@ -37,7 +34,6 @@ const STRATEGY_TO_ALTERNATE_ASSET: { [key: Address]: Address } = {
   "0xA84397004Abe8229CC481cE91BA850ECd8204822": "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7"
 }
 
-const NETWORKS_WITH_GAUGES = [1, 10, 42161]
 
 interface GetVaultsByChainProps {
   chain: Chain;
@@ -76,7 +72,7 @@ export async function getTokenAndVaultsData({
   // Create token array
   const uniqueAssetAdresses: Address[] = [...ZapAssetAddressesByChain[chainId]];
   if (chainId === 1) uniqueAssetAdresses.push(...[VCX, VCX_LP])
-  if (NETWORKS_WITH_GAUGES.includes(chainId)) uniqueAssetAdresses.push(OptionTokenByChain[chainId])
+  if (GAUGE_NETWORKS.includes(chainId)) uniqueAssetAdresses.push(...[OptionTokenByChain[chainId], VeTokenByChain[chainId]])
 
 
   // Add vault assets
@@ -96,7 +92,7 @@ export async function getTokenAndVaultsData({
   reserveData[0].filter(d => !d.isFrozen && !uniqueAssetAdresses.includes(d.underlyingAsset))
     .forEach(d => uniqueAssetAdresses.push(d.underlyingAsset))
 
-  const assets = await prepareAssets(uniqueAssetAdresses, chainId);
+  const assets = await prepareAssets(uniqueAssetAdresses, chainId, client);
 
   const vaults = await prepareVaults(vaultsData, assets, chainId)
 
@@ -108,7 +104,7 @@ export async function getTokenAndVaultsData({
   const gaugeTokens: TokenByAddress = {}
 
   // Add gauges
-  if (NETWORKS_WITH_GAUGES.includes(client.chain.id)) {
+  if (GAUGE_NETWORKS.includes(client.chain.id)) {
 
     const gauges = (
       await axios.get(
@@ -123,6 +119,35 @@ export async function getTokenAndVaultsData({
         );
 
         if (!!foundGauge) {
+          vault.gauge = foundGauge.address;
+          vault.minGaugeApy = gauges[foundGauge.address]?.lowerAPR || 0;
+          vault.maxGaugeApy = gauges[foundGauge.address]?.upperAPR || 0;
+          vault.totalApy += gauges[foundGauge.address]?.upperAPR || 0;
+
+          const boostRes = await client.multicall({
+            contracts: [{
+              address: foundGauge.address,
+              abi: GaugeAbi,
+              functionName: "totalSupply"
+            },
+            {
+              address: foundGauge.address,
+              abi: GaugeAbi,
+              functionName: "working_supply"
+            },
+            {
+              address: foundGauge.address,
+              abi: GaugeAbi,
+              functionName: "working_balances",
+              args: [account]
+            }],
+            allowFailure: false
+          })
+
+          vaultsData[vault.address].gaugeSupply = Number(boostRes[0])
+          vaultsData[vault.address].workingSupply = Number(boostRes[1])
+          vaultsData[vault.address].workingBalance = Number(boostRes[2])
+
           // Add gauge to tokens
           gaugeTokens[foundGauge.address] = {
             address: foundGauge.address,
@@ -131,15 +156,11 @@ export async function getTokenAndVaultsData({
             decimals: vaults[vault.address].decimals,
             logoURI: "/images/tokens/vcx.svg", // wont be used, just here for consistency
             balance: 0,
+            totalSupply: Number(boostRes[0]),
             price: vaults[vault.address].price,
             chainId: vault.chainId,
             type: TokenType.Gauge
           }
-
-          vault.gauge = foundGauge.address;
-          vault.boostMin = gauges[foundGauge.address]?.lowerAPR || 0;
-          vault.boostMax = gauges[foundGauge.address]?.upperAPR || 0;
-          vault.totalApy += gauges[foundGauge.address]?.upperAPR || 0;
         }
       })
     );
@@ -204,10 +225,11 @@ async function prepareVaultsData(chainId: number, client: PublicClient): Promise
       tvl: 0,
       apy: 0,
       totalApy: 0,
-      boostMin: 0,
-      boostMax: 0,
-      workingBalance:0,
-      workingSupply:0,
+      minGaugeApy: 0,
+      maxGaugeApy: 0,
+      gaugeSupply: 0,
+      workingSupply: 0,
+      workingBalance: 0,
       metadata: {
         vaultName: vault.name ? vault.name : undefined,
         labels: vault.labels
@@ -237,7 +259,7 @@ async function prepareVaultsData(chainId: number, client: PublicClient): Promise
   return result
 }
 
-async function prepareAssets(addresses: Address[], chainId: number): Promise<TokenByAddress> {
+async function prepareAssets(addresses: Address[], chainId: number, client: PublicClient): Promise<TokenByAddress> {
   const { data: assets } = await axios.get(
     `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/assets/tokens/${chainId}.json`
   );
@@ -249,12 +271,28 @@ async function prepareAssets(addresses: Address[], chainId: number): Promise<Tok
       )
     )}`
   );
+
+  const ts = await client.multicall({
+    contracts: addresses
+      .map((address: Address) => {
+        return {
+          address: address,
+          abi: erc20ABI,
+          functionName: "totalSupply"
+        }
+      })
+      .flat(),
+    allowFailure: false,
+  });
+
+
   let result: TokenByAddress = {}
-  addresses.forEach(address => {
+  addresses.forEach((address, i) => {
     result[address] = {
       ...assets[address],
       price: Number(priceData.coins[`${networkMap[chainId].toLowerCase()}:${address}`]?.price) || 0,
       balance: 0,
+      totalSupply: Number(ts[i]),
       chainId: chainId,
       type: TokenType.Asset
     }
@@ -278,6 +316,7 @@ async function prepareVaults(vaultsData: VaultDataByAddress, assets: TokenByAddr
       ...vaultTokens[vault.address],
       price,
       balance: 0,
+      totalSupply: vault.totalSupply,
       chainId: chainId,
       type: TokenType.Vault
     }

@@ -14,6 +14,7 @@ export const DEFAULT_ASSET: Token = {
   logoURI: "",
   address: zeroAddress,
   balance: 0,
+  totalSupply: 0,
   price: 0,
 };
 

@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
-import { Address, useAccount, usePublicClient } from "wagmi";
+import { Address, useAccount } from "wagmi";
 import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
 import AssetWithName from "@/components/vault/AssetWithName";
 import { Token, VaultData } from "@/lib/types";
 import Accordion from "@/components/common/Accordion";
-import Title from "@/components/common/Title";
+import CardStat from "@/components/common/CardStat";
 import useGaugeWeights from "@/lib/gauges/useGaugeWeights";
-import getAPR from "@/lib/gauges/getGaugeAPR";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import { roundToTwoDecimalPlaces } from "@/lib/utils/helpers";
 import { useAtom } from "jotai";
@@ -30,6 +29,8 @@ export default function Gauge({
   canVote,
   searchTerm,
 }: GaugeProps): JSX.Element {
+  const baseTooltipId = vaultData.address.slice(1);
+
   const { address: account } = useAccount();
 
   const { data: weights } = useGaugeWeights({
@@ -93,101 +94,48 @@ export default function Gauge({
           <div className="flex items-center justify-between select-none w-full">
             <AssetWithName vault={vaultData} />
           </div>
-          <div className="w-full flex justify-between gap-8 xs:gap-4">
-            <div className="w-full mt-6 xs:mt-0">
-              <p className="text-primary font-normal xs:text-[14px]">TVL</p>
-              <p className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
-                <Title
-                  level={2}
-                  fontWeight="font-normal"
-                  as="span"
-                  className="mr-1 text-primary"
-                >
-                  $ {NumberFormatter.format(vaultData.tvl)}
-                </Title>
-              </p>
-            </div>
-
-            <div className="w-full mt-6 xs:mt-0">
-              <p className="font-normal text-primary xs:text-[14px]">
-                Min Boost
-              </p>
-              <Title
-                as="span"
-                level={2}
-                fontWeight="font-normal"
-                className="text-primary"
-              >
-                {NumberFormatter.format(
-                  roundToTwoDecimalPlaces(vaultData.boostMin)
-                )}{" "}
-                %
-              </Title>
-            </div>
-
-            <div className="w-full mt-6 xs:mt-0">
-              <p className="font-normal text-primary xs:text-[14px]">
-                Max Boost
-              </p>
-              <Title
-                as="span"
-                level={2}
-                fontWeight="font-normal"
-                className="text-primary"
-              >
-                {NumberFormatter.format(
-                  roundToTwoDecimalPlaces(vaultData.boostMax)
-                )}{" "}
-                %
-              </Title>
-            </div>
+          <div className="w-full md:flex md:flex-wrap md:justify-between md:gap-4">
+            <CardStat
+              id={`${baseTooltipId}-tvl`}
+              label="TVL"
+              value={`$ ${vaultData.tvl < 1 ? "0" : NumberFormatter.format(vaultData.tvl)}`}
+              tooltip="Total value of all assets deposited into the vault"
+            />
+            <CardStat
+              id={`${baseTooltipId}-minRewards`}
+              label="Min Rewards Apy"
+              value={`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData?.minGaugeApy))} %`}
+              tooltip="Minimum oVCX boost APR based on most current epoch&apos;s distribution"
+            />
+            <CardStat
+              id={`${baseTooltipId}-maxRewards`}
+              label="Max Rewards Apy"
+              value={`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData?.maxGaugeApy))} %`}
+              tooltip="Maximum oVCX boost APR based on most current epoch&apos;s distribution"
+            />
+            <CardStat
+              id={`${baseTooltipId}-currAlloc`}
+              label="Current Allocation"
+              value={`${(Number(weights?.[0]) / 1e16).toFixed(2) || 0} %`}
+              tooltip="Current allocation of weekly rewards for this gauge"
+            />
+            <CardStat
+              id={`${baseTooltipId}-upcAlloc`}
+              label="Upcoming Allocation"
+              value={`${(Number(weights?.[1]) / 1e16).toFixed(2) || 0} %`}
+              tooltip="Upcoming allocation of weekly rewards for this gauge"
+            />
+            <CardStat
+              id={`${baseTooltipId}-myVotes`}
+              label="Your Votes"
+              value={`${(Number(weights?.[2].power) / 100).toFixed(2)} %`}
+              tooltip="Percentage of your votes allocated to this gauge"
+            />
           </div>
 
-          <div className="w-full flex justify-between gap-8 xs:gap-4">
-            <div className="w-full mt-6 xs:mt-0">
-              <p className="font-normal text-primary xs:text-[14px]">
-                Current Weight
-              </p>
-              <Title
-                as="span"
-                level={2}
-                fontWeight="font-normal"
-                className="text-primary"
-              >
-                {(Number(weights?.[0]) / 1e16).toFixed(2) || 0} %
-              </Title>
-            </div>
-            <div className="w-full mt-6 xs:mt-0">
-              <p className="font-normal text-primary xs:text-[14px]">
-                Upcoming Weight
-              </p>
-              <Title
-                as="span"
-                level={2}
-                fontWeight="font-normal"
-                className="text-primary"
-              >
-                {(Number(weights?.[1]) / 1e16).toFixed(2) || 0} %
-              </Title>
-            </div>
-            <div className="w-full mt-6 xs:mt-0">
-              <p className="font-normal text-primary xs:text-[14px]">
-                My Votes
-              </p>
-              <Title
-                as="span"
-                level={2}
-                fontWeight="font-normal"
-                className="text-primary"
-              >
-                {(Number(weights?.[2].power) / 100).toFixed(2)} %
-              </Title>
-            </div>
-          </div>
-
-          <div className="w-full flex justify-between gap-8 xs:gap-4">
+          <div className="w-full flex justify-between my-4">
             <div className="w-full">
-              <p className="text-primary font-normal text-sm">My Vote: {amount / 100} %</p>
+              <p className="text-primary font-normal text-sm">New Vote: {amount / 100} %</p>
               <div className="flex flex-row items-center justify-between">
                 <div className="w-full mt-4 ml-[11px]">
                   <Slider

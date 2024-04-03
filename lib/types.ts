@@ -9,6 +9,7 @@ export type Token = {
   logoURI: string;
   balance: number;
   price: number;
+  totalSupply: number;
   chainId?: number;
   type?: TokenType;
 };
@@ -49,10 +50,11 @@ export type VaultData = {
   tvl: number;
   apy: number;
   totalApy: number;
-  boostMin: number;
-  boostMax: number;
-  workingBalance: number;
+  minGaugeApy: number;
+  maxGaugeApy: number;
+  gaugeSupply: number;
   workingSupply: number;
+  workingBalance: number;
   metadata: VaultMetadata;
   strategies: Strategy[];
 };

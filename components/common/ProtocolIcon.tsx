@@ -49,10 +49,10 @@ export default function ProtocolIcon({
   return (
     <>
       <div
-        className="flex align-middle justify-between w-full md:block md:w-max cursor-pointer"
+        className="flex align-middle justify-between md:block md:w-max cursor-pointer"
         id={tooltip?.id}
       >
-        <div className="bg-gray-700 bg-opacity-40 rounded-lg py-1 px-3 flex flex-row items-center gap-2">
+        <div className="w-max bg-gray-700 bg-opacity-40 rounded-lg py-1 px-3 flex flex-row items-center gap-2">
           <img
             src={
               protocolName

@@ -57,7 +57,7 @@ export default function LoanInterface({ visibilityState, vaultData }: { visibili
   const [inputToken, setInputToken] = useState<Token | null>(null)
 
   useEffect(() => {
-    if (Object.keys(reserveData).length > 0 && Object.keys(vaultData).length > 0 && Object.keys(tokens).length > 0) {
+    if (Object.keys(reserveData).length > 0 && Object.keys(vaultData).length > 0 && Object.keys(tokens).length > 0 && reserveData[vaultData.chainId]?.length > 0) {
       let sorted = reserveData[vaultData.chainId].sort((a, b) => a.balance - b.balance)
       setTokenList(sorted.map(e => tokens[vaultData.chainId][e.asset]))
 
@@ -397,6 +397,9 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
     if (inputToken.symbol === "none") return
     const newReserveData = [...reserveData[chainId]]
     const value = Number(inputAmount) - oldInputAmount
+
+    console.log({ inputToken, newReserveData, inputAmount, value })
+
     setOldInputAmount(Number(inputAmount))
 
     switch (activeTab) {

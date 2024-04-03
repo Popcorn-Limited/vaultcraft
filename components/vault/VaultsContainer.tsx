@@ -161,7 +161,7 @@ export default function VaultsContainer({
           supportedNetworks={SUPPORTED_NETWORKS.map((chain) => chain.id)}
           selectNetwork={selectNetwork}
         />
-        <div className="flex flex-row space-x-4">
+        <div className="flex flex-row space-x-4 mt-4">
           <SearchBar searchTerm={searchTerm} handleSearch={handleSearch} />
           <VaultsSorting className="" vaultState={[vaults, setVaults]} />
         </div>

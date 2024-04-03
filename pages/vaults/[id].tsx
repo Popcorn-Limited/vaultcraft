@@ -8,7 +8,7 @@ import NoSSR from "react-no-ssr";
 import { erc20ABI, useAccount, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
 import { Address, WalletClient, createPublicClient, http, zeroAddress } from "viem";
 import { yieldOptionsAtom } from "@/lib/atoms/sdk";
-import { NumberFormatter, formatAndRoundNumber } from "@/lib/utils/formatBigNumber";
+import { NumberFormatter, formatAndRoundNumber, formatNumber } from "@/lib/utils/formatBigNumber";
 import { roundToTwoDecimalPlaces } from "@/lib/utils/helpers";
 import MainActionButton from "@/components/button/MainActionButton";
 import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
@@ -20,7 +20,7 @@ import { Square2StackIcon } from "@heroicons/react/24/outline";
 import { gaugeRewardsAtom, tokensAtom } from "@/lib/atoms";
 import LeftArrowIcon from "@/components/svg/LeftArrowIcon";
 import LoanInterface from "@/components/lending/LoanInterface";
-import { MinterByChain, OptionTokenByChain, VCX, ZapAssetAddressesByChain } from "@/lib/constants";
+import { MinterByChain, OptionTokenByChain, VCX, VE_VCX, VeTokenByChain, ZapAssetAddressesByChain } from "@/lib/constants";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
 
@@ -193,22 +193,22 @@ export default function Index() {
                     </div>
                   </div>
                   {
-                    vaultData.boostMin ? (
+                    vaultData.minGaugeApy ? (
                       <div className="w-[120px] md:w-max">
                         <p className="w-max leading-6 text-base text-primaryDark md:text-primary">Min Rewards</p>
                         <div className="text-3xl font-bold whitespace-nowrap text-primary">
-                          {`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.boostMin))} %`}
+                          {`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.minGaugeApy))} %`}
                         </div>
                       </div>
                     )
                       : <></>
                   }
                   {
-                    vaultData.boostMax ? (
+                    vaultData.maxGaugeApy ? (
                       <div className="w-[120px] md:w-max">
                         <p className="w-max leading-6 text-base text-primaryDark md:text-primary">Max Rewards</p>
                         <div className="text-3xl font-bold whitespace-nowrap text-primary">
-                          {`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.boostMax))} %`}
+                          {`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.maxGaugeApy))} %`}
                         </div>
                       </div>
                     )
@@ -268,19 +268,22 @@ export default function Index() {
 
               <div className="w-full md:w-2/3 mt-8 md:mt-0 space-y-4">
 
-                <div className="bg-[#23262f] p-6 rounded-lg">
-                  <p className="text-white text-2xl font-bold mb-4">Your Boost</p>
-                  <p className='text-white mb-4'>
-                    Your APY: 50%
-                    Your Boost: 4.29X
-                    VeVCX to full boost: 500 veVCX
-                  </p>
-                </div>
+                {(gauge && gauge?.balance > 0) &&
+                  <div className="bg-[#23262f] p-6 rounded-lg">
+                    <p className="text-white text-2xl font-bold mb-4">Your Boost</p>
+                    <p className='text-white mb-4'>
+                      Boost: {formatNumber((vaultData.workingBalance / (gauge?.balance || 0)) * 5)} X <br />
+                      Your Apy: {formatNumber((vaultData.workingBalance / (gauge?.balance || 0)) * vaultData.maxGaugeApy)} % <br />
+                      Pool Share: {formatNumber((gauge?.balance || 0) / vaultData.gaugeSupply)} % <br />
+                      VeVCX Missing: {formatNumber((((gauge?.balance || 0) / vaultData.gaugeSupply) * (tokens[vaultData.chainId][VeTokenByChain[vaultData.chainId]].totalSupply / 1e18)) - (tokens[vaultData.chainId][VeTokenByChain[vaultData.chainId]].balance / 1e18))} VeVCX
+                    </p>
+                  </div>
+                }
 
                 <div className="bg-[#23262f] p-6 rounded-lg">
                   <p className="text-white text-2xl font-bold mb-4">Farm with any Token</p>
                   <p className='text-white mb-4'>
-                    The loan modal is designed for investors looking to engage with high-yield vaults without risking their blue chip assets. Deposit your assets. Earn interest and use them to borrow the required tokens for farming instead of purchasing them. This allows you to avoid direct exposure to their price volatility, maximizing your investment potential in high yield farming opportunities with minimized risk.  It's an efficient way to leverage your portfolio, ensuring you're always positioned to capture the best yields without selling from your blue chip assets.
+                    The loan modal is designed for investors looking to engage with high-yield vaults without risking their blue chip assets. Deposit your assets. Earn interest and use them to borrow the required tokens for farming instead of purchasing them. This allows you to avoid direct exposure to their price volatility, maximizing your investment potential in high yield farming opportunities with minimized risk.  It&apos;s an efficient way to leverage your portfolio, ensuring you&apos;re always positioned to capture the best yields without selling from your blue chip assets.
                   </p>
                   <div className="w-full md:w-60">
                     <MainActionButton

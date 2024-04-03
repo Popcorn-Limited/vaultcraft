@@ -213,7 +213,7 @@ export default function Migration(): JSX.Element {
         {vcxBal ? (
           <div className="rounded-lg w-full md:w-1/3 md:min-w-[870px] bg-[#23262F] md:ml-auto md:mr-auto md:p-8 px-8 pt-6 pb-5 md:pl-11 border border-[#353945] [&_summary::-webkit-details-marker]:hidden">
             <InputTokenWithError
-              onSelectToken={() => {}}
+              onSelectToken={() => { }}
               onMaxClick={() =>
                 handleChangeInput({
                   currentTarget: { value: Number(formatEther(popBal)) },
@@ -229,6 +229,7 @@ export default function Migration(): JSX.Element {
                 decimals: 18,
                 logoURI: "",
                 balance: Number(popBal),
+                totalSupply: 0,
                 price: 1,
               }}
               errorMessage={
@@ -246,11 +247,11 @@ export default function Migration(): JSX.Element {
               />
             </div>
             <InputTokenWithError
-              onSelectToken={() => {}}
-              onMaxClick={() => {}}
+              onSelectToken={() => { }}
+              onMaxClick={() => { }}
               chainId={1}
               value={multiplyDecimals(Number(inputBalance), 10) || 0}
-              onChange={() => {}}
+              onChange={() => { }}
               selectedToken={{
                 address: VCX,
                 name: "VCX",
@@ -258,6 +259,7 @@ export default function Migration(): JSX.Element {
                 decimals: 18,
                 logoURI: "/images/tokens/vcx.svg",
                 balance: 0,
+                totalSupply:0,
                 price: 1,
               }}
               errorMessage={""}

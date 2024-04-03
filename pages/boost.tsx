@@ -183,8 +183,8 @@ function VePopContainer() {
         </section>
 
         <section className="my-10 px-4 md:px-8 md:flex flex-row items-center justify-between">
-          <NetworkFilter supportedNetworks={[1, 10, 42161]} selectNetwork={selectNetwork} />
-          <div className="flex flex-row space-x-4">
+          <NetworkFilter supportedNetworks={GAUGE_NETWORKS} selectNetwork={selectNetwork} />
+          <div className="flex flex-row space-x-4 mt-4">
             <SearchBar searchTerm={searchTerm} handleSearch={handleSearch} />
             <VaultsSorting className="" vaultState={[gaugeVaults, setGaugeVaults]} />
           </div>

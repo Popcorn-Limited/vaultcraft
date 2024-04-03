@@ -37,6 +37,7 @@ export function formatAndRoundNumber(value: number, decimals: number): string {
 }
 
 export function formatNumber(value: number): string {
+  if (!value) value = 0;
   if (value > MILLION) {
     return `${(value / MILLION).toLocaleString(undefined, {
       maximumFractionDigits: 2,
