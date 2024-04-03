@@ -204,23 +204,7 @@ export async function getVaults({
     }
 
     const key = `${networkMap[chainId].toLowerCase()}:${vault.asset.address}`;
-    let assetPrice = Number(priceData.coins[key]?.price || 10);
-
-    if (assetPrice === 10 && client.chain.id === 10) {
-      const lpFound: any | undefined = Object.entries(beefyTokens["optimism"])
-        .map((entry) => entry[1])
-        .find(
-          (token: any) =>
-            getAddress(token.address) === getAddress(vault.asset.address)
-        );
-
-      if (!lpFound) assetPrice = 1;
-      const beefyKey = Object.keys(beefyPrices).find(
-        (key) => key === lpFound.oracleId
-      );
-      // @ts-ignore
-      assetPrice = beefyPrices[beefyKey];
-    }
+    let assetPrice = Number(priceData.coins[key]?.price || 1);
 
     const pricePerShare = assetsPerShare * assetPrice;
 
