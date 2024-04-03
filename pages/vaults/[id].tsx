@@ -229,7 +229,7 @@ export default function Index() {
                       <p className="w-max leading-6 text-base text-primaryDark md:text-primary">Claimable oVCX</p>
                       <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
                         {`$${gaugeRewards && tokens[1][VCX] ?
-                          NumberFormatter.format((Number(gaugeRewards?.[vaultData.chainId]?.total) / 1e18) * (tokens[1][VCX].price * 0.25)) : "0"}`}
+                          NumberFormatter.format((Number(gaugeRewards?.[vaultData.chainId]?.total || 0) / 1e18) * (tokens[1][VCX].price * 0.25)) : "0"}`}
                       </div>
                     </div>
                   </div>
@@ -269,14 +269,25 @@ export default function Index() {
               <div className="w-full md:w-2/3 mt-8 md:mt-0 space-y-4">
 
                 <div className="bg-[#23262f] p-6 rounded-lg">
-                  <p className="text-white text-2xl font-bold mb-8">Farm with any Token</p>
-                  <p className='text-white'>
-                    
+                  <p className="text-white text-2xl font-bold mb-4">Your Boost</p>
+                  <p className='text-white mb-4'>
+                    Your APY: 50%
+                    Your Boost: 4.29X
+                    VeVCX to full boost: 500 veVCX
                   </p>
-                  <MainActionButton
-                    label="Open Loan Modal"
-                    handleClick={() => setShowLendModal(true)}
-                  />
+                </div>
+
+                <div className="bg-[#23262f] p-6 rounded-lg">
+                  <p className="text-white text-2xl font-bold mb-4">Farm with any Token</p>
+                  <p className='text-white mb-4'>
+                    The loan modal is designed for investors looking to engage with high-yield vaults without risking their blue chip assets. Deposit your assets. Earn interest and use them to borrow the required tokens for farming instead of purchasing them. This allows you to avoid direct exposure to their price volatility, maximizing your investment potential in high yield farming opportunities with minimized risk.  It's an efficient way to leverage your portfolio, ensuring you're always positioned to capture the best yields without selling from your blue chip assets.
+                  </p>
+                  <div className="w-full md:w-60">
+                    <MainActionButton
+                      label="Open Loan Modal"
+                      handleClick={() => setShowLendModal(true)}
+                    />
+                  </div>
                 </div>
 
                 <div className="bg-[#23262f] p-6 rounded-lg">
@@ -305,7 +316,7 @@ export default function Index() {
 
                   <div className="md:flex md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4 mt-4">
 
-                    <div className="w-10/12 border border-[#353945] rounded-lg p-4">
+                    <div className="w-full md:w-10/12 border border-[#353945] rounded-lg p-4">
                       <p className="text-primary font-normal">Vault address:</p>
                       <div className="flex flex-row items-center justify-between">
                         <p className="font-bold text-primary">
@@ -319,7 +330,7 @@ export default function Index() {
                       </div>
                     </div>
 
-                    <div className="w-10/12 border border-[#353945] rounded-lg p-4">
+                    <div className="w-full md:w-10/12 border border-[#353945] rounded-lg p-4">
                       <p className="text-primary font-normal">Asset address:</p>
                       <div className="flex flex-row items-center justify-between">
                         <p className="font-bold text-primary">
@@ -334,7 +345,7 @@ export default function Index() {
                     </div>
 
                     {vaultData.gauge &&
-                      <div className="w-10/12 border border-[#353945] rounded-lg p-4">
+                      <div className="w-full md:w-10/12 border border-[#353945] rounded-lg p-4">
                         <p className="text-primary font-normal">Gauge address:</p>
                         <div className="flex flex-row items-center justify-between">
                           <p className="font-bold text-primary">

@@ -11,22 +11,22 @@ export default function Hero(): JSX.Element {
   return (
     <section className="pb-8 pt-8 sm:pb-6 border-b border-[#AFAFAF]">
       <div className="flex flex-col smmd:flex-row smmd:items-center justify-between mx-4 md:mx-8">
-        <div className="flex flex-col sm:flex-row sm:space-x-28 smmd:space-x-10">
-          <StatusWithLabel
-            label={"Deposits"}
-            content={
-              <p className="text-3xl font-bold text-primary leading-[120%]">
-                ${" "}
-                {
-                  networth.vault > 0.01
-                    ? NumberFormatter.format(networth.vault)
-                    : "0"
-                }
-              </p>
-            }
-            className="md:min-w-[160px] lg:min-w-0"
-          />
-          <div className="flex flex-row space-x-28 smmd:space-x-10 items-center mt-4 sm:mt-0">
+        <div className="w-full lg:w-8/12 md:flex md:flex-row space-y-4 md:space-y-0 mt-4 md:mt-0">
+          <div className="flex flex-row items-center md:pr-10 gap-10 md:w-fit">
+            <StatusWithLabel
+              label={"Deposits"}
+              content={
+                <p className="text-3xl font-bold text-primary leading-[120%]">
+                  ${" "}
+                  {
+                    networth.vault > 0.01
+                      ? NumberFormatter.format(networth.vault)
+                      : "0"
+                  }
+                </p>
+              }
+              className="md:min-w-[160px] lg:min-w-0"
+            />
             <StatusWithLabel
               label={"Staked"}
               content={
@@ -55,6 +55,9 @@ export default function Hero(): JSX.Element {
               }
               className="md:min-w-[160px] lg:min-w-0"
             />
+          </div>
+
+          <div className="flex flex-row items-center md:pr-10 gap-10 md:w-fit">
             <StatusWithLabel
               label={"My Net Worth"}
               content={
@@ -77,6 +80,7 @@ export default function Hero(): JSX.Element {
                   </p>
                 ),
               }}
+              className="md:min-w-[160px] lg:min-w-0"
             />
             <StatusWithLabel
               label={"My XP"}
@@ -94,10 +98,12 @@ export default function Hero(): JSX.Element {
                   </p>
                 ),
               }}
+              className="md:min-w-[160px] lg:min-w-0"
             />
           </div>
         </div>
-        <div className="w-full md:w-fit-content">
+
+        <div className="w-full md:w-fit-content mt-8 md:mt-0">
           <p className="uppercase md:hidden text-[#C8C8C8] text-sm mb-2">
             Platform
           </p>

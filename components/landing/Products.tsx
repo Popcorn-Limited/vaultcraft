@@ -18,38 +18,51 @@ export default function Products(): JSX.Element {
         visibility={[showModal, setShowModal]}
         title="How to use VaultCraft"
       >
-        <div className="text-start space-y-4">
-          <div className="">
-            <h2>Step 1</h2>
-            <ul className="list-inside list-disc	">
-              <li>Deposit into Smart Vaults 🪙</li>
-              <li>Borrow and deposit more ♻️</li>
-              <li>Earn 10%+ base APY 🙂</li>
-              <li>Earn 25%+ APY with perpetual call options (oVCX) 😏</li>
-            </ul>
-          </div>
-          <div>
-            <h2>Step 2</h2>
-            <ul className="list-inside list-disc	">
-              <li>Provide liquidity in the 80 VCX 20 WETH Balancer Pool 🤓</li>
-              <li>Lock the VCX LP token on app.vaultcraft.io for voting power 🗳️</li>
-              <li>Earn multiples on you oVCX 🚀</li>
-            </ul>
-          </div>
-          <div>
-            <h2>Step 3</h2>
-            <ul className="list-inside list-disc	">
-              <li>Claim your oVCX rewards 🫴 </li>
-              <li>
-                Exercise for VCX, and then you can either
-                <ul className="list-inside list-disc	ml-6">
-                  <li>HODL </li>
-                  <li>Provide more liquidity to earn higher multiples on oVCX 😝</li>
-                  <li>Arbitrage instantly for 33% ROI on Balancer 🤪</li>
+        <div className="">
+          <div className="text-start space-y-4 pr-8">
+            <div className="">
+              <h2 className="text-lg font-bold text-[#DFFF1C] border-b border-gray-500 pb-2">Step 1</h2>
+              <div className="flex flex-row justify-between">
+                <ul className="list-inside list-disc mt-2 ml-4 w-1/2">
+                  <li>Deposit into Smart Vaults 🪙</li>
+                  <li>Borrow and deposit more ♻️</li>
+                  <li>Earn 10%+ base APY 🙂</li>
+                  <li>Earn 25%+ APY with perpetual call options (oVCX) 😏</li>
                 </ul>
-              </li>
-            </ul>
+                <img src="/images/tutorial-step1.png" className="w-1/3 rounded-md border border-gray-500 mt-2" />
+              </div>
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-[#DFFF1C] border-b border-gray-500 pb-2">Step 2</h2>
+              <div className="flex flex-row justify-between">
+                <ul className="list-inside list-disc mt-2 ml-4 w-1/2">
+                <li>Provide liquidity in the 80 VCX 20 WETH Balancer Pool 🤓</li>
+                <li>Lock the VCX LP token on app.vaultcraft.io for voting power 🗳️</li>
+                <li>Earn multiples on you oVCX 🚀</li>
+              </ul>
+              <img src="/images/tutorial-step2.png" className="w-1/3 rounded-md border border-gray-500 mt-2" />
+              </div>
+
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-[#DFFF1C] border-b border-gray-500 pb-2">Step 3</h2>
+              <div className="flex flex-row justify-between">
+                <ul className="list-inside list-disc mt-2 ml-4 w-1/2">
+                <li>Claim your oVCX rewards 🫴 </li>
+                <li>
+                  Exercise for VCX, and then you can either
+                  <ul className="list-inside list-disc	ml-6">
+                    <li>HODL </li>
+                    <li>Provide more liquidity to earn higher multiples on oVCX 😝</li>
+                    <li>Arbitrage instantly for 25% ROI on Balancer 🤪</li>
+                  </ul>
+                </li>
+              </ul>
+              <img src="/images/tutorial-step3.png" className="w-1/3 rounded-md border border-gray-500 mt-2" />
+              </div>
+            </div>
           </div>
+          <img src="/images/image.png" className="w-full rounded-md border border-gray-500 mt-2" />
         </div>
       </Modal>
       {/* @dev Product.tsx has `md:mx-2` so with `md:mx-6` that adds up to consistent mx-8*/}
@@ -123,7 +136,7 @@ export default function Products(): JSX.Element {
           />
           <div className="w-full lg:max-w-full h-[600px] relative flex flex-col space-y-4 md:mx-2">
             <Link href="vaultron">
-              <div className="rounded w-full md:h-[200px] h-[300px] bg-[#141416] border border-[#353945] border-opacity-75 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:bg-[#23262f] flex flex-col justify-start bg-cover"
+              <div className="rounded w-full md:h-[200px] h-[300px] bg-[#141416] border border-[#353945] border-opacity-75 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:opacity-50 flex flex-col justify-start bg-cover"
                 style={{ backgroundImage: "url('https://resolve.mercle.xyz/ipfs/bafkreibn26tzshouo6ayr33uhwwqzxpp5h6zgzitzgxwhsacsuuxoo7fuq')" }}
               >
                 <h2 className="text-primary text-3xl leading-none mb-2 py-6 px-8">
