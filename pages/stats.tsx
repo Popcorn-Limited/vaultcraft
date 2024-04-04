@@ -16,6 +16,7 @@ import {
 import { formatToFixedDecimals } from "@/lib/utils/formatBigNumber";
 import { bigint } from "zod";
 import { DuneQueryResult } from "@/lib/types";
+import { resolvePrice } from "@/lib/resolver/price/price";
 
 const { VCX, VotingEscrow, WETH, WETH_VCX_LP, oVCX, BalancerVault } =
   getVeAddresses();
@@ -331,6 +332,7 @@ export default function Vaults() {
       snapshotPips,
       duneTokenResult,
       prices,
+      vcxPrice,
       poolTokens,
       llamaRes,
       holder,
@@ -353,8 +355,14 @@ export default function Vaults() {
         }>
       >("https://api.dune.com/api/v1/query/3238349/results", duneOpts),
       axios.get(
-        `https://coins.llama.fi/prices/current/ethereum:0xcE246eEa10988C495B4A90a905Ee9237a0f91543,ethereum:0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2,ethereum:0x577A7f7EE659Aa14Dc16FD384B3F8078E23F1920?searchWidth=24h`
+        `https://coins.llama.fi/prices/current/ethereum:0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2,ethereum:0x577A7f7EE659Aa14Dc16FD384B3F8078E23F1920?searchWidth=24h`
       ),
+      resolvePrice({
+        address: VCX,
+        chainId: 1,
+        client: undefined,
+        resolver: "vcx",
+      }),
       publicClient.readContract({
         address: BalancerVault,
         abi: BalancerVaultAbi,
@@ -419,9 +427,7 @@ export default function Vaults() {
       >("https://api.dune.com/api/v1/query/3237707/results", duneOpts),
     ]);
 
-    const vcxInUsd =
-      prices.data.coins["ethereum:0xcE246eEa10988C495B4A90a905Ee9237a0f91543"]
-        .price;
+    const vcxInUsd = vcxPrice
     const wethInUsd =
       prices.data.coins["ethereum:0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"]
         .price;

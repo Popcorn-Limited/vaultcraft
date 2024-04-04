@@ -15,6 +15,7 @@ import { claimOPop } from "@/lib/optionToken/interactions";
 import { WalletClient } from "viem";
 import { Token } from "@/lib/types";
 import { llama } from "@/lib/resolver/price/resolver";
+import { resolvePrice } from "@/lib/resolver/price/price";
 
 const { oVCX: OVCX, VCX, WETH } = getVeAddresses();
 
@@ -54,7 +55,12 @@ export default function OptionTokenInterface({
   const [wethPrice, setWethPrice] = useState<number>(0);
 
   useEffect(() => {
-    llama({ address: VCX, chainId: 1 }).then((res: number) => setVcxPrice(res));
+    resolvePrice({
+      address: VCX,
+      chainId: 1,
+      client: undefined,
+      resolver: "vcx",
+    }).then((res: number) => setVcxPrice(res));
     llama({ address: WETH, chainId: 1 }).then((res: number) =>
       setWethPrice(res)
     );

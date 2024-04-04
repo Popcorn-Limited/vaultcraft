@@ -16,6 +16,7 @@ import { validateInput } from "@/lib/utils/helpers";
 import { Token } from "@/lib/types";
 import { llama } from "@/lib/resolver/price/resolver";
 import { formatEther } from "viem";
+import { resolvePrice } from "@/lib/resolver/price/price";
 
 const {
   VCX,
@@ -67,7 +68,12 @@ export default function ExerciseOptionTokenInterface({
     async function setUpPrices() {
       setInitialLoad(true);
 
-      const vcxInUsd = await llama({ address: VCX, chainId: 1 });
+      const vcxInUsd = await resolvePrice({
+        address: VCX,
+        chainId: 1,
+        client: undefined,
+        resolver: "vcx",
+      });
       const wethInUsd = await llama({ address: WETH, chainId: 1 });
       const multiplier = await publicClient.readContract({
         address: OVCX_ORACLE,
@@ -79,7 +85,6 @@ export default function ExerciseOptionTokenInterface({
         abi: BalancerOracleAbi,
         functionName: "getPrice",
       });
-      const oVcxInUsd = (vcxInUsd * (10_000 - multiplier)) / 10_000;
       const strikePriceInUsd = (Number(strikePriceRes) / 1e18) * wethInUsd;
 
       setWethPrice(wethInUsd);

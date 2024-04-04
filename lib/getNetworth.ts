@@ -85,7 +85,7 @@ export async function getNetworthByChain({
       address: VCX,
       chainId: 1,
       client: undefined,
-      resolver: "llama",
+      resolver: "vcx",
     });
     const lpPrice = await resolvePrice({
       address: WETH_VCX_LP,
