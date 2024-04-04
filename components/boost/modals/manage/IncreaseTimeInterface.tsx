@@ -18,7 +18,7 @@ function LockTimeButton({
   return (
     <button
       className={`w-10 h-10 border border-customGray200 rounded-lg ${
-        isActive ? "bg-[#D7D5BC] text-customNeutral200" : "text-customGray400"
+        isActive ? "bg-customGray200 text-customNeutral200" : "text-customGray400"
       }`}
       onClick={() => handleClick()}
     >

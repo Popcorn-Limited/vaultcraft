@@ -46,7 +46,7 @@ export default function PopUpModal({
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
               <Dialog.Panel
-                className={`relative transform overflow-hidden rounded-t-4xl transition-all w-full border-t border-[#F0EEE0] ${classNames}`}
+                className={`relative transform overflow-hidden rounded-t-4xl transition-all w-full border-t border-customGray100 ${classNames}`}
               >
                 <div className="bg-customNeutral200 rounded-t-4xl p-6 w-full h-full">
                   {children}

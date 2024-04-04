@@ -242,7 +242,7 @@ export default function Migration(): JSX.Element {
             />
             <div className="relative flex justify-center my-6">
               <ArrowDownIcon
-                className="h-10 w-10 p-2 text-[#9CA3AF] border border-[#4D525C] rounded-full"
+                className="h-10 w-10 p-2 text-customGray200 border border-customGray400 rounded-full"
                 aria-hidden="true"
               />
             </div>

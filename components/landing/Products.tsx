@@ -3,11 +3,11 @@ import Product from "@/components/landing/Product";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import PopSmileyIcon from "@/components/svg/popcorn/PopSmileyIcon";
 import SmileyIcon from "@/components/svg/popcorn/SmileyIcon";
+import PopIcon from "@/components/svg/popcorn/PopIcon";
 import { useAtom } from "jotai";
 import Link from "next/link";
 import { tvlAtom } from "@/lib/atoms";
 import Modal from "@/components/modal/Modal";
-import RightArrowIcon from "../svg/RightArrowIcon";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 
 export default function Products(): JSX.Element {
@@ -26,20 +26,7 @@ export default function Products(): JSX.Element {
       <section className="py-12 md:py-10 mx-4 md:mx-6">
         <p className="text-2xl mb-6 text-white smmd:hidden"> Our products </p>
         <div className="flex flex-col gap-6 smmd:flex-wrap lg:flex-nowrap space-y-4 md:space-y-0 md:flex-row md:justify-between">
-          <div
-            className="group cursor-pointer border rounded w-full lg:max-w-full h-[600px] relative flex flex-col bg-customNeutral300 border-customNeutral100 border-opacity-75 smmd:items-center py-6 px-8 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:bg-customNeutral200"
-            onClick={() => setShowModal(true)}
-          >
-            <div className="col-span-12 md:col-span-4 xs:self-start flex-1">
-              <div className="relative flex flex-row">
-                <h2 className="text-white text-4xl md:text-6xl leading-none mb-2">
-                  Instruction Manual
-                </h2>
-              </div>
-              <p className="mt-2 text-white">Learn how to use VaultCraft and optimize your yield with our perpetual call options</p>
-            </div>
-          </div>
-
+          <InstructionManualCard setShowModal={setShowModal}/>
           <Product
             title={
               <>
@@ -51,7 +38,7 @@ export default function Products(): JSX.Element {
               <PopSmileyIcon
                 size={"60"}
                 color={"white"}
-                className="group-hover:fill-[#FFA0B4]"
+                className="group-hover:fill-secondaryFuchsia"
               />
             }
             description="Deposit and optimize your yield with automated, non-custodial DeFi strategies"
@@ -84,7 +71,7 @@ export default function Products(): JSX.Element {
               <SmileyIcon
                 size={"60"}
                 color={"white"}
-                className="group-hover:fill-[#C391FF]"
+                className="group-hover:fill-secondaryViolet"
               />
             }
             description="Lock your VCX LP token to earn additional perpetual call options on your Smart Vault deposits"
@@ -96,7 +83,7 @@ export default function Products(): JSX.Element {
               <div className="rounded w-full md:h-[200px] h-[300px] bg-customNeutral300 border border-customNeutral100 border-opacity-75 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:opacity-50 flex flex-col justify-start bg-cover"
                 style={{ backgroundImage: "url('https://resolve.mercle.xyz/ipfs/bafkreibn26tzshouo6ayr33uhwwqzxpp5h6zgzitzgxwhsacsuuxoo7fuq')" }}
               >
-                <h2 className="text-white text-3xl leading-none mb-2 py-6 px-8">
+                <h2 className="text-white text-2xl leading-none mb-2 py-6 px-8">
                   Vaultron
                 </h2>
               </div>
@@ -144,6 +131,29 @@ const TutorialTitleByStep: { [key: number]: string } = {
   1: "Deposit into a Smart Vault",
   2: "Get and Lock VCX-LP",
   3: "Vote on Gauges",
+}
+
+function InstructionManualCard({ setShowModal }: { setShowModal: Function }): JSX.Element {
+  return <div
+    className="group cursor-pointer border rounded w-full lg:max-w-full h-[600px] relative flex flex-col bg-customNeutral300 border-customNeutral100 border-opacity-75 smmd:items-center py-6 px-8 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:bg-customNeutral200"
+    onClick={() => setShowModal(true)}
+  >
+    <div className="col-span-12 md:col-span-4 xs:self-start flex-1">
+      <div className="relative flex flex-row">
+        <h2 className="text-white text-4xl md:text-6xl leading-none mb-2">
+          Instruction Manual
+        </h2>
+      </div>
+      <p className="mt-2 text-white">Learn how to use VaultCraft and optimize your yield with our perpetual call options 🚀</p>
+    </div>
+    <div className="flex absolute flex-grow items-center justify-end w-full top-[50%] translate-y-[-50%] right-8">
+      <PopIcon
+        size={"60"}
+        color={"white"}
+        className="group-hover:fill-secondaryYellow"
+      />
+    </div>
+  </div>
 }
 
 function Tutorial(): JSX.Element {

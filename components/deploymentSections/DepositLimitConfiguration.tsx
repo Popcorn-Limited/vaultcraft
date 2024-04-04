@@ -38,7 +38,7 @@ function DepositLimitConfiguration() {
           <span
             aria-hidden="true"
             className={`${
-              enabled ? "translate-x-6 bg-white" : "translate-x-1 bg-[#777E90]"
+              enabled ? "translate-x-6 bg-white" : "translate-x-1 bg-customGray500"
             } first-letter:pointer-events-none inline-block h-3 w-3 transform rounded-full shadow ring-0 transition duration-200 ease-in-out`}
           />
         </Switch>

@@ -96,7 +96,7 @@ export default function Navbar(): JSX.Element {
                   className="w-5 h-5 md:mr-2"
                   onClick={openChainModal}
                 />
-                <div className="hidden w-2 h-2 bg-[#50C56E] ml-2 rounded-full"></div>
+                <div className="hidden w-2 h-2 bg-green-500 ml-2 rounded-full"></div>
                 <span className="hidden md:inline">|</span>
                 <p className="ml-2 leading-none hidden md:block">
                   {address?.substring(0, 5)}...

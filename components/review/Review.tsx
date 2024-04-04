@@ -160,7 +160,7 @@ export default function Review(): JSX.Element {
           I have read and agree to the{" "}
           <a
             href="https://app.vaultcraft.io/disclaimer"
-            className={`text-[#87C1F8]`}
+            className={`text-secondaryBlue`}
           >
             Terms & Conditions
           </a>

@@ -9,7 +9,7 @@ export default function Hero(): JSX.Element {
   const [vaultronStats] = useAtom(vaultronAtom)
 
   return (
-    <section className="pb-8 pt-8 sm:pb-6 border-b border-[#AFAFAF]">
+    <section className="pb-8 pt-8 sm:pb-6 border-b border-customGray300">
       <div className="flex flex-col smmd:flex-row smmd:items-center justify-between mx-4 md:mx-8">
         <div className="w-full lg:w-8/12 md:flex md:flex-row space-y-4 md:space-y-0 mt-4 md:mt-0">
           <div className="flex flex-row items-center md:pr-10 gap-10 md:w-fit">

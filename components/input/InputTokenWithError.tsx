@@ -48,7 +48,7 @@ export default function InputTokenWithError({
             errorMessage ? "border-red-500" : "border-customGray100"
           }`}
         >
-          <div className="xs:w-full xs:border-r xs:border-[#7D7E83] xs:pr-4 smmd:p-0 smmd:border-none smmd:w-1/2">
+          <div className="xs:w-full xs:border-r xs:border-customGray500 xs:pr-4 smmd:p-0 smmd:border-none smmd:w-1/2">
             <InputNumber {...props} />
           </div>
           <div className="xs:w-fit xs:pl-4 smmd:p-0 smmd:w-1/2">

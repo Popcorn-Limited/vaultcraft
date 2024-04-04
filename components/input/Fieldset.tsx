@@ -34,7 +34,7 @@ function Fieldset({
                 className={`${
                   isOpened
                     ? "translate-x-6 bg-white"
-                    : "translate-x-1 bg-[#3772FF]"
+                    : "translate-x-1 bg-customGray500"
                 } first-letter:pointer-events-none inline-block h-3 w-3 transform rounded-full shadow ring-0 transition duration-200 ease-in-out`}
               />
             </Switch>

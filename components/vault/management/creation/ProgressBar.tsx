@@ -26,8 +26,8 @@ export default function ProgressBar({ stages, activeStage }: ProgressBarProps) {
                   className={`flex flex-row border-1 border justify-center h-6 w-6 items-center rounded-full 
                                 ${
                                   activeStage >= index
-                                    ? "bg-[#DFFF1C66] border-primaryYellow"
-                                    : " border-[#d7d7d766] bg-[#35394599]"
+                                    ? "bg-primaryYellow bg-opacity-50 border-primaryYellow"
+                                    : " border-customGray300 bg-customGray500"
                                 }`}
                 >
                   {index < activeStage ? (
@@ -38,14 +38,14 @@ export default function ProgressBar({ stages, activeStage }: ProgressBarProps) {
                   ) : (
                     <div
                       className={`rounded-full h-2 w-2 ${
-                        activeStage >= index ? "bg-primaryYellow" : "bg-[#d7d7d766]"
+                        activeStage >= index ? "bg-primaryYellow" : "bg-customGray100"
                       }`}
                     />
                   )}
                 </div>
                 <p
                   className={`${
-                    activeStage >= index ? "text-white" : "text-[#ffffff66]"
+                    activeStage >= index ? "text-white" : "text-customGray100"
                   } absolute text-xs top-8`}
                 >
                   {stage}

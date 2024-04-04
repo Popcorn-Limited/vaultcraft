@@ -63,7 +63,7 @@ export default function VaultsSorting({
           e.preventDefault();
           setOpenSorting((prevState) => !prevState);
         }}
-        className="w-full h-[58px] py-[14px] px-6 gap-2 flex flex-row items-center justify-between rounded-lg border border-[#626263]"
+        className="w-full h-14 py-4 px-6 gap-2 flex flex-row items-center justify-between rounded-lg border border-customGray500"
       >
         <div className="flex items-center">
           <p className="text-white">Sorting</p>
@@ -77,7 +77,7 @@ export default function VaultsSorting({
       {openFilter && !isLessThenMdScreenSize && (
         <div
           ref={dropdownRef}
-          className="hidden md:block absolute w-[180px] p-[10px] border border-[#626263] top-16 bg-customNeutral300 rounded-lg right-0"
+          className="hidden md:block absolute w-[180px] p-2 border border-customGray500 top-16 bg-customNeutral300 rounded-lg right-0"
         >
           <button
             className={`

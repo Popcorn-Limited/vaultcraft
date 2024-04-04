@@ -129,14 +129,14 @@ export function Option({
                 {value.symbol && (
                   <p
                     className={`${
-                      selected ? "text-black" : "text-[#ffffff99]"
+                      selected ? "text-black" : "text-white"
                     }`}
                   >
                     {value.name}
                   </p>
                 )}
                 {disabled && (
-                  <span className="border border-red-500 bg-red-500/20 rounded-md py-1 px-2">
+                  <span className="border border-red-500 bg-red-500 bg-opacity-20 rounded-md py-1 px-2">
                     <p className={`self-end text-red-500`}>Not supported</p>
                   </span>
                 )}
