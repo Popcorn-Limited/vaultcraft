@@ -166,7 +166,7 @@ function Tutorial(): JSX.Element {
   }
 
   return <div className="flex flex-row justify-between">
-    <div className="text-start space-y-8 w-full xl:w-1/2 xl:pr-8">
+    <div className="text-start space-y-8 w-full lg:w-1/3 xl:w-1/2 lg:pr-8">
       <div className="">
         <h2 className="text-lg font-bold text-primaryYellow border-b border-customGray500 pb-2">Step 1</h2>
         <div className="flex flex-row justify-between">
@@ -177,7 +177,7 @@ function Tutorial(): JSX.Element {
             <li>Earn 25%+ APY with perpetual call options (oVCX) 😏</li>
           </ul>
         </div>
-        <img src={TutorialImageByStep[1]} className="rounded-md mt-4 lg:w-2/3 xl:hidden" />
+        <img src={TutorialImageByStep[1]} className="rounded-md mt-4 md:w-2/3 lg:hidden" />
       </div>
       <div>
         <h2 className="text-lg font-bold text-primaryYellow border-b border-customGray500 pb-2">Step 2</h2>
@@ -188,7 +188,7 @@ function Tutorial(): JSX.Element {
             <li>Earn multiples on you oVCX 🚀</li>
           </ul>
         </div>
-        <img src={TutorialImageByStep[2]} className="rounded-md mt-4 lg:w-2/3 xl:hidden" />
+        <img src={TutorialImageByStep[2]} className="rounded-md mt-4 md:w-2/3 lg:hidden" />
       </div>
       <div>
         <h2 className="text-lg font-bold text-primaryYellow border-b border-customGray500 pb-2">Step 3</h2>
@@ -205,10 +205,10 @@ function Tutorial(): JSX.Element {
             </li>
           </ul>
         </div>
-        <img src={TutorialImageByStep[3]} className="rounded-md mt-4 lg:w-2/3 xl:hidden" />
+        <img src={TutorialImageByStep[3]} className="rounded-md mt-4 md:w-2/3 lg:hidden" />
       </div>
     </div>
-    <div className="hidden xl:block xl:w-1/2 rounded-md border border-customGray500 bg-customNeutral300 px-4 pb-16 pt-4">
+    <div className="hidden lg:block lg:w-2/3 rounded-md border border-customGray500 bg-customNeutral300 px-4 pb-16 pt-4">
       <div className="flex flex-row justify-between mb-2">
         <div className="flex flex-row items-end">
           <p className="mb-1 mr-2">{step}/3</p>
