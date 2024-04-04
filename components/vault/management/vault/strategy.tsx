@@ -71,7 +71,7 @@ export default function VaultStrategyConfiguration({
           {strategies.map((strategy) => (
             <div
               key={strategy.address}
-              className="px-2 py-2 rounded-lg cursor-pointer hover:bg-gray-500"
+              className="px-2 py-2 rounded-lg cursor-pointer hover:bg-customGray500"
               onClick={() => {
                 setStrategy(strategy);
                 setShow(false);
@@ -92,7 +92,7 @@ export default function VaultStrategyConfiguration({
       </Modal>
       <div className="flex flex-row justify-center">
         <div className="w-1/2">
-          <p className="text-gray-500">
+          <p className="text-customGray500">
             Change the strategy used by this vault. The new strategy must use
             the same asset as the current. This process happens in two steps.
             First a new strategy must be proposed. Users now have three days to
@@ -103,7 +103,7 @@ export default function VaultStrategyConfiguration({
           {Number(settings.proposedAdapterTime) > 0 ? (
             <div className="mt-4">
               <h2 className="text-xl">Proposed Strategy</h2>
-              <div className="mt-1 border border-gray-500 p-4 rounded-md">
+              <div className="mt-1 border border-customGray500 p-4 rounded-md">
                 <span className="flex flex-row items-center gap-x-4 mb-2">
                   <ProtocolIcon protocolName={settings.proposedAdapter.name} />
                   <p>
@@ -118,7 +118,7 @@ export default function VaultStrategyConfiguration({
           ) : (
             <div className="mt-4">
               <h2 className="text-xl">Current Strategy</h2>
-              <div className="mt-1 border border-gray-500 p-4 rounded-md">
+              <div className="mt-1 border border-customGray500 p-4 rounded-md">
                 <span className="flex flex-row items-center gap-x-4 mb-2">
                   <ProtocolIcon
                     protocolName={
@@ -142,7 +142,7 @@ export default function VaultStrategyConfiguration({
               {strategy && (
                 <div className="mt-4">
                   <h2 className="text-xl">Proposed Strategy</h2>
-                  <div className="mt-1 border border-gray-500 p-4 rounded-md">
+                  <div className="mt-1 border border-customGray500 p-4 rounded-md">
                     <span className="flex flex-row items-center gap-x-4 mb-2">
                       <ProtocolIcon protocolName={strategy.name} />
                       <p>

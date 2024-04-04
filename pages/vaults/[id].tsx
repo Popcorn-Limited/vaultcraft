@@ -136,7 +136,7 @@ export default function Index() {
           <LoanInterface visibilityState={[showLendModal, setShowLendModal]} vaultData={vaultData} />
           <div className="min-h-screen">
             <button
-              className="border border-gray-500 rounded-lg flex flex-row items-center px-4 py-2 ml-4 md:ml-8 mt-10"
+              className="border border-customGray500 rounded-lg flex flex-row items-center px-4 py-2 ml-4 md:ml-8 mt-10"
               type="button"
               onClick={() => router.push("/vaults")}
             >
@@ -145,7 +145,7 @@ export default function Index() {
               </div>
               <p className="text-white leading-0 mt-1 ml-2">Back to Vaults</p>
             </button>
-            <section className="md:border-b border-[#353945] py-10 px-4 md:px-8">
+            <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-8">
 
               <div className="w-full mb-8">
                 <AssetWithName vault={vaultData} size={3} />
@@ -155,10 +155,10 @@ export default function Index() {
                 <div className="flex flex-wrap md:flex-row md:items-center md:pr-10 gap-4 md:gap-10 md:w-fit">
 
                   <div className="w-[120px] md:w-max">
-                    <p className="leading-6 text-base text-primaryDark md:text-primary">
+                    <p className="leading-6 text-base text-customGray100 md:text-white">
                       Your Wallet
                     </p>
-                    <div className="text-3xl font-bold whitespace-nowrap text-primary">
+                    <div className="text-3xl font-bold whitespace-nowrap text-white">
                       {asset ? `${formatAndRoundNumber(
                         asset.balance,
                         asset.decimals
@@ -167,10 +167,10 @@ export default function Index() {
                   </div>
 
                   <div className="w-[120px] md:w-max">
-                    <p className="leading-6 text-base text-primaryDark md:text-primary">
+                    <p className="leading-6 text-base text-customGray100 md:text-white">
                       Deposits
                     </p>
-                    <div className="text-3xl font-bold whitespace-nowrap text-primary">
+                    <div className="text-3xl font-bold whitespace-nowrap text-white">
                       {vaultData ?
                         `${!!gauge ?
                           formatAndRoundNumber(gauge.balance * gauge.price, gauge.decimals)
@@ -180,23 +180,23 @@ export default function Index() {
                   </div>
 
                   <div className="w-[120px] md:w-max">
-                    <p className="leading-6 text-base text-primaryDark md:text-primary">TVL</p>
-                    <div className="text-3xl font-bold whitespace-nowrap text-primary">
+                    <p className="leading-6 text-base text-customGray100 md:text-white">TVL</p>
+                    <div className="text-3xl font-bold whitespace-nowrap text-white">
                       $ {vaultData.tvl < 1 ? "0" : NumberFormatter.format(vaultData.tvl)}
                     </div>
                   </div>
 
                   <div className="w-[120px] md:w-max">
-                    <p className="w-max leading-6 text-base text-primaryDark md:text-primary">vAPY</p>
-                    <div className="text-3xl font-bold whitespace-nowrap text-primary">
+                    <p className="w-max leading-6 text-base text-customGray100 md:text-white">vAPY</p>
+                    <div className="text-3xl font-bold whitespace-nowrap text-white">
                       {`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.apy))} %`}
                     </div>
                   </div>
                   {
                     vaultData.minGaugeApy ? (
                       <div className="w-[120px] md:w-max">
-                        <p className="w-max leading-6 text-base text-primaryDark md:text-primary">Min Rewards</p>
-                        <div className="text-3xl font-bold whitespace-nowrap text-primary">
+                        <p className="w-max leading-6 text-base text-customGray100 md:text-white">Min Rewards</p>
+                        <div className="text-3xl font-bold whitespace-nowrap text-white">
                           {`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.minGaugeApy))} %`}
                         </div>
                       </div>
@@ -206,8 +206,8 @@ export default function Index() {
                   {
                     vaultData.maxGaugeApy ? (
                       <div className="w-[120px] md:w-max">
-                        <p className="w-max leading-6 text-base text-primaryDark md:text-primary">Max Rewards</p>
-                        <div className="text-3xl font-bold whitespace-nowrap text-primary">
+                        <p className="w-max leading-6 text-base text-customGray100 md:text-white">Max Rewards</p>
+                        <div className="text-3xl font-bold whitespace-nowrap text-white">
                           {`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.maxGaugeApy))} %`}
                         </div>
                       </div>
@@ -219,15 +219,15 @@ export default function Index() {
                 <div className="flex flex-row items-center md:gap-6 md:w-fit md:pl-12">
                   <div className="flex gap-4 md:gap-10 w-fit">
                     <div className="w-[120px] md:w-max">
-                      <p className="w-max leading-6 text-base text-primaryDark md:text-primary">My oVCX</p>
-                      <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
+                      <p className="w-max leading-6 text-base text-customGray100 md:text-white">My oVCX</p>
+                      <div className="w-max text-3xl font-bold whitespace-nowrap text-white">
                         {`$${oBal && tokens[1][VCX] ? NumberFormatter.format(oBal * (tokens[1][VCX].price * 0.25)) : "0"}`}
                       </div>
                     </div>
 
                     <div className="w-[120px] md:w-max">
-                      <p className="w-max leading-6 text-base text-primaryDark md:text-primary">Claimable oVCX</p>
-                      <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
+                      <p className="w-max leading-6 text-base text-customGray100 md:text-white">Claimable oVCX</p>
+                      <div className="w-max text-3xl font-bold whitespace-nowrap text-white">
                         {`$${gaugeRewards && tokens[1][VCX] ?
                           NumberFormatter.format((Number(gaugeRewards?.[vaultData.chainId]?.total || 0) / 1e18) * (tokens[1][VCX].price * 0.25)) : "0"}`}
                       </div>
@@ -254,8 +254,8 @@ export default function Index() {
 
             <section className="w-full md:flex md:flex-row md:justify-between md:space-x-8 py-10 px-4 md:px-8">
               <div className="w-full md:w-1/3">
-                <div className="bg-[#23262f] p-6 rounded-lg">
-                  <div className="bg-[#141416] px-6 py-6 rounded-lg">
+                <div className="bg-customNeutral200 p-6 rounded-lg">
+                  <div className="bg-customNeutral300 px-6 py-6 rounded-lg">
                     <VaultInputs
                       vaultData={vaultData}
                       tokenOptions={tokenOptions}
@@ -269,7 +269,7 @@ export default function Index() {
               <div className="w-full md:w-2/3 mt-8 md:mt-0 space-y-4">
 
                 {(gauge && gauge?.balance > 0) &&
-                  <div className="bg-[#23262f] p-6 rounded-lg">
+                  <div className="bg-customNeutral200 p-6 rounded-lg">
                     <p className="text-white text-2xl font-bold mb-4">Your Boost</p>
                     <p className='text-white mb-4'>
                       Boost: {formatNumber((vaultData.workingBalance / (gauge?.balance || 0)) * 5)} X <br />
@@ -280,7 +280,7 @@ export default function Index() {
                   </div>
                 }
 
-                <div className="bg-[#23262f] p-6 rounded-lg">
+                <div className="bg-customNeutral200 p-6 rounded-lg">
                   <p className="text-white text-2xl font-bold mb-4">Farm with any Token</p>
                   <p className='text-white mb-4'>
                     The loan modal is designed for investors looking to engage with high-yield vaults without risking their blue chip assets. Deposit your assets. Earn interest and use them to borrow the required tokens for farming instead of purchasing them. This allows you to avoid direct exposure to their price volatility, maximizing your investment potential in high yield farming opportunities with minimized risk.  It&apos;s an efficient way to leverage your portfolio, ensuring you&apos;re always positioned to capture the best yields without selling from your blue chip assets.
@@ -293,12 +293,12 @@ export default function Index() {
                   </div>
                 </div>
 
-                <div className="bg-[#23262f] p-6 rounded-lg">
+                <div className="bg-customNeutral200 p-6 rounded-lg">
                   <p className="text-white text-2xl font-bold">Strategies</p>
                   {vaultData.strategies.map((strategy, i) =>
                     <div
                       key={strategy.metadata.name}
-                      className={`py-4 ${i + 1 < vaultData.strategies.length ? "border-b border-gray-500" : ""}`}
+                      className={`py-4 ${i + 1 < vaultData.strategies.length ? "border-b border-customGray500" : ""}`}
                     >
                       <h2 className="text-lg font-bold text-white">
                         {strategy.metadata.name}
@@ -307,10 +307,10 @@ export default function Index() {
                         {strategy.metadata.description}
                       </p>
                       <div className="mt-1">
-                        <p className='text-gray-400'>
+                        <p className='text-customGray400'>
                           Allocation: $ {formatAndRoundNumber(strategy.allocation * asset?.price!, asset?.decimals!)} | {strategy.allocationPerc * 100} %
                         </p>
-                        <p className='text-gray-400'>
+                        <p className='text-customGray400'>
                           Apy: {`${NumberFormatter.format(roundToTwoDecimalPlaces(strategy.apy))} %`}
                         </p>
                       </div>
@@ -319,44 +319,44 @@ export default function Index() {
 
                   <div className="md:flex md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4 mt-4">
 
-                    <div className="w-full md:w-10/12 border border-[#353945] rounded-lg p-4">
-                      <p className="text-primary font-normal">Vault address:</p>
+                    <div className="w-full md:w-10/12 border border-customNeutral100 rounded-lg p-4">
+                      <p className="text-white font-normal">Vault address:</p>
                       <div className="flex flex-row items-center justify-between">
-                        <p className="font-bold text-primary">
+                        <p className="font-bold text-white">
                           {vaultData.address.slice(0, 6)}...{vaultData.address.slice(-4)}
                         </p>
                         <div className='w-6 h-6 group/vaultAddress'>
                           <CopyToClipboard text={vaultData.address} onCopy={() => showSuccessToast("Vault address copied!")}>
-                            <Square2StackIcon className="text-white group-hover/vaultAddress:text-[#DFFF1C]" />
+                            <Square2StackIcon className="text-white group-hover/vaultAddress:text-primaryYellow" />
                           </CopyToClipboard>
                         </div>
                       </div>
                     </div>
 
-                    <div className="w-full md:w-10/12 border border-[#353945] rounded-lg p-4">
-                      <p className="text-primary font-normal">Asset address:</p>
+                    <div className="w-full md:w-10/12 border border-customNeutral100 rounded-lg p-4">
+                      <p className="text-white font-normal">Asset address:</p>
                       <div className="flex flex-row items-center justify-between">
-                        <p className="font-bold text-primary">
+                        <p className="font-bold text-white">
                           {vaultData.asset.slice(0, 6)}...{vaultData.asset.slice(-4)}
                         </p>
                         <div className='w-6 h-6 group/vaultAddress'>
                           <CopyToClipboard text={vaultData.asset} onCopy={() => showSuccessToast("Asset address copied!")}>
-                            <Square2StackIcon className="text-white group-hover/vaultAddress:text-[#DFFF1C]" />
+                            <Square2StackIcon className="text-white group-hover/vaultAddress:text-primaryYellow" />
                           </CopyToClipboard>
                         </div>
                       </div>
                     </div>
 
                     {vaultData.gauge &&
-                      <div className="w-full md:w-10/12 border border-[#353945] rounded-lg p-4">
-                        <p className="text-primary font-normal">Gauge address:</p>
+                      <div className="w-full md:w-10/12 border border-customNeutral100 rounded-lg p-4">
+                        <p className="text-white font-normal">Gauge address:</p>
                         <div className="flex flex-row items-center justify-between">
-                          <p className="font-bold text-primary">
+                          <p className="font-bold text-white">
                             {vaultData.gauge.slice(0, 6)}...{vaultData.gauge.slice(-4)}
                           </p>
                           <div className='w-6 h-6 group/gaugeAddress'>
                             <CopyToClipboard text={vaultData.gauge} onCopy={() => showSuccessToast("Gauge address copied!")}>
-                              <Square2StackIcon className="text-white group-hover/gaugeAddress:text-[#DFFF1C]" />
+                              <Square2StackIcon className="text-white group-hover/gaugeAddress:text-primaryYellow" />
                             </CopyToClipboard>
                           </div>
                         </div>

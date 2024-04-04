@@ -132,7 +132,7 @@ export default function LpInterface({
           tokenList={[]}
         />
         <div className="flex justify-center -mt-2 mb-4">
-          <PlusIcon className="w-8 h-8 text-gray-500" />
+          <PlusIcon className="w-8 h-8 text-customGray500" />
         </div>
 
         <InputTokenWithError

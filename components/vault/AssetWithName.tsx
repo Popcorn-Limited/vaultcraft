@@ -9,7 +9,7 @@ import { tokensAtom } from "@/lib/atoms";
 const vaultLabelColor: { [key: string]: string } = {
   Experimental: "text-white bg-orange-500 bg-opacity-90",
   Deprecated: "text-white bg-red-500 bg-opacity-80",
-  New: "text-[#DFFF1C] bg-[#DFFF1C] bg-opacity-30",
+  New: "text-primaryYellow bg-primaryYellow bg-opacity-30",
 };
 
 const vaultLabelTooltip: { [key: string]: string } = {
@@ -91,7 +91,7 @@ export default function AssetWithName({
         />
       </div>
       <h2
-        className={`${vaultTextSize[size]} font-bold text-primary mr-1 text-ellipsis overflow-hidden whitespace-nowrap smmd:flex-1 smmd:flex-nowrap xs:max-w-[80%] smmd:max-w-fit smmd:block`}
+        className={`${vaultTextSize[size]} font-bold text-white mr-1 text-ellipsis overflow-hidden whitespace-nowrap smmd:flex-1 smmd:flex-nowrap xs:max-w-[80%] smmd:max-w-fit smmd:block`}
       >
         {vault.metadata.vaultName || tokens[vault.chainId][vault.asset].name}
       </h2>

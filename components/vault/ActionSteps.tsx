@@ -2,9 +2,9 @@ import { ActionStep } from "@/lib/getActionSteps";
 import { ArrowRightIcon, XMarkIcon } from "@heroicons/react/24/outline";
 
 function getStepColor(preFix: string, step: any): string {
-  if (step.loading || step.success) return `${preFix}-[#DFFF1C]`;
+  if (step.loading || step.success) return `${preFix}-primaryYellow`;
   if (step.error) return `${preFix}-red-500`;
-  return `${preFix}-gray-500`;
+  return `${preFix}-customGray500`;
 }
 
 interface ActionStepsProps {
@@ -24,7 +24,7 @@ export default function ActionSteps({
             className={`w-8 h-8 rounded-full border leading-none flex justify-center items-center cursor-default bg-opacity-40
               ${
                 i === stepCounter
-                  ? "border-[#DFFF1C] bg-[#DFFF1C]"
+                  ? "border-primaryYellow bg-primaryYellow"
                   : `${getStepColor("border", step)} ${getStepColor(
                       "bg",
                       step
@@ -46,7 +46,7 @@ export default function ActionSteps({
             {!step.loading && !step.error && !step.success && (
               <div
                 className={`rounded-full h-3 w-3 ${
-                  i === stepCounter ? "bg-[#DFFF1C]" : getStepColor("bg", step)
+                  i === stepCounter ? "bg-primaryYellow" : getStepColor("bg", step)
                 }`}
               />
             )}

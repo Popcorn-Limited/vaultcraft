@@ -35,7 +35,7 @@ export default function InputTokenWithError({
   return (
     <>
       {captionText && (
-        <p className="text-primary text-start">
+        <p className="text-white text-start">
           {captionText}
           {inputMoreThanBalance && (
             <span className="text-red-500 ml-2">Input More than Balance</span>
@@ -45,7 +45,7 @@ export default function InputTokenWithError({
       <div className="relative flex items-center w-full">
         <div
           className={`h-14 w-full flex px-5 py-4 items-center justify-between rounded-lg border ${
-            errorMessage ? "border-customRed" : "border-customLightGray"
+            errorMessage ? "border-red-500" : "border-customGray100"
           }`}
         >
           <div className="xs:w-full xs:border-r xs:border-[#7D7E83] xs:pr-4 smmd:p-0 smmd:border-none smmd:w-1/2">
@@ -63,7 +63,7 @@ export default function InputTokenWithError({
         </div>
       </div>
       {errorMessage && (
-        <p className="text-customRed pt-2 leading-6">{errorMessage}</p>
+        <p className="text-red-500 pt-2 leading-6">{errorMessage}</p>
       )}
       <div className="flex justify-between items-center mt-1 w-full">
         <div
@@ -72,7 +72,7 @@ export default function InputTokenWithError({
         >
           {allowInput && (
             <>
-              <div className="text-[#D7D7D7] group-hover/max:text-primary">
+              <div className="text-customGray100 group-hover/max:text-white">
                 <svg
                   width="16"
                   height="16"
@@ -88,7 +88,7 @@ export default function InputTokenWithError({
                   />
                 </svg>
               </div>
-              <p className="text-[#D7D7D7] group-hover/max:text-primary">
+              <p className="text-customGray100 group-hover/max:text-white">
                 {balance < 0.001 && balance > 0
                   ? "<0.001"
                   : `${formatNumber(balance)}`}
@@ -98,7 +98,7 @@ export default function InputTokenWithError({
         </div>
         {getToken && (
           <button
-            className="w-40 h-9 flex items-center justify-center py-2 px-6 text-base text-primary font-medium border border-warmGray rounded-lg cursor-pointer hover:bg-primary hover:text-black transition-all leading-none"
+            className="w-40 h-9 flex items-center justify-center py-2 px-6 text-base text-white font-medium border border-customGray300 rounded-lg cursor-pointer hover:bg-white hover:text-black transition-all leading-none"
             onClick={() => getToken()}
           >
             <p className="mb-0.5">Get Token </p>

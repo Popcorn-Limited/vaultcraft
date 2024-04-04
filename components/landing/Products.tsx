@@ -24,19 +24,19 @@ export default function Products(): JSX.Element {
       </Modal>
       {/* @dev Product.tsx has `md:mx-2` so with `md:mx-6` that adds up to consistent mx-8*/}
       <section className="py-12 md:py-10 mx-4 md:mx-6">
-        <p className="text-2xl mb-6 text-primary smmd:hidden"> Our products </p>
+        <p className="text-2xl mb-6 text-white smmd:hidden"> Our products </p>
         <div className="flex flex-col gap-6 smmd:flex-wrap lg:flex-nowrap space-y-4 md:space-y-0 md:flex-row md:justify-between">
           <div
-            className="group cursor-pointer border rounded w-full lg:max-w-full h-[600px] relative flex flex-col bg-[#141416] border-[#353945] border-opacity-75 smmd:items-center py-6 px-8 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:bg-[#23262f]"
+            className="group cursor-pointer border rounded w-full lg:max-w-full h-[600px] relative flex flex-col bg-customNeutral300 border-customNeutral100 border-opacity-75 smmd:items-center py-6 px-8 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:bg-customNeutral200"
             onClick={() => setShowModal(true)}
           >
             <div className="col-span-12 md:col-span-4 xs:self-start flex-1">
               <div className="relative flex flex-row">
-                <h2 className="text-primary text-4xl md:text-[56px] leading-none mb-2">
+                <h2 className="text-white text-4xl md:text-6xl leading-none mb-2">
                   Instruction Manual
                 </h2>
               </div>
-              <p className="mt-2 text-primary">Learn how to use VaultCraft and optimize your yield with our perpetual call options</p>
+              <p className="mt-2 text-white">Learn how to use VaultCraft and optimize your yield with our perpetual call options</p>
             </div>
           </div>
 
@@ -93,38 +93,38 @@ export default function Products(): JSX.Element {
           />
           <div className="w-full lg:max-w-full h-[600px] relative flex flex-col space-y-4 md:mx-2">
             <Link href="vaultron">
-              <div className="rounded w-full md:h-[200px] h-[300px] bg-[#141416] border border-[#353945] border-opacity-75 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:opacity-50 flex flex-col justify-start bg-cover"
+              <div className="rounded w-full md:h-[200px] h-[300px] bg-customNeutral300 border border-customNeutral100 border-opacity-75 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:opacity-50 flex flex-col justify-start bg-cover"
                 style={{ backgroundImage: "url('https://resolve.mercle.xyz/ipfs/bafkreibn26tzshouo6ayr33uhwwqzxpp5h6zgzitzgxwhsacsuuxoo7fuq')" }}
               >
-                <h2 className="text-primary text-3xl leading-none mb-2 py-6 px-8">
+                <h2 className="text-white text-3xl leading-none mb-2 py-6 px-8">
                   Vaultron
                 </h2>
               </div>
             </Link>
             <Link
               href="create-vault"
-              className="rounded w-full relative flex flex-col bg-[#141416] border border-[#353945] border-opacity-75 smmd:items-center py-6 px-8 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:bg-[#23262f]"
+              className="rounded w-full relative flex flex-col bg-customNeutral300 border border-customNeutral100 border-opacity-75 smmd:items-center py-6 px-8 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:bg-customNeutral200"
             >
               <div className="col-span-12 md:col-span-4 xs:self-start flex-1">
                 <div className="relative flex flex-row">
-                  <h2 className="text-primary text-3xl leading-none mb-2">
+                  <h2 className="text-white text-3xl leading-none mb-2">
                     Create Vaults
                   </h2>
                 </div>
-                <p className="mt-2 text-primary">Customize and deploy your own Smart Vault</p>
+                <p className="mt-2 text-white">Customize and deploy your own Smart Vault</p>
               </div>
             </Link>
             <Link
               href="stats"
-              className="rounded w-full relative flex flex-col bg-[#141416] border border-[#353945] border-opacity-75 smmd:items-center py-6 px-8 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:bg-[#23262f]"
+              className="rounded w-full relative flex flex-col bg-customNeutral300 border border-customNeutral100 border-opacity-75 smmd:items-center py-6 px-8 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:bg-customNeutral200"
             >
               <div className="col-span-12 md:col-span-4 xs:self-start flex-1">
                 <div className="relative flex flex-row">
-                  <h2 className="text-primary text-3xl leading-none mb-2">
+                  <h2 className="text-white text-3xl leading-none mb-2">
                     VaultCraft Stats
                   </h2>
                 </div>
-                <p className="mt-2 text-primary">See all stats regarding VCX and VaultCraft</p>
+                <p className="mt-2 text-white">See all stats regarding VCX and VaultCraft</p>
               </div>
             </Link>
           </div>
@@ -158,7 +158,7 @@ function Tutorial(): JSX.Element {
   return <div className="flex flex-row justify-between">
     <div className="text-start space-y-8 w-full xl:w-1/2 xl:pr-8">
       <div className="">
-        <h2 className="text-lg font-bold text-[#DFFF1C] border-b border-gray-500 pb-2">Step 1</h2>
+        <h2 className="text-lg font-bold text-primaryYellow border-b border-customGray500 pb-2">Step 1</h2>
         <div className="flex flex-row justify-between">
           <ul className="list-inside list-disc mt-2 ml-4">
             <li>Deposit into Smart Vaults 🪙</li>
@@ -170,7 +170,7 @@ function Tutorial(): JSX.Element {
         <img src={TutorialImageByStep[1]} className="rounded-md mt-4 lg:w-2/3 xl:hidden" />
       </div>
       <div>
-        <h2 className="text-lg font-bold text-[#DFFF1C] border-b border-gray-500 pb-2">Step 2</h2>
+        <h2 className="text-lg font-bold text-primaryYellow border-b border-customGray500 pb-2">Step 2</h2>
         <div className="flex flex-row justify-between">
           <ul className="list-inside list-disc mt-2 ml-4">
             <li>Provide liquidity in the 80 VCX 20 WETH Balancer Pool 🤓</li>
@@ -181,7 +181,7 @@ function Tutorial(): JSX.Element {
         <img src={TutorialImageByStep[2]} className="rounded-md mt-4 lg:w-2/3 xl:hidden" />
       </div>
       <div>
-        <h2 className="text-lg font-bold text-[#DFFF1C] border-b border-gray-500 pb-2">Step 3</h2>
+        <h2 className="text-lg font-bold text-primaryYellow border-b border-customGray500 pb-2">Step 3</h2>
         <div className="flex flex-row justify-between">
           <ul className="list-inside list-disc mt-2 ml-4">
             <li>Claim your oVCX rewards 🫴 </li>
@@ -198,15 +198,15 @@ function Tutorial(): JSX.Element {
         <img src={TutorialImageByStep[3]} className="rounded-md mt-4 lg:w-2/3 xl:hidden" />
       </div>
     </div>
-    <div className="hidden xl:block xl:w-1/2 rounded-md border border-gray-500 bg-[#141416] px-4 pb-16 pt-4">
+    <div className="hidden xl:block xl:w-1/2 rounded-md border border-customGray500 bg-customNeutral300 px-4 pb-16 pt-4">
       <div className="flex flex-row justify-between mb-2">
         <div className="flex flex-row items-end">
           <p className="mb-1 mr-2">{step}/3</p>
           <h2 className="text-3xl">{TutorialTitleByStep[step]}</h2>
         </div>
         <div className="w-1/5 flex flex-row justify-end items-center">
-          <ChevronLeftIcon className="opacity-100 text-[#DFFF1C] h-8 cursor-pointer hover:opacity-50" onClick={() => handleStep(step - 1)} />
-          <ChevronRightIcon className="opacity-100 text-[#DFFF1C] h-8 cursor-pointer hover:opacity-50" onClick={() => handleStep(step + 1)} />
+          <ChevronLeftIcon className="opacity-100 text-primaryYellow h-8 cursor-pointer hover:opacity-50" onClick={() => handleStep(step - 1)} />
+          <ChevronRightIcon className="opacity-100 text-primaryYellow h-8 cursor-pointer hover:opacity-50" onClick={() => handleStep(step + 1)} />
         </div>
       </div>
       <img src={TutorialImageByStep[step]} className="rounded-md" />

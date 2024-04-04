@@ -71,7 +71,7 @@ export default function Navbar(): JSX.Element {
         <div className="flex flex-container h-full flex-row w-fit-content items-center gap-x-6">
           {(chain && userAccountData[chain?.id]?.healthFactor > 0) &&
             <div
-              className={`w-fit cursor-pointer h-full py-2 bg-[#141416] md:bg-transparent md:py-[10px] px-4 md:px-6 flex flex-row items-center justify-between border border-customLightGray rounded-4xl text-primary`}
+              className={`w-fit cursor-pointer h-full py-2 bg-customNeutral300 md:bg-transparent md:py-2 px-4 md:px-6 flex flex-row items-center justify-between border border-customGray100 rounded-4xl text-white`}
               onClick={() => setShowLendModal(true)}
               id="global-health-factor"
             >
@@ -88,7 +88,7 @@ export default function Navbar(): JSX.Element {
           {address ? (
             <div className={`relative flex flex-container flex-row z-10`}>
               <div
-                className={`w-fit cursor-pointer h-full py-2 bg-[#141416] md:bg-transparent md:py-[10px] px-4 md:px-6 flex flex-row items-center justify-between border border-customLightGray rounded-4xl text-primary`}
+                className={`w-fit cursor-pointer h-full py-2 bg-customNeutral300 md:bg-transparent md:py-2 px-4 md:px-6 flex flex-row items-center justify-between border border-customGray100 rounded-4xl text-white`}
               >
                 <img
                   src={logo}
@@ -103,7 +103,7 @@ export default function Navbar(): JSX.Element {
                 </p>
                 <span className="hidden md:inline">|</span>
                 <PowerIcon
-                  className="w-5 h-5 ml-3 text-primary hidden md:block"
+                  className="w-5 h-5 ml-3 text-white hidden md:block"
                   aria-hidden="true"
                   onClick={handleWalletDisconnect}
                 />
@@ -117,22 +117,22 @@ export default function Navbar(): JSX.Element {
             />
           )}
           <button
-            className={`text-primary w-10 transform transition duration-500 relative focus:outline-none`}
+            className={`text-white w-10 transform transition duration-500 relative focus:outline-none`}
             onClick={() => toggleMenu(!menuVisible)}
           >
             <span
               aria-hidden="true"
-              className={`block h-0.5 w-8 bg-primary ease-in-out rounded-3xl ${menuVisible ? "rotate-45 translate-y-1" : "-translate-y-2"
+              className={`block h-0.5 w-8 bg-white ease-in-out rounded-3xl ${menuVisible ? "rotate-45 translate-y-1" : "-translate-y-2"
                 }`}
             ></span>
             <span
               aria-hidden="true"
-              className={`block h-0.5 w-8 bg-primary ease-in-out rounded-3xl ${menuVisible ? "opacity-0" : "opacity-100"
+              className={`block h-0.5 w-8 bg-white ease-in-out rounded-3xl ${menuVisible ? "opacity-0" : "opacity-100"
                 }`}
             ></span>
             <span
               aria-hidden="true"
-              className={`block h-0.5 w-8 bg-primary ease-in-out rounded-3xl ${menuVisible ? "-rotate-45 -translate-y-1" : "translate-y-2"
+              className={`block h-0.5 w-8 bg-white ease-in-out rounded-3xl ${menuVisible ? "-rotate-45 -translate-y-1" : "translate-y-2"
                 }`}
             ></span>
           </button>
@@ -145,7 +145,7 @@ export default function Navbar(): JSX.Element {
           onClose={() => toggleMenu(false)}
         >
           <button
-            className={`text-gray-500 absolute top-8 right-8 p-6 bg-[#353945] z-50 rounded-full flex justify-center items-center w-12 h-12`}
+            className={`text-customGray500 absolute top-8 right-8 p-6 bg-customNeutral100 z-50 rounded-full flex justify-center items-center w-12 h-12`}
             onClick={() => toggleMenu(!menuVisible)}
           >
             <div className="block w-10 bg-transparent">
@@ -178,7 +178,7 @@ export default function Navbar(): JSX.Element {
               leaveFrom="translate-x-0"
               leaveTo="-translate-x-full"
             >
-              <div className="h-full w-full flex flex-col justify-between pt-12 px-8 shadow-xl bg-[#dfff1c] overflow-y-scroll">
+              <div className="h-full w-full flex flex-col justify-between pt-12 px-8 shadow-xl bg-primaryYellow overflow-y-scroll">
                 <div className="flex flex-1 flex-col w-full space-y-4">
                   <div className="mb-6">
                     <Link href={`/`} passHref>
@@ -196,7 +196,7 @@ export default function Navbar(): JSX.Element {
                     <NavbarLinks />
                   </div>
                   <div className="">
-                    <p className="text-[#23262F]">
+                    <p className="text-customNeutral200">
                       VaultCraft is a DeFi yield-optimizing protocol with
                       customizable asset strategies that instantly zap your
                       crypto from any chain into the highest yield-generating

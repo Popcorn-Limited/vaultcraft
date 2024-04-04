@@ -27,14 +27,14 @@ export default function SelectManagementOption({
 
       <div>
         <h2 className="text-start text-5xl">Update your Lock</h2>
-        <p className="text-start text-primaryDark">
+        <p className="text-start text-customGray100">
           Increase your veVCX by locking more VCX-LP or increasing the lock time
           for your locked VCX-LP balance. Alternatively Unlock your locked
           VCX-LP.
         </p>
       </div>
       <div className="space-y-4">
-        <div className="w-full px-4 py-4 border border-gray-500 rounded-lg">
+        <div className="w-full px-4 py-4 border border-customGray500 rounded-lg">
           <TertiaryActionButton
             label="Increase Lock Amount"
             handleClick={() => {
@@ -43,7 +43,7 @@ export default function SelectManagementOption({
             }}
           />
         </div>
-        <div className="w-full px-4 py-4 border border-gray-500 rounded-lg">
+        <div className="w-full px-4 py-4 border border-customGray500 rounded-lg">
           <TertiaryActionButton
             label="Increase Lock Time"
             handleClick={() => {
@@ -52,7 +52,7 @@ export default function SelectManagementOption({
             }}
           />
         </div>
-        <div className="w-full px-4 py-4 border border-gray-500 rounded-lg">
+        <div className="w-full px-4 py-4 border border-customGray500 rounded-lg">
           <TertiaryActionButton
             label="Unlock VCX"
             handleClick={() => {
@@ -61,7 +61,7 @@ export default function SelectManagementOption({
             }}
           />
         </div>
-        <div className="w-full px-4 py-4 border border-gray-500 rounded-lg">
+        <div className="w-full px-4 py-4 border border-customGray500 rounded-lg">
           <TertiaryActionButton
             label="Sync VeBalance to L2's"
             handleClick={() => {

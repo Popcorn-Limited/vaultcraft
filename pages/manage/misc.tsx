@@ -118,8 +118,8 @@ function SetOptionTokenOracleParams(): JSX.Element {
       <h2 className="text-white text-xl">OptionToken-Oracle Values</h2>
       <div className="flex md:flex-row md:space-x-4 mt-4">
         <div>
-          <p className="text-primary text-start">Multiplier</p>
-          <div className="border border-gray-500">
+          <p className="text-white text-start">Multiplier</p>
+          <div className="border border-customGray500">
             <InputNumber
               value={values.multiplier}
               onChange={(e) =>
@@ -129,8 +129,8 @@ function SetOptionTokenOracleParams(): JSX.Element {
           </div>
         </div>
         <div>
-          <p className="text-primary text-start">Secs</p>
-          <div className="border border-gray-500">
+          <p className="text-white text-start">Secs</p>
+          <div className="border border-customGray500">
             <InputNumber
               value={values.secs}
               onChange={(e) => handleChangeInput(e.currentTarget.value, "secs")}
@@ -138,8 +138,8 @@ function SetOptionTokenOracleParams(): JSX.Element {
           </div>
         </div>
         <div>
-          <p className="text-primary text-start">Ago</p>
-          <div className="border border-gray-500">
+          <p className="text-white text-start">Ago</p>
+          <div className="border border-customGray500">
             <InputNumber
               value={values.ago}
               onChange={(e) => handleChangeInput(e.currentTarget.value, "ago")}
@@ -147,8 +147,8 @@ function SetOptionTokenOracleParams(): JSX.Element {
           </div>
         </div>
         <div>
-          <p className="text-primary text-start">Min Price</p>
-          <div className="border border-gray-500">
+          <p className="text-white text-start">Min Price</p>
+          <div className="border border-customGray500">
             <InputNumber
               value={values.minPrice}
               onChange={(e) =>
@@ -180,12 +180,12 @@ export default function Misc(): JSX.Element {
     <NoSSR>
       {(account && walletClient) &&
         <>
-          <section className="md:border-b border-[#353945] md:flex md:flex-row items-center justify-between py-10 px-4 md:px-8 md:gap-4">
+          <section className="md:border-b border-customNeutral100 md:flex md:flex-row items-center justify-between py-10 px-4 md:px-8 md:gap-4">
             <div className="w-full md:w-max">
-              <h1 className="text-5xl font-normal m-0 mb-4 md:mb-2 leading-0 text-primary md:text-3xl leading-none">
+              <h1 className="text-5xl font-normal m-0 mb-4 md:mb-2 leading-0 text-white md:text-3xl leading-none">
                 Smart Vaults
               </h1>
-              <p className="text-primaryDark md:text-primary md:opacity-80">
+              <p className="text-customGray100 md:text-white md:opacity-80">
                 Automate your returns in single-asset deposit yield strategies.
               </p>
             </div>

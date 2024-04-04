@@ -148,7 +148,7 @@ function FeeConfiguration({
   }
 
   return (
-    <section className="flex flex-col gap-y-4 divide-y-2 divide-[#353945]">
+    <section className="flex flex-col gap-y-4 divide-y-2 divide-customNeutral100">
       {FEE_INPUTS.map((category, idx) => {
         return (
           <div key={`fee-element-${category.name}`}>

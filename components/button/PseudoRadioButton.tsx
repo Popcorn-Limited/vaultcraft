@@ -14,8 +14,8 @@ export default function PseudoRadioButton({
       className={`w-full transition ease-in-out duration-250 flex justify-center items-center border rounded-3xl py-3 px-7
       ${
         isActive
-          ? "text-[#DFFF1C] border-[#DFFF1C] bg-[#DFFF1C] bg-opacity-20 hover:bg-opacity-50"
-          : "text-white bg-[#191A1D] border-[#656667] hover:border-primary"
+          ? "text-primaryYellow border-primaryYellow bg-primaryYellow bg-opacity-20 hover:bg-opacity-50"
+          : "text-white bg-customNeutral300 border-customNeutral100 hover:border-white"
       }`}
       type="button"
       onClick={() => handleClick()}

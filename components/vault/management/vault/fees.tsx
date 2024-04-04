@@ -22,7 +22,7 @@ export default function VaultFees({
   return (
     <div className="flex flex-row justify-center">
       <div className="w-1/2">
-        <p className="text-gray-500">
+        <p className="text-customGray500">
           Taking fees mints new vault shares for the value of accumulated fees.
           These new shares will be minted to the configured fee recipient and
           continue to earn yield. Withdraw the assets through the vault

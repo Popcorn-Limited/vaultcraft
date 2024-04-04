@@ -16,7 +16,7 @@ export default function Hero(): JSX.Element {
             <StatusWithLabel
               label={"Deposits"}
               content={
-                <p className="text-3xl font-bold text-primary leading-[120%]">
+                <p className="text-3xl font-bold text-white leading-[120%]">
                   ${" "}
                   {
                     networth.vault > 0.01
@@ -30,7 +30,7 @@ export default function Hero(): JSX.Element {
             <StatusWithLabel
               label={"Staked"}
               content={
-                <p className="text-3xl font-bold text-primary leading-[120%]">
+                <p className="text-3xl font-bold text-white leading-[120%]">
                   ${" "}
                   {
                     networth.stake > 0.01
@@ -44,7 +44,7 @@ export default function Hero(): JSX.Element {
             <StatusWithLabel
               label={"VCX in Wallet"}
               content={
-                <p className="text-3xl font-bold text-primary leading-[120%]">
+                <p className="text-3xl font-bold text-white leading-[120%]">
                   ${" "}
                   {
                     networth.wallet > 0.01
@@ -61,7 +61,7 @@ export default function Hero(): JSX.Element {
             <StatusWithLabel
               label={"My Net Worth"}
               content={
-                <p className="text-3xl font-bold text-primary leading-[120%]">
+                <p className="text-3xl font-bold text-white leading-[120%]">
                   ${" "}
                   {
                     networth.total > 0.01
@@ -85,7 +85,7 @@ export default function Hero(): JSX.Element {
             <StatusWithLabel
               label={"My XP"}
               content={
-                <p className="text-3xl font-bold text-primary leading-[120%]">
+                <p className="text-3xl font-bold text-white leading-[120%]">
                   {vaultronStats.xp}
                 </p>
               }
@@ -104,14 +104,14 @@ export default function Hero(): JSX.Element {
         </div>
 
         <div className="w-full md:w-fit-content mt-8 md:mt-0">
-          <p className="uppercase md:hidden text-[#C8C8C8] text-sm mb-2">
+          <p className="uppercase md:hidden text-customGray200 text-sm mb-2">
             Platform
           </p>
           <div className="flex flex-row items-center w-full space-x-10">
             <StatusWithLabel
               label={"Total Value Locked"}
               content={
-                <p className="text-3xl font-bold text-primary leading-[120%]">
+                <p className="text-3xl font-bold text-white leading-[120%]">
                   {
                     tvl.total > 0.01
                       ? NumberFormatter.format(tvl.total)

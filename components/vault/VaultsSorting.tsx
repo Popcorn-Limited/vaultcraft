@@ -66,10 +66,10 @@ export default function VaultsSorting({
         className="w-full h-[58px] py-[14px] px-6 gap-2 flex flex-row items-center justify-between rounded-lg border border-[#626263]"
       >
         <div className="flex items-center">
-          <p className="text-primary">Sorting</p>
+          <p className="text-white">Sorting</p>
         </div>
         <SwitchIcon
-          className="w-5 h-5 text-primary"
+          className="w-5 h-5 text-white"
           color={"#FFFFFF"}
           size={"21px"}
         />
@@ -77,22 +77,22 @@ export default function VaultsSorting({
       {openFilter && !isLessThenMdScreenSize && (
         <div
           ref={dropdownRef}
-          className="hidden md:block absolute w-[180px] p-[10px] border border-[#626263] top-16 bg-[#141416] rounded-lg right-0"
+          className="hidden md:block absolute w-[180px] p-[10px] border border-[#626263] top-16 bg-customNeutral300 rounded-lg right-0"
         >
           <button
             className={`
                             py-2 w-full 
                             cursor-pointer
-                            text-primary 
+                            text-white 
                             rounded-lg 
-                            hover:bg-[#23262F] 
+                            hover:bg-customNeutral200 
                             transition 
                             ease-in-out 
                             duration-250 
                             ${
                               sortingType === VAULT_SORTING_TYPE.mostTvl
-                                ? "bg-[#353945]"
-                                : "bg-[#141416]"
+                                ? "bg-customNeutral100"
+                                : "bg-customNeutral300"
                             }
                         `}
             onClick={() => sortVaults(VAULT_SORTING_TYPE.mostTvl)}
@@ -102,16 +102,16 @@ export default function VaultsSorting({
           <button
             className={`
                             py-2 w-full
-                            text-primary 
+                            text-white 
                             rounded-lg 
-                            hover:bg-[#23262F] 
+                            hover:bg-customNeutral200 
                             transition 
                             ease-in-out 
                             duration-250
                             ${
                               sortingType === VAULT_SORTING_TYPE.lessTvl
-                                ? "bg-[#353945]"
-                                : "bg-[#141416]"
+                                ? "bg-customNeutral100"
+                                : "bg-customNeutral300"
                             }
                         `}
             onClick={() => sortVaults(VAULT_SORTING_TYPE.lessTvl)}
@@ -121,16 +121,16 @@ export default function VaultsSorting({
           <button
             className={`
                             py-2 w-full 
-                            text-primary 
+                            text-white 
                             rounded-lg 
-                            hover:bg-[#23262F] 
+                            hover:bg-customNeutral200 
                             transition 
                             ease-in-out 
                             duration-250
                             ${
                               sortingType === VAULT_SORTING_TYPE.mostvAPR
-                                ? "bg-[#353945]"
-                                : "bg-[#141416]"
+                                ? "bg-customNeutral100"
+                                : "bg-customNeutral300"
                             }
                         `}
             onClick={() => sortVaults(VAULT_SORTING_TYPE.mostvAPR)}
@@ -141,16 +141,16 @@ export default function VaultsSorting({
             className={`
                             py-2 
                             w-full 
-                            text-primary 
+                            text-white 
                             rounded-lg 
-                            hover:bg-[#23262F] 
+                            hover:bg-customNeutral200 
                             transition 
                             ease-in-out 
                             duration-250
                             ${
                               sortingType === VAULT_SORTING_TYPE.lessvAPR
-                                ? "bg-[#353945]"
-                                : "bg-[#141416]"
+                                ? "bg-customNeutral100"
+                                : "bg-customNeutral300"
                             }
                         `}
             onClick={() => sortVaults(VAULT_SORTING_TYPE.lessvAPR)}

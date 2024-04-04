@@ -147,8 +147,8 @@ export default function Review(): JSX.Element {
           checked={conditions}
           onChange={setConditions}
           className={`
-            ${conditions ? "bg-[#45B26B]" : "border-[2px] border-[#353945]"}
-            w-6 h-6 rounded-[4px]
+            ${conditions ? "bg-green-500" : "border-2 border-customNeutral100"}
+            w-6 h-6 rounded
           `}
         >
           <img
@@ -156,7 +156,7 @@ export default function Review(): JSX.Element {
             src="/images/icons/checkIcon.svg"
           />
         </Switch>
-        <span className={`text-white text-[14px]`}>
+        <span className={`text-white text-sm`}>
           I have read and agree to the{" "}
           <a
             href="https://app.vaultcraft.io/disclaimer"

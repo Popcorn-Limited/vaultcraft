@@ -274,7 +274,7 @@ export default function LoanInterface({ visibilityState, vaultData }: { visibili
       visibility={visibilityState}
       title={vaultData.address ?
         <AssetWithName vault={vaultData} /> :
-        <h2 className={`text-2xl font-bold text-primary`}>
+        <h2 className={`text-2xl font-bold text-white`}>
           Lending
         </h2>
       }
@@ -431,11 +431,11 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
   return (supplyReserve && borrowReserve) ? (
     <>
       <div className="w-full space-y-4">
-        <div className="border border-[#353945] rounded-lg p-4">
+        <div className="border border-customNeutral100 rounded-lg p-4">
           <div className="w-full flex flex-row justify-between">
 
             <div className="w-1/3">
-              <p className="text-start text-primary font-normal md:text-[14px]">Health Factor</p>
+              <p className="text-start text-white font-normal md:text-sm">Health Factor</p>
               <span className="flex flex-row items-center space-x-1">
                 <Title
                   as="p"
@@ -461,15 +461,15 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
             </div>
 
             <div className="w-1/3">
-              <p className="text-start text-primary font-normal md:text-[14px]">Available Credit</p>
+              <p className="text-start text-white font-normal md:text-sm">Available Credit</p>
               <span className="flex flex-row items-center space-x-1">
-                <Title as="p" level={2} fontWeight="font-normal" className="text-primary">
+                <Title as="p" level={2} fontWeight="font-normal" className="text-white">
                   $ {formatToFixedDecimals(((userAccountData[chainId].ltv * userAccountData[chainId].totalCollateral) - userAccountData[chainId].totalBorrowed) || 0, 2)}
                 </Title>
                 {inputAmount > 0 &&
                   <>
                     <ArrowRightIcon className="w-4 h-3 text-white" />
-                    <Title as="p" level={2} fontWeight="font-normal" className="text-primary">
+                    <Title as="p" level={2} fontWeight="font-normal" className="text-white">
                       $ {formatToFixedDecimals(((newUserAccountData.ltv * newUserAccountData.totalCollateral) - newUserAccountData.totalBorrowed) || 0, 2)}
                     </Title>
                   </>
@@ -478,15 +478,15 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
             </div>
 
             <div className="w-1/3">
-              <p className="text-start text-primary font-normal md:text-[14px]">Net Apy</p>
+              <p className="text-start text-white font-normal md:text-sm">Net Apy</p>
               <span className="flex flex-row items-center space-x-1">
-                <Title as="p" level={2} fontWeight="font-normal" className="text-primary">
+                <Title as="p" level={2} fontWeight="font-normal" className="text-white">
                   {formatToFixedDecimals(userAccountData[chainId].netRate || 0, 2)} %
                 </Title>
                 {inputAmount > 0 &&
                   <>
                     <ArrowRightIcon className="w-4 h-3 text-white" />
-                    <Title as="p" level={2} fontWeight="font-normal" className="text-primary">
+                    <Title as="p" level={2} fontWeight="font-normal" className="text-white">
                       {formatToFixedDecimals(newUserAccountData.netRate || 0, 2)} %
                     </Title>
                   </>
@@ -498,7 +498,7 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
           <div className="w-full flex flex-row justify-between mt-4">
 
             <div className="w-1/3">
-              <p className="text-start text-primary font-normal md:text-[14px]">Collateral</p>
+              <p className="text-start text-white font-normal md:text-sm">Collateral</p>
               <span className="flex flex-row items-center space-x-1">
                 <Title
                   as="p"
@@ -522,15 +522,15 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
             </div>
 
             <div className="w-1/3">
-              <p className="text-start text-primary font-normal md:text-[14px]">Borrowed</p>
+              <p className="text-start text-white font-normal md:text-sm">Borrowed</p>
               <span className="flex flex-row items-center space-x-1">
-                <Title as="p" level={2} fontWeight="font-normal" className="text-primary">
+                <Title as="p" level={2} fontWeight="font-normal" className="text-white">
                   $ {formatNumber(userAccountData[chainId].totalBorrowed || 0)}
                 </Title>
                 {inputAmount > 0 &&
                   <>
                     <ArrowRightIcon className="w-4 h-3 text-white" />
-                    <Title as="p" level={2} fontWeight="font-normal" className="text-primary">
+                    <Title as="p" level={2} fontWeight="font-normal" className="text-white">
                       $ {formatNumber(newUserAccountData.totalBorrowed || 0)}
                     </Title>
                   </>
@@ -539,15 +539,15 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
             </div>
 
             <div className="w-1/3">
-              <p className="text-start text-primary font-normal md:text-[14px]">Net Loan Value</p>
+              <p className="text-start text-white font-normal md:text-sm">Net Loan Value</p>
               <span className="flex flex-row items-center space-x-1">
-                <Title as="p" level={2} fontWeight="font-normal" className="text-primary">
+                <Title as="p" level={2} fontWeight="font-normal" className="text-white">
                   $ {formatNumber(userAccountData[chainId].netValue || 0)}
                 </Title>
                 {inputAmount > 0 &&
                   <>
                     <ArrowRightIcon className="w-4 h-3 text-white" />
-                    <Title as="p" level={2} fontWeight="font-normal" className="text-primary">
+                    <Title as="p" level={2} fontWeight="font-normal" className="text-white">
                       $ {formatNumber(newUserAccountData.netValue || 0)}
                     </Title>
                   </>
@@ -559,24 +559,24 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
         </div>
 
 
-        <div className="border border-[#353945] rounded-lg p-4">
+        <div className="border border-customNeutral100 rounded-lg p-4">
           <div className="w-full flex flex-row justify-between">
 
             <div className="w-1/3">
-              <p className="text-start text-primary font-normal md:text-[14px]">Lending Apy</p>
+              <p className="text-start text-white font-normal md:text-sm">Lending Apy</p>
               <span className="flex flex-row items-center space-x-2">
                 <TokenIcon token={supplyToken} icon={supplyToken.logoURI} chainId={10} imageSize={"w-6 h-6 mb-0.5"} />
-                <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
+                <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-white">
                   {formatToFixedDecimals(supplyReserve.supplyRate || 0, 2)} %
                 </Title>
               </span>
             </div>
 
             <div className="w-1/3">
-              <p className="text-start text-primary font-normal md:text-[14px]">Borrow Apy</p>
+              <p className="text-start text-white font-normal md:text-sm">Borrow Apy</p>
               <span className="flex flex-row items-center space-x-2">
                 <TokenIcon token={borrowToken} icon={borrowToken.logoURI} chainId={10} imageSize={"w-6 h-6 mb-0.5"} />
-                <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
+                <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-white">
                   -{formatToFixedDecimals(borrowReserve.borrowRate || 0, 2)} %
                 </Title>
               </span>
@@ -591,22 +591,22 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
           <div className="w-full flex flex-row justify-between mt-4">
 
             <div className="text-start w-1/3">
-              <p className="font-normal text-primary md:text-[14px]">Max LTV</p>
-              <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
+              <p className="font-normal text-white md:text-sm">Max LTV</p>
+              <Title as="span" level={2} fontWeight="font-normal" className="text-white">
                 {supplyReserve.ltv.toFixed(2)} %
               </Title>
             </div>
 
             <div className="text-start w-1/3">
-              <p className="font-normal text-primary md:text-[14px]">Liquidation Threshold</p>
-              <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
+              <p className="font-normal text-white md:text-sm">Liquidation Threshold</p>
+              <Title as="span" level={2} fontWeight="font-normal" className="text-white">
                 {supplyReserve.liquidationThreshold.toFixed(2)} %
               </Title>
             </div>
 
             <div className="text-start w-1/3">
-              <p className="font-normal text-primary md:text-[14px]">Liquidation Penalty</p>
-              <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
+              <p className="font-normal text-white md:text-sm">Liquidation Penalty</p>
+              <Title as="span" level={2} fontWeight="font-normal" className="text-white">
                 {supplyReserve.liquidationPenalty.toFixed(2)} %
               </Title>
             </div>

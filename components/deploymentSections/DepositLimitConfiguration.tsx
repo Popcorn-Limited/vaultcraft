@@ -32,7 +32,7 @@ function DepositLimitConfiguration() {
         <Switch
           checked={enabled}
           onChange={handleToggle}
-          className={`${enabled ? "bg-[#45B26B]" : "bg-[#353945]"} 
+          className={`${enabled ? "bg-green-500" : "bg-customNeutral100"} 
           relative inline-flex items-center h-5 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none`}
         >
           <span
@@ -43,12 +43,12 @@ function DepositLimitConfiguration() {
           />
         </Switch>
       </div>
-      <p className="text-gray-500 text-sm">
+      <p className="text-customGray500 text-sm">
         Restricts the maximum of assets that can be deposited into the vault.
       </p>
       {enabled && (
         <div className="flex flex-col mt-4">
-          <div className="border-2 border-[#353945] rounded-lg flex flex-row justify-between w-full px-2 py-3 h-full bg-[#23262F] text-white mt-4">
+          <div className="border-2 border-customNeutral100 rounded-lg flex flex-row justify-between w-full px-2 py-3 h-full bg-customNeutral200 text-white mt-4">
             <div className="flex flex-row">
               <ExclamationCircleIcon className="text-white w-16 h-16 mr-4 pb-2" />
               <p className="text-white text-sm">

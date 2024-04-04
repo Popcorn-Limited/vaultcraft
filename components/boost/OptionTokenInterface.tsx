@@ -76,8 +76,8 @@ export default function OptionTokenInterface({ setShowOptionTokenModal }: Option
   }
 
   return (
-    <div className="w-full bg-transparent border border-[#353945] rounded-3xl p-8 text-primary md:h-fit">
-      <h3 className="text-2xl pb-6 border-b border-[#353945]">oVCX</h3>
+    <div className="w-full bg-transparent border border-customNeutral100 rounded-3xl p-8 text-white md:h-fit">
+      <h3 className="text-2xl pb-6 border-b border-customNeutral100">oVCX</h3>
       <span className="flex flex-row items-center justify-between mt-6">
         <p className="">Mainnet Claimable oVCX</p>
         <p className="font-bold">{`$${(gaugeRewards && gaugeRewards[1] && vcxPrice > 0)
@@ -114,7 +114,7 @@ export default function OptionTokenInterface({ setShowOptionTokenModal }: Option
           : "0"
           }`}</p>
       </span>
-      <span className="flex flex-row items-center justify-between mt-6 pb-6 border-b border-[#353945]"></span>
+      <span className="flex flex-row items-center justify-between mt-6 pb-6 border-b border-customNeutral100"></span>
       <div className="lg:flex lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-8 mt-6">
         {(gaugeRewards && Object.keys(gaugeRewards).length > 0) &&
           <>

@@ -57,16 +57,16 @@ export default function BroadcastVeBalanceInterface({ amount, setShowModal }: { 
         </p>
         <div className="mt-10">
           <span className="flex flex-row items-center justify-between">
-            <p className="text-primary font-semibold mb-1">Mainnet VeBalance:</p>
-            <p className="w-32 text-secondaryLight">{formatNumber(amount || 0)}</p>
+            <p className="text-white font-semibold mb-1">Mainnet VeBalance:</p>
+            <p className="w-32 text-customGray300">{formatNumber(amount || 0)}</p>
           </span>
           <span className="flex flex-row items-center justify-between">
-            <p className="text-primary font-semibold mb-1">Optimism VeBalance:</p>
-            <p className="w-32 text-secondaryLight">{formatNumber(opVeBal || 0)}</p>
+            <p className="text-white font-semibold mb-1">Optimism VeBalance:</p>
+            <p className="w-32 text-customGray300">{formatNumber(opVeBal || 0)}</p>
           </span>
           <span className="flex flex-row items-center justify-between">
-            <p className="text-primary font-semibold mb-1">Arbitrum VeBalance:</p>
-            <p className="w-32 text-secondaryLight">{formatNumber(arbVeBal || 0)}</p>
+            <p className="text-white font-semibold mb-1">Arbitrum VeBalance:</p>
+            <p className="w-32 text-customGray300">{formatNumber(arbVeBal || 0)}</p>
           </span>
         </div>
         <div className="flex flex-row space-x-4 mt-10">

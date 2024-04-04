@@ -17,7 +17,7 @@ function MarkdownRenderer({ content = "" }) {
         link(href, text) {
           return (
             <a
-              className="text-customPurple underline"
+              className="text-purple-500 underline"
               href={href}
               rel="noopener noreferrer"
               target="_blank"

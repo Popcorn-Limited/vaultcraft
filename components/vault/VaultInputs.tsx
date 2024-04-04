@@ -339,7 +339,7 @@ export default function VaultInputs({
       <Modal visibility={[showModal, setShowModal]}>
         <div className="text-start">
           <p>Slippage (in BPS)</p>
-          <div className="w-full rounded-lg border border-primary p-2">
+          <div className="w-full rounded-lg border border-white p-2">
             <InputNumber
               value={slippage}
               onChange={(e) => setSlippage(Number(e.currentTarget.value))}
@@ -375,12 +375,12 @@ export default function VaultInputs({
 
       <div className="relative py-4">
         <div className="absolute inset-0 flex items-center" aria-hidden="true">
-          <div className="w-full border-t border-gray-500" />
+          <div className="w-full border-t border-customGray500" />
         </div>
         <div className="relative flex justify-center">
-          <span className="bg-[#141416] px-4">
+          <span className="bg-customNeutral300 px-4">
             <ArrowDownIcon
-              className="h-10 w-10 p-2 text-gray-500 border border-gray-500 rounded-full cursor-pointer hover:text-primary hover:border-primary"
+              className="h-10 w-10 p-2 text-customGray500 border border-customGray500 rounded-full cursor-pointer hover:text-white hover:border-white"
               aria-hidden="true"
               onClick={switchTokens}
             />
@@ -419,10 +419,10 @@ export default function VaultInputs({
             onClick={() => setShowModal(true)}
           >
             <Cog6ToothIcon
-              className="h-5 w-5 mt-1 mr-2 text-secondaryLight group-hover/zap:text-primary"
+              className="h-5 w-5 mt-1 mr-2 text-customGray300 group-hover/zap:text-white"
               aria-hidden="true"
             />
-            <p className="text-secondaryLight group-hover/zap:text-primary">
+            <p className="text-customGray300 group-hover/zap:text-white">
               Zap Settings
             </p>
           </div>
@@ -430,7 +430,7 @@ export default function VaultInputs({
 
       <div className="mt-6">
         <p className="text-white font-bold mb-2 text-start">Fee Breakdown</p>
-        <div className="bg-[#23262f] py-2 px-4 rounded-lg space-y-2">
+        <div className="bg-customNeutral200 py-2 px-4 rounded-lg space-y-2">
           <span className="flex flex-row items-center justify-between text-white">
             <p>Deposit Fee</p>
             <p>{vaultData.fees.deposit / 1e16} %</p>

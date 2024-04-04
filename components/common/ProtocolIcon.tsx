@@ -59,9 +59,9 @@ export default function ProtocolIcon({
                 ? IconByProtocol[protocolName]
                 : "/images/tokens/vcx.svg"
             }
-            className={`${iconSize[size]} mr-1 rounded-full border border-[#ebe7d4cc]`}
+            className={`${iconSize[size]} mr-1 rounded-full border border-white`}
           />
-          <p className={`text-primary ${textSize[size]}`}>{protocolName}</p>
+          <p className={`text-white ${textSize[size]}`}>{protocolName}</p>
         </div>
       </div>
       {tooltip && (

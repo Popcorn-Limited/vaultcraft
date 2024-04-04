@@ -54,8 +54,8 @@ export default function StakingInterface({
 
   return (
     <>
-      <div className="w-full lg:w-1/2 bg-transparent border border-[#353945] rounded-3xl p-8 text-primary">
-        <h3 className="text-2xl pb-6 border-b border-[#353945]">veVCX</h3>
+      <div className="w-full lg:w-1/2 bg-transparent border border-customNeutral100 rounded-3xl p-8 text-white">
+        <h3 className="text-2xl pb-6 border-b border-customNeutral100">veVCX</h3>
         <div className="flex flex-col mt-6 gap-4">
           <span className="flex flex-row items-center justify-between">
             <p className="">My VCX-LP</p>
@@ -89,7 +89,7 @@ export default function StakingInterface({
               ) || "0"}
             </p>
           </span>
-          <span className="flex flex-row items-center justify-between pb-6 border-b border-[#353945]">
+          <span className="flex flex-row items-center justify-between pb-6 border-b border-customNeutral100">
             <p className="">Voting period ends</p>
             <p className="font-bold">
               {votingPeriodEnd()[0]}d : {votingPeriodEnd()[1]}h

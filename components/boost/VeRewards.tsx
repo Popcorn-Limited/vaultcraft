@@ -51,8 +51,8 @@ export default function VeRewards(): JSX.Element {
   }, [account]);
 
   return (
-    <div className="lg:w-1/2 bg-[#FAF9F4] border border-[#353945] rounded-3xl p-8 text-primary">
-      <h3 className="text-2xl pb-6 border-b border-[#353945]">
+    <div className="lg:w-1/2 bg-[#FAF9F4] border border-customNeutral100 rounded-3xl p-8 text-white">
+      <h3 className="text-2xl pb-6 border-b border-customNeutral100">
         Total veVCX Rewards
       </h3>
       <span className="flex flex-row items-center justify-between mt-6">

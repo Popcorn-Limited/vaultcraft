@@ -38,10 +38,10 @@ export default function ManageVault() {
           selectNetwork={selectNetwork}
         />
         <div className="flex gap-4 justify-between md:justify-end">
-          <div className="md:w-96 flex px-6 py-3 items-center rounded-lg border border-gray-300 border-opacity-40 group/search hover:border-opacity-80 gap-2 md:mt-6 mt-12 mb-6 md:my-0">
-            <MagnifyingGlassIcon className="w-8 h-8 text-gray-400 group-hover/search:text-gray-200" />
+          <div className="md:w-96 flex px-6 py-3 items-center rounded-lg border border-customGray300 border-opacity-40 group/search hover:border-opacity-80 gap-2 md:mt-6 mt-12 mb-6 md:my-0">
+            <MagnifyingGlassIcon className="w-8 h-8 text-white group-hover/search:text-customGray200" />
             <input
-              className="w-10/12 md:w-80 focus:outline-none border-0 text-gray-500 focus:text-gray-200 leading-none bg-transparent"
+              className="w-10/12 md:w-80 focus:outline-none border-0 text-white focus:text-customGray200 leading-none bg-transparent"
               type="text"
               placeholder="Search..."
               onChange={(e) => handleSearch(e.target.value.toLowerCase())}
@@ -60,7 +60,7 @@ export default function ManageVault() {
               return (
                 <div
                   key={`${vault.chainId}-${vault.address}`}
-                  className="w-full flex flex-wrap items-center justify-between flex-col gap-4 px-8 pt-6 pb-5 rounded-3xl border border-[#353945] group hover:bg-[#23262f] [&_summary::-webkit-details-marker]:hidden cursor-pointer"
+                  className="w-full flex flex-wrap items-center justify-between flex-col gap-4 px-8 pt-6 pb-5 rounded-3xl border border-customNeutral100 group hover:bg-customNeutral200 [&_summary::-webkit-details-marker]:hidden cursor-pointer"
                   onClick={() =>
                     router.push(
                       `/manage/vaults/${vault.address}?chainId=${vault.chainId}`

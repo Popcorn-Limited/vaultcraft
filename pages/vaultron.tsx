@@ -76,7 +76,7 @@ export default function Vaultron() {
           </p>
 
           <div className="mt-16">
-            <p className="text-sm text-gray-400">Your Points</p>
+            <p className="text-sm text-customGray400">Your Points</p>
             {account ?
               <div className="space-y-4 mt-2">
                 <InfoRow label="Your XP" value={vaultronStats.xp} />
@@ -89,7 +89,7 @@ export default function Vaultron() {
             }
           </div>
 
-          <div className="flex flex-row items-center space-x-4 rounded-2xl border border-[#353945] bg-[#23262f] p-6 mt-16">
+          <div className="flex flex-row items-center space-x-4 rounded-2xl border border-customNeutral100 bg-customNeutral200 p-6 mt-16">
             <MainActionButton
               label="View on Mercle"
               handleClick={() => handleMercle(vaultronStats.tokenId)}
@@ -114,7 +114,7 @@ function InfoRow({ label, value }: { label: string, value: number }): JSX.Elemen
       className="w-12 h-12 object-contain rounded-full mr-4"
     />
     <div>
-      <p className="text-sm text-gray-400">
+      <p className="text-sm text-customGray400">
         {label}
       </p>
       <p className="font-bold text-2xl text-white">
@@ -126,7 +126,7 @@ function InfoRow({ label, value }: { label: string, value: number }): JSX.Elemen
 
 function VaultronLevel({ label, active }: { label: string, active: boolean }): JSX.Element {
   return (
-    <div className={`px-2 py-1 rounded-full w-20 text-center font-bold ${active ? "text-black bg-white" : "text-gray-400"}`}>
+    <div className={`px-2 py-1 rounded-full w-20 text-center font-bold ${active ? "text-black bg-white" : "text-customGray400"}`}>
       <p className="mt-0.5">{label}</p>
     </div>
   )

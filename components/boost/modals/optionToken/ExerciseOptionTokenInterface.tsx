@@ -123,7 +123,7 @@ export default function ExerciseOptionTokenInterface({
   return (
     <div className="mb-8 text-start">
       <h2 className="text-start text-5xl">Exercise oVCX</h2>
-      <p className="text-primary font-semibold">
+      <p className="text-white font-semibold">
         Strike Price: $ {formatNumber(strikePrice)} | oVCX Price: ${" "}
         {formatNumber(vcxPrice - strikePrice)} | VCX Price: $ {formatNumber(vcxPrice)} | Discount:{" "}
         {((10_000 - oVcxDiscount) / 100).toFixed(2)} %
@@ -146,7 +146,7 @@ export default function ExerciseOptionTokenInterface({
           tokenList={[]}
         />
         <div className="flex justify-center -mt-2 mb-4">
-          <PlusIcon className="w-8 h-8 text-gray-500" />
+          <PlusIcon className="w-8 h-8 text-customGray500" />
         </div>
 
         <InputTokenWithError
@@ -170,10 +170,10 @@ export default function ExerciseOptionTokenInterface({
 
       <div className="relative -mt-10 -mb-10">
         <div className="absolute inset-0 flex items-center" aria-hidden="true">
-          <div className="w-full border-t border-gray-500" />
+          <div className="w-full border-t border-customGray500" />
         </div>
         <div className={`relative flex justify-center my-12`}>
-          <div className="w-20 bg-[#23262f]">
+          <div className="w-20 bg-customNeutral200">
             <div className="flex items-center w-14 h-14 mx-auto justify-center">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -196,9 +196,9 @@ export default function ExerciseOptionTokenInterface({
       </div>
 
       <div className="mt-4">
-        <p className="text-primary">Received VCX</p>
+        <p className="text-white">Received VCX</p>
         <div
-          className={`w-full flex flex-row px-5 py-4 items-center justify-between rounded-lg border border-gray-500`}
+          className={`w-full flex flex-row px-5 py-4 items-center justify-between rounded-lg border border-customGray500`}
         >
           <p>{amount}</p>
           <span className={`flex flex-row items-center justify-end`}>
@@ -209,7 +209,7 @@ export default function ExerciseOptionTokenInterface({
                 chainId={1}
               />
             </div>
-            <p className="font-medium text-lg leading-none hidden md:block text-white group-hover:text-[#DFFF1C]">
+            <p className="font-medium text-lg leading-none hidden md:block text-white group-hover:text-primaryYellow">
               VCX
             </p>
           </span>

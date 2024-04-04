@@ -10,13 +10,13 @@ function Input({ errors, info, className, ...props }: InputProps) {
     <>
       <div
         className={`border-2 ${
-          errors ? "border-red-500" : "border-[#353945]"
-        } rounded-[4px] h-full`}
+          errors ? "border-red-500" : "border-customNeutral100"
+        } rounded h-full`}
       >
         <input
           className={`${
             className || ""
-          } flex flex-row justify-between w-full px-2 py-4 h-full bg-[#23262F] text-white leading-none`}
+          } flex flex-row justify-between w-full px-2 py-4 h-full bg-customNeutral200 text-white leading-none`}
           autoComplete="off"
           autoCorrect="off"
           // text-specific options
@@ -28,7 +28,7 @@ function Input({ errors, info, className, ...props }: InputProps) {
           {...props}
         />
       </div>
-      {info && <p className="text-gray-500 text-xs">{info}</p>}
+      {info && <p className="text-customGray500 text-xs">{info}</p>}
       {errors && (
         <div className="">
           {errors.map((error) => (

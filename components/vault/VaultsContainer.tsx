@@ -69,12 +69,12 @@ export default function VaultsContainer({
       <Modal visibility={[showOptionTokenModal, setShowOptionTokenModal]}>
         <OptionTokenInterface />
       </Modal>
-      <section className="md:border-b border-[#353945] md:flex md:flex-row items-center justify-between py-10 px-4 md:px-8 md:gap-4">
+      <section className="md:border-b border-customNeutral100 md:flex md:flex-row items-center justify-between py-10 px-4 md:px-8 md:gap-4">
         <div className="w-full md:w-max">
-          <h1 className="text-5xl font-normal m-0 mb-4 md:mb-2 leading-0 text-primary md:text-3xl leading-none">
+          <h1 className="text-5xl font-normal m-0 mb-4 md:mb-2 leading-0 text-white md:text-3xl leading-none">
             Smart Vaults
           </h1>
-          <p className="text-primaryDark md:text-primary md:opacity-80">
+          <p className="text-customGray100 md:text-white md:opacity-80">
             Automate your returns in single-asset deposit yield strategies.
           </p>
         </div>
@@ -82,19 +82,19 @@ export default function VaultsContainer({
         <div className="w-full lg:justify-end lg:w-8/12 md:divide-x md:flex md:flex-row space-y-4 md:space-y-0 mt-4 md:mt-0">
           <div className="flex flex-row items-center md:pr-10 gap-10 md:w-fit">
             <div className="w-[120px] md:w-max">
-              <p className="leading-6 text-base text-primaryDark md:text-primary">
+              <p className="leading-6 text-base text-customGray100 md:text-white">
                 TVL
               </p>
-              <div className="text-3xl font-bold whitespace-nowrap text-primary">
+              <div className="text-3xl font-bold whitespace-nowrap text-white">
                 {`$${NumberFormatter.format(tvl.vault)}`}
               </div>
             </div>
 
             <div className="w-[120px] md:w-max">
-              <p className="leading-6 text-base text-primaryDark md:text-primary">
+              <p className="leading-6 text-base text-customGray100 md:text-white">
                 Deposits
               </p>
-              <div className="text-3xl font-bold whitespace-nowrap text-primary">
+              <div className="text-3xl font-bold whitespace-nowrap text-white">
                 {`$${NumberFormatter.format(networth.vault)}`}
               </div>
             </div>
@@ -103,10 +103,10 @@ export default function VaultsContainer({
           <div className="flex flex-row items-center md:gap-6 md:w-fit md:pl-12">
             <div className="flex gap-10 w-fit">
               <div className="w-[120px] md:w-max">
-                <p className="w-max leading-6 text-base text-primaryDark md:text-primary">
+                <p className="w-max leading-6 text-base text-customGray100 md:text-white">
                   My oVCX
                 </p>
-                <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
+                <div className="w-max text-3xl font-bold whitespace-nowrap text-white">
                   {`$${oBal && tokens[1] && tokens[1][VCX]
                     ? NumberFormatter.format(
                       (Number(oBal?.value) / 1e18) * (tokens[1][VCX].price * 0.25)
@@ -117,10 +117,10 @@ export default function VaultsContainer({
               </div>
 
               <div className="w-[120px] md:w-max">
-                <p className="w-max leading-6 text-base text-primaryDark md:text-primary">
+                <p className="w-max leading-6 text-base text-customGray100 md:text-white">
                   Claimable oVCX
                 </p>
-                <div className="w-max text-3xl font-bold whitespace-nowrap text-primary">
+                <div className="w-max text-3xl font-bold whitespace-nowrap text-white">
                   {`$${gaugeRewards && tokens[1] && tokens[1][VCX]
                     ? NumberFormatter.format(
                       Number(gaugeRewards?.[1]?.total + gaugeRewards?.[10]?.total + gaugeRewards?.[42161]?.total || 0) / 1e18 *

@@ -64,7 +64,7 @@ function TermsModal({
           By clicking “I Agree” below, you agree to be bound by the terms of
           this Agreement. As such, you fully understand that:
         </p>
-        <ul className="list-outside list-disc text-gray-500 text-sm mb-4">
+        <ul className="list-outside list-disc text-customGray500 text-sm mb-4">
           <li>
             VaultCraft is a blockchain-based decentralized finance project. You
             are participating at your own risk.
@@ -322,7 +322,7 @@ export default function Page({
 
   return (
     <>
-      <div className="bg-[#141416] w-full mx-auto min-h-screen h-full font-khTeka flex flex-col">
+      <div className="bg-customNeutral300 w-full mx-auto min-h-screen h-full font-khTeka flex flex-col">
         <Navbar />
         <div className="flex-1">
           <TermsModal

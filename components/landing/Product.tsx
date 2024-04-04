@@ -24,7 +24,7 @@ export default function Product({
   return (
     <Link
       href={route}
-      className="group border rounded w-full lg:max-w-full h-[600px] relative flex flex-col bg-[#141416] border-[#353945] border-opacity-75 smmd:items-center py-6 px-8 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:bg-[#23262f]"
+      className="group border rounded w-full lg:max-w-full h-[600px] relative flex flex-col bg-customNeutral300 border-customNeutral100 border-opacity-75 smmd:items-center py-6 px-8 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:bg-customNeutral200"
     >
       {badge && (
         <img
@@ -35,11 +35,11 @@ export default function Product({
       )}
       <div className="col-span-12 md:col-span-4 xs:self-start flex-1">
         <div className="relative flex flex-row">
-          <h2 className="text-primary text-4xl md:text-[56px] leading-none mb-2">
+          <h2 className="text-white text-4xl md:text-6xl leading-none mb-2">
             {title}
           </h2>
         </div>
-        <p className="mt-2 text-primary">{description}</p>
+        <p className="mt-2 text-white">{description}</p>
       </div>
 
       <div className="flex absolute flex-grow items-center justify-end w-full top-[50%] translate-y-[-50%] right-8">

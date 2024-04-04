@@ -201,17 +201,17 @@ export default function Migration(): JSX.Element {
 
   return (
     <>
-      <div className="w-full pt-6 px-6 md:pt-0 border-t border-[#353945] md:border-none md:mt-10">
-        <h1 className="text-[32px] leading-none md:text-center md:text-[56px] font-normal m-0 mb-2 md:mb-6 leading-0 text-primary">
+      <div className="w-full pt-6 px-6 md:pt-0 border-t border-customNeutral100 md:border-none md:mt-10">
+        <h1 className="text-3xl leading-none md:text-center md:text-[56px] font-normal m-0 mb-2 md:mb-6 leading-0 text-white">
           POP Migration
         </h1>
-        <p className="leading-none md:text-4 text-left md:text-center text-xl text-primary">
+        <p className="leading-none md:text-4 text-left md:text-center text-xl text-white">
           Migrate your POP to VCX
         </p>
       </div>
-      <div className="px-6 md:px-8 py-10 border-t border-b border-[#353945] mt-6 md:mt-10 w-full">
+      <div className="px-6 md:px-8 py-10 border-t border-b border-customNeutral100 mt-6 md:mt-10 w-full">
         {vcxBal ? (
-          <div className="rounded-lg w-full md:w-1/3 md:min-w-[870px] bg-[#23262F] md:ml-auto md:mr-auto md:p-8 px-8 pt-6 pb-5 md:pl-11 border border-[#353945] [&_summary::-webkit-details-marker]:hidden">
+          <div className="rounded-lg w-full md:w-1/3 md:min-w-[870px] bg-customNeutral200 md:ml-auto md:mr-auto md:p-8 px-8 pt-6 pb-5 md:pl-11 border border-customNeutral100 [&_summary::-webkit-details-marker]:hidden">
             <InputTokenWithError
               onSelectToken={() => { }}
               onMaxClick={() =>

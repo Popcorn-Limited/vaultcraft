@@ -60,7 +60,7 @@ export default function NetworkFilter({
             e.preventDefault();
             setOpenFilter(true);
           }}
-          className="w-full py-3 px-5 flex flex-row items-center justify-between space-x-1 rounded-4xl border border-primary"
+          className="w-full py-3 px-5 flex flex-row items-center justify-between space-x-1 rounded-4xl border border-white"
         >
           <div className="flex items-center">
             <Image
@@ -69,14 +69,14 @@ export default function NetworkFilter({
               height="24"
               width="24"
             />
-            <p className="ml-4 mt-1 text-primary">
+            <p className="ml-4 mt-1 text-white">
               {activeNetwork === ChainId.ALL
                 ? "All Networks"
                 : ChainId[activeNetwork]}
             </p>
           </div>
           <ChevronDownIcon
-            className="w-5 h-5 text-primary"
+            className="w-5 h-5 text-white"
             aria-hidden="true"
           />
         </button>

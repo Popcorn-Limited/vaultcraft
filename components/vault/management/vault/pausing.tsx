@@ -19,7 +19,7 @@ export default function VaultPausing({
   return (
     <div className="flex flex-row justify-center">
       <div className="w-1/2">
-        <p className="text-gray-500">
+        <p className="text-customGray500">
           Pausing the vault pulls all funds from its strategy and the underlying
           protocol and disables new vault deposits. Use this in case the
           underlying protocol puts funds in risk. All assets are available in

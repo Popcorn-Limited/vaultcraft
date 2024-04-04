@@ -71,7 +71,7 @@ export default function SmartVault({
           />
 
           {description && (
-            <p className="text-gray-500">{vaultData.metadata.description}</p>
+            <p className="text-customGray500">{vaultData.metadata.description}</p>
           )}
         </div>
       </Accordion>

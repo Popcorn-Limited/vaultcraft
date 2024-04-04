@@ -18,7 +18,7 @@ function LockTimeButton({
 }): JSX.Element {
   return (
     <button
-      className={`w-10 h-10 border border-[#C8C8C8] hover:bg-[#23262f] rounded-lg ${
+      className={`w-10 h-10 border border-customGray200 hover:bg-customNeutral200 rounded-lg ${
         isActive ? "bg-white text-black" : "text-white"
       }`}
       onClick={() => handleClick()}
@@ -75,7 +75,7 @@ export default function LockVcxInterface({
       <h2 className="text-start text-5xl">Lock your VCX-LP</h2>
 
       <div>
-        <p className="text-primary font-semibold">Amount VCX-LP</p>
+        <p className="text-white font-semibold">Amount VCX-LP</p>
         <InputTokenWithError
           captionText={``}
           onSelectToken={() => {}}
@@ -107,8 +107,8 @@ export default function LockVcxInterface({
 
       <div>
         <div className="flex flex-row items-center justify-between">
-          <p className="text-primary font-semibold mb-1">Lockup Time</p>
-          <p className="w-32 text-secondaryLight">Custom Time</p>
+          <p className="text-white font-semibold mb-1">Lockup Time</p>
+          <p className="w-32 text-customGray300">Custom Time</p>
         </div>
         <div className="flex flex-row items-center justify-between">
           <LockTimeButton
@@ -146,7 +146,7 @@ export default function LockVcxInterface({
             isActive={days === 1460}
             handleClick={() => setDays(1460)}
           />
-          <div className="w-32 flex px-5 py-2 items-center rounded-lg border border-customLightGray">
+          <div className="w-32 flex px-5 py-2 items-center rounded-lg border border-customGray100">
             <InputNumber
               onChange={handleSetDays}
               value={days}
@@ -161,16 +161,16 @@ export default function LockVcxInterface({
             />
           </div>
         </div>
-        <div className="flex flex-row items-center justify-between text-secondaryLight">
+        <div className="flex flex-row items-center justify-between text-customGray300">
           <p>Unlocks at:</p>
           <p>{new Date(calcUnlockTime(days)).toLocaleDateString()}</p>
         </div>
       </div>
 
       <div>
-        <p className="text-primary font-semibold mb-1">Voting Power</p>
-        <div className="w-full border border-customLightGray rounded-lg p-4">
-          <p className="text-primaryDark">
+        <p className="text-white font-semibold mb-1">Voting Power</p>
+        <div className="w-full border border-customGray100 rounded-lg p-4">
+          <p className="text-customGray100">
             {Number(amount) > 0
               ? calculateVeOut(Number(amount), days).toFixed(2)
               : "Enter the amount to view your voting power"}
