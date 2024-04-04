@@ -135,7 +135,7 @@ export default function Gauge({
 
           <div className="w-full flex justify-between my-4">
             <div className="w-full">
-              <p className="text-primary font-normal text-sm">New Vote: {amount / 100} %</p>
+              <p className="text-primary font-normal text-sm">New Vote: {(amount || 0) / 100} %</p>
               <div className="flex flex-row items-center justify-between">
                 <div className="w-full mt-4 ml-[11px]">
                   <Slider

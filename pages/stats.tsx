@@ -8,12 +8,17 @@ import { usePublicClient } from "wagmi";
 import {
   BALANCER_VAULT,
   BalancerVaultAbi,
+  VCX,
+  VCX_LP,
   VCX_POOL_ID,
   VOTING_ESCROW,
   VotingEscrowAbi,
+  WETH,
 } from "@/lib/constants";
 import { formatToFixedDecimals } from "@/lib/utils/formatBigNumber";
 import { DuneQueryResult } from "@/lib/types";
+import { useAtom } from "jotai";
+import { tokensAtom } from "@/lib/atoms";
 
 
 const vaultTvlChartColors = [
@@ -83,77 +88,84 @@ const formatDate = (timestamp: number) => {
   return `${month}. ${day} ${year}`;
 };
 
+type Statistics = {
+  totalSupply: number;
+  liquidSupply: number;
+  fdv: number;
+  marketCap: number;
+  vcxPrice: number;
+  vcxInBalPool: number;
+  wethInBalPool: number;
+  balLp: number;
+  veVcx: number;
+  oVcxEmissions: number;
+  oVcxExercised: number;
+  networkId: number;
+  vaultTvl: {
+    title: string;
+    count: number;
+  }[];
+  tvlMonthByMonth: {
+    date: number;
+    value: number;
+  }[];
+  totalRevenue: number;
+  oVcxRevenue: number;
+  burnedVcx: number;
+  weekDexVolume: number;
+  holderTotal: number;
+  holderPlankton: number;
+  holderShrimp: number;
+  holderFish: number;
+  holderDolphin: number;
+  holderWhale: number;
+  tvl: number;
+  snapshotPips: {
+    created: number;
+    title: string;
+  }[];
+  leaderboard: {
+    address: string;
+    count: number;
+  }[];
+}
+
+const DEFAULT_STATISTICS = {
+  totalSupply: 0,
+  liquidSupply: 0,
+  fdv: 0,
+  marketCap: 0,
+  vcxPrice: 0,
+  vcxInBalPool: 0,
+  wethInBalPool: 0,
+  balLp: 0,
+  veVcx: 0,
+  oVcxEmissions: 0,
+  oVcxExercised: 0,
+  networkId: 0,
+  vaultTvl: [],
+  tvlMonthByMonth: [],
+  totalRevenue: 0,
+  oVcxRevenue: 0,
+  burnedVcx: 0,
+  weekDexVolume: 0,
+  holderTotal: 0,
+  holderPlankton: 0,
+  holderShrimp: 0,
+  holderFish: 0,
+  holderDolphin: 0,
+  holderWhale: 0,
+  tvl: 0,
+  snapshotPips: [],
+  leaderboard: [],
+}
+
 export default function Vaults() {
   const publicClient = usePublicClient({ chainId: 1 });
-  const [statistics, setStatistics] = useState<{
-    totalSupply: number;
-    liquidSupply: number;
-    fdv: number;
-    marketCap: number;
-    vcxPrice: number;
-    vcxInBalPool: number;
-    wethInBalPool: number;
-    balLp: number;
-    veVcx: number;
-    oVcxEmissions: number;
-    oVcxExercised: number;
-    networkId: number;
-    vaultTvl: {
-      title: string;
-      count: number;
-    }[];
-    tvlMonthByMonth: {
-      date: number;
-      value: number;
-    }[];
-    totalRevenue: number;
-    oVcxRevenue: number;
-    burnedVcx: number;
-    weekDexVolume: number;
-    holderTotal: number;
-    holderPlankton: number;
-    holderShrimp: number;
-    holderFish: number;
-    holderDolphin: number;
-    holderWhale: number;
-    tvl: number;
-    snapshotPips: {
-      created: number;
-      title: string;
-    }[];
-    leaderboard: {
-      address: string;
-      count: number;
-    }[];
-  }>({
-    totalSupply: 0,
-    liquidSupply: 0,
-    fdv: 0,
-    marketCap: 0,
-    vcxPrice: 0,
-    vcxInBalPool: 0,
-    wethInBalPool: 0,
-    balLp: 0,
-    veVcx: 0,
-    oVcxEmissions: 0,
-    oVcxExercised: 0,
-    networkId: 0,
-    vaultTvl: [],
-    tvlMonthByMonth: [],
-    totalRevenue: 0,
-    oVcxRevenue: 0,
-    burnedVcx: 0,
-    weekDexVolume: 0,
-    holderTotal: 0,
-    holderPlankton: 0,
-    holderShrimp: 0,
-    holderFish: 0,
-    holderDolphin: 0,
-    holderWhale: 0,
-    tvl: 0,
-    snapshotPips: [],
-    leaderboard: [],
-  });
+
+  const [tokens] = useAtom(tokensAtom)
+
+  const [statistics, setStatistics] = useState<Statistics>(DEFAULT_STATISTICS);
   const [tvlChain, setTvlChain] = useState<{
     image?: string;
     label: string;
@@ -326,7 +338,6 @@ export default function Vaults() {
     const [
       snapshotPips,
       duneTokenResult,
-      prices,
       poolTokens,
       llamaRes,
       holder,
@@ -348,9 +359,6 @@ export default function Vaults() {
           circulatingsupply: number;
         }>
       >("https://api.dune.com/api/v1/query/3238349/results", duneOpts),
-      axios.get(
-        `https://coins.llama.fi/prices/current/ethereum:0xcE246eEa10988C495B4A90a905Ee9237a0f91543,ethereum:0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2,ethereum:0x577A7f7EE659Aa14Dc16FD384B3F8078E23F1920?searchWidth=24h`
-      ),
       publicClient.readContract({
         address: BALANCER_VAULT,
         abi: BalancerVaultAbi,
@@ -415,15 +423,9 @@ export default function Vaults() {
       >("https://api.dune.com/api/v1/query/3237707/results", duneOpts),
     ]);
 
-    const vcxInUsd =
-      prices.data.coins["ethereum:0xcE246eEa10988C495B4A90a905Ee9237a0f91543"]
-        .price;
-    const wethInUsd =
-      prices.data.coins["ethereum:0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"]
-        .price;
-    const lpInUsd =
-      prices.data.coins["ethereum:0x577A7f7EE659Aa14Dc16FD384B3F8078E23F1920"]
-        .price;
+    const vcxInUsd = tokens[1][VCX].price
+    const wethInUsd =tokens[1][WETH].price
+    const lpInUsd = tokens[1][VCX_LP].price
     const tvlByTime = Object.keys(
       llamaRes.data.tokensInUsd.slice(-1)[0].tokens
     );
@@ -448,11 +450,11 @@ export default function Vaults() {
       tvlMonthByMonth: llamaRes.data.tvl.map((tvl, i) => {
         return i >= 41
           ? {
-              date: tvl.date,
-              value:
-                tvl.totalLiquidityUSD +
-                llamaRes.data.chainTvls.staking.tvl[i - 41].totalLiquidityUSD,
-            }
+            date: tvl.date,
+            value:
+              tvl.totalLiquidityUSD +
+              llamaRes.data.chainTvls.staking.tvl[i - 41].totalLiquidityUSD,
+          }
           : { date: tvl.date, value: tvl.totalLiquidityUSD };
       }),
       tvl:
@@ -517,7 +519,7 @@ export default function Vaults() {
   }
 
   useEffect(() => {
-    init();
+    if (Object.keys(tokens).length > 0) init();
 
     function resizeHandler() {
       initLineChart(
@@ -532,7 +534,7 @@ export default function Vaults() {
     }
 
     window.addEventListener("resize", resizeHandler);
-  }, []);
+  }, [tokens]);
 
   return (
     <NoSSR>

@@ -5,7 +5,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import { useAccount, useBalance, usePublicClient, useToken } from "wagmi";
+import { useAccount, useBalance, usePublicClient } from "wagmi";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import TokenIcon from "@/components/common/TokenIcon";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
@@ -13,8 +13,9 @@ import { BalancerOracleAbi, OVCX_ORACLE, OptionTokenByChain, VCX, WETH, ZERO } f
 import { formatNumber, safeRound } from "@/lib/utils/formatBigNumber";
 import { validateInput } from "@/lib/utils/helpers";
 import { Token } from "@/lib/types";
-import { llama } from "@/lib/resolver/price/resolver";
 import { formatEther } from "viem";
+import { useAtom } from "jotai";
+import { tokensAtom } from "@/lib/atoms";
 
 const SLIPPAGE = 0.01; // @dev adding some slippage to the call -- TODO -> we should later allow users to change that
 
@@ -30,6 +31,8 @@ export default function ExerciseOptionTokenInterface({
   const { address: account } = useAccount();
   const publicClient = usePublicClient();
 
+  const [tokens] = useAtom(tokensAtom)
+
   const [amount, setAmount] = amountState;
   const [maxPaymentAmount, setMaxPaymentAmount] = maxPaymentAmountState;
 
@@ -44,10 +47,6 @@ export default function ExerciseOptionTokenInterface({
     token: WETH,
   });
 
-  const { data: oVcx } = useToken({ chainId: 1, address: OptionTokenByChain[1] });
-  const { data: vcx } = useToken({ chainId: 1, address: VCX });
-  const { data: weth } = useToken({ chainId: 1, address: WETH });
-
   const [strikePrice, setStrikePrice] = useState<number>(0);
   const [oVcxDiscount, setOVcxDiscount] = useState<number>(0);
   const [vcxPrice, setVCXPrice] = useState<number>(0);
@@ -59,8 +58,6 @@ export default function ExerciseOptionTokenInterface({
     async function setUpPrices() {
       setInitialLoad(true);
 
-      const vcxInUsd = await llama({ address: VCX, chainId: 1 });
-      const wethInUsd = await llama({ address: WETH, chainId: 1 });
       const multiplier = await publicClient.readContract({
         address: OVCX_ORACLE,
         abi: BalancerOracleAbi,
@@ -71,15 +68,14 @@ export default function ExerciseOptionTokenInterface({
         abi: BalancerOracleAbi,
         functionName: "getPrice",
       });
-      const oVcxInUsd = (vcxInUsd * (10_000 - multiplier)) / 10_000;
-      const strikePriceInUsd = (Number(strikePriceRes) / 1e18) * wethInUsd;
+      const strikePriceInUsd = (Number(strikePriceRes) / 1e18) * tokens[1][WETH].price;
 
-      setWethPrice(wethInUsd);
-      setVCXPrice(vcxInUsd);
+      setWethPrice(tokens[1][WETH].price);
+      setVCXPrice(tokens[1][VCX].price);
       setStrikePrice(strikePriceInUsd);
       setOVcxDiscount(multiplier);
     }
-    if (!initialLoad) setUpPrices();
+    if (!initialLoad && Object.keys(tokens).length > 0) setUpPrices();
   }, [initialLoad]);
 
   function handleMaxWeth() {
@@ -135,22 +131,13 @@ export default function ExerciseOptionTokenInterface({
       <div className="mt-8">
         <InputTokenWithError
           captionText={"Amount oVCX"}
-          onSelectToken={() => {}}
+          onSelectToken={() => { }}
           onMaxClick={handleMaxOPop}
           chainId={1}
           value={amount}
           onChange={handleOPopInput}
           allowInput={true}
-          selectedToken={
-            {
-              ...oVcx,
-              name: "oVCX",
-              symbol: "oVCX",
-              decimals: 18,
-              logoURI: "/images/tokens/oVcx.svg",
-              balance: oVcxBal?.value || ZERO,
-            } as any
-          }
+          selectedToken={tokens[1][OptionTokenByChain[1]]}
           errorMessage={
             Number(amount) > Number(oVcxBal?.value) / 1e18
               ? "Insufficient Balance"
@@ -164,21 +151,13 @@ export default function ExerciseOptionTokenInterface({
 
         <InputTokenWithError
           captionText={"Amount WETH"}
-          onSelectToken={() => {}}
+          onSelectToken={() => { }}
           onMaxClick={handleMaxWeth}
           chainId={1}
           value={maxPaymentAmount}
           onChange={handleEthInput}
           allowInput={true}
-          selectedToken={
-            {
-              ...weth,
-              name: "WETH",
-              symbol: "WETH",
-              decimals: 18,
-              logoURI: "https://etherscan.io/token/images/weth_28.png",
-              balance: wethBal?.value || ZERO,
-            } as any
+          selectedToken={tokens[1][WETH]
           }
           tokenList={[]}
           errorMessage={
@@ -231,7 +210,7 @@ export default function ExerciseOptionTokenInterface({
               />
             </div>
             <p className="font-medium text-lg leading-none hidden md:block text-white group-hover:text-[#DFFF1C]">
-              {vcx?.symbol}
+              VCX
             </p>
           </span>
         </div>

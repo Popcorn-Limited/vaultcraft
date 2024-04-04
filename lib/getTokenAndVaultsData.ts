@@ -259,6 +259,11 @@ async function prepareVaultsData(chainId: number, client: PublicClient): Promise
   return result
 }
 
+async function getVCXPrice(): Promise<number> {
+  const { data: vcxPriceRes } = await axios.get("https://api.dexscreener.com/latest/dex/pairs/ethereum/0x577a7f7ee659aa14dc16fd384b3f8078e23f1920000200000000000000000633-0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2-0xcE246eEa10988C495B4A90a905Ee9237a0f91543")
+  return Number(vcxPriceRes.pair.priceUsd)
+}
+
 async function prepareAssets(addresses: Address[], chainId: number, client: PublicClient): Promise<TokenByAddress> {
   const { data: assets } = await axios.get(
     `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/assets/tokens/${chainId}.json`
@@ -271,6 +276,8 @@ async function prepareAssets(addresses: Address[], chainId: number, client: Publ
       )
     )}`
   );
+
+  const vcxPrice = await getVCXPrice()
 
   const ts = await client.multicall({
     contracts: addresses
@@ -288,9 +295,17 @@ async function prepareAssets(addresses: Address[], chainId: number, client: Publ
 
   let result: TokenByAddress = {}
   addresses.forEach((address, i) => {
+    let tokenPrice = Number(priceData.coins[`${networkMap[chainId].toLowerCase()}:${address}`]?.price) || 0
+
+    if (address === VCX) {
+      tokenPrice = vcxPrice
+    } else if (address === OptionTokenByChain[chainId]) {
+      tokenPrice = vcxPrice * 0.25
+    }
+
     result[address] = {
       ...assets[address],
-      price: Number(priceData.coins[`${networkMap[chainId].toLowerCase()}:${address}`]?.price) || 0,
+      price: tokenPrice,
       balance: 0,
       totalSupply: Number(ts[i]),
       chainId: chainId,
