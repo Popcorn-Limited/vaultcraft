@@ -6,8 +6,12 @@ import MainActionButton from "@/components/button/MainActionButton";
 import useLockedBalanceOf from "@/lib/gauges/useLockedBalanceOf";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import { formatEther } from "viem";
-import { VCX_LP, VOTING_ESCROW, ZERO } from "@/lib/constants";
+import { OptionTokenByChain, VCX_LP, VOTING_ESCROW, ZERO } from "@/lib/constants";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
+import NetworkSticker from "../network/NetworkSticker";
+import TokenIcon from "../common/TokenIcon";
+import { useAtom } from "jotai";
+import { tokensAtom } from "@/lib/atoms";
 
 function votingPeriodEnd(): number[] {
   const periodEnd = getVotePeriodEndTime();
@@ -34,6 +38,8 @@ export default function StakingInterface({
 }: StakingInterfaceProps): JSX.Element {
   const { address: account } = useAccount();
 
+  const [tokens] = useAtom(tokensAtom)
+
   const { data: lockedBal } = useLockedBalanceOf({
     chainId: 1,
     address: VOTING_ESCROW,
@@ -58,7 +64,16 @@ export default function StakingInterface({
         <h3 className="text-2xl pb-6 border-b border-customNeutral100">veVCX</h3>
         <div className="flex flex-col mt-6 gap-4">
           <span className="flex flex-row items-center justify-between">
-            <p className="">My VCX-LP</p>
+            <div className="relative">
+              <NetworkSticker chainId={1} size={1} />
+              <TokenIcon
+                token={tokens?.[1]?.[OptionTokenByChain[1]]}
+                icon={tokens?.[1]?.[OptionTokenByChain[1]]?.logoURI}
+                chainId={1}
+                imageSize={"w-8 h-8"}
+              />
+              <p className="">My VCX-LP</p>
+            </div>
             <p className="font-bold">
               {NumberFormatter.format(
                 Number(formatEther(LpBal?.value || ZERO))
