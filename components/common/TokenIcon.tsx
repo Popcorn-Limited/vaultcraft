@@ -16,10 +16,9 @@ export default function TokenIcon({
   imageSize,
   chainId,
 }: TokenIconProps): JSX.Element {
-  icon = token?.logoURI || icon;
-  const className = `${
-    imageSize ? imageSize : "w-6 md:w-10 h-6 md:h-10"
-  } object-contain rounded-full`;
+  icon = icon || token?.logoURI;
+  const className = `${imageSize ? imageSize : "w-6 md:w-10 h-6 md:h-10"
+    } object-contain rounded-full`;
 
   if (icon) {
     return <img src={icon} alt="token icon" className={className} />;

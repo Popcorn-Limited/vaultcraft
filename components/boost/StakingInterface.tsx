@@ -63,16 +63,17 @@ export default function StakingInterface({
       <div className="w-full lg:w-1/2 bg-transparent border border-customNeutral100 rounded-3xl p-8 text-white">
         <h3 className="text-2xl pb-6 border-b border-customNeutral100">veVCX</h3>
         <div className="flex flex-col mt-6 gap-4">
-          <span className="flex flex-row items-center justify-between">
-            <div className="relative">
-              <NetworkSticker chainId={1} size={1} />
-              <TokenIcon
-                token={tokens?.[1]?.[OptionTokenByChain[1]]}
-                icon={tokens?.[1]?.[OptionTokenByChain[1]]?.logoURI}
-                chainId={1}
-                imageSize={"w-8 h-8"}
-              />
-              <p className="">My VCX-LP</p>
+          <span className="flex flex-row items-center justify-between ml-2">
+            <div className="flex flex-row items-center">
+              <div className="relative mb-0.5">
+                <NetworkSticker chainId={1} size={1} />
+                <TokenIcon
+                  token={tokens?.[1]?.[VCX_LP]}
+                  chainId={1}
+                  imageSize={"w-8 h-8"}
+                />
+              </div>
+              <p className="ml-2">My VCX-LP</p>
             </div>
             <p className="font-bold">
               {NumberFormatter.format(
@@ -80,12 +81,41 @@ export default function StakingInterface({
               ) || "0"}
             </p>
           </span>
-          <span className="flex flex-row items-center justify-between">
-            <p className="">My Locked VCX-LP</p>
+          <span className="flex flex-row items-center justify-between ml-2">
+            <div className="flex flex-row items-center">
+              <div className="relative mb-0.5">
+                <NetworkSticker chainId={1} size={1} />
+                <TokenIcon
+                  token={tokens?.[1]?.[VCX_LP]}
+                  chainId={1}
+                  imageSize={"w-8 h-8"}
+                />
+              </div>
+              <p className="ml-2">My Locked VCX-LP 🔒</p>
+            </div>
             <p className="font-bold">
               {lockedBal
                 ? NumberFormatter.format(Number(formatEther(lockedBal?.amount)))
                 : "0"}
+            </p>
+          </span>
+          <span className="flex flex-row items-center justify-between ml-2">
+            <div className="flex flex-row items-center">
+              <div className="relative mb-0.5">
+                <NetworkSticker chainId={1} size={1} />
+                <TokenIcon
+                  token={tokens?.[1]?.[OptionTokenByChain[1]]}
+                  icon={"/images/tokens/veVCX.svg"}
+                  chainId={1}
+                  imageSize={"w-8 h-8"}
+                />
+              </div>
+              <p className="ml-2">My veVCX</p>
+            </div>
+            <p className="font-bold">
+              {NumberFormatter.format(
+                Number(formatEther(veBal?.value || ZERO))
+              ) || "0"}
             </p>
           </span>
           <span className="flex flex-row items-center justify-between">
@@ -94,14 +124,6 @@ export default function StakingInterface({
               {lockedBal && lockedBal?.end.toString() !== "0"
                 ? new Date(Number(lockedBal?.end) * 1000).toLocaleDateString()
                 : "-"}
-            </p>
-          </span>
-          <span className="flex flex-row items-center justify-between">
-            <p className="">My veVCX</p>
-            <p className="font-bold">
-              {NumberFormatter.format(
-                Number(formatEther(veBal?.value || ZERO))
-              ) || "0"}
             </p>
           </span>
           <span className="flex flex-row items-center justify-between pb-6 border-b border-customNeutral100">
