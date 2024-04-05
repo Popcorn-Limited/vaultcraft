@@ -235,11 +235,13 @@ export default function Page({
       const newReserveData: { [key: number]: ReserveData[] } = {}
       const newUserAccountData: { [key: number]: UserAccountData } = {}
 
-      SUPPORTED_NETWORKS.forEach(async (chain) => {
-        const res = await fetchAaveData(account || zeroAddress, newTokens[chain.id], chain)
-        newReserveData[chain.id] = res.reserveData
-        newUserAccountData[chain.id] = res.userAccountData
-      })
+      await Promise.all(
+        SUPPORTED_NETWORKS.map(async (chain) => {
+          const res = await fetchAaveData(account || zeroAddress, newTokens[chain.id], chain)
+          newReserveData[chain.id] = res.reserveData
+          newUserAccountData[chain.id] = res.userAccountData
+        })
+      )
 
       const vaultTVL = SUPPORTED_NETWORKS.map(chain => newVaultsData[chain.id]).flat().reduce((a, b) => a + b.tvl, 0)
       const lockVaultTVL = 520000 // @dev hardcoded since we removed lock vaults
