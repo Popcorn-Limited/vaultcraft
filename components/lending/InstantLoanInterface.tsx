@@ -25,7 +25,7 @@ import CardStat from "@/components/common/CardStat";
 
 const LOAN_TABS = ["Supply", "Borrow", "Repay", "Withdraw"]
 
-export default function LoanInterface({ visibilityState, vaultData }: { visibilityState: [boolean, Dispatch<SetStateAction<boolean>>], vaultData: VaultData }): JSX.Element {
+export default function InstantLoanInterface({ visibilityState, vaultData }: { visibilityState: [boolean, Dispatch<SetStateAction<boolean>>], vaultData: VaultData }): JSX.Element {
   const [visible, setVisible] = visibilityState
 
   const { address: account } = useAccount();
@@ -244,7 +244,6 @@ export default function LoanInterface({ visibilityState, vaultData }: { visibili
       clients: { publicClient, walletClient },
     })
     const success = await aaveInteraction()
-    console.log({ success })
 
     currentStep.loading = false
     currentStep.success = success;

@@ -208,7 +208,7 @@ function Tutorial(): JSX.Element {
         <img src={TutorialImageByStep[3]} className="rounded-md mt-4 md:w-2/3 lg:hidden" />
       </div>
     </div>
-    <div className="hidden lg:block lg:w-2/3 rounded-md border border-customGray500 bg-customNeutral300 px-4 pb-16 pt-4">
+    <div className="hidden lg:block lg:w-2/3 h-fit rounded-md border border-customGray500 bg-customNeutral300 px-4 pb-16 pt-4">
       <div className="flex flex-row justify-between mb-2">
         <div className="flex flex-row items-end">
           <p className="mb-1 mr-2">{step}/3</p>

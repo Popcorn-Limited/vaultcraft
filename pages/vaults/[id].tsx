@@ -16,13 +16,20 @@ import { claimOPop } from "@/lib/optionToken/interactions";
 import VaultInputs from "@/components/vault/VaultInputs";
 import { showSuccessToast } from "@/lib/toasts";
 import CopyToClipboard from "react-copy-to-clipboard";
-import { Square2StackIcon } from "@heroicons/react/24/outline";
+import { ArrowDownIcon, Square2StackIcon } from "@heroicons/react/24/outline";
 import { gaugeRewardsAtom, tokensAtom } from "@/lib/atoms";
 import LeftArrowIcon from "@/components/svg/LeftArrowIcon";
-import LoanInterface from "@/components/lending/LoanInterface";
+import ManageLoanInterface from "@/components/lending/ManageLoanInterface";
 import { MinterByChain, OptionTokenByChain, VCX, VE_VCX, VeTokenByChain, ZapAssetAddressesByChain } from "@/lib/constants";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
+import TabSelector from "@/components/common/TabSelector";
+import InputTokenWithError from "@/components/input/InputTokenWithError";
+import Slider from "rc-slider";
+import Modal from "@/components/modal/Modal";
+import SecondaryActionButton from "@/components/button/SecondaryActionButton";
+import CardStat from "@/components/common/CardStat";
+import ProtocolIcon, { IconByProtocol } from "@/components/common/ProtocolIcon";
 
 export default function Index() {
   const router = useRouter();
@@ -133,7 +140,140 @@ export default function Index() {
     {
       (vaultData && tokenOptions.length > 0) ? (
         <>
-          <LoanInterface visibilityState={[showLendModal, setShowLendModal]} vaultData={vaultData} />
+          {/* <Modal visibility={[true, () => { }]}>
+            <div className="bg-customNeutral200 p-6 rounded-lg">
+              <p className="text-white text-2xl font-bold mb-4">Loan Deposit</p>
+              <TabSelector
+                className="mb-6"
+                availableTabs={["Deposit", "Withdraw"]}
+                activeTab={"Deposit"}
+                setActiveTab={() => { }}
+              />
+              <InputTokenWithError
+                captionText={"Deposit Amount"}
+                onSelectToken={(option) => { }}
+                onMaxClick={() => { }}
+                chainId={1}
+                value={1000}
+                onChange={() => { }}
+                selectedToken={asset}
+                errorMessage={""}
+                tokenList={tokenOptions.filter((token) =>
+                  gauge?.address
+                    ? token.address !== gauge?.address
+                    : token.address !== vault?.address
+                )}
+                allowSelection={true}
+                allowInput
+              />
+              <p className="text-customGray100">Collateral Value: $ 1000</p>
+
+              <div className="relative py-4">
+                <div className="relative flex justify-center">
+                  <span className="px-4">
+                    <ArrowDownIcon
+                      className="h-10 w-10 p-2 text-customGray500 cursor-pointer hover:text-white hover:border-white"
+                      aria-hidden="true"
+                      onClick={() => { }}
+                    />
+                  </span>
+                </div>
+              </div>
+
+              <InputTokenWithError
+                captionText={"Borrow Amount"}
+                onSelectToken={(option) => { }}
+                onMaxClick={() => { }}
+                chainId={1}
+                value={100}
+                onChange={() => { }}
+                selectedToken={asset}
+                errorMessage={""}
+                tokenList={[]}
+                allowSelection={false}
+                allowInput={false}
+              />
+              <p className="text-customGray100">Borrow Value: $ 100</p>
+              <div className="w-full">
+                <p className="text-white font-normal text-sm">Loan Percentage: {(1000 || 0) / 100} %</p>
+                <div className="flex flex-row items-center justify-between">
+                  <div className="w-full mt-4 ml-4">
+                    <Slider
+                      railStyle={{
+                        backgroundColor: "#FFFFFF",
+                        height: 4,
+                      }}
+                      trackStyle={{
+                        backgroundColor: "#FFFFFF",
+                        height: 4,
+                      }}
+                      handleStyle={{
+                        height: 22,
+                        width: 22,
+                        marginLeft: 0,
+                        marginTop: -9,
+                        borderWidth: 4,
+                        opacity: 1,
+                        borderColor: "#C391FF",
+                        backgroundColor: "#fff",
+                        zIndex: 0,
+                      }}
+                      value={1000}
+                      onChange={() => { }}
+                      max={10000}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="relative py-4">
+                <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                  <div className="w-full border-t border-customGray500" />
+                </div>
+                <div className="relative flex justify-center">
+                  <span className="bg-customNeutral200 px-4">
+                    <ArrowDownIcon
+                      className="h-10 w-10 p-2 text-customGray500 border border-customGray500 rounded-full cursor-pointer hover:text-white hover:border-white"
+                      aria-hidden="true"
+                      onClick={() => { }}
+                    />
+                  </span>
+                </div>
+              </div>
+
+              <InputTokenWithError
+                captionText={"Output Amount"}
+                onSelectToken={(option) => { }}
+                onMaxClick={() => { }}
+                chainId={1}
+                value={20}
+                onChange={() => { }}
+                selectedToken={gauge}
+                errorMessage={""}
+                tokenList={[]}
+                allowSelection={false}
+                allowInput={false}
+              />
+              <div className="mt-6">
+                <p className="text-white font-bold mb-2 text-start">Action Breakdown</p>
+                <div className="bg-customNeutral200 py-2 px-4 rounded-lg space-y-2">
+                  <span className="flex flex-row items-center justify-between text-white">
+                    <p>Net Loan Apy</p>
+                    <p>3.2 %</p>
+                  </span>
+                  <span className="flex flex-row items-center justify-between text-white">
+                    <p>Health Factor</p>
+                    <p>5.42</p>
+                  </span>
+                  <span className="flex flex-row items-center justify-between text-white">
+                    <p>Lending Net Worth</p>
+                    <p>$ 400</p>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </Modal> */}
+          <ManageLoanInterface visibilityState={[showLendModal, setShowLendModal]} vaultData={vaultData} />
           <div className="min-h-screen">
             <button
               className="border border-customGray500 rounded-lg flex flex-row items-center px-4 py-2 ml-4 md:ml-8 mt-10"
@@ -268,28 +408,52 @@ export default function Index() {
 
               <div className="w-full md:w-2/3 mt-8 md:mt-0 space-y-4">
 
+
+
                 {(gauge && gauge?.balance > 0) &&
                   <div className="bg-customNeutral200 p-6 rounded-lg">
-                    <p className="text-white text-2xl font-bold mb-4">Your Boost</p>
-                    <p className='text-white mb-4'>
-                      Boost: {formatNumber((vaultData.workingBalance / (gauge?.balance || 0)) * 5)} X <br />
-                      Your Apy: {formatNumber((vaultData.workingBalance / (gauge?.balance || 0)) * vaultData.maxGaugeApy)} % <br />
-                      Pool Share: {formatNumber((gauge?.balance || 0) / vaultData.gaugeSupply)} % <br />
-                      VeVCX Missing: {formatNumber((((gauge?.balance || 0) / vaultData.gaugeSupply) * (tokens[vaultData.chainId][VeTokenByChain[vaultData.chainId]].totalSupply / 1e18)) - (tokens[vaultData.chainId][VeTokenByChain[vaultData.chainId]].balance / 1e18))} VeVCX
-                    </p>
+                    <p className="text-white text-2xl font-bold mb-4">Your Boost 🚀</p>
+                    <div className="w-full md:flex md:flex-wrap md:justify-between md:gap-4">
+                      <CardStat
+                        id="your-apy"
+                        label="Your APY"
+                        value={`${formatNumber((vaultData.workingBalance / (gauge?.balance || 0)) * vaultData.maxGaugeApy)} %`}
+                        tooltip="Total value of all assets deposited into the vault"
+                      />
+                      <CardStat
+                        id="boost"
+                        label="Your Boost"
+                        value={`${formatNumber((vaultData.workingBalance / (gauge?.balance || 0)) * 5)} X`}
+                        tooltip="Total value of all assets deposited into the vault"
+                      />
+                      <CardStat
+                        id="ve-missing"
+                        label="VeVCX Missing for max Boost"
+                        value={`${formatNumber((((gauge?.balance || 0) / vaultData.gaugeSupply) * (tokens[vaultData.chainId][VeTokenByChain[vaultData.chainId]].totalSupply / 1e18)) - (tokens[vaultData.chainId][VeTokenByChain[vaultData.chainId]].balance / 1e18))} VeVCX`}
+                        tooltip="Total value of all assets deposited into the vault"
+                      />
+                    </div>
                   </div>
                 }
 
                 <div className="bg-customNeutral200 p-6 rounded-lg">
-                  <p className="text-white text-2xl font-bold mb-4">Farm with any Token</p>
+                  <p className="text-white text-2xl font-bold mb-4">Leverage Farm 🧑‍🌾</p>
                   <p className='text-white mb-4'>
-                    The loan modal is designed for investors looking to engage with high-yield vaults without risking their blue chip assets. Deposit your assets. Earn interest and use them to borrow the required tokens for farming instead of purchasing them. This allows you to avoid direct exposure to their price volatility, maximizing your investment potential in high yield farming opportunities with minimized risk.  It&apos;s an efficient way to leverage your portfolio, ensuring you&apos;re always positioned to capture the best yields without selling from your blue chip assets.
+                    The borrow modal allows liquidity providers to borrow against their collateral and deposit more into Smart Vaults, enhancing capital efficiency and premiums earned.
                   </p>
-                  <div className="w-full md:w-60">
-                    <MainActionButton
-                      label="Open Loan Modal"
-                      handleClick={() => setShowLendModal(true)}
-                    />
+                  <div className="md:flex md:flex-row md:items-center md:space-x-4 space-y-4 md:space-y-0">
+                    <div className="w-full md:w-60">
+                      <MainActionButton
+                        label="Instant Loan Deposit"
+                        handleClick={() => setShowLendModal(true)}
+                      />
+                    </div>
+                    <div className="w-full md:w-60">
+                      <SecondaryActionButton
+                        label="Loan Management Modal"
+                        handleClick={() => setShowLendModal(true)}
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -297,22 +461,43 @@ export default function Index() {
                   <p className="text-white text-2xl font-bold">Strategies</p>
                   {vaultData.strategies.map((strategy, i) =>
                     <div
-                      key={strategy.metadata.name}
+                      key={`${strategy.resolver}-${i}`}
                       className={`py-4 ${i + 1 < vaultData.strategies.length ? "border-b border-customGray500" : ""}`}
                     >
-                      <h2 className="text-lg font-bold text-white">
-                        {strategy.metadata.name}
-                      </h2>
+                      <div className="w-max flex flex-row items-center mb-2">
+                        <img
+                          src={IconByProtocol[strategy.metadata.name] || "/images/tokens/vcx.svg"}
+                          className={`h-7 w-7 mr-2 mb-1.5 rounded-full border border-white`}
+                        />
+                        <h2 className="text-2xl font-bold text-white">
+                          {strategy.metadata.name}
+                        </h2>
+                      </div>
                       <p className='text-white'>
                         {strategy.metadata.description}
                       </p>
-                      <div className="mt-1">
-                        <p className='text-customGray400'>
-                          Allocation: $ {formatAndRoundNumber(strategy.allocation * asset?.price!, asset?.decimals!)} | {strategy.allocationPerc * 100} %
-                        </p>
-                        <p className='text-customGray400'>
-                          Apy: {`${NumberFormatter.format(roundToTwoDecimalPlaces(strategy.apy))} %`}
-                        </p>
+                      <div className="mt-2 md:flex md:flex-row md:items-center">
+                        <CardStat
+                          id={`${strategy.resolver}-${i}-allocation`}
+                          label="Allocation"
+                          tooltip="Total value of all assets deposited into the vault"
+                        >
+                          <span className="md:flex md:flex-row md:items-center w-full md:space-x-2">
+                            <p className="text-white text-xl leading-6 md:leading-8 text-end md:text-start">
+                              $ {formatAndRoundNumber(strategy.allocation * asset?.price!, asset?.decimals!)}
+                            </p>
+                            <p className="hidden md:block text-white">|</p>
+                            <p className="text-white text-xl leading-6 md:leading-8 text-end md:text-start">
+                              {NumberFormatter.format(roundToTwoDecimalPlaces(strategy.allocationPerc * 100))} %
+                            </p>
+                          </span>
+                        </CardStat>
+                        <CardStat
+                          id={`${strategy.resolver}-${i}-apy`}
+                          label="APY"
+                          value={`${NumberFormatter.format(roundToTwoDecimalPlaces(strategy.apy))} %`}
+                          tooltip="Total value of all assets deposited into the vault"
+                        />
                       </div>
                     </div>
                   )}

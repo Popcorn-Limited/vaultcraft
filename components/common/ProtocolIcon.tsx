@@ -1,6 +1,6 @@
 import ResponsiveTooltip from "./Tooltip";
 
-const IconByProtocol: { [key: string]: string } = {
+export const IconByProtocol: { [key: string]: string } = {
   Aave: "https://icons.llamao.fi/icons/protocols/aave?w=48&h=48",
   Aura: "https://icons.llamao.fi/icons/protocols/aura?w=48&h=48",
   Balancer: "https://icons.llamao.fi/icons/protocols/balancer?w=48&h=48",

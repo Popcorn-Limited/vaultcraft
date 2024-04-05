@@ -11,7 +11,7 @@ import NavbarLinks from "@/components/navbar/NavbarLinks";
 import { aaveAccountDataAtom } from "@/lib/atoms/lending";
 import { useAtom } from "jotai";
 import { formatToFixedDecimals } from "@/lib/utils/formatBigNumber";
-import LoanInterface, { getHealthFactorColor } from "@/components/lending/LoanInterface";
+import ManageLoanInterface, { getHealthFactorColor } from "@/components/lending/ManageLoanInterface";
 import { vaultsAtom } from "@/lib/atoms/vaults";
 import { useRouter } from "next/router";
 import ResponsiveTooltip from "@/components/common/Tooltip";
@@ -47,7 +47,7 @@ export default function Navbar(): JSX.Element {
   return (
     <>
       {(chain && Object.keys(vaults).length > 0) &&
-        <LoanInterface
+        <ManageLoanInterface
           visibilityState={[showLendModal, setShowLendModal]}
           vaultData={query?.id && query?.chainId ?
             (vaults[Number(query?.chainId)].find(vault => vault.address === query?.id)
