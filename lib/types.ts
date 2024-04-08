@@ -59,7 +59,7 @@ export type VaultData = {
   strategies: Strategy[];
 };
 
-type Strategy = {
+export type Strategy = {
   address: Address;
   metadata: StrategyMetadata;
   resolver: string;
@@ -213,7 +213,11 @@ export type ReserveData = {
   asset: Address;
   supplyAmount: number;
   borrowAmount: number;
+  supplyValue: number;
+  borrowValue: number;
   balance: number;
+  supplyBalance: number;
+  balanceValue: number;
 }
 
 export enum ZapProvider {

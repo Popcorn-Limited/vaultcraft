@@ -142,7 +142,7 @@ export async function repayToAave({ asset, amount, onBehalfOf, chainId, account,
 
 const secondsPerYear = 31536000
 
-export async function fetchAaveReserveData(account: Address, chain: Chain): Promise<ReserveData[]> {
+export async function fetchAaveReserveData(account: Address, tokens: TokenByAddress, chain: Chain): Promise<ReserveData[]> {
   const client = createPublicClient({ chain, transport: http(RPC_URLS[chain.id]) })
 
   const userData = await client.readContract({
@@ -161,6 +161,9 @@ export async function fetchAaveReserveData(account: Address, chain: Chain): Prom
   let result = reserveData[0].filter(d => !d.isFrozen).map(d => {
     const uData = userData[0].find(e => e.underlyingAsset === d.underlyingAsset)
     const decimals = Number(d.decimals)
+
+    const supplyAmount = account === zeroAddress ? 0 : Number(formatUnits(uData?.scaledATokenBalance || BigInt(0), decimals)) * Number(formatUnits(d.liquidityIndex, 27))
+    const borrowAmount = account === zeroAddress ? 0 : Number(formatUnits(uData?.scaledVariableDebt || BigInt(0), decimals))
     return {
       ltv: Number(d.baseLTVasCollateral) / 100,
       liquidationThreshold: Number(d.reserveLiquidationThreshold) / 100,
@@ -168,9 +171,13 @@ export async function fetchAaveReserveData(account: Address, chain: Chain): Prom
       supplyRate: (((1 + (Number(formatUnits(d.liquidityRate, 27)) / secondsPerYear)) ** secondsPerYear) - 1) * 100,
       borrowRate: (((1 + (Number(formatUnits(d.variableBorrowRate, 27)) / secondsPerYear)) ** secondsPerYear) - 1) * 100,
       asset: d.underlyingAsset,
-      supplyAmount: account === zeroAddress ? 0 : Number(formatUnits(uData?.scaledATokenBalance || BigInt(0), decimals)) * Number(formatUnits(d.liquidityIndex, 27)),
-      borrowAmount: account === zeroAddress ? 0 : Number(formatUnits(uData?.scaledVariableDebt || BigInt(0), decimals)),
-      balance: account === zeroAddress ? 0 : Math.floor(Number(formatUnits(uData?.scaledATokenBalance || BigInt(0), decimals)) * Number(formatUnits(d.liquidityIndex, 27)) * (10 ** decimals))
+      supplyAmount: supplyAmount,
+      borrowAmount: borrowAmount,
+      supplyValue: supplyAmount * tokens[d.underlyingAsset].price,
+      borrowValue: borrowAmount * tokens[d.underlyingAsset].price,
+      balance: tokens[d.underlyingAsset].balance,
+      balanceValue: tokens[d.underlyingAsset].balance * tokens[d.underlyingAsset].price,
+      supplyBalance: account === zeroAddress ? 0 : Math.floor(Number(formatUnits(uData?.scaledATokenBalance || BigInt(0), decimals)) * Number(formatUnits(d.liquidityIndex, 27)) * (10 ** decimals))
     }
   })
 
@@ -178,7 +185,7 @@ export async function fetchAaveReserveData(account: Address, chain: Chain): Prom
 }
 
 export async function fetchAaveData(account: Address, tokens: TokenByAddress, chain: Chain): Promise<{ reserveData: ReserveData[], userAccountData: UserAccountData }> {
-  const reserveData = await fetchAaveReserveData(account || zeroAddress, chain);
+  const reserveData = await fetchAaveReserveData(account || zeroAddress, tokens, chain);
 
   const client = createPublicClient({ chain, transport: http(RPC_URLS[chain.id]) })
   const accountData = await client.readContract({

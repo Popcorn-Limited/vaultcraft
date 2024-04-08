@@ -18,10 +18,10 @@ export default function TabSelector({
       {availableTabs.map((tab) => (
         <div
           key={tab}
-          className={`w-1/2 cursor-pointer border-b ${
+          className={`w-1/2 cursor-pointer group border-b ${
             activeTab === tab
               ? "border-white"
-              : "border-customGray500 group-hover:border-white"
+              : "border-customGray500 hover:border-white"
           }`}
           onClick={(e) => setActiveTab(tab)}
         >

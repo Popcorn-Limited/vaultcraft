@@ -8,13 +8,12 @@ import { Address, WalletClient, createPublicClient, extractChain, formatUnits, g
 import { NumberFormatter, formatAndRoundNumber, formatNumber, formatToFixedDecimals, safeRound } from "@/lib/utils/formatBigNumber";
 import { roundToTwoDecimalPlaces, validateInput } from "@/lib/utils/helpers";
 import MainActionButton from "@/components/button/MainActionButton";
-import { ArrowRightIcon, Square2StackIcon } from "@heroicons/react/24/outline";
+import { ArrowDownIcon, ArrowRightIcon, Square2StackIcon } from "@heroicons/react/24/outline";
 import { DEFAULT_ASSET, availableZapAssetAtom, tokensAtom, zapAssetsAtom } from "@/lib/atoms";
 import TabSelector from "@/components/common/TabSelector";
 import Modal from "@/components/modal/Modal";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import TokenIcon from "@/components/common/TokenIcon";
-import Title from "@/components/common/Title";
 import { EMPTY_USER_ACCOUNT_DATA, aaveAccountDataAtom, aaveReserveDataAtom } from "@/lib/atoms/lending";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { ActionStep, getAaveActionSteps } from "@/lib/getActionSteps";
@@ -22,8 +21,7 @@ import handleAaveInteraction, { AaveActionType } from "@/lib/external/aave/handl
 import { calcUserAccountData, fetchAaveData } from "@/lib/external/aave/interactions";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
 import CardStat from "@/components/common/CardStat";
-
-const LOAN_TABS = ["Supply", "Borrow", "Repay", "Withdraw"]
+import Slider from "rc-slider";
 
 export default function InstantLoanInterface({ visibilityState, vaultData }: { visibilityState: [boolean, Dispatch<SetStateAction<boolean>>], vaultData: VaultData }): JSX.Element {
   const [visible, setVisible] = visibilityState
@@ -37,180 +35,160 @@ export default function InstantLoanInterface({ visibilityState, vaultData }: { v
 
   const [reserveData, setAaveReserveData] = useAtom(aaveReserveDataAtom)
   const [aaveAccountData, setAaveAccountData] = useAtom(aaveAccountDataAtom)
-  const [vaults, setVaults] = useAtom(vaultsAtom)
   const [tokens, setTokens] = useAtom(tokensAtom)
 
-  const [activeTab, setActiveTab] = useState<string>("Supply")
+  const [asset, setAsset] = useState<Token>();
+  const [vault, setVault] = useState<Token>();
+  const [gauge, setGauge] = useState<Token>();
+
+  const [tokenList, setTokenList] = useState<Token[]>([])
+  const [tokenIn, setTokenIn] = useState<Token | null>(null)
+  const [tokenMid, setTokenMid] = useState<Token | null>(null)
+  const [tokenOut, setTokenOut] = useState<Token | null>(null)
+
+  useEffect(() => {
+    if (Object.keys(reserveData).length > 0 && Object.keys(vaultData).length > 0 && Object.keys(tokens).length > 0 && reserveData[vaultData.chainId]?.length > 0) {
+      // Set Basic Tokens
+      setAsset(tokens[vaultData.chainId][vaultData.asset])
+      setVault(tokens[vaultData.chainId][vaultData.vault])
+
+      if (vaultData.gauge) {
+        setGauge(tokens[vaultData.chainId][vaultData.gauge])
+        setTokenOut(tokens[vaultData.chainId][vaultData.gauge])
+      } else {
+        setTokenOut(tokens[vaultData.chainId][vaultData.vault])
+      }
+
+      const sorted = reserveData[vaultData.chainId].sort((a, b) => a.balance - b.balance)
+      setTokenList(sorted.map(e => tokens[vaultData.chainId][e.asset]))
+
+      setTokenIn(tokens[vaultData.chainId][reserveData[vaultData.chainId].sort((a, b) => b.balanceValue - a.balanceValue)[0].asset])
+      setTokenMid(reserveData[vaultData.chainId].find(e => e.asset === vaultData.asset)
+        ? tokens[vaultData.chainId][vaultData.asset]
+        : tokens[vaultData.chainId][sorted[0].asset]
+      )
+    }
+  }, [reserveData, vaultData, tokens])
 
   const [stepCounter, setStepCounter] = useState<number>(0)
   const [steps, setSteps] = useState<ActionStep[]>(getAaveActionSteps(AaveActionType.Supply))
   const [action, setAction] = useState<AaveActionType>(AaveActionType.Supply)
+  const [isDeposit, setIsDeposit] = useState<boolean>(true);
 
-  const [tokenList, setTokenList] = useState<Token[]>([])
-  const [supplyToken, setSupplyToken] = useState<Token | null>(null)
-  const [borrowToken, setBorrowToken] = useState<Token | null>(null)
-  const [repayToken, setRepayToken] = useState<Token | null>(null)
-  const [withdrawToken, setWithdrawToken] = useState<Token | null>(null)
+  function changeTab() {
+    if (isDeposit) {
+      // Switch to "Withdraw"
+      setTokenIn(gauge ? gauge! : vault!)
 
-  const [inputToken, setInputToken] = useState<Token | null>(null)
-
-  useEffect(() => {
-    if (Object.keys(reserveData).length > 0 && Object.keys(vaultData).length > 0 && Object.keys(tokens).length > 0 && reserveData[vaultData.chainId]?.length > 0) {
-      let sorted = reserveData[vaultData.chainId].sort((a, b) => a.balance - b.balance)
-      setTokenList(sorted.map(e => tokens[vaultData.chainId][e.asset]))
-
-      const _supplyToken = sorted[0].asset === vaultData.asset ? reserveData[vaultData.chainId][1].asset : reserveData[vaultData.chainId][0].asset
-      setSupplyToken(tokens[vaultData.chainId][_supplyToken])
-      setInputToken(tokens[vaultData.chainId][_supplyToken])
-      setBorrowToken(
-        !!reserveData[vaultData.chainId].find(e => e.asset === vaultData.asset) ?
-          tokens[vaultData.chainId][vaultData.asset] :
-          tokens[vaultData.chainId][reserveData[vaultData.chainId][0].asset]
+      const sorted = reserveData[vaultData.chainId].sort((a, b) => a.borrowValue - b.borrowValue)
+      setTokenMid(reserveData[vaultData.chainId].find(e => e.asset === vaultData.asset)
+        ? tokens[vaultData.chainId][vaultData.asset]
+        : tokens[vaultData.chainId][sorted[0].asset]
       )
+      setTokenOut(tokens[vaultData.chainId][reserveData[vaultData.chainId][0].asset])
+    } else {
+      // Switch to "Deposit"
+      setTokenIn(tokens[vaultData.chainId][reserveData[vaultData.chainId].sort((a, b) => b.balanceValue - a.balanceValue)[0].asset])
+      setTokenOut(gauge ? gauge! : vault!)
 
-      sorted = reserveData[vaultData.chainId].filter(e => e.borrowAmount > 0).sort((a, b) => b.borrowAmount - a.borrowAmount)
-      setRepayToken(sorted.length === 0 ? null : tokens[vaultData.chainId][sorted[0].asset])
-
-      sorted = reserveData[vaultData.chainId].filter(e => e.borrowAmount === 0).filter(e => e.balance > 0).sort((a, b) => b.balance - a.balance)
-      setWithdrawToken(!account || sorted.length === 0 ? null : tokens[vaultData.chainId][sorted[0].asset])
+      const sorted = reserveData[vaultData.chainId].sort((a, b) => a.balance - b.balance)
+      setTokenMid(reserveData[vaultData.chainId].find(e => e.asset === vaultData.asset)
+        ? tokens[vaultData.chainId][vaultData.asset]
+        : tokens[vaultData.chainId][sorted[0].asset]
+      )
     }
-  }, [reserveData, vaultData, tokens])
 
-  function changeTab(newTab: string) {
-    setActiveTab(newTab);
-    setInputAmount("0");
+    setIsDeposit(!isDeposit);
+    setAmountIn("0");
+    setAmountMid("0");
+    setAmountOut("0");
+    setLtv(0);
     setStepCounter(0);
-
-    const assetBorrowable = !!reserveData[vaultData.chainId].find(e => e.asset === vaultData.asset);
-    let sorted: ReserveData[]
-    let _inputToken: Token
-
-    switch (newTab) {
-      case "Supply":
-        sorted = reserveData[vaultData.chainId].filter(e => e.asset !== vaultData.asset).sort((a, b) => b.balance - a.balance)
-        setTokenList(sorted.map(e => tokens[vaultData.chainId][e.asset]))
-
-        if (!supplyToken) {
-          _inputToken = tokens[vaultData.chainId][sorted[0].asset]
-          setSupplyToken(_inputToken)
-          setInputToken(_inputToken)
-        } else {
-          setInputToken(supplyToken)
-        }
-        setAction(AaveActionType.Supply)
-        setSteps(getAaveActionSteps(AaveActionType.Supply))
-        return;
-      case "Borrow":
-        sorted = reserveData[vaultData.chainId].sort((a, b) => b.borrowRate - a.borrowRate)
-        setTokenList(sorted.map(e => tokens[vaultData.chainId][e.asset]))
-
-        if (!borrowToken) {
-          _inputToken = assetBorrowable ?
-            tokens[vaultData.chainId][vaultData.asset]
-            : tokens[vaultData.chainId][sorted[0].asset]
-          setBorrowToken(_inputToken)
-          setInputToken(_inputToken)
-        } else {
-          setInputToken(borrowToken)
-        }
-        setAction(AaveActionType.Borrow)
-        setSteps(getAaveActionSteps(AaveActionType.Borrow))
-        return;
-      case "Repay":
-        sorted = reserveData[vaultData.chainId].filter(e => e.borrowAmount > 0).sort((a, b) => b.borrowAmount - a.borrowAmount)
-        setTokenList(sorted.length === 0 ? [] : sorted.map(e => tokens[vaultData.chainId][e.asset]))
-
-        if (!repayToken) {
-          setInputToken(sorted.length === 0 ? null : tokens[vaultData.chainId][sorted[0].asset])
-        } else {
-          setInputToken(repayToken)
-        }
-        setAction(AaveActionType.Repay)
-        setSteps(getAaveActionSteps(AaveActionType.Repay))
-        return;
-      case "Withdraw":
-        sorted = reserveData[vaultData.chainId].filter(e => e.supplyAmount > 0).sort((a, b) => b.supplyAmount - a.supplyAmount)
-        setTokenList(!account || sorted.length === 0 ? [] : sorted.map(e => tokens[vaultData.chainId][e.asset]))
-
-        if (!withdrawToken) {
-          setInputToken(!account || sorted.length === 0 ? null : tokens[vaultData.chainId][sorted[0].asset])
-        } else {
-          setInputToken(withdrawToken)
-        }
-        setAction(AaveActionType.Withdraw)
-        setSteps(getAaveActionSteps(AaveActionType.Withdraw))
-        return;
-      default:
-        return;
-    }
   }
 
   function handleTokenSelect(input: Token) {
-    switch (activeTab) {
-      case "Supply":
-        setSupplyToken(input)
-        setInputToken(input)
-        return;
-      case "Borrow":
-        setBorrowToken(input)
-        setInputToken(input)
-        return;
-      case "Repay":
-        setRepayToken(input)
-        setInputToken(input)
-        return;
-      case "Withdraw":
-        setWithdrawToken(input)
-        setInputToken(input)
-        return;
-      default:
-        return;
-    }
+    // switch (activeTab) {
+    //   case "Supply":
+    //     setSupplyToken(input)
+    //     setInputToken(input)
+    //     return;
+    //   case "Borrow":
+    //     setBorrowToken(input)
+    //     setInputToken(input)
+    //     return;
+    //   case "Repay":
+    //     setRepayToken(input)
+    //     setInputToken(input)
+    //     return;
+    //   case "Withdraw":
+    //     setWithdrawToken(input)
+    //     setInputToken(input)
+    //     return;
+    //   default:
+    //     return;
+    // }
   }
 
-  const [inputAmount, setInputAmount] = useState<string>("0");
+  const [amountIn, setAmountIn] = useState<string>("0");
+  const [amountMid, setAmountMid] = useState<string>("0");
+  const [amountOut, setAmountOut] = useState<string>("0");
+
+  const [ltv, setLtv] = useState<number>(0);
+  const [newUserAccountData, setNewUserAccountData] = useState<UserAccountData>(EMPTY_USER_ACCOUNT_DATA)
 
   function handleChangeInput(e: any) {
-    let value = e.currentTarget.value
-    value = validateInput(value).isValid ? value : "0"
+    if (!tokenIn || !tokenMid || !tokenOut) return
 
-    if (activeTab === "Repay") {
-      const reserveTokenData = reserveData[vaultData.chainId].find(d => d.asset === inputToken?.address)
-      if (reserveTokenData && reserveTokenData.borrowAmount < Number(value)) {
-        value = String(reserveTokenData.borrowAmount)
+    let valueIn = e.currentTarget.value
+    valueIn = validateInput(valueIn).isValid ? valueIn : "0"
+
+    let valueMid = ((Number(valueIn) * tokenIn.price) * (ltv / 100)) / tokenMid.price;
+    if (!isDeposit) {
+      const reserveTokenData = reserveData[vaultData.chainId].find(d => d.asset === tokenMid?.address)
+      if (reserveTokenData) {
+        valueMid = valueMid > reserveTokenData.borrowAmount ? reserveTokenData.borrowAmount : valueMid;
       }
     }
 
-    setInputAmount(value);
+    const valueOut = (valueMid * tokenMid.price) / tokenOut.price
+
+    setAmountIn(valueIn)
+    setAmountMid(String(valueMid))
+    setAmountOut(String(valueOut))
   };
 
+  function handleSlider(e: any) {
+    setLtv(e as number)
+    handleChangeInput({ currentTarget: { value: amountIn } })
+  }
+
   function handleMaxClick() {
-    if (!inputToken) return
-    switch (activeTab) {
-      case "Withdraw":
-        handleChangeInput({
-          currentTarget: {
-            value:
-              String((reserveData[vaultData.chainId].find(d => d.asset === inputToken?.address)?.balance || 0) * (10 ** inputToken.decimals))
-          }
-        })
-      case "Repay":
-        handleChangeInput({
-          currentTarget: {
-            value:
-              String((reserveData[vaultData.chainId].find(d => d.asset === inputToken?.address)?.borrowAmount || 0) * (10 ** inputToken.decimals))
-          }
-        })
-      default:
-        const stringBal = inputToken.balance.toLocaleString("fullwide", { useGrouping: false })
-        const rounded = safeRound(BigInt(stringBal), inputToken.decimals)
-        const formatted = formatUnits(rounded, inputToken.decimals)
-        handleChangeInput({ currentTarget: { value: formatted } })
-    }
+    if (!tokenIn) return
+    // switch (activeTab) {
+    //   case "Withdraw":
+    //     handleChangeInput({
+    //       currentTarget: {
+    //         value:
+    //           String((reserveData[vaultData.chainId].find(d => d.asset === tokenIn?.address)?.balance || 0) * (10 ** tokenIn.decimals))
+    //       }
+    //     })
+    //   case "Repay":
+    //     handleChangeInput({
+    //       currentTarget: {
+    //         value:
+    //           String((reserveData[vaultData.chainId].find(d => d.asset === tokenIn?.address)?.borrowAmount || 0) * (10 ** tokenIn.decimals))
+    //       }
+    //     })
+    //   default:
+    //     const stringBal = tokenIn.balance.toLocaleString("fullwide", { useGrouping: false })
+    //     const rounded = safeRound(BigInt(stringBal), tokenIn.decimals)
+    //     const formatted = formatUnits(rounded, tokenIn.decimals)
+    //     handleChangeInput({ currentTarget: { value: formatted } })
+    // }
   }
 
   async function handleMainAction() {
-    if (Number(inputAmount) === 0 || !inputToken || !account || !walletClient || !chain) return;
+    if (Number(amountIn) === 0 || !tokenIn || !account || !walletClient || !chain) return;
 
     if (chain?.id !== Number(vaultData.chainId)) {
       try {
@@ -225,12 +203,9 @@ export default function InstantLoanInterface({ visibilityState, vaultData }: { v
     currentStep.loading = true
     setSteps(stepsCopy)
 
-    let val = (Number(inputAmount) * (10 ** inputToken.decimals))
-    if (AaveActionType.Repay === action &&
-      val >= ((reserveData[vaultData.chainId].find(d => d.asset === repayToken?.address)?.borrowAmount || 0) * (10 ** inputToken.decimals))) {
-      val = Number(maxUint256)
-    } else if (AaveActionType.Withdraw === action &&
-      val === ((reserveData[vaultData.chainId].find(d => d.asset === repayToken?.address)?.balance || 0) * (10 ** inputToken.decimals))) {
+    let val = (Number(amountIn) * (10 ** tokenIn.decimals))
+    if (!isDeposit &&
+      val >= ((reserveData[vaultData.chainId].find(d => d.asset === tokenMid?.address)?.borrowAmount || 0) * (10 ** tokenIn.decimals))) {
       val = Number(maxUint256)
     }
 
@@ -239,7 +214,7 @@ export default function InstantLoanInterface({ visibilityState, vaultData }: { v
       stepCounter,
       chainId: vaultData.chainId,
       amount: val,
-      inputToken,
+      inputToken: tokenIn,
       account,
       clients: { publicClient, walletClient },
     })
@@ -254,7 +229,7 @@ export default function InstantLoanInterface({ visibilityState, vaultData }: { v
 
     if (newStepCounter === steps.length && success) {
       await mutateTokenBalance({
-        tokensToUpdate: [inputToken.address],
+        tokensToUpdate: [tokenIn.address],
         account,
         tokensAtom: [tokens, setTokens],
         chainId: chain.id
@@ -265,7 +240,6 @@ export default function InstantLoanInterface({ visibilityState, vaultData }: { v
       setAaveAccountData({ ...aaveAccountData, [chain.id]: newAaveData.userAccountData })
     }
   }
-
 
   return <>
     <Modal
@@ -278,78 +252,156 @@ export default function InstantLoanInterface({ visibilityState, vaultData }: { v
       }
     >
       <div className="w-full md:flex md:flex-row md:space-x-8">
-        <div className="w-full md:w-1/3">
+        <div className="w-full">
           <TabSelector
-            className="mb-6"
-            availableTabs={LOAN_TABS}
-            activeTab={activeTab}
+            className="w-full mb-6"
+            availableTabs={["Deposit", "Withdraw"]}
+            activeTab={isDeposit ? "Deposit" : "Withdraw"}
             setActiveTab={changeTab}
           />
-          {!account &&
-            <div>
-              <MainActionButton
-                label="Connect Wallet"
-                handleClick={openConnectModal}
-              />
-            </div>
-          }
-          {
-            (account && !inputToken) &&
-            <p className="text-white">Nothing to do here</p>
-          }
-          {(account && inputToken && reserveData && reserveData[vaultData.chainId]) &&
+
+          {(account && tokenIn && tokenMid && tokenOut && reserveData && reserveData[vaultData.chainId] && asset && vault) &&
             <>
               <InputTokenWithError
-                captionText={`${activeTab} Amount`}
+                captionText={isDeposit ? "Deposit Amount" : "Withdrawal Amount"}
                 onSelectToken={handleTokenSelect}
                 onMaxClick={handleMaxClick}
                 chainId={vaultData.chainId}
-                value={inputAmount}
+                value={amountIn}
                 onChange={handleChangeInput}
-                selectedToken={activeTab === "Withdraw" ?
-                  {
-                    ...inputToken,
-                    balance: reserveData[vaultData.chainId].find(d => d.asset === inputToken?.address)?.balance || 0
-                  }
-                  : inputToken}
+                selectedToken={tokenIn}
                 errorMessage={""}
-                tokenList={tokenList}
-                allowSelection
+                tokenList={isDeposit ? tokenList : []}
+                allowSelection={isDeposit}
                 allowInput
               />
-              {(activeTab === "Repay" && repayToken && reserveData && reserveData[vaultData.chainId]) &&
-                <p className="text-start text-white">
-                  Borrowed: {
-                    // @ts-ignore
-                    (reserveData[vaultData.chainId].find(d => d.asset === repayToken?.address)?.borrowAmount < 0.001
-                      // @ts-ignore
-                      && reserveData[vaultData.chainId].find(d => d.asset === repayToken?.address)?.borrowAmount > 0)
-                      ? "<0.001"
-                      // @ts-ignore
-                      : `${formatNumber(reserveData[vaultData.chainId].find(d => d.asset === repayToken?.address)?.borrowAmount)}`}
+              <p className="text-customGray100 text-start">
+                {isDeposit ? "Collateral" : "Withdraw"} Value: ${formatNumber(Number(amountIn) * tokenIn.price)}
+              </p>
+              <div className="relative py-4">
+                <div className="relative flex justify-center">
+                  <span className="px-4">
+                    <ArrowDownIcon
+                      className="h-10 w-10 p-2 text-customGray500 cursor-pointer hover:text-white hover:border-white"
+                      aria-hidden="true"
+                      onClick={() => { }}
+                    />
+                  </span>
+                </div>
+              </div>
+
+              <InputTokenWithError
+                captionText={isDeposit ? "Borrow Amount" : "Repay Amount"}
+                onSelectToken={handleTokenSelect}
+                onMaxClick={() => { }}
+                chainId={vaultData.chainId}
+                value={amountMid}
+                onChange={() => { }}
+                selectedToken={tokenMid}
+                errorMessage={""}
+                tokenList={tokenList.find(t => t.address === asset?.address) ? [asset] : tokenList}
+                allowSelection={!tokenList.find(t => t.address === asset?.address)}
+                allowInput={true}
+              />
+
+              <p className="text-customGray100 text-start">
+                {isDeposit ? "Borrow" : "Repay"} Value: ${formatNumber(Number(amountMid) * tokenMid.price)}
+              </p>
+
+              <div className="w-full mt-4">
+                <p className="text-white font-normal text-sm text-start">
+                  {isDeposit ? `Loan To Value Ratio: ${ltv} / ${reserveData[vaultData.chainId][0].ltv}` : `Repayment Percentage: ${ltv} / 100`} %
                 </p>
-              }
+                <div className="flex flex-row items-center justify-between">
+                  <div className="w-full mt-2">
+                    <Slider
+                      railStyle={{
+                        backgroundColor: "#FFFFFF",
+                        height: 4,
+                      }}
+                      trackStyle={{
+                        backgroundColor: "#FFFFFF",
+                        height: 4,
+                      }}
+                      handleStyle={{
+                        height: 22,
+                        width: 22,
+                        marginLeft: 0,
+                        marginTop: -9,
+                        borderWidth: 4,
+                        opacity: 1,
+                        borderColor: "#C391FF",
+                        backgroundColor: "#fff",
+                        zIndex: 0,
+                      }}
+                      value={ltv}
+                      onChange={handleSlider}
+                      max={isDeposit ? reserveData[vaultData.chainId][0].ltv : 100}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="relative py-4">
+                <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                  <div className="w-full border-t border-customGray500" />
+                </div>
+                <div className="relative flex justify-center">
+                  <span className="bg-customNeutral200 px-4">
+                    <ArrowDownIcon
+                      className="h-10 w-10 p-2 text-customGray500 border border-customGray500 rounded-full cursor-pointer hover:text-white hover:border-white"
+                      aria-hidden="true"
+                      onClick={() => { }}
+                    />
+                  </span>
+                </div>
+              </div>
+
+              <InputTokenWithError
+                captionText={"Output Amount"}
+                onSelectToken={handleTokenSelect}
+                onMaxClick={handleMaxClick}
+                chainId={vaultData.chainId}
+                value={amountOut}
+                onChange={() => { }}
+                selectedToken={tokenOut}
+                errorMessage={""}
+                tokenList={isDeposit ? [] : tokenList}
+                allowSelection={!isDeposit}
+                allowInput={!isDeposit}
+              />
+              <p className="text-customGray100 text-start">
+                Output Value: ${formatNumber(Number(amountOut) * tokenOut.price)}
+              </p>
+
+              <div className="mt-6">
+                <p className="text-white font-bold mb-2 text-start">Action Breakdown</p>
+                <div className="bg-customNeutral200 py-2 px-4 rounded-lg space-y-2">
+                  <span className="flex flex-row items-center justify-between text-white">
+                    <p>Net Loan Apy</p>
+                    <p>3.2 %</p>
+                  </span>
+                  <span className="flex flex-row items-center justify-between text-white">
+                    <p>Health Factor</p>
+                    <p>5.42</p>
+                  </span>
+                  <span className="flex flex-row items-center justify-between text-white">
+                    <p>Lending Net Worth</p>
+                    <p>$ 400</p>
+                  </span>
+                </div>
+              </div>
+
               <div className="mt-8">
                 {(stepCounter === steps.length || steps.some(step => !step.loading && step.error)) ?
                   <MainActionButton label={"Finish"} handleClick={() => setVisible(false)} /> :
-                  <MainActionButton label={steps[stepCounter].label} handleClick={handleMainAction} disabled={inputAmount === "0" || steps[stepCounter].loading} />
+                  <MainActionButton label={steps[stepCounter].label} handleClick={handleMainAction} disabled={amountIn === "0" || steps[stepCounter].loading} />
                 }
               </div>
             </>
           }
         </div>
-        <div className="w-full md:w-2/3 mt-8 md:mt-0">
-          {(!!reserveData && !!supplyToken && !!borrowToken) &&
-            <AaveUserAccountData
-              supplyToken={supplyToken}
-              borrowToken={borrowToken}
-              inputToken={inputToken || DEFAULT_ASSET}
-              inputAmount={Number(inputAmount)}
-              activeTab={activeTab}
-              chainId={vaultData.chainId}
-            />
-          }
-        </div>
+
       </div>
     </Modal>
   </>
@@ -368,8 +420,8 @@ export function getHealthFactorColor(suffix: string, healthFactor: number): stri
   }
 }
 
-export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inputAmount, activeTab, chainId }
-  : { supplyToken: Token, borrowToken: Token, inputToken: Token, inputAmount: number, activeTab: string, chainId: number }): JSX.Element {
+export function AaveUserAccountData({ supplyToken, borrowToken, tokenIn, amountIn, activeTab, chainId }
+  : { supplyToken: Token, borrowToken: Token, tokenIn: Token, amountIn: number, activeTab: string, chainId: number }): JSX.Element {
   const [tokens, setTokens] = useAtom(tokensAtom)
   const [reserveData] = useAtom(aaveReserveDataAtom)
   const [userAccountData] = useAtom(aaveAccountDataAtom)
@@ -392,39 +444,39 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
   const [oldInputAmount, setOldInputAmount] = useState<number>(0);
 
   useEffect(() => {
-    if (inputToken.symbol === "none") return
+    if (tokenIn.symbol === "none") return
     const newReserveData = [...reserveData[chainId]]
-    const value = Number(inputAmount) - oldInputAmount
+    const value = Number(amountIn) - oldInputAmount
 
-    console.log({ inputToken, newReserveData, inputAmount, value })
+    console.log({ tokenIn, newReserveData, amountIn, value })
 
-    setOldInputAmount(Number(inputAmount))
+    setOldInputAmount(Number(amountIn))
 
     switch (activeTab) {
       case "Supply":
-        newReserveData[newReserveData.findIndex(e => e.asset === inputToken.address)].supplyAmount += value
+        newReserveData[newReserveData.findIndex(e => e.asset === tokenIn.address)].supplyAmount += value
 
         setNewUserAccountData({ ...calcUserAccountData(newReserveData, tokens[chainId], userAccountData[chainId].ltv) })
         return;
       case "Borrow":
-        newReserveData[newReserveData.findIndex(e => e.asset === inputToken.address)].borrowAmount += value
+        newReserveData[newReserveData.findIndex(e => e.asset === tokenIn.address)].borrowAmount += value
 
         setNewUserAccountData({ ...calcUserAccountData(newReserveData, tokens[chainId], userAccountData[chainId].ltv) })
         return;
       case "Repay":
-        newReserveData[newReserveData.findIndex(e => e.asset === inputToken.address)].borrowAmount -= value
+        newReserveData[newReserveData.findIndex(e => e.asset === tokenIn.address)].borrowAmount -= value
 
         setNewUserAccountData(calcUserAccountData(newReserveData, tokens[chainId], userAccountData[chainId].ltv))
         return;
       case "Withdraw":
-        newReserveData[newReserveData.findIndex(e => e.asset === inputToken.address)].supplyAmount -= value
+        newReserveData[newReserveData.findIndex(e => e.asset === tokenIn.address)].supplyAmount -= value
 
         setNewUserAccountData(calcUserAccountData(newReserveData, tokens[chainId], userAccountData[chainId].ltv))
         return;
       default:
         return;
     }
-  }, [inputAmount, activeTab])
+  }, [amountIn, activeTab])
 
   return (supplyReserve && borrowReserve) ? (
     <>
@@ -442,7 +494,7 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
                   <p className="text-white text-xl">
                     {formatToFixedDecimals(userAccountData[chainId].healthFactor || 0, 2)}
                   </p>
-                  {inputAmount > 0 &&
+                  {amountIn > 0 &&
                     <>
                       <p className={`text-sm ${getHealthFactorColor("text", newUserAccountData.healthFactor)}`}>
                         {formatToFixedDecimals(newUserAccountData.healthFactor || 0, 2)}
@@ -460,7 +512,7 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
                   <p className="text-white text-xl">
                     $ {formatToFixedDecimals(((userAccountData[chainId].ltv * userAccountData[chainId].totalCollateral) - userAccountData[chainId].totalBorrowed) || 0, 2)}
                   </p>
-                  {inputAmount > 0 &&
+                  {amountIn > 0 &&
                     <>
                       <p className={`text-sm text-white`}>
                         $ {formatToFixedDecimals(((newUserAccountData.ltv * newUserAccountData.totalCollateral) - newUserAccountData.totalBorrowed) || 0, 2)}
@@ -477,7 +529,7 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
                   <p className="text-white text-xl">
                     {formatToFixedDecimals(userAccountData[chainId].netRate || 0, 2)} %
                   </p>
-                  {inputAmount > 0 &&
+                  {amountIn > 0 &&
                     <>
                       <p className={`text-sm text-white`}>
                         {formatToFixedDecimals(newUserAccountData.netRate || 0, 2)} %
@@ -494,7 +546,7 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
                   <p className="text-white text-xl">
                     $ {formatToFixedDecimals(userAccountData[chainId].totalCollateral || 0, 2)}
                   </p>
-                  {inputAmount > 0 &&
+                  {amountIn > 0 &&
                     <>
                       <p className={`text-sm text-white`}>
                         $ {formatToFixedDecimals(newUserAccountData.totalCollateral || 0, 2)}
@@ -511,7 +563,7 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
                   <p className="text-white text-xl">
                     $ {formatNumber(userAccountData[chainId].totalBorrowed || 0)}
                   </p>
-                  {inputAmount > 0 &&
+                  {amountIn > 0 &&
                     <>
                       <p className={`text-sm text-white`}>
                         $ {formatNumber(newUserAccountData.totalBorrowed || 0)}
@@ -528,7 +580,7 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
                   <p className="text-white text-xl">
                     $ {formatNumber(userAccountData[chainId].netValue || 0)}
                   </p>
-                  {inputAmount > 0 &&
+                  {amountIn > 0 &&
                     <>
                       <p className={`text-sm text-white`}>
                         $ {formatNumber(newUserAccountData.netValue || 0)}

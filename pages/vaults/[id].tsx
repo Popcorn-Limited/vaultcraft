@@ -1,6 +1,6 @@
 import AssetWithName from "@/components/vault/AssetWithName";
 import { vaultsAtom } from "@/lib/atoms/vaults";
-import { Token, VaultData } from "@/lib/types";
+import { Strategy, Token, VaultData } from "@/lib/types";
 import { useAtom } from "jotai";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -30,6 +30,7 @@ import Modal from "@/components/modal/Modal";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import CardStat from "@/components/common/CardStat";
 import ProtocolIcon, { IconByProtocol } from "@/components/common/ProtocolIcon";
+import InstantLoanInterface from "@/components/lending/InstantLoanInterface";
 
 export default function Index() {
   const router = useRouter();
@@ -97,6 +98,7 @@ export default function Index() {
 
   const [gaugeRewards, setGaugeRewards] = useAtom(gaugeRewardsAtom);
 
+  const [showLoanManagementModal, setShowLoanManagementModal] = useState(false)
   const [showLendModal, setShowLendModal] = useState(false)
 
   async function handleClaim() {
@@ -273,7 +275,8 @@ export default function Index() {
               </div>
             </div>
           </Modal> */}
-          <ManageLoanInterface visibilityState={[showLendModal, setShowLendModal]} vaultData={vaultData} />
+          <InstantLoanInterface visibilityState={[showLendModal, setShowLendModal]} vaultData={vaultData} />
+          <ManageLoanInterface visibilityState={[showLoanManagementModal, setShowLoanManagementModal]} vaultData={vaultData} />
           <div className="min-h-screen">
             <button
               className="border border-customGray500 rounded-lg flex flex-row items-center px-4 py-2 ml-4 md:ml-8 mt-10"
@@ -444,14 +447,14 @@ export default function Index() {
                   <div className="md:flex md:flex-row md:items-center md:space-x-4 space-y-4 md:space-y-0">
                     <div className="w-full md:w-60">
                       <MainActionButton
-                        label="Instant Loan Deposit"
+                        label="Instant Leverage Deposit"
                         handleClick={() => setShowLendModal(true)}
                       />
                     </div>
                     <div className="w-full md:w-60">
                       <SecondaryActionButton
-                        label="Loan Management Modal"
-                        handleClick={() => setShowLendModal(true)}
+                        label="Loan Management"
+                        handleClick={() => setShowLoanManagementModal(true)}
                       />
                     </div>
                   </div>
@@ -459,48 +462,15 @@ export default function Index() {
 
                 <div className="bg-customNeutral200 p-6 rounded-lg">
                   <p className="text-white text-2xl font-bold">Strategies</p>
-                  {vaultData.strategies.map((strategy, i) =>
-                    <div
-                      key={`${strategy.resolver}-${i}`}
-                      className={`py-4 ${i + 1 < vaultData.strategies.length ? "border-b border-customGray500" : ""}`}
-                    >
-                      <div className="w-max flex flex-row items-center mb-2">
-                        <img
-                          src={IconByProtocol[strategy.metadata.name] || "/images/tokens/vcx.svg"}
-                          className={`h-7 w-7 mr-2 mb-1.5 rounded-full border border-white`}
-                        />
-                        <h2 className="text-2xl font-bold text-white">
-                          {strategy.metadata.name}
-                        </h2>
-                      </div>
-                      <p className='text-white'>
-                        {strategy.metadata.description}
-                      </p>
-                      <div className="mt-2 md:flex md:flex-row md:items-center">
-                        <CardStat
-                          id={`${strategy.resolver}-${i}-allocation`}
-                          label="Allocation"
-                          tooltip="Total value of all assets deposited into the vault"
-                        >
-                          <span className="md:flex md:flex-row md:items-center w-full md:space-x-2">
-                            <p className="text-white text-xl leading-6 md:leading-8 text-end md:text-start">
-                              $ {formatAndRoundNumber(strategy.allocation * asset?.price!, asset?.decimals!)}
-                            </p>
-                            <p className="hidden md:block text-white">|</p>
-                            <p className="text-white text-xl leading-6 md:leading-8 text-end md:text-start">
-                              {NumberFormatter.format(roundToTwoDecimalPlaces(strategy.allocationPerc * 100))} %
-                            </p>
-                          </span>
-                        </CardStat>
-                        <CardStat
-                          id={`${strategy.resolver}-${i}-apy`}
-                          label="APY"
-                          value={`${NumberFormatter.format(roundToTwoDecimalPlaces(strategy.apy))} %`}
-                          tooltip="Total value of all assets deposited into the vault"
-                        />
-                      </div>
-                    </div>
-                  )}
+                  {asset &&
+                    vaultData.strategies.map((strategy, i) =>
+                      <Strategy
+                        strategy={strategy}
+                        asset={asset}
+                        i={i}
+                        stratLen={vaultData.strategies.length}
+                      />
+                    )}
 
                   <div className="md:flex md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4 mt-4">
 
@@ -559,4 +529,48 @@ export default function Index() {
         <p className="text-white ml-4 md:ml-8">Loading...</p>
     }
   </NoSSR >
+}
+
+
+function Strategy({ strategy, asset, i, stratLen }: { strategy: Strategy, asset: Token, i: number, stratLen: number }) {
+  return <div
+    key={`${strategy.resolver}-${i}`}
+    className={`py-4 ${i + 1 < stratLen ? "border-b border-customGray500" : ""}`}
+  >
+    <div className="w-max flex flex-row items-center mb-2">
+      <img
+        src={IconByProtocol[strategy.metadata.name] || "/images/tokens/vcx.svg"}
+        className={`h-7 w-7 mr-2 mb-1.5 rounded-full border border-white`}
+      />
+      <h2 className="text-2xl font-bold text-white">
+        {strategy.metadata.name}
+      </h2>
+    </div>
+    <p className='text-white'>
+      {strategy.metadata.description}
+    </p>
+    <div className="mt-2 md:flex md:flex-row md:items-center">
+      <CardStat
+        id={`${strategy.resolver}-${i}-allocation`}
+        label="Allocation"
+        tooltip="Total value of all assets deposited into the vault"
+      >
+        <span className="md:flex md:flex-row md:items-center w-full md:space-x-2">
+          <p className="text-white text-xl leading-6 md:leading-8 text-end md:text-start">
+            $ {formatAndRoundNumber(strategy.allocation * asset?.price!, asset?.decimals!)}
+          </p>
+          <p className="hidden md:block text-white">|</p>
+          <p className="text-white text-xl leading-6 md:leading-8 text-end md:text-start">
+            {NumberFormatter.format(roundToTwoDecimalPlaces(strategy.allocationPerc * 100))} %
+          </p>
+        </span>
+      </CardStat>
+      <CardStat
+        id={`${strategy.resolver}-${i}-apy`}
+        label="APY"
+        value={`${NumberFormatter.format(roundToTwoDecimalPlaces(strategy.apy))} %`}
+        tooltip="Total value of all assets deposited into the vault"
+      />
+    </div>
+  </div>
 }
