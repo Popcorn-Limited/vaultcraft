@@ -23,10 +23,6 @@ import ManageLoanInterface from "@/components/lending/ManageLoanInterface";
 import { MinterByChain, OptionTokenByChain, VCX, VE_VCX, VeTokenByChain, ZapAssetAddressesByChain } from "@/lib/constants";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
-import TabSelector from "@/components/common/TabSelector";
-import InputTokenWithError from "@/components/input/InputTokenWithError";
-import Slider from "rc-slider";
-import Modal from "@/components/modal/Modal";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import CardStat from "@/components/common/CardStat";
 import ProtocolIcon, { IconByProtocol } from "@/components/common/ProtocolIcon";
@@ -142,139 +138,6 @@ export default function Index() {
     {
       (vaultData && tokenOptions.length > 0) ? (
         <>
-          {/* <Modal visibility={[true, () => { }]}>
-            <div className="bg-customNeutral200 p-6 rounded-lg">
-              <p className="text-white text-2xl font-bold mb-4">Loan Deposit</p>
-              <TabSelector
-                className="mb-6"
-                availableTabs={["Deposit", "Withdraw"]}
-                activeTab={"Deposit"}
-                setActiveTab={() => { }}
-              />
-              <InputTokenWithError
-                captionText={"Deposit Amount"}
-                onSelectToken={(option) => { }}
-                onMaxClick={() => { }}
-                chainId={1}
-                value={1000}
-                onChange={() => { }}
-                selectedToken={asset}
-                errorMessage={""}
-                tokenList={tokenOptions.filter((token) =>
-                  gauge?.address
-                    ? token.address !== gauge?.address
-                    : token.address !== vault?.address
-                )}
-                allowSelection={true}
-                allowInput
-              />
-              <p className="text-customGray100">Collateral Value: $ 1000</p>
-
-              <div className="relative py-4">
-                <div className="relative flex justify-center">
-                  <span className="px-4">
-                    <ArrowDownIcon
-                      className="h-10 w-10 p-2 text-customGray500 cursor-pointer hover:text-white hover:border-white"
-                      aria-hidden="true"
-                      onClick={() => { }}
-                    />
-                  </span>
-                </div>
-              </div>
-
-              <InputTokenWithError
-                captionText={"Borrow Amount"}
-                onSelectToken={(option) => { }}
-                onMaxClick={() => { }}
-                chainId={1}
-                value={100}
-                onChange={() => { }}
-                selectedToken={asset}
-                errorMessage={""}
-                tokenList={[]}
-                allowSelection={false}
-                allowInput={false}
-              />
-              <p className="text-customGray100">Borrow Value: $ 100</p>
-              <div className="w-full">
-                <p className="text-white font-normal text-sm">Loan Percentage: {(1000 || 0) / 100} %</p>
-                <div className="flex flex-row items-center justify-between">
-                  <div className="w-full mt-4 ml-4">
-                    <Slider
-                      railStyle={{
-                        backgroundColor: "#FFFFFF",
-                        height: 4,
-                      }}
-                      trackStyle={{
-                        backgroundColor: "#FFFFFF",
-                        height: 4,
-                      }}
-                      handleStyle={{
-                        height: 22,
-                        width: 22,
-                        marginLeft: 0,
-                        marginTop: -9,
-                        borderWidth: 4,
-                        opacity: 1,
-                        borderColor: "#C391FF",
-                        backgroundColor: "#fff",
-                        zIndex: 0,
-                      }}
-                      value={1000}
-                      onChange={() => { }}
-                      max={10000}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="relative py-4">
-                <div className="absolute inset-0 flex items-center" aria-hidden="true">
-                  <div className="w-full border-t border-customGray500" />
-                </div>
-                <div className="relative flex justify-center">
-                  <span className="bg-customNeutral200 px-4">
-                    <ArrowDownIcon
-                      className="h-10 w-10 p-2 text-customGray500 border border-customGray500 rounded-full cursor-pointer hover:text-white hover:border-white"
-                      aria-hidden="true"
-                      onClick={() => { }}
-                    />
-                  </span>
-                </div>
-              </div>
-
-              <InputTokenWithError
-                captionText={"Output Amount"}
-                onSelectToken={(option) => { }}
-                onMaxClick={() => { }}
-                chainId={1}
-                value={20}
-                onChange={() => { }}
-                selectedToken={gauge}
-                errorMessage={""}
-                tokenList={[]}
-                allowSelection={false}
-                allowInput={false}
-              />
-              <div className="mt-6">
-                <p className="text-white font-bold mb-2 text-start">Action Breakdown</p>
-                <div className="bg-customNeutral200 py-2 px-4 rounded-lg space-y-2">
-                  <span className="flex flex-row items-center justify-between text-white">
-                    <p>Net Loan Apy</p>
-                    <p>3.2 %</p>
-                  </span>
-                  <span className="flex flex-row items-center justify-between text-white">
-                    <p>Health Factor</p>
-                    <p>5.42</p>
-                  </span>
-                  <span className="flex flex-row items-center justify-between text-white">
-                    <p>Lending Net Worth</p>
-                    <p>$ 400</p>
-                  </span>
-                </div>
-              </div>
-            </div>
-          </Modal> */}
           <InstantLoanInterface visibilityState={[showLendModal, setShowLendModal]} vaultData={vaultData} />
           <ManageLoanInterface visibilityState={[showLoanManagementModal, setShowLoanManagementModal]} vaultData={vaultData} />
           <div className="min-h-screen">
@@ -464,7 +327,8 @@ export default function Index() {
                   <p className="text-white text-2xl font-bold">Strategies</p>
                   {asset &&
                     vaultData.strategies.map((strategy, i) =>
-                      <Strategy
+                      <StrategyDesc
+                        key={`${strategy.resolver}-${i}`}
                         strategy={strategy}
                         asset={asset}
                         i={i}
@@ -532,9 +396,8 @@ export default function Index() {
 }
 
 
-function Strategy({ strategy, asset, i, stratLen }: { strategy: Strategy, asset: Token, i: number, stratLen: number }) {
+function StrategyDesc({ strategy, asset, i, stratLen }: { strategy: Strategy, asset: Token, i: number, stratLen: number }) {
   return <div
-    key={`${strategy.resolver}-${i}`}
     className={`py-4 ${i + 1 < stratLen ? "border-b border-customGray500" : ""}`}
   >
     <div className="w-max flex flex-row items-center mb-2">

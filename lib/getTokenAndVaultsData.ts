@@ -12,9 +12,9 @@ import { GaugeData, Token, TokenByAddress, TokenType, VaultData, VaultDataByAddr
 import { ERC20Abi, GaugeAbi, OptionTokenByChain, VCX, VCX_LP, VeTokenByChain, ZapAssetAddressesByChain } from "@/lib/constants";
 import { RPC_URLS, networkMap } from "@/lib/utils/connectors";
 import { ProtocolName, YieldOptions } from "vaultcraft-sdk";
-import { AavePoolAddressProviderByChain, AaveUiPoolProviderByChain } from "@/lib/external/aave/interactions";
 import { AavePoolUiAbi } from "@/lib/constants/abi/Aave";
 import { GAUGE_NETWORKS } from "pages/boost";
+import { AavePoolAddressProviderByChain, AaveUiPoolProviderByChain } from "@/lib/external/aave";
 
 const HIDDEN_VAULTS: Address[] = [
   "0xb6cED1C0e5d26B815c3881038B88C829f39CE949",

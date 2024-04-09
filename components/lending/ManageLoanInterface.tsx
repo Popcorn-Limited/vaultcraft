@@ -8,20 +8,18 @@ import { Address, WalletClient, createPublicClient, extractChain, formatUnits, g
 import { NumberFormatter, formatAndRoundNumber, formatNumber, formatToFixedDecimals, safeRound } from "@/lib/utils/formatBigNumber";
 import { roundToTwoDecimalPlaces, validateInput } from "@/lib/utils/helpers";
 import MainActionButton from "@/components/button/MainActionButton";
-import { ArrowRightIcon, Square2StackIcon } from "@heroicons/react/24/outline";
 import { DEFAULT_ASSET, availableZapAssetAtom, tokensAtom, zapAssetsAtom } from "@/lib/atoms";
 import TabSelector from "@/components/common/TabSelector";
 import Modal from "@/components/modal/Modal";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import TokenIcon from "@/components/common/TokenIcon";
-import Title from "@/components/common/Title";
 import { EMPTY_USER_ACCOUNT_DATA, aaveAccountDataAtom, aaveReserveDataAtom } from "@/lib/atoms/lending";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { ActionStep, getAaveActionSteps } from "@/lib/getActionSteps";
 import handleAaveInteraction, { AaveActionType } from "@/lib/external/aave/handleAaveInteractions";
-import { calcUserAccountData, fetchAaveData } from "@/lib/external/aave/interactions";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
 import CardStat from "@/components/common/CardStat";
+import { fetchAaveData, getHealthFactorColor, calcUserAccountData } from "@/lib/external/aave";
 
 const LOAN_TABS = ["Supply", "Borrow", "Repay", "Withdraw"]
 
@@ -353,19 +351,6 @@ export default function ManageLoanInterface({ visibilityState, vaultData }: { vi
       </div>
     </Modal>
   </>
-}
-
-export function getHealthFactorColor(suffix: string, healthFactor: number): string {
-  if (!healthFactor) return `${suffix}-white`
-  if (healthFactor === 0) {
-    return `${suffix}-white`
-  } else if (healthFactor > 3) {
-    return `${suffix}-green-500`
-  } else if (healthFactor > 1.3) {
-    return `${suffix}-yellow-500`
-  } else {
-    return `${suffix}-red-500`
-  }
 }
 
 export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inputAmount, activeTab, chainId }

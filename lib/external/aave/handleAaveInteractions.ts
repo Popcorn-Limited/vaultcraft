@@ -1,7 +1,8 @@
 import { Address } from "viem";
 import { handleAllowance } from "@/lib/approve";
 import { Clients, Token } from "@/lib/types";
-import { AavePoolByChain, borrowFromAave, repayToAave, supplyToAave, withdrawFromAave } from "./interactions";
+import { borrowFromAave, repayToAave, supplyToAave, withdrawFromAave } from "./interactions";
+import { AavePoolByChain } from ".";
 
 export enum AaveActionType {
   Supply,

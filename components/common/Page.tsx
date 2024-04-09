@@ -19,7 +19,7 @@ import { aaveAccountDataAtom, aaveReserveDataAtom } from "@/lib/atoms/lending";
 import { GAUGE_NETWORKS } from "pages/boost";
 import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
 import axios from "axios";
-import { fetchAaveData } from "@/lib/external/aave/interactions";
+import { fetchAaveData } from "@/lib/external/aave";
 import { VCX_LP, VE_VCX, VotingEscrowAbi } from "@/lib/constants";
 import fetchVaultron from "@/lib/vaultron";
 import { polygon } from "viem/chains";

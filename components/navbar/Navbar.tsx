@@ -11,11 +11,12 @@ import NavbarLinks from "@/components/navbar/NavbarLinks";
 import { aaveAccountDataAtom } from "@/lib/atoms/lending";
 import { useAtom } from "jotai";
 import { formatToFixedDecimals } from "@/lib/utils/formatBigNumber";
-import ManageLoanInterface, { getHealthFactorColor } from "@/components/lending/ManageLoanInterface";
 import { vaultsAtom } from "@/lib/atoms/vaults";
 import { useRouter } from "next/router";
 import ResponsiveTooltip from "@/components/common/Tooltip";
 import { VaultData } from "@/lib/types";
+import ManageLoanInterface from "@/components/lending/ManageLoanInterface";
+import { getHealthFactorColor } from "@/lib/external/aave";
 
 export default function Navbar(): JSX.Element {
   const router = useRouter();

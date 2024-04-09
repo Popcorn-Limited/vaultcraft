@@ -13,12 +13,11 @@ import { DEFAULT_ASSET, availableZapAssetAtom, tokensAtom, zapAssetsAtom } from 
 import TabSelector from "@/components/common/TabSelector";
 import Modal from "@/components/modal/Modal";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
-import TokenIcon from "@/components/common/TokenIcon";
 import { EMPTY_USER_ACCOUNT_DATA, aaveAccountDataAtom, aaveReserveDataAtom } from "@/lib/atoms/lending";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { ActionStep, getAaveActionSteps } from "@/lib/getActionSteps";
 import handleAaveInteraction, { AaveActionType } from "@/lib/external/aave/handleAaveInteractions";
-import { calcUserAccountData, fetchAaveData } from "@/lib/external/aave/interactions";
+import { calcUserAccountData, fetchAaveData, getHealthFactorColor } from "@/lib/external/aave";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
 import CardStat from "@/components/common/CardStat";
 import Slider from "rc-slider";
@@ -33,10 +32,13 @@ export default function InstantLoanInterface({ visibilityState, vaultData }: { v
   const { switchNetworkAsync } = useSwitchNetwork();
   const { openConnectModal } = useConnectModal();
 
-  const [reserveData, setAaveReserveData] = useAtom(aaveReserveDataAtom)
-  const [aaveAccountData, setAaveAccountData] = useAtom(aaveAccountDataAtom)
   const [tokens, setTokens] = useAtom(tokensAtom)
 
+  const [reserveData, setAaveReserveData] = useAtom(aaveReserveDataAtom)
+  const [aaveAccountData, setAaveAccountData] = useAtom(aaveAccountDataAtom)
+  const [newUserAccountData, setNewUserAccountData] = useState<UserAccountData>(EMPTY_USER_ACCOUNT_DATA)
+
+  const [assetBorrowable, setAssetBorrowable] = useState(false);
   const [asset, setAsset] = useState<Token>();
   const [vault, setVault] = useState<Token>();
   const [gauge, setGauge] = useState<Token>();
@@ -47,7 +49,12 @@ export default function InstantLoanInterface({ visibilityState, vaultData }: { v
   const [tokenOut, setTokenOut] = useState<Token | null>(null)
 
   useEffect(() => {
-    if (Object.keys(reserveData).length > 0 && Object.keys(vaultData).length > 0 && Object.keys(tokens).length > 0 && reserveData[vaultData.chainId]?.length > 0) {
+    if (
+      Object.keys(reserveData).length > 0 &&
+      Object.keys(vaultData).length > 0 &&
+      Object.keys(tokens).length > 0 &&
+      reserveData[vaultData.chainId]?.length > 0
+    ) {
       // Set Basic Tokens
       setAsset(tokens[vaultData.chainId][vaultData.asset])
       setVault(tokens[vaultData.chainId][vaultData.vault])
@@ -59,13 +66,21 @@ export default function InstantLoanInterface({ visibilityState, vaultData }: { v
         setTokenOut(tokens[vaultData.chainId][vaultData.vault])
       }
 
+      const assetReserveData = reserveData[vaultData.chainId].find(e => e.asset === vaultData.asset)
+      setAssetBorrowable(!!assetReserveData)
+
       const sorted = reserveData[vaultData.chainId].sort((a, b) => a.balance - b.balance)
       setTokenList(sorted.map(e => tokens[vaultData.chainId][e.asset]))
 
       setTokenIn(tokens[vaultData.chainId][reserveData[vaultData.chainId].sort((a, b) => b.balanceValue - a.balanceValue)[0].asset])
-      setTokenMid(reserveData[vaultData.chainId].find(e => e.asset === vaultData.asset)
+
+      setTokenMid(!!assetReserveData
         ? tokens[vaultData.chainId][vaultData.asset]
-        : tokens[vaultData.chainId][sorted[0].asset]
+        : tokens[vaultData.chainId][sorted[0].asset])
+
+      setLtv(!!assetReserveData
+        ? assetReserveData.ltv
+        : sorted[0].ltv
       )
     }
   }, [reserveData, vaultData, tokens])
@@ -81,60 +96,66 @@ export default function InstantLoanInterface({ visibilityState, vaultData }: { v
       setTokenIn(gauge ? gauge! : vault!)
 
       const sorted = reserveData[vaultData.chainId].sort((a, b) => a.borrowValue - b.borrowValue)
-      setTokenMid(reserveData[vaultData.chainId].find(e => e.asset === vaultData.asset)
+      setTokenMid(assetBorrowable
         ? tokens[vaultData.chainId][vaultData.asset]
         : tokens[vaultData.chainId][sorted[0].asset]
       )
       setTokenOut(tokens[vaultData.chainId][reserveData[vaultData.chainId][0].asset])
+
+      // Default repayment rate is 100%
+      setRatio(100);
     } else {
       // Switch to "Deposit"
       setTokenIn(tokens[vaultData.chainId][reserveData[vaultData.chainId].sort((a, b) => b.balanceValue - a.balanceValue)[0].asset])
       setTokenOut(gauge ? gauge! : vault!)
 
       const sorted = reserveData[vaultData.chainId].sort((a, b) => a.balance - b.balance)
-      setTokenMid(reserveData[vaultData.chainId].find(e => e.asset === vaultData.asset)
+      setTokenMid(assetBorrowable
         ? tokens[vaultData.chainId][vaultData.asset]
         : tokens[vaultData.chainId][sorted[0].asset]
       )
+
+      if (!assetBorrowable) {
+        setLtv(sorted[0].ltv)
+      }
+
+      setRatio(0);
     }
 
     setIsDeposit(!isDeposit);
     setAmountIn("0");
     setAmountMid("0");
     setAmountOut("0");
-    setLtv(0);
     setStepCounter(0);
   }
 
-  function handleTokenSelect(input: Token) {
-    // switch (activeTab) {
-    //   case "Supply":
-    //     setSupplyToken(input)
-    //     setInputToken(input)
-    //     return;
-    //   case "Borrow":
-    //     setBorrowToken(input)
-    //     setInputToken(input)
-    //     return;
-    //   case "Repay":
-    //     setRepayToken(input)
-    //     setInputToken(input)
-    //     return;
-    //   case "Withdraw":
-    //     setWithdrawToken(input)
-    //     setInputToken(input)
-    //     return;
-    //   default:
-    //     return;
-    // }
+  function handleTokenSelect(input: Token, type: "in" | "mid" | "out") {
+    handleChangeInput({ currentTarget: { value: 0 } })
+
+    switch (type) {
+      case "in":
+        setTokenIn(input)
+        return
+      case "mid":
+        setTokenMid(input)
+        setLtv(reserveData[vaultData.chainId].find(e => e.asset === input.address)?.ltv!)
+        return
+      case "out":
+        setTokenOut(input)
+      default:
+        return
+    }
   }
 
   const [amountIn, setAmountIn] = useState<string>("0");
   const [amountMid, setAmountMid] = useState<string>("0");
   const [amountOut, setAmountOut] = useState<string>("0");
 
+  const [oldAmountIn, setOldAmountIn] = useState<number>(0);
+  const [oldAmountMid, setOldAmountMid] = useState<number>(0);
+
   const [ltv, setLtv] = useState<number>(0);
-  const [newUserAccountData, setNewUserAccountData] = useState<UserAccountData>(EMPTY_USER_ACCOUNT_DATA)
+  const [ratio, setRatio] = useState<number>(0);
 
   function handleChangeInput(e: any) {
     if (!tokenIn || !tokenMid || !tokenOut) return
@@ -142,9 +163,9 @@ export default function InstantLoanInterface({ visibilityState, vaultData }: { v
     let valueIn = e.currentTarget.value
     valueIn = validateInput(valueIn).isValid ? valueIn : "0"
 
-    let valueMid = ((Number(valueIn) * tokenIn.price) * (ltv / 100)) / tokenMid.price;
+    let valueMid = ((Number(valueIn) * tokenIn.price) * (ratio / 100)) / tokenMid.price;
+    const reserveTokenData = reserveData[vaultData.chainId].find(d => d.asset === tokenMid?.address)
     if (!isDeposit) {
-      const reserveTokenData = reserveData[vaultData.chainId].find(d => d.asset === tokenMid?.address)
       if (reserveTokenData) {
         valueMid = valueMid > reserveTokenData.borrowAmount ? reserveTokenData.borrowAmount : valueMid;
       }
@@ -155,36 +176,45 @@ export default function InstantLoanInterface({ visibilityState, vaultData }: { v
     setAmountIn(valueIn)
     setAmountMid(String(valueMid))
     setAmountOut(String(valueOut))
+
+    // calc preview
+    const newReserveData = [...reserveData[vaultData.chainId]]
+    const previewAmountIn = Number(valueIn) - oldAmountIn
+    const previewAmountMid = Number(valueMid) - oldAmountMid
+
+    setOldAmountIn(Number(valueIn))
+    setOldAmountMid(valueMid)
+
+    const userLtv = aaveAccountData[vaultData.chainId].ltv > 0
+      // user has an account already 
+      ? aaveAccountData[vaultData.chainId].ltv
+      // use the borrow token ltv
+      : reserveTokenData?.ltv
+
+    if (isDeposit) {
+      newReserveData[newReserveData.findIndex(e => e.asset === tokenIn.address)].supplyAmount += previewAmountIn
+      newReserveData[newReserveData.findIndex(e => e.asset === tokenMid.address)].borrowAmount += previewAmountMid
+
+      setNewUserAccountData({ ...calcUserAccountData(newReserveData, tokens[vaultData.chainId], userLtv!) })
+
+    } else {
+      newReserveData[newReserveData.findIndex(e => e.asset === tokenMid.address)].borrowAmount -= previewAmountMid
+
+      setNewUserAccountData(calcUserAccountData(newReserveData, tokens[vaultData.chainId], userLtv!))
+    }
   };
 
   function handleSlider(e: any) {
-    setLtv(e as number)
+    setRatio(e as number)
     handleChangeInput({ currentTarget: { value: amountIn } })
   }
 
   function handleMaxClick() {
     if (!tokenIn) return
-    // switch (activeTab) {
-    //   case "Withdraw":
-    //     handleChangeInput({
-    //       currentTarget: {
-    //         value:
-    //           String((reserveData[vaultData.chainId].find(d => d.asset === tokenIn?.address)?.balance || 0) * (10 ** tokenIn.decimals))
-    //       }
-    //     })
-    //   case "Repay":
-    //     handleChangeInput({
-    //       currentTarget: {
-    //         value:
-    //           String((reserveData[vaultData.chainId].find(d => d.asset === tokenIn?.address)?.borrowAmount || 0) * (10 ** tokenIn.decimals))
-    //       }
-    //     })
-    //   default:
-    //     const stringBal = tokenIn.balance.toLocaleString("fullwide", { useGrouping: false })
-    //     const rounded = safeRound(BigInt(stringBal), tokenIn.decimals)
-    //     const formatted = formatUnits(rounded, tokenIn.decimals)
-    //     handleChangeInput({ currentTarget: { value: formatted } })
-    // }
+    const stringBal = tokenIn.balance.toLocaleString("fullwide", { useGrouping: false })
+    const rounded = safeRound(BigInt(stringBal), tokenIn.decimals)
+    const formatted = formatUnits(rounded, tokenIn.decimals)
+    handleChangeInput({ currentTarget: { value: formatted } })
   }
 
   async function handleMainAction() {
@@ -264,7 +294,7 @@ export default function InstantLoanInterface({ visibilityState, vaultData }: { v
             <>
               <InputTokenWithError
                 captionText={isDeposit ? "Deposit Amount" : "Withdrawal Amount"}
-                onSelectToken={handleTokenSelect}
+                onSelectToken={(t) => handleTokenSelect(t, "in")}
                 onMaxClick={handleMaxClick}
                 chainId={vaultData.chainId}
                 value={amountIn}
@@ -292,7 +322,7 @@ export default function InstantLoanInterface({ visibilityState, vaultData }: { v
 
               <InputTokenWithError
                 captionText={isDeposit ? "Borrow Amount" : "Repay Amount"}
-                onSelectToken={handleTokenSelect}
+                onSelectToken={(t) => handleTokenSelect(t, "mid")}
                 onMaxClick={() => { }}
                 chainId={vaultData.chainId}
                 value={amountMid}
@@ -310,7 +340,7 @@ export default function InstantLoanInterface({ visibilityState, vaultData }: { v
 
               <div className="w-full mt-4">
                 <p className="text-white font-normal text-sm text-start">
-                  {isDeposit ? `Loan To Value Ratio: ${ltv} / ${reserveData[vaultData.chainId][0].ltv}` : `Repayment Percentage: ${ltv} / 100`} %
+                  {isDeposit ? `Loan To Value Ratio: ${ratio} / ${ltv}` : `Repayment Percentage: ${ratio} / 100`} %
                 </p>
                 <div className="flex flex-row items-center justify-between">
                   <div className="w-full mt-2">
@@ -334,7 +364,7 @@ export default function InstantLoanInterface({ visibilityState, vaultData }: { v
                         backgroundColor: "#fff",
                         zIndex: 0,
                       }}
-                      value={ltv}
+                      value={ratio}
                       onChange={handleSlider}
                       max={isDeposit ? reserveData[vaultData.chainId][0].ltv : 100}
                     />
@@ -359,8 +389,8 @@ export default function InstantLoanInterface({ visibilityState, vaultData }: { v
 
               <InputTokenWithError
                 captionText={"Output Amount"}
-                onSelectToken={handleTokenSelect}
-                onMaxClick={handleMaxClick}
+                onSelectToken={(t) => handleTokenSelect(t, "out")}
+                onMaxClick={() => { }}
                 chainId={vaultData.chainId}
                 value={amountOut}
                 onChange={() => { }}
@@ -376,19 +406,58 @@ export default function InstantLoanInterface({ visibilityState, vaultData }: { v
 
               <div className="mt-6">
                 <p className="text-white font-bold mb-2 text-start">Action Breakdown</p>
-                <div className="bg-customNeutral200 py-2 px-4 rounded-lg space-y-2">
-                  <span className="flex flex-row items-center justify-between text-white">
-                    <p>Net Loan Apy</p>
-                    <p>3.2 %</p>
-                  </span>
-                  <span className="flex flex-row items-center justify-between text-white">
-                    <p>Health Factor</p>
-                    <p>5.42</p>
-                  </span>
-                  <span className="flex flex-row items-center justify-between text-white">
-                    <p>Lending Net Worth</p>
-                    <p>$ 400</p>
-                  </span>
+                <div className="w-full md:flex md:flex-wrap md:justify-between md:gap-4 text-start">
+                  <CardStat
+                    id={`instant-health-factor`}
+                    label="Health Factor"
+                    tooltip="Health Factor Tooltip"
+                  >
+                    <span className="w-full text-end md:text-start">
+                      <p className="text-white text-xl">
+                        {formatToFixedDecimals(aaveAccountData[vaultData.chainId].healthFactor || 0, 2)}
+                      </p>
+                      {Number(amountMid) > 0 &&
+                        <>
+                          <p className={`text-sm ${getHealthFactorColor("text", newUserAccountData.healthFactor)}`}>
+                            {formatToFixedDecimals(newUserAccountData.healthFactor || 0, 2)}
+                          </p>
+                        </>}
+                    </span>
+                  </CardStat>
+                  <CardStat
+                    id={`instant-net-apy`}
+                    label="Net Apy"
+                    tooltip="Health Factor Tooltip"
+                  >
+                    <span className="w-full text-end md:text-start">
+                      <p className="text-white text-xl">
+                        {formatToFixedDecimals(aaveAccountData[vaultData.chainId].netRate || 0, 2)} %
+                      </p>
+                      {Number(amountMid) > 0 &&
+                        <>
+                          <p className={`text-sm text-white`}>
+                            {formatToFixedDecimals(newUserAccountData.netRate || 0, 2)} %
+                          </p>
+                        </>}
+                    </span>
+                  </CardStat>
+                  <CardStat
+                    id={`instant-nlv`}
+                    label="Net Loan Value"
+                    tooltip="Health Factor Tooltip"
+                  >
+                    <span className="w-full text-end md:text-start">
+                      <p className="text-white text-xl">
+                        $ {formatNumber(aaveAccountData[vaultData.chainId].netValue || 0)}
+                      </p>
+                      {Number(amountMid) > 0 &&
+                        <>
+                          <p className={`text-sm text-white`}>
+                            $ {formatNumber(newUserAccountData.netValue || 0)}
+                          </p>
+                        </>}
+                    </span>
+                  </CardStat>
                 </div>
               </div>
 
@@ -405,256 +474,4 @@ export default function InstantLoanInterface({ visibilityState, vaultData }: { v
       </div>
     </Modal>
   </>
-}
-
-export function getHealthFactorColor(suffix: string, healthFactor: number): string {
-  if (!healthFactor) return `${suffix}-white`
-  if (healthFactor === 0) {
-    return `${suffix}-white`
-  } else if (healthFactor > 3) {
-    return `${suffix}-green-500`
-  } else if (healthFactor > 1.3) {
-    return `${suffix}-yellow-500`
-  } else {
-    return `${suffix}-red-500`
-  }
-}
-
-export function AaveUserAccountData({ supplyToken, borrowToken, tokenIn, amountIn, activeTab, chainId }
-  : { supplyToken: Token, borrowToken: Token, tokenIn: Token, amountIn: number, activeTab: string, chainId: number }): JSX.Element {
-  const [tokens, setTokens] = useAtom(tokensAtom)
-  const [reserveData] = useAtom(aaveReserveDataAtom)
-  const [userAccountData] = useAtom(aaveAccountDataAtom)
-
-  const [supplyReserve, setSupplyReserve] = useState<ReserveData>()
-  const [borrowReserve, setBorrowReserve] = useState<ReserveData>()
-
-  useEffect(() => {
-    if (reserveData) {
-      if (supplyToken) {
-        setSupplyReserve(reserveData[chainId].find(e => e.asset === supplyToken.address))
-      }
-      if (reserveData) {
-        setBorrowReserve(reserveData[chainId].find(e => e.asset === borrowToken.address))
-      }
-    }
-  }, [supplyToken, borrowToken, reserveData])
-
-  const [newUserAccountData, setNewUserAccountData] = useState<UserAccountData>(EMPTY_USER_ACCOUNT_DATA)
-  const [oldInputAmount, setOldInputAmount] = useState<number>(0);
-
-  useEffect(() => {
-    if (tokenIn.symbol === "none") return
-    const newReserveData = [...reserveData[chainId]]
-    const value = Number(amountIn) - oldInputAmount
-
-    console.log({ tokenIn, newReserveData, amountIn, value })
-
-    setOldInputAmount(Number(amountIn))
-
-    switch (activeTab) {
-      case "Supply":
-        newReserveData[newReserveData.findIndex(e => e.asset === tokenIn.address)].supplyAmount += value
-
-        setNewUserAccountData({ ...calcUserAccountData(newReserveData, tokens[chainId], userAccountData[chainId].ltv) })
-        return;
-      case "Borrow":
-        newReserveData[newReserveData.findIndex(e => e.asset === tokenIn.address)].borrowAmount += value
-
-        setNewUserAccountData({ ...calcUserAccountData(newReserveData, tokens[chainId], userAccountData[chainId].ltv) })
-        return;
-      case "Repay":
-        newReserveData[newReserveData.findIndex(e => e.asset === tokenIn.address)].borrowAmount -= value
-
-        setNewUserAccountData(calcUserAccountData(newReserveData, tokens[chainId], userAccountData[chainId].ltv))
-        return;
-      case "Withdraw":
-        newReserveData[newReserveData.findIndex(e => e.asset === tokenIn.address)].supplyAmount -= value
-
-        setNewUserAccountData(calcUserAccountData(newReserveData, tokens[chainId], userAccountData[chainId].ltv))
-        return;
-      default:
-        return;
-    }
-  }, [amountIn, activeTab])
-
-  return (supplyReserve && borrowReserve) ? (
-    <>
-      <div className="w-full space-y-4">
-        <div className="border border-customNeutral100 rounded-lg p-4">
-          <div className="w-full flex flex-row justify-between">
-
-            <div className="w-full md:flex md:flex-wrap md:justify-between md:gap-4 text-start">
-              <CardStat
-                id={`health-factor`}
-                label="Health Factor"
-                tooltip="Health Factor Tooltip"
-              >
-                <span className="w-full text-end md:text-start">
-                  <p className="text-white text-xl">
-                    {formatToFixedDecimals(userAccountData[chainId].healthFactor || 0, 2)}
-                  </p>
-                  {amountIn > 0 &&
-                    <>
-                      <p className={`text-sm ${getHealthFactorColor("text", newUserAccountData.healthFactor)}`}>
-                        {formatToFixedDecimals(newUserAccountData.healthFactor || 0, 2)}
-                      </p>
-                    </>}
-                </span>
-              </CardStat>
-              <CardStat
-                id={`av-credit`}
-                label="Av. Credit"
-
-                tooltip="Health Factor Tooltip"
-              >
-                <span className="w-full text-end md:text-start">
-                  <p className="text-white text-xl">
-                    $ {formatToFixedDecimals(((userAccountData[chainId].ltv * userAccountData[chainId].totalCollateral) - userAccountData[chainId].totalBorrowed) || 0, 2)}
-                  </p>
-                  {amountIn > 0 &&
-                    <>
-                      <p className={`text-sm text-white`}>
-                        $ {formatToFixedDecimals(((newUserAccountData.ltv * newUserAccountData.totalCollateral) - newUserAccountData.totalBorrowed) || 0, 2)}
-                      </p>
-                    </>}
-                </span>
-              </CardStat>
-              <CardStat
-                id={`net-apy`}
-                label="Net Apy"
-                tooltip="Health Factor Tooltip"
-              >
-                <span className="w-full text-end md:text-start">
-                  <p className="text-white text-xl">
-                    {formatToFixedDecimals(userAccountData[chainId].netRate || 0, 2)} %
-                  </p>
-                  {amountIn > 0 &&
-                    <>
-                      <p className={`text-sm text-white`}>
-                        {formatToFixedDecimals(newUserAccountData.netRate || 0, 2)} %
-                      </p>
-                    </>}
-                </span>
-              </CardStat>
-              <CardStat
-                id={`collateral`}
-                label="Collateral"
-                tooltip="Health Factor Tooltip"
-              >
-                <span className="w-full text-end md:text-start">
-                  <p className="text-white text-xl">
-                    $ {formatToFixedDecimals(userAccountData[chainId].totalCollateral || 0, 2)}
-                  </p>
-                  {amountIn > 0 &&
-                    <>
-                      <p className={`text-sm text-white`}>
-                        $ {formatToFixedDecimals(newUserAccountData.totalCollateral || 0, 2)}
-                      </p>
-                    </>}
-                </span>
-              </CardStat>
-              <CardStat
-                id={`borrowed`}
-                label="Borrowed"
-                tooltip="Health Factor Tooltip"
-              >
-                <span className="w-full text-end md:text-start">
-                  <p className="text-white text-xl">
-                    $ {formatNumber(userAccountData[chainId].totalBorrowed || 0)}
-                  </p>
-                  {amountIn > 0 &&
-                    <>
-                      <p className={`text-sm text-white`}>
-                        $ {formatNumber(newUserAccountData.totalBorrowed || 0)}
-                      </p>
-                    </>}
-                </span>
-              </CardStat>
-              <CardStat
-                id={`nlv`}
-                label="Net Loan Value"
-                tooltip="Health Factor Tooltip"
-              >
-                <span className="w-full text-end md:text-start">
-                  <p className="text-white text-xl">
-                    $ {formatNumber(userAccountData[chainId].netValue || 0)}
-                  </p>
-                  {amountIn > 0 &&
-                    <>
-                      <p className={`text-sm text-white`}>
-                        $ {formatNumber(newUserAccountData.netValue || 0)}
-                      </p>
-                    </>}
-                </span>
-              </CardStat>
-            </div>
-          </div>
-        </div>
-
-
-        <div className="border border-customNeutral100 rounded-lg p-4">
-          <div className="w-full flex flex-row justify-between">
-
-            <div className="w-full md:flex md:flex-wrap md:justify-between md:gap-4 text-start">
-              <CardStat
-                id={`lending-apy`}
-                label="Lending Apy"
-                tooltip="Health Factor Tooltip"
-              >
-                <div className="w-full flex justify-end md:justify-start">
-                  <span className="flex flex-row items-center">
-                    <TokenIcon token={supplyToken} icon={supplyToken.logoURI} chainId={10} imageSize={"w-6 h-6 mb-0.5"} />
-                    <p className="ml-2 mb-1.5 text-xl text-white">
-                      {formatToFixedDecimals(supplyReserve.supplyRate || 0, 2)} %
-                    </p>
-                  </span>
-                </div>
-              </CardStat>
-              <CardStat
-                id={`borrow-apy`}
-                label="Borrow Apy"
-                tooltip="Health Factor Tooltip"
-              >
-                <div className="w-full flex justify-end md:justify-start">
-                  <span className="flex flex-row items-center">
-                    <TokenIcon token={borrowToken} icon={borrowToken.logoURI} chainId={10} imageSize={"w-6 h-6 mb-0.5"} />
-                    <p className="ml-2 mb-1.5 text-xl text-white">
-                      {formatToFixedDecimals(borrowReserve.borrowRate || 0, 2)} %
-                    </p>
-                  </span>
-                </div>
-              </CardStat>
-              <CardStat
-                id={`none`}
-                label=""
-                value=""
-                tooltip=""
-              />
-              <CardStat
-                id={`max-ltv`}
-                label="Max LTV"
-                value={`${supplyReserve.ltv.toFixed(2)} %`}
-                tooltip="Health Factor Tooltip"
-              />
-              <CardStat
-                id={`liq-threshold`}
-                label="Liquidation Threshold"
-                value={`${supplyReserve.liquidationThreshold.toFixed(2)} %`}
-                tooltip="Health Factor Tooltip"
-              />
-              <CardStat
-                id={`liq-penalty`}
-                label="Liquidation Penalty"
-                value={`${supplyReserve.liquidationPenalty.toFixed(2)} %`}
-                tooltip="Health Factor Tooltip"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </>
-  ) : <div className="w-full space-y-4">
-    <p className="text-white">Data loading...</p>
-  </div>
 }
