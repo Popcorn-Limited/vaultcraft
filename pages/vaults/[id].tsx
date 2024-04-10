@@ -26,7 +26,6 @@ import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import CardStat from "@/components/common/CardStat";
 import ProtocolIcon, { IconByProtocol } from "@/components/common/ProtocolIcon";
-import InstantLoanInterface from "@/components/lending/InstantLoanInterface";
 
 export default function Index() {
   const router = useRouter();
@@ -95,7 +94,6 @@ export default function Index() {
   const [gaugeRewards, setGaugeRewards] = useAtom(gaugeRewardsAtom);
 
   const [showLoanManagementModal, setShowLoanManagementModal] = useState(false)
-  const [showLendModal, setShowLendModal] = useState(false)
 
   async function handleClaim() {
     if (!vaultData || !account) return
@@ -138,7 +136,6 @@ export default function Index() {
     {
       (vaultData && tokenOptions.length > 0) ? (
         <>
-          <InstantLoanInterface visibilityState={[showLendModal, setShowLendModal]} vaultData={vaultData} />
           <ManageLoanInterface visibilityState={[showLoanManagementModal, setShowLoanManagementModal]} vaultData={vaultData} />
           <div className="min-h-screen">
             <button
@@ -308,12 +305,6 @@ export default function Index() {
                     The borrow modal allows liquidity providers to borrow against their collateral and deposit more into Smart Vaults, enhancing capital efficiency and premiums earned.
                   </p>
                   <div className="md:flex md:flex-row md:items-center md:space-x-4 space-y-4 md:space-y-0">
-                    <div className="w-full md:w-60">
-                      <MainActionButton
-                        label="Instant Leverage Deposit"
-                        handleClick={() => setShowLendModal(true)}
-                      />
-                    </div>
                     <div className="w-full md:w-60">
                       <SecondaryActionButton
                         label="Loan Management"
