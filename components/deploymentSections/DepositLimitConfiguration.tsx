@@ -4,7 +4,7 @@ import { Switch } from "@headlessui/react";
 import Input from "@/components/input/Input";
 import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
 import { assetAtom, limitAtom } from "@/lib/atoms";
-import { validateInput } from "@/lib/helpers";
+import { validateInput } from "@/lib/utils/helpers";
 
 function DepositLimitConfiguration() {
   const [asset] = useAtom(assetAtom);

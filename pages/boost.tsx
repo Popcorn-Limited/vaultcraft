@@ -26,6 +26,10 @@ import SearchBar from "@/components/input/SearchBar";
 import VaultsSorting from "@/components/vault/VaultsSorting";
 import useNetworkFilter from "@/lib/useNetworkFilter";
 import { VOTING_ESCROW } from "@/lib/constants";
+import Modal from "@/components/modal/Modal";
+import TabSelector from "@/components/common/TabSelector";
+import InputTokenWithError from "@/components/input/InputTokenWithError";
+import BridgeModal from "@/components/bridge/BridgeModal";
 
 const HIDDEN_VAULTS = [
   // eth
@@ -64,8 +68,10 @@ function VePopContainer() {
 
   const [showLockModal, setShowLockModal] = useState(false);
   const [showMangementModal, setShowMangementModal] = useState(false);
-  const [showOptionTokenModal, setShowOptionTokenModal] = useState(false);
   const [showLpModal, setShowLpModal] = useState(false);
+  const [showExerciseModal, setShowExerciseModal] = useState(false);
+  const [showClaimModal, setShowClaimModal] = useState(false);
+  const [showBridgeModal, setShowBridgeModal] = useState(false);
 
   useEffect(() => {
     async function initialSetup() {
@@ -103,7 +109,7 @@ function VePopContainer() {
           publicClient,
           account: account as Address,
         });
-        
+
         console.log({ canCastVote, canVoteOnGauges, state: !!account && Number(veBal?.value) > 0 && canCastVote })
 
         setCanVoteOnGauges(canVoteOnGauges);
@@ -146,10 +152,14 @@ function VePopContainer() {
         show={[showMangementModal, setShowMangementModal]}
         setShowLpModal={setShowLpModal}
       />
-      <OptionTokenModal
-        show={[showOptionTokenModal, setShowOptionTokenModal]}
-      />
       <LpModal show={[showLpModal, setShowLpModal]} />
+      <OptionTokenModal
+        show={[showExerciseModal, setShowExerciseModal]}
+      />
+      <Modal visibility={[showClaimModal, setShowClaimModal]}>
+        <OptionTokenInterface />
+      </Modal>
+      <BridgeModal show={[showBridgeModal, setShowBridgeModal]} />
       <div className="static">
         <section className="py-10 px-4 md:px-8 border-t md:border-t-0 md:border-b border-customNeutral100 lg:flex lg:flex-row items-center justify-between text-white">
           <div className="lg:w-[1050px]">
@@ -176,9 +186,10 @@ function VePopContainer() {
             setShowLockModal={setShowLockModal}
             setShowMangementModal={setShowMangementModal}
             setShowLpModal={setShowLpModal}
+            setShowBridgeModal={setShowBridgeModal}
           />
           <div className="w-full lg:w-1/2">
-            <OptionTokenInterface setShowOptionTokenModal={setShowOptionTokenModal} />
+            <OptionTokenInterface setShowOptionTokenModal={setShowExerciseModal} />
           </div>
         </section>
 

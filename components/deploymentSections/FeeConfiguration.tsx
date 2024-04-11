@@ -1,7 +1,7 @@
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { feeAtom } from "@/lib/atoms/fees";
-import { validateInput } from "@/lib/helpers";
+import { validateInput } from "@/lib/utils/helpers";
 import Fieldset from "@/components/input/Fieldset";
 import Input from "@/components/input/Input";
 import { ADDRESS_ZERO } from "@/lib/constants";

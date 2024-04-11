@@ -29,12 +29,14 @@ interface StakingInterfaceProps {
   setShowLockModal: Dispatch<SetStateAction<boolean>>;
   setShowMangementModal: Dispatch<SetStateAction<boolean>>;
   setShowLpModal: Dispatch<SetStateAction<boolean>>;
+  setShowBridgeModal: Dispatch<SetStateAction<boolean>>;
 }
 
 export default function StakingInterface({
   setShowLockModal,
   setShowMangementModal,
   setShowLpModal,
+  setShowBridgeModal
 }: StakingInterfaceProps): JSX.Element {
   const { address: account } = useAccount();
 
@@ -151,6 +153,10 @@ export default function StakingInterface({
           <SecondaryActionButton
             label="Get VCX-LP"
             handleClick={() => setShowLpModal(true)}
+          />
+          <SecondaryActionButton
+            label="Bridge VCX"
+            handleClick={() => setShowBridgeModal(true)}
           />
         </div>
       </div>
