@@ -19,7 +19,7 @@ export default function ActionSteps({
   return (
     <div className="flex flex-row items-center">
       {steps.map((step, i) => (
-        <div key={step.label} className="flex flex-row items-center w-14 h-8">
+        <div key={step.label} className="flex flex-row items-center h-8">
           <div
             className={`w-8 h-8 rounded-full border leading-none flex justify-center items-center cursor-default bg-opacity-40
               ${

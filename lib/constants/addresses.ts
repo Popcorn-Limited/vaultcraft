@@ -64,6 +64,18 @@ export const OptionTokenByChain: AddressByChain = {
   42161: "0x59a696bF34Eae5AD8Fd472020e3Bed410694a230"
 }
 
+export const VcxByChain: AddressByChain = {
+  1: VCX,
+  10: "0xD41d34d6b50785fDC025caD971fE940B8AA1bE45",
+  42161: "0x59a696bF34Eae5AD8Fd472020e3Bed410694a230"
+}
+
+export const WethByChain: AddressByChain = {
+  1: WETH,
+  10: "0x4200000000000000000000000000000000000006",
+  42161: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"
+}
+
 export const GaugeFactoryByChain: AddressByChain = {
   1: "0x8133cA3AB91B3FE3792992eA69720Ca6d3A92163",
   10: "0x6aa03ebAb1e9CB8d44Fd79153d3a258FFd48169A", // Same as Minter

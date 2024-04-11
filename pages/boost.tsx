@@ -8,17 +8,17 @@ import {
 import { Address, WalletClient } from "viem";
 import { useEffect, useState } from "react";
 import { hasAlreadyVoted } from "@/lib/gauges/hasAlreadyVoted";
-import { Token, VaultData } from "@/lib/types";
+import { VaultData } from "@/lib/types";
 import StakingInterface from "@/components/boost/StakingInterface";
 import { sendVotes } from "@/lib/gauges/interactions";
 import Gauge from "@/components/boost/Gauge";
 import LockModal from "@/components/boost/modals/lock/LockModal";
 import ManageLockModal from "@/components/boost/modals/manage/ManageLockModal";
-import OptionTokenModal from "@/components/boost/modals/optionToken/OptionTokenModal";
+import OptionTokenExerciseModal from "@/components/optionToken/exercise/OptionTokenExerciseModal";
 import MainActionButton from "@/components/button/MainActionButton";
 import { useAtom } from "jotai";
 import { vaultsAtom } from "@/lib/atoms/vaults";
-import OptionTokenInterface from "@/components/boost/OptionTokenInterface";
+import OptionTokenInterface from "@/components/optionToken/OptionTokenInterface";
 import LpModal from "@/components/boost/modals/lp/LpModal";
 import { voteUserSlopes } from "@/lib/gauges/useGaugeWeights";
 import NetworkFilter from "@/components/network/NetworkFilter";
@@ -27,8 +27,6 @@ import VaultsSorting from "@/components/vault/VaultsSorting";
 import useNetworkFilter from "@/lib/useNetworkFilter";
 import { VOTING_ESCROW } from "@/lib/constants";
 import Modal from "@/components/modal/Modal";
-import TabSelector from "@/components/common/TabSelector";
-import InputTokenWithError from "@/components/input/InputTokenWithError";
 import BridgeModal from "@/components/bridge/BridgeModal";
 
 const HIDDEN_VAULTS = [
@@ -153,7 +151,7 @@ function VePopContainer() {
         setShowLpModal={setShowLpModal}
       />
       <LpModal show={[showLpModal, setShowLpModal]} />
-      <OptionTokenModal
+      <OptionTokenExerciseModal
         show={[showExerciseModal, setShowExerciseModal]}
       />
       <Modal visibility={[showClaimModal, setShowClaimModal]}>

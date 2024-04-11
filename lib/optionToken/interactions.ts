@@ -7,6 +7,7 @@ import { PublicClient } from "wagmi";
 interface ExerciseOPopProps {
   amount: bigint;
   maxPaymentAmount: bigint;
+  address: Address,
   account: Address;
   clients: Clients;
 }
@@ -14,6 +15,7 @@ interface ExerciseOPopProps {
 export async function exerciseOPop({
   amount,
   maxPaymentAmount,
+  address,
   account,
   clients,
 }: ExerciseOPopProps): Promise<boolean> {
@@ -22,11 +24,11 @@ export async function exerciseOPop({
     simulationResponse: await simulateCall({
       account,
       contract: {
-        address: OptionTokenByChain[1],
+        address: address,
         abi: OptionTokenAbi,
       },
       functionName: "exercise",
-      publicClient: clients.publicClient  as PublicClient,
+      publicClient: clients.publicClient as PublicClient,
       args: [amount, maxPaymentAmount, account],
     }),
     clients,

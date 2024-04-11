@@ -17,10 +17,11 @@ import VaultsSorting from "@/components/vault/VaultsSorting";
 import SearchBar from "@/components/input/SearchBar";
 import { OptionTokenByChain, VCX } from "@/lib/constants";
 import Modal from "@/components/modal/Modal";
-import OptionTokenInterface from "@/components/boost/OptionTokenInterface";
+import OptionTokenInterface from "@/components/optionToken/OptionTokenInterface";
 import { VaultData } from "@/lib/types";
 import { gaugeRewardsAtom, networthAtom, tokensAtom, tvlAtom } from "@/lib/atoms";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
+import OptionTokenExerciseModal from "@/components/optionToken/exercise/OptionTokenExerciseModal";
 
 interface VaultsContainerProps {
   hiddenVaults: Address[];
@@ -59,6 +60,7 @@ export default function VaultsContainer({
   );
   const [searchTerm, setSearchTerm] = useState("");
   const [showOptionTokenModal, setShowOptionTokenModal] = useState(false);
+  const [showExerciseModal, setShowExerciseModal] = useState(false);
 
   function handleSearch(value: string) {
     setSearchTerm(value);
@@ -69,6 +71,7 @@ export default function VaultsContainer({
       <Modal visibility={[showOptionTokenModal, setShowOptionTokenModal]}>
         <OptionTokenInterface />
       </Modal>
+      <OptionTokenExerciseModal show={[showExerciseModal, setShowExerciseModal]} />
       <section className="md:border-b border-customNeutral100 md:flex md:flex-row items-center justify-between py-10 px-4 md:px-8 md:gap-4">
         <div className="w-full md:w-max">
           <h1 className="text-5xl font-normal m-0 mb-4 md:mb-2 leading-0 text-white md:text-3xl leading-none">
@@ -139,7 +142,7 @@ export default function VaultsContainer({
               />
               <SecondaryActionButton
                 label="Exercise oVCX"
-                handleClick={() => setShowOptionTokenModal(true)}
+                handleClick={() => setShowExerciseModal(true)}
               />
             </div>
           </div>
@@ -150,7 +153,7 @@ export default function VaultsContainer({
             />
             <SecondaryActionButton
               label="Exercise oVCX"
-              handleClick={() => setShowOptionTokenModal(true)}
+              handleClick={() => setShowExerciseModal(true)}
             />
           </div>
         </div>
