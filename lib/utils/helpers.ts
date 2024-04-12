@@ -39,6 +39,7 @@ export async function handleCallResult({
       showSuccessToast(successMessage);
       return true;
     } catch (error: any) {
+      console.log({ error })
       showErrorToast(error.shortMessage);
       return false;
     }
@@ -183,6 +184,7 @@ export async function simulateCall({
     });
     return { request: request, success: true, error: null };
   } catch (error: any) {
+    console.log({ simError: error })
     return { request: null, success: false, error: error.shortMessage };
   }
 }
