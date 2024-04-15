@@ -12,6 +12,6 @@ export async function vcx({
     return Number(data.pair.priceUsd)
   } catch(e){
     console.log("error fetching vcx price: ",e)
-    return 0.09133
+    return 0.08563
   }
 }
