@@ -249,12 +249,10 @@ export default function Page({
   useEffect(() => {
     if (!termsSigned) {
       const expiryDate = localStorage.getItem("termsAndConditions");
-      console.log(expiryDate)
       if (!expiryDate || (Number(expiryDate) + 1209600000 < Number(new Date()))) {
         setShowTermsModal(true);
       } else {
-        setShowTermsModal(true);
-        //setTermsSigned(true);
+        setTermsSigned(true);
       }
     }
   }, [termsSigned]);
