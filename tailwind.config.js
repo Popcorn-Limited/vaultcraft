@@ -149,6 +149,27 @@ module.exports = {
         rewardsLightGreen: "#7CE59D",
 
         tokenTextGray: "#969696",
+
+        customNeutral100: "#353945",
+        customNeutral200: "#23262F",
+        customNeutral300: "#141416",
+
+        customGray100: "#D7D7D7",
+        customGray200: "#C8C8C8",
+        customGray300: "#AFAFAF",
+        customGray400: "#969696",
+        customGray500: "#737373",
+        customGray600: "#555555",
+
+        primaryGreen: "#7AFB79",
+        primaryYellow: "#DFFF1C",
+
+        secondaryYellow: "#FFE650",
+        secondaryBlue: "#87C1F8",
+        secondaryPink: "#E93BD5",
+        secondaryFuchsia: "#F289E6",
+        secondaryPurple: "#9B55FF",
+        secondaryViolet: "#C391FF",
       },
       fontSize: {
         zero: "0rem",
