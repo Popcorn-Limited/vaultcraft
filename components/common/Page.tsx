@@ -60,7 +60,7 @@ function TermsModal({
       title={<h2 className="text-xl font-bold">Terms and Conditions</h2>}
     >
       <div className="text-start text-white">
-        <ul className="list-inside list-disc space-y-4 mb-6">
+      <ul className="list-inside list-disc space-y-4 mb-6 h-[400px] overflow-y-scroll">
           <li>
             VaultCraft is a blockchain-based decentralized finance project. You
             are participating at your own risk.
