@@ -62,21 +62,84 @@ function TermsModal({
       <div className="text-start text-white">
         <ul className="list-inside list-disc space-y-4 mb-6">
           <li>
-            You hereby release all present and future claims against VaultCraftDAO related to your use of the protocol, the tokens, VaultCraftDAO governance, and any other facet of the protocol.
+            VaultCraft is a blockchain-based decentralized finance project. You
+            are participating at your own risk.
           </li>
           <li>
-            You agree to indemnify and hold harmless VaultCraftDAO and its affiliates for any costs arising out of or relating to your use of the VaultCraft protocol.
+            VaultCraft is offered for use “as is” and without any guarantees
+            regarding security. The protocol is made up of immutable code and
+            can be accessed through a variety of user interfaces.
           </li>
           <li>
-            You are not accessing the protocol from Burma (Myanmar), Cuba, Iran, Sudan, Syria, the Western Balkans, Belarus, Côte d’Ivoire, Democratic Republic of the Congo, Iraq, Lebanon, Liberia, Libya, North Korea, Russia, certain sanctioned areas of Ukraine, Somalia, Venezuela, Yemen, Zimbabwe, or the United States of America (collectively, “Prohibited Jurisdictions”), or any other jurisdiction listed as a Specially Designated National by the United States Office of Foreign Asset Control (“OFAC”).
+            No central entity operates the VaultCraft protocol. Decisions
+            related to the protocol are governed by a dispersed group of
+            participants who collectively govern and maintain the protocol.
           </li>
           <li>
-            Important Notice: Residents of the USA are expressly prohibited from using the app.vaultcraft.io interface. Accessing or using this service from the United States of America violates these Terms of Service.
+            VaultCraftDAO does not unilaterally offer, maintain, operate,
+            administer, or control any trading interfaces. The only user
+            interfaces maintained by VaultCraftDAO are the governance and
+            staking interfaces herein.
+          </li>
+          <li>
+            You can participate in the governance process by staking tokens in
+            accordance with the rules and parameters summarized
+            <a
+              className="text-secondaryBlue hover:text-primaryYellow focus:none outline-none"
+              href="https://docs.vaultcraft.io/welcome-to-vaultcraft/introduction"
+              target="_blank"
+            >
+              {" "}
+              here
+            </a>
+            , and/or joining the VaultCraft forum and contributing to the
+            conversation.
+          </li>
+          <li>
+            The rules and parameters associated with the VaultCraft protocol and
+            VaultCraftDAO governance are subject to change at any time.
+          </li>
+          <li>
+            The laws that apply to your use of VaultCraft may vary based upon
+            the jurisdiction in which you are located. We strongly encourage you
+            to speak with legal counsel in your jurisdiction if you have any
+            questions regarding your use of VaultCraft.
+          </li>
+          <li>
+            By entering into this agreement, you are not agreeing to enter into
+            a partnership. You understand that VaultCraft is a decentralized
+            protocol provided on an “as is” basis.
+          </li>
+          <li>
+            You hereby release all present and future claims against
+            VaultCraftDAO related to your use of the protocol, the tokens,
+            VaultCraftDAO governance, and any other facet of the protocol.
+          </li>
+          <li>
+            You agree to indemnify and hold harmless VaultCraftDAO and its
+            affiliates for any costs arising out of or relating to your use of
+            the VaultCraft protocol.
+          </li>
+          <li>
+            You are not accessing the protocol from Burma (Myanmar), Cuba, Iran,
+            Sudan, Syria, the Western Balkans, Belarus, Côte d’Ivoire,
+            Democratic Republic of the Congo, Iraq, Lebanon, Liberia, Libya,
+            North Korea, Russia, certain sanctioned areas of Ukraine, Somalia,
+            Venezuela, Yemen, Zimbabwe, or the United States of America
+            (collectively, “Prohibited Jurisdictions”), or any other
+            jurisdiction listed as a Specially Designated National by the United
+            States Office of Foreign Asset Control (“OFAC”).
+          </li>
+          <li>
+            Important Notice: Residents of the USA are expressly prohibited from
+            using the app.vaultcraft.io interface. Accessing or using this
+            service from the United States of America violates these Terms of
+            Service.
           </li>
         </ul>
         <p className="py-6 border-t-2 border-customNeutral100">
           By accepting you agree that you have read and accept the <a
-            className="text-secondaryBlue hover:text-primaryYellow"
+            className="text-secondaryBlue hover:text-primaryYellow focus:none outline-none"
             href="https://app.vaultcraft.io/disclaimer"
             target="_blank"
           >
