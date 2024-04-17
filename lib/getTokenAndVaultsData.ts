@@ -16,19 +16,6 @@ import { AavePoolUiAbi } from "@/lib/constants/abi/Aave";
 import { GAUGE_NETWORKS } from "pages/boost";
 import { AavePoolAddressProviderByChain, AaveUiPoolProviderByChain } from "@/lib/external/aave";
 
-const HIDDEN_VAULTS: Address[] = [
-  "0xb6cED1C0e5d26B815c3881038B88C829f39CE949",
-  "0x2fD2C18f79F93eF299B20B681Ab2a61f5F28A6fF",
-  "0xDFf04Efb38465369fd1A2E8B40C364c22FfEA340",
-  "0xd4D442AC311d918272911691021E6073F620eb07", //@dev for some reason the live 3Crypto yVault isnt picked up by the yearnAdapter nor the yearnFactoryAdapter
-  "0x8bd3D95Ec173380AD546a4Bd936B9e8eCb642de1", // Sample Stargate Vault
-  "0xcBb5A4a829bC086d062e4af8Eba69138aa61d567", // yOhmFrax factory
-  "0x9E237F8A3319b47934468e0b74F0D5219a967aB8", // yABoosted Balancer
-  "0x860b717B360378E44A241b23d8e8e171E0120fF0", // R/Dai
-  "0xBae30fBD558A35f147FDBaeDbFF011557d3C8bd2", // 50OHM - 50 DAI
-  "0xa6fcC7813d9D394775601aD99874c9f8e95BAd78", // Automated Pool Token - Oracle Vault 3
-];
-
 const STRATEGY_TO_ALTERNATE_ASSET: { [key: Address]: Address } = {
   "0x9E0c5d524dc3Ff0aa734c52aa57ab623436364e6": "0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee",
   "0xA84397004Abe8229CC481cE91BA850ECd8204822": "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7"
@@ -179,8 +166,12 @@ async function prepareVaultsData(chainId: number, client: PublicClient): Promise
     `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/vaults/${chainId}.json`
   );
 
+  const { data: hiddenVaults } = await axios.get(
+    `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/vaults/hidden/${chainId}.json`
+  );
+
   const filteredVaults = Object.values(allVaults)
-    .filter((vault: any) => !HIDDEN_VAULTS.includes(vault.address))
+    .filter((vault: any) => !hiddenVaults.includes(vault.address))
     .filter((vault: any) => vault.type !== "single-asset-lock-vault-v1")
 
   const dynamicValues = await client.multicall({

@@ -36,11 +36,11 @@ const DestinationIdByChain: { [key: number]: number } = {
   [arbitrumSepolia.id]: 1633842021
 }
 
-const vcx = "0x417755cDB723ddA17C781208bdAe81E7e9427398"
+const vcx = "0x18445923592be303fbd3BC164ee685C7457051b4"
 
 const xvcxByChain: AddressByChain = {
   [sepolia.id]: "0x18445923592be303fbd3BC164ee685C7457051b4",
-  [arbitrumSepolia.id]: "0x18445923592be303fbd3BC164ee685C7457051b4"
+  [arbitrumSepolia.id]: "0x1fa00Efd6Fe975E2D587016d863896FF0012e16c"
 }
 
 const xVCX: Token = {
@@ -70,7 +70,7 @@ interface BridgeTokenProps {
 
 async function bridgeToken({ destination, to, asset, delegate, amount, slippage, callData, account, clients, chainId }: BridgeTokenProps): Promise<boolean> {
   console.log([destination, to, asset, delegate, amount, slippage, callData])
-  destination = 1869640549
+  //destination = 1869640549
   //asset = "0xd26e3540A0A368845B234736A0700E0a5A821bBA"
   return handleCallResult({
     successMessage: "VCX bridged successfully!",
@@ -119,10 +119,10 @@ export default function Test() {
     switch (stepCounter) {
       case 0:
         success = await handleAllowance({
-          token: "0xd26e3540A0A368845B234736A0700E0a5A821bBA", //chainId === sepolia.id ? vcx : xvcxByChain[chainId],
+          token: "0x417755cDB723ddA17C781208bdAe81E7e9427398", //xvcxByChain[chainId],
           amount: val,
           account: account!,
-          spender: LockboxAdapterByChain[chainId],
+          spender: "0xF7C71Db03B4143ead7033cDe38d10e610BdF4423", //LockboxAdapterByChain[chainId],
           clients: {
             publicClient,
             walletClient: walletClient!,
@@ -133,7 +133,7 @@ export default function Test() {
         success = await bridgeToken({
           destination: DestinationIdByChain[destChainId],
           to: account!,
-          asset: chainId === sepolia.id ? vcx : xvcxByChain[chainId],
+          asset: xvcxByChain[chainId],
           delegate: account!,
           amount: BigInt(
             Number(val).toLocaleString("fullwide", { useGrouping: false })
