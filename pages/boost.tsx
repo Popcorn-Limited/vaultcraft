@@ -8,7 +8,7 @@ import {
 import { Address, WalletClient } from "viem";
 import { useEffect, useState } from "react";
 import { hasAlreadyVoted } from "@/lib/gauges/hasAlreadyVoted";
-import { VaultData } from "@/lib/types";
+import { AddressesByChain, VaultData } from "@/lib/types";
 import StakingInterface from "@/components/boost/StakingInterface";
 import { sendVotes } from "@/lib/gauges/interactions";
 import Gauge from "@/components/boost/Gauge";
@@ -28,17 +28,24 @@ import useNetworkFilter from "@/lib/useNetworkFilter";
 import { VOTING_ESCROW } from "@/lib/constants";
 import Modal from "@/components/modal/Modal";
 import BridgeModal from "@/components/bridge/BridgeModal";
-
-const HIDDEN_VAULTS = [
-  // eth
-  "0xdC266B3D2c62Ce094ff4E12DC52399c430283417", // pCVX
-  "0x6B2c5ef7FB59e6A1Ad79a4dB65234fb7bDDcaD6b", // oeth-lp
-  "0xD211486ed1A04A176E588b67dd3A30a7dE164C0B", // 50 aura
-  "0x4658eC64b99cAd7F939b3bf87c345738A04310A9", // mim
-  "0xDCd86dDDE7B49C46292Aa7B699b10BF98248D4b5", // yCRV
-];
+import axios from "axios";
 
 export const GAUGE_NETWORKS = [1, 10, 42161]
+
+async function getHiddenGauges(): Promise<AddressesByChain> {
+  const result: AddressesByChain = {}
+  await Promise.all(
+    GAUGE_NETWORKS.map(async (chain) => {
+      const res = await axios.get(
+        `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/gauges/hidden/${chain}.json`
+      )
+      result[chain] = res.data
+    })
+  )
+  return result;
+}
+
+
 
 function VePopContainer() {
   const { address: account } = useAccount();
@@ -71,10 +78,16 @@ function VePopContainer() {
   const [showClaimModal, setShowClaimModal] = useState(false);
   const [showBridgeModal, setShowBridgeModal] = useState(false);
 
+  const [hiddenGauges, setHiddenGauges] = useState<AddressesByChain>({})
+
   useEffect(() => {
     async function initialSetup() {
       setInitalLoad(true);
       if (account) setAccountLoad(true);
+
+
+      const _hiddenGauges = await getHiddenGauges();
+      setHiddenGauges(_hiddenGauges);
 
       const vaultsWithGauges = Object.values(vaults).flat().filter((vault) => !!vault.gauge);
       setGaugeVaults(vaultsWithGauges);
@@ -203,7 +216,7 @@ function VePopContainer() {
           {gaugeVaults?.length > 0 ? (
             gaugeVaults
               .filter((vault) => selectedNetworks.includes(vault.chainId))
-              .filter((vault) => !HIDDEN_VAULTS.includes(vault.address))
+              .filter((vault) => Object.keys(hiddenGauges).length > 0 ? !hiddenGauges[vault.chainId].includes(vault.gauge!) : true)
               .sort((a, b) => b.tvl - a.tvl)
               .map((vault: VaultData, index: number) => (
                 <Gauge
