@@ -18,14 +18,14 @@ import SearchBar from "@/components/input/SearchBar";
 import { OptionTokenByChain, VCX } from "@/lib/constants";
 import Modal from "@/components/modal/Modal";
 import OptionTokenInterface from "@/components/optionToken/OptionTokenInterface";
-import { VaultData } from "@/lib/types";
+import { AddressesByChain, VaultData } from "@/lib/types";
 import { gaugeRewardsAtom, networthAtom, tokensAtom, tvlAtom } from "@/lib/atoms";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import OptionTokenExerciseModal from "@/components/optionToken/exercise/OptionTokenExerciseModal";
 
 interface VaultsContainerProps {
-  hiddenVaults: Address[];
-  displayVaults: Address[];
+  hiddenVaults: AddressesByChain;
+  displayVaults: AddressesByChain;
   showDescription?: boolean;
 }
 
@@ -176,11 +176,10 @@ export default function VaultsContainer({
             {vaults
               .filter((vault) => selectedNetworks.includes(vault.chainId))
               .filter((vault) =>
-                displayVaults.length > 0
-                  ? displayVaults.includes(vault.address)
-                  : true
+                Object.keys(displayVaults).length > 0
+                  ? displayVaults[vault.chainId].includes(vault.address)
+                  : !hiddenVaults[vault.chainId].includes(vault.address)
               )
-              .filter((vault) => !hiddenVaults.includes(vault.address))
               .sort((a, b) => b.tvl - a.tvl)
               .map((vault) => {
                 return (

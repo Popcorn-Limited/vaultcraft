@@ -242,6 +242,10 @@ export type AddressByChain = {
   [key: number]: Address
 }
 
+export type AddressesByChain = {
+  [key: number]: Address[]
+}
+
 export type VaultronStats = {
   level: number;
   xp: number;

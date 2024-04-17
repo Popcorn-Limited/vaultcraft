@@ -21,7 +21,6 @@ const STRATEGY_TO_ALTERNATE_ASSET: { [key: Address]: Address } = {
   "0xA84397004Abe8229CC481cE91BA850ECd8204822": "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7"
 }
 
-
 interface GetVaultsByChainProps {
   chain: Chain;
   account?: Address;
