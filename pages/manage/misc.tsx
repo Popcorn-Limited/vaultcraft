@@ -5,9 +5,11 @@ import { transmitRewards } from "@/lib/gauges/interactions";
 import { showLoadingToast } from "@/lib/toasts";
 import { SimulationResponse } from "@/lib/types";
 import { handleCallResult } from "@/lib/utils/helpers";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { useEffect, useState } from "react";
 import NoSSR from "react-no-ssr";
-import { useAccount, usePublicClient, useWalletClient } from "wagmi";
+import { getAddress } from "viem";
+import { Address, useAccount, usePublicClient, useWalletClient } from "wagmi";
 
 async function simulateCall({
   address,
@@ -175,10 +177,11 @@ export default function Misc(): JSX.Element {
   const { address: account } = useAccount();
   const publicClient = usePublicClient({ chainId: 1 });
   const { data: walletClient } = useWalletClient();
+  const { openConnectModal } = useConnectModal();
 
   return (
     <NoSSR>
-      {(account && walletClient) &&
+      {(account && walletClient) ?
         <>
           <section className="md:border-b border-customNeutral100 md:flex md:flex-row items-center justify-between py-10 px-4 md:px-8 md:gap-4">
             <div className="w-full md:w-max">
@@ -191,18 +194,49 @@ export default function Misc(): JSX.Element {
             </div>
           </section>
           <SetOptionTokenOracleParams />
-          <div className="border-b border-white pb-4 py-10 px-4 md:px-8">
-            <h2 className="text-white text-xl">OptionToken-Oracle Values</h2>
-            <div className="flex md:flex-row md:space-x-4 mt-4">
-              <MainActionButton
-                label="Transmit Rewards"
-                handleClick={() => transmitRewards({ gauges: ["0xb5DC74CBF45A53a7E0920885ed506D5B862B119D"], account, address: ROOT_GAUGE_FACTORY, publicClient, walletClient })}
-                disabled={!account}
-              />
-            </div>
-          </div>
+          <RewardBridger />
         </>
+        : <MainActionButton label="Connect Wallet" handleClick={openConnectModal} />
       }
     </NoSSR>
   );
+}
+
+
+function RewardBridger() {
+  const { address: account } = useAccount();
+  const publicClient = usePublicClient({ chainId: 1 });
+  const { data: walletClient } = useWalletClient();
+
+  const [inputValue, setInputValue] = useState<string>("")
+
+  return <div className="border-b border-white pb-4 py-10 px-4 md:px-8">
+    <h2 className="text-white text-xl">Bridge Gauge Rewards</h2>
+    <div>
+      <p className="text-white text-start">Gauges</p>
+      <p className="text-customGray500">Enter the gauge addresses of L2 gauges with rewards seperated by comma. (address1,address2)</p>
+      <div className="border border-customGray500">
+        <InputNumber
+          value={inputValue}
+          onChange={(e) => setInputValue(e.currentTarget.value)}
+          type="text"
+        />
+      </div>
+    </div>
+    <div className="flex md:flex-row md:space-x-4 mt-4">
+      <MainActionButton
+        label="Transmit Rewards"
+        handleClick={() =>
+          transmitRewards({
+            gauges: inputValue.split(",").map(addr => getAddress(addr)),
+            account: account!,
+            address: ROOT_GAUGE_FACTORY,
+            publicClient,
+            walletClient: walletClient!
+          })
+        }
+        disabled={!account}
+      />
+    </div>
+  </div>
 }
