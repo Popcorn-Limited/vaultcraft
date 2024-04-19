@@ -164,6 +164,7 @@ interface SimulateProps {
   functionName: string;
   publicClient: PublicClient;
   args?: any[];
+  value?: bigint;
 }
 
 export async function simulateCall({
@@ -172,6 +173,7 @@ export async function simulateCall({
   functionName,
   publicClient,
   args,
+  value
 }: SimulateProps): Promise<SimulationResponse> {
   try {
     const { request } = await publicClient.simulateContract({
@@ -181,6 +183,7 @@ export async function simulateCall({
       // @ts-ignore
       functionName,
       args,
+      value
     });
     return { request: request, success: true, error: null };
   } catch (error: any) {

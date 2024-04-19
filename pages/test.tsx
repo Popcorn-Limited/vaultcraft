@@ -18,7 +18,8 @@ import { tokensAtom } from "@/lib/atoms";
 import { useAtom } from "jotai";
 import { arbitrumSepolia } from "viem/chains";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
-
+import axios from "axios";
+import { showLoadingToast } from "@/lib/toasts";
 
 const LockboxAdapterByChain: AddressByChain = {
   1: "0x45bf3c737e57b059a5855280ca1adb8e9606ac68",
@@ -69,9 +70,14 @@ interface BridgeTokenProps {
 }
 
 async function bridgeToken({ destination, to, asset, delegate, amount, slippage, callData, account, clients, chainId }: BridgeTokenProps): Promise<boolean> {
-  console.log([destination, to, asset, delegate, amount, slippage, callData])
-  //destination = 1869640549
-  //asset = "0xd26e3540A0A368845B234736A0700E0a5A821bBA"
+  showLoadingToast("Bridging VCX...");
+
+  const { data: relayerFee } = await axios.post(
+    "https://sdk-server.mainnet.connext.ninja/estimateRelayerFee", {
+    originDomain: DestinationIdByChain[chainId],
+    destinationDomain: destination,
+  })
+
   return handleCallResult({
     successMessage: "VCX bridged successfully!",
     simulationResponse: await simulateCall({
@@ -83,6 +89,7 @@ async function bridgeToken({ destination, to, asset, delegate, amount, slippage,
       functionName: "xcall",
       publicClient: clients.publicClient as PublicClient,
       args: [destination, to, asset, delegate, amount, slippage, callData],
+      value: BigInt(relayerFee.hex)
     }),
     clients,
   });
@@ -119,10 +126,10 @@ export default function Test() {
     switch (stepCounter) {
       case 0:
         success = await handleAllowance({
-          token: "0x417755cDB723ddA17C781208bdAe81E7e9427398", //xvcxByChain[chainId],
+          token: xvcxByChain[chainId],
           amount: val,
           account: account!,
-          spender: "0xF7C71Db03B4143ead7033cDe38d10e610BdF4423", //LockboxAdapterByChain[chainId],
+          spender: LockboxAdapterByChain[chainId],
           clients: {
             publicClient,
             walletClient: walletClient!,
@@ -139,7 +146,7 @@ export default function Test() {
             Number(val).toLocaleString("fullwide", { useGrouping: false })
           ),
           slippage: 0,
-          callData: destChainId === sepolia.id ? encodeAbiParameters([{ name: "recipient", type: "address" }], [account!]) : "",
+          callData: encodeAbiParameters([{ name: "recipient", type: "address" }], [account!]),
           account: account!,
           clients: { publicClient, walletClient: walletClient! },
           chainId

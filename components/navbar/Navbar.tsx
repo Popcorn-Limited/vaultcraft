@@ -86,6 +86,18 @@ export default function Navbar(): JSX.Element {
               />
             </div>
           }
+          
+          <div
+            className={`w-fit cursor-pointer h-full py-2 bg-customNeutral300 md:bg-transparent md:py-2 px-4 md:px-6 flex flex-row items-center justify-between border border-customGray100 rounded-4xl text-white`}
+            onClick={() =>
+              window.open(
+                "https://swap.cow.fi/#/1/swap/WETH/VCX",
+                "_blank"
+              )}
+          >
+            Buy VCX
+          </div>
+
           {address ? (
             <div className={`relative flex flex-container flex-row z-10`}>
               <div

@@ -23,6 +23,8 @@ export const ROOT_GAUGE_FACTORY: Address = "0x6aa03ebAb1e9CB8d44Fd79153d3a258FFd
 
 export const VAULTRON: Address = "0x590e3A9260ffb7887ffD54A57d1FACf7db59c751"
 
+export const FEE_RECIPIENT_PROXY = "0x47fd36ABcEeb9954ae9eA1581295Ce9A8308655E" // Is the same on all deployed chains
+
 export const ENSO_ROUTER: Address = "0x80EbA3855878739F4710233A8a19d89Bdd2ffB8E"
 
 export const VaultRegistryByChain: AddressByChain = {
@@ -30,6 +32,7 @@ export const VaultRegistryByChain: AddressByChain = {
   137: "0x2246c4c469735bCE95C120939b0C078EC37A08D0",
   10: "0xdD0d135b5b52B7EDd90a83d4A4112C55a1A6D23A",
   42161: "0xB205e94D402742B919E851892f7d515592a7A6cC",
+  56:"0x25172C73958064f9ABc757ffc63EB859D7dc2219"
 };
 
 export const VaultControllerByChain: AddressByChain = {
@@ -127,4 +130,24 @@ export const ZapAssetAddressesByChain: { [key: number]: Address[] } = {
     "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f", // WBTC
   ],
   56: []
+}
+
+
+
+// Archive Addresses
+
+const PermissionRegistryByChain: AddressByChain = {
+  1: "0x7a33b5b57C8b235A3519e6C010027c5cebB15CB4",
+  56: "0x8c76AA6B65D0619042EAd6DF748f782c89a06357",
+  137: "0x1F381429943AFBb6870b3b9B0aB4707a6BdC2356",
+  10: "0xf5862457AA842605f8b675Af13026d3Fd03bFfF0",
+  42161: "0xB67C4c9C3CebCeC2FD3fDE436340D728D990A8d9"
+}
+
+const AdminProxyByChain: AddressByChain = {
+  1: "0x564fBe59c448743FA9382E691a0320458F6dCDE5",
+  56: "0x0CfE90Bc6156360E003d5367fcC054Bd1656d1B1",
+  137: "0x7Edd61A58B5920dF39208E9888D8be713f639A60",
+  10: "0x7D224F9Eaf3855CE3109b205e6fA853d25Bb457f",
+  42161: "0xcC09F5bd7582D02Bb31825d09589F4773B65eCc9"
 }
