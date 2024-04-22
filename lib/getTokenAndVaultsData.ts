@@ -9,7 +9,7 @@ import { PublicClient, erc20ABI } from "wagmi";
 import axios from "axios";
 import { VaultAbi } from "@/lib/constants/abi/Vault";
 import { GaugeData, Token, TokenByAddress, TokenType, VaultData, VaultDataByAddress, VaultLabel } from "@/lib/types";
-import { ERC20Abi, GaugeAbi, OptionTokenByChain, VCX, VCX_LP, VeTokenByChain, ZapAssetAddressesByChain } from "@/lib/constants";
+import { ERC20Abi, GaugeAbi, OptionTokenByChain, VCX, VCX_LP, VeTokenByChain, XVCXByChain, ZapAssetAddressesByChain } from "@/lib/constants";
 import { RPC_URLS, networkMap } from "@/lib/utils/connectors";
 import { ProtocolName, YieldOptions } from "vaultcraft-sdk";
 import { AavePoolUiAbi } from "@/lib/constants/abi/Aave";
@@ -58,7 +58,7 @@ export async function getTokenAndVaultsData({
   // Create token array
   const uniqueAssetAdresses: Address[] = [...ZapAssetAddressesByChain[chainId]];
   if (chainId === 1) uniqueAssetAdresses.push(...[VCX, VCX_LP])
-  if (GAUGE_NETWORKS.includes(chainId)) uniqueAssetAdresses.push(...[OptionTokenByChain[chainId], VeTokenByChain[chainId]])
+  if (GAUGE_NETWORKS.includes(chainId)) uniqueAssetAdresses.push(...[OptionTokenByChain[chainId], VeTokenByChain[chainId], XVCXByChain[chainId]])
 
 
   // Add vault assets
@@ -153,6 +153,7 @@ export async function getTokenAndVaultsData({
   }
 
   let tokens = { ...assets, ...vaults, ...gaugeTokens }
+  console.log(tokens)
   if (account !== zeroAddress) {
     tokens = await addBalances(tokens, account, client)
   }

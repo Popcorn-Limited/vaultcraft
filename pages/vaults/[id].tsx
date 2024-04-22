@@ -279,21 +279,21 @@ export default function Index() {
                     <div className="w-full md:flex md:flex-wrap md:justify-between md:gap-4">
                       <CardStat
                         id="your-apy"
-                        label="Your APY"
+                        label="Your Rewards APY"
                         value={`${formatNumber((vaultData.workingBalance / (gauge?.balance || 0)) * vaultData.maxGaugeApy)} %`}
-                        tooltip="Total value of all assets deposited into the vault"
+                        tooltip={`Your rewards APY depends on the proportion of locked liquidity, veVCX, you provide relative to the total veVCX held by all gauge holders. For instance, to receive the maximum rewards APY, if you own 10% of the supply of Gauge A you also would need to own 10% of cumulative veVCX supply of all gauge share holders to earn the maximum rewards apy of ${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.maxGaugeApy))} %. Liquidity providers are guaranteed a minimum rewards apy of ${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.minGaugeApy))}`}
                       />
                       <CardStat
                         id="boost"
                         label="Your Boost"
                         value={`${formatNumber((vaultData.workingBalance / (gauge?.balance || 0)) * 5)} X`}
-                        tooltip="Total value of all assets deposited into the vault"
+                        tooltip="Your Boost depends on the proportion of locked liquidity, veVCX, you provide relative to the total veVCX held by all gauge holders. For instance, to receive the maximum 5x boost, if you own 10% of the supply of Gauge A you also would need to own 10% of cumulative veVCX supply of all gauge share holders to earn the maximum boost of 5x. Liquidity providers are guaranteed a minimum boost of 1x."
                       />
                       <CardStat
                         id="ve-missing"
                         label="VeVCX Missing for max Boost"
                         value={`${formatNumber((((gauge?.balance || 0) / vaultData.gaugeSupply) * (tokens[vaultData.chainId][VeTokenByChain[vaultData.chainId]].totalSupply / 1e18)) - (tokens[vaultData.chainId][VeTokenByChain[vaultData.chainId]].balance / 1e18))} VeVCX`}
-                        tooltip="Total value of all assets deposited into the vault"
+                        tooltip="The amount of locked liquidity, veVCX, required to earn the maximum boost in oVCX rewards per epoch."
                       />
                     </div>
                   </div>
@@ -407,7 +407,7 @@ function StrategyDesc({ strategy, asset, i, stratLen }: { strategy: Strategy, as
       <CardStat
         id={`${strategy.resolver}-${i}-allocation`}
         label="Allocation"
-        tooltip="Total value of all assets deposited into the vault"
+        tooltip="Total value of all assets deposited into this strategy"
       >
         <span className="md:flex md:flex-row md:items-center w-full md:space-x-2">
           <p className="text-white text-xl leading-6 md:leading-8 text-end md:text-start">
@@ -423,7 +423,7 @@ function StrategyDesc({ strategy, asset, i, stratLen }: { strategy: Strategy, as
         id={`${strategy.resolver}-${i}-apy`}
         label="APY"
         value={`${NumberFormatter.format(roundToTwoDecimalPlaces(strategy.apy))} %`}
-        tooltip="Total value of all assets deposited into the vault"
+        tooltip="Current variable apy of the strategy"
       />
     </div>
   </div>

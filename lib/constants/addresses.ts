@@ -1,5 +1,7 @@
 import { Address, zeroAddress } from "viem";
 import { AddressByChain } from "@/lib/types";
+import { mainnet } from "wagmi";
+import { arbitrum, bsc, optimism, polygon } from "viem/chains";
 
 export const VCX: Address = "0xcE246eEa10988C495B4A90a905Ee9237a0f91543";
 export const VCX_LP: Address = "0x577A7f7EE659Aa14Dc16FD384B3F8078E23F1920";
@@ -28,76 +30,76 @@ export const FEE_RECIPIENT_PROXY = "0x47fd36ABcEeb9954ae9eA1581295Ce9A8308655E" 
 export const ENSO_ROUTER: Address = "0x80EbA3855878739F4710233A8a19d89Bdd2ffB8E"
 
 export const VaultRegistryByChain: AddressByChain = {
-  1: "0x007318Dc89B314b47609C684260CfbfbcD412864",
-  137: "0x2246c4c469735bCE95C120939b0C078EC37A08D0",
-  10: "0xdD0d135b5b52B7EDd90a83d4A4112C55a1A6D23A",
-  42161: "0xB205e94D402742B919E851892f7d515592a7A6cC",
-  56:"0x25172C73958064f9ABc757ffc63EB859D7dc2219"
+  [mainnet.id]: "0x007318Dc89B314b47609C684260CfbfbcD412864",
+  [polygon.id]: "0x2246c4c469735bCE95C120939b0C078EC37A08D0",
+  [optimism.id]: "0xdD0d135b5b52B7EDd90a83d4A4112C55a1A6D23A",
+  [arbitrum.id]: "0xB205e94D402742B919E851892f7d515592a7A6cC",
+  [bsc.id]:"0x25172C73958064f9ABc757ffc63EB859D7dc2219"
 };
 
 export const VaultControllerByChain: AddressByChain = {
-  1: "0x7D51BABA56C2CA79e15eEc9ECc4E92d9c0a7dbeb",
+  [mainnet.id]: "0x7D51BABA56C2CA79e15eEc9ECc4E92d9c0a7dbeb",
   1337: "0x7D51BABA56C2CA79e15eEc9ECc4E92d9c0a7dbeb",
-  42161: "0xF40749d72Ab5422CC5d735A373E66d67f7cA9393",
-  10: "0x757D953c53aD28748aCf94AD2d59C13955E09c08",
-  56: "0x815B4A955169Ba1D66944A4d8F18B69bc9553a62",
-  137: "0xCe22Ff6d00c5414E64b9253Dd49a35e0B9Ea8b60",
+  [arbitrum.id]: "0xF40749d72Ab5422CC5d735A373E66d67f7cA9393",
+  [optimism.id]: "0x757D953c53aD28748aCf94AD2d59C13955E09c08",
+  [bsc.id]: "0x815B4A955169Ba1D66944A4d8F18B69bc9553a62",
+  [polygon.id]: "0xCe22Ff6d00c5414E64b9253Dd49a35e0B9Ea8b60",
 };
 
 export const VaultRouterByChain: AddressByChain = {
-  1: "0x4995F3bb85E1381D02699e2164bC1C6c6Fa243cd",
-  10: "0x3828845F4d7212b6a0Dc3D67482AFf4544002919",
-  42161: "0x48943F145686bF5c4580D545CDA405844D1f777b"
+  [mainnet.id]: "0x4995F3bb85E1381D02699e2164bC1C6c6Fa243cd",
+  [optimism.id]: "0x3828845F4d7212b6a0Dc3D67482AFf4544002919",
+  [arbitrum.id]: "0x48943F145686bF5c4580D545CDA405844D1f777b"
 }
 
 export const VeRecipientByChain: AddressByChain = {
-  10: "0xC1A6Db6793967Ff7fb7f211E044A4c285A0eB7FB",
-  42161: "0xC1A6Db6793967Ff7fb7f211E044A4c285A0eB7FB"
+  [optimism.id]: "0xC1A6Db6793967Ff7fb7f211E044A4c285A0eB7FB",
+  [arbitrum.id]: "0xC1A6Db6793967Ff7fb7f211E044A4c285A0eB7FB"
 }
 
 export const VeTokenByChain: AddressByChain = {
-  1: VE_VCX,
-  10: VeRecipientByChain[10],
-  42161: VeRecipientByChain[42161],
+  [mainnet.id]: VE_VCX,
+  [optimism.id]: VeRecipientByChain[10],
+  [arbitrum.id]: VeRecipientByChain[42161],
 }
 
 export const OptionTokenByChain: AddressByChain = {
-  1: "0xaFa52E3860b4371ab9d8F08E801E9EA1027C0CA2",
-  10: "0xD41d34d6b50785fDC025caD971fE940B8AA1bE45",
-  42161: "0x59a696bF34Eae5AD8Fd472020e3Bed410694a230"
+  [mainnet.id]: "0xaFa52E3860b4371ab9d8F08E801E9EA1027C0CA2",
+  [optimism.id]: "0xD41d34d6b50785fDC025caD971fE940B8AA1bE45",
+  [arbitrum.id]: "0x59a696bF34Eae5AD8Fd472020e3Bed410694a230"
 }
 
 export const VcxByChain: AddressByChain = {
-  1: VCX,
-  10: "0xD41d34d6b50785fDC025caD971fE940B8AA1bE45",
-  42161: "0x59a696bF34Eae5AD8Fd472020e3Bed410694a230"
+  [mainnet.id]: VCX,
+  [optimism.id]: "0xD41d34d6b50785fDC025caD971fE940B8AA1bE45",
+  [arbitrum.id]: "0x59a696bF34Eae5AD8Fd472020e3Bed410694a230"
 }
 
 export const WethByChain: AddressByChain = {
-  1: WETH,
-  10: "0x4200000000000000000000000000000000000006",
-  42161: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"
+  [mainnet.id]: WETH,
+  [optimism.id]: "0x4200000000000000000000000000000000000006",
+  [arbitrum.id]: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"
 }
 
 export const GaugeFactoryByChain: AddressByChain = {
-  1: "0x8133cA3AB91B3FE3792992eA69720Ca6d3A92163",
-  10: "0x6aa03ebAb1e9CB8d44Fd79153d3a258FFd48169A", // Same as Minter
-  42161: "0x6aa03ebAb1e9CB8d44Fd79153d3a258FFd48169A" // Same as Minter
+  [mainnet.id]: "0x8133cA3AB91B3FE3792992eA69720Ca6d3A92163",
+  [optimism.id]: "0x6aa03ebAb1e9CB8d44Fd79153d3a258FFd48169A", // Same as Minter
+  [arbitrum.id]: "0x6aa03ebAb1e9CB8d44Fd79153d3a258FFd48169A" // Same as Minter
 }
 
 export const MinterByChain: AddressByChain = {
-  1: "0x49f095B38eE6d8541758af51c509332e7793D4b0",
-  10: "0x6aa03ebAb1e9CB8d44Fd79153d3a258FFd48169A", // Same as GaugeFactory
-  42161: "0x6aa03ebAb1e9CB8d44Fd79153d3a258FFd48169A" // Same as GaugeFactory
+  [mainnet.id]: "0x49f095B38eE6d8541758af51c509332e7793D4b0",
+  [optimism.id]: "0x6aa03ebAb1e9CB8d44Fd79153d3a258FFd48169A", // Same as GaugeFactory
+  [arbitrum.id]: "0x6aa03ebAb1e9CB8d44Fd79153d3a258FFd48169A" // Same as GaugeFactory
 }
 
 export const BridgerByDestination: AddressByChain = {
-  10: "0xae167C59FB601260A317A803b5879D47621b1379",
-  42161: "0x44E6FD99a6df3E3D1792a71C1575519293894Ee2"
+  [optimism.id]: "0xae167C59FB601260A317A803b5879D47621b1379",
+  [arbitrum.id]: "0x44E6FD99a6df3E3D1792a71C1575519293894Ee2"
 }
 
 export const ZapAssetAddressesByChain: { [key: number]: Address[] } = {
-  1: [
+  [mainnet.id]: [
     "0x6B175474E89094C44Da98b954EedeAC495271d0F", // DAI
     "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // USDC
     "0xdAC17F958D2ee523a2206206994597C13D831ec7", // USDT
@@ -105,14 +107,14 @@ export const ZapAssetAddressesByChain: { [key: number]: Address[] } = {
     "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", // WETH
     "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599", // WBTC
   ],
-  137: [
+  [polygon.id]: [
     "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063", // DAI
     "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174", // USDC
     "0xc2132D05D31c914a87C6611C10748AEb04B58e8F", // USDT
     "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270", // WMATIC
     "0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6", // WBTC
   ],
-  10: [
+  [optimism.id]: [
     "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1", // DAI
     "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85", // USDC
     "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58", // USDT
@@ -120,7 +122,7 @@ export const ZapAssetAddressesByChain: { [key: number]: Address[] } = {
     "0x4200000000000000000000000000000000000006", // WETH
     "0x68f180fcCe6836688e9084f035309E29Bf0A2095", // WBTC
   ],
-  42161: [
+  [arbitrum.id]: [
     "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1", // DAI
     "0xaf88d065e77c8cC2239327C5EDb3A432268e5831", // USDC
     "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8", // USDC.e
@@ -129,25 +131,31 @@ export const ZapAssetAddressesByChain: { [key: number]: Address[] } = {
     "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1", // WETH
     "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f", // WBTC
   ],
-  56: []
+  [bsc.id]: []
 }
 
-
+export const XVCXByChain: AddressByChain = {
+  [mainnet.id]: "0x18445923592be303fbd3BC164ee685C7457051b4",
+  [optimism.id]: "0xfe7950eC9AfE82538CEAC95735f1daf31829d066",
+  [arbitrum.id]: "0x18445923592be303fbd3BC164ee685C7457051b4"
+  // [sepolia.id]: "0x18445923592be303fbd3BC164ee685C7457051b4",
+  // [arbitrumSepolia.id]: "0x1fa00Efd6Fe975E2D587016d863896FF0012e16c"
+}
 
 // Archive Addresses
 
 const PermissionRegistryByChain: AddressByChain = {
-  1: "0x7a33b5b57C8b235A3519e6C010027c5cebB15CB4",
-  56: "0x8c76AA6B65D0619042EAd6DF748f782c89a06357",
-  137: "0x1F381429943AFBb6870b3b9B0aB4707a6BdC2356",
-  10: "0xf5862457AA842605f8b675Af13026d3Fd03bFfF0",
-  42161: "0xB67C4c9C3CebCeC2FD3fDE436340D728D990A8d9"
+  [mainnet.id]: "0x7a33b5b57C8b235A3519e6C010027c5cebB15CB4",
+  [bsc.id]: "0x8c76AA6B65D0619042EAd6DF748f782c89a06357",
+  [polygon.id]: "0x1F381429943AFBb6870b3b9B0aB4707a6BdC2356",
+  [optimism.id]: "0xf5862457AA842605f8b675Af13026d3Fd03bFfF0",
+  [arbitrum.id]: "0xB67C4c9C3CebCeC2FD3fDE436340D728D990A8d9"
 }
 
 const AdminProxyByChain: AddressByChain = {
-  1: "0x564fBe59c448743FA9382E691a0320458F6dCDE5",
-  56: "0x0CfE90Bc6156360E003d5367fcC054Bd1656d1B1",
-  137: "0x7Edd61A58B5920dF39208E9888D8be713f639A60",
-  10: "0x7D224F9Eaf3855CE3109b205e6fA853d25Bb457f",
-  42161: "0xcC09F5bd7582D02Bb31825d09589F4773B65eCc9"
+  [mainnet.id]: "0x564fBe59c448743FA9382E691a0320458F6dCDE5",
+  [bsc.id]: "0x0CfE90Bc6156360E003d5367fcC054Bd1656d1B1",
+  [polygon.id]: "0x7Edd61A58B5920dF39208E9888D8be713f639A60",
+  [optimism.id]: "0x7D224F9Eaf3855CE3109b205e6fA853d25Bb457f",
+  [arbitrum.id]: "0xcC09F5bd7582D02Bb31825d09589F4773B65eCc9"
 }

@@ -20,7 +20,7 @@ export default function CardStat({ id, label, value, children, tooltip }: { id: 
     <ResponsiveTooltip
       id={id}
       content={
-        <p className="max-w-52">{tooltip}</p>
+        <p className="w-52">{tooltip}</p>
       }
     />
   </div>

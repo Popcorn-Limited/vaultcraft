@@ -421,7 +421,7 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
               <CardStat
                 id={`health-factor`}
                 label="Health Factor"
-                tooltip="Health Factor Tooltip"
+                tooltip="Measures your loan's safety, showing how much your collateral value can drop before risking liquidation. Higher values mean greater safety from being liquidated."
               >
                 <span className="w-full text-end md:text-start">
                   <p className="text-white text-xl">
@@ -439,7 +439,7 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
                 id={`av-credit`}
                 label="Av. Credit"
 
-                tooltip="Health Factor Tooltip"
+                tooltip="Maximum additional amount you can borrow, based on the value of your collateral."
               >
                 <span className="w-full text-end md:text-start">
                   <p className="text-white text-xl">
@@ -456,7 +456,7 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
               <CardStat
                 id={`net-apy`}
                 label="Net Apy"
-                tooltip="Health Factor Tooltip"
+                tooltip="Net yield from your lending and borrowing activities, considering all associated fees."
               >
                 <span className="w-full text-end md:text-start">
                   <p className="text-white text-xl">
@@ -473,7 +473,7 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
               <CardStat
                 id={`collateral`}
                 label="Collateral"
-                tooltip="Health Factor Tooltip"
+                tooltip="Total value of all assets you've deposited to secure your borrowed funds."
               >
                 <span className="w-full text-end md:text-start">
                   <p className="text-white text-xl">
@@ -490,7 +490,7 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
               <CardStat
                 id={`borrowed`}
                 label="Borrowed"
-                tooltip="Health Factor Tooltip"
+                tooltip="Total amount of funds you have currently borrowed."
               >
                 <span className="w-full text-end md:text-start">
                   <p className="text-white text-xl">
@@ -507,7 +507,7 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
               <CardStat
                 id={`nlv`}
                 label="Net Loan Value"
-                tooltip="Health Factor Tooltip"
+                tooltip="Current net value of all your active loans, minus any repayments."
               >
                 <span className="w-full text-end md:text-start">
                   <p className="text-white text-xl">
@@ -533,7 +533,7 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
               <CardStat
                 id={`lending-apy`}
                 label="Lending Apy"
-                tooltip="Health Factor Tooltip"
+                tooltip="Annual yield you earn from lending out the selected asset."
               >
                 <div className="w-full flex justify-end md:justify-start">
                   <span className="flex flex-row items-center">
@@ -547,7 +547,7 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
               <CardStat
                 id={`borrow-apy`}
                 label="Borrow Apy"
-                tooltip="Health Factor Tooltip"
+                tooltip="Annual interest rate you are charged on your borrowed funds on the selected asset."
               >
                 <div className="w-full flex justify-end md:justify-start">
                   <span className="flex flex-row items-center">
@@ -568,19 +568,19 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
                 id={`max-ltv`}
                 label="Max LTV"
                 value={`${supplyReserve.ltv.toFixed(2)} %`}
-                tooltip="Health Factor Tooltip"
+                tooltip="Highest ratio of loan amount to collateral value that you can borrow, reflecting your borrowing capacity."
               />
               <CardStat
                 id={`liq-threshold`}
                 label="Liquidation Threshold"
                 value={`${supplyReserve.liquidationThreshold.toFixed(2)} %`}
-                tooltip="Health Factor Tooltip"
+                tooltip="Point where your debt reaches a specific percentage of your collateral value, indicating the debt is undercollateralized and triggering a risk of liquidation."
               />
               <CardStat
                 id={`liq-penalty`}
                 label="Liquidation Penalty"
                 value={`${supplyReserve.liquidationPenalty.toFixed(2)} %`}
-                tooltip="Health Factor Tooltip"
+                tooltip="Fee or cost added to your debt when your loan is liquidated, typically benefiting the liquidator who covers part of your borrowed amount."
               />
             </div>
           </div>

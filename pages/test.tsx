@@ -8,7 +8,7 @@ import { safeRound } from "@/lib/utils/formatBigNumber";
 import { Address, encodeAbiParameters, formatUnits, parseEther } from "viem";
 import { handleCallResult, simulateCall, validateInput } from "@/lib/utils/helpers";
 import { ArrowDownIcon } from "@heroicons/react/24/outline";
-import { VCX } from "@/lib/constants";
+import { VCX, XVCXByChain } from "@/lib/constants";
 import { PublicClient, sepolia, useAccount, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
 import { AddressByChain, Clients, SmartVaultActionType, Token } from "@/lib/types";
 import { ActionStep, getSmartVaultActionSteps } from "@/lib/getActionSteps";
@@ -16,7 +16,7 @@ import { handleAllowance } from "@/lib/approve";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
 import { tokensAtom } from "@/lib/atoms";
 import { useAtom } from "jotai";
-import { arbitrumSepolia } from "viem/chains";
+import { arbitrum, arbitrumSepolia, mainnet, optimism } from "viem/chains";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import axios from "axios";
 import { showLoadingToast } from "@/lib/toasts";
@@ -37,12 +37,8 @@ const DestinationIdByChain: { [key: number]: number } = {
   [arbitrumSepolia.id]: 1633842021
 }
 
-const vcx = "0x18445923592be303fbd3BC164ee685C7457051b4"
+const lockbox = "0x0658276359Dae13BE1E991076cD957ABFBA94f15"
 
-const xvcxByChain: AddressByChain = {
-  [sepolia.id]: "0x18445923592be303fbd3BC164ee685C7457051b4",
-  [arbitrumSepolia.id]: "0x1fa00Efd6Fe975E2D587016d863896FF0012e16c"
-}
 
 const xVCX: Token = {
   address: VCX,
@@ -102,8 +98,8 @@ export default function Test() {
   const { chain } = useNetwork();
   const { switchNetworkAsync } = useSwitchNetwork();
 
-  const [chainId, setChainId] = useState<number>(sepolia.id)
-  const [destChainId, setDestChainId] = useState<number>(arbitrumSepolia.id)
+  const [chainId, setChainId] = useState<number>(mainnet.id)
+  const [destChainId, setDestChainId] = useState<number>(arbitrum.id)
 
   const [stepCounter, setStepCounter] = useState<number>(0);
 
@@ -126,7 +122,7 @@ export default function Test() {
     switch (stepCounter) {
       case 0:
         success = await handleAllowance({
-          token: xvcxByChain[chainId],
+          token: XVCXByChain[chainId],
           amount: val,
           account: account!,
           spender: LockboxAdapterByChain[chainId],
@@ -140,7 +136,7 @@ export default function Test() {
         success = await bridgeToken({
           destination: DestinationIdByChain[destChainId],
           to: account!,
-          asset: xvcxByChain[chainId],
+          asset: XVCXByChain[chainId],
           delegate: account!,
           amount: BigInt(
             Number(val).toLocaleString("fullwide", { useGrouping: false })
@@ -159,7 +155,7 @@ export default function Test() {
 
   return <div className="text-white">
     <div className="border-b border-gray-500 pb-4">
-      <h1>Bridge {chainId === sepolia.id ? "From ETH to ARB" : "From ARB to ETH"}</h1>
+      <h1>Bridge {chainId === mainnet.id ? "From ETH to ARB" : "From ARB to ETH"}</h1>
       <p>Step {stepCounter}</p>
       <div className="flex flex-row space-x-4">
         <MainActionButton
