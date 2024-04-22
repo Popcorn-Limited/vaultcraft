@@ -5,6 +5,8 @@ const HIDDEN_GAUGES = [
   "0x38098e3600665168eBE4d827D24D0416efC24799", // Deployment script ran out of gas and somehow added a random address into the gauges which now breaks these calls
   "0xF4c8736c1cf9b03ccB09DA6e8A8312E75CA5B529", // Failed Op Gauge Test
   "0xb5DC74CBF45A53a7E0920885ed506D5B862B119D", // Test Op Gauge 
+  "0x54581Aa242054B17738A58Eb984c43c3F33bB5cd", // OP - AaveV3 WBTC Gauge
+  "0x52843d173FE0BBeA5307fa4864665858AaFc9b73", // ARB - AaveV3 WBTC Gauge
 ]
 
 export interface Gauge {
