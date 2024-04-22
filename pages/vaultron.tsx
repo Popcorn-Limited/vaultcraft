@@ -71,8 +71,15 @@ export default function Vaultron() {
             <VaultronLevel label="Gold" active={vaultronStats.level === 3} />
           </div>
 
-          <p className="mt-16">
-            Your Vaultron NFT gives you access to XP points, airdrops, and oVCX rewards.
+          <p className="mt-10">
+            🤖Mint VAULTRON for free on Polygon<br />
+            🎮Complete on-chain & off-chain tasks to earn more XP<br />
+            🎚️Level up from Bronze to Silver to Gold<br />
+            🪂Convert your XP for future airdrops<br />
+          </p>
+
+          <p className="mt-10">
+            Go to <a className="text-primaryYellow cursor-pointer" href="https://app.mercle.xyz/vaultcraft/events" target="_blank">https://app.mercle.xyz/vaultcraft/events</a> and mint Vaultron to be eligible to earn XP points.
           </p>
 
           <div className="mt-16">
