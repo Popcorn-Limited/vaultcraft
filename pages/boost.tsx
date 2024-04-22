@@ -175,19 +175,17 @@ function VePopContainer() {
         <section className="py-10 px-4 md:px-8 border-t md:border-t-0 md:border-b border-customNeutral100 lg:flex lg:flex-row items-center justify-between text-white">
           <div className="lg:w-[1050px]">
             <h1 className="text-2xl md:text-3xl font-normal">
-              Lock{" "}
+              Lock your{" "}
               <span className="text-primaryYellow font-bold md:font-normal md:underline md:decoration-solid">
-                20WETH-80VCX
+                VCX LP
               </span>{" "}
-              for veVCX, Rewards, and Voting Power
+              for voting power, XP points, and oVCX multipliers
             </h1>
             <p className="text-base text-white opacity-80 mt-4">
-              Vote with your veVCX below to influence how much $oVCX each pool
-              will receive.
+              Vote on which Smart Vaults will receive more oVCX every epoch with veVCX - your locked VCX LP.
             </p>
             <p className="text-base text-white opacity-80">
-              Your vote will persist until you change it and editing a pool can
-              only be done once every 10 days.
+              You can only vote once every 10 days and your vote persists until you change it.
             </p>
           </div>
         </section>

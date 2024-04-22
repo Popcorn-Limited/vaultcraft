@@ -19,8 +19,7 @@ export default function OptionInfo(): JSX.Element {
       <div>
         <h2 className="text-start text-5xl">Exercise oVCX</h2>
         <p className="text-start">
-          Exercise your oVCX to buy discounted VCX. You need to burn oVCX and
-          pay with WETH to get cheap VCX directly from the DAO.
+          Exercise oVCX with WETH for a 25% discount on VCX from the VaultCraftDAO treasury.
         </p>
       </div>
     </div>
