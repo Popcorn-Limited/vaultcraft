@@ -18,6 +18,7 @@ import { VaultData } from "@/lib/types";
 import ManageLoanInterface from "@/components/lending/ManageLoanInterface";
 import { getHealthFactorColor } from "@/lib/external/aave";
 import { isAddress } from "viem";
+import ProtocolIcon from "../common/ProtocolIcon";
 
 export default function Navbar(): JSX.Element {
   const router = useRouter();
@@ -94,16 +95,28 @@ export default function Navbar(): JSX.Element {
             </div>
           }
 
-          <div
-            className={`hidden md:flex w-48 cursor-pointer h-full py-2 bg-customNeutral300 md:bg-transparent md:py-2 px-4 md:px-6 flex-row items-center justify-between border border-customGray100 rounded-4xl text-white`}
-            onClick={() =>
-              window.open(
-                "https://swap.cow.fi/#/1/swap/WETH/VCX",
-                "_blank"
-              )}
+          <button
+            className={`w-56 px-4 py-2 rounded bg-white border border-white font-semibold text-base text-black
+                  transition-all ease-in-out duration-500 hover:bg-primaryYellow hover:border-primaryYellow 
+                  disabled:bg-customGray100 disabled:border-customGray100 disabled:text-white disabled:cursor-not-allowed 
+                  disabled:hover:border-customGray100 disabled:hover:bg-customGray100 disabled:hover:text-white
+                  flex flex-row items-center
+                  `}
+            onClick={
+              () =>
+                window.open(
+                  "https://swap.cow.fi/#/1/swap/WETH/VCX",
+                  "_blank"
+                )
+            }
+            type="button"
           >
-            Buy VCX
-          </div>
+            <img
+              src="https://icons.llamao.fi/icons/protocols/cowswap?w=48&h=48"
+              className="w-5 h-5 rounded-full border border-white"
+            />
+            <p className="ml-2 mt-1">Buy VCX</p>
+          </button>
 
           {address ? (
             <div className={`relative flex flex-container flex-row z-10`}>
