@@ -41,40 +41,6 @@ export default function Products(): JSX.Element {
                   Instruction <br className="hidden md:inline" />
                   Manual
                 </h2>
-                <div className="mb-3 z-10">
-                  <InfoIconWithTooltip
-                    id="manual-tooltip"
-                    content={
-                      <div className="w-60">
-                        <p className="text-white font-bold mb-2">Earn Vault XP</p>
-                        <div className="w-full flex flex-row items-center justify-between">
-                          <p className="text-white">Deposit</p>
-                          <div className="flex flex-row items-center">
-                            <p className="text-white">25 XP</p>
-                            <TokenIcon
-                              token={{} as Token}
-                              icon={"/images/tokens/XP.svg"}
-                              chainId={1}
-                              imageSize="w-6 h-6 mb-1 ml-1"
-                            />
-                          </div>
-                        </div>
-                        <div className="w-full flex flex-row items-center justify-between">
-                          <p className="text-white">Create Vault</p>
-                          <div className="flex flex-row items-center">
-                            <p className="text-white">25 XP</p>
-                            <TokenIcon
-                              token={{} as Token}
-                              icon={"/images/tokens/XP.svg"}
-                              chainId={1}
-                              imageSize="w-6 h-6 mb-1 ml-1"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    }
-                  />
-                </div>
               </div>
             }
             customContent={
@@ -100,36 +66,53 @@ export default function Products(): JSX.Element {
                     id="depositor-tooltip"
                     content={
                       <div className="w-60">
-                        <p className="text-white font-bold mb-2">Depositors earn</p>
-                        <p className="text-white">Vault APY</p>
-                        <p className="text-white">Restaking APY</p>
-                        <p className="text-white">LRT Points</p>
-                        <div className="flex flex-row items-center justify-between">
-                          <p className="text-white">oVCX Rewards</p>
-                          <TokenIcon
-                            token={{} as Token}
-                            icon={"/images/tokens/oVcx.svg"}
-                            chainId={1}
-                            imageSize="w-6 h-6 mb-1 ml-1"
-                          />
-                        </div>
-                        <div className="flex flex-row items-center justify-between">
-                          <p className="text-white">Eigenlayer Points</p>
-                          <TokenIcon
-                            token={{} as Token}
-                            icon={"https://icons.llamao.fi/icons/protocols/eigenlayer?w=48&h=48"}
-                            chainId={1}
-                            imageSize="w-6 h-6 mb-1 ml-1"
-                          />
-                        </div>
-                        <div className="flex flex-row items-center justify-between">
-                          <p className="text-white">VaultCraft XP</p>
-                          <TokenIcon
-                            token={{} as Token}
-                            icon={"/images/tokens/XP.svg"}
-                            chainId={1}
-                            imageSize="w-6 h-6 mb-1 ml-1"
-                          />
+                        <p className="text-white font-bold mb-2">Depositors Earn</p>
+                        <div className="space-y-2">
+                          <p className="text-white">Vault APY</p>
+                          <p className="text-white">Restaking APY</p>
+                          <p className="text-white">LRT Points</p>
+                          <div className="flex flex-row items-center justify-between">
+                            <p className="text-white">oVCX Rewards</p>
+                            <TokenIcon
+                              token={{} as Token}
+                              icon={"/images/tokens/oVcx.svg"}
+                              chainId={1}
+                              imageSize="w-6 h-6 mb-1 ml-1"
+                            />
+                          </div>
+                          <div className="flex flex-row items-center justify-between">
+                            <p className="text-white">Eigenlayer Points</p>
+                            <TokenIcon
+                              token={{} as Token}
+                              icon={"https://icons.llamao.fi/icons/protocols/eigenlayer?w=48&h=48"}
+                              chainId={1}
+                              imageSize="w-6 h-6 mb-1 ml-1"
+                            />
+                          </div>
+                          <div className="w-full flex flex-row items-center justify-between">
+                            <p className="text-white">Deposit</p>
+                            <div className="flex flex-row items-center">
+                              <p className="text-white">25 XP</p>
+                              <TokenIcon
+                                token={{} as Token}
+                                icon={"/images/tokens/XP.svg"}
+                                chainId={1}
+                                imageSize="w-6 h-6 mb-1 ml-1"
+                              />
+                            </div>
+                          </div>
+                          <div className="w-full flex flex-row items-center justify-between">
+                            <p className="text-white">Create Vault</p>
+                            <div className="flex flex-row items-center">
+                              <p className="text-white">25 XP</p>
+                              <TokenIcon
+                                token={{} as Token}
+                                icon={"/images/tokens/XP.svg"}
+                                chainId={1}
+                                imageSize="w-6 h-6 mb-1 ml-1"
+                              />
+                            </div>
+                          </div>
                         </div>
                       </div>
                     }
@@ -176,64 +159,67 @@ export default function Products(): JSX.Element {
                     content={
                       <div className="w-60">
                         <p className="text-white font-bold mb-2">Earn XP</p>
-                        <div className="w-full flex flex-row items-center justify-between">
-                          <p className="text-white">Buy VCX</p>
-                          <div className="flex flex-row items-center">
-                            <p className="text-white">25 XP</p>
-                            <TokenIcon
-                              token={{} as Token}
-                              icon={"/images/tokens/XP.svg"}
-                              chainId={1}
-                              imageSize="w-6 h-6 mb-1 ml-1"
-                            />
+                        <div className="space-y-2">
+
+                          <div className="w-full flex flex-row items-center justify-between">
+                            <p className="text-white">Buy VCX</p>
+                            <div className="flex flex-row items-center">
+                              <p className="text-white">25 XP</p>
+                              <TokenIcon
+                                token={{} as Token}
+                                icon={"/images/tokens/XP.svg"}
+                                chainId={1}
+                                imageSize="w-6 h-6 mb-1 ml-1"
+                              />
+                            </div>
                           </div>
-                        </div>
-                        <div className="w-full flex flex-row items-center justify-between">
-                          <p className="text-white">Hold VCX</p>
-                          <div className="flex flex-row items-center">
-                            <p className="text-white">Up to 1250 XP</p>
-                            <TokenIcon
-                              token={{} as Token}
-                              icon={"/images/tokens/XP.svg"}
-                              chainId={1}
-                              imageSize="w-6 h-6 mb-1 ml-1"
-                            />
+                          <div className="w-full flex flex-row items-center justify-between">
+                            <p className="text-white">Hold VCX</p>
+                            <div className="flex flex-row items-center">
+                              <p className="text-white">Up to 1250 XP</p>
+                              <TokenIcon
+                                token={{} as Token}
+                                icon={"/images/tokens/XP.svg"}
+                                chainId={1}
+                                imageSize="w-6 h-6 mb-1 ml-1"
+                              />
+                            </div>
                           </div>
-                        </div>
-                        <div className="w-full flex flex-row items-center justify-between">
-                          <p className="text-white">Exercise oVCX</p>
-                          <div className="flex flex-row items-center">
-                            <p className="text-white">Up to 300 XP</p>
-                            <TokenIcon
-                              token={{} as Token}
-                              icon={"/images/tokens/XP.svg"}
-                              chainId={1}
-                              imageSize="w-6 h-6 mb-1 ml-1"
-                            />
+                          <div className="w-full flex flex-row items-center justify-between">
+                            <p className="text-white">Exercise oVCX</p>
+                            <div className="flex flex-row items-center">
+                              <p className="text-white">Up to 300 XP</p>
+                              <TokenIcon
+                                token={{} as Token}
+                                icon={"/images/tokens/XP.svg"}
+                                chainId={1}
+                                imageSize="w-6 h-6 mb-1 ml-1"
+                              />
+                            </div>
                           </div>
-                        </div>
-                        <div className="w-full flex flex-row items-center justify-between">
-                          <p className="text-white">Mint veVCX</p>
-                          <div className="flex flex-row items-center">
-                            <p className="text-white">200 XP</p>
-                            <TokenIcon
-                              token={{} as Token}
-                              icon={"/images/tokens/XP.svg"}
-                              chainId={1}
-                              imageSize="w-6 h-6 mb-1 ml-1"
-                            />
+                          <div className="w-full flex flex-row items-center justify-between">
+                            <p className="text-white">Mint veVCX</p>
+                            <div className="flex flex-row items-center">
+                              <p className="text-white">200 XP</p>
+                              <TokenIcon
+                                token={{} as Token}
+                                icon={"/images/tokens/XP.svg"}
+                                chainId={1}
+                                imageSize="w-6 h-6 mb-1 ml-1"
+                              />
+                            </div>
                           </div>
-                        </div>
-                        <div className="w-full flex flex-row items-center justify-between">
-                          <p className="text-white">Exercise oVCX</p>
-                          <div className="flex flex-row items-center">
-                            <p className="text-white">Up to 300 XP</p>
-                            <TokenIcon
-                              token={{} as Token}
-                              icon={"/images/tokens/XP.svg"}
-                              chainId={1}
-                              imageSize="w-6 h-6 mb-1 ml-1"
-                            />
+                          <div className="w-full flex flex-row items-center justify-between">
+                            <p className="text-white">Exercise oVCX</p>
+                            <div className="flex flex-row items-center">
+                              <p className="text-white">Up to 300 XP</p>
+                              <TokenIcon
+                                token={{} as Token}
+                                icon={"/images/tokens/XP.svg"}
+                                chainId={1}
+                                imageSize="w-6 h-6 mb-1 ml-1"
+                              />
+                            </div>
                           </div>
                         </div>
                       </div>
