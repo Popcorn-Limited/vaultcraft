@@ -26,6 +26,10 @@ const links: { label: string; url: string; onClick?: Function }[] = [
     label: "Archive",
     url: "https://archive.pop.network/",
   },
+  {
+    label: "Buy VCX",
+    url: "https://swap.cow.fi/#/1/swap/WETH/VCX",
+  },
 ];
 
 export default function NavbarLinks(): JSX.Element {

@@ -69,6 +69,12 @@ export default function Navbar(): JSX.Element {
             </Link>
           </div>
         </div>
+        <div className="hidden md:block bg-primaryYellow rounded-md py-3 md:px-4 px-8 mx-4">
+          <p>
+            <span className="font-bold"> V1.5 is live.{" "}</span>
+            Depositors earn: Smart Vault APR + oVCX perpetual call options + Eigenlayer Points + LRT points 🔥
+          </p>
+        </div>
         <div className="flex flex-container h-full flex-row w-fit-content items-center gap-x-6">
           {(chain && userAccountData[chain?.id]?.healthFactor > 0) &&
             <div
@@ -86,9 +92,9 @@ export default function Navbar(): JSX.Element {
               />
             </div>
           }
-          
+
           <div
-            className={`w-fit cursor-pointer h-full py-2 bg-customNeutral300 md:bg-transparent md:py-2 px-4 md:px-6 flex flex-row items-center justify-between border border-customGray100 rounded-4xl text-white`}
+            className={`hidden md:flex w-48 cursor-pointer h-full py-2 bg-customNeutral300 md:bg-transparent md:py-2 px-4 md:px-6 flex-row items-center justify-between border border-customGray100 rounded-4xl text-white`}
             onClick={() =>
               window.open(
                 "https://swap.cow.fi/#/1/swap/WETH/VCX",
@@ -229,6 +235,12 @@ export default function Navbar(): JSX.Element {
           </div>
         </Dialog>
       </Transition.Root>
+      <div className="md:hidden bg-primaryYellow rounded-md py-3 md:px-4 px-8 mx-4">
+        <p>
+          <span className="font-bold"> V1.5 is live.{" "}</span>
+          Depositors earn: Smart Vault APR + oVCX perpetual call options + Eigenlayer Points + LRT points 🔥
+        </p>
+      </div>
     </>
   );
 }

@@ -30,7 +30,7 @@ export default function StatusWithLabel({
           <p className="text-customGray200">{label}</p>
           <div className="ml-2 mt-0">
             <InfoIconWithTooltip
-              classExtras="text-customGray400"
+              classExtras="w-4 h-4 text-customGray400"
               id={infoIconProps.id}
               title={infoIconProps.title}
               content={infoIconProps.content}

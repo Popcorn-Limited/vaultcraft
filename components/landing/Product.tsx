@@ -8,6 +8,7 @@ export interface ProductProps {
   title: JSX.Element;
   description: string;
   route: string;
+  handleClick?: Function;
   stats?: StatusWithLabelProps[];
   customContent?: JSX.Element;
   badge?: string;
@@ -20,10 +21,13 @@ export default function Product({
   badge,
   customContent,
   route,
+  handleClick
 }: ProductProps): JSX.Element {
   return (
     <Link
       href={route}
+      // @ts-ignore
+      onClick={handleClick ? handleClick : () => { }}
       className="group border rounded w-full lg:max-w-full h-[600px] relative flex flex-col bg-customNeutral300 border-customNeutral100 border-opacity-75 smmd:items-center py-6 px-8 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:bg-customNeutral200"
     >
       {badge && (
@@ -35,9 +39,7 @@ export default function Product({
       )}
       <div className="col-span-12 md:col-span-4 xs:self-start flex-1">
         <div className="relative flex flex-row">
-          <h2 className="text-white text-4xl md:text-6xl leading-none mb-2">
-            {title}
-          </h2>
+          {title}
         </div>
         <p className="mt-2 text-white">{description}</p>
       </div>

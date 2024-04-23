@@ -13,7 +13,9 @@ export default function ResponsiveTooltip({
         <Tooltip
           anchorSelect={`#${id}`}
           place="bottom"
-          style={{ backgroundColor: "#353945" }}
+          style={{ backgroundColor: "#353945", borderRadius: "8px" }}
+          border="1px solid #555555"
+          opacity={1}
         >
           {content}
         </Tooltip>
@@ -23,7 +25,9 @@ export default function ResponsiveTooltip({
           anchorSelect={`#${id}`}
           openOnClick
           place="bottom"
-          style={{ backgroundColor: "#353945" }}
+          style={{ backgroundColor: "#353945", borderRadius: "8px" }}
+          border="1px solid #555555"
+          opacity={1}
         >
           {content}
         </Tooltip>

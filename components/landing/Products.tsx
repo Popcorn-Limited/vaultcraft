@@ -8,7 +8,10 @@ import { useAtom } from "jotai";
 import Link from "next/link";
 import { tvlAtom } from "@/lib/atoms";
 import Modal from "@/components/modal/Modal";
-import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import { ChevronLeftIcon, ChevronRightIcon, InformationCircleIcon } from "@heroicons/react/24/outline";
+import InfoIconWithTooltip from "@/components/common/InfoIconWithTooltip";
+import TokenIcon from "@/components/common/TokenIcon";
+import { Token } from "@/lib/types";
 
 export default function Products(): JSX.Element {
   const [tvl] = useAtom(tvlAtom);
@@ -26,13 +29,108 @@ export default function Products(): JSX.Element {
       <section className="py-12 md:py-10 mx-4 md:mx-6">
         <p className="text-2xl mb-6 text-white smmd:hidden"> Our products </p>
         <div className="flex flex-col gap-6 smmd:flex-wrap lg:flex-nowrap space-y-4 md:space-y-0 md:flex-row md:justify-between">
-          <InstructionManualCard setShowModal={setShowModal}/>
           <Product
             title={
-              <>
-                Smart <br className="hidden md:inline" />
-                Vaults
-              </>
+              <div className="flex flex-row w-full justify-between items-end">
+                <h2 className="text-white text-4xl md:text-6xl leading-none">
+                  Instruction <br className="hidden md:inline" />
+                  Manual
+                </h2>
+                <div className="mb-3 z-10">
+                  <InfoIconWithTooltip
+                    id="manual-tooltip"
+                    content={
+                      <div className="w-60">
+                        <p className="text-white font-bold mb-2">Earn Vault XP</p>
+                        <div className="w-full flex flex-row items-center justify-between">
+                          <p className="text-white">Deposit</p>
+                          <div className="flex flex-row items-center">
+                            <p className="text-white">25 XP</p>
+                            <TokenIcon
+                              token={{} as Token}
+                              icon={"/images/tokens/XP.svg"}
+                              chainId={1}
+                              imageSize="w-6 h-6 mb-1 ml-1"
+                            />
+                          </div>
+                        </div>
+                        <div className="w-full flex flex-row items-center justify-between">
+                          <p className="text-white">Create Vault</p>
+                          <div className="flex flex-row items-center">
+                            <p className="text-white">25 XP</p>
+                            <TokenIcon
+                              token={{} as Token}
+                              icon={"/images/tokens/XP.svg"}
+                              chainId={1}
+                              imageSize="w-6 h-6 mb-1 ml-1"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    }
+                  />
+                </div>
+              </div>
+            }
+            customContent={
+              <PopIcon
+                size={"60"}
+                color={"white"}
+                className="group-hover:fill-secondaryYellow"
+              />
+            }
+            description="Learn how to use VaultCraft and optimize your yield with our perpetual call options 🚀"
+            route=""
+            handleClick={() => setShowModal(true)}
+          />
+          <Product
+            title={
+              <div className="flex flex-row w-full justify-between items-end">
+                <h2 className="text-white text-4xl md:text-6xl leading-none">
+                  Smart <br className="hidden md:inline" />
+                  Vaults
+                </h2>
+                <div className="mb-3 z-10">
+                  <InfoIconWithTooltip
+                    id="depositor-tooltip"
+                    content={
+                      <div className="w-60">
+                        <p className="text-white font-bold mb-2">Depositors earn</p>
+                        <p className="text-white">Vault APY</p>
+                        <p className="text-white">Restaking APY</p>
+                        <p className="text-white">LRT Points</p>
+                        <div className="flex flex-row items-center justify-between">
+                          <p className="text-white">oVCX Rewards</p>
+                          <TokenIcon
+                            token={{} as Token}
+                            icon={"/images/tokens/oVcx.svg"}
+                            chainId={1}
+                            imageSize="w-6 h-6 mb-1 ml-1"
+                          />
+                        </div>
+                        <div className="flex flex-row items-center justify-between">
+                          <p className="text-white">Eigenlayer Points</p>
+                          <TokenIcon
+                            token={{} as Token}
+                            icon={"https://icons.llamao.fi/icons/protocols/eigenlayer?w=48&h=48"}
+                            chainId={1}
+                            imageSize="w-6 h-6 mb-1 ml-1"
+                          />
+                        </div>
+                        <div className="flex flex-row items-center justify-between">
+                          <p className="text-white">VaultCraft XP</p>
+                          <TokenIcon
+                            token={{} as Token}
+                            icon={"/images/tokens/XP.svg"}
+                            chainId={1}
+                            imageSize="w-6 h-6 mb-1 ml-1"
+                          />
+                        </div>
+                      </div>
+                    }
+                  />
+                </div>
+              </div>
             }
             customContent={
               <PopSmileyIcon
@@ -62,10 +160,82 @@ export default function Products(): JSX.Element {
           />
           <Product
             title={
-              <>
-                Boost <br className="hidden md:inline" />
-                Vaults
-              </>
+              <div className="flex flex-row w-full justify-between items-end">
+                <h2 className="text-white text-4xl md:text-6xl leading-none">
+                  Boost <br className="hidden md:inline" />
+                  Vaults
+                </h2>
+                <div className="mb-3 z-10">
+                  <InfoIconWithTooltip
+                    id="boost-tooltip"
+                    content={
+                      <div className="w-60">
+                        <p className="text-white font-bold mb-2">Earn XP</p>
+                        <div className="w-full flex flex-row items-center justify-between">
+                          <p className="text-white">Buy VCX</p>
+                          <div className="flex flex-row items-center">
+                            <p className="text-white">25 XP</p>
+                            <TokenIcon
+                              token={{} as Token}
+                              icon={"/images/tokens/XP.svg"}
+                              chainId={1}
+                              imageSize="w-6 h-6 mb-1 ml-1"
+                            />
+                          </div>
+                        </div>
+                        <div className="w-full flex flex-row items-center justify-between">
+                          <p className="text-white">Hold VCX</p>
+                          <div className="flex flex-row items-center">
+                            <p className="text-white">Up to 1250 XP</p>
+                            <TokenIcon
+                              token={{} as Token}
+                              icon={"/images/tokens/XP.svg"}
+                              chainId={1}
+                              imageSize="w-6 h-6 mb-1 ml-1"
+                            />
+                          </div>
+                        </div>
+                        <div className="w-full flex flex-row items-center justify-between">
+                          <p className="text-white">Exercise oVCX</p>
+                          <div className="flex flex-row items-center">
+                            <p className="text-white">Up to 300 XP</p>
+                            <TokenIcon
+                              token={{} as Token}
+                              icon={"/images/tokens/XP.svg"}
+                              chainId={1}
+                              imageSize="w-6 h-6 mb-1 ml-1"
+                            />
+                          </div>
+                        </div>
+                        <div className="w-full flex flex-row items-center justify-between">
+                          <p className="text-white">Mint veVCX</p>
+                          <div className="flex flex-row items-center">
+                            <p className="text-white">200 XP</p>
+                            <TokenIcon
+                              token={{} as Token}
+                              icon={"/images/tokens/XP.svg"}
+                              chainId={1}
+                              imageSize="w-6 h-6 mb-1 ml-1"
+                            />
+                          </div>
+                        </div>
+                        <div className="w-full flex flex-row items-center justify-between">
+                          <p className="text-white">Exercise oVCX</p>
+                          <div className="flex flex-row items-center">
+                            <p className="text-white">Up to 300 XP</p>
+                            <TokenIcon
+                              token={{} as Token}
+                              icon={"/images/tokens/XP.svg"}
+                              chainId={1}
+                              imageSize="w-6 h-6 mb-1 ml-1"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    }
+                  />
+                </div>
+              </div>
             }
             customContent={
               <SmileyIcon
@@ -131,29 +301,6 @@ const TutorialTitleByStep: { [key: number]: string } = {
   1: "Deposit into a Smart Vault",
   2: "Get and Lock VCX-LP",
   3: "Vote on Gauges",
-}
-
-function InstructionManualCard({ setShowModal }: { setShowModal: Function }): JSX.Element {
-  return <div
-    className="group cursor-pointer border rounded w-full lg:max-w-full h-[600px] relative flex flex-col bg-customNeutral300 border-customNeutral100 border-opacity-75 smmd:items-center py-6 px-8 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:bg-customNeutral200"
-    onClick={() => setShowModal(true)}
-  >
-    <div className="col-span-12 md:col-span-4 xs:self-start flex-1">
-      <div className="relative flex flex-row">
-        <h2 className="text-white text-4xl md:text-6xl leading-none mb-2">
-          Instruction Manual
-        </h2>
-      </div>
-      <p className="mt-2 text-white">Learn how to use VaultCraft and optimize your yield with our perpetual call options 🚀</p>
-    </div>
-    <div className="flex absolute flex-grow items-center justify-end w-full top-[50%] translate-y-[-50%] right-8">
-      <PopIcon
-        size={"60"}
-        color={"white"}
-        className="group-hover:fill-secondaryYellow"
-      />
-    </div>
-  </div>
 }
 
 function Tutorial(): JSX.Element {
