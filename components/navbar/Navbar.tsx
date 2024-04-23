@@ -17,6 +17,7 @@ import ResponsiveTooltip from "@/components/common/Tooltip";
 import { VaultData } from "@/lib/types";
 import ManageLoanInterface from "@/components/lending/ManageLoanInterface";
 import { getHealthFactorColor } from "@/lib/external/aave";
+import { isAddress } from "viem";
 
 export default function Navbar(): JSX.Element {
   const router = useRouter();
@@ -60,7 +61,7 @@ export default function Navbar(): JSX.Element {
       <div className="flex flex-row items-center justify-between w-full py-8 px-4 md:px-8 z-10">
         <div className="flex flex-row items-center">
           <div>
-            <Link href={`/`} passHref>
+            <Link href={(!!query?.ref && isAddress(query.ref as string)) ? `/?ref=${query.ref}` : `/`} passHref>
               <img
                 src="/images/icons/popLogo.svg"
                 alt="Logo"
@@ -200,7 +201,7 @@ export default function Navbar(): JSX.Element {
               <div className="h-full w-full flex flex-col justify-between pt-12 px-8 shadow-xl bg-primaryYellow overflow-y-scroll">
                 <div className="flex flex-1 flex-col w-full space-y-4">
                   <div className="mb-6">
-                    <Link href={`/`} passHref>
+                    <Link href={(!!query?.ref && isAddress(query.ref as string)) ? `/?ref=${query.ref}` : `/`} passHref>
                       <img
                         src="/images/icons/popLogoBlack.svg"
                         alt="Logo"

@@ -1,5 +1,6 @@
 import { useRouter } from "next/router";
 import NavbarLink from "@/components/navbar/NavbarLink";
+import { isAddress } from "viem";
 
 const links: { label: string; url: string; onClick?: Function }[] = [
   {
@@ -34,13 +35,15 @@ const links: { label: string; url: string; onClick?: Function }[] = [
 
 export default function NavbarLinks(): JSX.Element {
   const router = useRouter();
+  const { query } = router;
+
   return (
     <>
       {links.map((link) => (
         <NavbarLink
           key={link.label}
           label={link.label}
-          url={link.url}
+          url={(!!query?.ref && isAddress(query.ref as string)) ? `${link.url}?ref=${query.ref}` : `${link.url}`}
           isActive={router.pathname === link.url}
         />
       ))}

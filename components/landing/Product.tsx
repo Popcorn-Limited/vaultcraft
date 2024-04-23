@@ -3,6 +3,8 @@ import StatusWithLabel, {
   StatusWithLabelProps,
 } from "@/components/common/StatusWithLabel";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import { isAddress } from "viem";
 
 export interface ProductProps {
   title: JSX.Element;
@@ -23,9 +25,12 @@ export default function Product({
   route,
   handleClick
 }: ProductProps): JSX.Element {
+  const router = useRouter();
+  const { query } = router;
+
   return (
     <Link
-      href={route}
+      href={(!!query?.ref && isAddress(query.ref as string)) ? `${route}?ref=${query.ref}` : `/${route}`}
       // @ts-ignore
       onClick={handleClick ? handleClick : () => { }}
       className="group border rounded w-full lg:max-w-full h-[600px] relative flex flex-col bg-customNeutral300 border-customNeutral100 border-opacity-75 smmd:items-center py-6 px-8 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:bg-customNeutral200"

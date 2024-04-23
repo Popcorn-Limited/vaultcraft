@@ -12,8 +12,13 @@ import { ChevronLeftIcon, ChevronRightIcon, InformationCircleIcon } from "@heroi
 import InfoIconWithTooltip from "@/components/common/InfoIconWithTooltip";
 import TokenIcon from "@/components/common/TokenIcon";
 import { Token } from "@/lib/types";
+import { useRouter } from "next/router";
+import { isAddress } from "viem";
 
 export default function Products(): JSX.Element {
+  const router = useRouter();
+  const { query } = router;
+
   const [tvl] = useAtom(tvlAtom);
   const [showModal, setShowModal] = useState<boolean>(false);
 
@@ -249,7 +254,9 @@ export default function Products(): JSX.Element {
             route="boost"
           />
           <div className="w-full lg:max-w-full h-[600px] relative flex flex-col space-y-4 md:mx-2">
-            <Link href="vaultron">
+            <Link
+              href={(!!query?.ref && isAddress(query.ref as string)) ? `vaultron?ref=${query.ref}` : `vaultron`}
+            >
               <div className="rounded w-full md:h-[200px] h-[300px] bg-customNeutral300 border border-customNeutral100 border-opacity-75 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:opacity-50 flex flex-col justify-start bg-cover"
                 style={{ backgroundImage: "url('https://resolve.mercle.xyz/ipfs/bafkreibn26tzshouo6ayr33uhwwqzxpp5h6zgzitzgxwhsacsuuxoo7fuq')" }}
               >
@@ -259,7 +266,7 @@ export default function Products(): JSX.Element {
               </div>
             </Link>
             <Link
-              href="create-vault"
+              href={(!!query?.ref && isAddress(query.ref as string)) ? `create-vault?ref=${query.ref}` : `create-vault`}
               className="rounded w-full relative flex flex-col bg-customNeutral300 border border-customNeutral100 border-opacity-75 smmd:items-center py-6 px-8 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:bg-customNeutral200"
             >
               <div className="col-span-12 md:col-span-4 xs:self-start flex-1">
@@ -272,7 +279,7 @@ export default function Products(): JSX.Element {
               </div>
             </Link>
             <Link
-              href="stats"
+              href={(!!query?.ref && isAddress(query.ref as string)) ? `stats?ref=${query.ref}` : `stats`}
               className="rounded w-full relative flex flex-col bg-customNeutral300 border border-customNeutral100 border-opacity-75 smmd:items-center py-6 px-8 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:bg-customNeutral200"
             >
               <div className="col-span-12 md:col-span-4 xs:self-start flex-1">

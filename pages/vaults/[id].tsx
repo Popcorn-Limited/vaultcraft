@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import NoSSR from "react-no-ssr";
 import { erc20ABI, useAccount, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
-import { Address, WalletClient, createPublicClient, http, zeroAddress } from "viem";
+import { Address, WalletClient, createPublicClient, http, isAddress, zeroAddress } from "viem";
 import { yieldOptionsAtom } from "@/lib/atoms/sdk";
 import { NumberFormatter, formatAndRoundNumber, formatNumber } from "@/lib/utils/formatBigNumber";
 import { roundToTwoDecimalPlaces } from "@/lib/utils/helpers";
@@ -141,7 +141,7 @@ export default function Index() {
             <button
               className="border border-customGray500 rounded-lg flex flex-row items-center px-4 py-2 ml-4 md:ml-8 mt-10"
               type="button"
-              onClick={() => router.push("/vaults")}
+              onClick={() => router.push((!!query?.ref && isAddress(query.ref as string)) ? `/vaults?ref=${query.ref}` : "/vaults")}
             >
               <div className="w-5 h-5">
                 <LeftArrowIcon color="#FFF" />

@@ -7,6 +7,7 @@ import VaultStats from "@/components/vault/VaultStats";
 import { useAtom } from 'jotai';
 import { tokensAtom } from '@/lib/atoms';
 import { useRouter } from 'next/router';
+import { isAddress } from "viem";
 
 
 interface SmartVaultsProps {
@@ -21,6 +22,8 @@ export default function SmartVault({
   description,
 }: SmartVaultsProps) {
   const router = useRouter();
+  const { query } = router;
+
   const { address: account } = useAccount();
 
   const [tokens] = useAtom(tokensAtom)
@@ -55,7 +58,13 @@ export default function SmartVault({
     return <></>;
   return (
     <>
-      <Accordion handleClick={() => router.push(`/vaults/${vaultData.vault}?chainId=${vaultData.chainId}`)}>
+      <Accordion
+        handleClick={() =>
+          router.push((!!query?.ref && isAddress(query.ref as string))
+            ? `/vaults/${vaultData.vault}?chainId=${vaultData.chainId}&ref=${query.ref}`
+            : `/vaults/${vaultData.vault}?chainId=${vaultData.chainId}`)
+        }
+      >
         <div className="w-full flex flex-wrap items-center justify-between flex-col gap-4">
           <div className="flex items-center justify-between select-none w-full">
             <AssetWithName vault={vaultData} />
