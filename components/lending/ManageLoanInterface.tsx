@@ -226,10 +226,10 @@ export default function ManageLoanInterface({ visibilityState, vaultData }: { vi
     let val = (Number(inputAmount) * (10 ** inputToken.decimals))
     if (AaveActionType.Repay === action &&
       val >= ((reserveData[vaultData.chainId].find(d => d.asset === repayToken?.address)?.borrowAmount || 0) * (10 ** inputToken.decimals))) {
-      val = Number(maxUint256)
+      val = -1
     } else if (AaveActionType.Withdraw === action &&
       val === ((reserveData[vaultData.chainId].find(d => d.asset === repayToken?.address)?.balance || 0) * (10 ** inputToken.decimals))) {
-      val = Number(maxUint256)
+      val = -1
     }
 
     const aaveInteraction = await handleAaveInteraction({

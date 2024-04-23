@@ -75,7 +75,7 @@ export async function withdrawFromAave({ asset, amount, onBehalfOf, chainId, acc
       account,
       args: [
         asset,
-        BigInt(Number(amount).toLocaleString("fullwide", { useGrouping: false })),
+        amount < 0 ? maxUint256 : BigInt(Number(amount).toLocaleString("fullwide", { useGrouping: false })),
         onBehalfOf
       ],
       functionName: "withdraw",
@@ -87,8 +87,6 @@ export async function withdrawFromAave({ asset, amount, onBehalfOf, chainId, acc
 
 export async function borrowFromAave({ asset, amount, onBehalfOf, chainId, account, clients }: AavePoolProps): Promise<boolean> {
   showLoadingToast("Borrowing from Aave...")
-
-  console.log({ asset, amount, onBehalfOf, chainId, account, pool: AavePoolByChain[chainId], clients })
 
   return await handleCallResult({
     successMessage: "Borrowed underlying asset from Aave pool!",
@@ -119,7 +117,7 @@ export async function repayToAave({ asset, amount, onBehalfOf, chainId, account,
       account,
       args: [
         asset,
-        BigInt(Number(amount).toLocaleString("fullwide", { useGrouping: false })),
+        amount < 0 ? maxUint256 : BigInt(Number(amount).toLocaleString("fullwide", { useGrouping: false })),
         2,
         onBehalfOf
       ],
