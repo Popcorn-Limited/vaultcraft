@@ -52,7 +52,12 @@ export async function supplyToAave({ asset, amount, onBehalfOf, chainId, account
     simulationResponse: await simulateAavePoolCall({
       address: AavePoolByChain[chainId],
       account,
-      args: [asset, amount, onBehalfOf, 0],
+      args: [
+        asset,
+        BigInt(Number(amount).toLocaleString("fullwide", { useGrouping: false })),
+        onBehalfOf,
+        0
+      ],
       functionName: "supply",
       publicClient: clients.publicClient
     }),
@@ -68,7 +73,11 @@ export async function withdrawFromAave({ asset, amount, onBehalfOf, chainId, acc
     simulationResponse: await simulateAavePoolCall({
       address: AavePoolByChain[chainId],
       account,
-      args: [asset, amount, onBehalfOf],
+      args: [
+        asset,
+        BigInt(Number(amount).toLocaleString("fullwide", { useGrouping: false })),
+        onBehalfOf
+      ],
       functionName: "withdraw",
       publicClient: clients.publicClient
     }),
@@ -86,7 +95,13 @@ export async function borrowFromAave({ asset, amount, onBehalfOf, chainId, accou
     simulationResponse: await simulateAavePoolCall({
       address: AavePoolByChain[chainId],
       account,
-      args: [asset, amount, 2, 0, onBehalfOf],
+      args: [
+        asset,
+        BigInt(Number(amount).toLocaleString("fullwide", { useGrouping: false })),
+        2,
+        0,
+        onBehalfOf
+      ],
       functionName: "borrow",
       publicClient: clients.publicClient
     }),
@@ -102,7 +117,12 @@ export async function repayToAave({ asset, amount, onBehalfOf, chainId, account,
     simulationResponse: await simulateAavePoolCall({
       address: AavePoolByChain[chainId],
       account,
-      args: [asset, amount === Number(maxUint256) ? maxUint256 : amount, 2, onBehalfOf],
+      args: [
+        asset,
+        BigInt(Number(amount).toLocaleString("fullwide", { useGrouping: false })),
+        2,
+        onBehalfOf
+      ],
       functionName: "repay",
       publicClient: clients.publicClient
     }),
