@@ -14,10 +14,14 @@ import TokenIcon from "@/components/common/TokenIcon";
 import { Token } from "@/lib/types";
 import { useRouter } from "next/router";
 import { isAddress } from "viem";
+import CopyToClipboard from "react-copy-to-clipboard";
+import { showErrorToast, showSuccessToast } from "@/lib/toasts";
+import { useAccount } from "wagmi";
 
 export default function Products(): JSX.Element {
   const router = useRouter();
   const { query } = router;
+  const { address: account } = useAccount();
 
   const [tvl] = useAtom(tvlAtom);
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -239,11 +243,11 @@ export default function Products(): JSX.Element {
             stats={[]}
             route="boost"
           />
-          <div className="w-full lg:max-w-full h-[600px] relative flex flex-col space-y-4 md:mx-2">
+          <div className="w-full lg:max-w-full h-[400px] relative flex flex-col space-y-4 md:mx-2">
             <Link
               href={(!!query?.ref && isAddress(query.ref as string)) ? `vaultron?ref=${query.ref}` : `vaultron`}
             >
-              <div className="rounded w-full md:h-[200px] h-[300px] bg-customNeutral300 border border-customNeutral100 border-opacity-75 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:opacity-50 flex flex-col justify-start bg-cover"
+              <div className="rounded w-full md:h-[190px] h-[300px] bg-customNeutral300 border border-customNeutral100 border-opacity-75 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:opacity-50 flex flex-col justify-start bg-cover"
                 style={{ backgroundImage: "url('https://resolve.mercle.xyz/ipfs/bafkreibn26tzshouo6ayr33uhwwqzxpp5h6zgzitzgxwhsacsuuxoo7fuq')" }}
               >
                 <h2 className="text-white text-2xl leading-none mb-2 py-6 px-8">
@@ -277,9 +281,29 @@ export default function Products(): JSX.Element {
                 <p className="mt-2 text-white">See all stats regarding VCX and VaultCraft</p>
               </div>
             </Link>
+            <div
+              className="rounded w-full relative flex flex-col bg-customNeutral300 border border-customNeutral100 border-opacity-75 smmd:items-center py-6 px-8 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:bg-customNeutral200"
+            >
+              <CopyToClipboard
+                text={`https://app.vaultcraft.io/vaults?ref=${account}`}
+                onCopy={() => account
+                  ? showSuccessToast("Referal link copied!")
+                  : showErrorToast("Connect your Wallet to copy referal link")
+                }
+              >
+                <div className="col-span-12 md:col-span-4 xs:self-start flex-1">
+                  <div className="relative flex flex-row">
+                    <h2 className="text-white text-3xl leading-none mb-2">
+                      Copy referral link
+                    </h2>
+                  </div>
+                  <p className="mt-2 text-white">Invite people to VaultCraft</p>
+                </div>
+              </CopyToClipboard>
+            </div>
           </div>
         </div>
-      </section>
+      </section >
     </>
   );
 }
