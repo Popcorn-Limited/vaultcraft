@@ -71,16 +71,13 @@ export default function Navbar(): JSX.Element {
             </Link>
           </div>
         </div>
-        <div className="hidden md:block bg-primaryYellow rounded-md py-3 md:px-4 px-8 mx-4">
-          <p>
-            <span className="font-bold"> V1.5 is live.{" "}</span>
-            Depositors earn: Smart Vault APR + oVCX perpetual call options + Eigenlayer Points + LRT points 🔥
-          </p>
-        </div>
-        <div className="flex flex-container h-full flex-row w-fit-content items-center gap-x-6">
+        <div className="flex flex-row items-center space-x-4">
+          <div className="hidden md:block">
+            <BuyVCXButton />
+          </div>
           {(chain && userAccountData[chain?.id]?.healthFactor > 0) &&
             <div
-              className={`w-fit cursor-pointer h-full py-2 bg-customNeutral300 md:bg-transparent md:py-2 px-4 md:px-6 flex flex-row items-center justify-between border border-customGray100 rounded-4xl text-white`}
+              className={`w-48 cursor-pointer h-full py-2 bg-customNeutral300 md:bg-transparent md:py-2 px-4 hidden md:flex flex-row items-center justify-between border border-customGray100 rounded-4xl text-white`}
               onClick={() => setShowLendModal(true)}
               id="global-health-factor"
             >
@@ -94,34 +91,10 @@ export default function Navbar(): JSX.Element {
               />
             </div>
           }
-
-          <button
-            className={`w-56 px-4 py-2 rounded bg-white border border-white font-semibold text-base text-black
-                  transition-all ease-in-out duration-500 hover:bg-primaryYellow hover:border-primaryYellow 
-                  disabled:bg-customGray100 disabled:border-customGray100 disabled:text-white disabled:cursor-not-allowed 
-                  disabled:hover:border-customGray100 disabled:hover:bg-customGray100 disabled:hover:text-white
-                  flex flex-row items-center
-                  `}
-            onClick={
-              () =>
-                window.open(
-                  "https://swap.cow.fi/#/1/swap/WETH/VCX",
-                  "_blank"
-                )
-            }
-            type="button"
-          >
-            <img
-              src="https://icons.llamao.fi/icons/protocols/cowswap?w=48&h=48"
-              className="w-5 h-5 rounded-full border border-white"
-            />
-            <p className="ml-2 mt-1">Buy VCX</p>
-          </button>
-
           {address ? (
             <div className={`relative flex flex-container flex-row z-10`}>
               <div
-                className={`w-fit cursor-pointer h-full py-2 bg-customNeutral300 md:bg-transparent md:py-2 px-4 md:px-6 flex flex-row items-center justify-between border border-customGray100 rounded-4xl text-white`}
+                className={`md:w-48 h-full py-2 px-4 md:px-6 flex flex-row items-center justify-between bg-transparent border border-customGray100 rounded-4xl cursor-pointer  text-white text-sm`}
               >
                 <img
                   src={logo}
@@ -129,7 +102,7 @@ export default function Navbar(): JSX.Element {
                   className="w-5 h-5 md:mr-2"
                   onClick={openChainModal}
                 />
-                <div className="hidden w-2 h-2 bg-green-500 ml-2 rounded-full"></div>
+                <div className="md:hidden w-2 h-2 bg-green-500 ml-1 rounded-full"></div>
                 <span className="hidden md:inline">|</span>
                 <p className="ml-2 leading-none hidden md:block">
                   {address?.substring(0, 5)}...
@@ -143,29 +116,31 @@ export default function Navbar(): JSX.Element {
               </div>
             </div>
           ) : (
-            <MainActionButton
-              label="Connect Wallet"
-              handleClick={openConnectModal}
-              hidden={address ? true : false}
-            />
+            <div className="w-48">
+              <MainActionButton
+                label="Connect Wallet"
+                handleClick={openConnectModal}
+                hidden={address ? true : false}
+              />
+            </div>
           )}
           <button
-            className={`text-white w-10 transform transition duration-500 relative focus:outline-none`}
+            className={`text-white w-10 h-10 p-1 transform transition duration-500 relative focus:outline-none`}
             onClick={() => toggleMenu(!menuVisible)}
           >
             <span
               aria-hidden="true"
-              className={`block h-0.5 w-8 bg-white ease-in-out rounded-3xl ${menuVisible ? "rotate-45 translate-y-1" : "-translate-y-2"
+              className={`block h-1 md:h-0.5 w-8 bg-white ease-in-out rounded-3xl ${menuVisible ? "rotate-45 translate-y-1" : "-translate-y-2"
                 }`}
             ></span>
             <span
               aria-hidden="true"
-              className={`block h-0.5 w-8 bg-white ease-in-out rounded-3xl ${menuVisible ? "opacity-0" : "opacity-100"
+              className={`block h-1 md:h-0.5 w-8 bg-white ease-in-out rounded-3xl ${menuVisible ? "opacity-0" : "opacity-100"
                 }`}
             ></span>
             <span
               aria-hidden="true"
-              className={`block h-0.5 w-8 bg-white ease-in-out rounded-3xl ${menuVisible ? "-rotate-45 -translate-y-1" : "translate-y-2"
+              className={`block h-1 md:h-0.5 w-8 bg-white ease-in-out rounded-3xl ${menuVisible ? "-rotate-45 -translate-y-1" : "translate-y-2"
                 }`}
             ></span>
           </button>
@@ -227,8 +202,11 @@ export default function Navbar(): JSX.Element {
                     onClick={() => toggleMenu(false)}
                   >
                     <NavbarLinks />
+                    <div className="md:hidden">
+                      <BuyVCXButton />
+                    </div>
                   </div>
-                  <div className="">
+                  <div className="pt-12 md:pt-0">
                     <p className="text-customNeutral200">
                       VaultCraft is a DeFi yield-optimizing protocol with
                       customizable asset strategies that instantly zap your
@@ -249,12 +227,58 @@ export default function Navbar(): JSX.Element {
           </div>
         </Dialog>
       </Transition.Root>
-      <div className="md:hidden bg-primaryYellow rounded-md py-3 md:px-4 px-8 mx-4">
-        <p>
-          <span className="font-bold"> V1.5 is live.{" "}</span>
-          Depositors earn: Smart Vault APR + oVCX perpetual call options + Eigenlayer Points + LRT points 🔥
-        </p>
-      </div>
     </>
   );
+}
+
+
+function BuyVCXButton(): JSX.Element {
+  return (
+    <>
+      <button
+        className={`w-48 px-4 py-2 rounded bg-white border border-white font-semibold text-base text-black
+                  transition-all ease-in-out duration-500 hover:bg-primaryYellow hover:border-primaryYellow 
+                  disabled:bg-customGray100 disabled:border-customGray100 disabled:text-white disabled:cursor-not-allowed 
+                  disabled:hover:border-customGray100 disabled:hover:bg-customGray100 disabled:hover:text-white
+                  hidden md:flex flex-row items-center justify-center`
+        }
+        type="button"
+        onClick={
+          () =>
+            window.open(
+              "https://swap.cow.fi/#/1/swap/WETH/VCX",
+              "_blank"
+            )
+        }
+      >
+        <img
+          src="https://icons.llamao.fi/icons/protocols/cowswap?w=48&h=48"
+          className="w-5 h-5 rounded-full border border-white"
+        />
+        <p className="ml-2 mt-1">Buy VCX</p>
+      </button>
+      <button
+        className={`w-48 px-4 py-2 rounded bg-black border border-black font-semibold text-base text-primaryYellow 
+        transition-all ease-in-out duration-500 hover:bg-white hover:border-white hover:text-black 
+        disabled:bg-customGray100 disabled:border-customGray100 disabled:text-white disabled:cursor-not-allowed 
+        disabled:hover:border-customGray100 disabled:hover:bg-customGray100 disabled:hover:text-white
+        md:hidden flex flex-row items-center justify-center`
+        }
+        type="button"
+        onClick={
+          () =>
+            window.open(
+              "https://swap.cow.fi/#/1/swap/WETH/VCX",
+              "_blank"
+            )
+        }
+      >
+        <img
+          src="https://icons.llamao.fi/icons/protocols/cowswap?w=48&h=48"
+          className="w-5 h-5 rounded-full border border-customGray500"
+        />
+        <p className="ml-2 mb-1">Buy VCX</p>
+      </button>
+    </>
+  )
 }
