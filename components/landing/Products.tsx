@@ -315,6 +315,7 @@ function Tutorial(): JSX.Element {
             <li>Borrow and deposit more ♻️</li>
             <li>Earn 10%+ base APY 🙂</li>
             <li>Earn 25%+ APY with perpetual call options (oVCX) 😏</li>
+            <li>Mint Vaultron NFT to earn XP Points for future airdrops 🪂</li>
           </ul>
         </div>
         <img src={TutorialImageByStep[1]} className="rounded-md mt-4 md:w-2/3 lg:hidden" />
@@ -338,7 +339,7 @@ function Tutorial(): JSX.Element {
             <li>
               Exercise for VCX, and then you can either
               <ul className="list-inside list-disc ml-6">
-                <li>HODL </li>
+                <li>HODL 💎</li>
                 <li>Provide more liquidity to earn higher multiples on oVCX 😝</li>
                 <li>Arbitrage instantly for 25% ROI on Balancer 🤪</li>
               </ul>
