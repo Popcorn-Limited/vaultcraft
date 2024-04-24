@@ -153,7 +153,6 @@ export async function getTokenAndVaultsData({
   }
 
   let tokens = { ...assets, ...vaults, ...gaugeTokens }
-  console.log(tokens)
   if (account !== zeroAddress) {
     tokens = await addBalances(tokens, account, client)
   }
