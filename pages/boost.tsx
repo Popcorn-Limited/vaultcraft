@@ -7,7 +7,7 @@ import {
 } from "wagmi";
 import { Address, WalletClient } from "viem";
 import { useEffect, useState } from "react";
-import { hasAlreadyVoted } from "@/lib/gauges/hasAlreadyVoted";
+import { VoteData, hasAlreadyVoted } from "@/lib/gauges/hasAlreadyVoted";
 import { AddressesByChain, VaultData } from "@/lib/types";
 import StakingInterface from "@/components/boost/StakingInterface";
 import { sendVotes } from "@/lib/gauges/interactions";
@@ -69,7 +69,7 @@ function VePopContainer() {
   );
   const [votes, setVotes] = useState<{ [key: Address]: number }>({});
   const [canCastVote, setCanCastVote] = useState<boolean>(false);
-  const [canVoteOnGauges, setCanVoteOnGauges] = useState<boolean[]>([]);
+  const [voteData, setVoteData] = useState<VoteData[]>([]);
 
   const [showLockModal, setShowLockModal] = useState(false);
   const [showMangementModal, setShowMangementModal] = useState(false);
@@ -89,7 +89,7 @@ function VePopContainer() {
       const _hiddenGauges = await getHiddenGauges();
       setHiddenGauges(_hiddenGauges);
 
-      const vaultsWithGauges = Object.values(vaults).flat().filter((vault) => !!vault.gauge);
+      const vaultsWithGauges = Object.values(vaults).flat().filter((vault) => !!vault.gauge)
       setGaugeVaults(vaultsWithGauges);
 
       if (
@@ -113,18 +113,15 @@ function VePopContainer() {
         setInitialVotes(initialVotes);
         setVotes(initialVotes);
 
-        const { canCastVote, canVoteOnGauges } = await hasAlreadyVoted({
+        const voteData_ = await hasAlreadyVoted({
           addresses: vaultsWithGauges?.map(
             (vault: VaultData) => vault.gauge as Address
           ),
           publicClient,
           account: account as Address,
         });
-
-        console.log({ canCastVote, canVoteOnGauges, state: !!account && Number(veBal?.value) > 0 && canCastVote })
-
-        setCanVoteOnGauges(canVoteOnGauges);
-        setCanCastVote(!!account && Number(veBal?.value) > 0 && canCastVote);
+        setVoteData(voteData_);
+        setCanCastVote(!!account && Number(veBal?.value) > 0);
       }
     }
     if (!account && !initalLoad && Object.keys(vaults).length > 0) initialSetup();
@@ -212,21 +209,40 @@ function VePopContainer() {
 
         <section className="grid grid-cols-1 md:grid-cols-3 gap-4 px-4 md:px-8">
           {gaugeVaults?.length > 0 ? (
-            gaugeVaults
-              .filter((vault) => selectedNetworks.includes(vault.chainId))
-              .filter((vault) => Object.keys(hiddenGauges).length > 0 ? !hiddenGauges[vault.chainId].includes(vault.gauge!) : true)
-              .sort((a, b) => b.tvl - a.tvl)
-              .map((vault: VaultData, index: number) => (
-                <Gauge
-                  key={vault.address}
-                  vaultData={vault}
-                  index={vault.gauge as Address}
-                  votes={votes}
-                  handleVotes={handleVotes}
-                  canVote={canVoteOnGauges[index]}
-                  searchTerm={searchTerm}
-                />
-              ))
+            <>
+              {gaugeVaults
+                .filter((vault) => selectedNetworks.includes(vault.chainId))
+                .filter((vault) => Object.keys(hiddenGauges).length > 0 ? !hiddenGauges[vault.chainId].includes(vault.gauge!) : true)
+                .sort((a, b) => b.tvl - a.tvl)
+                .map((vault: VaultData, index: number) => (
+                  <Gauge
+                    key={vault.address}
+                    vaultData={vault}
+                    index={vault.gauge!}
+                    votes={votes}
+                    handleVotes={handleVotes}
+                    canVote={voteData.find(v => v.gauge === vault.gauge)?.canVote!}
+                    searchTerm={searchTerm}
+                    deprecated={false}
+                  />
+                ))}
+              {gaugeVaults
+                .filter((vault) => selectedNetworks.includes(vault.chainId))
+                .filter((vault) => Object.keys(hiddenGauges).length > 0 ? hiddenGauges[vault.chainId].includes(vault.gauge!) : true)
+                .sort((a, b) => b.tvl - a.tvl)
+                .map((vault: VaultData, index: number) => (
+                  <Gauge
+                    key={vault.address}
+                    vaultData={vault}
+                    index={vault.gauge!}
+                    votes={votes}
+                    handleVotes={handleVotes}
+                    canVote={voteData.find(v => v.gauge === vault.gauge)?.canVote!}
+                    searchTerm={searchTerm}
+                    deprecated={true}
+                  />
+                ))}
+            </>
           ) : (
             <p className="text-white">Loading Gauges...</p>
           )}
@@ -259,7 +275,6 @@ function VePopContainer() {
                       publicClient,
                       walletClient: walletClient as WalletClient,
                     },
-                    canVoteOnGauges,
                   })
                 }
               />

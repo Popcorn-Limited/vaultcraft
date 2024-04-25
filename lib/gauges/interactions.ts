@@ -55,7 +55,6 @@ interface SendVotesProps {
   vaults: VaultData[];
   votes: { [key: Address]: number };
   prevVotes: { [key: Address]: number };
-  canVoteOnGauges: boolean[];
   account: Address;
   clients: Clients;
 }
@@ -64,7 +63,6 @@ export async function sendVotes({
   vaults,
   votes,
   prevVotes,
-  canVoteOnGauges,
   account,
   clients,
 }: SendVotesProps): Promise<boolean> {
@@ -74,8 +72,7 @@ export async function sendVotes({
 
   const votesCleaned = Object.entries(votes).filter(
     (vote, index) =>
-      Math.abs(vote[1] - Number(prevVotes[vote[0] as Address])) > 0 &&
-      canVoteOnGauges[index]
+      Math.abs(vote[1] - Number(prevVotes[vote[0] as Address])) > 0
   )
     .map((vote, index) => [...vote, vote[1] - Number(prevVotes[vote[0] as Address])])
     // @ts-ignore

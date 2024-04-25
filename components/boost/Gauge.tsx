@@ -3,7 +3,7 @@ import { Address, useAccount } from "wagmi";
 import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
 import AssetWithName from "@/components/vault/AssetWithName";
-import { Token, VaultData } from "@/lib/types";
+import { Token, VaultData, VaultLabel } from "@/lib/types";
 import Accordion from "@/components/common/Accordion";
 import CardStat from "@/components/common/CardStat";
 import useGaugeWeights from "@/lib/gauges/useGaugeWeights";
@@ -19,6 +19,7 @@ interface GaugeProps {
   handleVotes: Function;
   canVote: boolean;
   searchTerm: string;
+  deprecated: boolean;
 }
 
 export default function Gauge({
@@ -28,6 +29,7 @@ export default function Gauge({
   handleVotes,
   canVote,
   searchTerm,
+  deprecated
 }: GaugeProps): JSX.Element {
   const baseTooltipId = vaultData.address.slice(1);
 
@@ -71,6 +73,13 @@ export default function Gauge({
     if (vaultData) {
       setAsset(tokens[vaultData.chainId][vaultData.asset])
       setVault(tokens[vaultData.chainId][vaultData.vault])
+      if (deprecated) {
+        if (vaultData.metadata.labels && !vaultData.metadata.labels.includes(VaultLabel.deprecated)) {
+          vaultData.metadata.labels.push(VaultLabel.deprecated)
+        } else {
+          vaultData.metadata.labels = [VaultLabel.deprecated]
+        }
+      }
     }
   }, [vaultData])
 
