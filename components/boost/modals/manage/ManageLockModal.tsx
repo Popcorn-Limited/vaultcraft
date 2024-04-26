@@ -42,9 +42,11 @@ export enum ManagementOption {
 export default function ManageLockModal({
   show,
   setShowLpModal,
+  setShowSyncModal
 }: {
   show: [boolean, Dispatch<SetStateAction<boolean>>];
   setShowLpModal: Dispatch<SetStateAction<boolean>>;
+  setShowSyncModal: Dispatch<SetStateAction<boolean>>;
 }): JSX.Element {
   const { chain } = useNetwork();
   const { switchNetworkAsync } = useSwitchNetwork();
@@ -135,6 +137,7 @@ export default function ManageLockModal({
     }
 
     setShowModal(false);
+    setShowSyncModal(true);
   }
 
   function showLpModal(): void {
@@ -226,7 +229,6 @@ export default function ManageLockModal({
         {mangementOption === ManagementOption.BroadcastVeBalance && (
           <>
             <BroadcastVeBalanceInterface
-              amount={Number(lockedBal?.amount) / 1e18}
               setShowModal={setShowModal}
             />
           </>

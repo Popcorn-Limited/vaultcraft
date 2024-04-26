@@ -1,6 +1,7 @@
 import MainActionButton from "@/components/button/MainActionButton";
-import { VE_BEACON, VeRecipientByChain } from "@/lib/constants";
+import { VE_BEACON, VOTING_ESCROW, VeRecipientByChain } from "@/lib/constants";
 import { broadcastVeBalance } from "@/lib/gauges/interactions";
+import useLockedBalanceOf from "@/lib/gauges/useLockedBalanceOf";
 import { RPC_URLS } from "@/lib/utils/connectors";
 import { formatNumber } from "@/lib/utils/formatBigNumber";
 import { useEffect, useState } from "react";
@@ -22,10 +23,16 @@ async function getVeBalance(account: Address, chain: Chain): Promise<number> {
   return Number(veBal) / 1e18
 }
 
-export default function BroadcastVeBalanceInterface({ amount, setShowModal }: { amount: number, setShowModal: Function }): JSX.Element {
+export default function BroadcastVeBalanceInterface({ setShowModal }: { setShowModal: Function }): JSX.Element {
   const { address: account } = useAccount();
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
+
+  const { data: lockedBal } = useLockedBalanceOf({
+    chainId: 1,
+    address: VOTING_ESCROW,
+    account: account as Address,
+  }) as { data: { amount: bigint; end: bigint } };
 
   const [opVeBal, setOpVeBal] = useState<number>(0)
   const [arbVeBal, setArbVeBal] = useState<number>(0)
@@ -58,7 +65,7 @@ export default function BroadcastVeBalanceInterface({ amount, setShowModal }: { 
         <div className="mt-10">
           <span className="flex flex-row items-center justify-between">
             <p className="text-white font-semibold mb-1">Mainnet VeBalance:</p>
-            <p className="w-32 text-customGray300">{formatNumber(amount || 0)}</p>
+            <p className="w-32 text-customGray300">{formatNumber(Number(lockedBal?.amount) / 1e18 || 0)}</p>
           </span>
           <span className="flex flex-row items-center justify-between">
             <p className="text-white font-semibold mb-1">Optimism VeBalance:</p>

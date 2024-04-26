@@ -29,6 +29,7 @@ import { VOTING_ESCROW } from "@/lib/constants";
 import Modal from "@/components/modal/Modal";
 import BridgeModal from "@/components/bridge/BridgeModal";
 import axios from "axios";
+import BroadcastVeBalanceInterface from "@/components/boost/modals/manage/BroadcastVeBalanceInterface";
 
 export const GAUGE_NETWORKS = [1, 10, 42161]
 
@@ -77,6 +78,7 @@ function VePopContainer() {
   const [showExerciseModal, setShowExerciseModal] = useState(false);
   const [showClaimModal, setShowClaimModal] = useState(false);
   const [showBridgeModal, setShowBridgeModal] = useState(false);
+  const [showSyncModal, setShowSyncModal] = useState(false);
 
   const [hiddenGauges, setHiddenGauges] = useState<AddressesByChain>({})
 
@@ -159,6 +161,7 @@ function VePopContainer() {
       <ManageLockModal
         show={[showMangementModal, setShowMangementModal]}
         setShowLpModal={setShowLpModal}
+        setShowSyncModal={setShowSyncModal}
       />
       <LpModal show={[showLpModal, setShowLpModal]} />
       <OptionTokenExerciseModal
@@ -168,6 +171,9 @@ function VePopContainer() {
         <OptionTokenInterface />
       </Modal>
       <BridgeModal show={[showBridgeModal, setShowBridgeModal]} />
+      <Modal visibility={[showSyncModal, setShowSyncModal]}>
+        <BroadcastVeBalanceInterface setShowModal={setShowSyncModal} />
+      </Modal>
       <div className="static">
         <section className="py-10 px-4 md:px-8 border-t md:border-t-0 md:border-b border-customNeutral100 lg:flex lg:flex-row items-center justify-between text-white">
           <div className="lg:w-[1050px]">
@@ -193,6 +199,7 @@ function VePopContainer() {
             setShowMangementModal={setShowMangementModal}
             setShowLpModal={setShowLpModal}
             setShowBridgeModal={setShowBridgeModal}
+            setShowSyncModal={setShowSyncModal}
           />
           <div className="w-full lg:w-1/2">
             <OptionTokenInterface setShowOptionTokenModal={setShowExerciseModal} />
