@@ -122,7 +122,7 @@ export default function Test() {
     switch (stepCounter) {
       case 0:
         success = await handleAllowance({
-          token: XVCXByChain[chainId],
+          token: chainId === mainnet.id ? VCX : XVCXByChain[chainId],
           amount: val,
           account: account!,
           spender: LockboxAdapterByChain[chainId],
@@ -136,7 +136,7 @@ export default function Test() {
         success = await bridgeToken({
           destination: DestinationIdByChain[destChainId],
           to: account!,
-          asset: XVCXByChain[chainId],
+          asset: chainId === mainnet.id ? VCX : XVCXByChain[chainId],
           delegate: account!,
           amount: BigInt(
             Number(val).toLocaleString("fullwide", { useGrouping: false })

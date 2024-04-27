@@ -48,20 +48,19 @@ export default function OptionTokenInterface({ setShowOptionTokenModal }: Option
   }, []);
 
   async function handleClaim(chainId: number) {
-    if (!account) return
-
+    console.log("handleCLaim", chainId)
     const success = await claimOPop({
       gauges: gaugeRewards[chainId].amounts
         ?.filter((gauge) => Number(gauge.amount) > 0)
         .map((gauge) => gauge.address) as Address[],
-      account: account,
+      account: account!,
       minter: MinterByChain[chainId],
       clients: { publicClient, walletClient: walletClient as WalletClient }
     })
     if (success) {
       await mutateTokenBalance({
         tokensToUpdate: [OptionTokenByChain[chainId]],
-        account,
+        account: account!,
         tokensAtom: [tokens, setTokens],
         chainId
       })
@@ -69,7 +68,7 @@ export default function OptionTokenInterface({ setShowOptionTokenModal }: Option
         ...gaugeRewards,
         [chainId]: await getGaugeRewards({
           gauges: vaults[chainId].filter(vault => !!vault.gauge).map(vault => vault.gauge) as Address[],
-          account: account as Address,
+          account: account!,
           chainId: chainId,
           publicClient
         })
@@ -176,22 +175,22 @@ export default function OptionTokenInterface({ setShowOptionTokenModal }: Option
             <div className="w-full md:w-60">
               <MainActionButton
                 label="Claim ETH oVCX"
-                handleClick={() => () => handleClaim(1)}
-                disabled={gaugeRewards ? Number(gaugeRewards[1].total) === 0 : true}
+                handleClick={() => handleClaim(1)}
+                disabled={!account || (gaugeRewards ? Number(gaugeRewards[1].total) === 0 : true)}
               />
             </div>
             <div className="w-full md:w-60">
               <MainActionButton
                 label="Claim OPT oVCX"
-                handleClick={() => () => handleClaim(10)}
-                disabled={gaugeRewards ? Number(gaugeRewards[10].total) === 0 : true}
+                handleClick={() => handleClaim(10)}
+                disabled={!account || (gaugeRewards ? Number(gaugeRewards[10].total) === 0 : true)}
               />
             </div>
             <div className="w-full md:w-60">
               <MainActionButton
                 label="Claim ARB oVCX"
                 handleClick={() => handleClaim(42161)}
-                disabled={gaugeRewards ? Number(gaugeRewards[42161].total) === 0 : true}
+                disabled={!account || (gaugeRewards ? Number(gaugeRewards[42161].total) === 0 : true)}
               />
             </div>
           </>
