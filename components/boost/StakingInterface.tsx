@@ -161,7 +161,7 @@ export default function StakingInterface({
             handleClick={() => setShowBridgeModal(true)}
           />
           <SecondaryActionButton
-            label="Sync VeBalance"
+            label="Sync veBalance"
             handleClick={() => setShowSyncModal(true)}
           />
         </div>

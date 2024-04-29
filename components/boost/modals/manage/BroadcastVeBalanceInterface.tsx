@@ -1,13 +1,13 @@
 import MainActionButton from "@/components/button/MainActionButton";
-import { VE_BEACON, VOTING_ESCROW, VeRecipientByChain } from "@/lib/constants";
+import { VE_BEACON, VOTING_ESCROW, VeRecipientByChain, ZERO } from "@/lib/constants";
 import { broadcastVeBalance } from "@/lib/gauges/interactions";
 import useLockedBalanceOf from "@/lib/gauges/useLockedBalanceOf";
 import { RPC_URLS } from "@/lib/utils/connectors";
-import { formatNumber } from "@/lib/utils/formatBigNumber";
+import { NumberFormatter, formatNumber } from "@/lib/utils/formatBigNumber";
 import { useEffect, useState } from "react";
-import { createPublicClient, http } from "viem";
+import { createPublicClient, formatEther, http } from "viem";
 import { arbitrum, optimism } from "viem/chains";
-import { Address, Chain, erc20ABI, useAccount, usePublicClient, useWalletClient } from "wagmi";
+import { Address, Chain, erc20ABI, useAccount, useBalance, usePublicClient, useWalletClient } from "wagmi";
 
 async function getVeBalance(account: Address, chain: Chain): Promise<number> {
   const client = createPublicClient({
@@ -28,11 +28,12 @@ export default function BroadcastVeBalanceInterface({ setShowModal }: { setShowM
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
 
-  const { data: lockedBal } = useLockedBalanceOf({
+  const { data: veBal } = useBalance({
     chainId: 1,
-    address: VOTING_ESCROW,
-    account: account as Address,
-  }) as { data: { amount: bigint; end: bigint } };
+    address: account,
+    token: VOTING_ESCROW,
+    watch: true,
+  });
 
   const [opVeBal, setOpVeBal] = useState<number>(0)
   const [arbVeBal, setArbVeBal] = useState<number>(0)
@@ -46,13 +47,13 @@ export default function BroadcastVeBalanceInterface({ setShowModal }: { setShowM
 
   async function handleBroadcast(chainId: number) {
     if (!account || !walletClient) return
-    await broadcastVeBalance({ targetChain: chainId, account, address: VE_BEACON, publicClient, walletClient })
+    await broadcastVeBalance({ targetChain: chainId, account, address: VE_BEACON, clients: { publicClient, walletClient } })
     setShowModal(false)
   }
 
   return (
     <div className="text-start">
-      <h2 className="text-start text-5xl">Sync VeBalance</h2>
+      <h2 className="text-start text-5xl">Sync veBalance</h2>
 
       <div>
         <p className="text-start">
@@ -64,15 +65,17 @@ export default function BroadcastVeBalanceInterface({ setShowModal }: { setShowM
         </p>
         <div className="mt-10">
           <span className="flex flex-row items-center justify-between">
-            <p className="text-white font-semibold mb-1">Mainnet VeBalance:</p>
-            <p className="w-32 text-customGray300">{formatNumber(Number(lockedBal?.amount) / 1e18 || 0)}</p>
+            <p className="text-white font-semibold mb-1">Mainnet veBalance:</p>
+            <p className="w-32 text-customGray300">{NumberFormatter.format(
+              Number(formatEther(veBal?.value || ZERO))
+            ) || "0"}</p>
           </span>
           <span className="flex flex-row items-center justify-between">
-            <p className="text-white font-semibold mb-1">Optimism VeBalance:</p>
+            <p className="text-white font-semibold mb-1">Optimism veBalance:</p>
             <p className="w-32 text-customGray300">{formatNumber(opVeBal || 0)}</p>
           </span>
           <span className="flex flex-row items-center justify-between">
-            <p className="text-white font-semibold mb-1">Arbitrum VeBalance:</p>
+            <p className="text-white font-semibold mb-1">Arbitrum veBalance:</p>
             <p className="w-32 text-customGray300">{formatNumber(arbVeBal || 0)}</p>
           </span>
         </div>

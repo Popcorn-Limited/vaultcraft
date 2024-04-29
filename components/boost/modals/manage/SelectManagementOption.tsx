@@ -63,7 +63,7 @@ export default function SelectManagementOption({
         </div>
         <div className="w-full px-4 py-4 border border-customGray500 rounded-lg">
           <TertiaryActionButton
-            label="Sync VeBalance to L2's"
+            label="Sync veBalance to L2's"
             handleClick={() => {
               setManagementOption(ManagementOption.BroadcastVeBalance);
               setStep(1);
