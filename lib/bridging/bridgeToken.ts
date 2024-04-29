@@ -29,6 +29,8 @@ interface BridgeTokenProps {
 export default async function bridgeToken({ destination, to, asset, delegate, amount, slippage, callData, account, clients, chainId }: BridgeTokenProps): Promise<boolean> {
   showLoadingToast("Bridging VCX...");
 
+  console.log({ destination, to, asset, delegate, amount, slippage, callData, account, chainId })
+
   const { data: relayerFee } = await axios.post(
     "https://sdk-server.mainnet.connext.ninja/estimateRelayerFee", {
     originDomain: DestinationIdByChain[chainId],

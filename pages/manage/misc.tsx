@@ -298,21 +298,25 @@ function BridgeVCX() {
         setDestChainId(1)
         setInputToken(tokens[10][XVCXByChain[10]])
         setOutputToken(tokens[1][VCX])
+        break
       case "ETH -> OP":
         setChainId(1)
         setDestChainId(10)
         setInputToken(tokens[1][VCX])
         setOutputToken(tokens[10][XVCXByChain[10]])
+        break
       case "ARB -> ETH":
         setChainId(42161)
         setDestChainId(1)
         setInputToken(tokens[42161][XVCXByChain[42161]])
         setOutputToken(tokens[1][VCX])
+        break
       case "ETH -> ARB":
         setChainId(1)
         setDestChainId(42161)
         setInputToken(tokens[1][VCX])
         setOutputToken(tokens[42161][XVCXByChain[42161]])
+        break
     }
 
     setActiveTab(newTab)
@@ -347,6 +351,8 @@ function BridgeVCX() {
         return;
       }
     }
+
+    console.log({ chainId, destChainId })
 
     const stepsCopy = [...steps];
     const currentStep = stepsCopy[stepCounter];
