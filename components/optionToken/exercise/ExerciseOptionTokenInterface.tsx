@@ -8,6 +8,7 @@ import {
 import {
   Address,
   WalletClient,
+  mainnet,
   useAccount,
   useNetwork,
   usePublicClient,
@@ -17,7 +18,7 @@ import {
 import { PlusIcon } from "@heroicons/react/24/outline";
 import TokenIcon from "@/components/common/TokenIcon";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
-import { BalancerOracleAbi, OVCX_ORACLE, OptionTokenByChain, VCX, VcxByChain, WETH, WethByChain, ZERO } from "@/lib/constants";
+import { BalancerOracleAbi, ExerciseByChain, OVCX_ORACLE, OptionTokenByChain, VCX, VcxByChain, WETH, WethByChain, ZERO } from "@/lib/constants";
 import { formatNumber, safeRound } from "@/lib/utils/formatBigNumber";
 import { validateInput } from "@/lib/utils/helpers";
 import { Token } from "@/lib/types";
@@ -154,7 +155,7 @@ export default function ExerciseOptionTokenInterface({ chainId, setShowModal }: 
           token: WethByChain[chainId],
           amount: Number(amount) * 10 ** 18 || 0,
           account: account as Address,
-          spender: OptionTokenByChain[chainId], // TODO change this once we have the exercise contracts deployed
+          spender: ExerciseByChain[chainId],
           clients: {
             publicClient,
             walletClient: walletClient!,
@@ -162,13 +163,25 @@ export default function ExerciseOptionTokenInterface({ chainId, setShowModal }: 
         });
         break;
       case 1:
+        success = chainId === mainnet.id || await handleAllowance({
+          token: OptionTokenByChain[chainId],
+          amount: Number(amount) * 10 ** 18 || 0,
+          account: account as Address,
+          spender: ExerciseByChain[chainId],
+          clients: {
+            publicClient,
+            walletClient: walletClient!,
+          },
+        });
+        break;
+      case 2:
         success = await exerciseOPop({
           account: account as Address,
           amount: parseEther(
             Number(amount).toLocaleString("fullwide", { useGrouping: false })
           ),
           maxPaymentAmount: parseEther(maxPaymentAmount),
-          address: OptionTokenByChain[chainId], // TODO change this once we have the exercise contracts deployed
+          address: ExerciseByChain[chainId],
           clients: { publicClient, walletClient: walletClient as WalletClient },
         });
         if (success) {
@@ -214,7 +227,7 @@ export default function ExerciseOptionTokenInterface({ chainId, setShowModal }: 
               captionText={"Amount oVCX"}
               onSelectToken={() => { }}
               onMaxClick={handleMaxOPop}
-              chainId={1}
+              chainId={chainId}
               value={amount}
               onChange={handleOPopInput}
               allowInput={true}
@@ -234,7 +247,7 @@ export default function ExerciseOptionTokenInterface({ chainId, setShowModal }: 
               captionText={"Amount WETH"}
               onSelectToken={() => { }}
               onMaxClick={handleMaxWeth}
-              chainId={1}
+              chainId={chainId}
               value={maxPaymentAmount}
               onChange={handleEthInput}
               allowInput={true}

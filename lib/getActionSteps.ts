@@ -233,6 +233,12 @@ export const EXERCISE_OVCX_STEPS = [
   },
   {
     step: 2,
+    label: "Handle oVCX Allowance",
+    ...BaseStepInfo,
+    updateBalance: false
+  },
+  {
+    step: 3,
     label: "Exercise oVCX",
     ...BaseStepInfo
   }

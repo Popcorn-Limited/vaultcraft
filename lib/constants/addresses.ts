@@ -146,6 +146,19 @@ export const LockboxAdapterByChain: AddressByChain = {
   [arbitrum.id]: "0xEE9deC2712cCE65174B561151701Bf54b99C24C8",
 }
 
+export const ExerciseByChain: AddressByChain = {
+  [mainnet.id]: OptionTokenByChain[mainnet.id],
+  [optimism.id]: "0xCFAe9b648D929D10AFaf22529431b3138627da66",
+  [arbitrum.id]: "0xCFAe9b648D929D10AFaf22529431b3138627da66",
+}
+
+export const ExerciseOracleByChain: AddressByChain = {
+  [mainnet.id]: OVCX_ORACLE,
+  [optimism.id]: "0x8Ee82Ad9919b7D272A732479305133B205dA297F",
+  [arbitrum.id]: "0x8Ee82Ad9919b7D272A732479305133B205dA297F",
+
+}
+
 // ------------- Archive Addresses ------------- //
 
 const PermissionRegistryByChain: AddressByChain = {
