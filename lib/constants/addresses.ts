@@ -34,7 +34,7 @@ export const VaultRegistryByChain: AddressByChain = {
   [polygon.id]: "0x2246c4c469735bCE95C120939b0C078EC37A08D0",
   [optimism.id]: "0xdD0d135b5b52B7EDd90a83d4A4112C55a1A6D23A",
   [arbitrum.id]: "0xB205e94D402742B919E851892f7d515592a7A6cC",
-  [bsc.id]:"0x25172C73958064f9ABc757ffc63EB859D7dc2219"
+  [bsc.id]: "0x25172C73958064f9ABc757ffc63EB859D7dc2219"
 };
 
 export const VaultControllerByChain: AddressByChain = {
@@ -138,11 +138,15 @@ export const XVCXByChain: AddressByChain = {
   [mainnet.id]: "0x18445923592be303fbd3BC164ee685C7457051b4",
   [optimism.id]: "0xfe7950eC9AfE82538CEAC95735f1daf31829d066",
   [arbitrum.id]: "0x18445923592be303fbd3BC164ee685C7457051b4"
-  // [sepolia.id]: "0x18445923592be303fbd3BC164ee685C7457051b4",
-  // [arbitrumSepolia.id]: "0x1fa00Efd6Fe975E2D587016d863896FF0012e16c"
 }
 
-// Archive Addresses
+export const LockboxAdapterByChain: AddressByChain = {
+  [mainnet.id]: "0x45bf3c737e57b059a5855280ca1adb8e9606ac68",
+  [optimism.id]: "0x8f7492DE823025b4CfaAB1D34c58963F2af5DEDA",
+  [arbitrum.id]: "0xEE9deC2712cCE65174B561151701Bf54b99C24C8",
+}
+
+// ------------- Archive Addresses ------------- //
 
 const PermissionRegistryByChain: AddressByChain = {
   [mainnet.id]: "0x7a33b5b57C8b235A3519e6C010027c5cebB15CB4",
