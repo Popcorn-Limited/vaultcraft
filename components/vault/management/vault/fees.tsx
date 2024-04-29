@@ -9,9 +9,11 @@ import { Address, useAccount, usePublicClient, useWalletClient } from "wagmi";
 
 export default function VaultFees({
   vaultData,
+  callAddress,
   settings,
 }: {
   vaultData: VaultData;
+  callAddress: Address;
   settings: VaultSettings;
 }): JSX.Element {
   const { address: account } = useAccount();
@@ -41,10 +43,11 @@ export default function VaultFees({
                 handleClick={() =>
                   takeFees({
                     vaultData,
+                    address: callAddress,
                     account: account as Address,
                     clients: {
                       publicClient,
-                      walletClient: walletClient as WalletClient,
+                      walletClient: walletClient!,
                     },
                   })
                 }

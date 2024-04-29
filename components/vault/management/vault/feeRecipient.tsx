@@ -9,9 +9,11 @@ import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 
 export default function VaultFeeRecipient({
   vaultData,
+  callAddress,
   settings,
 }: {
   vaultData: VaultData;
+  callAddress: Address;
   settings: VaultSettings;
 }): JSX.Element {
   const { address: account } = useAccount();
@@ -50,10 +52,11 @@ export default function VaultFeeRecipient({
               changeFeeRecipient({
                 feeRecipient: feeRecipient as Address,
                 vaultData,
+                address: callAddress,
                 account,
                 clients: {
                   publicClient,
-                  walletClient: walletClient as WalletClient,
+                  walletClient: walletClient!,
                 },
               })
             }

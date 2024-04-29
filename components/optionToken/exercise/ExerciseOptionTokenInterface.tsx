@@ -182,7 +182,7 @@ export default function ExerciseOptionTokenInterface({ chainId, setShowModal }: 
           ),
           maxPaymentAmount: parseEther(maxPaymentAmount),
           address: ExerciseByChain[chainId],
-          clients: { publicClient, walletClient: walletClient as WalletClient },
+          clients: { publicClient, walletClient: walletClient! },
         });
         if (success) {
           await mutateTokenBalance({

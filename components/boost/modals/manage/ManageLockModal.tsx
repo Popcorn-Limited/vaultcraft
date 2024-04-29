@@ -99,7 +99,7 @@ export default function ManageLockModal({
 
     const clients = {
       publicClient,
-      walletClient: walletClient as WalletClient,
+      walletClient: walletClient!,
     };
 
     let success = false
@@ -110,10 +110,7 @@ export default function ManageLockModal({
         amount: val * 10 ** 18 || 0,
         account: account,
         spender: VOTING_ESCROW,
-        clients: {
-          publicClient,
-          walletClient: walletClient as WalletClient,
-        },
+        clients
       });
       success = await increaseLockAmount({ amount: val, account, clients });
     }

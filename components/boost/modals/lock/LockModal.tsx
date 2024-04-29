@@ -97,7 +97,7 @@ export default function LockModal({
           spender: VOTING_ESCROW,
           clients: {
             publicClient,
-            walletClient: walletClient as WalletClient,
+            walletClient: walletClient!,
           },
         });
         break;
@@ -107,7 +107,7 @@ export default function LockModal({
           amount: val,
           days,
           account: account,
-          clients: { publicClient, walletClient: walletClient as WalletClient },
+          clients: { publicClient, walletClient: walletClient! },
         });
         if (success) {
           await mutateTokenBalance({

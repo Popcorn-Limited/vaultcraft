@@ -2,14 +2,16 @@ import MainActionButton from "@/components/button/MainActionButton";
 import { VaultData } from "@/lib/types";
 import { pauseVault, unpauseVault } from "@/lib/vault/management/interactions";
 import { VaultSettings } from "pages/manage/vaults/[id]";
-import { WalletClient } from "viem";
+import { Address, WalletClient } from "viem";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 
 export default function VaultPausing({
   vaultData,
+  callAddress,
   settings,
 }: {
   vaultData: VaultData;
+  callAddress: Address;
   settings: VaultSettings;
 }): JSX.Element {
   const { address: account } = useAccount();
@@ -32,23 +34,25 @@ export default function VaultPausing({
             handleClick={
               settings?.paused
                 ? () =>
-                    unpauseVault({
-                      vaultData,
-                      account,
-                      clients: {
-                        publicClient,
-                        walletClient: walletClient as WalletClient,
-                      },
-                    })
+                  unpauseVault({
+                    vaultData,
+                    address: callAddress,
+                    account,
+                    clients: {
+                      publicClient,
+                      walletClient: walletClient!,
+                    },
+                  })
                 : () =>
-                    pauseVault({
-                      vaultData,
-                      account,
-                      clients: {
-                        publicClient,
-                        walletClient: walletClient as WalletClient,
-                      },
-                    })
+                  pauseVault({
+                    vaultData,
+                    address: callAddress,
+                    account,
+                    clients: {
+                      publicClient,
+                      walletClient: walletClient!,
+                    },
+                  })
             }
           />
         </div>

@@ -39,7 +39,6 @@ export const VaultRegistryByChain: AddressByChain = {
 
 export const VaultControllerByChain: AddressByChain = {
   [mainnet.id]: "0x7D51BABA56C2CA79e15eEc9ECc4E92d9c0a7dbeb",
-  1337: "0x7D51BABA56C2CA79e15eEc9ECc4E92d9c0a7dbeb",
   [arbitrum.id]: "0xF40749d72Ab5422CC5d735A373E66d67f7cA9393",
   [optimism.id]: "0x757D953c53aD28748aCf94AD2d59C13955E09c08",
   [bsc.id]: "0x815B4A955169Ba1D66944A4d8F18B69bc9553a62",
@@ -156,12 +155,9 @@ export const ExerciseOracleByChain: AddressByChain = {
   [mainnet.id]: OVCX_ORACLE,
   [optimism.id]: "0x8Ee82Ad9919b7D272A732479305133B205dA297F",
   [arbitrum.id]: "0x8Ee82Ad9919b7D272A732479305133B205dA297F",
-
 }
 
-// ------------- Archive Addresses ------------- //
-
-const PermissionRegistryByChain: AddressByChain = {
+export const PermissionRegistryByChain: AddressByChain = {
   [mainnet.id]: "0x7a33b5b57C8b235A3519e6C010027c5cebB15CB4",
   [bsc.id]: "0x8c76AA6B65D0619042EAd6DF748f782c89a06357",
   [polygon.id]: "0x1F381429943AFBb6870b3b9B0aB4707a6BdC2356",
@@ -169,7 +165,7 @@ const PermissionRegistryByChain: AddressByChain = {
   [arbitrum.id]: "0xB67C4c9C3CebCeC2FD3fDE436340D728D990A8d9"
 }
 
-const AdminProxyByChain: AddressByChain = {
+export const AdminProxyByChain: AddressByChain = {
   [mainnet.id]: "0x564fBe59c448743FA9382E691a0320458F6dCDE5",
   [bsc.id]: "0x0CfE90Bc6156360E003d5367fcC054Bd1656d1B1",
   [polygon.id]: "0x7Edd61A58B5920dF39208E9888D8be713f639A60",

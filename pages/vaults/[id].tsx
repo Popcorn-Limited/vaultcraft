@@ -110,7 +110,7 @@ export default function Index() {
       gauges: [vaultData.gauge || zeroAddress],
       account: account as Address,
       minter: MinterByChain[vaultData?.chainId],
-      clients: { publicClient, walletClient: walletClient as WalletClient }
+      clients: { publicClient, walletClient: walletClient! }
     })
 
     if (success) {

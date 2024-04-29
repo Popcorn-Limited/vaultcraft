@@ -7,8 +7,8 @@ import { useEffect, useState } from "react";
 import NoSSR from "react-no-ssr";
 import { useAccount } from "wagmi";
 import axios from "axios";
-import { createPublicClient, extractChain, http, zeroAddress } from "viem";
-import { VaultAbi } from "@/lib/constants";
+import { Address, createPublicClient, extractChain, http, zeroAddress } from "viem";
+import { AdminProxyByChain, VaultAbi, VaultControllerByChain } from "@/lib/constants";
 import { RPC_URLS } from "@/lib/utils/connectors";
 import * as chains from "viem/chains";
 import { ProtocolName, YieldOptions } from "vaultcraft-sdk";
@@ -20,32 +20,23 @@ import VaultDepositLimit from "@/components/vault/management/vault/depositLimit"
 import VaultFeeRecipient from "@/components/vault/management/vault/feeRecipient";
 import VaultFeeConfiguration from "@/components/vault/management/vault/feeConfiguration";
 import VaultFees from "@/components/vault/management/vault/fees";
-
-export type Strategy = {
-  name: string;
-  description: string;
-  resolver: string;
-  apy: number;
-};
+import { setgroups } from "process";
 
 export interface VaultSettings {
-  proposedAdapter: Strategy;
+  proposedAdapter: Address;
   proposedAdapterTime: number;
   proposedFees: FeeConfiguration;
   proposedFeeTime: number;
   paused: boolean;
   feeBalance: number;
   accruedFees: number;
+  owner: Address;
 }
 
 async function getVaultSettings(
   vault: VaultData,
   yieldOptions: YieldOptions
 ): Promise<VaultSettings> {
-  const { data: strategyDescriptions } = await axios.get(
-    `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/descriptions/strategies/${vault.chainId}.json`
-  );
-
   const client = createPublicClient({
     chain: extractChain({
       chains: Object.values(chains),
@@ -95,34 +86,16 @@ async function getVaultSettings(
         ...vaultContract,
         functionName: "accruedPerformanceFee",
       },
+      {
+        ...vaultContract,
+        functionName: "owner"
+      }
     ],
     allowFailure: false,
   });
 
-  let proposedAdapter = {
-    name: "None",
-    description: "None",
-    resolver: "None",
-    apy: 0,
-  };
-
-  if (res[0] !== zeroAddress) {
-    proposedAdapter = {
-      name: strategyDescriptions[res[0]].name,
-      description: strategyDescriptions[res[0]].description,
-      resolver: strategyDescriptions[res[0]].resolver,
-      apy: (
-        await yieldOptions.getApy({
-          chainId: vault.chainId,
-          protocol: strategyDescriptions[res[0]].resolver as ProtocolName,
-          asset: vault.asset,
-        })
-      ).total,
-    };
-  }
-
   return {
-    proposedAdapter: proposedAdapter,
+    proposedAdapter: res[0],
     proposedAdapterTime: Number(res[1]),
     proposedFees: {
       deposit: Number(res[2][0]),
@@ -134,6 +107,7 @@ async function getVaultSettings(
     paused: res[4],
     feeBalance: Number(res[5]),
     accruedFees: Number(res[6]) + Number(res[7]),
+    owner: res[8]
   };
 }
 
@@ -147,24 +121,23 @@ export default function Index() {
 
   const [vaults, setVaults] = useAtom(vaultsAtom);
   const [vault, setVault] = useState<VaultData>();
-
-  useEffect(() => {
-    if (!vault && query && Object.keys(vaults).length > 0) {
-      setVault(
-        vaults[Number(query?.chainId)].find(vault => vault.address === query?.id)
-      );
-    }
-  }, [vaults, query, vault]);
-
   const [settings, setSettings] = useState<VaultSettings>();
+  const [callAddress, setCallAddress] = useState<Address>()
+  const [tab, setTab] = useState<string>("Strategy");
+
 
   useEffect(() => {
-    if (vault && yieldOptions && !settings) {
-      getVaultSettings(vault, yieldOptions).then((res) => setSettings(res));
+    async function setupVault() {
+      const vault_ = vaults[Number(query?.chainId)].find(vault => vault.address === query?.id)
+      if (vault_) {
+        const settings_ = await getVaultSettings(vault_, yieldOptions!)
+        setVault(vault_);
+        setSettings(settings_);
+        setCallAddress(settings_.owner === AdminProxyByChain[vault_.chainId] ? VaultControllerByChain[vault_.chainId] : vault_.address)
+      }
     }
-  }, [vault, yieldOptions, settings]);
-
-  const [tab, setTab] = useState<string>("Strategy");
+    if (!vault && query && Object.keys(vaults).length > 0 && yieldOptions) setupVault()
+  }, [vaults, query, vault, yieldOptions]);
 
   function changeTab(tab: string) {
     setTab(tab);
@@ -191,37 +164,41 @@ export default function Index() {
                   activeTab={tab}
                   setActiveTab={changeTab}
                 />
-                {settings ? (
+                {(settings && callAddress) ? (
                   <div>
                     {tab === "Strategy" && (
                       <VaultStrategyConfiguration
                         vaultData={vault}
                         settings={settings}
+                        callAddress={callAddress}
                       />
                     )}
                     {tab === "Fee Configuration" && (
                       <VaultFeeConfiguration
                         vaultData={vault}
                         settings={settings}
+                        callAddress={callAddress}
                       />
                     )}
                     {tab === "Fee Recipient" && (
                       <VaultFeeRecipient
                         vaultData={vault}
                         settings={settings}
+                        callAddress={callAddress}
                       />
                     )}
                     {tab === "Deposit Limit" && (
                       <VaultDepositLimit
                         vaultData={vault}
                         settings={settings}
+                        callAddress={callAddress}
                       />
                     )}
                     {tab === "Take Fees" && (
-                      <VaultFees vaultData={vault} settings={settings} />
+                      <VaultFees vaultData={vault} settings={settings} callAddress={callAddress} />
                     )}
                     {tab === "Pausing" && (
-                      <VaultPausing vaultData={vault} settings={settings} />
+                      <VaultPausing vaultData={vault} settings={settings} callAddress={callAddress} />
                     )}
                   </div>
                 ) : (

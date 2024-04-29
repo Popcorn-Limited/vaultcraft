@@ -153,12 +153,12 @@ export function extractRevertReason(error: any): string {
 }
 
 
-type SimulationContract = {
+export type SimulationContract = {
   address: Address;
   abi: Abi;
 };
 
-interface SimulateProps {
+export interface SimulateProps {
   account: Address;
   contract: SimulationContract;
   functionName: string;

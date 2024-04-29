@@ -8,48 +8,12 @@ import {
 } from "viem";
 import { Clients, TokenByAddress, VaultData } from "@/lib/types";
 import { showLoadingToast } from "@/lib/toasts";
-import { SimulationResponse } from "@/lib/types";
 import { GAUGE_CONTROLLER, GaugeAbi, GaugeControllerAbi, VOTING_ESCROW, VotingEscrowAbi } from "@/lib/constants";
-import { handleCallResult } from "@/lib/utils/helpers";
+import { handleCallResult, simulateCall } from "@/lib/utils/helpers";
 import { networkMap } from "@/lib/utils/connectors";
 import { VeBeaconAbi } from "@/lib/constants/abi/VeBeacon";
 import { RootGaugeFactoryAbi } from "@/lib/constants/abi/RootGaugeFactory";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
-
-type SimulationContract = {
-  address: Address;
-  abi: Abi;
-};
-
-interface SimulateProps {
-  account: Address;
-  contract: SimulationContract;
-  functionName: string;
-  publicClient: PublicClient;
-  args?: any[];
-}
-
-async function simulateCall({
-  account,
-  contract,
-  functionName,
-  publicClient,
-  args,
-}: SimulateProps): Promise<SimulationResponse> {
-  try {
-    const { request } = await publicClient.simulateContract({
-      account,
-      address: contract.address,
-      abi: contract.abi,
-      // @ts-ignore
-      functionName,
-      args,
-    });
-    return { request: request, success: true, error: null };
-  } catch (error: any) {
-    return { request: null, success: false, error: error.shortMessage };
-  }
-}
 
 interface SendVotesProps {
   vaults: VaultData[];
@@ -320,8 +284,9 @@ export async function gaugeWithdraw({
   return success
 }
 
-export async function broadcastVeBalance({ targetChain, account, address, publicClient, walletClient }
-  : { targetChain: number, account: Address, address: Address, publicClient: PublicClient, walletClient: WalletClient }) {
+export async function broadcastVeBalance({ targetChain, account, address, clients, }
+  : { targetChain: number, account: Address, address: Address, clients: Clients }) {
+  const { walletClient, publicClient } = clients;
 
   if (walletClient.chain?.id !== Number(1)) {
     try {
@@ -351,12 +316,14 @@ export async function broadcastVeBalance({ targetChain, account, address, public
   return handleCallResult({
     successMessage: "VeBalance broadcasted!",
     simulationResponse: simRes,
-    clients: { publicClient, walletClient }
+    clients
   })
 }
 
-export async function transmitRewards({ gauges, account, address, publicClient, walletClient }
-  : { gauges: Address[], account: Address, address: Address, publicClient: PublicClient, walletClient: WalletClient }) {
+export async function transmitRewards({ gauges, account, address, clients }
+  : { gauges: Address[], account: Address, address: Address, clients: Clients }) {
+  const { walletClient, publicClient } = clients;
+
 
   if (walletClient.chain?.id !== Number(1)) {
     try {
@@ -386,6 +353,6 @@ export async function transmitRewards({ gauges, account, address, publicClient, 
   return handleCallResult({
     successMessage: "Bridged Rewards!",
     simulationResponse: simRes,
-    clients: { publicClient, walletClient }
+    clients
   })
 }

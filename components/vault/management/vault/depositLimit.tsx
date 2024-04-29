@@ -6,14 +6,16 @@ import { changeDepositLimit } from "@/lib/vault/management/interactions";
 import { useAtom } from "jotai";
 import { VaultSettings } from "pages/manage/vaults/[id]";
 import { FormEventHandler, useState } from "react";
-import { WalletClient, maxUint256 } from "viem";
+import { Address, WalletClient, maxUint256 } from "viem";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 
 export default function VaultDepositLimit({
   vaultData,
+  callAddress,
   settings,
 }: {
   vaultData: VaultData;
+  callAddress: Address;
   settings: VaultSettings;
 }): JSX.Element {
   const { address: account } = useAccount();
@@ -66,10 +68,11 @@ export default function VaultDepositLimit({
               changeDepositLimit({
                 depositLimit: Number(depositLimit),
                 vaultData,
+                address: callAddress,
                 account,
                 clients: {
                   publicClient,
-                  walletClient: walletClient as WalletClient,
+                  walletClient: walletClient!,
                 },
               })
             }

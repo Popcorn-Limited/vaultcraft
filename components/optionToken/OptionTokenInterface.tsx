@@ -49,14 +49,16 @@ export default function OptionTokenInterface({ setShowOptionTokenModal }: Option
 
   async function handleClaim(chainId: number) {
     console.log("handleCLaim", chainId)
+
     const success = await claimOPop({
       gauges: gaugeRewards[chainId].amounts
         ?.filter((gauge) => Number(gauge.amount) > 0)
         .map((gauge) => gauge.address) as Address[],
       account: account!,
       minter: MinterByChain[chainId],
-      clients: { publicClient, walletClient: walletClient as WalletClient }
+      clients: { publicClient, walletClient: walletClient! }
     })
+    
     if (success) {
       await mutateTokenBalance({
         tokensToUpdate: [OptionTokenByChain[chainId]],

@@ -280,7 +280,7 @@ function VePopContainer() {
                     account: account as Address,
                     clients: {
                       publicClient,
-                      walletClient: walletClient as WalletClient,
+                      walletClient: walletClient!,
                     },
                   })
                 }

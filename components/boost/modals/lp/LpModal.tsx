@@ -83,7 +83,7 @@ export default function LpModal({
           spender: BALANCER_VAULT,
           clients: {
             publicClient,
-            walletClient: walletClient as WalletClient,
+            walletClient: walletClient!,
           },
         });
         break;
@@ -95,7 +95,7 @@ export default function LpModal({
           spender: BALANCER_VAULT,
           clients: {
             publicClient,
-            walletClient: walletClient as WalletClient,
+            walletClient: walletClient!,
           },
         });
         break;
@@ -108,7 +108,7 @@ export default function LpModal({
           account: account,
           clients: {
             publicClient,
-            walletClient: walletClient as WalletClient,
+            walletClient: walletClient!,
           },
         });
         if (success) {

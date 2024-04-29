@@ -247,8 +247,7 @@ function RewardBridger() {
             gauges: inputValue.split(",").map(addr => getAddress(addr)),
             account: account!,
             address: ROOT_GAUGE_FACTORY,
-            publicClient,
-            walletClient: walletClient!
+            clients: { publicClient, walletClient: walletClient! }
           })
         }
         disabled={!account}
