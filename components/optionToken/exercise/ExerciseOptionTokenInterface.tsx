@@ -22,7 +22,7 @@ import { BalancerOracleAbi, ExerciseByChain, OVCX_ORACLE, OptionTokenByChain, VC
 import { formatNumber, safeRound } from "@/lib/utils/formatBigNumber";
 import { validateInput } from "@/lib/utils/helpers";
 import { Token } from "@/lib/types";
-import { formatEther, parseEther } from "viem";
+import { createPublicClient, formatEther, http, parseEther } from "viem";
 import { useAtom } from "jotai";
 import { tokensAtom } from "@/lib/atoms";
 import ActionSteps from "../../vault/ActionSteps";
@@ -31,6 +31,7 @@ import MainActionButton from "../../button/MainActionButton";
 import { exerciseOPop } from "@/lib/optionToken/interactions";
 import { handleAllowance } from "@/lib/approve";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
+import { RPC_URLS } from "@/lib/utils/connectors";
 
 const SLIPPAGE = 0.01; // @dev adding some slippage to the call -- TODO -> we should later allow users to change that
 
@@ -68,12 +69,14 @@ export default function ExerciseOptionTokenInterface({ chainId, setShowModal }: 
       setOvcx(tokens[chainId][OptionTokenByChain[chainId]])
       setWeth(tokens[chainId][WethByChain[chainId]])
 
-      const multiplier = await publicClient.readContract({
+      const mainnetClient = createPublicClient({ chain: mainnet, transport: http(RPC_URLS[1]) })
+
+      const multiplier = await mainnetClient.readContract({
         address: OVCX_ORACLE,
         abi: BalancerOracleAbi,
         functionName: "multiplier",
       });
-      const strikePriceRes = await publicClient.readContract({
+      const strikePriceRes = await mainnetClient.readContract({
         address: OVCX_ORACLE,
         abi: BalancerOracleAbi,
         functionName: "getPrice",
@@ -316,7 +319,7 @@ export default function ExerciseOptionTokenInterface({ chainId, setShowModal }: 
             />
           </div>
           <div className="mb-4">
-            {stepCounter < 2 ? (
+            {stepCounter < EXERCISE_OVCX_STEPS.length ? (
               <MainActionButton
                 label={steps[stepCounter].label}
                 handleClick={handleExerciseOptionToken}

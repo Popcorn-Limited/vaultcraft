@@ -32,7 +32,6 @@ export default function VaultStrategyConfiguration({
 
   const [newStrategy, setNewStrategy] = useState<string>(zeroAddress)
 
-
   return (
     <>
       <div className="flex flex-row justify-center">

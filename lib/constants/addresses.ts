@@ -147,8 +147,8 @@ export const LockboxAdapterByChain: AddressByChain = {
 
 export const ExerciseByChain: AddressByChain = {
   [mainnet.id]: OptionTokenByChain[mainnet.id],
-  [optimism.id]: "0xCFAe9b648D929D10AFaf22529431b3138627da66",
-  [arbitrum.id]: "0xCFAe9b648D929D10AFaf22529431b3138627da66",
+  [optimism.id]: "0x63421beE7a26966156403FF1c8ACBE79c2EaFB1f",
+  [arbitrum.id]: "0x63421beE7a26966156403FF1c8ACBE79c2EaFB1f",
 }
 
 export const ExerciseOracleByChain: AddressByChain = {

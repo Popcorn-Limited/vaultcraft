@@ -111,6 +111,15 @@ async function getVaultSettings(
   };
 }
 
+const DEFAULT_TABS = [
+  "Strategy",
+  "Fee Configuration",
+  "Fee Recipient",
+  "Take Fees",
+  "Deposit Limit",
+  "Pausing",
+]
+
 export default function Index() {
   const router = useRouter();
   const { query } = router;
@@ -122,9 +131,9 @@ export default function Index() {
   const [vaults, setVaults] = useAtom(vaultsAtom);
   const [vault, setVault] = useState<VaultData>();
   const [settings, setSettings] = useState<VaultSettings>();
-  const [callAddress, setCallAddress] = useState<Address>()
+  const [callAddress, setCallAddress] = useState<Address>();
+  const [availableTabs, setAvailableTabs] = useState<string[]>(DEFAULT_TABS)
   const [tab, setTab] = useState<string>("Strategy");
-
 
   useEffect(() => {
     async function setupVault() {
@@ -134,6 +143,10 @@ export default function Index() {
         setVault(vault_);
         setSettings(settings_);
         setCallAddress(settings_.owner === AdminProxyByChain[vault_.chainId] ? VaultControllerByChain[vault_.chainId] : vault_.address)
+        if (vault_.strategies.length > 1) {
+          setAvailableTabs(["Rebalance", ...DEFAULT_TABS])
+          setTab("Rebalance")
+        }
       }
     }
     if (!vault && query && Object.keys(vaults).length > 0 && yieldOptions) setupVault()
@@ -153,19 +166,13 @@ export default function Index() {
               <>
                 <TabSelector
                   className="mt-6 mb-12"
-                  availableTabs={[
-                    "Strategy",
-                    "Fee Configuration",
-                    "Fee Recipient",
-                    "Take Fees",
-                    "Deposit Limit",
-                    "Pausing",
-                  ]}
+                  availableTabs={availableTabs}
                   activeTab={tab}
                   setActiveTab={changeTab}
                 />
                 {(settings && callAddress) ? (
                   <div>
+                    {tab === "Rebalance" && (<></>)}
                     {tab === "Strategy" && (
                       <VaultStrategyConfiguration
                         vaultData={vault}
