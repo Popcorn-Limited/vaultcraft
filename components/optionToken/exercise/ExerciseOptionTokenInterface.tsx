@@ -210,7 +210,7 @@ export default function ExerciseOptionTokenInterface({ chainId, setShowModal }: 
     setAmount("0");
     setMaxPaymentAmount("0");
     setStepCounter(0);
-    setSteps(EXERCISE_OVCX_STEPS);
+    setSteps({ ...EXERCISE_OVCX_STEPS });
     setShowModal(false)
   }
 

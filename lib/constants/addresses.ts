@@ -68,10 +68,16 @@ export const OptionTokenByChain: AddressByChain = {
   [arbitrum.id]: "0x59a696bF34Eae5AD8Fd472020e3Bed410694a230"
 }
 
+export const XVCXByChain: AddressByChain = {
+  [mainnet.id]: "0x18445923592be303fbd3BC164ee685C7457051b4",
+  [optimism.id]: "0xfe7950eC9AfE82538CEAC95735f1daf31829d066",
+  [arbitrum.id]: "0x18445923592be303fbd3BC164ee685C7457051b4"
+}
+
 export const VcxByChain: AddressByChain = {
   [mainnet.id]: VCX,
-  [optimism.id]: "0xD41d34d6b50785fDC025caD971fE940B8AA1bE45",
-  [arbitrum.id]: "0x59a696bF34Eae5AD8Fd472020e3Bed410694a230"
+  [optimism.id]: XVCXByChain[optimism.id],
+  [arbitrum.id]: XVCXByChain[arbitrum.id]
 }
 
 export const WethByChain: AddressByChain = {
@@ -133,11 +139,6 @@ export const ZapAssetAddressesByChain: { [key: number]: Address[] } = {
   [bsc.id]: []
 }
 
-export const XVCXByChain: AddressByChain = {
-  [mainnet.id]: "0x18445923592be303fbd3BC164ee685C7457051b4",
-  [optimism.id]: "0xfe7950eC9AfE82538CEAC95735f1daf31829d066",
-  [arbitrum.id]: "0x18445923592be303fbd3BC164ee685C7457051b4"
-}
 
 export const LockboxAdapterByChain: AddressByChain = {
   [mainnet.id]: "0x45bf3c737e57b059a5855280ca1adb8e9606ac68",

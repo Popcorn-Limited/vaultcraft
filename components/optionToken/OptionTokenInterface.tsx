@@ -227,7 +227,6 @@ export default function OptionTokenInterface({ setShowOptionTokenModal }: Option
               <SecondaryActionButton
                 label="Exercise oVCX"
                 handleClick={() => setShowOptionTokenModal(true)}
-                disabled={oBal ? Number(oBal?.value) === 0 : true}
               />
             </div>
           )}
