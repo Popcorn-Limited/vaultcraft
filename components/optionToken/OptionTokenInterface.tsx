@@ -48,17 +48,16 @@ export default function OptionTokenInterface({ setShowOptionTokenModal }: Option
   }, []);
 
   async function handleClaim(chainId: number) {
-    console.log("handleCLaim", chainId)
-
     const success = await claimOPop({
       gauges: gaugeRewards[chainId].amounts
         ?.filter((gauge) => Number(gauge.amount) > 0)
         .map((gauge) => gauge.address) as Address[],
+      chainId: chainId,
       account: account!,
       minter: MinterByChain[chainId],
       clients: { publicClient, walletClient: walletClient! }
     })
-    
+
     if (success) {
       await mutateTokenBalance({
         tokensToUpdate: [OptionTokenByChain[chainId]],
@@ -171,8 +170,9 @@ export default function OptionTokenInterface({ setShowOptionTokenModal }: Option
         </span>
       </div>
       <span className="flex flex-row items-center justify-between pb-6 border-b border-customNeutral100"></span>
+
       <div className="lg:flex lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-8 mt-6">
-        {(gaugeRewards && Object.keys(gaugeRewards).length > 0) &&
+        {(gaugeRewards && Object.keys(gaugeRewards).length > 0) ?
           <>
             <div className="w-full md:w-60">
               <MainActionButton
@@ -193,6 +193,30 @@ export default function OptionTokenInterface({ setShowOptionTokenModal }: Option
                 label="Claim ARB oVCX"
                 handleClick={() => handleClaim(42161)}
                 disabled={!account || (gaugeRewards ? Number(gaugeRewards[42161].total) === 0 : true)}
+              />
+            </div>
+          </>
+          :
+          <>
+            <div className="w-full md:w-60">
+              <MainActionButton
+                label="Claim ETH oVCX"
+                handleClick={() => { }}
+                disabled={true}
+              />
+            </div>
+            <div className="w-full md:w-60">
+              <MainActionButton
+                label="Claim OPT oVCX"
+                handleClick={() => { }}
+                disabled={true}
+              />
+            </div>
+            <div className="w-full md:w-60">
+              <MainActionButton
+                label="Claim ARB oVCX"
+                handleClick={() => { }}
+                disabled={true}
               />
             </div>
           </>

@@ -108,6 +108,7 @@ export default function Index() {
 
     const success = await claimOPop({
       gauges: [vaultData.gauge || zeroAddress],
+      chainId: vaultData.chainId!,
       account: account as Address,
       minter: MinterByChain[vaultData?.chainId],
       clients: { publicClient, walletClient: walletClient! }

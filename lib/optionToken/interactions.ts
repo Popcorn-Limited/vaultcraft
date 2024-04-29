@@ -1,8 +1,8 @@
 import { Address } from "viem";
-import { MinterAbi, OptionTokenAbi, OptionTokenByChain } from "@/lib/constants";
+import { ChildGaugeFactoryAbi, MinterAbi, OptionTokenAbi, OptionTokenByChain } from "@/lib/constants";
 import { Clients } from "@/lib/types";
 import { handleCallResult, simulateCall } from "@/lib/utils/helpers";
-import { PublicClient } from "wagmi";
+import { PublicClient, mainnet } from "wagmi";
 
 interface ExerciseOPopProps {
   amount: bigint;
@@ -37,22 +37,24 @@ export async function exerciseOPop({
 
 interface ClaimOPopProps {
   gauges: Address[];
+  chainId: number;
   account: Address;
   minter: Address;
   clients: Clients
 }
 
-export async function claimOPop({ gauges, account, minter, clients }: ClaimOPopProps): Promise<boolean> {
+export async function claimOPop({ gauges, chainId, account, minter, clients }: ClaimOPopProps): Promise<boolean> {
+
   return handleCallResult({
     successMessage: "oVCX Succesfully Claimed!",
     simulationResponse: await simulateCall({
       account,
       contract: {
         address: minter,
-        abi: MinterAbi,
+        abi: chainId === mainnet.id ? MinterAbi : ChildGaugeFactoryAbi,
       },
-      functionName: "mintMany",
-      publicClient: clients.publicClient as PublicClient,
+      functionName: chainId === mainnet.id ? "mintMany" : "mint_many",
+      publicClient: clients.publicClient,
       args: [gauges],
     }),
     clients,

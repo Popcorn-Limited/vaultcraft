@@ -16,3 +16,4 @@ export * from "./StakingVault";
 export * from "./FraxLend";
 export * from "./Vaultron";
 export * from "./LockBoxAdapter";
+export * from "./ChildGaugeFactory";
