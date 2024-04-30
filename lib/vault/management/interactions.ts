@@ -1,6 +1,6 @@
-import { VaultAbi, VaultControllerAbi, VaultControllerByChain } from "@/lib/constants";
+import { MultiStrategyVaultAbi, VaultAbi, VaultControllerAbi, VaultControllerByChain } from "@/lib/constants";
 import { showLoadingToast } from "@/lib/toasts"
-import { AddressByChain, Clients, SimulationResponse, VaultData } from "@/lib/types"
+import { AddressByChain, Clients, SimulationResponse, VaultAllocation, VaultData } from "@/lib/types"
 import { SimulationContract, handleCallResult, simulateCall } from "@/lib/utils/helpers"
 import { VaultController } from "vaultcraft-sdk";
 import { Address } from "viem"
@@ -24,6 +24,100 @@ function getSimulationContract(address: Address, chainId: number): SimulationCon
       abi: VaultAbi
     }
   }
+}
+
+export async function allocateToStrategies({
+  allocations,
+  vaultData,
+  address,
+  account,
+  clients,
+}: BaseWriteProps & { allocations: VaultAllocation[] }): Promise<boolean> {
+  showLoadingToast("Allocating into strategies...");
+
+  const success = await handleCallResult({
+    successMessage: "Allocated into strategies!",
+    simulationResponse: await simulateCall({
+      account: account as Address,
+      contract: { address: vaultData.address, abi: MultiStrategyVaultAbi },
+      functionName: "pushFunds",
+      args: allocations,
+      publicClient: clients.publicClient
+    }),
+    clients,
+  });
+
+  return success;
+}
+
+export async function deallocateFromStrategies({
+  allocations,
+  vaultData,
+  address,
+  account,
+  clients,
+}: BaseWriteProps & { allocations: VaultAllocation[] }): Promise<boolean> {
+  showLoadingToast("Deallocating from strategies...");
+
+  const success = await handleCallResult({
+    successMessage: "Deallocated from strategies!",
+    simulationResponse: await simulateCall({
+      account: account as Address,
+      contract: { address: vaultData.address, abi: MultiStrategyVaultAbi },
+      functionName: "pullFunds",
+      args: allocations,
+      publicClient: clients.publicClient
+    }),
+    clients,
+  });
+
+  return success;
+}
+
+export async function proposeStrategies({
+  strategies,
+  vaultData,
+  address,
+  account,
+  clients,
+}: BaseWriteProps & { strategies: Address[] }): Promise<boolean> {
+  showLoadingToast("Proposing new strategies...");
+
+  const success = await handleCallResult({
+    successMessage: "Proposed new strategies!",
+    simulationResponse: await simulateCall({
+      account: account as Address,
+      contract: { address: vaultData.address, abi: MultiStrategyVaultAbi },
+      functionName: "proposeStrategies",
+      args: strategies,
+      publicClient: clients.publicClient
+    }),
+    clients,
+  });
+
+  return success;
+}
+
+export async function acceptStrategies({
+  vaultData,
+  address,
+  account,
+  clients,
+}: BaseWriteProps): Promise<boolean> {
+  showLoadingToast("Accepting new strategies...");
+
+  const success = await handleCallResult({
+    successMessage: "Accepted new strategies!",
+    simulationResponse: await simulateCall({
+      account: account as Address,
+      contract: { address: vaultData.address, abi: MultiStrategyVaultAbi },
+      functionName: "changeStrategies",
+      publicClient: clients.publicClient
+    }),
+    clients,
+  });
+
+  return success;
 }
 
 export async function proposeStrategy({

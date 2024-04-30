@@ -7,7 +7,7 @@ import { VaultSettings } from "pages/manage/vaults/[id]";
 import { WalletClient } from "viem";
 import { Address, useAccount, usePublicClient, useWalletClient } from "wagmi";
 
-export default function VaultFees({
+export default function VaultTakeFees({
   vaultData,
   callAddress,
   settings,

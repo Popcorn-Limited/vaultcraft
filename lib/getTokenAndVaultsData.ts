@@ -336,7 +336,7 @@ async function prepareVaults(vaultsData: VaultDataByAddress, assets: TokenByAddr
   return result;
 }
 
-async function addStrategyData(vaults: VaultDataByAddress, chainId: number, client: PublicClient, yieldOptions: YieldOptions): Promise<VaultDataByAddress> {
+export async function addStrategyData(vaults: VaultDataByAddress, chainId: number, client: PublicClient, yieldOptions: YieldOptions): Promise<VaultDataByAddress> {
   const uniqueStrategyAdresses: Address[] = [];
   Object.values(vaults).forEach((vault) => {
     vault.strategies.forEach((strategy: any) => {

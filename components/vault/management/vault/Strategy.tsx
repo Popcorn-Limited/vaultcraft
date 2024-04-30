@@ -9,8 +9,6 @@ import { VaultData } from "@/lib/types";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import { roundToTwoDecimalPlaces } from "@/lib/utils/helpers";
 import { acceptStrategy, proposeStrategy } from "@/lib/vault/management/interactions";
-import axios from "axios";
-import { useAtom } from "jotai";
 import { VaultSettings } from "pages/manage/vaults/[id]";
 import { useEffect, useState } from "react";
 import { ProtocolName, VaultController, YieldOptions } from "vaultcraft-sdk";
@@ -51,11 +49,11 @@ export default function VaultStrategyConfiguration({
               <p>{vaultData.strategies[0].address}</p>
             </div>
 
-            {settings.proposedAdapter !== zeroAddress && (
+            {settings.proposedStrategies[0] !== zeroAddress && (
               <div className="mt-4">
                 <h2 className="text-xl">Proposed Strategy</h2>
                 <div className="mt-1 border border-customGray500 p-4 rounded-md">
-                  <p>{settings.proposedAdapter}</p>
+                  <p>{settings.proposedStrategies[0]}</p>
                 </div>
               </div>
             )}
@@ -86,7 +84,7 @@ export default function VaultStrategyConfiguration({
                     walletClient: walletClient!,
                   }
                 })}
-                disabled={Number(settings.proposedAdapterTime) === 0}
+                disabled={Number(settings.proposedStrategyTime) === 0}
               />
             </div>
             <div className="w-60 mt-4">

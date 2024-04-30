@@ -17,3 +17,4 @@ export * from "./FraxLend";
 export * from "./Vaultron";
 export * from "./LockBoxAdapter";
 export * from "./ChildGaugeFactory";
+export * from "./MultiStrategyVault";

@@ -19,6 +19,7 @@ export const IconByProtocol: { [key: string]: string } = {
   Pirex: "https://icons.llamao.fi/icons/protocols/pirex?w=48&h=48",
   Sommelier: "https://icons.llamao.fi/icons/protocols/sommelier?w=48&h=48",
   Frax: "https://icons.llamao.fi/icons/protocols/frax?w=48&h=48",
+  FraxLend: "https://icons.llamao.fi/icons/protocols/frax?w=48&h=48",
   Velodrome: "https://icons.llamao.fi/icons/protocols/velodrome?w=48&h=48",
   Stader: "https://icons.llamao.fi/icons/protocols/stader?w=48&h=48",
   KelpDAO: "https://icons.llamao.fi/icons/protocols/kelp-dao?w=48&h=48",

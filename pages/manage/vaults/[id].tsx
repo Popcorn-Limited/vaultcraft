@@ -1,6 +1,6 @@
 import AssetWithName from "@/components/vault/AssetWithName";
 import { vaultsAtom } from "@/lib/atoms/vaults";
-import { FeeConfiguration, VaultData } from "@/lib/types";
+import { VaultFees, VaultData } from "@/lib/types";
 import { useAtom } from "jotai";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -8,29 +8,94 @@ import NoSSR from "react-no-ssr";
 import { useAccount } from "wagmi";
 import axios from "axios";
 import { Address, createPublicClient, extractChain, http, zeroAddress } from "viem";
-import { AdminProxyByChain, VaultAbi, VaultControllerByChain } from "@/lib/constants";
+import { AdminProxyByChain, MultiStrategyVaultAbi, VaultAbi, VaultControllerByChain } from "@/lib/constants";
 import { RPC_URLS } from "@/lib/utils/connectors";
 import * as chains from "viem/chains";
 import { ProtocolName, YieldOptions } from "vaultcraft-sdk";
 import { yieldOptionsAtom } from "@/lib/atoms/sdk";
 import TabSelector from "@/components/common/TabSelector";
-import VaultStrategyConfiguration from "@/components/vault/management/vault/strategy";
-import VaultPausing from "@/components/vault/management/vault/pausing";
-import VaultDepositLimit from "@/components/vault/management/vault/depositLimit";
-import VaultFeeRecipient from "@/components/vault/management/vault/feeRecipient";
-import VaultFeeConfiguration from "@/components/vault/management/vault/feeConfiguration";
-import VaultFees from "@/components/vault/management/vault/fees";
-import { setgroups } from "process";
+import VaultStrategyConfiguration from "@/components/vault/management/vault/Strategy";
+import VaultPausing from "@/components/vault/management/vault/Pausing";
+import VaultDepositLimit from "@/components/vault/management/vault/DepositLimit";
+import VaultFeeRecipient from "@/components/vault/management/vault/FeeRecipient";
+import VaultFeeConfiguration from "@/components/vault/management/vault/FeeConfiguration";
+import VaultTakeFees from "@/components/vault/management/vault/Fees";
+import VaultStrategiesConfiguration from "@/components/vault/management/vault/Strategies";
+import VaultRebalance from "@/components/vault/management/vault/Rebalance";
 
 export interface VaultSettings {
-  proposedAdapter: Address;
-  proposedAdapterTime: number;
-  proposedFees: FeeConfiguration;
+  proposedStrategies: Address[];
+  proposedStrategyTime: number;
+  proposedFees: VaultFees;
   proposedFeeTime: number;
   paused: boolean;
   feeBalance: number;
   accruedFees: number;
   owner: Address;
+}
+
+function getMulticalls(vault: VaultData) {
+  const vaultContract = {
+    address: vault.address,
+    abi: vault.strategies.length > 1 ? MultiStrategyVaultAbi : VaultAbi,
+  };
+  const result = [
+    {
+      ...vaultContract,
+      functionName: "proposedFees",
+    },
+    {
+      ...vaultContract,
+      functionName: "proposedFeeTime",
+    },
+    {
+      ...vaultContract,
+      functionName: "paused",
+    },
+    {
+      ...vaultContract,
+      functionName: "balanceOf",
+      args: [vault.metadata.feeRecipient],
+    },
+    {
+      ...vaultContract,
+      functionName: "accruedManagementFee",
+    },
+    {
+      ...vaultContract,
+      functionName: "accruedPerformanceFee",
+    },
+    {
+      ...vaultContract,
+      functionName: "owner"
+    }
+  ]
+
+  if (vault.strategies.length > 1) {
+    return [
+      {
+        ...vaultContract,
+        functionName: "getProposedStrategies",
+      },
+      {
+        ...vaultContract,
+        functionName: "proposedStrategyTime",
+      },
+      ...result
+    ]
+  } else {
+    return [
+      {
+        ...vaultContract,
+        functionName: "proposedAdapter",
+      },
+      {
+        ...vaultContract,
+        functionName: "proposedAdapterTime",
+      },
+      ...result
+    ]
+  }
 }
 
 async function getVaultSettings(
@@ -46,57 +111,14 @@ async function getVaultSettings(
     transport: http(RPC_URLS[vault.chainId]),
   });
 
-  const vaultContract = {
-    address: vault.address,
-    abi: VaultAbi,
-  };
-
-  const res = await client.multicall({
-    contracts: [
-      {
-        ...vaultContract,
-        functionName: "proposedAdapter",
-      },
-      {
-        ...vaultContract,
-        functionName: "proposedAdapterTime",
-      },
-      {
-        ...vaultContract,
-        functionName: "proposedFees",
-      },
-      {
-        ...vaultContract,
-        functionName: "proposedFeeTime",
-      },
-      {
-        ...vaultContract,
-        functionName: "paused",
-      },
-      {
-        ...vaultContract,
-        functionName: "balanceOf",
-        args: [vault.metadata.feeRecipient],
-      },
-      {
-        ...vaultContract,
-        functionName: "accruedManagementFee",
-      },
-      {
-        ...vaultContract,
-        functionName: "accruedPerformanceFee",
-      },
-      {
-        ...vaultContract,
-        functionName: "owner"
-      }
-    ],
+  const res: any[] = await client.multicall({
+    contracts: getMulticalls(vault),
     allowFailure: false,
   });
 
   return {
-    proposedAdapter: res[0],
-    proposedAdapterTime: Number(res[1]),
+    proposedStrategies: vault.strategies.length > 1 ? res[0] : [res[0]],
+    proposedStrategyTime: Number(res[1]),
     proposedFees: {
       deposit: Number(res[2][0]),
       withdrawal: Number(res[2][1]),
@@ -172,13 +194,26 @@ export default function Index() {
                 />
                 {(settings && callAddress) ? (
                   <div>
-                    {tab === "Rebalance" && (<></>)}
-                    {tab === "Strategy" && (
-                      <VaultStrategyConfiguration
-                        vaultData={vault}
+                    {tab === "Rebalance" && (
+                      <VaultRebalance vaultData={vault}
                         settings={settings}
-                        callAddress={callAddress}
-                      />
+                        callAddress={callAddress} />
+                    )}
+                    {tab === "Strategy" && (
+                      <>
+                        {vault.strategies.length > 1
+                          ? <VaultStrategiesConfiguration
+                            vaultData={vault}
+                            settings={settings}
+                            callAddress={callAddress}
+                          />
+                          : <VaultStrategyConfiguration
+                            vaultData={vault}
+                            settings={settings}
+                            callAddress={callAddress}
+                          />
+                        }
+                      </>
                     )}
                     {tab === "Fee Configuration" && (
                       <VaultFeeConfiguration
@@ -202,7 +237,7 @@ export default function Index() {
                       />
                     )}
                     {tab === "Take Fees" && (
-                      <VaultFees vaultData={vault} settings={settings} callAddress={callAddress} />
+                      <VaultTakeFees vaultData={vault} settings={settings} callAddress={callAddress} />
                     )}
                     {tab === "Pausing" && (
                       <VaultPausing vaultData={vault} settings={settings} callAddress={callAddress} />

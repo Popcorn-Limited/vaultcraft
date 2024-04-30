@@ -1,11 +1,11 @@
 import MainActionButton from "@/components/button/MainActionButton";
 import FeeConfiguration from "@/components/deploymentSections/FeeConfiguration";
 import { feeAtom } from "@/lib/atoms";
-import { VaultData } from "@/lib/types";
+import { VaultFees, VaultData } from "@/lib/types";
 import { acceptFees, proposeFees } from "@/lib/vault/management/interactions";
 import { useAtom } from "jotai";
 import { VaultSettings } from "pages/manage/vaults/[id]";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Address, parseUnits, zeroAddress } from "viem";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 
@@ -54,7 +54,7 @@ export default function VaultFeeConfiguration({
           </div>
         ) : (
           <>
-            {fees.recipient !== zeroAddress ? (
+            {vaultData.metadata.feeRecipient !== zeroAddress ? (
               <FeeConfiguration
                 showFeeRecipient={false}
                 openCategories={Object.values(vaultData.fees).map(

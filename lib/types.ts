@@ -31,7 +31,7 @@ export type Asset = {
   apy?: number;
 };
 
-export type FeeConfiguration = {
+export type VaultFees = {
   deposit: number;
   withdrawal: number;
   management: number;
@@ -44,7 +44,7 @@ export type VaultData = {
   asset: Address;
   gauge?: Address;
   chainId: number;
-  fees: FeeConfiguration;
+  fees: VaultFees;
   totalAssets: number;
   totalSupply: number;
   depositLimit: number;
@@ -255,3 +255,8 @@ export type VaultronStats = {
   tokenId: number;
   totalXp: number;
 }
+
+export type VaultAllocation = {
+  index: bigint;
+  amount: bigint;
+};
