@@ -1,6 +1,6 @@
 import { Address } from "viem";
 import { PublicClient } from "wagmi";
-import { llama } from "./resolver";
+import { llama, vcx } from "./resolver";
 
 export type PriceResolverParams = {
   address: Address;
@@ -18,6 +18,7 @@ export const PriceResolvers: {
   }: PriceResolverParams) => Promise<number>;
 } = {
   llama,
+  vcx,
   default: llama,
 };
 

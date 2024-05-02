@@ -16,7 +16,7 @@ import { validateInput } from "@/lib/utils/helpers";
 import Modal from "@/components/modal/Modal";
 import InputNumber from "@/components/input/InputNumber";
 import { safeRound } from "@/lib/utils/formatBigNumber";
-import { formatUnits, getAddress, isAddress } from "viem";
+import { formatUnits, getAddress, isAddress, maxUint256 } from "viem";
 import handleVaultInteraction from "@/lib/vault/handleVaultInteraction";
 import ActionSteps from "@/components/vault/ActionSteps";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
@@ -373,6 +373,13 @@ export default function VaultInputs({
         allowInput
       />
 
+      {vaultData.depositLimit < maxUint256 &&
+        <span className="flex flex-row items-center justify-between text-[#D7D7D7]">
+          <p>Deposit Limit:</p>
+          <p>{vaultData.depositLimit / (10 ** vaultData.asset.decimals)} {vaultData.asset.symbol}</p>
+        </span>
+      }
+
       <div className="relative py-4">
         <div className="absolute inset-0 flex items-center" aria-hidden="true">
           <div className="w-full border-t border-customGray500" />
@@ -428,7 +435,7 @@ export default function VaultInputs({
           </div>
         )}
 
-      <div className="mt-6">
+      <div className="mt-4">
         <p className="text-white font-bold mb-2 text-start">Fee Breakdown</p>
         <div className="bg-customNeutral200 py-2 px-4 rounded-lg space-y-2">
           <span className="flex flex-row items-center justify-between text-white">
