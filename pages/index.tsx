@@ -15,6 +15,12 @@ const IndexPage = () => {
 
   return (
     <NoSSR>
+      <div className="bg-primaryYellow rounded-md py-3 md:px-4 px-8 mx-4">
+        <p>
+          <span className="font-bold"> V1.5 is live.{" "}</span>
+          Depositors earn: Smart Vault APR + oVCX perpetual call options + Eigenlayer Points + LRT points 🔥
+        </p>
+      </div>
       <Hero />
       <Products />
     </NoSSR>

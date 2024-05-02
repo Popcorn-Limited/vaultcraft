@@ -11,7 +11,6 @@ import { parseUnits, WalletClient } from "viem";
 import Modal from "@/components/modal/Modal";
 import MainActionButton from "@/components/button/MainActionButton";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
-import { getVeAddresses } from "@/lib/constants";
 import LockVxcInfo from "@/components/boost/modals/lock/LockVxcInfo";
 import LockVcxInterface from "@/components/boost/modals/lock/LockVcxInterface";
 import LockPreview from "@/components/boost/modals/lock/LockPreview";
@@ -20,8 +19,10 @@ import { handleAllowance } from "@/lib/approve";
 import { createLock } from "@/lib/gauges/interactions";
 import ActionSteps from "@/components/vault/ActionSteps";
 import { ActionStep, LOCK_VCX_LP_STEPS } from "@/lib/getActionSteps";
-
-const { BalancerPool: VCX_LP, VotingEscrow: VOTING_ESCROW } = getVeAddresses();
+import { VCX_LP, VE_VCX, VOTING_ESCROW } from "@/lib/constants";
+import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
+import { useAtom } from "jotai";
+import { tokensAtom } from "@/lib/atoms";
 
 interface LockModalProps {
   show: [boolean, Dispatch<SetStateAction<boolean>>];
@@ -36,9 +37,10 @@ export default function LockModal({
 
   const { chain } = useNetwork();
   const { switchNetworkAsync } = useSwitchNetwork();
-
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
+
+  const [tokens, setTokens] = useAtom(tokensAtom);
 
   const [modalStep, setModalStep] = useState(0);
   const [showModal, setShowModal] = show;
@@ -70,7 +72,7 @@ export default function LockModal({
     const val = Number(parseUnits(amount, 18));
 
     // Early exit if value is ZERO
-    if (val == 0) return;
+    if (val === 0 || !account) return;
 
     if (chain?.id !== Number(1)) {
       try {
@@ -95,7 +97,7 @@ export default function LockModal({
           spender: VOTING_ESCROW,
           clients: {
             publicClient,
-            walletClient: walletClient as WalletClient,
+            walletClient: walletClient!,
           },
         });
         break;
@@ -104,9 +106,17 @@ export default function LockModal({
         success = await createLock({
           amount: val,
           days,
-          account: account as Address,
-          clients: { publicClient, walletClient: walletClient as WalletClient },
+          account: account,
+          clients: { publicClient, walletClient: walletClient! },
         });
+        if (success) {
+          await mutateTokenBalance({
+            tokensToUpdate: [VCX_LP],
+            account,
+            tokensAtom: [tokens, setTokens],
+            chainId: 1
+          })
+        }
         break;
     }
 

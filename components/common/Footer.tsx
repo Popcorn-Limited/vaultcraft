@@ -57,7 +57,7 @@ const GovernanceLinks = [
 
 const Footer = () => {
   return (
-    <footer className="w-full flex flex-col md:flex-row py-12 px-8 bg-[#23262F]">
+    <footer className="w-full flex flex-col md:flex-row py-12 px-8 bg-customNeutral200">
       <div className="w-full md:w-1/4 md:mr-8">
         <div className="flex flex-row">
           <Link href={`/`} passHref>
@@ -67,7 +67,7 @@ const Footer = () => {
               className="hidden md:block w-10 h-10"
             />
           </Link>
-          <p className="text-primaryDark leading-6 md:ml-10 md:w-11/12">
+          <p className="text-customGray100 leading-6 md:ml-10 md:w-11/12">
             VaultCraft is a DeFi yield-optimizing protocol with customizable
             asset strategies that instantly zap your crypto from any chain into
             the highest yield-generating products across DeFi in 1 click.
@@ -89,7 +89,7 @@ const Footer = () => {
                 key={link.label}
                 href={link.href}
                 passHref
-                className=" text-primaryDark hover:text-[#DFFF1C] leading-6 mt-4"
+                className=" text-customGray100 hover:text-primaryYellow leading-6 mt-4"
               >
                 {link.label}
               </Link>
@@ -106,7 +106,7 @@ const Footer = () => {
                 href={link.href}
                 passHref
                 target="_blank"
-                className=" text-primaryDark hover:text-[#DFFF1C] leading-6 mt-4"
+                className=" text-customGray100 hover:text-primaryYellow leading-6 mt-4"
               >
                 {link.label}
               </Link>
@@ -125,7 +125,7 @@ const Footer = () => {
                 href={link.href}
                 passHref
                 target="_blank"
-                className=" text-primaryDark hover:text-[#DFFF1C] leading-6 mt-4"
+                className="text-customGray100 hover:text-primaryYellow leading-6 mt-4"
               >
                 {link.label}
               </Link>
@@ -144,7 +144,7 @@ const Footer = () => {
                 href={link.href}
                 passHref
                 target="_blank"
-                className=" text-primaryDark hover:text-[#DFFF1C] leading-6 mt-4"
+                className="text-customGray100 hover:text-primaryYellow leading-6 mt-4"
               >
                 {link.label}
               </Link>

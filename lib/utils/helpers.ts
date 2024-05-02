@@ -1,5 +1,9 @@
 import { showErrorToast, showSuccessToast } from "@/lib/toasts";
 import { Clients, SimulationResponse, Token } from "@/lib/types";
+import { InitParam, InitParamRequirement } from "@/lib/atoms/adapter";
+import { Abi, Address, isAddress } from "viem";
+import { ADDRESS_ZERO } from "@/lib/constants";
+import { PublicClient } from "wagmi";
 
 export function validateInput(value: string | number): {
   formatted: string;
@@ -35,6 +39,7 @@ export async function handleCallResult({
       showSuccessToast(successMessage);
       return true;
     } catch (error: any) {
+      console.log({ error })
       showErrorToast(error.shortMessage);
       return false;
     }
@@ -82,4 +87,107 @@ export function cleanTokenSymbol(token: Token): string {
     return split[0].slice(0, -1) + split[1];
   }
   return token.symbol;
+}
+
+export function noOp() { }
+
+export const beautifyAddress = (addr: string) =>
+  `${addr.slice(0, 4)}...${addr.slice(-5, 5)}`;
+
+export function verifyInitParamValidity(
+  value: string,
+  inputParam: InitParam
+): string[] {
+  const errors: string[] = [];
+
+  if (value === "") errors.push("Value is required");
+  if (!inputParam.requirements) {
+    switch (inputParam.type) {
+      case "address":
+        if (!isAddress(value)) errors.push("Must be a valid address");
+    }
+  }
+  if (inputParam.requirements && inputParam.requirements.length > 0) {
+    if (
+      inputParam.requirements.includes(InitParamRequirement.NotAddressZero) &&
+      value !== ADDRESS_ZERO
+    )
+      errors.push("Must not be zero address");
+
+    if (
+      inputParam.requirements.includes(InitParamRequirement.NotZero) &&
+      Number(value) === 0
+    )
+      errors.push("Must not be zero");
+  }
+
+  return errors;
+}
+
+export function transformNetwork(network: string | undefined): string {
+  switch (network) {
+    case "homestead":
+    case undefined:
+      return "ethereum";
+    case "matic":
+      return "polygon";
+    default:
+      return network.toLowerCase();
+  }
+}
+
+export function cleanFileName(fileName: string): string {
+  return fileName.replace(/ /g, "-").replace(/[^a-zA-Z0-9]/g, "");
+}
+
+export function extractRevertReason(error: any): string {
+  if (error.reason) {
+    return error.reason;
+  }
+
+  if (error.data && error.data.message) {
+    return error.data.message;
+  }
+
+  return error;
+}
+
+
+export type SimulationContract = {
+  address: Address;
+  abi: Abi;
+};
+
+export interface SimulateProps {
+  account: Address;
+  contract: SimulationContract;
+  functionName: string;
+  publicClient: PublicClient;
+  args?: any[];
+  value?: bigint;
+}
+
+export async function simulateCall({
+  account,
+  contract,
+  functionName,
+  publicClient,
+  args,
+  value
+}: SimulateProps): Promise<SimulationResponse> {
+  try {
+    const { request } = await publicClient.simulateContract({
+      account,
+      address: contract.address,
+      abi: contract.abi,
+      // @ts-ignore
+      functionName,
+      args,
+      value
+    });
+    return { request: request, success: true, error: null };
+  } catch (error: any) {
+    console.log({ simError: error })
+    return { request: null, success: false, error: error.shortMessage };
+  }
 }

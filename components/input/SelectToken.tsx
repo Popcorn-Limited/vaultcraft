@@ -67,7 +67,7 @@ export default function SelectToken({
           </div>
           <p
             id={selectTokenId}
-            className="font-medium text-lg leading-none hidden md:block text-white group-hover:text-primary truncate cursor-pointer"
+            className="font-medium text-lg leading-none hidden md:block text-white group-hover:text-white truncate cursor-pointer"
           >
             {selectedToken?.symbol}
           </p>
@@ -92,7 +92,7 @@ export default function SelectToken({
           </div>
           {allowSelection && (
             <ChevronDownIcon
-              className={`w-6 h-6 ml-2 text-secondaryLight group-hover:text-primary 
+              className={`w-6 h-6 ml-2 text-customGray300 group-hover:text-white 
               transform transition-all ease-in-out duration-200 ${
                 show ? " rotate-180" : ""
               }`}

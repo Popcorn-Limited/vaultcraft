@@ -1,14 +1,20 @@
 import { PublicClient, zeroAddress } from "viem";
 import { Address } from "wagmi";
-import { GaugeControllerAbi, getVeAddresses } from "@/lib/constants";
+import { GAUGE_CONTROLLER, GaugeControllerAbi } from "@/lib/constants";
 
 const DAYS = 24 * 60 * 60;
 
-const { GaugeController: GAUGE_CONTROLLER } = getVeAddresses();
+export type VoteData = {
+    gauge: Address;
+    canVote: boolean;
+    lastUserVote: bigint;
+    nextVoteTimestamp: bigint;
+    currentTimestamp: bigint;
+}
 
 export async function hasAlreadyVoted(
     { addresses, publicClient, account = zeroAddress }: { addresses: Address[], publicClient: PublicClient, account?: Address }
-): Promise<{ canCastVote: boolean, canVoteOnGauges: boolean[] }> {
+): Promise<VoteData[]> {
     const data = await publicClient.multicall({
         contracts: addresses.map((address) => {
             return {
@@ -20,8 +26,14 @@ export async function hasAlreadyVoted(
         }),
         allowFailure: false
     })
-    const latest = data.sort((a, b) => Number(b) - Number(a))[0]
-    const limitTimestamp = BigInt(Math.floor(Date.now() / 1000) - (DAYS * 10));
-    const canVoteOnGauges = data.map((voteTimestamp: bigint) => voteTimestamp < limitTimestamp);
-    return { canCastVote: latest < limitTimestamp, canVoteOnGauges };
+    const currentTimestamp = BigInt(Math.floor(Date.now() / 1000));
+    return data.map((voteTimestamp: bigint, i: number) => {
+        return {
+            gauge: addresses[i],
+            canVote: voteTimestamp + BigInt(DAYS * 10) < currentTimestamp,
+            lastUserVote: voteTimestamp,
+            nextVoteTimestamp: voteTimestamp + BigInt(DAYS * 10),
+            currentTimestamp: currentTimestamp
+        }
+    });
 }

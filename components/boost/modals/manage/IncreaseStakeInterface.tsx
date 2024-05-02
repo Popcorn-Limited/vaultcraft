@@ -1,17 +1,14 @@
 import { Dispatch, FormEventHandler, SetStateAction, useMemo } from "react";
-import { getVeAddresses } from "@/lib/constants";
 import { Address, useAccount, useBalance, useToken } from "wagmi";
 import {
   formatAndRoundBigNumber,
   safeRound,
 } from "@/lib/utils/formatBigNumber";
-import { ZERO } from "@/lib/constants";
+import { VCX_LP, ZERO } from "@/lib/constants";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import { calcDaysToUnlock, calculateVeOut } from "@/lib/gauges/utils";
 import { validateInput } from "@/lib/utils/helpers";
 import { formatEther } from "viem";
-
-const { WETH_VCX_LP } = getVeAddresses();
 
 interface IncreaseStakeInterfaceProps {
   amountState: [string, Dispatch<SetStateAction<string>>];
@@ -27,12 +24,12 @@ export default function IncreaseStakeInterface({
   const { address: account } = useAccount();
   const { data: lpToken } = useToken({
     chainId: 1,
-    address: WETH_VCX_LP as Address,
+    address: VCX_LP,
   });
   const { data: lpBal } = useBalance({
     chainId: 1,
     address: account,
-    token: WETH_VCX_LP,
+    token: VCX_LP,
   });
 
   const [amount, setAmount] = amountState;
@@ -57,7 +54,7 @@ export default function IncreaseStakeInterface({
       <h2 className="text-start text-5xl">Lock your VCX</h2>
 
       <div>
-        <p className="text-primary font-semibold">Amount VCX</p>
+        <p className="text-white font-semibold">Amount VCX</p>
         <InputTokenWithError
           captionText={``}
           onSelectToken={() => {}}
@@ -88,14 +85,14 @@ export default function IncreaseStakeInterface({
       </div>
 
       <div className="space-y-2">
-        <div className="flex flex-row items-center justify-between text-secondaryLight">
+        <div className="flex flex-row items-center justify-between text-customGray300">
           <p>Current Lock Amount</p>
           <p>
             {lockedBal ? formatAndRoundBigNumber(lockedBal?.amount, 18) : ""}{" "}
             VCX
           </p>
         </div>
-        <div className="flex flex-row items-center justify-between text-secondaryLight">
+        <div className="flex flex-row items-center justify-between text-customGray300">
           <p>Unlock Date</p>
           <p>
             {lockedBal && lockedBal?.end.toString() !== "0"
@@ -106,9 +103,9 @@ export default function IncreaseStakeInterface({
       </div>
 
       <div>
-        <p className="text-primary font-semibold mb-1">New Voting Power</p>
-        <div className="w-full bg-[#d7d7d726] border border-customLightGray rounded-lg p-4">
-          <p className="text-primaryDark">
+        <p className="text-white font-semibold mb-1">New Voting Power</p>
+        <div className="w-full bg-customGray600 border border-customGray100 rounded-lg p-4">
+          <p className="text-customGray100">
             {Number(amount) > 0
               ? calculateVeOut(
                   Number(amount) + Number(lockedBal?.amount) / 1e18,

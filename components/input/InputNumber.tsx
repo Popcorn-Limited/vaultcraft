@@ -6,7 +6,7 @@ export default function InputNumber(
   return (
     <input
       {...props}
-      className="block w-full p-0 border-none text-primaryDark text-lg bg-inherit focus:ring-0"
+      className="block w-full p-0 border-none text-customGray100 text-lg bg-inherit focus:ring-0"
       inputMode="decimal"
       autoComplete="off"
       autoCorrect="off"

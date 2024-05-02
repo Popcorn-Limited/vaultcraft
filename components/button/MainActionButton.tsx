@@ -17,10 +17,10 @@ export default function MainActionButton({
 }: ButtonProps): JSX.Element {
   return (
     <button
-      className={`w-full px-8 py-2.5 rounded-[4px] bg-white border border-white font-semibold text-base text-black 
-                  transition-all ease-in-out duration-500 hover:bg-[#DFFF1C] hover:border-[#DFFF1C] 
-                  disabled:bg-[#D7D7D7] disabled:border-[#D7D7D7] disabled:text-white disabled:cursor-not-allowed 
-                  disabled:hover:border-[#D7D7D7] disabled:hover:bg-[#D7D7D7] disabled:hover:text-white
+      className={`w-full px-2 py-2.5 rounded bg-white border border-white font-semibold text-base text-black
+                  transition-all ease-in-out duration-500 hover:bg-primaryYellow hover:border-primaryYellow 
+                  disabled:bg-customGray100 disabled:border-customGray100 disabled:text-white disabled:cursor-not-allowed 
+                  disabled:hover:border-customGray100 disabled:hover:bg-customGray100 disabled:hover:text-white
                   ${hidden ? "hidden" : ""} ${className}`}
       onClick={handleClick}
       type="button"

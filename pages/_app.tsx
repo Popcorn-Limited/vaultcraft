@@ -2,7 +2,7 @@ import "../styles/globals.css";
 import "@rainbow-me/rainbowkit/styles.css";
 import type { AppProps } from "next/app";
 import localFont from "next/font/local";
-import { WagmiConfig, configureChains, createConfig } from "wagmi";
+import { WagmiConfig, configureChains, createConfig, sepolia } from "wagmi";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
@@ -23,9 +23,10 @@ import {
   rabbyWallet,
   safeWallet,
 } from "@rainbow-me/rainbowkit/wallets";
+import { arbitrumSepolia } from "viem/chains";
 
 const { chains, publicClient } = configureChains(
-  SUPPORTED_NETWORKS,
+  [...SUPPORTED_NETWORKS],
   [
     alchemyProvider({
       apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY as string,

@@ -1,25 +1,24 @@
 import NoSSR from "react-no-ssr";
 import axios from "axios";
 import { differenceInCalendarWeeks } from "date-fns";
-
-// import { BalancerSDK, Network } from '@balancer-labs/sdk';
 import { useEffect, useRef, useState } from "react";
 import Highcharts from "highcharts";
-import SelectField from "@/components/input/SelectField";
-import { erc20ABI, usePublicClient } from "wagmi";
-import { getVeAddresses } from "@/lib/constants";
+import { usePublicClient } from "wagmi";
 import {
+  BALANCER_VAULT,
   BalancerVaultAbi,
+  VCX,
+  VCX_LP,
   VCX_POOL_ID,
+  VOTING_ESCROW,
   VotingEscrowAbi,
+  WETH,
 } from "@/lib/constants";
 import { formatToFixedDecimals } from "@/lib/utils/formatBigNumber";
-import { bigint } from "zod";
 import { DuneQueryResult } from "@/lib/types";
-import { resolvePrice } from "@/lib/resolver/price/price";
+import { useAtom } from "jotai";
+import { tokensAtom } from "@/lib/atoms";
 
-const { VCX, VotingEscrow, WETH, WETH_VCX_LP, oVCX, BalancerVault } =
-  getVeAddresses();
 
 const vaultTvlChartColors = [
   "#FFE650",
@@ -88,77 +87,84 @@ const formatDate = (timestamp: number) => {
   return `${month}. ${day} ${year}`;
 };
 
+type Statistics = {
+  totalSupply: number;
+  liquidSupply: number;
+  fdv: number;
+  marketCap: number;
+  vcxPrice: number;
+  vcxInBalPool: number;
+  wethInBalPool: number;
+  balLp: number;
+  veVcx: number;
+  oVcxEmissions: number;
+  oVcxExercised: number;
+  networkId: number;
+  vaultTvl: {
+    title: string;
+    count: number;
+  }[];
+  tvlMonthByMonth: {
+    date: number;
+    value: number;
+  }[];
+  totalRevenue: number;
+  oVcxRevenue: number;
+  burnedVcx: number;
+  weekDexVolume: number;
+  holderTotal: number;
+  holderPlankton: number;
+  holderShrimp: number;
+  holderFish: number;
+  holderDolphin: number;
+  holderWhale: number;
+  tvl: number;
+  snapshotPips: {
+    created: number;
+    title: string;
+  }[];
+  leaderboard: {
+    address: string;
+    count: number;
+  }[];
+}
+
+const DEFAULT_STATISTICS = {
+  totalSupply: 0,
+  liquidSupply: 0,
+  fdv: 0,
+  marketCap: 0,
+  vcxPrice: 0,
+  vcxInBalPool: 0,
+  wethInBalPool: 0,
+  balLp: 0,
+  veVcx: 0,
+  oVcxEmissions: 0,
+  oVcxExercised: 0,
+  networkId: 0,
+  vaultTvl: [],
+  tvlMonthByMonth: [],
+  totalRevenue: 0,
+  oVcxRevenue: 0,
+  burnedVcx: 0,
+  weekDexVolume: 0,
+  holderTotal: 0,
+  holderPlankton: 0,
+  holderShrimp: 0,
+  holderFish: 0,
+  holderDolphin: 0,
+  holderWhale: 0,
+  tvl: 0,
+  snapshotPips: [],
+  leaderboard: [],
+}
+
 export default function Vaults() {
   const publicClient = usePublicClient({ chainId: 1 });
-  const [statistics, setStatistics] = useState<{
-    totalSupply: number;
-    liquidSupply: number;
-    fdv: number;
-    marketCap: number;
-    vcxPrice: number;
-    vcxInBalPool: number;
-    wethInBalPool: number;
-    balLp: number;
-    veVcx: number;
-    oVcxEmissions: number;
-    oVcxExercised: number;
-    networkId: number;
-    vaultTvl: {
-      title: string;
-      count: number;
-    }[];
-    tvlMonthByMonth: {
-      date: number;
-      value: number;
-    }[];
-    totalRevenue: number;
-    oVcxRevenue: number;
-    burnedVcx: number;
-    weekDexVolume: number;
-    holderTotal: number;
-    holderPlankton: number;
-    holderShrimp: number;
-    holderFish: number;
-    holderDolphin: number;
-    holderWhale: number;
-    tvl: number;
-    snapshotPips: {
-      created: number;
-      title: string;
-    }[];
-    leaderboard: {
-      address: string;
-      count: number;
-    }[];
-  }>({
-    totalSupply: 0,
-    liquidSupply: 0,
-    fdv: 0,
-    marketCap: 0,
-    vcxPrice: 0,
-    vcxInBalPool: 0,
-    wethInBalPool: 0,
-    balLp: 0,
-    veVcx: 0,
-    oVcxEmissions: 0,
-    oVcxExercised: 0,
-    networkId: 0,
-    vaultTvl: [],
-    tvlMonthByMonth: [],
-    totalRevenue: 0,
-    oVcxRevenue: 0,
-    burnedVcx: 0,
-    weekDexVolume: 0,
-    holderTotal: 0,
-    holderPlankton: 0,
-    holderShrimp: 0,
-    holderFish: 0,
-    holderDolphin: 0,
-    holderWhale: 0,
-    tvl: 0,
-    snapshotPips: [],
-    leaderboard: [],
-  });
+
+  const [tokens] = useAtom(tokensAtom)
+
+  const [statistics, setStatistics] = useState<Statistics>(DEFAULT_STATISTICS);
   const [tvlChain, setTvlChain] = useState<{
     image?: string;
     label: string;
@@ -331,8 +337,6 @@ export default function Vaults() {
     const [
       snapshotPips,
       duneTokenResult,
-      prices,
-      vcxPrice,
       poolTokens,
       llamaRes,
       holder,
@@ -354,17 +358,8 @@ export default function Vaults() {
           circulatingsupply: number;
         }>
       >("https://api.dune.com/api/v1/query/3238349/results", duneOpts),
-      axios.get(
-        `https://coins.llama.fi/prices/current/ethereum:0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2,ethereum:0x577A7f7EE659Aa14Dc16FD384B3F8078E23F1920?searchWidth=24h`
-      ),
-      resolvePrice({
-        address: VCX,
-        chainId: 1,
-        client: undefined,
-        resolver: "vcx",
-      }),
       publicClient.readContract({
-        address: BalancerVault,
+        address: BALANCER_VAULT,
         abi: BalancerVaultAbi,
         functionName: "getPoolTokens",
         args: [VCX_POOL_ID],
@@ -410,7 +405,7 @@ export default function Vaults() {
         }>
       >("https://api.dune.com/api/v1/query/3237039/results", duneOpts),
       publicClient.readContract({
-        address: VotingEscrow,
+        address: VOTING_ESCROW,
         abi: VotingEscrowAbi,
         functionName: "supply",
       }),
@@ -427,13 +422,9 @@ export default function Vaults() {
       >("https://api.dune.com/api/v1/query/3237707/results", duneOpts),
     ]);
 
-    const vcxInUsd = vcxPrice
-    const wethInUsd =
-      prices.data.coins["ethereum:0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"]
-        .price;
-    const lpInUsd =
-      prices.data.coins["ethereum:0x577A7f7EE659Aa14Dc16FD384B3F8078E23F1920"]
-        .price;
+    const vcxInUsd = tokens[1][VCX].price
+    const wethInUsd =tokens[1][WETH].price
+    const lpInUsd = tokens[1][VCX_LP].price
     const tvlByTime = Object.keys(
       llamaRes.data.tokensInUsd.slice(-1)[0].tokens
     );
@@ -458,11 +449,11 @@ export default function Vaults() {
       tvlMonthByMonth: llamaRes.data.tvl.map((tvl, i) => {
         return i >= 41
           ? {
-              date: tvl.date,
-              value:
-                tvl.totalLiquidityUSD +
-                llamaRes.data.chainTvls.staking.tvl[i - 41].totalLiquidityUSD,
-            }
+            date: tvl.date,
+            value:
+              tvl.totalLiquidityUSD +
+              llamaRes.data.chainTvls.staking.tvl[i - 41].totalLiquidityUSD,
+          }
           : { date: tvl.date, value: tvl.totalLiquidityUSD };
       }),
       tvl:
@@ -527,7 +518,7 @@ export default function Vaults() {
   }
 
   useEffect(() => {
-    init();
+    if (Object.keys(tokens).length > 0) init();
 
     function resizeHandler() {
       initLineChart(
@@ -542,7 +533,7 @@ export default function Vaults() {
     }
 
     window.addEventListener("resize", resizeHandler);
-  }, []);
+  }, [tokens]);
 
   return (
     <NoSSR>
@@ -553,44 +544,44 @@ export default function Vaults() {
         </p>
         <div className={`grid md:grid-cols-2 gap-[2rem]`}>
           <div
-            className={`border border-[#353945] rounded-[1rem] bg-[#23262f] p-6 grid col-span-full md:grid-cols-6 gap-6`}
+            className={`border border-customNeutral100 rounded-2xl bg-customNeutral200 p-6 grid col-span-full md:grid-cols-6 gap-6`}
           >
             <div className={`flex flex-col`}>
-              <p className={`text-[1rem]`}>Total Supply</p>
+              <p className={`text-lg`}>Total Supply</p>
               <h2
-                className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}
+                className={`text-2xl md:text-lg lg:text-xl xl:text-2xl font-bold`}
               >
                 {formatToFixedDecimals(statistics.totalSupply, 0)}
               </h2>
             </div>
             <div className={`flex flex-col`}>
-              <p className={`text-[1rem]`}>Liquid Supply</p>
+              <p className={`text-lg`}>Liquid Supply</p>
               <h2
-                className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}
+                className={`text-2xl md:text-lg lg:text-xl xl:text-2xl font-bold`}
               >
                 {formatToFixedDecimals(statistics.liquidSupply, 0)}
               </h2>
             </div>
             <div className={`flex flex-col`}>
-              <p className={`text-[1rem]`}>FDV</p>
+              <p className={`text-lg`}>FDV</p>
               <h2
-                className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}
+                className={`text-2xl md:text-lg lg:text-xl xl:text-2xl font-bold`}
               >
                 ${formatToFixedDecimals(statistics.fdv, 0)}
               </h2>
             </div>
             <div className={`flex flex-col`}>
-              <p className={`text-[1rem]`}>Market Cap</p>
+              <p className={`text-lg`}>Market Cap</p>
               <h2
-                className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}
+                className={`text-2xl md:text-lg lg:text-xl xl:text-2xl font-bold`}
               >
                 ${formatToFixedDecimals(statistics.marketCap, 0)}
               </h2>
             </div>
             <div className={`flex flex-col`}>
-              <p className={`text-[1rem]`}>VCX Price</p>
+              <p className={`text-lg`}>VCX Price</p>
               <h2
-                className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}
+                className={`text-2xl md:text-lg lg:text-xl xl:text-2xl font-bold`}
               >
                 $
                 {statistics.vcxPrice.toLocaleString(undefined, {
@@ -600,19 +591,19 @@ export default function Vaults() {
               </h2>
             </div>
             <div className={`flex flex-col`}>
-              <p className={`text-[1rem]`}>Burned VCX</p>
+              <p className={`text-lg`}>Burned VCX</p>
               <h2
-                className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}
+                className={`text-2xl md:text-lg lg:text-xl xl:text-2xl font-bold`}
               >
                 {formatToFixedDecimals(statistics.burnedVcx, 0)} VCX
               </h2>
             </div>
           </div>
           <div
-            className={`flex flex-col border border-[#353945] rounded-[1rem] bg-[#23262f]`}
+            className={`flex flex-col border border-customNeutral100 rounded-[1rem] bg-customNeutral200`}
           >
             <div
-              className={`h-[4rem] flex gap-2 border-b border-[#353945] px-[1.5rem]`}
+              className={`h-[4rem] flex gap-2 border-b border-customNeutral100 px-[1.5rem]`}
             >
               <img
                 src="/images/icons/popLogo.svg"
@@ -620,7 +611,7 @@ export default function Vaults() {
                 className={`w-8 h-8 self-center`}
               />
               <div className={`flex flex-col justify-center`}>
-                <p className={`text-[1rem]`}>VCX</p>
+                <p className={`text-lg`}>VCX</p>
                 <p className={`text-[0.625rem]`}>
                   Liquid VCX market (Mainnet only)
                 </p>
@@ -672,19 +663,14 @@ export default function Vaults() {
             </div>
           </div>
           <div
-            className={`flex flex-col border border-[#353945] rounded-[1rem] bg-[#23262f]`}
+            className={`flex flex-col border border-customNeutral100 rounded-[1rem] bg-customNeutral200`}
           >
             <div
-              className={`h-[4rem] flex justify-between border-b border-[#353945] px-[1.5rem]`}
+              className={`h-[4rem] flex justify-between border-b border-customNeutral100 px-[1.5rem]`}
             >
-              <p className={`text-[0.75rem] sm:text-[1rem] my-auto`}>
+              <p className={`text-[0.75rem] sm:text-lg my-auto`}>
                 Smart Vault TVL
               </p>
-              <SelectField
-                value={tvlChain}
-                options={chainOptions}
-                onChange={(opt) => setTvlChain(opt)}
-              />
             </div>
             <div className={`py-4 px-6 flex flex-col md:flex-row gap-[3.5rem]`}>
               <div className={`flex flex-col justify-between grow-[1]`}>
@@ -706,15 +692,15 @@ export default function Vaults() {
             </div>
           </div>
           <div
-            className={`flex flex-col border border-[#353945] rounded-[1rem] bg-[#23262f]`}
+            className={`flex flex-col border border-customNeutral100 rounded-[1rem] bg-customNeutral200`}
           >
             <div
-              className={`h-[4rem] flex gap-2 border-b border-[#353945] px-[1.5rem]`}
+              className={`h-[4rem] flex gap-2 border-b border-customNeutral100 px-[1.5rem]`}
             >
-              <p className={`text-[1rem] my-auto`}>Total Stats</p>
+              <p className={`text-lg my-auto`}>Total Stats</p>
             </div>
             <div className={`py-4 px-6 flex gap-[3.5rem]`}>
-              <div className={`flex flex-col grow-[1]`}>
+              <div className={`flex flex-col grow-1`}>
                 <div className={`flex justify-between`}>
                   <p>Total Revenue</p>
                   <p className={`font-bold text-right`}>
@@ -775,14 +761,14 @@ export default function Vaults() {
             </div>
           </div>
           <div
-            className={`flex flex-col border border-[#353945] rounded-[1rem] bg-[#23262f]`}
+            className={`flex flex-col border border-customNeutral100 rounded-2xl bg-customNeutral200`}
           >
             <div
-              className={`h-[4rem] flex gap-2 border-b border-[#353945] px-[1.5rem]`}
+              className={`h-16 flex gap-2 border-b border-customNeutral100 px-6`}
             >
               <span className={`flex flex-col my-auto`}>
-                <p className={`text-[0.75rem]`}>Total Value locked</p>
-                <p className={`text-[1.5rem] leading-none font-bold`}>
+                <p className={`text-sm`}>Total Value locked</p>
+                <p className={`text-2xl leading-none font-bold`}>
                   $
                   {Intl.NumberFormat("en-US", {
                     notation: "compact",
@@ -796,12 +782,12 @@ export default function Vaults() {
             </div>
           </div>
           <div className={`col-span-full grid md:grid-cols-1 gap-2`}>
-            <h2 className={`text-[1.5rem] font-bold`}>{"Snapshot PIP's"}</h2>
+            <h2 className={`text-2xl font-bold`}>{"Snapshot PIP's"}</h2>
             <div
-              className={`flex flex-col border border-[#353945] rounded-[1rem] bg-[#23262f]`}
+              className={`flex flex-col border border-customNeutral100 rounded-[1rem] bg-customNeutral200`}
             >
               <div
-                className={`min-h-[4rem] max-h-[4rem] grid grid-cols-[2.5rem_1fr] gap-[1rem] md:grid-cols-[2.5rem_1fr_1fr_3rem] content-center border-b border-[#353945] px-[1.5rem]`}
+                className={`min-h-[4rem] max-h-[4rem] grid grid-cols-[2.5rem_1fr] gap-[1rem] md:grid-cols-[2.5rem_1fr_1fr_3rem] content-center border-b border-customNeutral100 px-[1.5rem]`}
               >
                 <span>#</span>
                 <span>Title</span>

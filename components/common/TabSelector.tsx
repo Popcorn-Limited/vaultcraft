@@ -2,7 +2,7 @@ import { Dispatch } from "react";
 
 interface TabSelectorProps {
   activeTab: any;
-  setActiveTab: Dispatch<any>;
+  setActiveTab: Function;
   availableTabs: any[];
   className?: string;
 }
@@ -18,10 +18,10 @@ export default function TabSelector({
       {availableTabs.map((tab) => (
         <div
           key={tab}
-          className={`w-1/2 cursor-pointer border-b ${
+          className={`w-1/2 cursor-pointer group border-b ${
             activeTab === tab
               ? "border-white"
-              : "border-gray-500 group-hover:border-white"
+              : "border-customGray500 hover:border-white"
           }`}
           onClick={(e) => setActiveTab(tab)}
         >
@@ -29,8 +29,8 @@ export default function TabSelector({
             className={`text-base md:text-center mb-4 cursor-pointer word-spacing-full sm:word-spacing-normal 
             ${
               activeTab === tab
-                ? "text-primary font-medium"
-                : "text-gray-500 group-hover:text-white"
+                ? "text-white font-medium"
+                : "text-customGray500 group-hover:text-white"
             }`}
           >
             {tab}

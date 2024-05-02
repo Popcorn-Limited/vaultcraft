@@ -4,11 +4,14 @@ import { Address, useAccount, useBalance } from "wagmi";
 import { getVotePeriodEndTime } from "@/lib/gauges/utils";
 import MainActionButton from "@/components/button/MainActionButton";
 import useLockedBalanceOf from "@/lib/gauges/useLockedBalanceOf";
-import { getVeAddresses } from "@/lib/constants";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import { formatEther } from "viem";
-import { ZERO } from "@/lib/constants";
+import { OptionTokenByChain, VCX_LP, VOTING_ESCROW, ZERO } from "@/lib/constants";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
+import NetworkSticker from "../network/NetworkSticker";
+import TokenIcon from "../common/TokenIcon";
+import { useAtom } from "jotai";
+import { tokensAtom } from "@/lib/atoms";
 
 function votingPeriodEnd(): number[] {
   const periodEnd = getVotePeriodEndTime();
@@ -22,21 +25,24 @@ function votingPeriodEnd(): number[] {
   ];
   return formattedTime;
 }
-
-const { BalancerPool: VCX_LP, VotingEscrow: VOTING_ESCROW } = getVeAddresses();
-
 interface StakingInterfaceProps {
   setShowLockModal: Dispatch<SetStateAction<boolean>>;
   setShowMangementModal: Dispatch<SetStateAction<boolean>>;
   setShowLpModal: Dispatch<SetStateAction<boolean>>;
+  setShowBridgeModal: Dispatch<SetStateAction<boolean>>;
+  setShowSyncModal: Dispatch<SetStateAction<boolean>>;
 }
 
 export default function StakingInterface({
   setShowLockModal,
   setShowMangementModal,
   setShowLpModal,
+  setShowBridgeModal,
+  setShowSyncModal
 }: StakingInterfaceProps): JSX.Element {
   const { address: account } = useAccount();
+
+  const [tokens] = useAtom(tokensAtom)
 
   const { data: lockedBal } = useLockedBalanceOf({
     chainId: 1,
@@ -58,23 +64,62 @@ export default function StakingInterface({
 
   return (
     <>
-      <div className="w-full lg:w-1/2 bg-transparent border border-[#353945] rounded-3xl p-8 text-primary">
-        <h3 className="text-2xl pb-6 border-b border-[#353945]">veVCX</h3>
+      <div className="w-full lg:w-1/2 bg-transparent border border-customNeutral100 rounded-3xl p-8 text-white">
+        <h3 className="text-2xl pb-6 border-b border-customNeutral100">veVCX</h3>
         <div className="flex flex-col mt-6 gap-4">
-          <span className="flex flex-row items-center justify-between">
-            <p className="">My VCX-LP</p>
+          <span className="flex flex-row items-center justify-between ml-2">
+            <div className="flex flex-row items-center">
+              <div className="relative mb-0.5">
+                <NetworkSticker chainId={1} size={1} />
+                <TokenIcon
+                  token={tokens?.[1]?.[VCX_LP]}
+                  chainId={1}
+                  imageSize={"w-8 h-8"}
+                />
+              </div>
+              <p className="ml-2">My VCX-LP</p>
+            </div>
             <p className="font-bold">
               {NumberFormatter.format(
                 Number(formatEther(LpBal?.value || ZERO))
               ) || "0"}
             </p>
           </span>
-          <span className="flex flex-row items-center justify-between">
-            <p className="">My Locked VCX-LP</p>
+          <span className="flex flex-row items-center justify-between ml-2">
+            <div className="flex flex-row items-center">
+              <div className="relative mb-0.5">
+                <NetworkSticker chainId={1} size={1} />
+                <TokenIcon
+                  token={tokens?.[1]?.[VCX_LP]}
+                  chainId={1}
+                  imageSize={"w-8 h-8"}
+                />
+              </div>
+              <p className="ml-2">My Locked VCX-LP 🔒</p>
+            </div>
             <p className="font-bold">
               {lockedBal
                 ? NumberFormatter.format(Number(formatEther(lockedBal?.amount)))
                 : "0"}
+            </p>
+          </span>
+          <span className="flex flex-row items-center justify-between ml-2">
+            <div className="flex flex-row items-center">
+              <div className="relative mb-0.5">
+                <NetworkSticker chainId={1} size={1} />
+                <TokenIcon
+                  token={tokens?.[1]?.[OptionTokenByChain[1]]}
+                  icon={"/images/tokens/veVCX.svg"}
+                  chainId={1}
+                  imageSize={"w-8 h-8"}
+                />
+              </div>
+              <p className="ml-2">My veVCX</p>
+            </div>
+            <p className="font-bold">
+              {NumberFormatter.format(
+                Number(formatEther(veBal?.value || ZERO))
+              ) || "0"}
             </p>
           </span>
           <span className="flex flex-row items-center justify-between">
@@ -85,15 +130,7 @@ export default function StakingInterface({
                 : "-"}
             </p>
           </span>
-          <span className="flex flex-row items-center justify-between">
-            <p className="">My veVCX</p>
-            <p className="font-bold">
-              {NumberFormatter.format(
-                Number(formatEther(veBal?.value || ZERO))
-              ) || "0"}
-            </p>
-          </span>
-          <span className="flex flex-row items-center justify-between pb-6 border-b border-[#353945]">
+          <span className="flex flex-row items-center justify-between pb-6 border-b border-customNeutral100">
             <p className="">Voting period ends</p>
             <p className="font-bold">
               {votingPeriodEnd()[0]}d : {votingPeriodEnd()[1]}h
@@ -118,6 +155,14 @@ export default function StakingInterface({
           <SecondaryActionButton
             label="Get VCX-LP"
             handleClick={() => setShowLpModal(true)}
+          />
+          <SecondaryActionButton
+            label="Bridge VCX"
+            handleClick={() => setShowBridgeModal(true)}
+          />
+          <SecondaryActionButton
+            label="Sync veBalance"
+            handleClick={() => setShowSyncModal(true)}
           />
         </div>
       </div>

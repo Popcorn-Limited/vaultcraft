@@ -1,164 +1,74 @@
 import StatusWithLabel from "@/components/common/StatusWithLabel";
-import { lockvaultsAtom, vaultsAtom } from "@/lib/atoms/vaults";
-import {
-  Networth,
-  getTotalNetworth,
-  getVaultNetworthByChain,
-} from "@/lib/getNetworth";
-import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
+import { networthAtom, tvlAtom, vaultronAtom } from "@/lib/atoms";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import { useAtom } from "jotai";
-import { useEffect, useState } from "react";
-import { Address, useAccount } from "wagmi";
-import axios from "axios";
 
 export default function Hero(): JSX.Element {
-  const { address: account } = useAccount();
-  const [vaults] = useAtom(vaultsAtom);
-  const [lockVaults] = useAtom(lockvaultsAtom);
-
-  const [networth, setNetworth] = useState<Networth>({
-    wallet: 0,
-    stake: 0,
-    vault: 0,
-    total: 0,
-  });
-  const [tvl, setTvl] = useState<string>("0");
-  const [loading, setLoading] = useState<boolean>(true);
-
-  useEffect(() => {
-    async function fetchNetworth() {
-      const vaultNetworth = SUPPORTED_NETWORKS.map((chain) =>
-        getVaultNetworthByChain({ vaults, chainId: chain.id })
-      ).reduce((a, b) => a + b, 0);
-      const lockVaultNetworth = lockVaults.reduce(
-        (a, b) =>
-          a + (b.vault.balance * b.vault.price) / 10 ** b.vault.decimals,
-        0
-      );
-      const totalNetworth = await getTotalNetworth({
-        account: account as Address,
-      });
-      setNetworth({
-        ...totalNetworth.total,
-        vault: vaultNetworth + lockVaultNetworth,
-        total: totalNetworth.total.total + vaultNetworth + lockVaultNetworth,
-      });
-      setLoading(false);
-    }
-    if (account && vaults.length > 0 && lockVaults.length > 0) fetchNetworth();
-  }, [account, vaults, lockVaults]);
-
-  useEffect(() => {
-    axios.get("https://api.llama.fi/protocol/vaultcraft").then((res) =>
-      setTvl(
-        NumberFormatter.format(
-          // @ts-ignore
-          Object.values(res.data.currentChainTvls).reduce((a, b) => a + b, 0) -
-          res.data.currentChainTvls["Ethereum-staking"]
-        )
-      )
-    );
-  }, [vaults, lockVaults]);
+  const [networth] = useAtom(networthAtom)
+  const [tvl] = useAtom(tvlAtom)
+  const [vaultronStats] = useAtom(vaultronAtom)
 
   return (
-    <section className="pb-8 pt-8 sm:pb-6 border-b border-[#AFAFAF]">
-      <div className="flex flex-col smmd:flex-row smmd:items-center justify-between mx-4 md:mx-8">
-        <div className="flex flex-col sm:flex-row sm:space-x-28 smmd:space-x-10">
-          <StatusWithLabel
-            label={"Deposits"}
-            content={
-              <p className="text-3xl font-bold text-primary leading-[120%]">
-                ${" "}
-                {loading ? (
-                  "..."
-                ) : (
-                  <>
-                    {networth.vault > 0.01
+    <section className="pb-8 pt-8 sm:pb-6 border-b border-customGray300">
+      <div className="w-full flex flex-col smmd:flex-row smmd:items-center justify-between px-4 md:px-8">
+        <div className="w-full xl:w-8/12 md:flex md:flex-row space-y-4 md:space-y-0 mt-4 md:mt-0">
+          <div className="flex flex-row items-center md:pr-10 gap-10 md:w-fit">
+            <StatusWithLabel
+              label={"Deposits"}
+              content={
+                <p className="text-3xl font-bold text-white leading-[120%]">
+                  ${" "}
+                  {
+                    networth.vault > 0.01
                       ? NumberFormatter.format(networth.vault)
-                      : "0"}
-                  </>
-                )}
-              </p>
-            }
-            className="md:min-w-[160px] lg:min-w-0"
-          />
-          <div className="flex flex-row space-x-28 smmd:space-x-10 items-center mt-4 sm:mt-0">
+                      : "0"
+                  }
+                </p>
+              }
+              className="md:min-w-[160px] lg:min-w-0"
+            />
             <StatusWithLabel
               label={"Staked"}
               content={
-                <p className="text-3xl font-bold text-primary leading-[120%]">
+                <p className="text-3xl font-bold text-white leading-[120%]">
                   ${" "}
-                  {loading ? (
-                    "..."
-                  ) : (
-                    <>
-                      {networth.stake > 0.01
-                        ? NumberFormatter.format(networth.stake)
-                        : "0"}
-                    </>
-                  )}
+                  {
+                    networth.stake > 0.01
+                      ? NumberFormatter.format(networth.stake)
+                      : "0"
+                  }
                 </p>
               }
               className="md:min-w-[160px] lg:min-w-0"
             />
+
+          </div>
+
+          <div className="flex flex-row items-center md:pr-10 gap-10 md:w-fit">
             <StatusWithLabel
               label={"VCX in Wallet"}
               content={
-                <p className="text-3xl font-bold text-primary leading-[120%]">
+                <p className="text-3xl font-bold text-white leading-[120%]">
                   ${" "}
-                  {loading ? (
-                    "..."
-                  ) : (
-                    <>
-                      {networth.wallet > 0.01
-                        ? NumberFormatter.format(networth.wallet)
-                        : "0"}
-                    </>
-                  )}
+                  {
+                    networth.wallet > 0.01
+                      ? NumberFormatter.format(networth.wallet)
+                      : "0"
+                  }
                 </p>
               }
               className="md:min-w-[160px] lg:min-w-0"
-            />
-          </div>
-        </div>
-        <div className="w-full md:w-fit-content">
-          <p className="uppercase md:hidden text-[#C8C8C8] text-sm mb-2">
-            Platform
-          </p>
-          <div className="flex flex-row items-center w-full space-x-10">
-            <StatusWithLabel
-              label={"Total Value Locked"}
-              content={
-                <p className="text-3xl font-bold text-primary leading-[120%]">
-                  $ {tvl}
-                </p>
-              }
-              infoIconProps={{
-                id: "tvl",
-                title: "Total Value Locked",
-                content: (
-                  <p>
-                    Total value locked (TVL) is the amount <br /> of user funds
-                    deposited in VaultCraft products.
-                  </p>
-                ),
-              }}
             />
             <StatusWithLabel
               label={"My Net Worth"}
               content={
-                <p className="text-3xl font-bold text-primary leading-[120%]">
+                <p className="text-3xl font-bold text-white leading-[120%]">
                   ${" "}
-                  {loading ? (
-                    "..."
-                  ) : (
-                    <>
-                      {networth.total > 0.01
-                        ? NumberFormatter.format(networth.total)
-                        : "0"}
-                    </>
-                  )}
+                  {
+                    networth.total > 0.01
+                      ? NumberFormatter.format(networth.total)
+                      : "0"
+                  }
                 </p>
               }
               infoIconProps={{
@@ -171,6 +81,56 @@ export default function Hero(): JSX.Element {
                   </p>
                 ),
               }}
+              className="md:min-w-[160px] lg:min-w-0"
+            />
+          </div>
+          <StatusWithLabel
+            label={"My XP"}
+            content={
+              <p className="text-3xl font-bold text-white leading-[120%]">
+                {vaultronStats.xp}
+              </p>
+            }
+            infoIconProps={{
+              id: "vaultronXp",
+              title: "My XP",
+              content: (
+                <p>
+                  This value shows your Vaultron XP
+                </p>
+              ),
+            }}
+            className="md:min-w-[160px] lg:min-w-0"
+          />
+        </div>
+
+        <div className="w-full md:w-1/3 mt-8 md:mt-0">
+          <p className="uppercase md:hidden text-customGray200 text-sm mb-2">
+            Platform
+          </p>
+          <div className="w-full flex flex-row items-center md:justify-end">
+            <StatusWithLabel
+              label={"Total Value Locked"}
+              content={
+                <p className="text-3xl font-bold text-white leading-[120%]">
+                  {
+                    tvl.total > 0.01
+                      ? NumberFormatter.format(tvl.total)
+                      : "0"
+                  }
+                </p>
+              }
+              infoIconProps={{
+                id: "tvl",
+                title: "Total Value Locked",
+                content: (
+                  <p>
+                    Total value locked (TVL) is the amount <br /> of user funds
+                    deposited in VaultCraft products.
+                  </p>
+                ),
+              }}
+              className="md:min-w-[160px]"
             />
           </div>
         </div>

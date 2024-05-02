@@ -1,5 +1,6 @@
 import { ProtocolName } from "vaultcraft-sdk";
-import { Address, PublicClient, WalletClient } from "viem";
+import { Address } from "viem";
+import { PublicClient, WalletClient } from "wagmi";
 
 export type Token = {
   address: Address;
@@ -9,30 +10,16 @@ export type Token = {
   logoURI: string;
   balance: number;
   price: number;
+  totalSupply: number;
+  chainId?: number;
+  type?: TokenType;
 };
 
-export type veAddresses = {
-  VCX: Address;
-  WETH_VCX_LP: Address;
-  VE_VCX: Address;
-  POP: Address;
-  WETH: Address;
-  BalancerPool: Address;
-  BalancerOracle: Address;
-  BalancerVault: Address;
-  oVCX: Address;
-  VaultRegistry: Address;
-  BoostV2: Address;
-  Minter: Address;
-  TokenAdmin: Address;
-  VotingEscrow: Address;
-  GaugeController: Address;
-  GaugeFactory: Address;
-  SmartWalletChecker: Address;
-  VotingEscrowDelegation: Address;
-  VaultRouter: Address;
-  FeeDistributor: Address;
-};
+export enum TokenType {
+  Vault,
+  Gauge,
+  Asset,
+}
 
 export type Asset = {
   chains: number[];
@@ -44,7 +31,7 @@ export type Asset = {
   apy?: number;
 };
 
-export type FeeConfiguration = {
+export type VaultFees = {
   deposit: number;
   withdrawal: number;
   management: number;
@@ -53,45 +40,39 @@ export type FeeConfiguration = {
 
 export type VaultData = {
   address: Address;
-  vault: Token;
-  asset: Token;
-  gauge?: Token;
+  vault: Address;
+  asset: Address;
+  gauge?: Address;
+  chainId: number;
+  fees: VaultFees;
   totalAssets: number;
   totalSupply: number;
-  assetsPerShare: number;
-  assetPrice: number;
-  pricePerShare: number;
-  tvl: number;
-  fees: FeeConfiguration;
   depositLimit: number;
-  metadata: VaultMetadata;
-  chainId: number;
+  tvl: number;
   apy: number;
-  gaugeMinApy?: number;
-  gaugeMaxApy?: number;
   totalApy: number;
+  minGaugeApy: number;
+  maxGaugeApy: number;
+  gaugeSupply: number;
+  workingSupply: number;
+  workingBalance: number;
+  metadata: VaultMetadata;
+  strategies: Strategy[];
 };
 
-type LockVaultLock = {
-  unlockTime: number;
-  amount: number;
-  rewardShares: number;
-  daysToUnlock: number;
-};
+export type Strategy = {
+  address: Address;
+  metadata: StrategyMetadata;
+  resolver: string;
+  allocation: number;
+  allocationPerc: number;
+  apy: number;
+}
 
-export type LockVaultData = VaultData & {
-  strategyShares: bigint;
-  rewardAddresses: Address[];
-  rewards: RewardToken[];
-  lock: LockVaultLock;
-};
-
-export type RewardToken = Token & {
-  rewardBalance: number;
-  userIndex: number;
-  globalIndex: number;
-  rewardApy: number;
-};
+type StrategyMetadata = {
+  name: string;
+  description: string;
+}
 
 export enum VaultLabel {
   experimental = "Experimental",
@@ -100,17 +81,15 @@ export enum VaultLabel {
 }
 
 export type VaultMetadata = {
-  creator: Address;
-  feeRecipient: Address;
-  cid: string;
-  optionalMetadata: OptionalMetadata;
   vaultName?: string;
   labels?: VaultLabel[];
   description?: string;
   type:
-    | "single-asset-vault-v1"
-    | "single-asset-lock-vault-v1"
-    | "multi-strategy-vault-v1";
+  | "single-asset-vault-v1"
+  | "single-asset-lock-vault-v1"
+  | "multi-strategy-vault-v1";
+  creator: Address;
+  feeRecipient: Address;
 };
 
 export type OptionalMetadata = {
@@ -155,7 +134,7 @@ export type GaugeData = {
     lowerAPR: number;
     upperAPR: number;
   };
-};
+}
 
 export enum SmartVaultActionType {
   Deposit,
@@ -170,24 +149,6 @@ export enum SmartVaultActionType {
   ZapUnstakeAndWithdraw,
 }
 
-export enum LockVaultActionType {
-  Deposit,
-  IncreaseAmount,
-  Withdrawal,
-  Claim,
-  ZapDeposit,
-  ZapIncreaseAmount,
-  ZapWithdrawal,
-}
-
-export enum KelpVaultActionType {
-  Deposit,
-  Withdrawal,
-  ZapDeposit,
-  EthxZapDeposit,
-  ZapWithdrawal,
-}
-
 export type DuneQueryResult<T> = {
   result: {
     rows: T[];
@@ -195,7 +156,107 @@ export type DuneQueryResult<T> = {
 };
 
 export type VoteUserSlopes = {
-  slope: bigint;
-  power: bigint;
-  end: bigint;
+  slope: bigint,
+  power: bigint,
+  end: bigint,
+}
+
+export type UserAccountData = {
+  totalCollateral: number;
+  totalBorrowed: number;
+  netValue: number;
+  totalSupplyRate: number;
+  totalBorrowRate: number;
+  netRate: number;
+  ltv: number;
+  healthFactor: number;
+}
+
+export type ReserveDataResponse = {
+  id: bigint;
+  underlyingAsset: string;
+  aTokenAddress: string;
+  stableDebtTokenAddress: string;
+  variableDebtTokenAddress: string;
+  interestRateStrategyAddress: string;
+  liquidityIndex: bigint;
+  variableBorrowIndex: bigint;
+  currentLiquidityRate: bigint;
+  currentVariableBorrowRate: bigint;
+  currentStableBorrowRate: bigint;
+  lastUpdateTimestamp: bigint;
+  configuration: bigint;
+  liquidityRate: bigint;
+  stableBorrowRate: bigint;
+  averageStableBorrowRate: bigint;
+  variableBorrowRate: bigint;
+  totalPrincipalStableDebt: bigint;
+  totalScaledVariableDebt: bigint;
+  totalDeposits: bigint;
+  totalLiquidity: bigint;
+  utilizationRate: bigint;
+  reserveFactor: bigint;
+  accruedToTreasury: bigint;
+  unbacked: bigint;
+  isolationModeTotalDebt: bigint;
+  eModeCategoryId: bigint;
+  debtCeiling: bigint;
+  debtOutstanding: bigint;
+  coverageRatio: bigint;
+}
+
+export type ReserveData = {
+  ltv: number;
+  liquidationThreshold: number;
+  liquidationPenalty: number;
+  supplyRate: number;
+  borrowRate: number;
+  asset: Address;
+  supplyAmount: number;
+  borrowAmount: number;
+  supplyValue: number;
+  borrowValue: number;
+  balance: number;
+  supplyBalance: number;
+  balanceValue: number;
+}
+
+export enum ZapProvider {
+  none,
+  notFound,
+  enso,
+  zeroX,
+  oneInch,
+  paraSwap,
+  openOcean
+}
+
+export type TokenByAddress = {
+  [key: Address]: Token;
+}
+
+export type VaultDataByAddress = {
+  [key: Address]: VaultData
+}
+
+export type AddressByChain = {
+  [key: number]: Address
+}
+
+export type AddressesByChain = {
+  [key: number]: Address[]
+}
+
+export type VaultronStats = {
+  level: number;
+  xp: number;
+  animation: string;
+  image: string;
+  tokenId: number;
+  totalXp: number;
+}
+
+export type VaultAllocation = {
+  index: bigint;
+  amount: bigint;
 };

@@ -2,6 +2,7 @@ import Image from "next/image";
 import { ChainId, networkLogos } from "@/lib/utils/connectors";
 
 const iconSize: { [key: number]: number } = {
+  0: 15,
   1: 20,
   2: 25,
   3: 30,

@@ -2,61 +2,23 @@ import {
   Abi,
   Address,
   PublicClient,
-  getAddress,
+  WalletClient,
   parseEther,
   zeroAddress,
 } from "viem";
-import { Clients, VaultData } from "@/lib/types";
+import { Clients, TokenByAddress, VaultData } from "@/lib/types";
 import { showLoadingToast } from "@/lib/toasts";
-import { SimulationResponse } from "@/lib/types";
-import { getVeAddresses } from "@/lib/constants";
-import { GaugeAbi, GaugeControllerAbi, VotingEscrowAbi } from "@/lib/constants";
-import { handleCallResult } from "@/lib/utils/helpers";
-import { voteUserSlopes } from "@/lib/gauges/useGaugeWeights";
-
-type SimulationContract = {
-  address: Address;
-  abi: Abi;
-};
-
-interface SimulateProps {
-  account: Address;
-  contract: SimulationContract;
-  functionName: string;
-  publicClient: PublicClient;
-  args?: any[];
-}
-
-const { GaugeController: GAUGE_CONTROLLER, VotingEscrow: VOTING_ESCROW } =
-  getVeAddresses();
-
-async function simulateCall({
-  account,
-  contract,
-  functionName,
-  publicClient,
-  args,
-}: SimulateProps): Promise<SimulationResponse> {
-  try {
-    const { request } = await publicClient.simulateContract({
-      account,
-      address: contract.address,
-      abi: contract.abi,
-      // @ts-ignore
-      functionName,
-      args,
-    });
-    return { request: request, success: true, error: null };
-  } catch (error: any) {
-    return { request: null, success: false, error: error.shortMessage };
-  }
-}
+import { GAUGE_CONTROLLER, GaugeAbi, GaugeControllerAbi, VOTING_ESCROW, VotingEscrowAbi } from "@/lib/constants";
+import { handleCallResult, simulateCall } from "@/lib/utils/helpers";
+import { networkMap } from "@/lib/utils/connectors";
+import { VeBeaconAbi } from "@/lib/constants/abi/VeBeacon";
+import { RootGaugeFactoryAbi } from "@/lib/constants/abi/RootGaugeFactory";
+import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
 
 interface SendVotesProps {
   vaults: VaultData[];
   votes: { [key: Address]: number };
   prevVotes: { [key: Address]: number };
-  canVoteOnGauges: boolean[];
   account: Address;
   clients: Clients;
 }
@@ -65,7 +27,6 @@ export async function sendVotes({
   vaults,
   votes,
   prevVotes,
-  canVoteOnGauges,
   account,
   clients,
 }: SendVotesProps): Promise<boolean> {
@@ -75,8 +36,7 @@ export async function sendVotes({
 
   const votesCleaned = Object.entries(votes).filter(
     (vote, index) =>
-      Math.abs(vote[1] - Number(prevVotes[vote[0] as Address])) > 0 &&
-      canVoteOnGauges[index]
+      Math.abs(vote[1] - Number(prevVotes[vote[0] as Address])) > 0
   )
     .map((vote, index) => [...vote, vote[1] - Number(prevVotes[vote[0] as Address])])
     // @ts-ignore
@@ -246,28 +206,28 @@ export async function withdrawLock({
 }
 
 interface GaugeInteractionProps {
-  chainId: number;
-  address: Address;
+  vaultData: VaultData,
   amount: number;
   account: Address;
   clients: Clients;
+  tokensAtom: [{ [key: number]: TokenByAddress }, Function]
 }
 
 export async function gaugeDeposit({
-  chainId,
-  address,
+  vaultData,
   amount,
   account,
   clients,
+  tokensAtom
 }: GaugeInteractionProps): Promise<boolean> {
   showLoadingToast("Staking into Gauge...");
 
-  return handleCallResult({
+  const success = await handleCallResult({
     successMessage: "Staked into Gauge successful!",
     simulationResponse: await simulateCall({
       account,
       contract: {
-        address,
+        address: vaultData.gauge!,
         abi: GaugeAbi,
       },
       functionName: "deposit",
@@ -276,23 +236,34 @@ export async function gaugeDeposit({
     }),
     clients,
   });
+
+  if (success) {
+    mutateTokenBalance({
+      tokensToUpdate: [vaultData.address, vaultData.gauge!],
+      account,
+      tokensAtom,
+      chainId: vaultData.chainId
+    })
+  }
+
+  return success
 }
 
 export async function gaugeWithdraw({
-  chainId,
-  address,
+  vaultData,
   amount,
   account,
   clients,
+  tokensAtom
 }: GaugeInteractionProps): Promise<boolean> {
   showLoadingToast("Unstaking from Gauge...");
 
-  return handleCallResult({
+  const success = await handleCallResult({
     successMessage: "Unstaked from Gauge successful!",
     simulationResponse: await simulateCall({
       account,
       contract: {
-        address,
+        address: vaultData.gauge!,
         abi: GaugeAbi,
       },
       functionName: "withdraw",
@@ -301,4 +272,87 @@ export async function gaugeWithdraw({
     }),
     clients,
   });
+
+  if (success) {
+    mutateTokenBalance({
+      tokensToUpdate: [vaultData.address, vaultData.gauge!],
+      account,
+      tokensAtom,
+      chainId: vaultData.chainId
+    })
+  }
+  return success
+}
+
+export async function broadcastVeBalance({ targetChain, account, address, clients, }
+  : { targetChain: number, account: Address, address: Address, clients: Clients }) {
+  const { walletClient, publicClient } = clients;
+
+  if (walletClient.chain?.id !== Number(1)) {
+    try {
+      await walletClient.switchChain({ id: 1 });
+    } catch (error) {
+      return
+    }
+  }
+
+  showLoadingToast(`Broadcasting VeBalance to ${networkMap[targetChain]}...`)
+
+  let simRes;
+  try {
+    const { request } = await publicClient.simulateContract({
+      account,
+      address,
+      abi: VeBeaconAbi,
+      functionName: "broadcastVeBalance",
+      args: [account, BigInt(String(targetChain)), BigInt("500000"), BigInt("100000000")],
+      value: parseEther("0.01")
+    })
+    simRes = { request: request, success: true, error: null }
+  } catch (error: any) {
+    simRes = { request: null, success: false, error: error.shortMessage }
+  }
+
+  return handleCallResult({
+    successMessage: "VeBalance broadcasted!",
+    simulationResponse: simRes,
+    clients
+  })
+}
+
+export async function transmitRewards({ gauges, account, address, clients }
+  : { gauges: Address[], account: Address, address: Address, clients: Clients }) {
+  const { walletClient, publicClient } = clients;
+
+
+  if (walletClient.chain?.id !== Number(1)) {
+    try {
+      await walletClient.switchChain({ id: 1 });
+    } catch (error) {
+      return
+    }
+  }
+
+  showLoadingToast("Bridging Rewards...")
+
+  let simRes;
+  try {
+    const { request } = await publicClient.simulateContract({
+      account,
+      address,
+      abi: RootGaugeFactoryAbi,
+      functionName: "transmit_emissions_multiple",
+      args: [gauges],
+      value: parseEther("0.01")
+    })
+    simRes = { request: request, success: true, error: null }
+  } catch (error: any) {
+    simRes = { request: null, success: false, error: error.shortMessage }
+  }
+
+  return handleCallResult({
+    successMessage: "Bridged Rewards!",
+    simulationResponse: simRes,
+    clients
+  })
 }

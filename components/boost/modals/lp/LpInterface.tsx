@@ -3,25 +3,16 @@ import {
   FormEventHandler,
   SetStateAction,
   useEffect,
-  useMemo,
   useState,
 } from "react";
-import { useAccount, useBalance, usePublicClient, useToken } from "wagmi";
-import { getVeAddresses } from "@/lib/constants";
+import { useAccount, useBalance, useToken } from "wagmi";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
-import InputNumber from "@/components/input/InputNumber";
-import { calcUnlockTime, calculateVeOut } from "@/lib/gauges/utils";
-import { BalancerOracleAbi, ROUNDING_VALUE, ZERO } from "@/lib/constants";
 import { safeRound } from "@/lib/utils/formatBigNumber";
 import { validateInput } from "@/lib/utils/helpers";
 import { formatEther } from "viem";
 import { llama } from "@/lib/resolver/price/resolver";
-import TokenIcon from "@/components/common/TokenIcon";
-import { Token } from "@/lib/types";
 import { PlusIcon } from "@heroicons/react/24/outline";
-
-const { BalancerOracle, BalancerPool, WETH_VCX_LP, VCX, WETH } =
-  getVeAddresses();
+import { VCX, VCX_LP, WETH, ZERO } from "@/lib/constants";
 
 interface LpInterfaceInterfaceProps {
   vcxAmountState: [string, Dispatch<SetStateAction<string>>];
@@ -48,7 +39,7 @@ export default function LpInterface({
     token: WETH,
   });
 
-  const { data: lp } = useToken({ chainId: 1, address: WETH_VCX_LP });
+  const { data: lp } = useToken({ chainId: 1, address: VCX_LP });
   const { data: vcx } = useToken({ chainId: 1, address: VCX });
   const { data: weth } = useToken({ chainId: 1, address: WETH });
 
@@ -141,7 +132,7 @@ export default function LpInterface({
           tokenList={[]}
         />
         <div className="flex justify-center -mt-2 mb-4">
-          <PlusIcon className="w-8 h-8 text-gray-500" />
+          <PlusIcon className="w-8 h-8 text-customGray500" />
         </div>
 
         <InputTokenWithError

@@ -10,16 +10,16 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { WalletClient } from "viem";
 import Modal from "@/components/modal/Modal";
 import MainActionButton from "@/components/button/MainActionButton";
-import SecondaryActionButton from "@/components/button/SecondaryActionButton";
-import { getVeAddresses } from "@/lib/constants";
 import LpInfo from "@/components/boost/modals/lp/LpInfo";
 import LpInterface from "@/components/boost/modals/lp/LpInterface";
 import { handleAllowance } from "@/lib/approve";
 import ActionSteps from "@/components/vault/ActionSteps";
 import { depositIntoPool } from "@/lib/balancer/interactions";
 import { ActionStep, POOL_DEPOSIT_STEPS } from "@/lib/getActionSteps";
-
-const { BalancerPool: VCX_LP, BalancerVault, VCX, WETH } = getVeAddresses();
+import { BALANCER_VAULT, VCX, VCX_LP, WETH } from "@/lib/constants";
+import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
+import { useAtom } from "jotai";
+import { tokensAtom } from "@/lib/atoms";
 
 export default function LpModal({
   show,
@@ -29,9 +29,10 @@ export default function LpModal({
   const { address: account } = useAccount();
   const { chain } = useNetwork();
   const { switchNetworkAsync } = useSwitchNetwork();
-
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
+
+  const [tokens, setTokens] = useAtom(tokensAtom)
 
   const [modalStep, setModalStep] = useState(0);
   const [showModal, setShowModal] = show;
@@ -57,7 +58,7 @@ export default function LpModal({
     const vcxVal = Math.trunc(Number(vcxAmount) * 1e18);
 
     // Early exit if values are ZERO
-    if (wethVal === 0 || vcxVal === 0) return;
+    if (wethVal === 0 || vcxVal === 0 || !account) return;
 
     if (chain?.id !== Number(1)) {
       try {
@@ -79,10 +80,10 @@ export default function LpModal({
           token: WETH,
           amount: wethVal,
           account: account as Address,
-          spender: BalancerVault,
+          spender: BALANCER_VAULT,
           clients: {
             publicClient,
-            walletClient: walletClient as WalletClient,
+            walletClient: walletClient!,
           },
         });
         break;
@@ -90,11 +91,11 @@ export default function LpModal({
         success = await handleAllowance({
           token: VCX,
           amount: vcxVal,
-          account: account as Address,
-          spender: BalancerVault,
+          account: account,
+          spender: BALANCER_VAULT,
           clients: {
             publicClient,
-            walletClient: walletClient as WalletClient,
+            walletClient: walletClient!,
           },
         });
         break;
@@ -104,12 +105,20 @@ export default function LpModal({
             BigInt(wethVal.toLocaleString("fullwide", { useGrouping: false })),
             BigInt(vcxVal.toLocaleString("fullwide", { useGrouping: false })),
           ],
-          account: account as Address,
+          account: account,
           clients: {
             publicClient,
-            walletClient: walletClient as WalletClient,
+            walletClient: walletClient!,
           },
         });
+        if (success) {
+          await mutateTokenBalance({
+            tokensToUpdate: [VCX, WETH, VCX_LP],
+            account,
+            tokensAtom: [tokens, setTokens],
+            chainId: 1
+          })
+        }
         break;
     }
 

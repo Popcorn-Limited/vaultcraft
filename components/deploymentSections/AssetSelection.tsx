@@ -10,11 +10,9 @@ import Input from "@/components/input/Input";
 import Selector, { Option } from "@/components/input/Selector";
 import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
-import { Address, getAddress, isAddress } from "viem";
-import { Asset, Token } from "@/lib/types";
-import { RPC_URLS } from "@/lib/utils/connectors";
+import { Token } from "@/lib/types";
 import { useWalletClient } from "wagmi";
-import { getAssetsByChain, zapAssetAddressesByChain } from "@/lib/constants";
+import { getAssetsByChain, ZapAssetAddressesByChain } from "@/lib/constants";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
 function AssetSelection() {
@@ -46,7 +44,7 @@ function AssetSelection() {
       setAssetsByChain(newAssets);
       setAvailableAssets(
         newAssets[chainId].filter((asset) =>
-          zapAssetAddressesByChain[chainId].includes(asset.address)
+          ZapAssetAddressesByChain[chainId].includes(asset.address)
         )
       );
     }
@@ -103,7 +101,7 @@ function AssetSelection() {
             />
           </div>
           <button
-            className="w-2/12 ml-2 rounded-md border-2 border-[#353945] bg-[#23262F] hover:bg-[#353945] h-14 justify-center"
+            className="w-2/12 ml-2 rounded-md border-2 border-customNeutral100 bg-customNeutral200 hover:bg-customNeutral100 h-14 justify-center"
             onClick={handleSearch}
           >
             <MagnifyingGlassIcon className="w-6 h-6 text-white mx-auto" />

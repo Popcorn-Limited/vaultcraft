@@ -24,7 +24,7 @@ export default function TertiaryActionButton({
     <button
       className={`${
         hidden ? "hidden" : ""
-      } w-full flex justify-between items-center text-gray-500 hover:text-white transition-all ease-in-out font-medium leading-4 md:leading-7 relative`}
+      } w-full flex justify-between items-center text-customGray500 hover:text-white transition-all ease-in-out font-medium leading-4 md:leading-7 relative`}
       onMouseEnter={animateArrow}
       onClick={handleClick}
     >

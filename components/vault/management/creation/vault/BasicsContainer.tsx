@@ -108,7 +108,7 @@ export default function BasicsContainer({
   return (
     <VaultCreationCard activeStage={activeStage} stages={stages}>
       <div className="mb-6">
-        <h1 className="text-[white] text-2xl mb-2">Set up a new vault</h1>
+        <h1 className="text-white text-2xl mb-2">Set up a new vault</h1>
         <p className="text-white">
           Choose a name for your vault, than select an asset and see what
           protocols have to offer.
@@ -123,7 +123,7 @@ export default function BasicsContainer({
         </div>
         <div>
           <StrategySelection isDisabled={basics.protocol.key === "none"} />
-          <p className="text-gray-500 text-sm mt-1">
+          <p className="text-customGray500 text-sm mt-1">
             To learn more click
             <a
               href="https://docs.vaultcraft.io/products/smart-vaults/strategies"

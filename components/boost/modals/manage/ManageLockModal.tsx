@@ -26,29 +26,35 @@ import IncreaseStakePreview from "@/components/boost/modals/manage/IncreaseStake
 import IncreaseTimeInterface from "@/components/boost/modals/manage/IncreaseTimeInterface";
 import IncreaseTimePreview from "@/components/boost/modals/manage/IncreaseTimePreview";
 import UnstakePreview from "@/components/boost/modals/manage/UnstakePreview";
-import { getVeAddresses } from "@/lib/constants";
-
-const { BalancerPool: VCX_LP, VotingEscrow: VOTING_ESCROW } = getVeAddresses();
+import { VCX_LP, VOTING_ESCROW } from "@/lib/constants";
+import BroadcastVeBalanceInterface from "./BroadcastVeBalanceInterface";
+import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
+import { tokensAtom } from "@/lib/atoms";
+import { useAtom } from "jotai";
 
 export enum ManagementOption {
   IncreaseLock,
   IncreaseTime,
   Unlock,
+  BroadcastVeBalance
 }
 
 export default function ManageLockModal({
   show,
   setShowLpModal,
+  setShowSyncModal
 }: {
   show: [boolean, Dispatch<SetStateAction<boolean>>];
   setShowLpModal: Dispatch<SetStateAction<boolean>>;
+  setShowSyncModal: Dispatch<SetStateAction<boolean>>;
 }): JSX.Element {
   const { chain } = useNetwork();
   const { switchNetworkAsync } = useSwitchNetwork();
   const { address: account } = useAccount();
-
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
+
+  const [tokens, setTokens] = useAtom(tokensAtom);
 
   const [showModal, setShowModal] = show;
   const [step, setStep] = useState(0);
@@ -80,6 +86,8 @@ export default function ManageLockModal({
   }, [showModal]);
 
   async function handleMainAction() {
+    if (!account) return
+
     if (chain?.id !== Number(1)) {
       try {
         await switchNetworkAsync?.(Number(1));
@@ -91,22 +99,20 @@ export default function ManageLockModal({
 
     const clients = {
       publicClient,
-      walletClient: walletClient as WalletClient,
+      walletClient: walletClient!,
     };
 
+    let success = false
     if (mangementOption === ManagementOption.IncreaseLock) {
-      if ((val || 0) == 0) return;
+      if ((val || 0) === 0) return;
       await handleAllowance({
         token: VCX_LP,
         amount: val * 10 ** 18 || 0,
-        account: account as Address,
+        account: account,
         spender: VOTING_ESCROW,
-        clients: {
-          publicClient,
-          walletClient: walletClient as WalletClient,
-        },
+        clients
       });
-      increaseLockAmount({ amount: val, account: account as Address, clients });
+      success = await increaseLockAmount({ amount: val, account, clients });
     }
 
     if (mangementOption === ManagementOption.IncreaseTime)
@@ -116,9 +122,19 @@ export default function ManageLockModal({
         clients,
       });
     if (mangementOption === ManagementOption.Unlock)
-      withdrawLock({ account: account as Address, clients });
+      success = await withdrawLock({ account: account, clients });
+
+    if (success) {
+      await mutateTokenBalance({
+        tokensToUpdate: [VCX_LP],
+        account,
+        tokensAtom: [tokens, setTokens],
+        chainId: 1
+      })
+    }
 
     setShowModal(false);
+    setShowSyncModal(true);
   }
 
   function showLpModal(): void {
@@ -205,6 +221,13 @@ export default function ManageLockModal({
               isExpired={isExpired}
             />
             <MainActionButton label="Unlock" handleClick={handleMainAction} />
+          </>
+        )}
+        {mangementOption === ManagementOption.BroadcastVeBalance && (
+          <>
+            <BroadcastVeBalanceInterface
+              setShowModal={setShowModal}
+            />
           </>
         )}
       </>

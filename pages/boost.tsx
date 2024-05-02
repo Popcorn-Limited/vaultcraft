@@ -7,36 +7,46 @@ import {
 } from "wagmi";
 import { Address, WalletClient } from "viem";
 import { useEffect, useState } from "react";
-import { getVeAddresses } from "@/lib/constants";
-import { hasAlreadyVoted } from "@/lib/gauges/hasAlreadyVoted";
-import { Token, VaultData } from "@/lib/types";
+import { VoteData, hasAlreadyVoted } from "@/lib/gauges/hasAlreadyVoted";
+import { AddressesByChain, VaultData } from "@/lib/types";
 import StakingInterface from "@/components/boost/StakingInterface";
 import { sendVotes } from "@/lib/gauges/interactions";
 import Gauge from "@/components/boost/Gauge";
 import LockModal from "@/components/boost/modals/lock/LockModal";
 import ManageLockModal from "@/components/boost/modals/manage/ManageLockModal";
-import OptionTokenModal from "@/components/boost/modals/optionToken/OptionTokenModal";
+import OptionTokenExerciseModal from "@/components/optionToken/exercise/OptionTokenExerciseModal";
 import MainActionButton from "@/components/button/MainActionButton";
 import { useAtom } from "jotai";
 import { vaultsAtom } from "@/lib/atoms/vaults";
-import OptionTokenInterface from "@/components/boost/OptionTokenInterface";
+import OptionTokenInterface from "@/components/optionToken/OptionTokenInterface";
 import LpModal from "@/components/boost/modals/lp/LpModal";
 import { voteUserSlopes } from "@/lib/gauges/useGaugeWeights";
 import NetworkFilter from "@/components/network/NetworkFilter";
 import SearchBar from "@/components/input/SearchBar";
 import VaultsSorting from "@/components/vault/VaultsSorting";
 import useNetworkFilter from "@/lib/useNetworkFilter";
+import { VOTING_ESCROW } from "@/lib/constants";
+import Modal from "@/components/modal/Modal";
+import BridgeModal from "@/components/bridge/BridgeModal";
+import axios from "axios";
+import BroadcastVeBalanceInterface from "@/components/boost/modals/manage/BroadcastVeBalanceInterface";
 
-const { VotingEscrow: VOTING_ESCROW } = getVeAddresses();
+export const GAUGE_NETWORKS = [1, 10, 42161]
 
-const HIDDEN_VAULTS = [
-  // eth
-  "0xdC266B3D2c62Ce094ff4E12DC52399c430283417", // pCVX
-  "0x6B2c5ef7FB59e6A1Ad79a4dB65234fb7bDDcaD6b", // oeth-lp
-  "0xD211486ed1A04A176E588b67dd3A30a7dE164C0B", // 50 aura
-  "0x4658eC64b99cAd7F939b3bf87c345738A04310A9", // mim
-  "0xDCd86dDDE7B49C46292Aa7B699b10BF98248D4b5", // yCRV
-];
+async function getHiddenGauges(): Promise<AddressesByChain> {
+  const result: AddressesByChain = {}
+  await Promise.all(
+    GAUGE_NETWORKS.map(async (chain) => {
+      const res = await axios.get(
+        `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/gauges/hidden/${chain}.json`
+      )
+      result[chain] = res.data
+    })
+  )
+  return result;
+}
+
+
 
 function VePopContainer() {
   const { address: account } = useAccount();
@@ -54,25 +64,35 @@ function VePopContainer() {
   const [accountLoad, setAccountLoad] = useState<boolean>(false);
 
   const [vaults, setVaults] = useAtom(vaultsAtom);
+  const [gaugeVaults, setGaugeVaults] = useState<VaultData[]>([])
   const [initialVotes, setInitialVotes] = useState<{ [key: Address]: number }>(
     {}
   );
   const [votes, setVotes] = useState<{ [key: Address]: number }>({});
   const [canCastVote, setCanCastVote] = useState<boolean>(false);
-  const [canVoteOnGauges, setCanVoteOnGauges] = useState<boolean[]>([]);
+  const [voteData, setVoteData] = useState<VoteData[]>([]);
 
   const [showLockModal, setShowLockModal] = useState(false);
   const [showMangementModal, setShowMangementModal] = useState(false);
-  const [showOptionTokenModal, setShowOptionTokenModal] = useState(false);
   const [showLpModal, setShowLpModal] = useState(false);
+  const [showExerciseModal, setShowExerciseModal] = useState(false);
+  const [showClaimModal, setShowClaimModal] = useState(false);
+  const [showBridgeModal, setShowBridgeModal] = useState(false);
+  const [showSyncModal, setShowSyncModal] = useState(false);
+
+  const [hiddenGauges, setHiddenGauges] = useState<AddressesByChain>({})
 
   useEffect(() => {
     async function initialSetup() {
       setInitalLoad(true);
       if (account) setAccountLoad(true);
 
-      const vaultsWithGauges = vaults.filter((vault) => !!vault.gauge);
-      setVaults(vaultsWithGauges);
+
+      const _hiddenGauges = await getHiddenGauges();
+      setHiddenGauges(_hiddenGauges);
+
+      const vaultsWithGauges = Object.values(vaults).flat().filter((vault) => !!vault.gauge)
+      setGaugeVaults(vaultsWithGauges);
 
       if (
         vaultsWithGauges.length > 0 &&
@@ -82,36 +102,32 @@ function VePopContainer() {
         const initialVotes: { [key: Address]: number } = {};
         const voteUserSlopesData = await voteUserSlopes({
           gaugeAddresses: vaultsWithGauges?.map(
-            (vault: VaultData) => vault.gauge?.address as Address
+            (vault: VaultData) => vault.gauge as Address
           ),
           publicClient,
           account: account as Address,
         });
         vaultsWithGauges.forEach((vault, index) => {
-          // @ts-ignore
-          initialVotes[vault.gauge?.address] = Number(
+          initialVotes[vault.gauge as Address] = Number(
             voteUserSlopesData[index].power
           );
         });
         setInitialVotes(initialVotes);
         setVotes(initialVotes);
 
-        const { canCastVote, canVoteOnGauges } = await hasAlreadyVoted({
+        const voteData_ = await hasAlreadyVoted({
           addresses: vaultsWithGauges?.map(
-            (vault: VaultData) => vault.gauge?.address as Address
+            (vault: VaultData) => vault.gauge as Address
           ),
           publicClient,
           account: account as Address,
         });
-        
-        console.log({ canCastVote, canVoteOnGauges, state: !!account && Number(veBal?.value) > 0 && canCastVote })
-
-        setCanVoteOnGauges(canVoteOnGauges);
-        setCanCastVote(!!account && Number(veBal?.value) > 0 && canCastVote);
+        setVoteData(voteData_);
+        setCanCastVote(!!account && Number(veBal?.value) > 0);
       }
     }
-    if (!account && !initalLoad && vaults.length > 0) initialSetup();
-    if (account && !accountLoad && !!veBal && vaults.length > 0) initialSetup();
+    if (!account && !initalLoad && Object.keys(vaults).length > 0) initialSetup();
+    if (account && !accountLoad && !!veBal && Object.keys(vaults).length > 0) initialSetup();
   }, [account, initalLoad, accountLoad, vaults]);
 
   function handleVotes(val: number, index: Address) {
@@ -129,7 +145,7 @@ function VePopContainer() {
     setVotes((prevVotes) => updatedVotes);
   }
 
-  const [selectedNetworks, selectNetwork] = useNetworkFilter([1]);
+  const [selectedNetworks, selectNetwork] = useNetworkFilter(GAUGE_NETWORKS);
   const [searchTerm, setSearchTerm] = useState("");
 
   function handleSearch(value: string) {
@@ -145,28 +161,34 @@ function VePopContainer() {
       <ManageLockModal
         show={[showMangementModal, setShowMangementModal]}
         setShowLpModal={setShowLpModal}
-      />
-      <OptionTokenModal
-        show={[showOptionTokenModal, setShowOptionTokenModal]}
+        setShowSyncModal={setShowSyncModal}
       />
       <LpModal show={[showLpModal, setShowLpModal]} />
+      <OptionTokenExerciseModal
+        show={[showExerciseModal, setShowExerciseModal]}
+      />
+      <Modal visibility={[showClaimModal, setShowClaimModal]}>
+        <OptionTokenInterface />
+      </Modal>
+      <BridgeModal show={[showBridgeModal, setShowBridgeModal]} />
+      <Modal visibility={[showSyncModal, setShowSyncModal]}>
+        <BroadcastVeBalanceInterface setShowModal={setShowSyncModal} />
+      </Modal>
       <div className="static">
-        <section className="py-10 px-4 md:px-8 border-t md:border-t-0 md:border-b border-[#353945] lg:flex lg:flex-row items-center justify-between text-primary">
+        <section className="py-10 px-4 md:px-8 border-t md:border-t-0 md:border-b border-customNeutral100 lg:flex lg:flex-row items-center justify-between text-white">
           <div className="lg:w-[1050px]">
             <h1 className="text-2xl md:text-3xl font-normal">
-              Lock{" "}
-              <span className="text-[#DFFF1C] font-bold md:font-normal md:underline md:decoration-solid">
-                20WETH-80VCX
+              Lock your{" "}
+              <span className="text-primaryYellow font-bold md:font-normal md:underline md:decoration-solid">
+                VCX LP
               </span>{" "}
-              for veVCX, Rewards, and Voting Power
+              for voting power, XP points, and oVCX multipliers
             </h1>
-            <p className="text-base text-primary opacity-80 mt-4">
-              Vote with your veVCX below to influence how much $oVCX each pool
-              will receive.
+            <p className="text-base text-white opacity-80 mt-4">
+              Vote on which Smart Vaults will receive more oVCX every epoch with veVCX - your locked VCX LP.
             </p>
-            <p className="text-base text-primary opacity-80">
-              Your vote will persist until you change it and editing a pool can
-              only be done once every 10 days.
+            <p className="text-base text-white opacity-80">
+              You can only vote once every 10 days and your vote persists until you change it.
             </p>
           </div>
         </section>
@@ -176,59 +198,72 @@ function VePopContainer() {
             setShowLockModal={setShowLockModal}
             setShowMangementModal={setShowMangementModal}
             setShowLpModal={setShowLpModal}
+            setShowBridgeModal={setShowBridgeModal}
+            setShowSyncModal={setShowSyncModal}
           />
-          <OptionTokenInterface
-            gauges={
-              vaults?.length > 0
-                ? vaults
-                    .filter((vault) => !!vault.gauge?.address)
-                    .map((vault: VaultData) => vault.gauge as Token)
-                : []
-            }
-            setShowOptionTokenModal={setShowOptionTokenModal}
-          />
+          <div className="w-full lg:w-1/2">
+            <OptionTokenInterface setShowOptionTokenModal={setShowExerciseModal} />
+          </div>
         </section>
 
         <section className="my-10 px-4 md:px-8 md:flex flex-row items-center justify-between">
-          <NetworkFilter supportedNetworks={[1]} selectNetwork={() => {}} />
-          <div className="flex flex-row space-x-4">
+          <NetworkFilter supportedNetworks={GAUGE_NETWORKS} selectNetwork={selectNetwork} />
+          <div className="flex flex-row space-x-4 mt-4">
             <SearchBar searchTerm={searchTerm} handleSearch={handleSearch} />
-            <VaultsSorting className="" vaultState={[vaults, setVaults]} />
+            <VaultsSorting className="" vaultState={[gaugeVaults, setGaugeVaults]} />
           </div>
         </section>
 
         <section className="grid grid-cols-1 md:grid-cols-3 gap-4 px-4 md:px-8">
-          {vaults?.length > 0 ? (
-            vaults
-              .filter((vault) => selectedNetworks.includes(vault.chainId))
-              .filter((vault) => !!vault.gauge?.address)
-              .filter((vault) => !HIDDEN_VAULTS.includes(vault.address))
-              .sort((a, b) => b.tvl - a.tvl)
-              .map((vault: VaultData, index: number) => (
-                <Gauge
-                  key={vault.address}
-                  vaultData={vault}
-                  index={vault.gauge?.address as Address}
-                  votes={votes}
-                  handleVotes={handleVotes}
-                  canVote={canVoteOnGauges[index]}
-                  searchTerm={searchTerm}
-                />
-              ))
+          {gaugeVaults?.length > 0 ? (
+            <>
+              {gaugeVaults
+                .filter((vault) => selectedNetworks.includes(vault.chainId))
+                .filter((vault) => Object.keys(hiddenGauges).length > 0 ? !hiddenGauges[vault.chainId].includes(vault.gauge!) : true)
+                .sort((a, b) => b.tvl - a.tvl)
+                .map((vault: VaultData, index: number) => (
+                  <Gauge
+                    key={vault.address}
+                    vaultData={vault}
+                    index={vault.gauge!}
+                    votes={votes}
+                    handleVotes={handleVotes}
+                    canVote={voteData.find(v => v.gauge === vault.gauge)?.canVote!}
+                    searchTerm={searchTerm}
+                    deprecated={false}
+                  />
+                ))}
+              {gaugeVaults
+                .filter((vault) => selectedNetworks.includes(vault.chainId))
+                .filter((vault) => Object.keys(hiddenGauges).length > 0 ? hiddenGauges[vault.chainId].includes(vault.gauge!) : true)
+                .sort((a, b) => b.tvl - a.tvl)
+                .map((vault: VaultData, index: number) => (
+                  <Gauge
+                    key={vault.address}
+                    vaultData={vault}
+                    index={vault.gauge!}
+                    votes={votes}
+                    handleVotes={handleVotes}
+                    canVote={voteData.find(v => v.gauge === vault.gauge)?.canVote!}
+                    searchTerm={searchTerm}
+                    deprecated={true}
+                  />
+                ))}
+            </>
           ) : (
-            <p className="text-primary">Loading Gauges...</p>
+            <p className="text-white">Loading Gauges...</p>
           )}
         </section>
 
         <div className="fixed left-0 bottom-10 w-full">
-          <div className="z-10 mx-auto w-60 md:w-104 bg-[#23262F] px-6 py-4 rounded-lg flex flex-col md:flex-row items-center justify-between text-white border border-[#353945]">
+          <div className="z-10 mx-auto w-60 md:w-104 bg-customNeutral200 px-6 py-4 rounded-lg flex flex-col md:flex-row items-center justify-between text-white border border-customNeutral100">
             <p className="mt-1">
               Voting power used:{" "}
               <span className="font-bold">
                 {veBal && veBal.value && Object.keys(votes).length > 0
                   ? (
-                      Object.values(votes).reduce((a, b) => a + b, 0) / 100
-                    ).toFixed(2)
+                    Object.values(votes).reduce((a, b) => a + b, 0) / 100
+                  ).toFixed(2)
                   : "0"}
                 %
               </span>
@@ -239,15 +274,14 @@ function VePopContainer() {
                 disabled={!canCastVote}
                 handleClick={() =>
                   sendVotes({
-                    vaults,
+                    vaults: gaugeVaults,
                     votes,
                     prevVotes: initialVotes,
                     account: account as Address,
                     clients: {
                       publicClient,
-                      walletClient: walletClient as WalletClient,
+                      walletClient: walletClient!,
                     },
-                    canVoteOnGauges,
                   })
                 }
               />

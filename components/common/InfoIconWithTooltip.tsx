@@ -19,7 +19,7 @@ export default function InfoIconWithTooltip({
       <div className="flex items-center" id={id}>
         <img
           src="/images/icons/tooltip.svg"
-          className={`cursor-pointer text-white w-4 h-4 ${classExtras}`}
+          className={`cursor-pointer text-white ${classExtras ? "w-4 h-4" : classExtras}`}
         />
       </div>
       <ResponsiveTooltip id={id} content={content} />

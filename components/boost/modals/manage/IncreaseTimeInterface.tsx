@@ -17,8 +17,8 @@ function LockTimeButton({
 }): JSX.Element {
   return (
     <button
-      className={`w-10 h-10 border border-[#C8C8C8] rounded-lg ${
-        isActive ? "bg-[#D7D5BC] text-[#645F4B]" : "text-[#969696]"
+      className={`w-10 h-10 border border-customGray200 rounded-lg ${
+        isActive ? "bg-customGray200 text-customNeutral200" : "text-customGray400"
       }`}
       onClick={() => handleClick()}
     >
@@ -50,8 +50,8 @@ export default function IncreaseTimeInterface({
 
       <div>
         <div className="flex flex-row items-center justify-between">
-          <p className="text-primary font-semibold mb-1">Lockup Time</p>
-          <p className="w-32 text-secondaryLight">Custom Time</p>
+          <p className="text-white font-semibold mb-1">Lockup Time</p>
+          <p className="w-32 text-customGray300">Custom Time</p>
         </div>
         <div className="flex flex-row items-center justify-between">
           <LockTimeButton
@@ -89,7 +89,7 @@ export default function IncreaseTimeInterface({
             isActive={days === 1460}
             handleClick={() => setDays(1460)}
           />
-          <div className="w-32 flex px-5 py-2 items-center rounded-lg border border-customLightGray">
+          <div className="w-32 flex px-5 py-2 items-center rounded-lg border border-customGray100">
             <InputNumber
               onChange={handleSetDays}
               value={days}
@@ -104,16 +104,16 @@ export default function IncreaseTimeInterface({
             />
           </div>
         </div>
-        <div className="flex flex-row items-center justify-between text-secondaryLight">
+        <div className="flex flex-row items-center justify-between text-customGray300">
           <p>Unlocks at:</p>
           <p>{new Date(calcUnlockTime(totalDays)).toLocaleDateString()}</p>
         </div>
       </div>
 
       <div>
-        <p className="text-primary font-semibold mb-1">New Voting Power</p>
-        <div className="w-full bg-[#d7d7d726] border border-customLightGray rounded-lg p-4">
-          <p className="text-primaryDark">
+        <p className="text-white font-semibold mb-1">New Voting Power</p>
+        <div className="w-full bg-customGray600 border border-customGray100 rounded-lg p-4">
+          <p className="text-customGray100">
             {Number(lockedBal?.amount) > 0
               ? calculateVeOut(
                   Number(lockedBal?.amount) / 1e18,

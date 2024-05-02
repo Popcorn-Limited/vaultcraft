@@ -73,7 +73,7 @@ function ProtocolSelection() {
 
   if (asset.symbol === "none")
     return (
-      <div className="border-2 border-[#353945] rounded-[4px] flex gap-2 w-full px-2 h-15 flex-row items-center">
+      <div className="border-2 border-customNeutral100 rounded flex gap-2 w-full px-2 h-15 flex-row items-center">
         <p className="text-gray-600">Select an asset first</p>
       </div>
     );

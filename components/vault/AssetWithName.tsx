@@ -3,11 +3,13 @@ import TokenIcon from "@/components/common/TokenIcon";
 import { VaultData, VaultLabel } from "@/lib/types";
 import ProtocolIcon from "@/components/common/ProtocolIcon";
 import ResponsiveTooltip from "../common/Tooltip";
+import { useAtom } from "jotai";
+import { tokensAtom } from "@/lib/atoms";
 
 const vaultLabelColor: { [key: string]: string } = {
   Experimental: "text-white bg-orange-500 bg-opacity-90",
   Deprecated: "text-white bg-red-500 bg-opacity-80",
-  New: "text-[#DFFF1C] bg-[#DFFF1C] bg-opacity-30",
+  New: "text-primaryYellow bg-primaryYellow bg-opacity-30",
 };
 
 const vaultLabelTooltip: { [key: string]: string } = {
@@ -47,13 +49,12 @@ function VaultLabelPill({
   return (
     <>
       <div
-        className="flex align-middle justify-between w-full md:block md:w-max cursor-pointer"
+        className="flex align-middle justify-between md:block md:w-max cursor-pointer"
         id={tooltipId}
       >
         <div
-          className={`${
-            vaultLabelColor[String(label)]
-          } rounded-lg py-1 px-3 flex flex-row items-center gap-2`}
+          className={`${vaultLabelColor[String(label)]
+            } rounded-lg py-1 px-3 flex flex-row items-center gap-2`}
         >
           <p className={`${textSize[size]}`}>{String(label)}</p>
         </div>
@@ -75,6 +76,7 @@ export default function AssetWithName({
   vault: VaultData;
   size?: number;
 }) {
+  const [tokens] = useAtom(tokensAtom);
   const tooltipId = vault.address.slice(1);
 
   return (
@@ -82,42 +84,43 @@ export default function AssetWithName({
       <div className="relative">
         <NetworkSticker chainId={vault.chainId} size={size} />
         <TokenIcon
-          token={vault.asset}
-          icon={vault.asset.logoURI}
+          token={tokens[vault.chainId][vault.asset]}
+          icon={tokens[vault.chainId][vault.asset].logoURI}
           chainId={vault.chainId}
           imageSize={iconSize[size]}
         />
       </div>
       <h2
-        className={`${vaultTextSize[size]} font-bold text-primary mr-1 text-ellipsis overflow-hidden whitespace-nowrap smmd:flex-1 smmd:flex-nowrap xs:max-w-[80%] smmd:max-w-fit smmd:block`}
+        className={`${vaultTextSize[size]} font-bold text-white mr-1 text-ellipsis overflow-hidden whitespace-nowrap smmd:flex-1 smmd:flex-nowrap xs:max-w-[80%] smmd:max-w-fit smmd:block`}
       >
-        {vault.metadata.vaultName || vault.asset.name}
+        {vault.metadata.vaultName || tokens[vault.chainId][vault.asset].name}
       </h2>
-      <ProtocolIcon
-        protocolName={vault.metadata.optionalMetadata?.protocol?.name}
-        tooltip={{
-          id: tooltipId,
-          content: (
-            <p className="w-60">
-              {
-                vault.metadata.optionalMetadata?.protocol?.description.split(
-                  "** - "
-                )[1]
-              }
-            </p>
-          ),
-        }}
-        size={size}
-      />
-      {vault.metadata.labels &&
-        vault.metadata.labels.length > 0 &&
-        vault.metadata.labels.map((label) => (
-          <VaultLabelPill
-            key={`${tooltipId}-${label}`}
-            label={label}
-            id={tooltipId}
-          />
-        ))}
+      <div className="flex flex-row flex-wrap w-max space-x-2">
+        <ProtocolIcon
+          protocolName={vault.strategies.length > 1 ? "Multistrategy" : vault.strategies[0].metadata.name}
+          tooltip={{
+            id: tooltipId,
+            content: (
+              <p className="w-60">
+                {vault.strategies.length > 1 ?
+                  "This vault allocates between multiple strategies"
+                  : vault.strategies[0].metadata.description
+                }
+              </p>
+            ),
+          }}
+          size={size}
+        />
+        {vault.metadata.labels &&
+          vault.metadata.labels.length > 0 &&
+          vault.metadata.labels.map((label) => (
+            <VaultLabelPill
+              key={`${tooltipId}-${label}`}
+              label={label}
+              id={tooltipId}
+            />
+          ))}
+      </div>
     </div>
   );
 }

@@ -1,14 +1,13 @@
 import MainActionButton from "@/components/button/MainActionButton";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import { handleAllowance } from "@/lib/approve";
-import { ROUNDING_VALUE, VCXAbi, ZERO } from "@/lib/constants";
+import { POP, ROUNDING_VALUE, VCX, VCXAbi, ZERO } from "@/lib/constants";
 import {
   showErrorToast,
   showLoadingToast,
   showSuccessToast,
 } from "@/lib/toasts";
 import { SimulationResponse } from "@/lib/types";
-import { getVeAddresses } from "@/lib/constants";
 import { validateInput } from "@/lib/utils/helpers";
 import { ArrowDownIcon } from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
@@ -29,8 +28,6 @@ import {
   useWalletClient,
 } from "wagmi";
 import { multiplyDecimals } from "@/lib/utils/formatBigNumber";
-
-const { VCX, POP } = getVeAddresses();
 
 interface SimulateProps {
   address: Address;
@@ -204,19 +201,19 @@ export default function Migration(): JSX.Element {
 
   return (
     <>
-      <div className="w-full pt-6 px-6 md:pt-0 border-t border-[#353945] md:border-none md:mt-10">
-        <h1 className="text-[32px] leading-none md:text-center md:text-[56px] font-normal m-0 mb-2 md:mb-6 leading-0 text-primary">
+      <div className="w-full pt-6 px-6 md:pt-0 border-t border-customNeutral100 md:border-none md:mt-10">
+        <h1 className="text-3xl leading-none md:text-center md:text-[56px] font-normal m-0 mb-2 md:mb-6 leading-0 text-white">
           POP Migration
         </h1>
-        <p className="leading-none md:text-4 text-left md:text-center text-xl text-primary">
+        <p className="leading-none md:text-4 text-left md:text-center text-xl text-white">
           Migrate your POP to VCX
         </p>
       </div>
-      <div className="px-6 md:px-8 py-10 border-t border-b border-[#353945] mt-6 md:mt-10 w-full">
+      <div className="px-6 md:px-8 py-10 border-t border-b border-customNeutral100 mt-6 md:mt-10 w-full">
         {vcxBal ? (
-          <div className="rounded-lg w-full md:w-1/3 md:min-w-[870px] bg-[#23262F] md:ml-auto md:mr-auto md:p-8 px-8 pt-6 pb-5 md:pl-11 border border-[#353945] [&_summary::-webkit-details-marker]:hidden">
+          <div className="rounded-lg w-full md:w-1/3 md:min-w-[870px] bg-customNeutral200 md:ml-auto md:mr-auto md:p-8 px-8 pt-6 pb-5 md:pl-11 border border-customNeutral100 [&_summary::-webkit-details-marker]:hidden">
             <InputTokenWithError
-              onSelectToken={() => {}}
+              onSelectToken={() => { }}
               onMaxClick={() =>
                 handleChangeInput({
                   currentTarget: { value: Number(formatEther(popBal)) },
@@ -232,6 +229,7 @@ export default function Migration(): JSX.Element {
                 decimals: 18,
                 logoURI: "",
                 balance: Number(popBal),
+                totalSupply: 0,
                 price: 1,
               }}
               errorMessage={
@@ -244,16 +242,16 @@ export default function Migration(): JSX.Element {
             />
             <div className="relative flex justify-center my-6">
               <ArrowDownIcon
-                className="h-10 w-10 p-2 text-[#9CA3AF] border border-[#4D525C] rounded-full"
+                className="h-10 w-10 p-2 text-customGray200 border border-customGray400 rounded-full"
                 aria-hidden="true"
               />
             </div>
             <InputTokenWithError
-              onSelectToken={() => {}}
-              onMaxClick={() => {}}
+              onSelectToken={() => { }}
+              onMaxClick={() => { }}
               chainId={1}
               value={multiplyDecimals(Number(inputBalance), 10) || 0}
-              onChange={() => {}}
+              onChange={() => { }}
               selectedToken={{
                 address: VCX,
                 name: "VCX",
@@ -261,6 +259,7 @@ export default function Migration(): JSX.Element {
                 decimals: 18,
                 logoURI: "/images/tokens/vcx.svg",
                 balance: 0,
+                totalSupply:0,
                 price: 1,
               }}
               errorMessage={""}

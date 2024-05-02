@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ChainId } from "@/lib/utils/connectors";
 import { Token } from "@/lib/types";
 import TokenIcon from "@/components/common/TokenIcon";
-import { getAssetsByChain, zapAssetAddressesByChain } from "@/lib/constants";
+import { ZapAssetAddressesByChain } from "@/lib/constants";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
 interface SearchTokenProps {
@@ -49,13 +49,13 @@ export default function SearchToken({
           id="search"
           value={search}
           onChange={(e) => handleSearchChange(e.target.value)}
-          className="block w-full h-14 md:h-14 pb-0 border-white pl-14 focus:border-white focus:ring-white rounded-5xl text-base md:text-xl placeholder:text-base md:placeholder:text-xl pt-0 bg-[#141416]"
+          className="block w-full h-14 md:h-14 pb-0 border-white pl-14 focus:border-white focus:ring-white rounded-5xl text-base md:text-xl placeholder:text-base md:placeholder:text-xl pt-0 bg-customNeutral300"
           placeholder="Search"
         />
       </div>
       {options
         .filter((option) =>
-          zapAssetAddressesByChain[chainId].find(
+          ZapAssetAddressesByChain[chainId].find(
             (address) => address == option.address
           )
         )
@@ -73,7 +73,7 @@ export default function SearchToken({
             {quickOption.map((option) => (
               <div className="w-fit" key={option?.address}>
                 <button
-                  className="w-full flex items-center rounded-[14px] border border-[#353945cc] hover:bg-[#353945] transition ease-in-out duration-250 font-medium text-white py-2 px-3 md:py-2.5 md:px-4 text-base md:text-lg active:bg-[#3d4318] active:border-[#DFFF1C] active:text-[#DFFF1C]"
+                  className="w-full flex items-center rounded-xl border border-customNeutral100 hover:bg-customNeutral100 transition ease-in-out duration-250 font-medium text-white py-2 px-3 md:py-2.5 md:px-4 text-base md:text-lg active:bg-primaryYellow active:bg-opacity-50 active:border-primaryYellow active:text-primaryYellow"
                   onClick={() => {
                     selectToken(option);
                   }}
@@ -92,10 +92,10 @@ export default function SearchToken({
           </div>
         ))}
       <div className="mt-4">
-        <ul className="scrollable__select py-6 overflow-y-auto shadow-scrollableSelect rounded-lg p-6 border border-customPaleGray">
+        <ul className="scrollable__select py-6 overflow-y-auto shadow-scrollableSelect rounded-lg p-6 border border-customGray300">
           {filteredOptions.map((option) => (
             <li
-              className="my-1 bg-transparent text-base md:text-lg hover:bg-customPaleGray hover:bg-opacity-40 rounded-lg"
+              className="my-1 bg-transparent text-base md:text-lg hover:bg-customGray300 hover:bg-opacity-40 rounded-lg"
               key={option.symbol}
               onClick={() => {
                 selectToken(option);
@@ -104,8 +104,8 @@ export default function SearchToken({
               <span
                 className={`flex items-center py-3 px-3 ${
                   selectedToken.address === option.address
-                    ? "text-[#DFFF1C] font-semibold"
-                    : "text-primary font-normal  cursor-pointer"
+                    ? "text-primaryYellow font-semibold"
+                    : "text-white font-normal  cursor-pointer"
                 }`}
               >
                 <span className="w-5 h-5 inline-flex mr-3 flex-shrink-0 cursor-pointer">

@@ -19,16 +19,23 @@ export default function LockVxcInfo(): JSX.Element {
       <div>
         <h2 className="text-start text-5xl">Locking VCX</h2>
         <p className="text-start">
-          Lock your VCX-LP to receive vote-escrowed veVCX. veVCX has many
-          purposes. It allows you to boost your vault yield by earning VCX call
-          options (oVCX). You can use veVCX to vote on vault gauge incentives,
-          participate in governance and earn protocol fees. Unlocking VCX early
-          results in a penalty of up to 25% of your VCX.
+          Lock VCX for veVCX to get the following features:
         </p>
+        <ul className="list-inside list-disc text-start">
+          <li>
+            Voting power - vote once every 10 days on which Smart Vault gauges you want oVCX distributed to
+          </li>
+          <li>
+            Participate in governance
+          </li>
+          <li>
+            Unlock early for a 25% penalty
+          </li>
+        </ul>
       </div>
       <div className="flex flex-row items-center justify-center space-x-4">
         <div className="h-2 w-20 rounded-2xl bg-white"></div>
-        <div className="h-2 w-20 rounded-2xl bg-[#353945]"></div>
+        <div className="h-2 w-20 rounded-2xl bg-customNeutral100"></div>
       </div>
     </div>
   );

@@ -1,8 +1,5 @@
-import {
-  KelpVaultActionType,
-  LockVaultActionType,
-  SmartVaultActionType,
-} from "@/lib/types";
+import { SmartVaultActionType } from "@/lib/types";
+import { AaveActionType } from "./external/aave/handleAaveInteractions";
 
 export interface ActionStep {
   step: number;
@@ -10,12 +7,14 @@ export interface ActionStep {
   success: boolean;
   error: boolean;
   loading: boolean;
+  updateBalance: boolean;
 }
 
 const BaseStepInfo = {
   success: false,
   error: false,
   loading: false,
+  updateBalance: true,
 };
 
 export function getSmartVaultActionSteps(
@@ -28,6 +27,7 @@ export function getSmartVaultActionSteps(
           step: 1,
           label: "Handle Allowance",
           ...BaseStepInfo,
+          updateBalance: false
         },
         {
           step: 2,
@@ -49,6 +49,7 @@ export function getSmartVaultActionSteps(
           step: 1,
           label: "Handle Allowance",
           ...BaseStepInfo,
+          updateBalance: false
         },
         {
           step: 2,
@@ -70,6 +71,7 @@ export function getSmartVaultActionSteps(
           step: 1,
           label: "Handle Allowance",
           ...BaseStepInfo,
+          updateBalance: false
         },
         {
           step: 2,
@@ -83,6 +85,7 @@ export function getSmartVaultActionSteps(
           step: 1,
           label: "Handle Allowance",
           ...BaseStepInfo,
+          updateBalance: false
         },
         {
           step: 2,
@@ -96,6 +99,7 @@ export function getSmartVaultActionSteps(
           step: 1,
           label: "Handle Zap Allowance",
           ...BaseStepInfo,
+          updateBalance: false
         },
         {
           step: 2,
@@ -106,6 +110,7 @@ export function getSmartVaultActionSteps(
           step: 3,
           label: "Handle Allowance",
           ...BaseStepInfo,
+          updateBalance: false
         },
         {
           step: 4,
@@ -124,6 +129,7 @@ export function getSmartVaultActionSteps(
           step: 2,
           label: "Handle Zap Allowance",
           ...BaseStepInfo,
+          updateBalance: false
         },
         {
           step: 3,
@@ -137,6 +143,7 @@ export function getSmartVaultActionSteps(
           step: 1,
           label: "Handle Zap Allowance",
           ...BaseStepInfo,
+          updateBalance: false
         },
         {
           step: 2,
@@ -147,6 +154,7 @@ export function getSmartVaultActionSteps(
           step: 3,
           label: "Handle Allowance",
           ...BaseStepInfo,
+          updateBalance: false
         },
         {
           step: 4,
@@ -160,6 +168,7 @@ export function getSmartVaultActionSteps(
           step: 1,
           label: "Handle Allowance",
           ...BaseStepInfo,
+          updateBalance: false
         },
         {
           step: 2,
@@ -170,226 +179,7 @@ export function getSmartVaultActionSteps(
           step: 3,
           label: "Handle Zap Allowance",
           ...BaseStepInfo,
-        },
-        {
-          step: 4,
-          label: "Zap",
-          ...BaseStepInfo,
-        },
-      ];
-  }
-}
-
-export function getLockVaultActionSteps(
-  action: LockVaultActionType
-): ActionStep[] {
-  switch (action) {
-    case LockVaultActionType.Deposit:
-      return [
-        {
-          step: 1,
-          label: "Handle Allowance",
-          ...BaseStepInfo,
-        },
-        {
-          step: 2,
-          label: "Deposit",
-          ...BaseStepInfo,
-        },
-      ];
-    case LockVaultActionType.IncreaseAmount:
-      return [
-        {
-          step: 1,
-          label: "Handle Allowance",
-          ...BaseStepInfo,
-        },
-        {
-          step: 2,
-          label: "Deposit",
-          ...BaseStepInfo,
-        },
-      ];
-    case LockVaultActionType.Withdrawal:
-      return [
-        {
-          step: 1,
-          label: "Withdraw",
-          ...BaseStepInfo,
-        },
-      ];
-    case LockVaultActionType.Claim:
-      return [
-        {
-          step: 1,
-          label: "Claim Rewards",
-          ...BaseStepInfo,
-        },
-      ];
-    case LockVaultActionType.ZapDeposit:
-      return [
-        {
-          step: 1,
-          label: "Handle Zap Allowance",
-          ...BaseStepInfo,
-        },
-        {
-          step: 2,
-          label: "Zap",
-          ...BaseStepInfo,
-        },
-        {
-          step: 3,
-          label: "Handle Allowance",
-          ...BaseStepInfo,
-        },
-        {
-          step: 4,
-          label: "Deposit",
-          ...BaseStepInfo,
-        },
-      ];
-    case LockVaultActionType.ZapIncreaseAmount:
-      return [
-        {
-          step: 1,
-          label: "Handle Zap Allowance",
-          ...BaseStepInfo,
-        },
-        {
-          step: 2,
-          label: "Zap",
-          ...BaseStepInfo,
-        },
-        {
-          step: 3,
-          label: "Handle Allowance",
-          ...BaseStepInfo,
-        },
-        {
-          step: 4,
-          label: "Deposit",
-          ...BaseStepInfo,
-        },
-      ];
-    case LockVaultActionType.ZapWithdrawal:
-      return [
-        {
-          step: 1,
-          label: "Withdraw",
-          ...BaseStepInfo,
-        },
-        {
-          step: 2,
-          label: "Handle Zap Allowance",
-          ...BaseStepInfo,
-        },
-        {
-          step: 3,
-          label: "Zap",
-          ...BaseStepInfo,
-        },
-      ];
-  }
-}
-
-export function getKelpVaultActionSteps(
-  action: KelpVaultActionType
-): ActionStep[] {
-  switch (action) {
-    case KelpVaultActionType.Deposit:
-      return [
-        {
-          step: 1,
-          label: "Handle Vault Allowance",
-          ...BaseStepInfo,
-        },
-        {
-          step: 2,
-          label: "Deposit and Stake",
-          ...BaseStepInfo,
-        },
-      ];
-    case KelpVaultActionType.Withdrawal:
-      return [
-        {
-          step: 1,
-          label: "Handle Router Allowance",
-          ...BaseStepInfo,
-        },
-        {
-          step: 2,
-          label: "Unstake and Withdraw",
-          ...BaseStepInfo,
-        },
-      ];
-    case KelpVaultActionType.ZapDeposit:
-      return [
-        {
-          step: 1,
-          label: "Mint ETHx",
-          ...BaseStepInfo,
-        },
-        {
-          step: 3,
-          label: "Handle rsETH Allowance",
-          ...BaseStepInfo,
-        },
-        {
-          step: 3,
-          label: "Mint rsETH",
-          ...BaseStepInfo,
-        },
-        {
-          step: 4,
-          label: "Handle Vault Allowance",
-          ...BaseStepInfo,
-        },
-        {
-          step: 5,
-          label: "Deposit and Stake",
-          ...BaseStepInfo,
-        },
-      ];
-    case KelpVaultActionType.EthxZapDeposit:
-      return [
-        {
-          step: 1,
-          label: "Handle rsETH Allowance",
-          ...BaseStepInfo,
-        },
-        {
-          step: 2,
-          label: "Mint rsETH",
-          ...BaseStepInfo,
-        },
-        {
-          step: 3,
-          label: "Handle Vault Allowance",
-          ...BaseStepInfo,
-        },
-        {
-          step: 4,
-          label: "Deposit and Stake",
-          ...BaseStepInfo,
-        },
-      ];
-    case KelpVaultActionType.ZapWithdrawal:
-      return [
-        {
-          step: 1,
-          label: "Handle Router Allowance",
-          ...BaseStepInfo,
-        },
-        {
-          step: 2,
-          label: "Unstake and Withdraw",
-          ...BaseStepInfo,
-        },
-        {
-          step: 3,
-          label: "Handle Zap Allowance",
-          ...BaseStepInfo,
+          updateBalance: false
         },
         {
           step: 4,
@@ -405,11 +195,13 @@ export const POOL_DEPOSIT_STEPS = [
     step: 1,
     label: "Handle WETH Allowance",
     ...BaseStepInfo,
+    updateBalance: false
   },
   {
     step: 2,
     label: "Handle VCX Allowance",
     ...BaseStepInfo,
+    updateBalance: false
   },
   {
     step: 3,
@@ -423,6 +215,7 @@ export const LOCK_VCX_LP_STEPS = [
     step: 1,
     label: "Handle VCX-LP Allowance",
     ...BaseStepInfo,
+    updateBalance: false
   },
   {
     step: 2,
@@ -436,10 +229,59 @@ export const EXERCISE_OVCX_STEPS = [
     step: 1,
     label: "Handle WETH Allowance",
     ...BaseStepInfo,
+    updateBalance: false
   },
   {
     step: 2,
-    label: "Exercise oVCX",
+    label: "Handle oVCX Allowance",
     ...BaseStepInfo,
+    updateBalance: false
   },
-];
+  {
+    step: 3,
+    label: "Exercise oVCX",
+    ...BaseStepInfo
+  }
+]
+
+export function getAaveActionSteps(action: AaveActionType): ActionStep[] {
+  switch (action) {
+    case AaveActionType.Supply:
+      return [{
+        step: 1,
+        label: "Handle Allowance",
+        ...BaseStepInfo,
+        updateBalance: false
+      },
+      {
+        step: 2,
+        label: "Supply Asset",
+        ...BaseStepInfo
+      }]
+    case AaveActionType.Withdraw:
+      return [
+        {
+          step: 1,
+          label: "Withdraw Asset",
+          ...BaseStepInfo
+        }]
+    case AaveActionType.Borrow:
+      return [{
+        step: 1,
+        label: "Borrow Asset",
+        ...BaseStepInfo
+      }]
+    case AaveActionType.Repay:
+      return [{
+        step: 1,
+        label: "Handle Allowance",
+        ...BaseStepInfo,
+        updateBalance: false
+      },
+      {
+        step: 2,
+        label: "Repay Loan",
+        ...BaseStepInfo
+      }]
+  }
+}

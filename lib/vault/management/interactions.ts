@@ -1,95 +1,149 @@
-import { VaultAbi, VaultControllerAbi } from "@/lib/constants";
-import { showLoadingToast } from "@/lib/toasts";
-import { Clients, SimulationResponse, VaultData } from "@/lib/types";
-import { handleCallResult } from "@/lib/utils/helpers";
-import { Address, PublicClient } from "viem";
+import { MultiStrategyVaultAbi, VaultAbi, VaultControllerAbi, VaultControllerByChain } from "@/lib/constants";
+import { showLoadingToast } from "@/lib/toasts"
+import { AddressByChain, Clients, SimulationResponse, VaultAllocation, VaultData } from "@/lib/types"
+import { SimulationContract, handleCallResult, simulateCall } from "@/lib/utils/helpers"
+import { VaultController } from "vaultcraft-sdk";
+import { Address } from "viem"
 
 interface BaseWriteProps {
   vaultData: VaultData;
+  address: Address;
   account?: Address;
   clients: Clients;
 }
 
-interface VaultControllerSimulateProps {
-  account: Address;
-  args: any[];
-  functionName: string;
-  publicClient: PublicClient;
-  chainId: number;
-}
-
-interface VaultSimulateProps {
-  address: Address;
-  account: Address;
-  functionName: string;
-  publicClient: PublicClient;
-}
-
-const VAULT_CONTROLLER_ADDRESS: { [key: number]: Address } = {
-  1: "0x7D51BABA56C2CA79e15eEc9ECc4E92d9c0a7dbeb",
-};
-
-async function simulateCall({
-  account,
-  args,
-  functionName,
-  publicClient,
-  chainId,
-}: VaultControllerSimulateProps): Promise<SimulationResponse> {
-  try {
-    const { request } = await publicClient.simulateContract({
-      account: account as Address,
-      address: VAULT_CONTROLLER_ADDRESS[chainId],
-      abi: VaultControllerAbi,
-      // @ts-ignore
-      functionName,
-      // @ts-ignore
-      args,
-    });
-    return { request: request, success: true, error: null };
-  } catch (error: any) {
-    return { request: null, success: false, error: error.shortMessage };
+function getSimulationContract(address: Address, chainId: number): SimulationContract {
+  if (address === VaultControllerByChain[chainId]) {
+    return {
+      address,
+      abi: VaultControllerAbi
+    }
+  } else {
+    return {
+      address,
+      abi: VaultAbi
+    }
   }
 }
 
-async function simulateVaultCall({
+export async function allocateToStrategies({
+  allocations,
+  vaultData,
   address,
   account,
-  functionName,
-  publicClient,
-}: VaultSimulateProps): Promise<SimulationResponse> {
-  try {
-    const { request } = await publicClient.simulateContract({
+  clients,
+}: BaseWriteProps & { allocations: VaultAllocation[] }): Promise<boolean> {
+  showLoadingToast("Allocating into strategies...");
+
+  const success = await handleCallResult({
+    successMessage: "Allocated into strategies!",
+    simulationResponse: await simulateCall({
       account: account as Address,
-      address,
-      abi: VaultAbi,
-      // @ts-ignore
-      functionName,
-      // @ts-ignore
-      args,
-    });
-    return { request: request, success: true, error: null };
-  } catch (error: any) {
-    return { request: null, success: false, error: error.shortMessage };
-  }
+      contract: { address: vaultData.address, abi: MultiStrategyVaultAbi },
+      functionName: "pushFunds",
+      args: allocations,
+      publicClient: clients.publicClient
+    }),
+    clients,
+  });
+
+  return success;
+}
+
+export async function deallocateFromStrategies({
+  allocations,
+  vaultData,
+  address,
+  account,
+  clients,
+}: BaseWriteProps & { allocations: VaultAllocation[] }): Promise<boolean> {
+  showLoadingToast("Deallocating from strategies...");
+
+  const success = await handleCallResult({
+    successMessage: "Deallocated from strategies!",
+    simulationResponse: await simulateCall({
+      account: account as Address,
+      contract: { address: vaultData.address, abi: MultiStrategyVaultAbi },
+      functionName: "pullFunds",
+      args: allocations,
+      publicClient: clients.publicClient
+    }),
+    clients,
+  });
+
+  return success;
+}
+
+export async function proposeStrategies({
+  strategies,
+  vaultData,
+  address,
+  account,
+  clients,
+}: BaseWriteProps & { strategies: Address[] }): Promise<boolean> {
+  showLoadingToast("Proposing new strategies...");
+
+  const success = await handleCallResult({
+    successMessage: "Proposed new strategies!",
+    simulationResponse: await simulateCall({
+      account: account as Address,
+      contract: { address: vaultData.address, abi: MultiStrategyVaultAbi },
+      functionName: "proposeStrategies",
+      args: strategies,
+      publicClient: clients.publicClient
+    }),
+    clients,
+  });
+
+  return success;
+}
+
+export async function acceptStrategies({
+  vaultData,
+  address,
+  account,
+  clients,
+}: BaseWriteProps): Promise<boolean> {
+  showLoadingToast("Accepting new strategies...");
+
+  const success = await handleCallResult({
+    successMessage: "Accepted new strategies!",
+    simulationResponse: await simulateCall({
+      account: account as Address,
+      contract: { address: vaultData.address, abi: MultiStrategyVaultAbi },
+      functionName: "changeStrategies",
+      publicClient: clients.publicClient
+    }),
+    clients,
+  });
+
+  return success;
 }
 
 export async function proposeStrategy({
   strategy,
   vaultData,
+  address,
   account,
   clients,
 }: BaseWriteProps & { strategy: Address }): Promise<boolean> {
   showLoadingToast("Proposing new strategy...");
 
+  let functionName = "proposeAdapter"
+  let args: any[] = [strategy]
+  if (address === VaultControllerByChain[vaultData.chainId]) {
+    functionName = "proposeVaultAdapters";
+    args = [[vaultData.address], [strategy]]
+  }
+
   const success = await handleCallResult({
     successMessage: "Proposed new strategy!",
     simulationResponse: await simulateCall({
       account: account as Address,
-      functionName: "proposeVaultAdapters",
-      args: [[vaultData.address], [strategy]],
-      publicClient: clients.publicClient,
-      chainId: vaultData.chainId,
+      contract: getSimulationContract(address, vaultData.chainId),
+      functionName,
+      args,
+      publicClient: clients.publicClient
     }),
     clients,
   });
@@ -99,19 +153,27 @@ export async function proposeStrategy({
 
 export async function acceptStrategy({
   vaultData,
+  address,
   account,
   clients,
 }: BaseWriteProps): Promise<boolean> {
   showLoadingToast("Accepting new strategy...");
 
+  let functionName = "changeAdapter"
+  let args: any = undefined
+  if (address === VaultControllerByChain[vaultData.chainId]) {
+    functionName = "changeVaultAdapters";
+    args = [vaultData.address]
+  }
+
   const success = await handleCallResult({
     successMessage: "Accepted new strategy!",
     simulationResponse: await simulateCall({
       account: account as Address,
-      functionName: "changeVaultAdapters",
-      args: [vaultData.address],
-      publicClient: clients.publicClient,
-      chainId: vaultData.chainId,
+      contract: getSimulationContract(address, vaultData.chainId),
+      functionName,
+      args,
+      publicClient: clients.publicClient
     }),
     clients,
   });
@@ -122,6 +184,7 @@ export async function acceptStrategy({
 export async function proposeFees({
   fees,
   vaultData,
+  address,
   account,
   clients,
 }: BaseWriteProps & {
@@ -134,14 +197,21 @@ export async function proposeFees({
 }): Promise<boolean> {
   showLoadingToast("Proposing new fees...");
 
+  let functionName = "proposeFees"
+  let args: any = [fees]
+  if (address === VaultControllerByChain[vaultData.chainId]) {
+    functionName = "proposeVaultFees";
+    args = [[vaultData.address], [fees]]
+  }
+
   const success = await handleCallResult({
     successMessage: "Proposed new fees!",
     simulationResponse: await simulateCall({
       account: account as Address,
-      functionName: "proposeVaultFees",
-      args: [[vaultData.address], [fees]],
-      publicClient: clients.publicClient,
-      chainId: vaultData.chainId,
+      contract: getSimulationContract(address, vaultData.chainId),
+      functionName,
+      args,
+      publicClient: clients.publicClient
     }),
     clients,
   });
@@ -151,19 +221,27 @@ export async function proposeFees({
 
 export async function acceptFees({
   vaultData,
+  address,
   account,
   clients,
 }: BaseWriteProps): Promise<boolean> {
   showLoadingToast("Accepting new fees...");
 
+  let functionName = "changeFees"
+  let args: any = undefined
+  if (address === VaultControllerByChain[vaultData.chainId]) {
+    functionName = "changeVaultFees";
+    args = [vaultData.address]
+  }
+
   const success = await handleCallResult({
     successMessage: "Accepted new fees!",
     simulationResponse: await simulateCall({
       account: account as Address,
-      functionName: "changeVaultFees",
-      args: [vaultData.address],
-      publicClient: clients.publicClient,
-      chainId: vaultData.chainId,
+      contract: getSimulationContract(address, vaultData.chainId),
+      functionName,
+      args,
+      publicClient: clients.publicClient
     }),
     clients,
   });
@@ -174,19 +252,27 @@ export async function acceptFees({
 export async function changeFeeRecipient({
   feeRecipient,
   vaultData,
+  address,
   account,
   clients,
 }: BaseWriteProps & { feeRecipient: Address }): Promise<boolean> {
   showLoadingToast("Changing fee recipient...");
 
+  let functionName = "setFeeRecipient"
+  let args: any = [feeRecipient]
+  if (address === VaultControllerByChain[vaultData.chainId]) {
+    functionName = "setVaultFeeRecipients";
+    args = [[vaultData.address], [feeRecipient]]
+  }
+
   const success = await handleCallResult({
     successMessage: "Changed fee recipient!",
     simulationResponse: await simulateCall({
       account: account as Address,
-      functionName: "setVaultFeeRecipients",
-      args: [[vaultData.address], [feeRecipient]],
-      publicClient: clients.publicClient,
-      chainId: vaultData.chainId,
+      contract: getSimulationContract(address, vaultData.chainId),
+      functionName,
+      args,
+      publicClient: clients.publicClient
     }),
     clients,
   });
@@ -197,19 +283,27 @@ export async function changeFeeRecipient({
 export async function changeDepositLimit({
   depositLimit,
   vaultData,
+  address,
   account,
   clients,
 }: BaseWriteProps & { depositLimit: number }): Promise<boolean> {
   showLoadingToast("Changing deposit limit...");
 
+  let functionName = "setDepositLimit"
+  let args: any = [depositLimit]
+  if (address === VaultControllerByChain[vaultData.chainId]) {
+    functionName = "setVaultDepositLimits";
+    args = [[vaultData.address], [depositLimit]]
+  }
+
   const success = await handleCallResult({
     successMessage: "Changed deposit limit!",
     simulationResponse: await simulateCall({
       account: account as Address,
-      functionName: "setVaultDepositLimits",
-      args: [[vaultData.address], [depositLimit]],
-      publicClient: clients.publicClient,
-      chainId: vaultData.chainId,
+      contract: getSimulationContract(address, vaultData.chainId),
+      functionName,
+      args,
+      publicClient: clients.publicClient
     }),
     clients,
   });
@@ -219,19 +313,27 @@ export async function changeDepositLimit({
 
 export async function pauseVault({
   vaultData,
+  address,
   account,
   clients,
 }: BaseWriteProps): Promise<boolean> {
   showLoadingToast("Pausing vault...");
 
+  let functionName = "pause"
+  let args: any = undefined
+  if (address === VaultControllerByChain[vaultData.chainId]) {
+    functionName = "pauseVaults";
+    args = [[vaultData.address]]
+  }
+
   const success = await handleCallResult({
     successMessage: "Paused vault!",
     simulationResponse: await simulateCall({
       account: account as Address,
-      functionName: "pauseVaults",
-      args: [[vaultData.address]],
-      publicClient: clients.publicClient,
-      chainId: vaultData.chainId,
+      contract: getSimulationContract(address, vaultData.chainId),
+      functionName,
+      args,
+      publicClient: clients.publicClient
     }),
     clients,
   });
@@ -241,19 +343,27 @@ export async function pauseVault({
 
 export async function unpauseVault({
   vaultData,
+  address,
   account,
   clients,
 }: BaseWriteProps): Promise<boolean> {
   showLoadingToast("Unpausing vault...");
 
+  let functionName = "unpause"
+  let args: any = undefined
+  if (address === VaultControllerByChain[vaultData.chainId]) {
+    functionName = "unpauseVaults";
+    args = [[vaultData.address]]
+  }
+
   const success = await handleCallResult({
     successMessage: "Unpaused vault!",
     simulationResponse: await simulateCall({
       account: account as Address,
+      contract: getSimulationContract(address, vaultData.chainId),
       functionName: "unpauseVaults",
       args: [[vaultData.address]],
-      publicClient: clients.publicClient,
-      chainId: vaultData.chainId,
+      publicClient: clients.publicClient
     }),
     clients,
   });
@@ -263,6 +373,7 @@ export async function unpauseVault({
 
 export async function takeFees({
   vaultData,
+  address,
   account,
   clients,
 }: BaseWriteProps): Promise<boolean> {
@@ -270,11 +381,14 @@ export async function takeFees({
 
   return handleCallResult({
     successMessage: "Took fees!",
-    simulationResponse: await simulateVaultCall({
-      address: vaultData.address,
+    simulationResponse: await simulateCall({
+      contract: {
+        address,
+        abi: VaultAbi
+      },
       account: account as Address,
       functionName: "takeManagementAndPerformanceFees",
-      publicClient: clients.publicClient,
+      publicClient: clients.publicClient
     }),
     clients,
   });

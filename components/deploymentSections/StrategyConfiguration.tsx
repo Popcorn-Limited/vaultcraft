@@ -6,7 +6,7 @@ import {
   strategyAtom,
   strategyConfigAtom,
 } from "@/lib/atoms";
-import { validateInput, verifyInitParamValidity } from "@/lib/helpers";
+import { validateInput, verifyInitParamValidity } from "@/lib/utils/helpers";
 import Fieldset from "@/components/input/Fieldset";
 import Input from "@/components/input/Input";
 

@@ -6,3 +6,7 @@ export * from "./limits";
 export * from "./metadata";
 export * from "./protocols";
 export * from "./strategy";
+export * from "./gauges";
+export * from "./tokens";
+export * from "./networth";
+export * from "./vaultron";

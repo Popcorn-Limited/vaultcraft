@@ -16,9 +16,7 @@ export default function NavbarLink({
   onClick,
   target,
 }: NavbarLinkProps): JSX.Element {
-  // TODO -- ask enialo how hover and active should differ
-  const className = `leading-5 text-lg text-black font-medium 
-    hover:font-bold transition-all ease-in-out delay-250 cursor-pointer`;
+  const className = `leading-5 text-lg text-black hover:font-bold transition-all ease-in-out delay-250 cursor-pointer ${isActive ? "font-bold" : "font-medium"}`;
   return (
     <>
       <span className={`${!url ? "" : "hidden"}`}>

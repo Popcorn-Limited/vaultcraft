@@ -101,7 +101,7 @@ export default function ReviewContainer({
             href="/experimental/vaults"
             rel="noopener noreferrer"
             target="_blank"
-            className="text-customPurple"
+            className="text-purple-500"
           >
             {" "}
             here
@@ -127,7 +127,7 @@ export default function ReviewContainer({
       {
         <Modal visibility={[showModal, setShowModal]}>
           <div>
-            <p className="text-[white] text-2xl mb-4">Creating Vault</p>
+            <p className="text-white text-2xl mb-4">Creating Vault</p>
             <span className="flex flex-row">
               <p className="text-white mr-2">Creating Vault... </p>
               {(metadata.ipfsHash === "" || isLoading) && (
