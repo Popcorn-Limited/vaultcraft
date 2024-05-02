@@ -376,7 +376,7 @@ export default function VaultInputs({
       {vaultData.depositLimit < maxUint256 &&
         <span className="flex flex-row items-center justify-between text-[#D7D7D7]">
           <p>Deposit Limit:</p>
-          <p>{vaultData.depositLimit / (10 ** vaultData.asset.decimals)} {vaultData.asset.symbol}</p>
+          <p>{vaultData.depositLimit / (10 ** asset.decimals)} {asset.symbol}</p>
         </span>
       }
 
