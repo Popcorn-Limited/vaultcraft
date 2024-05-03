@@ -322,7 +322,7 @@ export default function Page({
 
   return (
     <>
-      <div className="bg-customNeutral300 w-full mx-auto min-h-screen h-full font-khTeka flex flex-col">
+      <div className="bg-customNeutral300 w-full mx-auto font-khTeka flex flex-col">
         <Navbar />
         <div className="flex-1">
           <TermsModal

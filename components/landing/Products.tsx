@@ -35,9 +35,9 @@ export default function Products(): JSX.Element {
         <Tutorial />
       </Modal>
       {/* @dev Product.tsx has `md:mx-2` so with `md:mx-6` that adds up to consistent mx-8*/}
-      <section className="py-12 md:py-10 mx-4 md:mx-6">
+      <section className="py-12 md:py-10 mx-4 md:mx-6 h-max">
         <p className="text-2xl mb-6 text-white smmd:hidden"> Our products </p>
-        <div className="flex flex-col gap-6 smmd:flex-wrap lg:flex-nowrap space-y-4 md:space-y-0 md:flex-row md:justify-between">
+        <div className="flex flex-col gap-1 smmd:flex-wrap lg:flex-nowrap space-y-4 md:space-y-0 md:flex-row md:justify-between">
           <Product
             title={
               <div className="flex flex-row w-full justify-between items-end">
@@ -243,11 +243,11 @@ export default function Products(): JSX.Element {
             stats={[]}
             route="boost"
           />
-          <div className="w-full lg:max-w-full h-[400px] relative flex flex-col space-y-4 md:mx-2">
+          <div className="w-full lg:max-w-full h-[640px] relative flex flex-col space-y-4 md:mx-2">
             <Link
               href={(!!query?.ref && isAddress(query.ref as string)) ? `vaultron?ref=${query.ref}` : `vaultron`}
             >
-              <div className="rounded w-full md:h-[190px] h-[300px] bg-customNeutral300 border border-customNeutral100 border-opacity-75 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:opacity-50 flex flex-col justify-start bg-cover"
+              <div className="rounded w-full h-[208px] bg-customNeutral300 border border-customNeutral100 border-opacity-75 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:opacity-50 flex flex-col justify-start bg-cover"
                 style={{ backgroundImage: "url('https://resolve.mercle.xyz/ipfs/bafkreibn26tzshouo6ayr33uhwwqzxpp5h6zgzitzgxwhsacsuuxoo7fuq')" }}
               >
                 <h2 className="text-white text-2xl leading-none mb-2 py-6 px-8">
@@ -257,9 +257,9 @@ export default function Products(): JSX.Element {
             </Link>
             <Link
               href={(!!query?.ref && isAddress(query.ref as string)) ? `create-vault?ref=${query.ref}` : `create-vault`}
-              className="rounded w-full relative flex flex-col bg-customNeutral300 border border-customNeutral100 border-opacity-75 smmd:items-center py-6 px-8 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:bg-customNeutral200"
+              className="rounded w-full h-[128px] relative flex flex-col bg-customNeutral300 border border-customNeutral100 border-opacity-75 smmd:items-center py-6 px-6 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:bg-customNeutral200"
             >
-              <div className="col-span-12 md:col-span-4 xs:self-start flex-1">
+              <div className="col-span-12 md:col-span-4 xs:self-start">
                 <div className="relative flex flex-row">
                   <h2 className="text-white text-3xl leading-none mb-2">
                     Create Vaults
@@ -270,9 +270,9 @@ export default function Products(): JSX.Element {
             </Link>
             <Link
               href={(!!query?.ref && isAddress(query.ref as string)) ? `stats?ref=${query.ref}` : `stats`}
-              className="rounded w-full relative flex flex-col bg-customNeutral300 border border-customNeutral100 border-opacity-75 smmd:items-center py-6 px-8 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:bg-customNeutral200"
+              className="rounded w-full h-[128px] relative flex flex-col bg-customNeutral300 border border-customNeutral100 border-opacity-75 smmd:items-center py-6 px-6 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:bg-customNeutral200"
             >
-              <div className="col-span-12 md:col-span-4 xs:self-start flex-1">
+              <div className="col-span-12 md:col-span-4 xs:self-start">
                 <div className="relative flex flex-row">
                   <h2 className="text-white text-3xl leading-none mb-2">
                     VaultCraft Stats
@@ -282,7 +282,8 @@ export default function Products(): JSX.Element {
               </div>
             </Link>
             <div
-              className="rounded w-full relative flex flex-col bg-customNeutral300 border border-customNeutral100 border-opacity-75 smmd:items-center py-6 px-8 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:bg-customNeutral200"
+              className="rounded w-full h-[128px] relative flex flex-col bg-customNeutral300 border border-customNeutral100 border-opacity-75 smmd:items-center
+              py-6 px-6 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:bg-customNeutral200"
             >
               <CopyToClipboard
                 text={`https://app.vaultcraft.io/vaults?ref=${account}`}
@@ -291,7 +292,7 @@ export default function Products(): JSX.Element {
                   : showErrorToast("Connect your Wallet to copy referal link")
                 }
               >
-                <div className="col-span-12 md:col-span-4 xs:self-start flex-1">
+                <div className="col-span-12 md:col-span-4 xs:self-start">
                   <div className="relative flex flex-row">
                     <h2 className="text-white text-3xl leading-none mb-2">
                       Copy referral link
