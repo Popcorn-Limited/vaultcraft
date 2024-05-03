@@ -84,7 +84,7 @@ export async function getTokenAndVaultsData({
 
   // calc vault tvl
   Object.values(vaultsData).forEach(vault => {
-    vault.tvl = (vault.totalAssets * vaults[vault.address].price) / (10 ** assets[vault.asset].decimals);
+    vault.tvl = (vault.totalAssets * assets[vault.asset].price) / (10 ** assets[vault.asset].decimals);
   });
 
   const gaugeTokens: TokenByAddress = {}

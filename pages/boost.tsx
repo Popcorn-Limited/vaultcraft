@@ -1,11 +1,12 @@
 import NoSSR from "react-no-ssr";
 import {
+  mainnet,
   useAccount,
   useBalance,
   usePublicClient,
   useWalletClient,
 } from "wagmi";
-import { Address, WalletClient } from "viem";
+import { Address, WalletClient, createPublicClient, http } from "viem";
 import { useEffect, useState } from "react";
 import { VoteData, hasAlreadyVoted } from "@/lib/gauges/hasAlreadyVoted";
 import { AddressesByChain, VaultData } from "@/lib/types";
@@ -25,11 +26,13 @@ import NetworkFilter from "@/components/network/NetworkFilter";
 import SearchBar from "@/components/input/SearchBar";
 import VaultsSorting from "@/components/vault/VaultsSorting";
 import useNetworkFilter from "@/lib/useNetworkFilter";
-import { VOTING_ESCROW } from "@/lib/constants";
+import { TOKEN_ADMIN, TokenAdminAbi, VOTING_ESCROW } from "@/lib/constants";
 import Modal from "@/components/modal/Modal";
 import BridgeModal from "@/components/bridge/BridgeModal";
 import axios from "axios";
 import BroadcastVeBalanceInterface from "@/components/boost/modals/manage/BroadcastVeBalanceInterface";
+import { RPC_URLS } from "@/lib/utils/connectors";
+import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 
 export const GAUGE_NETWORKS = [1, 10, 42161]
 
@@ -59,6 +62,7 @@ function VePopContainer() {
     token: VOTING_ESCROW,
     watch: true,
   });
+  const [weeklyEmissions, setWeeklyEmissions] = useState<number>(0)
 
   const [initalLoad, setInitalLoad] = useState<boolean>(false);
   const [accountLoad, setAccountLoad] = useState<boolean>(false);
@@ -87,18 +91,29 @@ function VePopContainer() {
       setInitalLoad(true);
       if (account) setAccountLoad(true);
 
-
       const _hiddenGauges = await getHiddenGauges();
       setHiddenGauges(_hiddenGauges);
 
       const vaultsWithGauges = Object.values(vaults).flat().filter((vault) => !!vault.gauge)
       setGaugeVaults(vaultsWithGauges);
 
+      const rate = await createPublicClient({
+        chain: mainnet,
+        transport: http(RPC_URLS[1]),
+      }).readContract({
+        address: TOKEN_ADMIN,
+        abi: TokenAdminAbi,
+        functionName: "rate",
+      });
+      // Emissions per second * seconds per week
+      setWeeklyEmissions((Number(rate) / 1e18) * 604800)
+
       if (
         vaultsWithGauges.length > 0 &&
         Object.keys(votes).length === 0 &&
         publicClient.chain.id === 1
       ) {
+
         const initialVotes: { [key: Address]: number } = {};
         const voteUserSlopesData = await voteUserSlopes({
           gaugeAddresses: vaultsWithGauges?.map(
@@ -190,6 +205,14 @@ function VePopContainer() {
             <p className="text-base text-white opacity-80">
               You can only vote once every 10 days and your vote persists until you change it.
             </p>
+          </div>
+          <div className="bg-customNeutral200 border border-customNeutral100 rounded-lg px-6 py-4">
+            <p className="text-base opacity-80">Emissions per week</p>
+            <div className="flex flex-row items-center justify-between">
+              <img src={"/images/tokens/oVcx.svg"}
+                alt="token icon" className="w-6 h-6 object-contain rounded-full" />
+              <p className="font-bold text-xl">{NumberFormatter.format(weeklyEmissions)} oVCX</p>
+            </div>
           </div>
         </section>
 
