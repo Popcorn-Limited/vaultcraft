@@ -35,9 +35,11 @@ export default function VaultStats({
         id={`${baseTooltipId}-deposit`}
         label="Your Deposit"
         value={`$ ${account
-          ? formatAndRoundNumber(
-            (!!gauge ? gauge.balance : vault.balance) * vault.price,
-            vault.decimals)
+          ?
+          `${!!gauge ?
+            NumberFormatter.format(((gauge.balance * gauge.price) / 10 ** gauge.decimals) + ((vault?.balance! * vault?.price!) / 10 ** vault?.decimals!))
+            : formatAndRoundNumber(vault?.balance! * vault?.price!, vault?.decimals!)
+          }`
           : "0"}`}
         tooltip="Value of your vault deposits"
       />

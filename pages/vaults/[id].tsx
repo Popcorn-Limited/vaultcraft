@@ -177,7 +177,7 @@ export default function Index() {
                     <div className="text-3xl font-bold whitespace-nowrap text-white">
                       {vaultData ?
                         `${!!gauge ?
-                          formatAndRoundNumber(gauge.balance * gauge.price, gauge.decimals)
+                          NumberFormatter.format(((gauge.balance * gauge.price) / 10 ** gauge.decimals) + ((vault?.balance! * vault?.price!) / 10 ** vault?.decimals!))
                           : formatAndRoundNumber(vault?.balance! * vault?.price!, vault?.decimals!)
                         }` : "0"}
                     </div>
