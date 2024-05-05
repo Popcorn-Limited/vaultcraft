@@ -146,6 +146,8 @@ export default function ExerciseOptionTokenInterface({ chainId, setShowModal }: 
       }
     }
 
+    console.log({ amount, maxPaymentAmount })
+
     const stepsCopy = [...steps];
     const currentStep = stepsCopy[stepCounter];
     currentStep.loading = true;
@@ -156,7 +158,7 @@ export default function ExerciseOptionTokenInterface({ chainId, setShowModal }: 
       case 0:
         success = await handleAllowance({
           token: WethByChain[chainId],
-          amount: Number(amount) * 10 ** 18 || 0,
+          amount: Number(maxPaymentAmount) * 10 ** 18 || 0,
           account: account as Address,
           spender: ExerciseByChain[chainId],
           clients: {
@@ -180,8 +182,8 @@ export default function ExerciseOptionTokenInterface({ chainId, setShowModal }: 
       case 2:
         success = await exerciseOPop({
           account: account as Address,
-          amount: parseEther(
-            Number(amount).toLocaleString("fullwide", { useGrouping: false })
+          amount: BigInt(
+            (Number(amount) * 10 ** 18).toLocaleString("fullwide", { useGrouping: false })
           ),
           maxPaymentAmount: parseEther(maxPaymentAmount),
           address: ExerciseByChain[chainId],
