@@ -47,16 +47,23 @@ export default function Navbar(): JSX.Element {
   const [vaults] = useAtom(vaultsAtom)
   const [showLendModal, setShowLendModal] = useState(false)
 
+  const [vaultData, setVaultData] = useState<VaultData>({ chainId: chain?.id || 1, asset: { address: "" } } as unknown as VaultData)
+
+  useEffect(() => {
+    if (chain && Object.keys(query).length > 0 && Object.keys(vaults).length > 0) {
+      const chainIdQuery = query?.chainId! as string
+      const chainId = Number(chainIdQuery.replace("?", "").replace("&", ""))
+      const foundVault = vaults[chainId].find(vault => vault.address === query?.id)
+      if (foundVault) setVaultData(foundVault)
+    }
+  }, [query, chain])
+
   return (
     <>
-      {(chain && Object.keys(vaults).length > 0) &&
+      {(chain && Object.keys(vaultData).length > 0) &&
         <ManageLoanInterface
           visibilityState={[showLendModal, setShowLendModal]}
-          vaultData={query?.id && query?.chainId ?
-            (vaults[Number(query?.chainId)].find(vault => vault.address === query?.id)
-              || ({ chainId: chain.id || 1, asset: { address: "" } } as unknown as VaultData))
-            : ({ chainId: chain.id || 1, asset: { address: "" } } as unknown as VaultData)
-          }
+          vaultData={vaultData}
         />
       }
       <div className="flex flex-row items-center justify-between w-full py-8 px-4 md:px-8 z-10">

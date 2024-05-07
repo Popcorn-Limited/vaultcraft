@@ -49,8 +49,9 @@ export default function Index() {
   const [gauge, setGauge] = useState<Token>();
 
   useEffect(() => {
-    if (!vaultData && query && yieldOptions && Object.keys(vaults).length > 0) {
-      const chainId = Number(query?.chainId)
+    if (!vaultData && yieldOptions && Object.keys(query).length > 0 && Object.keys(vaults).length > 0) {
+      const chainIdQuery = query?.chainId! as string
+      const chainId = Number(chainIdQuery.replace("?", "").replace("&", ""))
       const foundVault = vaults[chainId].find(vault => vault.address === query?.id)
       if (foundVault) {
         const newTokenOptions = [
