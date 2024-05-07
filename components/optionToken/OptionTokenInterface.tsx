@@ -41,12 +41,6 @@ export default function OptionTokenInterface({ setShowOptionTokenModal }: Option
     watch: true,
   });
 
-  const [vcxPrice, setVcxPrice] = useState<number>(0);
-
-  useEffect(() => {
-    llama({ address: VCX, chainId: 1 }).then((res: number) => setVcxPrice(res));
-  }, []);
-
   async function handleClaim(chainId: number) {
     const success = await claimOPop({
       gauges: gaugeRewards[chainId].amounts
@@ -95,9 +89,9 @@ export default function OptionTokenInterface({ setShowOptionTokenModal }: Option
             <p className="ml-2">Mainnet Claimable oVCX</p>
           </div>
           <p className="font-bold">
-            {`$${(gaugeRewards && gaugeRewards[1] && vcxPrice > 0)
+            {`$${(gaugeRewards && gaugeRewards[1] && tokens?.[1]?.[VCX]?.price > 0)
               ? NumberFormatter.format(
-                (Number(gaugeRewards[1].total) * (vcxPrice * 0.25)) / 1e18
+                (Number(gaugeRewards[1].total) / 1e18) * (tokens?.[1]?.[VCX]?.price * 0.25)
               )
               : "0"
               }`}
@@ -117,9 +111,9 @@ export default function OptionTokenInterface({ setShowOptionTokenModal }: Option
             <p className="ml-2">Optimism Claimable oVCX</p>
           </div>
           <p className="font-bold">
-            {`$${(gaugeRewards && gaugeRewards[10] && vcxPrice > 0)
+            {`$${(gaugeRewards && gaugeRewards[10] && tokens?.[1]?.[VCX]?.price > 0)
               ? NumberFormatter.format(
-                (Number(gaugeRewards[10].total) * (vcxPrice * 0.25)) / 1e18
+                (Number(gaugeRewards[10].total) / 1e18) * (tokens?.[1]?.[VCX]?.price * 0.25)
               )
               : "0"
               }`}
@@ -139,9 +133,9 @@ export default function OptionTokenInterface({ setShowOptionTokenModal }: Option
             <p className="ml-2">Arbitrum Claimable oVCX</p>
           </div>
           <p className="font-bold">
-            {`$${(gaugeRewards && gaugeRewards[42161] && vcxPrice > 0)
+            {`$${(gaugeRewards && gaugeRewards[42161] && tokens?.[1]?.[VCX]?.price > 0)
               ? NumberFormatter.format(
-                (Number(gaugeRewards[42161].total) * (vcxPrice * 0.25)) / 1e18
+                (Number(gaugeRewards[42161].total) / 1e18) * (tokens?.[1]?.[VCX]?.price * 0.25)
               )
               : "0"
               }`}
@@ -160,9 +154,9 @@ export default function OptionTokenInterface({ setShowOptionTokenModal }: Option
             <p className="ml-2">My oVCX</p>
           </div>
           <p className="font-bold">
-            {`$${oBal && vcxPrice > 0
+            {`$${oBal && tokens?.[1]?.[VCX]?.price > 0
               ? NumberFormatter.format(
-                (Number(oBal?.value) * (vcxPrice * 0.25)) / 1e18
+                (Number(oBal?.value) / 1e18) * (tokens?.[1]?.[VCX]?.price * 0.25)
               )
               : "0"
               }`}

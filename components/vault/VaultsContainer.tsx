@@ -126,7 +126,7 @@ export default function VaultsContainer({
                 <div className="w-max text-3xl font-bold whitespace-nowrap text-white">
                   {`$${gaugeRewards && tokens[1] && tokens[1][VCX]
                     ? NumberFormatter.format(
-                      Number(gaugeRewards?.[1]?.total + gaugeRewards?.[10]?.total + gaugeRewards?.[42161]?.total || 0) / 1e18 *
+                      (Number(gaugeRewards?.[1]?.total + gaugeRewards?.[10]?.total + gaugeRewards?.[42161]?.total || 0) / 1e18) *
                       (tokens[1][VCX].price * 0.25)
                     )
                     : "0"
