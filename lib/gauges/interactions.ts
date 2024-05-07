@@ -343,7 +343,7 @@ export async function transmitRewards({ gauges, account, address, clients }
       abi: RootGaugeFactoryAbi,
       functionName: "transmit_emissions_multiple",
       args: [gauges],
-      value: parseEther("0.01")
+      value: parseEther("0.05")
     })
     simRes = { request: request, success: true, error: null }
   } catch (error: any) {
