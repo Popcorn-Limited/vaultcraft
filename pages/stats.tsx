@@ -699,7 +699,7 @@ export default function Vaults() {
             >
               <p className={`text-lg my-auto`}>Total Stats</p>
             </div>
-            <div className={`py-4 px-6 flex gap-[3.5rem]`}>
+            <div className={`py-4 px-6 w-full`}>
               <div className={`flex flex-col grow-1`}>
                 <div className={`flex justify-between`}>
                   <p>Total Revenue</p>
