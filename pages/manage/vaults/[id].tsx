@@ -40,7 +40,15 @@ async function getLogs(vault: VaultData, asset: Token) {
     chain: ChainById[vault.chainId],
     transport: http(RPC_URLS[vault.chainId]),
   })
-  const creationBlockNumber = BigInt("19075227")
+
+  const initLog = await client.getContractEvents({
+    address: vault.address,
+    abi: VaultAbi,
+    eventName: "Initialized",
+    fromBlock: "earliest",
+    toBlock: "latest"
+  })
+  const creationBlockNumber = initLog[0].blockNumber
   const creationBlock = await client.getBlock({ blockNumber: creationBlockNumber })
   const creationTime = new Date(Number(creationBlock.timestamp) * 1000)
   const creationDate = Date.UTC(
