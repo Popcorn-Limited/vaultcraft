@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import NoSSR from "react-no-ssr";
 import { createConfig, erc20ABI, useAccount } from "wagmi";
 import axios from "axios";
-import { Address, createPublicClient, extractChain, http, zeroAddress } from "viem";
+import { Address, createPublicClient, extractChain, http, isAddress, zeroAddress } from "viem";
 import { AdminProxyByChain, MultiStrategyVaultAbi, VaultAbi, VaultControllerByChain } from "@/lib/constants";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 import * as chains from "viem/chains";
@@ -33,6 +33,7 @@ import Modal from "@/components/modal/Modal";
 import { showSuccessToast } from "@/lib/toasts";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { Square2StackIcon } from "@heroicons/react/24/outline";
+import LeftArrowIcon from "@/components/svg/LeftArrowIcon";
 
 async function getLogs(vault: VaultData, asset: Token) {
   const client = createPublicClient({
@@ -275,9 +276,19 @@ export default function Index() {
   return (
     <NoSSR>
       {vaultData ? (
-        <div className="py-10 px-4 md:px-8 text-white">
-          <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-8">
+        <div className="min-h-screen">
+          <button
+            className="border border-customGray500 rounded-lg flex flex-row items-center px-4 py-2 ml-4 md:ml-8 mt-10"
+            type="button"
+            onClick={() => router.push((!!query?.ref && isAddress(query.ref as string)) ? `/manage/vaults?ref=${query.ref}` : "/manage/vaults")}
+          >
+            <div className="w-5 h-5">
+              <LeftArrowIcon color="#FFF" />
+            </div>
+            <p className="text-white leading-0 mt-1 ml-2">Back to Vaults</p>
+          </button>
 
+          <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-8">
             <div className="w-full mb-8">
               <AssetWithName vault={vaultData} size={3} />
             </div>
@@ -348,9 +359,11 @@ export default function Index() {
               </div>
             </div>
           </section>
-          <NetFlowChart logs={logs} asset={asset} />
-          <section>
 
+          <NetFlowChart logs={logs} asset={asset} />
+
+          <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-8">
+            <h2 className="text-white font-bold text-2xl">Vault Settings</h2>
             {account === vaultData.metadata.creator ? (
               <>
                 <TabSelector
@@ -463,16 +476,16 @@ function initBarChart(elem: null | HTMLElement, data: any[], setShowModal: Funct
       credits: {
         enabled: false
       },
+      legend: {
+        itemStyle: { color: "#fff" }
+      },
       plotOptions: {
         column: {
           borderRadius: '25%',
           point: {
             events: {
               click: function () {
-                console.log(
-                  'Category: ' + this.category + ', value: ' + this.y + ', stuff: ' + this.name
-                );
-                setModalContent(data[Number(this.category)].logs)
+                setModalContent(data.find(d => d.day === Number(this.category)).logs)
                 setShowModal(true)
               }
             }
@@ -514,8 +527,6 @@ function NetFlowChart({ logs, asset }: { logs: any[], asset?: Token }): JSX.Elem
   useEffect(() => {
     initBarChart(chartElem.current, logs.filter(log => log.deposits > 0 || log.withdrawals > 0), setShowModal, setModalContent)
   }, [logs])
-
-  console.log(modalContent)
 
   return (
     <>
@@ -564,9 +575,9 @@ function NetFlowChart({ logs, asset }: { logs: any[], asset?: Token }): JSX.Elem
           : <></>
         }
       </Modal>
-      <section>
-        <h2>Vault In- and Outflows</h2>
-        <div className="flex flex-row items-end px-12 pt-12 pb-4 space-x-4">
+      <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-8">
+        <h2 className="text-white font-bold text-2xl">Vault In- and Outflows</h2>
+        <div className="flex flex-row items-end px-12 pt-4 pb-4 space-x-4 text-white">
           <div>
             <p>User Address</p>
             <div className="border border-customGray500 rounded-md p-1">
