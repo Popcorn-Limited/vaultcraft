@@ -216,7 +216,6 @@ export default function VaultRebalance({
                           {asset.symbol}
                         </td>
                       </tr>
-
                   )}
 
                 </tbody>

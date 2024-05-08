@@ -29,6 +29,10 @@ import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import MainActionButton from "@/components/button/MainActionButton";
 import { NumberFormatter, formatAndRoundNumber } from "@/lib/utils/formatBigNumber";
 import { roundToTwoDecimalPlaces } from "@/lib/utils/helpers";
+import Modal from "@/components/modal/Modal";
+import { showSuccessToast } from "@/lib/toasts";
+import CopyToClipboard from "react-copy-to-clipboard";
+import { Square2StackIcon } from "@heroicons/react/24/outline";
 
 async function getLogs(vault: VaultData, asset: Token) {
   const client = createPublicClient({
@@ -344,7 +348,7 @@ export default function Index() {
               </div>
             </div>
           </section>
-          <NetFlowChart logs={logs} />
+          <NetFlowChart logs={logs} asset={asset} />
           <section>
 
             {account === vaultData.metadata.creator ? (
@@ -425,7 +429,7 @@ export default function Index() {
   );
 }
 
-function initBarChart(elem: null | HTMLElement, data: any[]) {
+function initBarChart(elem: null | HTMLElement, data: any[], setShowModal: Function, setModalContent: Function) {
   if (!elem) return;
 
   Highcharts.chart(elem,
@@ -468,6 +472,8 @@ function initBarChart(elem: null | HTMLElement, data: any[]) {
                 console.log(
                   'Category: ' + this.category + ', value: ' + this.y + ', stuff: ' + this.name
                 );
+                setModalContent(data[Number(this.category)].logs)
+                setShowModal(true)
               }
             }
           }
@@ -495,78 +501,137 @@ function initBarChart(elem: null | HTMLElement, data: any[]) {
   );
 }
 
-function NetFlowChart({ logs }: { logs: any[] }): JSX.Element {
+function NetFlowChart({ logs, asset }: { logs: any[], asset?: Token }): JSX.Element {
   const chartElem = useRef(null);
 
-  const [filterAddress, setFilterAddress] = useState<string>("")
+  const [filterAddress, setFilterAddress] = useState<string>("0x")
   const [from, setFrom] = useState<number>(0)
   const [to, setTo] = useState<number>(logs.length - 1)
 
+  const [showModal, setShowModal] = useState(false)
+  const [modalContent, setModalContent] = useState<any[]>([])
+
   useEffect(() => {
-    initBarChart(chartElem.current, logs.filter(log => log.deposits > 0 || log.withdrawals > 0))
+    initBarChart(chartElem.current, logs.filter(log => log.deposits > 0 || log.withdrawals > 0), setShowModal, setModalContent)
   }, [logs])
 
-  return (
-    <section>
-      <h2>Vault In- and Outflows</h2>
-      <div className="flex flex-row items-end px-12 pt-12 pb-4 space-x-4">
-        <div>
-          <p>User Address</p>
-          <div className="border border-customGray500 rounded-md p-1">
-            <InputNumber
-              value={filterAddress}
-              onChange={(e) => setFilterAddress(e.currentTarget.value)}
-              type="text"
-            />
-          </div>
-        </div>
-        <div>
-          <p>From</p>
-          <div className="border border-customGray500 rounded-md p-1">
-            <InputNumber
-              value={from}
-              onChange={(e) => setFrom(Number(e.currentTarget.value))}
-              type="number"
-            />
-          </div>
-        </div>
-        <div>
-          <p>To</p>
-          <div className="border border-customGray500 rounded-md p-1">
-            <InputNumber
-              value={to}
-              onChange={(e) => setTo(Number(e.currentTarget.value))}
-              type="number"
-            />
-          </div>
-        </div>
-        <div className="w-40">
-          <MainActionButton
-            label="Filter"
-            handleClick={() =>
-              initBarChart(
-                chartElem.current,
-                logs.filter((_, i) => i >= from && i <= to)
-                  .filter(entry => filterAddress === "" ? true : entry.logs.some((log: any) => log.args.owner.toLowerCase().includes(filterAddress)))
-                  .filter(log => log.deposits > 0 || log.withdrawals > 0)
-              )
-            }
-          />
-        </div>
-        <div className="w-40">
-          <SecondaryActionButton
-            label="Reset"
-            handleClick={() => {
-              setFilterAddress("");
-              setFrom(0);
-              setTo(logs.length - 1);
-              initBarChart(chartElem.current, logs.filter(log => log.deposits > 0 || log.withdrawals > 0))
-            }}
-          />
-        </div>
+  console.log(modalContent)
 
-      </div>
-      <div className={`flex justify-center`} ref={chartElem} />
-    </section>
+  return (
+    <>
+      <Modal visibility={[showModal, setShowModal]}>
+        {modalContent.length > 0 ?
+          <table className="table-auto w-full">
+            <thead>
+              <tr>
+                <th scope="col" className="py-3.5 pl-4 pr-3 text-left font-semibold sm:pl-0">Type</th>
+                <th scope="col" className="px-3 py-3.5 text-left font-semibold">Value</th>
+                <th scope="col" className="px-3 py-3.5 text-left font-semibold">Address</th>
+                <th scope="col" className="px-3 py-3.5 text-left font-semibold">Tx Hash</th>
+              </tr>
+            </thead>
+            <tbody>
+              {modalContent.map(log =>
+                <tr key={log.transactionHash}>
+                  <td className="whitespace-nowrap py-4 pl-4 pr-3 font-medium sm:pl-0">
+                    <h2 className="text-lg text-white text-start">
+                      {log.eventName}
+                    </h2>
+                  </td>
+
+                  <td className="whitespace-nowrap px-3 py-4 text-gray-500 text-start">
+                    {Number(log.args.assets) / (10 ** asset?.decimals!)} {asset?.symbol!}
+                  </td>
+
+                  <td className="whitespace-nowrap px-3 py-4 text-gray-500 text-start">
+                    {log.args.owner}
+                  </td>
+
+                  <td className="whitespace-nowrap px-3 py-4 text-gray-500">
+                    <div className="flex flex-row items-center justify-between">
+                      {log.transactionHash.slice(0, 4)}...{log.transactionHash.slice(-4)}
+                      <div className='w-6 h-6 cursor-pointer group/txHash'>
+                        <CopyToClipboard text={log.transactionHash} onCopy={() => showSuccessToast("Tx Hash copied!")}>
+                          <Square2StackIcon className="text-white group-hover/txHash:text-primaryYellow" />
+                        </CopyToClipboard>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+          : <></>
+        }
+      </Modal>
+      <section>
+        <h2>Vault In- and Outflows</h2>
+        <div className="flex flex-row items-end px-12 pt-12 pb-4 space-x-4">
+          <div>
+            <p>User Address</p>
+            <div className="border border-customGray500 rounded-md p-1">
+              <InputNumber
+                value={filterAddress}
+                onChange={(e) => setFilterAddress(e.currentTarget.value)}
+                type="text"
+              />
+            </div>
+          </div>
+          <div>
+            <p>From</p>
+            <div className="border border-customGray500 rounded-md p-1">
+              <InputNumber
+                value={from}
+                onChange={(e) => setFrom(Number(e.currentTarget.value))}
+                type="number"
+              />
+            </div>
+          </div>
+          <div>
+            <p>To</p>
+            <div className="border border-customGray500 rounded-md p-1">
+              <InputNumber
+                value={to}
+                onChange={(e) => setTo(Number(e.currentTarget.value))}
+                type="number"
+              />
+            </div>
+          </div>
+          <div className="w-40">
+            <MainActionButton
+              label="Filter"
+              handleClick={() =>
+                initBarChart(
+                  chartElem.current,
+                  logs.filter((_, i) => i >= from && i <= to)
+                    .filter(entry => filterAddress === "" ? true : entry.logs.some((log: any) => log.args.owner.toLowerCase().includes(filterAddress)))
+                    .filter(log => log.deposits > 0 || log.withdrawals > 0),
+                  setShowModal,
+                  setModalContent
+                )
+              }
+            />
+          </div>
+          <div className="w-40">
+            <SecondaryActionButton
+              label="Reset"
+              handleClick={() => {
+                setFilterAddress("0x");
+                setFrom(0);
+                setTo(logs.length - 1);
+                initBarChart(
+                  chartElem.current,
+                  logs.filter(log => log.deposits > 0 || log.withdrawals > 0),
+                  setShowModal,
+                  setModalContent
+                )
+              }}
+            />
+          </div>
+
+        </div>
+        <div className={`flex justify-center`} ref={chartElem} />
+      </section>
+    </>
   )
 }
