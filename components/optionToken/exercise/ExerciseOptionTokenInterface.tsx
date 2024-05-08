@@ -224,7 +224,7 @@ export default function ExerciseOptionTokenInterface({ chainId, setShowModal }: 
           <p className="text-white font-semibold">
             Strike Price: $ {formatNumber(strikePrice)} | oVCX Price: ${" "}
             {formatNumber(vcxPrice - strikePrice)} | VCX Price: $ {formatNumber(vcxPrice)} | Discount:{" "}
-            {((10_000 - oVcxDiscount) / 100).toFixed(2)} %
+            {((1 - (strikePrice / vcxPrice)) * 100).toFixed(2)} %
           </p>
 
           <div className="mt-8">
