@@ -54,35 +54,70 @@ export default function ManageVault() {
       <section className="grid grid-cols-1 md:grid-cols-3 gap-4 px-4 md:px-8">
         {account ? <>
           {vaults.length > 0 ? (
-            vaults
-              .filter((vault) => selectedNetworks.includes(vault.chainId))
-              .filter((vault) => vault.metadata.creator === account)
-              .map((vault) => {
-                return (
-                  <div
-                    key={`${vault.chainId}-${vault.address}`}
-                    className="w-full flex flex-wrap items-center justify-between flex-col gap-4 px-8 pt-6 pb-5 rounded-3xl border border-customNeutral100 group hover:bg-customNeutral200 [&_summary::-webkit-details-marker]:hidden cursor-pointer"
-                    onClick={() =>
-                      router.push(
-                        `/manage/vaults/${vault.address}?chainId=${vault.chainId}`
-                      )
-                    }
-                  >
-                    <div className="flex items-center justify-between select-none w-full">
-                      <AssetWithName vault={vault} />
-                    </div>
+            <>
+              <>
+                {vaults
+                  .filter((vault) => selectedNetworks.includes(vault.chainId))
+                  .filter((vault) => vault.metadata.creator === account)
+                  .map((vault) => {
+                    return (
+                      <div
+                        key={`${vault.chainId}-${vault.address}`}
+                        className="w-full flex flex-wrap items-center justify-between flex-col gap-4 px-8 pt-6 pb-5 rounded-3xl border border-customNeutral100 group hover:bg-customNeutral200 [&_summary::-webkit-details-marker]:hidden cursor-pointer"
+                        onClick={() =>
+                          router.push(
+                            `/manage/vaults/${vault.address}?chainId=${vault.chainId}`
+                          )
+                        }
+                      >
+                        <div className="flex items-center justify-between select-none w-full">
+                          <AssetWithName vault={vault} />
+                        </div>
 
-                    <VaultStats
-                      vaultData={vault}
-                      asset={tokens[vault.chainId][vault.asset]}
-                      vault={tokens[vault.chainId][vault.vault]}
-                      gauge={vault.gauge ? tokens[vault.chainId][vault.gauge] : undefined}
-                      account={account}
-                      zapAvailable={false}
-                    />
-                  </div>
-                );
-              })
+                        <VaultStats
+                          vaultData={vault}
+                          asset={tokens[vault.chainId][vault.asset]}
+                          vault={tokens[vault.chainId][vault.vault]}
+                          gauge={vault.gauge ? tokens[vault.chainId][vault.gauge] : undefined}
+                          account={account}
+                          zapAvailable={false}
+                        />
+                      </div>
+                    );
+                  })}
+              </>
+              <>
+                {vaults
+                  .filter((vault) => selectedNetworks.includes(vault.chainId))
+                  .filter((vault) => vault.metadata.creator !== account)
+                  .map((vault) => {
+                    return (
+                      <div
+                        key={`${vault.chainId}-${vault.address}`}
+                        className="w-full flex flex-wrap items-center justify-between flex-col gap-4 px-8 pt-6 pb-5 rounded-3xl border border-customNeutral100 group hover:bg-customNeutral200 [&_summary::-webkit-details-marker]:hidden cursor-pointer"
+                        onClick={() =>
+                          router.push(
+                            `/manage/vaults/${vault.address}?chainId=${vault.chainId}`
+                          )
+                        }
+                      >
+                        <div className="flex items-center justify-between select-none w-full">
+                          <AssetWithName vault={vault} />
+                        </div>
+
+                        <VaultStats
+                          vaultData={vault}
+                          asset={tokens[vault.chainId][vault.asset]}
+                          vault={tokens[vault.chainId][vault.vault]}
+                          gauge={vault.gauge ? tokens[vault.chainId][vault.gauge] : undefined}
+                          account={account}
+                          zapAvailable={false}
+                        />
+                      </div>
+                    );
+                  })}
+              </>
+            </>
           ) : (
             <p className="text-white">Loading Vaults...</p>
           )}
