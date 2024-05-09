@@ -32,6 +32,9 @@ export default async function getGaugeRewards({ gauges, account, publicClient, c
     }),
     allowFailure: true,
   });
+
+  console.log({ chainId, gauges, data, account })
+
   const successfullCalls = data.filter((d) => d.status !== "failure");
   if (successfullCalls.length === 0) return { total: ZERO, amounts: [] };
 

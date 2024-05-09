@@ -81,7 +81,8 @@ export default function ExerciseOptionTokenInterface({ chainId, setShowModal }: 
         abi: BalancerOracleAbi,
         functionName: "getPrice",
       });
-      const strikePriceInUsd = (Number(strikePriceRes) / 1e18) * tokens[1][WETH].price;
+
+      const strikePriceInUsd = (Number(strikePriceRes) * tokens[1][WETH].price) / 1e18;
 
       setWethPrice(tokens[1][WETH].price);
       setVCXPrice(tokens[1][VCX].price);
