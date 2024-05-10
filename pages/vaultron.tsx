@@ -22,13 +22,9 @@ export default function Vaultron() {
 
   function handleMercle(tokenId: number) {
     if (!window) return
-    if (tokenId === 0) {
-      // @ts-ignore
-      window.open("https://app.mercle.xyz/vaultcraft/events", '_blank').focus()
-    } else {
-      // @ts-ignore
-      window.open("https://app.mercle.xyz/vaultcraft/events/profile", '_blank').focus()
-    }
+
+    // @ts-ignore
+    window.open("https://app.mercle.xyz/vaultcraft/events", '_blank').focus()
   }
 
   function handleOpensea(tokenId: number) {
