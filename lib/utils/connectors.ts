@@ -50,7 +50,7 @@ export const networkLogos: { [key: number]: string } = {
   [ChainId.RemoteFork]: "/images/networks/ethTestnet.svg",
   [ChainId.EthSepolia]: "/images/networks/ethTestnet.svg",
   [ChainId.ArbSepolia]: "/images/networks/arbTestnet.svg",
-  [ChainId.XLayer]: "https://static.okx.com/cdn/assets/imgs/243/230501A8E74482AB.png"
+  [ChainId.XLayer]: "/images/networks/xLayer.png"
 };
 export const RPC_URLS: { [key: number]: string } = {
   [ChainId.Ethereum]: `https://eth-mainnet.alchemyapi.io/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`,
