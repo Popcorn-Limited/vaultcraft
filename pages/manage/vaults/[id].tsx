@@ -296,70 +296,85 @@ export default function Index() {
             <p className="text-white leading-0 mt-1 ml-2">Back to Vaults</p>
           </button>
 
-          <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-8">
+          <section className="md:border-b border-customNeutral100 pt-10 pb-6 px-4 md:px-8">
             <div className="w-full mb-8">
               <AssetWithName vault={vaultData} size={3} />
             </div>
 
             <div className="w-full md:flex md:flex-row md:justify-between space-y-4 md:space-y-0 mt-4 md:mt-0">
-              <div className="flex flex-wrap md:flex-row md:items-center md:pr-10 gap-4 md:gap-10 md:w-fit">
+              <div className="flex flex-wrap md:flex-row md:pr-10 md:w-fit gap-y-4 md:gap-10">
 
-                <div className="w-[120px] md:w-max">
+                <div className="w-1/2 md:w-[120px]">
                   <p className="leading-6 text-base text-customGray100 md:text-white">
                     Your Wallet
                   </p>
-                  <div className="text-3xl font-bold whitespace-nowrap text-white">
+                  <p className="text-3xl font-bold whitespace-nowrap text-white leading-0">
+                    {asset ? `$ ${formatAndRoundNumber(
+                      asset.balance * asset.price,
+                      asset.decimals
+                    )}` : "$ 0"}
+                  </p>
+                  <p className="text-xl whitespace-nowrap text-customGray300 -mt-2">
                     {asset ? `${formatAndRoundNumber(
                       asset.balance,
                       asset.decimals
-                    )}` : "0"}
-                  </div>
+                    )} TKN` : "0 TKN"}
+                  </p>
                 </div>
 
-                <div className="w-[120px] md:w-max">
+                <div className="w-1/2 md:w-[120px]">
                   <p className="leading-6 text-base text-customGray100 md:text-white">
                     Deposits
                   </p>
-                  <div className="text-3xl font-bold whitespace-nowrap text-white">
+                  <p className="text-3xl font-bold whitespace-nowrap text-white">
                     {vaultData ?
                       `${!!gauge ?
                         NumberFormatter.format(((gauge.balance * gauge.price) / 10 ** gauge.decimals) + ((vault?.balance! * vault?.price!) / 10 ** vault?.decimals!))
                         : formatAndRoundNumber(vault?.balance! * vault?.price!, vault?.decimals!)
                       }` : "0"}
-                  </div>
+                  </p>
+                  <p className="text-xl whitespace-nowrap text-customGray300 -mt-2">
+                    {`${!!gauge ?
+                      NumberFormatter.format(((gauge.balance) / 10 ** gauge.decimals) + ((vault?.balance!) / 10 ** vault?.decimals!))
+                      : formatAndRoundNumber(vault?.balance!, vault?.decimals!)
+                      } TKN`}
+                  </p>
                 </div>
 
-                <div className="w-[120px] md:w-max">
+                <div className="w-1/2 md:w-max">
                   <p className="leading-6 text-base text-customGray100 md:text-white">TVL</p>
-                  <div className="text-3xl font-bold whitespace-nowrap text-white">
+                  <p className="text-3xl font-bold whitespace-nowrap text-white">
                     $ {vaultData.tvl < 1 ? "0" : NumberFormatter.format(vaultData.tvl)}
-                  </div>
+                  </p>
+                  <p className="text-xl whitespace-nowrap text-customGray300 -mt-2">
+                    {asset ? `${formatAndRoundNumber(vaultData.totalAssets, asset.decimals)} TKN` : "0 TKN"}
+                  </p>
                 </div>
 
-                <div className="w-[120px] md:w-max">
+                <div className="w-1/2 md:w-max">
                   <p className="w-max leading-6 text-base text-customGray100 md:text-white">vAPY</p>
-                  <div className="text-3xl font-bold whitespace-nowrap text-white">
+                  <p className="text-3xl font-bold whitespace-nowrap text-white">
                     {`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.apy))} %`}
-                  </div>
+                  </p>
                 </div>
                 {
                   vaultData.minGaugeApy ? (
-                    <div className="w-[120px] md:w-max">
+                    <div className="w-1/2 md:w-max">
                       <p className="w-max leading-6 text-base text-customGray100 md:text-white">Min Rewards</p>
-                      <div className="text-3xl font-bold whitespace-nowrap text-white">
+                      <p className="text-3xl font-bold whitespace-nowrap text-white">
                         {`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.minGaugeApy))} %`}
-                      </div>
+                      </p>
                     </div>
                   )
                     : <></>
                 }
                 {
                   vaultData.maxGaugeApy ? (
-                    <div className="w-[120px] md:w-max">
+                    <div className="w-1/2 md:w-max">
                       <p className="w-max leading-6 text-base text-customGray100 md:text-white">Max Rewards</p>
-                      <div className="text-3xl font-bold whitespace-nowrap text-white">
+                      <p className="text-3xl font-bold whitespace-nowrap text-white">
                         {`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.maxGaugeApy))} %`}
-                      </div>
+                      </p>
                     </div>
                   )
                     : <></>
