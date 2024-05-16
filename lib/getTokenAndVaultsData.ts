@@ -5,7 +5,7 @@ import {
   http,
   zeroAddress,
 } from "viem";
-import { PublicClient, erc20ABI } from "wagmi";
+import { PublicClient, erc20ABI, mainnet } from "wagmi";
 import axios from "axios";
 import { VaultAbi } from "@/lib/constants/abi/Vault";
 import { GaugeData, Token, TokenByAddress, TokenType, VaultData, VaultDataByAddress, VaultLabel } from "@/lib/types";
@@ -15,6 +15,7 @@ import { ProtocolName, YieldOptions } from "vaultcraft-sdk";
 import { AavePoolUiAbi } from "@/lib/constants/abi/Aave";
 import { GAUGE_NETWORKS } from "pages/boost";
 import { AavePoolAddressProviderByChain, AaveUiPoolProviderByChain } from "@/lib/external/aave";
+import { vcx as getVcxPrice } from "@/lib/resolver/price/resolver";
 
 const STRATEGY_TO_ALTERNATE_ASSET: { [key: Address]: Address } = {
   "0x9E0c5d524dc3Ff0aa734c52aa57ab623436364e6": "0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee",
@@ -249,17 +250,6 @@ async function prepareVaultsData(chainId: number, client: PublicClient): Promise
   return result
 }
 
-async function getVCXPrice(): Promise<number> {
-  try {
-    const { data } = await axios.get("https://api.dexscreener.com/latest/dex/pairs/ethereum/0x577a7f7ee659aa14dc16fd384b3f8078e23f1920000200000000000000000633-0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2-0xcE246eEa10988C495B4A90a905Ee9237a0f91543");
-
-    return Number(data.pair.priceUsd)
-  } catch (e) {
-    console.log("error fetching vcx price: ", e)
-    return 0.08563
-  }
-}
-
 async function prepareAssets(addresses: Address[], chainId: number, client: PublicClient): Promise<TokenByAddress> {
   const { data: assets } = await axios.get(
     `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/assets/tokens/${chainId}.json`
@@ -273,7 +263,7 @@ async function prepareAssets(addresses: Address[], chainId: number, client: Publ
     )}`
   );
 
-  const vcxPrice = await getVCXPrice()
+  const vcxPrice = await getVcxPrice({ address: VCX, chainId: mainnet.id, client: undefined })
 
   const ts = await client.multicall({
     contracts: addresses
