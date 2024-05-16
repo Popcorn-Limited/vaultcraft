@@ -1,7 +1,7 @@
 import axios from "axios";
 import { PriceResolverParams } from "..";
 
-const FALLBACK_PRICE = 0.084624
+const FALLBACK_PRICE = 0.09412
 
 export async function vcx({
   address,
@@ -9,7 +9,7 @@ export async function vcx({
   client,
 }: PriceResolverParams): Promise<number> {
   try {
-    const { data } = await axios.get("https://api.dexscreener.com/latest/dex/pairs/ethereum/0x577a7f7ee659aa14dc16fd384b3f8078e23f1920000200000000000000000633-0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2-0xcE246eEa10988C495B4A90a905Ee9237a0f91543");
+    const { data } = await axios.get("https://api.dexscreener.com/latest/dex/pairs/ethereum/0x577A7f7EE659Aa14Dc16FD384B3F8078E23F1920");
 
     return Number(data.pair.priceUsd)
   } catch (e) {
