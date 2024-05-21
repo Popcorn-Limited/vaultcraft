@@ -118,7 +118,7 @@ export default function BridgeModal({ show }: { show: [boolean, Dispatch<SetStat
             Number(val).toLocaleString("fullwide", { useGrouping: false })
           ),
           slippage: 0,
-          callData: encodeAbiParameters([{ name: "recipient", type: "address" }], [account!]),
+          callData: "0x", // encodeAbiParameters([{ name: "recipient", type: "address" }], [account!]),
           account: account!,
           clients: { publicClient, walletClient: walletClient! },
           chainId
