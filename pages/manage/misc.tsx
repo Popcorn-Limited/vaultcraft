@@ -382,7 +382,7 @@ function BridgeVCX() {
             Number(val).toLocaleString("fullwide", { useGrouping: false })
           ),
           slippage: 0,
-          callData: encodeAbiParameters([{ name: "recipient", type: "address" }], [account!]),
+          callData: chainId === mainnet.id ? "0x" : encodeAbiParameters([{ name: "recipient", type: "address" }], [account!]),
           account: account!,
           clients: { publicClient, walletClient: walletClient! },
           chainId
@@ -467,7 +467,7 @@ function BridgeVCX() {
           </div>
           <div className="mt-6">
             <MainActionButton
-              label={steps[stepCounter].label}
+              label="Bridge"
               handleClick={handleMainAction}
             />
           </div>
