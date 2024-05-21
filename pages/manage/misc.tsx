@@ -467,7 +467,7 @@ function BridgeVCX() {
           </div>
           <div className="mt-6">
             <MainActionButton
-              label="Bridge"
+              label={steps[stepCounter].label}
               handleClick={handleMainAction}
             />
           </div>

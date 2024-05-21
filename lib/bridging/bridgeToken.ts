@@ -3,7 +3,7 @@ import axios from "axios";
 import { PublicClient, mainnet } from "wagmi";
 import { arbitrum, optimism } from "viem/chains";
 import { Clients } from "@/lib/types";
-import { showLoadingToast } from "@/lib/toasts";
+import { showLoadingToast, showSuccessToast } from "@/lib/toasts";
 import { handleCallResult, simulateCall } from "@/lib/utils/helpers";
 import { LockboxAdapterAbi, LockboxAdapterByChain } from "@/lib/constants";
 
@@ -27,7 +27,7 @@ interface BridgeTokenProps {
 }
 
 export default async function bridgeToken({ destination, to, asset, delegate, amount, slippage, callData, account, clients, chainId }: BridgeTokenProps): Promise<boolean> {
-  showLoadingToast("Bridging VCX...");
+  showLoadingToast("Fetching Relayer Fee...");
 
   console.log({ destination, to, asset, delegate, amount, slippage, callData, account, chainId })
 
@@ -37,6 +37,10 @@ export default async function bridgeToken({ destination, to, asset, delegate, am
     destinationDomain: destination,
   })
   console.log({ relayerFee })
+
+  showSuccessToast("Fetched Relayer Fee!");
+
+  showLoadingToast("Bridging VCX...");
 
   return handleCallResult({
     successMessage: "VCX bridged successfully!",
