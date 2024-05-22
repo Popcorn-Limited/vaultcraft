@@ -18,7 +18,7 @@ import {
 import { PlusIcon } from "@heroicons/react/24/outline";
 import TokenIcon from "@/components/common/TokenIcon";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
-import { BalancerOracleAbi, ExerciseByChain, OVCX_ORACLE, OptionTokenByChain, VCX, VcxByChain, WETH, WethByChain, ZERO } from "@/lib/constants";
+import { BalancerOracleAbi, ExerciseByChain, ExerciseOracleByChain, OVCX_ORACLE, OptionTokenByChain, VCX, VcxByChain, WETH, WethByChain, ZERO } from "@/lib/constants";
 import { formatNumber, safeRound } from "@/lib/utils/formatBigNumber";
 import { validateInput } from "@/lib/utils/helpers";
 import { Token } from "@/lib/types";
@@ -77,7 +77,7 @@ export default function ExerciseOptionTokenInterface({ chainId, setShowModal }: 
         functionName: "multiplier",
       });
       const strikePriceRes = await mainnetClient.readContract({
-        address: OVCX_ORACLE,
+        address: ExerciseOracleByChain[chainId],
         abi: BalancerOracleAbi,
         functionName: "getPrice",
       });

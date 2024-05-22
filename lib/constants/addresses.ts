@@ -158,6 +158,11 @@ export const ExerciseOracleByChain: AddressByChain = {
   [arbitrum.id]: "0x8Ee82Ad9919b7D272A732479305133B205dA297F",
 }
 
+export const PushOracleOwnerByChain: AddressByChain = {
+  [optimism.id]: "0xa03fc60b0EdC2b1F99Df84193BD392d1CD84a7dA",
+  [arbitrum.id]: "0xe14b718e95699B40dc0E17b2061d8ee11d75709A"
+}
+
 export const PermissionRegistryByChain: AddressByChain = {
   [mainnet.id]: "0x7a33b5b57C8b235A3519e6C010027c5cebB15CB4",
   [bsc.id]: "0x8c76AA6B65D0619042EAd6DF748f782c89a06357",
