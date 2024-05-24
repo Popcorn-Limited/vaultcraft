@@ -31,7 +31,7 @@ import MainActionButton from "../../button/MainActionButton";
 import { exerciseOPop } from "@/lib/optionToken/interactions";
 import { handleAllowance } from "@/lib/approve";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
-import { RPC_URLS } from "@/lib/utils/connectors";
+import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 
 const SLIPPAGE = 0.01; // @dev adding some slippage to the call -- TODO -> we should later allow users to change that
 
@@ -76,7 +76,7 @@ export default function ExerciseOptionTokenInterface({ chainId, setShowModal }: 
         abi: BalancerOracleAbi,
         functionName: "multiplier",
       });
-      const strikePriceRes = await mainnetClient.readContract({
+      const strikePriceRes = await createPublicClient({ chain: ChainById[chainId], transport: http(RPC_URLS[chainId]) }).readContract({
         address: ExerciseOracleByChain[chainId],
         abi: BalancerOracleAbi,
         functionName: "getPrice",
