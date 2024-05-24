@@ -4,7 +4,9 @@ import {
   Address,
   useAccount,
   useBalance,
+  useNetwork,
   usePublicClient,
+  useSwitchNetwork,
   useWalletClient,
 } from "wagmi";
 import MainActionButton from "@/components/button/MainActionButton";
@@ -26,6 +28,8 @@ interface OptionTokenInterfaceProps {
 }
 
 export default function OptionTokenInterface({ setShowOptionTokenModal }: OptionTokenInterfaceProps): JSX.Element {
+  const { chain } = useNetwork();
+  const { switchNetworkAsync, switchNetwork } = useSwitchNetwork();
   const { address: account } = useAccount();
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
@@ -42,6 +46,14 @@ export default function OptionTokenInterface({ setShowOptionTokenModal }: Option
   });
 
   async function handleClaim(chainId: number) {
+    if (chain?.id !== chainId) {
+      try {
+        await switchNetworkAsync?.(chainId);
+      } catch (error) {
+        return;
+      }
+    }
+
     const success = await claimOPop({
       gauges: gaugeRewards[chainId].amounts
         ?.filter((gauge) => Number(gauge.amount) > 0)

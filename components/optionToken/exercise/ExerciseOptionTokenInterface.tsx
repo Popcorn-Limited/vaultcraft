@@ -147,8 +147,6 @@ export default function ExerciseOptionTokenInterface({ chainId, setShowModal }: 
       }
     }
 
-    console.log({ amount, maxPaymentAmount })
-
     const stepsCopy = [...steps];
     const currentStep = stepsCopy[stepCounter];
     currentStep.loading = true;
