@@ -111,7 +111,7 @@ export default function BridgeModal({ show }: { show: [boolean, Dispatch<SetStat
       case 1:
         success = await bridgeToken({
           destination: DestinationIdByChain[1],
-          to: account!,
+          to: chainId === mainnet.id ? account! : LockboxAdapterByChain[mainnet.id],
           asset: XVCXByChain[chainId],
           delegate: account!,
           amount: BigInt(

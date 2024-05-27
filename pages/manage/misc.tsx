@@ -375,7 +375,7 @@ function BridgeVCX() {
       case 1:
         success = await bridgeToken({
           destination: DestinationIdByChain[destChainId],
-          to: account!,
+          to: chainId === mainnet.id ? account! : LockboxAdapterByChain[mainnet.id],
           asset: chainId === mainnet.id ? VCX : XVCXByChain[chainId],
           delegate: account!,
           amount: BigInt(
