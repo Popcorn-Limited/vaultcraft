@@ -83,7 +83,8 @@ export default function Vaultron() {
             {account ?
               <div className="space-y-4 mt-2">
                 <InfoRow label="Your XP" value={vaultronStats.xp} />
-                <InfoRow label="Airdrop Boost" value={vaultronStats.totalXp > 0 ? (vaultronStats.xp / vaultronStats.totalXp) * AIRDROP_VCX : 0} />
+                <InfoRow label="Total XP" value={vaultronStats.totalXp} />
+                <InfoRow label="Your Airdrop Boost" value={vaultronStats.totalXp > 0 ? (vaultronStats.xp / vaultronStats.totalXp) * AIRDROP_VCX : 0} />
               </div>
               : <MainActionButton
                 label="Connect Wallet"

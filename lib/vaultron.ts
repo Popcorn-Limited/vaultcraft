@@ -14,6 +14,22 @@ export const DEFAULT_VAULTRON: VaultronStats = {
 }
 
 export default async function fetchVaultron(account: Address, client: PublicClient): Promise<VaultronStats> {
+  const logs = await client.getContractEvents({
+    address: VAULTRON,
+    abi: VaultronAbi,
+    eventName: "MetadataUpdate",
+    fromBlock: "earliest",
+    toBlock: "latest"
+  })
+  const datas = await client.readContract({
+    address: VAULTRON,
+    abi: VaultronAbi,
+    functionName: "getTokenDetailsBulk",
+    args: [BigInt(1), BigInt(logs.length)]
+  })
+  console.log({ datas })
+  const res = await Promise.all(datas.map(async (d) => axios.get(d.tokenUri)))
+  const totalXp = res.map(r => Number(r.data.properties.XP?.value || 0)).reduce((a, b) => a + b, 0)
   try {
     const tokenId = await client.readContract({
       address: VAULTRON,
@@ -29,22 +45,6 @@ export default async function fetchVaultron(account: Address, client: PublicClie
     })
     const { data } = await axios.get(tokenURI)
 
-    const logs = await client.getContractEvents({
-      address: VAULTRON,
-      abi: VaultronAbi,
-      eventName: "MetadataUpdate",
-      fromBlock: "earliest",
-      toBlock: "latest"
-    })
-    const datas = await client.readContract({
-      address: VAULTRON,
-      abi: VaultronAbi,
-      functionName: "getTokenDetailsBulk",
-      args: [BigInt(1), BigInt(logs.length)]
-    })
-    const res = await Promise.all(datas.map(async (d) => axios.get(d.tokenUri)))
-    const totalXp = res.map(r => Number(r.data.properties.XP?.value || 0)).reduce((a, b) => a + b, 0)
-
     return {
       level: Number(data.properties.Level.value),
       xp: Number(data.properties.XP?.value || 0),
@@ -55,6 +55,6 @@ export default async function fetchVaultron(account: Address, client: PublicClie
     }
   } catch (e) {
     console.log(e)
-    return DEFAULT_VAULTRON
+    return { ...DEFAULT_VAULTRON, totalXp }
   }
 }
