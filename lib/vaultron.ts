@@ -29,11 +29,18 @@ export default async function fetchVaultron(account: Address, client: PublicClie
     })
     const { data } = await axios.get(tokenURI)
 
+    const logs = await client.getContractEvents({
+      address: VAULTRON,
+      abi: VaultronAbi,
+      eventName: "MetadataUpdate",
+      fromBlock: "earliest",
+      toBlock: "latest"
+    })
     const datas = await client.readContract({
       address: VAULTRON,
       abi: VaultronAbi,
       functionName: "getTokenDetailsBulk",
-      args: [BigInt(1), BigInt(620)]
+      args: [BigInt(1), BigInt(logs.length)]
     })
     const res = await Promise.all(datas.map(async (d) => axios.get(d.tokenUri)))
     const totalXp = res.map(r => Number(r.data.properties.XP?.value || 0)).reduce((a, b) => a + b, 0)
