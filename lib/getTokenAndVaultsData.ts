@@ -397,7 +397,9 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
         name: desc.name,
         description: desc.description.split("** - ")[1],
         resolver: desc.resolver,
-        apy
+        apy,
+        apyId: desc["apy-id"],
+        apySource: desc["apy-source"]
       }
     }))
 
@@ -439,7 +441,9 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
         resolver: strategyData.resolver,
         allocation: allocation,
         allocationPerc: allocationPerc,
-        apy: strategyData.apy
+        apy: strategyData.apy,
+        apyId: strategyData.apyId,
+        apySource: strategyData.apySource
       }
 
       // calc blended apy of the vault

@@ -1,6 +1,6 @@
 import AssetWithName from "@/components/vault/AssetWithName";
 import { vaultsAtom } from "@/lib/atoms/vaults";
-import { VaultFees, VaultData, Token } from "@/lib/types";
+import { VaultFees, VaultData, Token, Strategy } from "@/lib/types";
 import { useAtom } from "jotai";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
@@ -44,7 +44,7 @@ async function getLogs(vault: VaultData, asset: Token) {
   const initLog = await client.getContractEvents({
     address: vault.address,
     abi: VaultAbi,
-    eventName: "Initialized",
+    eventName: "VaultInitialized",
     fromBlock: "earliest",
     toBlock: "latest"
   })
@@ -383,10 +383,10 @@ export default function Index() {
             </div>
           </section>
 
-          <ApyChart />
+          <ApyChart strategy={vaultData.strategies[0]} />
           <NetFlowChart logs={logs} asset={asset} />
 
-          <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-8">
+          <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-8 text-white">
             <h2 className="text-white font-bold text-2xl">Vault Settings</h2>
             {account === vaultData.metadata.creator ? (
               <>
@@ -689,18 +689,6 @@ function initMultiLineChart(elem: null | HTMLElement, data: any[]) {
     },
     xAxis: {
       type: "datetime",
-      lineWidth: 0,
-      tickColor: "transparent",
-      labels: {
-        style: {
-          color: "#fff",
-          visible: false
-        },
-      },
-      dateTimeLabelFormats: {
-        month: "%Y-%m",
-      },
-      visible: false
     },
     yAxis: {
       labels: {
@@ -721,17 +709,17 @@ function initMultiLineChart(elem: null | HTMLElement, data: any[]) {
     series: [
       {
         name: 'Total Apy',
-        data: data.map(d => d.apy),
+        data: data.map((d, i) => [Date.UTC(d.date.getFullYear(), d.date.getMonth(), d.date.getDate()), d.apy || 0]),
         type: "line"
       },
       {
         name: 'Base Apy',
-        data: data.map(d => d.apyBase),
+        data: data.map((d, i) => [Date.UTC(d.date.getFullYear(), d.date.getMonth(), d.date.getDate()), d.apyBase || 0]),
         type: "line"
       },
       {
         name: 'Reward Apy',
-        data: data.map(d => d.apyReward),
+        data: data.map((d, i) => [Date.UTC(d.date.getFullYear(), d.date.getMonth(), d.date.getDate()), d.apyReward || 0]),
         type: "line"
       },
     ],
@@ -760,29 +748,32 @@ function initMultiLineChart(elem: null | HTMLElement, data: any[]) {
 
 }
 
-async function getApy() {
-  const { data } = await axios.get("https://yields.llama.fi/chart/cc110152-36c2-4e10-9c12-c5b4eb662143")
+async function getApy(strategy: Strategy) {
+  const { data } = await axios.get(`https://yields.llama.fi/chart/${strategy.apyId}`)
   return data.data.map((entry: any) => { return { apy: entry.apy, apyBase: entry.apyBase, apyReward: entry.apyReward, date: new Date(entry.timestamp) } })
 }
 
-function ApyChart(): JSX.Element {
+function ApyChart({ strategy }: { strategy: Strategy }): JSX.Element {
   const chartElem = useRef(null);
 
-  const [filterAddress, setFilterAddress] = useState<string>("0x")
+  const [apyData, setApyData] = useState<any[]>([])
   const [from, setFrom] = useState<number>(0)
   const [to, setTo] = useState<number>(1)
 
-  const [showModal, setShowModal] = useState(false)
-  const [modalContent, setModalContent] = useState<any[]>([])
-
   useEffect(() => {
-    getApy().then(res => initMultiLineChart(chartElem.current, res))
+    async function setUp() {
+      const _apyData = await getApy(strategy);
+      setApyData(_apyData);
+      setTo(_apyData.length - 1)
+      initMultiLineChart(chartElem.current, _apyData);
+    }
+    setUp()
   }, [])
 
   return (
     <>
       <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-8">
-        <h2 className="text-white font-bold text-2xl">Vault APYs</h2>
+        <h2 className="text-white font-bold text-2xl">Vault APY</h2>
         <div className="flex flex-row items-end px-12 pt-4 pb-4 space-x-4 text-white">
           <div>
             <p>From</p>
@@ -807,32 +798,25 @@ function ApyChart(): JSX.Element {
           <div className="w-40">
             <MainActionButton
               label="Filter"
-            // handleClick={() =>
-            //   initBarChart(
-            //     chartElem.current,
-            //     logs.filter((_, i) => i >= from && i <= to)
-            //       .filter(entry => filterAddress === "" ? true : entry.logs.some((log: any) => log.args.owner.toLowerCase().includes(filterAddress)))
-            //       .filter(log => log.deposits > 0 || log.withdrawals > 0),
-            //     setShowModal,
-            //     setModalContent
-            //   )
-            // }
+              handleClick={() =>
+                initMultiLineChart(
+                  chartElem.current,
+                  apyData.filter((_, i) => i >= from && i <= to)
+                )
+              }
             />
           </div>
           <div className="w-40">
             <SecondaryActionButton
               label="Reset"
-            // handleClick={() => {
-            //   setFilterAddress("0x");
-            //   setFrom(0);
-            //   setTo(logs.length - 1);
-            //   initBarChart(
-            //     chartElem.current,
-            //     logs.filter(log => log.deposits > 0 || log.withdrawals > 0),
-            //     setShowModal,
-            //     setModalContent
-            //   )
-            // }}
+              handleClick={() => {
+                setFrom(0);
+                setTo(apyData.length - 1);
+                initMultiLineChart(
+                  chartElem.current,
+                  apyData
+                )
+              }}
             />
           </div>
 

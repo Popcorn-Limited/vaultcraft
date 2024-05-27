@@ -67,6 +67,8 @@ export type Strategy = {
   allocation: number;
   allocationPerc: number;
   apy: number;
+  apyId: string;
+  apySource: "custom" | "defillama"
 }
 
 type StrategyMetadata = {
