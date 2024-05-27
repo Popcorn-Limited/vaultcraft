@@ -38,6 +38,8 @@ export default function Vaultron() {
     }
   }
 
+  console.log({ vaultronStats })
+
   return (
     <NoSSR>
       <section className="md:flex md:flex-row md:justify-between w-full lg:w-10/12 px-4 md:mx-auto text-white">
