@@ -42,7 +42,7 @@ export default async function fetchVaultron(account: Address, client: PublicClie
   })
 
   const res = await Promise.all(datas.map(async (d) => axios.get(d.tokenUri)))
-  const totalXp = res.map(r => Number(r.data.properties.XP?.value || 0) * getMultiplier(r.data.properties.Level?.value)).reduce((a, b) => a + b, 0)
+  const totalXp = res.map(r => Number(r.data.properties.XP?.value || 0) * getMultiplier(r.data.properties.Level?.value || "1")).reduce((a, b) => a + b, 0)
 
   try {
     const tokenId = await client.readContract({
