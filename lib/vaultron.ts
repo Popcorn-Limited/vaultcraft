@@ -27,7 +27,34 @@ function getMultiplier(lvl: string): number {
 }
 
 export default async function fetchVaultron(account: Address, client: PublicClient): Promise<VaultronStats> {
-  const totalXp: number = await axios.get("https://app.vaultcraft.io/api/vaultron")
+  // const logs = await client.getContractEvents({
+  //   address: VAULTRON,
+  //   abi: VaultronAbi,
+  //   eventName: "MetadataUpdate",
+  //   fromBlock: "earliest",
+  //   toBlock: "latest"
+  // })
+  // const datas = await client.readContract({
+  //   address: VAULTRON,
+  //   abi: VaultronAbi,
+  //   functionName: "getTokenDetailsBulk",
+  //   args: [BigInt(1), BigInt(logs.length)]
+  // })
+
+  // const nftData = await Promise.all(
+  //   datas.map(async (d) => {
+  //     try {
+  //       return axios.get(d.tokenUri)
+  //     }
+  //     catch (e) {
+  //       return { data: { propoerties: { XP: { value: 0 }, Level: { value: "1" } } } }
+  //     }
+  //   })
+  // )
+
+  // const totalXp = nftData.map(nft => Number(nft.data.properties.XP?.value || 0) * getMultiplier(nft.data.properties.Level?.value || "1")).reduce((a, b) => a + b, 0)
+
+  const totalXp = 166050;
 
   try {
     const tokenId = await client.readContract({
