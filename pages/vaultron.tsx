@@ -5,6 +5,7 @@ import MainActionButton from "@/components/button/MainActionButton";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import { useAtom } from "jotai";
 import { vaultronAtom } from "@/lib/atoms";
+import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 
 const AIRDROP_VCX = 1_000_000
 
@@ -77,7 +78,13 @@ export default function Vaultron() {
           </p>
 
           <p className="mt-10">
-            Go to <a className="text-primaryYellow cursor-pointer" href="https://app.mercle.xyz/vaultcraft/events" target="_blank">https://app.mercle.xyz/vaultcraft/events</a> and mint Vaultron to be eligible to earn XP points.
+            Go to {" "}
+            <a
+              className="text-primaryYellow cursor-pointer"
+              href="https://app.mercle.xyz/vaultcraft/events"
+              target="_blank">https://app.mercle.xyz/vaultcraft/events
+            </a>
+            {" "} and mint Vaultron to be eligible to earn XP points.
           </p>
 
           <div className="mt-16">
@@ -86,7 +93,7 @@ export default function Vaultron() {
               <div className="space-y-4 mt-2">
                 <InfoRow label="Your XP" value={vaultronStats.xp} />
                 <InfoRow label="Total XP" value={vaultronStats.totalXp} />
-                <InfoRow label="Your Airdrop Boost" value={vaultronStats.totalXp > 0 ? (vaultronStats.xp / vaultronStats.totalXp) * AIRDROP_VCX : 0} />
+                <InfoRow label="Your Airdrop Boost" value={NumberFormatter.format(vaultronStats.totalXp > 0 ? (vaultronStats.xp / vaultronStats.totalXp) * AIRDROP_VCX : 0)} />
               </div>
               : <MainActionButton
                 label="Connect Wallet"
@@ -112,7 +119,7 @@ export default function Vaultron() {
 }
 
 
-function InfoRow({ label, value }: { label: string, value: number }): JSX.Element {
+function InfoRow({ label, value }: { label: string, value: number | string }): JSX.Element {
   return <div className="flex flex-row items-center pb-1 border-b border-gray-600">
     <img
       src={"/images/tokens/vcx.svg"}

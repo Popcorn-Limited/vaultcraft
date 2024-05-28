@@ -13,6 +13,19 @@ export const DEFAULT_VAULTRON: VaultronStats = {
   totalXp: 0,
 }
 
+function getMultiplier(lvl: string): number {
+  switch (lvl) {
+    case "1":
+      return 1;
+    case "2":
+      return 1.5;
+    case "3":
+      return 2;
+    default:
+      return 1;
+  }
+}
+
 export default async function fetchVaultron(account: Address, client: PublicClient): Promise<VaultronStats> {
   const logs = await client.getContractEvents({
     address: VAULTRON,
@@ -27,10 +40,10 @@ export default async function fetchVaultron(account: Address, client: PublicClie
     functionName: "getTokenDetailsBulk",
     args: [BigInt(1), BigInt(logs.length)]
   })
-  console.log({ datas })
+
   const res = await Promise.all(datas.map(async (d) => axios.get(d.tokenUri)))
-  const totalXp = res.map(r => Number(r.data.properties.XP?.value || 0)).reduce((a, b) => a + b, 0)
-  
+  const totalXp = res.map(r => Number(r.data.properties.XP?.value || 0) * getMultiplier(r.data.properties.Level?.value)).reduce((a, b) => a + b, 0)
+
   try {
     const tokenId = await client.readContract({
       address: VAULTRON,
@@ -48,7 +61,7 @@ export default async function fetchVaultron(account: Address, client: PublicClie
 
     return {
       level: Number(data.properties.Level.value),
-      xp: Number(data.properties.XP?.value || 0),
+      xp: Number(data.properties.XP?.value || 0) * getMultiplier(data.properties.Level?.value),
       animation: data.animation_url,
       image: data.image,
       tokenId: Number(tokenId),
