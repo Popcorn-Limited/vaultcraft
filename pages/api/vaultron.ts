@@ -42,7 +42,17 @@ export default async function handler(
     args: [BigInt(1), BigInt(logs.length)]
   })
 
-  const nftData = await Promise.all(datas.map(async (d) => axios.get(d.tokenUri)))
+  const nftData = await Promise.all(
+    datas.map(async (d) => {
+      try {
+        return axios.get(d.tokenUri)
+      }
+      catch (e) {
+        return { data: { propoerties: { XP: { value: 0 }, Level: { value: "1" } } } }
+      }
+    })
+  )
+
   const totalXp = nftData.map(nft => Number(nft.data.properties.XP?.value || 0) * getMultiplier(nft.data.properties.Level?.value || "1")).reduce((a, b) => a + b, 0)
 
   return res.status(200).json(totalXp);
