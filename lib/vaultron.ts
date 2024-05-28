@@ -27,22 +27,7 @@ function getMultiplier(lvl: string): number {
 }
 
 export default async function fetchVaultron(account: Address, client: PublicClient): Promise<VaultronStats> {
-  const logs = await client.getContractEvents({
-    address: VAULTRON,
-    abi: VaultronAbi,
-    eventName: "MetadataUpdate",
-    fromBlock: "earliest",
-    toBlock: "latest"
-  })
-  const datas = await client.readContract({
-    address: VAULTRON,
-    abi: VaultronAbi,
-    functionName: "getTokenDetailsBulk",
-    args: [BigInt(1), BigInt(logs.length)]
-  })
-
-  const res = await Promise.all(datas.map(async (d) => axios.get(d.tokenUri)))
-  const totalXp = res.map(r => Number(r.data.properties.XP?.value || 0) * getMultiplier(r.data.properties.Level?.value || "1")).reduce((a, b) => a + b, 0)
+  const totalXp: number = await axios.get("https://app.vaultcraft.io/api/vaultron")
 
   try {
     const tokenId = await client.readContract({
