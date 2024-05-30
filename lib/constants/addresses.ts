@@ -178,3 +178,9 @@ export const AdminProxyByChain: AddressByChain = {
   [optimism.id]: "0x7D224F9Eaf3855CE3109b205e6fA853d25Bb457f",
   [arbitrum.id]: "0xcC09F5bd7582D02Bb31825d09589F4773B65eCc9"
 }
+
+export const ManagementMultisigByChain:AddressByChain = {
+  [mainnet.id]:"0xB85e0d4ad9078676Ca86C6bAa51228aB3E21F5da",
+  [optimism.id]:"0xE8021873695943499168052AF6983aE674285aF1",
+  [arbitrum.id]:"0x24a1c01a0ca2393e03f292Be1A6EBcFe96956a50"
+}
