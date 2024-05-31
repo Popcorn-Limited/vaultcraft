@@ -35,6 +35,10 @@ const GeneralLinks = [
     label: "Disclaimer",
     href: "/disclaimer",
   },
+  {
+    label: "Dev Docs",
+    href: "https://hackmd.io/yY8KpIVxQYGft6fHSxfHCg"
+  }
 ];
 
 const BugBountyLinks = [

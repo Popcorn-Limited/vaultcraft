@@ -22,6 +22,7 @@ import {
   coin98Wallet,
   rabbyWallet,
   safeWallet,
+  okxWallet,
 } from "@rainbow-me/rainbowkit/wallets";
 
 const { chains, publicClient } = configureChains(
@@ -40,13 +41,15 @@ const { chains, publicClient } = configureChains(
   }
 );
 
+const PROJECT_ID = "9b83e8f348c7515d3f94d83f95a05749"
+
 const connectors = connectorsForWallets([
   {
     groupName: "Suggested",
     wallets: [
       injectedWallet({ chains }),
-      rainbowWallet({ projectId: "9b83e8f348c7515d3f94d83f95a05749", chains }),
-      metaMaskWallet({ projectId: "9b83e8f348c7515d3f94d83f95a05749", chains }),
+      rainbowWallet({ projectId: PROJECT_ID, chains }),
+      metaMaskWallet({ projectId: PROJECT_ID, chains }),
       rabbyWallet({ chains }),
     ],
   },
@@ -55,11 +58,12 @@ const connectors = connectorsForWallets([
     wallets: [
       coinbaseWallet({ chains, appName: "VaultCraft" }),
       walletConnectWallet({
-        projectId: "9b83e8f348c7515d3f94d83f95a05749",
+        projectId: PROJECT_ID,
         chains,
       }),
-      coin98Wallet({ projectId: "9b83e8f348c7515d3f94d83f95a05749", chains }),
+      coin98Wallet({ projectId: PROJECT_ID, chains }),
       safeWallet({ chains }),
+      okxWallet({ chains, projectId: PROJECT_ID })
     ],
   },
 ]);

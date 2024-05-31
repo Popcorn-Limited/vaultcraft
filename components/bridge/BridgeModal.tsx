@@ -111,14 +111,14 @@ export default function BridgeModal({ show }: { show: [boolean, Dispatch<SetStat
       case 1:
         success = await bridgeToken({
           destination: DestinationIdByChain[1],
-          to: account!,
+          to: chainId === mainnet.id ? account! : LockboxAdapterByChain[mainnet.id],
           asset: XVCXByChain[chainId],
           delegate: account!,
           amount: BigInt(
             Number(val).toLocaleString("fullwide", { useGrouping: false })
           ),
           slippage: 0,
-          callData: encodeAbiParameters([{ name: "recipient", type: "address" }], [account!]),
+          callData: chainId === mainnet.id ? "0x" : encodeAbiParameters([{ name: "recipient", type: "address" }], [account!]),
           account: account!,
           clients: { publicClient, walletClient: walletClient! },
           chainId

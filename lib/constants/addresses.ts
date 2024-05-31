@@ -158,6 +158,11 @@ export const ExerciseOracleByChain: AddressByChain = {
   [arbitrum.id]: "0x8Ee82Ad9919b7D272A732479305133B205dA297F",
 }
 
+export const PushOracleOwnerByChain: AddressByChain = {
+  [optimism.id]: "0xa03fc60b0EdC2b1F99Df84193BD392d1CD84a7dA",
+  [arbitrum.id]: "0xe14b718e95699B40dc0E17b2061d8ee11d75709A"
+}
+
 export const PermissionRegistryByChain: AddressByChain = {
   [mainnet.id]: "0x7a33b5b57C8b235A3519e6C010027c5cebB15CB4",
   [bsc.id]: "0x8c76AA6B65D0619042EAd6DF748f782c89a06357",
@@ -172,4 +177,10 @@ export const AdminProxyByChain: AddressByChain = {
   [polygon.id]: "0x7Edd61A58B5920dF39208E9888D8be713f639A60",
   [optimism.id]: "0x7D224F9Eaf3855CE3109b205e6fA853d25Bb457f",
   [arbitrum.id]: "0xcC09F5bd7582D02Bb31825d09589F4773B65eCc9"
+}
+
+export const ManagementMultisigByChain:AddressByChain = {
+  [mainnet.id]:"0xB85e0d4ad9078676Ca86C6bAa51228aB3E21F5da",
+  [optimism.id]:"0xE8021873695943499168052AF6983aE674285aF1",
+  [arbitrum.id]:"0x24a1c01a0ca2393e03f292Be1A6EBcFe96956a50"
 }

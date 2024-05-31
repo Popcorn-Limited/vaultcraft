@@ -18,7 +18,7 @@ import {
 import { PlusIcon } from "@heroicons/react/24/outline";
 import TokenIcon from "@/components/common/TokenIcon";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
-import { BalancerOracleAbi, ExerciseByChain, OVCX_ORACLE, OptionTokenByChain, VCX, VcxByChain, WETH, WethByChain, ZERO } from "@/lib/constants";
+import { BalancerOracleAbi, ExerciseByChain, ExerciseOracleByChain, OVCX_ORACLE, OptionTokenByChain, VCX, VcxByChain, WETH, WethByChain, ZERO } from "@/lib/constants";
 import { formatNumber, safeRound } from "@/lib/utils/formatBigNumber";
 import { validateInput } from "@/lib/utils/helpers";
 import { Token } from "@/lib/types";
@@ -31,7 +31,7 @@ import MainActionButton from "../../button/MainActionButton";
 import { exerciseOPop } from "@/lib/optionToken/interactions";
 import { handleAllowance } from "@/lib/approve";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
-import { RPC_URLS } from "@/lib/utils/connectors";
+import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 
 const SLIPPAGE = 0.01; // @dev adding some slippage to the call -- TODO -> we should later allow users to change that
 
@@ -76,8 +76,8 @@ export default function ExerciseOptionTokenInterface({ chainId, setShowModal }: 
         abi: BalancerOracleAbi,
         functionName: "multiplier",
       });
-      const strikePriceRes = await mainnetClient.readContract({
-        address: OVCX_ORACLE,
+      const strikePriceRes = await createPublicClient({ chain: ChainById[chainId], transport: http(RPC_URLS[chainId]) }).readContract({
+        address: ExerciseOracleByChain[chainId],
         abi: BalancerOracleAbi,
         functionName: "getPrice",
       });
@@ -146,8 +146,6 @@ export default function ExerciseOptionTokenInterface({ chainId, setShowModal }: 
         return;
       }
     }
-
-    console.log({ amount, maxPaymentAmount })
 
     const stepsCopy = [...steps];
     const currentStep = stepsCopy[stepCounter];

@@ -28,7 +28,8 @@ export default function VaultStats({
       <CardStat
         id={`${baseTooltipId}-wallet`}
         label="Your Wallet"
-        value={`${formatAndRoundNumber(asset.balance, asset.decimals)}`}
+        value={`$ ${formatAndRoundNumber(asset.balance * asset.price, asset.decimals)}`}
+        secondaryValue={`${formatAndRoundNumber(asset.balance, asset.decimals)} TKN`}
         tooltip="Deposit assets held in your wallet"
       />
       <CardStat
@@ -41,12 +42,17 @@ export default function VaultStats({
             : formatAndRoundNumber(vault?.balance! * vault?.price!, vault?.decimals!)
           }`
           : "0"}`}
+        secondaryValue={`${!!gauge ?
+          NumberFormatter.format(((gauge.balance) / 10 ** gauge.decimals) + ((vault?.balance!) / 10 ** vault?.decimals!))
+          : formatAndRoundNumber(vault?.balance!, vault?.decimals!)
+          } TKN`}
         tooltip="Value of your vault deposits"
       />
       <CardStat
         id={`${baseTooltipId}-tvl`}
         label="TVL"
         value={`$ ${vaultData.tvl < 1 ? "0" : NumberFormatter.format(vaultData.tvl)}`}
+        secondaryValue={`${formatAndRoundNumber(vaultData.totalAssets, asset.decimals)} TKN`}
         tooltip="Total value of all assets deposited into the vault"
       />
       <CardStat

@@ -375,14 +375,14 @@ function BridgeVCX() {
       case 1:
         success = await bridgeToken({
           destination: DestinationIdByChain[destChainId],
-          to: account!,
+          to: chainId === mainnet.id ? account! : LockboxAdapterByChain[mainnet.id],
           asset: chainId === mainnet.id ? VCX : XVCXByChain[chainId],
           delegate: account!,
           amount: BigInt(
             Number(val).toLocaleString("fullwide", { useGrouping: false })
           ),
           slippage: 0,
-          callData: encodeAbiParameters([{ name: "recipient", type: "address" }], [account!]),
+          callData: chainId === mainnet.id ? "0x" : encodeAbiParameters([{ name: "recipient", type: "address" }], [account!]),
           account: account!,
           clients: { publicClient, walletClient: walletClient! },
           chainId
