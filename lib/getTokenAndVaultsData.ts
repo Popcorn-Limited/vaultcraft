@@ -398,8 +398,8 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
         description: desc.description.split("** - ")[1],
         resolver: desc.resolver,
         apy,
-        apyId: desc["apy-id"],
-        apySource: desc["apy-source"]
+        apyId: desc.apyId,
+        apySource: desc.apySource
       }
     }))
 
