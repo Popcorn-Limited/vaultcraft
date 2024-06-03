@@ -27,7 +27,7 @@ import {
 import { arbitrumSepolia } from "viem/chains";
 
 const { chains, publicClient } = configureChains(
-  [...SUPPORTED_NETWORKS],
+  [...SUPPORTED_NETWORKS, sepolia, arbitrumSepolia],
   [
     alchemyProvider({
       apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY as string,
