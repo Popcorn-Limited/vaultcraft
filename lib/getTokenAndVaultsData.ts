@@ -9,7 +9,7 @@ import { PublicClient, erc20ABI, mainnet } from "wagmi";
 import axios from "axios";
 import { VaultAbi } from "@/lib/constants/abi/Vault";
 import { GaugeData, LlamaApy, Strategy, Token, TokenByAddress, TokenType, VaultData, VaultDataByAddress, VaultLabel } from "@/lib/types";
-import { ERC20Abi, GaugeAbi, OptionTokenByChain, VCX, VCX_LP, VeTokenByChain, XVCXByChain, ZapAssetAddressesByChain } from "@/lib/constants";
+import { ERC20Abi, GaugeAbi, OptionTokenByChain, VCX, VCX_LP, VeTokenByChain, XVCXByChain, ZapAssetAddressesByChain, xLayer } from "@/lib/constants";
 import { RPC_URLS, networkMap } from "@/lib/utils/connectors";
 import { ProtocolName, YieldOptions } from "vaultcraft-sdk";
 import { AavePoolUiAbi } from "@/lib/constants/abi/Aave";
@@ -69,15 +69,18 @@ export async function getTokenAndVaultsData({
     }
   });
 
+
   // Add aave assets
-  const reserveData = await client.readContract({
-    address: AaveUiPoolProviderByChain[chainId],
-    abi: AavePoolUiAbi,
-    functionName: 'getReservesData',
-    args: [AavePoolAddressProviderByChain[chainId]],
-  })
-  reserveData[0].filter(d => !d.isFrozen && !uniqueAssetAdresses.includes(d.underlyingAsset))
-    .forEach(d => uniqueAssetAdresses.push(d.underlyingAsset))
+  if (chainId !== xLayer.id) {
+    const reserveData = await client.readContract({
+      address: AaveUiPoolProviderByChain[chainId],
+      abi: AavePoolUiAbi,
+      functionName: 'getReservesData',
+      args: [AavePoolAddressProviderByChain[chainId]],
+    })
+    reserveData[0].filter(d => !d.isFrozen && !uniqueAssetAdresses.includes(d.underlyingAsset))
+      .forEach(d => uniqueAssetAdresses.push(d.underlyingAsset))
+  }
 
   const assets = await prepareAssets(uniqueAssetAdresses, chainId, client);
 
@@ -435,7 +438,7 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
       const allocation = Number(strategyBalances[n]) * strategyData.assetsPerShare
 
       // calc allocation percentage
-      const allocationPerc = allocation / vaults[address].totalAssets
+      const allocationPerc = (allocation / vaults[address].totalAssets) || 0
 
       // add strategy metadata
       vaults[address].strategies[i] = {
@@ -454,7 +457,12 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
       }
 
       // calc blended apy of the vault
-      apy += strategyData.apy * allocationPerc
+      if (vaults[address].totalSupply === 0) {
+        // Assume even allocation if the vault doesnt have allocations yet
+        apy += strategyData.apy * (1 / vaults[address].strategies.length)
+      } else {
+        apy += strategyData.apy * allocationPerc
+      }
 
       n += 1
     })

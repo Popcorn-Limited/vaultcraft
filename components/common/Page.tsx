@@ -20,7 +20,7 @@ import { GAUGE_NETWORKS } from "pages/boost";
 import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
 import axios from "axios";
 import { fetchAaveData } from "@/lib/external/aave";
-import { VCX_LP, VE_VCX, VotingEscrowAbi } from "@/lib/constants";
+import { VCX_LP, VE_VCX, VotingEscrowAbi, xLayer } from "@/lib/constants";
 import fetchVaultron from "@/lib/vaultron";
 import { polygon } from "viem/chains";
 
@@ -60,7 +60,7 @@ function TermsModal({
       title={<h2 className="text-xl font-bold">Terms and Conditions</h2>}
     >
       <div className="text-start text-white">
-      <ul className="list-inside list-disc space-y-4 mb-6 h-[400px] overflow-y-scroll">
+        <ul className="list-inside list-disc space-y-4 mb-6 h-[400px] overflow-y-scroll">
           <li>
             VaultCraft is a blockchain-based decentralized finance project. You
             are participating at your own risk.
@@ -230,9 +230,23 @@ export default function Page({
 
       await Promise.all(
         SUPPORTED_NETWORKS.map(async (chain) => {
-          const res = await fetchAaveData(account || zeroAddress, newTokens[chain.id], chain)
-          newReserveData[chain.id] = res.reserveData
-          newUserAccountData[chain.id] = res.userAccountData
+          if (chain.id === xLayer.id) {
+            newReserveData[chain.id] = []
+            newUserAccountData[chain.id] = {
+              totalCollateral: 0,
+              totalBorrowed: 0,
+              netValue: 0,
+              totalSupplyRate: 0,
+              totalBorrowRate: 0,
+              netRate: 0,
+              ltv: 0,
+              healthFactor: 0
+            }
+          } else {
+            const res = await fetchAaveData(account || zeroAddress, newTokens[chain.id], chain)
+            newReserveData[chain.id] = res.reserveData
+            newUserAccountData[chain.id] = res.userAccountData
+          }
         })
       )
 

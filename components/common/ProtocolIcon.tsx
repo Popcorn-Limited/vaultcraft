@@ -7,6 +7,7 @@ export const IconByProtocol: { [key: string]: string } = {
   Aura: "https://icons.llamao.fi/icons/protocols/aura?w=48&h=48",
   Balancer: "https://icons.llamao.fi/icons/protocols/balancer?w=48&h=48",
   Beefy: "https://icons.llamao.fi/icons/protocols/beefy?w=48&h=48",
+  Bedrock: "https://icons.llamao.fi/icons/protocols/bedrock?w=48&h=48",
   Compound: "https://icons.llamao.fi/icons/protocols/compound?w=48&h=48",
   Convex: "https://icons.llamao.fi/icons/protocols/convex-finance?w=48&h=48",
   Curve: "https://icons.llamao.fi/icons/protocols/curve?w=48&h=48",
@@ -24,7 +25,7 @@ export const IconByProtocol: { [key: string]: string } = {
   Stader: "https://icons.llamao.fi/icons/protocols/stader?w=48&h=48",
   KelpDAO: "https://icons.llamao.fi/icons/protocols/kelp-dao?w=48&h=48",
   Ion: "https://www.app.ionprotocol.io/logo.svg",
-  Multistrategy:"/images/tokens/vcx.svg"
+  Multistrategy: "/images/tokens/vcx.svg"
 };
 
 const iconSize: { [key: number]: string } = {

@@ -1,8 +1,10 @@
-export * from "./abi";
-export * from "./addresses";
 import { Token } from "../types";
 import { maxInt256, maxUint256, zeroAddress } from "viem";
 import axios from "axios";
+
+export * from "./abi";
+export * from "./addresses";
+export * from "./customChains";
 
 export async function getAssetsByChain(chainId: number): Promise<Token[]> {
   const { data: assets } = await axios.get(

@@ -1,7 +1,8 @@
 import { Address, zeroAddress } from "viem";
 import { AddressByChain } from "@/lib/types";
 import { mainnet } from "wagmi";
-import { arbitrum, bsc, optimism, polygon } from "viem/chains";
+import { arbitrum, aurora, avalanche, bsc, fantom, optimism, polygon } from "viem/chains";
+import { xLayer } from "./customChains";
 
 export const VCX: Address = "0xcE246eEa10988C495B4A90a905Ee9237a0f91543";
 export const VCX_LP: Address = "0x577A7f7EE659Aa14Dc16FD384B3F8078E23F1920";
@@ -136,7 +137,8 @@ export const ZapAssetAddressesByChain: { [key: number]: Address[] } = {
     "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1", // WETH
     "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f", // WBTC
   ],
-  [bsc.id]: []
+  [bsc.id]: [],
+  [xLayer.id]: []
 }
 
 
@@ -179,8 +181,20 @@ export const AdminProxyByChain: AddressByChain = {
   [arbitrum.id]: "0xcC09F5bd7582D02Bb31825d09589F4773B65eCc9"
 }
 
-export const ManagementMultisigByChain:AddressByChain = {
-  [mainnet.id]:"0xB85e0d4ad9078676Ca86C6bAa51228aB3E21F5da",
-  [optimism.id]:"0xE8021873695943499168052AF6983aE674285aF1",
-  [arbitrum.id]:"0x24a1c01a0ca2393e03f292Be1A6EBcFe96956a50"
+export const ManagementMultisigByChain: AddressByChain = {
+  [mainnet.id]: "0xB85e0d4ad9078676Ca86C6bAa51228aB3E21F5da",
+  [optimism.id]: "0xE8021873695943499168052AF6983aE674285aF1",
+  [arbitrum.id]: "0x24a1c01a0ca2393e03f292Be1A6EBcFe96956a50"
+}
+
+export const FeeRecipientByChain: AddressByChain = {
+  [mainnet.id]: FEE_RECIPIENT_PROXY,
+  [polygon.id]: FEE_RECIPIENT_PROXY,
+  [bsc.id]: FEE_RECIPIENT_PROXY,
+  [avalanche.id]: FEE_RECIPIENT_PROXY,
+  [aurora.id]: FEE_RECIPIENT_PROXY,
+  [fantom.id]: FEE_RECIPIENT_PROXY,
+  [optimism.id]: FEE_RECIPIENT_PROXY,
+  [arbitrum.id]: FEE_RECIPIENT_PROXY,
+  [xLayer.id]: "0xA9c5E4484d0f204E758637f7Bf5A08A0AA09A39C"
 }

@@ -24,7 +24,6 @@ import {
   safeWallet,
   okxWallet,
 } from "@rainbow-me/rainbowkit/wallets";
-import { arbitrumSepolia } from "viem/chains";
 
 const { chains, publicClient } = configureChains(
   [...SUPPORTED_NETWORKS],
