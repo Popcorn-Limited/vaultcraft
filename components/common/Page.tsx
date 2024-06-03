@@ -240,7 +240,7 @@ export default function Page({
       const lockVaultTVL = 520000 // @dev hardcoded since we removed lock vaults
       let stakingTVL = 0
       try {
-        stakingTVL = await axios.get("https://api.llama.fi/protocol/vaultcraft").then(res => res.data.currentChainTvls["staking"])
+        stakingTVL = await axios.get(`https://pro-api.llama.fi/${process.env.DEFILLAMA_API_KEY}/api/protocol/vaultcraft`).then(res => res.data.currentChainTvls["staking"])
       } catch (e) {
         stakingTVL = 762000
       }

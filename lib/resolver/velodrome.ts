@@ -63,7 +63,7 @@ export async function getApy(
   });
 
   const { data: priceData } = await axios.get(
-    `https://coins.llama.fi/prices/current/optimism:${token0},optimism:${token1},optimism:${velo}`
+    `https://pro-api.llama.fi/${process.env.DEFILLAMA_API_KEY}/coins/prices/current/optimism:${token0},optimism:${token1},optimism:${velo}`
   );
 
   const rewardRate = await client.readContract({

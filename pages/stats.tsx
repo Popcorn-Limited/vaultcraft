@@ -386,7 +386,7 @@ export default function Vaults() {
             [key: string]: number;
           };
         }[];
-      }>("https://api.llama.fi/protocol/vaultcraft"),
+      }>(`https://pro-api.llama.fi/${process.env.DEFILLAMA_API_KEY}/api/protocol/vaultcraft`),
       axios.get<
         DuneQueryResult<{
           summary_type: string;

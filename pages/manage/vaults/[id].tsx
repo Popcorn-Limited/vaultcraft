@@ -749,7 +749,7 @@ function initMultiLineChart(elem: null | HTMLElement, data: any[]) {
 }
 
 async function getApy(strategy: Strategy) {
-  const { data } = await axios.get(`https://yields.llama.fi/chart/${strategy.apyId}`)
+  const { data } = await axios.get(`https://pro-api.llama.fi/${process.env.DEFILLAMA_API_KEY}/yields/chart/${strategy.apyId}`)
   return data.data.map((entry: any) => { return { apy: entry.apy, apyBase: entry.apyBase, apyReward: entry.apyReward, date: new Date(entry.timestamp) } })
 }
 

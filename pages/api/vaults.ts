@@ -207,7 +207,7 @@ async function getVaultBaseApy(client: PublicClient, strategies: Strategies, def
 
 async function getDefillamaApy(): Promise<DefillamaYieldResponse> {
     const response: DefillamaYieldResponse = {};
-    const { data } = await axios.get('https://yields.llama.fi/pools');
+    const { data } = await axios.get(`https://pro-api.llama.fi/${process.env.DEFILLAMA_API_KEY}/yields/pools`);
 
     data.data.forEach((d: Pool) => {
         response[d.pool] = d;

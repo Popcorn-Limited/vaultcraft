@@ -2,7 +2,7 @@ import axios from "axios";
 import { PriceResolverParams } from "..";
 import { networkMap } from "@/lib/utils/connectors";
 
-const BASE_URL = "https://coins.llama.fi/prices/current/";
+const BASE_URL = `https://pro-api.llama.fi/${process.env.DEFILLAMA_API_KEY}/coins/prices/current/`;
 
 export async function llama({
   address,

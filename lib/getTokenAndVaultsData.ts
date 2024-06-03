@@ -256,7 +256,7 @@ async function prepareAssets(addresses: Address[], chainId: number, client: Publ
   );
 
   const { data: priceData } = await axios.get(
-    `https://coins.llama.fi/prices/current/${String(
+    `https://pro-api.llama.fi/${process.env.DEFILLAMA_API_KEY}/coins/prices/current/${String(
       addresses.map(
         (address) => `${networkMap[chainId].toLowerCase()}:${address}`
       )
@@ -327,7 +327,7 @@ async function prepareVaults(vaultsData: VaultDataByAddress, assets: TokenByAddr
 }
 
 async function getApy(strategy: Strategy) {
-  const { data } = await axios.get(`https://yields.llama.fi/chart/${strategy.apyId}`)
+  const { data } = await axios.get(`https://pro-api.llama.fi/${process.env.DEFILLAMA_API_KEY}/yields/chart/${strategy.apyId}`)
   return data.data.map((entry: any) => { return { apy: entry.apy, apyBase: entry.apyBase, apyReward: entry.apyReward, date: new Date(entry.timestamp) } })
 }
 
@@ -387,16 +387,9 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
       }
 
       try {
-        // const strategyApy = await getApy(desc)
-        // apy = strategyApy[strategyApy.length - 1].apy;
-        // apyHist = strategyApy;
-
-        const vaultYield = await yieldOptions.getApy({
-          chainId: chainId,
-          protocol: desc.resolver as ProtocolName,
-          asset: assetAddress,
-        });
-        apy = vaultYield.total;
+        const strategyApy = await getApy(desc)
+        apy = strategyApy[strategyApy.length - 1].apy;
+        apyHist = strategyApy;
       } catch (e) {
 
       }
