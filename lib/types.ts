@@ -238,7 +238,8 @@ export enum ZapProvider {
   zeroX,
   oneInch,
   paraSwap,
-  openOcean
+  openOcean,
+  kyberSwap
 }
 
 export type TokenByAddress = {

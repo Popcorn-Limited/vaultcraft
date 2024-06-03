@@ -17,6 +17,7 @@ export async function getAssetsByChain(chainId: number): Promise<Token[]> {
 }
 
 export const ADDRESS_ZERO = zeroAddress;
+export const ALT_NATIVE_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 export const MAX_INT256 = maxInt256;
 export const MAX_UINT256 = maxUint256;
 export const MINUS_ONE = BigInt(-0x01);

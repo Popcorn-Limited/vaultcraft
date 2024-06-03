@@ -35,7 +35,7 @@ export const networkMap: { [key: number]: string } = {
   [ChainId.EthSepolia]: "EthSepolia",
   [ChainId.ArbSepolia]: "ArbSepolia",
   [ChainId.ALL]: "All Networks",
-  [ChainId.XLayer]: "X-Layer"
+  [ChainId.XLayer]: "XLayer"
 };
 
 export const networkLogos: { [key: number]: string } = {
