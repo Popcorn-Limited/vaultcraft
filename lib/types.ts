@@ -60,6 +60,13 @@ export type VaultData = {
   strategies: Strategy[];
 };
 
+export type LlamaApy = {
+  apy: number;
+  apyBase: number;
+  apyReward: number;
+  date: Date;
+}
+
 export type Strategy = {
   address: Address;
   metadata: StrategyMetadata;
@@ -67,6 +74,7 @@ export type Strategy = {
   allocation: number;
   allocationPerc: number;
   apy: number;
+  apyHist: LlamaApy[];
   apyId: string;
   apySource: "custom" | "defillama"
 }

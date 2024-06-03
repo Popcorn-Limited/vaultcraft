@@ -8,7 +8,7 @@ import {
 import { PublicClient, erc20ABI, mainnet } from "wagmi";
 import axios from "axios";
 import { VaultAbi } from "@/lib/constants/abi/Vault";
-import { GaugeData, Token, TokenByAddress, TokenType, VaultData, VaultDataByAddress, VaultLabel } from "@/lib/types";
+import { GaugeData, Strategy, Token, TokenByAddress, TokenType, VaultData, VaultDataByAddress, VaultLabel } from "@/lib/types";
 import { ERC20Abi, GaugeAbi, OptionTokenByChain, VCX, VCX_LP, VeTokenByChain, XVCXByChain, ZapAssetAddressesByChain } from "@/lib/constants";
 import { RPC_URLS, networkMap } from "@/lib/utils/connectors";
 import { ProtocolName, YieldOptions } from "vaultcraft-sdk";
@@ -326,6 +326,11 @@ async function prepareVaults(vaultsData: VaultDataByAddress, assets: TokenByAddr
   return result;
 }
 
+async function getApy(strategy: Strategy) {
+  const { data } = await axios.get(`https://yields.llama.fi/chart/${strategy.apyId}`)
+  return data.data.map((entry: any) => { return { apy: entry.apy, apyBase: entry.apyBase, apyReward: entry.apyReward, date: new Date(entry.timestamp) } })
+}
+
 export async function addStrategyData(vaults: VaultDataByAddress, chainId: number, client: PublicClient, yieldOptions: YieldOptions): Promise<VaultDataByAddress> {
   const uniqueStrategyAdresses: Address[] = [];
   Object.values(vaults).forEach((vault) => {
@@ -374,6 +379,7 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
 
       const desc = strategyDescriptions[address]
       let apy = 0;
+      let apyHist = []
 
       let assetAddress = desc.asset
       if (Object.keys(STRATEGY_TO_ALTERNATE_ASSET).includes(address)) {
@@ -381,13 +387,12 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
       }
 
       try {
-        const vaultYield = await yieldOptions.getApy({
-          chainId: chainId,
-          protocol: desc.resolver as ProtocolName,
-          asset: assetAddress,
-        });
-        apy = vaultYield.total;
-      } catch (e) { }
+        const strategyApy = await getApy(desc)
+        apy = strategyApy[strategyApy.length - 1].apy;
+        apyHist = strategyApy;
+      } catch (e) {
+
+      }
 
       strategies[address] = {
         totalAssets,
@@ -398,6 +403,7 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
         description: desc.description.split("** - ")[1],
         resolver: desc.resolver,
         apy,
+        apyHist,
         apyId: desc.apyId,
         apySource: desc.apySource
       }
@@ -442,6 +448,7 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
         allocation: allocation,
         allocationPerc: allocationPerc,
         apy: strategyData.apy,
+        apyHist: strategyData.apyHist,
         apyId: strategyData.apyId,
         apySource: strategyData.apySource
       }

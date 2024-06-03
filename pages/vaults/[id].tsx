@@ -418,8 +418,13 @@ function StrategyDesc({ strategy, asset, i, stratLen }: { strategy: Strategy, as
       </h2>
     </div>
     <p className='text-white'>
-      {strategy.metadata.description}
+      {strategy.metadata.description} { }
     </p>
+    {strategy.apySource === "defillama" &&
+      <p className='text-white'>
+        View on <a href={`https://defillama.com/yields/pool/${strategy.apyId}`} target="_blank" className="text-secondaryBlue">Defillama</a>
+      </p>
+    }
     <div className="mt-2 md:flex md:flex-row md:items-center">
       <CardStat
         id={`${strategy.resolver}-${i}-allocation`}
