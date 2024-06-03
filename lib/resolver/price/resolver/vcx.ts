@@ -15,7 +15,7 @@ export async function vcx({
   } catch (e) {
     console.log("DEXSCREENER: error fetching vcx price : ", e)
     try {
-      const { data } = await axios.get("https://coins.llama.fi/prices/current/ethereum:0xce246eea10988c495b4a90a905ee9237a0f91543?searchWidth=4h");
+      const { data } = await axios.get(`https://pro-api.llama.fi/${process.env.DEFILLAMA_API_KEY}/coins/prices/current/ethereum:0xce246eea10988c495b4a90a905ee9237a0f91543?searchWidth=4h`);
 
       return Object.keys(data.coins).length === 0
         // Llama didnt find the token, return fallback

@@ -8,7 +8,7 @@ import {
 import { PublicClient, erc20ABI, mainnet } from "wagmi";
 import axios from "axios";
 import { VaultAbi } from "@/lib/constants/abi/Vault";
-import { GaugeData, Strategy, Token, TokenByAddress, TokenType, VaultData, VaultDataByAddress, VaultLabel } from "@/lib/types";
+import { GaugeData, LlamaApy, Strategy, Token, TokenByAddress, TokenType, VaultData, VaultDataByAddress, VaultLabel } from "@/lib/types";
 import { ERC20Abi, GaugeAbi, OptionTokenByChain, VCX, VCX_LP, VeTokenByChain, XVCXByChain, ZapAssetAddressesByChain } from "@/lib/constants";
 import { RPC_URLS, networkMap } from "@/lib/utils/connectors";
 import { ProtocolName, YieldOptions } from "vaultcraft-sdk";
@@ -256,7 +256,7 @@ async function prepareAssets(addresses: Address[], chainId: number, client: Publ
   );
 
   const { data: priceData } = await axios.get(
-    `https://coins.llama.fi/prices/current/${String(
+    `https://pro-api.llama.fi/${process.env.DEFILLAMA_API_KEY}/coins/prices/current/${String(
       addresses.map(
         (address) => `${networkMap[chainId].toLowerCase()}:${address}`
       )
@@ -327,7 +327,7 @@ async function prepareVaults(vaultsData: VaultDataByAddress, assets: TokenByAddr
 }
 
 async function getApy(strategy: Strategy) {
-  const { data } = await axios.get(`https://yields.llama.fi/chart/${strategy.apyId}`)
+  const { data } = await axios.get(`https://pro-api.llama.fi/${process.env.DEFILLAMA_API_KEY}/yields/chart/${strategy.apyId}`)
   return data.data.map((entry: any) => { return { apy: entry.apy, apyBase: entry.apyBase, apyReward: entry.apyReward, date: new Date(entry.timestamp) } })
 }
 
@@ -379,7 +379,7 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
 
       const desc = strategyDescriptions[address]
       let apy = 0;
-      let apyHist = []
+      let apyHist: LlamaApy[] = []
 
       let assetAddress = desc.asset
       if (Object.keys(STRATEGY_TO_ALTERNATE_ASSET).includes(address)) {
