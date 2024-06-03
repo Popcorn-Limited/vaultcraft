@@ -332,18 +332,14 @@ export default function Index() {
                 </div>
 
                 <div className="bg-customNeutral200 p-6 rounded-lg">
-                  <p className="text-white text-2xl font-bold">Strategies</p>
-                  {asset &&
-                    vaultData.strategies.map((strategy, i) =>
-                      <StrategyDesc
-                        key={`${strategy.resolver}-${i}`}
-                        strategy={strategy}
-                        asset={asset}
-                        i={i}
-                        stratLen={vaultData.strategies.length}
-                      />
-                    )}
-
+                  <p className="text-white text-2xl font-bold">Information</p>
+                  <p className="text-white">
+                    {vaultData.metadata.description && vaultData.metadata.description?.split("-LINK- ").length > 0 ?
+                      <>{vaultData.metadata.description?.split("-LINK- ")[0]}{" "}
+                        <a href={vaultData.metadata.description?.split("-LINK- ")[1]} target="_blank" className="text-secondaryBlue">here</a></>
+                      : <>{vaultData.metadata.description}</>
+                    }
+                  </p>
                   <div className="md:flex md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4 mt-4">
 
                     <div className="w-full md:w-10/12 border border-customNeutral100 rounded-lg p-4">
@@ -391,6 +387,20 @@ export default function Index() {
                     }
 
                   </div>
+                </div>
+
+                <div className="bg-customNeutral200 p-6 rounded-lg">
+                  <p className="text-white text-2xl font-bold">Strategies</p>
+                  {asset &&
+                    vaultData.strategies.map((strategy, i) =>
+                      <StrategyDesc
+                        key={`${strategy.resolver}-${i}`}
+                        strategy={strategy}
+                        asset={asset}
+                        i={i}
+                        stratLen={vaultData.strategies.length}
+                      />
+                    )}
                 </div>
               </div>
             </section>
