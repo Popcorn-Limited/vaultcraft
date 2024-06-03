@@ -8,7 +8,7 @@ import {
 import { PublicClient, erc20ABI, mainnet } from "wagmi";
 import axios from "axios";
 import { VaultAbi } from "@/lib/constants/abi/Vault";
-import { GaugeData, Strategy, Token, TokenByAddress, TokenType, VaultData, VaultDataByAddress, VaultLabel } from "@/lib/types";
+import { GaugeData, LlamaApy, Strategy, Token, TokenByAddress, TokenType, VaultData, VaultDataByAddress, VaultLabel } from "@/lib/types";
 import { ERC20Abi, GaugeAbi, OptionTokenByChain, VCX, VCX_LP, VeTokenByChain, XVCXByChain, ZapAssetAddressesByChain } from "@/lib/constants";
 import { RPC_URLS, networkMap } from "@/lib/utils/connectors";
 import { ProtocolName, YieldOptions } from "vaultcraft-sdk";
@@ -379,7 +379,7 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
 
       const desc = strategyDescriptions[address]
       let apy = 0;
-      let apyHist = []
+      let apyHist: LlamaApy[] = []
 
       let assetAddress = desc.asset
       if (Object.keys(STRATEGY_TO_ALTERNATE_ASSET).includes(address)) {
@@ -387,9 +387,16 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
       }
 
       try {
-        const strategyApy = await getApy(desc)
-        apy = strategyApy[strategyApy.length - 1].apy;
-        apyHist = strategyApy;
+        // const strategyApy = await getApy(desc)
+        // apy = strategyApy[strategyApy.length - 1].apy;
+        // apyHist = strategyApy;
+
+        const vaultYield = await yieldOptions.getApy({
+          chainId: chainId,
+          protocol: desc.resolver as ProtocolName,
+          asset: assetAddress,
+        });
+        apy = vaultYield.total;
       } catch (e) {
 
       }
