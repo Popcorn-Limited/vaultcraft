@@ -12,8 +12,24 @@ import { useRouter } from "next/router";
 import { Address, createPublicClient, http, zeroAddress } from "viem";
 import Modal from "@/components/modal/Modal";
 import MainActionButton from "../button/MainActionButton";
-import { availableZapAssetAtom, gaugeRewardsAtom, networthAtom, tokensAtom, tvlAtom, vaultronAtom, zapAssetsAtom } from "@/lib/atoms";
-import { ReserveData, Token, TokenByAddress, TokenType, UserAccountData, VaultData, VaultDataByAddress } from "@/lib/types";
+import {
+  availableZapAssetAtom,
+  gaugeRewardsAtom,
+  networthAtom,
+  tokensAtom,
+  tvlAtom,
+  vaultronAtom,
+  zapAssetsAtom,
+} from "@/lib/atoms";
+import {
+  ReserveData,
+  Token,
+  TokenByAddress,
+  TokenType,
+  UserAccountData,
+  VaultData,
+  VaultDataByAddress,
+} from "@/lib/types";
 import getTokenAndVaultsDataByChain from "@/lib/getTokenAndVaultsData";
 import { aaveAccountDataAtom, aaveReserveDataAtom } from "@/lib/atoms/lending";
 import { GAUGE_NETWORKS } from "pages/boost";
@@ -48,10 +64,7 @@ function TermsModal({
   function handleAccept() {
     setTermsSigned(true);
     setShowModal(false);
-    localStorage.setItem(
-      "termsAndConditions",
-      String(Number(new Date()))
-    );
+    localStorage.setItem("termsAndConditions", String(Number(new Date())));
   }
 
   return (
@@ -60,7 +73,7 @@ function TermsModal({
       title={<h2 className="text-xl font-bold">Terms and Conditions</h2>}
     >
       <div className="text-start text-white">
-      <ul className="list-inside list-disc space-y-4 mb-6 h-[400px] overflow-y-scroll">
+        <ul className="list-inside list-disc space-y-4 mb-6 h-[400px] overflow-y-scroll">
           <li>
             VaultCraft is a blockchain-based decentralized finance project. You
             are participating at your own risk.
@@ -138,7 +151,8 @@ function TermsModal({
           </li>
         </ul>
         <p className="py-6 border-t-2 border-customNeutral100">
-          By accepting you agree that you have read and accept the <a
+          By accepting you agree that you have read and accept the{" "}
+          <a
             className="text-secondaryBlue hover:text-primaryYellow focus:none outline-none"
             href="https://app.vaultcraft.io/disclaimer"
             target="_blank"
@@ -204,65 +218,83 @@ export default function Page({
   const [, setGaugeRewards] = useAtom(gaugeRewardsAtom);
   const [, setTVL] = useAtom(tvlAtom);
   const [, setNetworth] = useAtom(networthAtom);
-  const [, setAaveReserveData] = useAtom(aaveReserveDataAtom)
-  const [, setAaveAccountData] = useAtom(aaveAccountDataAtom)
-  const [, setVaultronStats] = useAtom(vaultronAtom)
+  const [, setAaveReserveData] = useAtom(aaveReserveDataAtom);
+  const [, setAaveAccountData] = useAtom(aaveAccountDataAtom);
+  const [, setVaultronStats] = useAtom(vaultronAtom);
 
   useEffect(() => {
     async function getData() {
       // get vaultsData and tokens
-      const newVaultsData: { [key: number]: VaultData[] } = {}
-      const newTokens: { [key: number]: TokenByAddress } = {}
+      const newVaultsData: { [key: number]: VaultData[] } = {};
+      const newTokens: { [key: number]: TokenByAddress } = {};
       await Promise.all(
         SUPPORTED_NETWORKS.map(async (chain) => {
           const { vaultsData, tokens } = await getTokenAndVaultsDataByChain({
             chain,
             account: account || zeroAddress,
             yieldOptions: yieldOptions as YieldOptions,
-          })
-          newVaultsData[chain.id] = vaultsData
+          });
+          newVaultsData[chain.id] = vaultsData;
           newTokens[chain.id] = tokens;
         })
-      )
+      );
 
-      const newReserveData: { [key: number]: ReserveData[] } = {}
-      const newUserAccountData: { [key: number]: UserAccountData } = {}
+      const newReserveData: { [key: number]: ReserveData[] } = {};
+      const newUserAccountData: { [key: number]: UserAccountData } = {};
 
       await Promise.all(
         SUPPORTED_NETWORKS.map(async (chain) => {
-          const res = await fetchAaveData(account || zeroAddress, newTokens[chain.id], chain)
-          newReserveData[chain.id] = res.reserveData
-          newUserAccountData[chain.id] = res.userAccountData
+          const res = await fetchAaveData(
+            account || zeroAddress,
+            newTokens[chain.id],
+            chain
+          );
+          newReserveData[chain.id] = res.reserveData;
+          newUserAccountData[chain.id] = res.userAccountData;
         })
-      )
+      );
 
-      const vaultTVL = SUPPORTED_NETWORKS.map(chain => newVaultsData[chain.id]).flat().reduce((a, b) => a + b.tvl, 0)
-      const lockVaultTVL = 520000 // @dev hardcoded since we removed lock vaults
-      let stakingTVL = 0
+      const vaultTVL = SUPPORTED_NETWORKS.map(
+        (chain) => newVaultsData[chain.id]
+      )
+        .flat()
+        .reduce((a, b) => a + b.tvl, 0);
+      const lockVaultTVL = 520000; // @dev hardcoded since we removed lock vaults
+      let stakingTVL = 0;
       try {
-        stakingTVL = await axios.get("https://api.llama.fi/protocol/vaultcraft").then(res => res.data.currentChainTvls["staking"])
+        stakingTVL = await axios
+          .get("https://api.llama.fi/protocol/vaultcraft")
+          .then((res) => res.data.currentChainTvls["staking"]);
       } catch (e) {
-        stakingTVL = 762000
+        stakingTVL = 762000;
       }
 
       setTVL({
         vault: vaultTVL,
         lockVault: lockVaultTVL,
         stake: stakingTVL,
-        total: vaultTVL + lockVaultTVL + stakingTVL
+        total: vaultTVL + lockVaultTVL + stakingTVL,
       });
       setVaults(newVaultsData);
       setTokens(newTokens);
-      setAaveReserveData(newReserveData)
-      setAaveAccountData(newUserAccountData)
+      setAaveReserveData(newReserveData);
+      setAaveAccountData(newUserAccountData);
 
       if (account) {
-        const vaultNetworth = SUPPORTED_NETWORKS.map(chain =>
-          Object.values(newTokens[chain.id])).flat().filter(t => t.type === TokenType.Vault || t.type === TokenType.Gauge)
-          .reduce((a, b) => a + ((b.balance / (10 ** b.decimals)) * b.price), 0)
-        const assetNetworth = SUPPORTED_NETWORKS.map(chain =>
-          Object.values(newTokens[chain.id])).flat().filter(t => t.type === TokenType.Asset)
-          .reduce((a, b) => a + ((b.balance / (10 ** b.decimals)) * b.price), 0)
+        const vaultNetworth = SUPPORTED_NETWORKS.map((chain) =>
+          Object.values(newTokens[chain.id])
+        )
+          .flat()
+          .filter(
+            (t) => t.type === TokenType.Vault || t.type === TokenType.Gauge
+          )
+          .reduce((a, b) => a + (b.balance / 10 ** b.decimals) * b.price, 0);
+        const assetNetworth = SUPPORTED_NETWORKS.map((chain) =>
+          Object.values(newTokens[chain.id])
+        )
+          .flat()
+          .filter((t) => t.type === TokenType.Asset)
+          .reduce((a, b) => a + (b.balance / 10 ** b.decimals) * b.price, 0);
 
         const stake = await createPublicClient({
           chain: mainnet,
@@ -274,33 +306,43 @@ export default function Page({
           args: [account],
         });
 
-        const stakeNetworth = (Number(stake.amount) / 1e18) * newTokens[1][VCX_LP].price;
-        const lockVaultNetworth = 0 // @dev hardcoded since we removed lock vaults
+        const stakeNetworth =
+          (Number(stake.amount) / 1e18) * newTokens[1][VCX_LP].price;
+        const lockVaultNetworth = 0; // @dev hardcoded since we removed lock vaults
 
-        const newRewards: { [key: number]: GaugeRewards } = {}
-        await Promise.all(GAUGE_NETWORKS.map(async (chain) =>
-          newRewards[chain] = await getGaugeRewards({
-            gauges: newVaultsData[chain].filter(vault => !!vault.gauge).map(vault => vault.gauge) as Address[],
-            account: account as Address,
-            chainId: chain,
-            publicClient
-          })
-        ))
+        const newRewards: { [key: number]: GaugeRewards } = {};
+        await Promise.all(
+          GAUGE_NETWORKS.map(
+            async (chain) =>
+              (newRewards[chain] = await getGaugeRewards({
+                gauges: newVaultsData[chain]
+                  .filter((vault) => !!vault.gauge)
+                  .map((vault) => vault.gauge) as Address[],
+                account: account as Address,
+                chainId: chain,
+                publicClient,
+              }))
+          )
+        );
 
         setNetworth({
           vault: vaultNetworth,
           lockVault: lockVaultNetworth,
           wallet: assetNetworth,
           stake: stakeNetworth,
-          total: vaultNetworth + assetNetworth + stakeNetworth + lockVaultNetworth
-        })
+          total:
+            vaultNetworth + assetNetworth + stakeNetworth + lockVaultNetworth,
+        });
         setGaugeRewards(newRewards);
 
-        const newVaultronStats = await fetchVaultron(account, createPublicClient({
-          chain: polygon,
-          transport: http(RPC_URLS[137]),
-        }))
-        setVaultronStats(newVaultronStats)
+        const newVaultronStats = await fetchVaultron(
+          account,
+          createPublicClient({
+            chain: polygon,
+            transport: http(RPC_URLS[137]),
+          })
+        );
+        setVaultronStats(newVaultronStats);
       }
     }
     if (yieldOptions) getData();
@@ -312,7 +354,7 @@ export default function Page({
   useEffect(() => {
     if (!termsSigned) {
       const expiryDate = localStorage.getItem("termsAndConditions");
-      if (!expiryDate || (Number(expiryDate) + 1209600000 < Number(new Date()))) {
+      if (!expiryDate || Number(expiryDate) + 1209600000 < Number(new Date())) {
         setShowTermsModal(true);
       } else {
         setTermsSigned(true);
@@ -324,7 +366,7 @@ export default function Page({
     <>
       <div className="bg-customNeutral300 w-full min-h-screen h-full mx-auto font-khTeka flex flex-col">
         <Navbar />
-        <div className="flex-1">
+        <div className="flex-1 container p-0">
           <TermsModal
             showModal={showTermsModal}
             setShowModal={setShowTermsModal}

@@ -41,35 +41,51 @@ export default function Navbar(): JSX.Element {
       setLogo(networkLogos[chain.id]);
       setChainName(chain.name);
     }
-  }, [chain?.id, address])
+  }, [chain?.id, address]);
 
-  const [userAccountData] = useAtom(aaveAccountDataAtom)
-  const [vaults] = useAtom(vaultsAtom)
-  const [showLendModal, setShowLendModal] = useState(false)
+  const [userAccountData] = useAtom(aaveAccountDataAtom);
+  const [vaults] = useAtom(vaultsAtom);
+  const [showLendModal, setShowLendModal] = useState(false);
 
-  const [vaultData, setVaultData] = useState<VaultData>({ chainId: chain?.id || 1, asset: { address: "" } } as unknown as VaultData)
+  const [vaultData, setVaultData] = useState<VaultData>({
+    chainId: chain?.id || 1,
+    asset: { address: "" },
+  } as unknown as VaultData);
 
   useEffect(() => {
-    if (chain && Object.keys(query).length > 0 && Object.keys(vaults).length > 0) {
-      const chainIdQuery = query?.chainId! as string
-      const chainId = Number(chainIdQuery.replace("?", "").replace("&", ""))
-      const foundVault = vaults[chainId].find(vault => vault.address === query?.id)
-      if (foundVault) setVaultData(foundVault)
+    if (
+      chain &&
+      Object.keys(query).length > 0 &&
+      Object.keys(vaults).length > 0
+    ) {
+      const chainIdQuery = query?.chainId! as string;
+      const chainId = Number(chainIdQuery.replace("?", "").replace("&", ""));
+      const foundVault = vaults[chainId].find(
+        (vault) => vault.address === query?.id
+      );
+      if (foundVault) setVaultData(foundVault);
     }
-  }, [query, chain])
+  }, [query, chain]);
 
   return (
     <>
-      {(chain && Object.keys(vaultData).length > 0) &&
+      {chain && Object.keys(vaultData).length > 0 && (
         <ManageLoanInterface
           visibilityState={[showLendModal, setShowLendModal]}
           vaultData={vaultData}
         />
-      }
-      <div className="flex flex-row items-center justify-between w-full py-8 px-4 md:px-8 z-10">
+      )}
+      <div className="flex container flex-row items-center justify-between w-full py-8 px-4 md:px-8 z-10">
         <div className="flex flex-row items-center">
           <div>
-            <Link href={(!!query?.ref && isAddress(query.ref as string)) ? `/?ref=${query.ref}` : `/`} passHref>
+            <Link
+              href={
+                !!query?.ref && isAddress(query.ref as string)
+                  ? `/?ref=${query.ref}`
+                  : `/`
+              }
+              passHref
+            >
               <img
                 src="/images/icons/popLogo.svg"
                 alt="Logo"
@@ -82,22 +98,34 @@ export default function Navbar(): JSX.Element {
           <div className="hidden md:block">
             <BuyVCXButton />
           </div>
-          {(chain && userAccountData[chain?.id]?.healthFactor > 0) &&
+          {chain && userAccountData[chain?.id]?.healthFactor > 0 && (
             <div
               className={`w-48 cursor-pointer h-full py-2 bg-customNeutral300 md:bg-transparent md:py-2 px-4 hidden md:flex flex-row items-center justify-between border border-customGray100 rounded-4xl text-white`}
               onClick={() => setShowLendModal(true)}
               id="global-health-factor"
             >
               <p className="mr-2 leading-none hidden md:block">Health Factor</p>
-              <p className={`md:ml-2 ${getHealthFactorColor("text", userAccountData[chain.id].healthFactor)}`}>
-                {formatToFixedDecimals(userAccountData[chain.id].healthFactor || 0, 2)}
+              <p
+                className={`md:ml-2 ${getHealthFactorColor(
+                  "text",
+                  userAccountData[chain.id].healthFactor
+                )}`}
+              >
+                {formatToFixedDecimals(
+                  userAccountData[chain.id].healthFactor || 0,
+                  2
+                )}
               </p>
               <ResponsiveTooltip
                 id="global-health-factor"
-                content={<p className="max-w-52">Health Factor of your Aave Account. (Click to manage)</p>}
+                content={
+                  <p className="max-w-52">
+                    Health Factor of your Aave Account. (Click to manage)
+                  </p>
+                }
               />
             </div>
-          }
+          )}
           {address ? (
             <div className={`relative flex flex-container flex-row z-10`}>
               <div
@@ -137,22 +165,25 @@ export default function Navbar(): JSX.Element {
           >
             <span
               aria-hidden="true"
-              className={`block h-1 md:h-0.5 w-8 bg-white ease-in-out rounded-3xl ${menuVisible ? "rotate-45 translate-y-1" : "-translate-y-2"
-                }`}
+              className={`block h-1 md:h-0.5 w-8 bg-white ease-in-out rounded-3xl ${
+                menuVisible ? "rotate-45 translate-y-1" : "-translate-y-2"
+              }`}
             ></span>
             <span
               aria-hidden="true"
-              className={`block h-1 md:h-0.5 w-8 bg-white ease-in-out rounded-3xl ${menuVisible ? "opacity-0" : "opacity-100"
-                }`}
+              className={`block h-1 md:h-0.5 w-8 bg-white ease-in-out rounded-3xl ${
+                menuVisible ? "opacity-0" : "opacity-100"
+              }`}
             ></span>
             <span
               aria-hidden="true"
-              className={`block h-1 md:h-0.5 w-8 bg-white ease-in-out rounded-3xl ${menuVisible ? "-rotate-45 -translate-y-1" : "translate-y-2"
-                }`}
+              className={`block h-1 md:h-0.5 w-8 bg-white ease-in-out rounded-3xl ${
+                menuVisible ? "-rotate-45 -translate-y-1" : "translate-y-2"
+              }`}
             ></span>
           </button>
         </div>
-      </div >
+      </div>
       <Transition.Root show={menuVisible} as={Fragment}>
         <Dialog
           as="div"
@@ -166,18 +197,21 @@ export default function Navbar(): JSX.Element {
             <div className="block w-10 bg-transparent">
               <span
                 aria-hidden="true"
-                className={`block h-0.5 w-8 bg-white transform transition duration-500 ease-in-out rounded-3xl ${menuVisible ? "rotate-45 translate-y-0.5" : "-translate-y-2"
-                  }`}
+                className={`block h-0.5 w-8 bg-white transform transition duration-500 ease-in-out rounded-3xl ${
+                  menuVisible ? "rotate-45 translate-y-0.5" : "-translate-y-2"
+                }`}
               ></span>
               <span
                 aria-hidden="true"
-                className={`block h-0.5 w-8 bg-white transform transition duration-500 ease-in-out rounded-3xl ${menuVisible ? "opacity-0" : "opacity-100"
-                  }`}
+                className={`block h-0.5 w-8 bg-white transform transition duration-500 ease-in-out rounded-3xl ${
+                  menuVisible ? "opacity-0" : "opacity-100"
+                }`}
               ></span>
               <span
                 aria-hidden="true"
-                className={`block h-0.5 w-8 bg-white transform transition duration-500 ease-in-out rounded-3xl ${menuVisible ? "-rotate-45 -translate-y-0.5" : "translate-y-2"
-                  }`}
+                className={`block h-0.5 w-8 bg-white transform transition duration-500 ease-in-out rounded-3xl ${
+                  menuVisible ? "-rotate-45 -translate-y-0.5" : "translate-y-2"
+                }`}
               ></span>
             </div>
           </button>
@@ -196,7 +230,14 @@ export default function Navbar(): JSX.Element {
               <div className="h-full w-full flex flex-col justify-between pt-12 px-8 shadow-xl bg-primaryYellow overflow-y-scroll">
                 <div className="flex flex-1 flex-col w-full space-y-4">
                   <div className="mb-6">
-                    <Link href={(!!query?.ref && isAddress(query.ref as string)) ? `/?ref=${query.ref}` : `/`} passHref>
+                    <Link
+                      href={
+                        !!query?.ref && isAddress(query.ref as string)
+                          ? `/?ref=${query.ref}`
+                          : `/`
+                      }
+                      passHref
+                    >
                       <img
                         src="/images/icons/popLogoBlack.svg"
                         alt="Logo"
@@ -238,24 +279,18 @@ export default function Navbar(): JSX.Element {
   );
 }
 
-
 function BuyVCXButton(): JSX.Element {
   return (
     <>
       <button
         className={`w-48 px-4 py-2 rounded bg-white border border-white font-semibold text-base text-black
-                  transition-all ease-in-out duration-500 hover:bg-primaryYellow hover:border-primaryYellow 
-                  disabled:bg-customGray100 disabled:border-customGray100 disabled:text-white disabled:cursor-not-allowed 
+                  transition-all ease-in-out duration-500 hover:bg-primaryYellow hover:border-primaryYellow
+                  disabled:bg-customGray100 disabled:border-customGray100 disabled:text-white disabled:cursor-not-allowed
                   disabled:hover:border-customGray100 disabled:hover:bg-customGray100 disabled:hover:text-white
-                  hidden md:flex flex-row items-center justify-center`
-        }
+                  hidden md:flex flex-row items-center justify-center`}
         type="button"
-        onClick={
-          () =>
-            window.open(
-              "https://swap.cow.fi/#/1/swap/WETH/VCX",
-              "_blank"
-            )
+        onClick={() =>
+          window.open("https://swap.cow.fi/#/1/swap/WETH/VCX", "_blank")
         }
       >
         <img
@@ -265,19 +300,14 @@ function BuyVCXButton(): JSX.Element {
         <p className="ml-2 mt-1">Buy VCX</p>
       </button>
       <button
-        className={`w-48 px-4 py-2 rounded bg-black border border-black font-semibold text-base text-primaryYellow 
-        transition-all ease-in-out duration-500 hover:bg-white hover:border-white hover:text-black 
-        disabled:bg-customGray100 disabled:border-customGray100 disabled:text-white disabled:cursor-not-allowed 
+        className={`w-48 px-4 py-2 rounded bg-black border border-black font-semibold text-base text-primaryYellow
+        transition-all ease-in-out duration-500 hover:bg-white hover:border-white hover:text-black
+        disabled:bg-customGray100 disabled:border-customGray100 disabled:text-white disabled:cursor-not-allowed
         disabled:hover:border-customGray100 disabled:hover:bg-customGray100 disabled:hover:text-white
-        md:hidden flex flex-row items-center justify-center`
-        }
+        md:hidden flex flex-row items-center justify-center`}
         type="button"
-        onClick={
-          () =>
-            window.open(
-              "https://swap.cow.fi/#/1/swap/WETH/VCX",
-              "_blank"
-            )
+        onClick={() =>
+          window.open("https://swap.cow.fi/#/1/swap/WETH/VCX", "_blank")
         }
       >
         <img
@@ -287,5 +317,5 @@ function BuyVCXButton(): JSX.Element {
         <p className="ml-2 mb-1">Buy VCX</p>
       </button>
     </>
-  )
+  );
 }

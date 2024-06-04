@@ -1,12 +1,11 @@
 import NoSSR from "react-no-ssr";
-import { useEffect, useState } from "react";
-import {
-  Address,
-  useAccount,
-  useBalance,
-} from "wagmi";
+import { Fragment, useEffect, useState } from "react";
+import { Address, useAccount, useBalance } from "wagmi";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
-import { NumberFormatter } from "@/lib/utils/formatBigNumber";
+import {
+  NumberFormatter,
+  formatTwoDecimals,
+} from "@/lib/utils/formatBigNumber";
 import useNetworkFilter from "@/lib/useNetworkFilter";
 import SmartVault from "@/components/vault/SmartVault";
 import NetworkFilter from "@/components/network/NetworkFilter";
@@ -18,11 +17,19 @@ import SearchBar from "@/components/input/SearchBar";
 import { OptionTokenByChain, VCX } from "@/lib/constants";
 import Modal from "@/components/modal/Modal";
 import OptionTokenInterface from "@/components/optionToken/OptionTokenInterface";
-import { AddressesByChain, VaultData } from "@/lib/types";
-import { gaugeRewardsAtom, networthAtom, tokensAtom, tvlAtom } from "@/lib/atoms";
+import type { AddressesByChain, VaultData } from "@/lib/types";
+import {
+  gaugeRewardsAtom,
+  networthAtom,
+  tokensAtom,
+  tvlAtom,
+} from "@/lib/atoms";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import OptionTokenExerciseModal from "@/components/optionToken/exercise/OptionTokenExerciseModal";
-
+import AssetWithName from "./AssetWithName";
+import { GoSearch } from "react-icons/go";
+import { MdClose } from "react-icons/md";
+import { cn } from "@/lib/utils/helpers";
 interface VaultsContainerProps {
   hiddenVaults: AddressesByChain;
   displayVaults: AddressesByChain;
@@ -34,19 +41,21 @@ export default function VaultsContainer({
   displayVaults,
   showDescription = false,
 }: VaultsContainerProps): JSX.Element {
+  const [showSearchInput, setShowSearchInput] = useState(false);
   const { address: account } = useAccount();
 
   const [vaultsData] = useAtom(vaultsAtom);
-  const [vaults, setVaults] = useState<VaultData[]>([])
+  const [vaults, setVaults] = useState<VaultData[]>([]);
 
   useEffect(() => {
-    if (Object.keys(vaultsData).length > 0) setVaults(SUPPORTED_NETWORKS.map(chain => vaultsData[chain.id]).flat())
-  }, [vaultsData])
+    if (Object.keys(vaultsData).length > 0)
+      setVaults(SUPPORTED_NETWORKS.map((chain) => vaultsData[chain.id]).flat());
+  }, [vaultsData]);
 
-  const [tvl] = useAtom(tvlAtom)
-  const [networth] = useAtom(networthAtom)
-  const [tokens] = useAtom(tokensAtom)
-  const [gaugeRewards] = useAtom(gaugeRewardsAtom)
+  const [tvl] = useAtom(tvlAtom);
+  const [networth] = useAtom(networthAtom);
+  const [tokens] = useAtom(tokensAtom);
+  const [gaugeRewards] = useAtom(gaugeRewardsAtom);
 
   const { data: oBal } = useBalance({
     chainId: 1,
@@ -66,18 +75,22 @@ export default function VaultsContainer({
     setSearchTerm(value);
   }
 
+  const SHOW_INPUT_SEARCH = showSearchInput || searchTerm.length > 0;
+
   return (
-    <NoSSR >
+    <NoSSR>
       <Modal visibility={[showOptionTokenModal, setShowOptionTokenModal]}>
         <OptionTokenInterface />
       </Modal>
-      <OptionTokenExerciseModal show={[showExerciseModal, setShowExerciseModal]} />
+      <OptionTokenExerciseModal
+        show={[showExerciseModal, setShowExerciseModal]}
+      />
       <section className="md:border-b border-customNeutral100 md:flex md:flex-row items-center justify-between py-10 px-4 md:px-8 md:gap-4">
         <div className="w-full md:w-max">
           <h1 className="text-5xl font-normal m-0 mb-4 md:mb-2 leading-0 text-white md:text-3xl leading-none">
             Smart Vaults
           </h1>
-          <p className="text-customGray100 md:text-white md:opacity-80">
+          <p className="text-customGray100 md:text-white md:opacity-80 max-w-xs">
             Automate your returns in single-asset deposit yield strategies.
           </p>
         </div>
@@ -110,12 +123,14 @@ export default function VaultsContainer({
                   My oVCX
                 </p>
                 <div className="w-max text-3xl font-bold whitespace-nowrap text-white">
-                  {`$${oBal && tokens[1] && tokens[1][VCX]
-                    ? NumberFormatter.format(
-                      (Number(oBal?.value) / 1e18) * (tokens[1][VCX].price * 0.25)
-                    )
-                    : "0"
-                    }`}
+                  {`$${
+                    oBal && tokens[1] && tokens[1][VCX]
+                      ? NumberFormatter.format(
+                          (Number(oBal?.value) / 1e18) *
+                            (tokens[1][VCX].price * 0.25)
+                        )
+                      : "0"
+                  }`}
                 </div>
               </div>
 
@@ -124,13 +139,19 @@ export default function VaultsContainer({
                   Claimable oVCX
                 </p>
                 <div className="w-max text-3xl font-bold whitespace-nowrap text-white">
-                  {`$${gaugeRewards && tokens[1] && tokens[1][VCX]
-                    ? NumberFormatter.format(
-                      (Number(gaugeRewards?.[1]?.total + gaugeRewards?.[10]?.total + gaugeRewards?.[42161]?.total || 0) / 1e18) *
-                      (tokens[1][VCX].price * 0.25)
-                    )
-                    : "0"
-                    }`}
+                  {`$${
+                    gaugeRewards && tokens[1] && tokens[1][VCX]
+                      ? NumberFormatter.format(
+                          (Number(
+                            gaugeRewards?.[1]?.total +
+                              gaugeRewards?.[10]?.total +
+                              gaugeRewards?.[42161]?.total || 0
+                          ) /
+                            1e18) *
+                            (tokens[1][VCX].price * 0.25)
+                        )
+                      : "0"
+                  }`}
                 </div>
               </div>
             </div>
@@ -159,44 +180,176 @@ export default function VaultsContainer({
         </div>
       </section>
 
-      <section className="my-10 px-4 md:px-8 md:flex flex-row items-center justify-between">
-        <NetworkFilter
-          supportedNetworks={SUPPORTED_NETWORKS.map((chain) => chain.id)}
-          selectNetwork={selectNetwork}
-        />
-        <div className="flex flex-row space-x-4 mt-4">
-          <SearchBar searchTerm={searchTerm} handleSearch={handleSearch} />
-          <VaultsSorting className="" vaultState={[vaults, setVaults]} />
-        </div>
-      </section>
+      <section className="text-white mt-12 w-full border rounded-xl overflow-hidden border-customNeutral100">
+        <table className="w-full [&_td]:h-20 [&_th]:h-18 [&_td]:px-5 [&_th]:px-5">
+          <thead className="bg-customNeutral200 border-b border-customNeutral100">
+            <tr>
+              <th className="font-normalt">
+                <nav className="flex relative gap-3 [&_button:not(.bg-opacity-20)]:bg-opacity-0 [&_button:not(.bg-opacity-20)]:border-customGray100/40 [&_button:hover]:border-primaryYellow [&_button]:rounded-full [&_img]:w-5 [&_button]:px-5 [&_button]:py-2">
+                  <fieldset
+                    onBlurCapture={() => setShowSearchInput(false)}
+                    onClick={() => setShowSearchInput(true)}
+                    role="button"
+                  >
+                    <button className="w-12 pointer-events-none h-10 grid place-items-center border !p-0 !rounded-lg">
+                      <GoSearch className="scale-110" />
+                    </button>
 
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-4 px-4 md:px-8">
-        {vaults.length > 0 ? (
-          <>
+                    {SHOW_INPUT_SEARCH && (
+                      <Fragment>
+                        <div className="absolute pointer-events-none w-12 z-[1] top-1/2 left-0 -translate-y-1/2 grid place-items-center">
+                          <GoSearch className="scale-110" />
+                        </div>
+
+                        <input
+                          autoFocus
+                          value={searchTerm}
+                          placeholder="Search"
+                          onInput={(e) => handleSearch(e.currentTarget.value)}
+                          className="absolute pl-14 pr-4 font-normal inset-0 border outline-none border-customGray100/40 rounded-lg bg-customNeutral200"
+                          type="text"
+                        />
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSearchTerm("");
+                            setShowSearchInput(false);
+                          }}
+                          className="absolute z-[1] flex items-center h-full !p-0 w-8 top-0 right-0"
+                        >
+                          <MdClose className="text-xl scale-105" />
+                        </button>
+                      </Fragment>
+                    )}
+                  </fieldset>
+
+                  <NetworkFilter
+                    supportedNetworks={SUPPORTED_NETWORKS.map(
+                      (chain) => chain.id
+                    )}
+                    selectNetwork={selectNetwork}
+                  />
+                </nav>
+              </th>
+              <th className="font-normal text-right whitespace-nowrap">
+                Your Wallet
+              </th>
+              <th className="font-normal text-right whitespace-nowrap">
+                Your Deposit
+              </th>
+              <th className="font-normal text-right">TVL</th>
+              <th className="font-normal text-right">vAPR</th>
+              <th className="font-normal text-right whitespace-nowrap">
+                Min Rewards APY
+              </th>
+              <th className="font-normal text-right whitespace-nowrap">
+                Max Rewards APY
+              </th>
+              <th className="font-normal text-right">Boost</th>
+            </tr>
+          </thead>
+          <tbody>
             {vaults
-              .filter((vault) => selectedNetworks.includes(vault.chainId))
+              .filter(
+                (vault) =>
+                  SHOW_INPUT_SEARCH || selectedNetworks.includes(vault.chainId)
+              )
               .filter((vault) =>
                 Object.keys(displayVaults).length > 0
                   ? displayVaults[vault.chainId].includes(vault.address)
                   : !hiddenVaults[vault.chainId].includes(vault.address)
               )
               .sort((a, b) => b.tvl - a.tvl)
-              .map((vault) => {
-                return (
-                  <SmartVault
-                    key={`sv-${vault.address}-${vault.chainId}`}
-                    vaultData={vault}
-                    searchTerm={searchTerm}
-                    description={showDescription ? vault.metadata.description : undefined}
-                  />
-                )
-              })
-            }
-          </>
-        ) : (
-          <p className="text-white">Loading Vaults...</p>
-        )}
+              .map((vaultData, i) => (
+                <VaultRow
+                  {...vaultData}
+                  searchTerm={searchTerm}
+                  key={`item-${i}`}
+                />
+              ))}
+          </tbody>
+        </table>
       </section>
-    </NoSSR >
-  )
+    </NoSSR>
+  );
+}
+
+function VaultRow({
+  searchTerm,
+  ...vaultData
+}: VaultData & {
+  searchTerm?: string;
+}) {
+  const {
+    asset,
+    gauge,
+    maxGaugeApy = 0,
+    minGaugeApy = 0,
+    tvl,
+    apy,
+    chainId,
+  } = vaultData;
+
+  const [tokens] = useAtom(tokensAtom);
+  const dataAsset = tokens[chainId]?.[asset] ?? {};
+  const dataGauge = tokens[chainId]?.[gauge!] ?? {};
+
+  let boost = Math.round(maxGaugeApy / minGaugeApy) || 0;
+  if (boost <= 1) boost = 1;
+
+  const searchData = [
+    vaultData.metadata?.vaultName,
+    dataAsset?.symbol,
+    dataAsset?.name,
+    dataGauge?.symbol,
+    dataGauge?.name,
+    ...(vaultData.metadata?.labels ?? []),
+    ...vaultData.strategies.map(
+      ({ metadata }) => `${metadata?.name}${metadata?.description}`
+    ),
+  ]
+    .join()
+    .toLowerCase();
+
+  return (
+    <tr
+      className={cn("border-b border-customNeutral100", {
+        hidden: searchTerm
+          ? !searchData.includes(searchTerm.toLowerCase())
+          : false,
+      })}
+    >
+      <td>
+        <AssetWithName
+          className="[&_h2]:font-normal pl-3 [&_h2]:text-lg"
+          vault={vaultData}
+        />
+      </td>
+
+      <td className="text-right">
+        <p className="text-lg">00000.993</p>
+        <p className="text-sm -mt-0.5 text-customGray200"># TKN</p>
+      </td>
+
+      <td className="text-right">
+        <p className="text-lg">$ 254.23K</p>
+        <p className="text-sm -mt-0.5 text-customGray200"># TKN</p>
+      </td>
+
+      <td className="text-right whitespace-nowrap">
+        <p className="text-lg">
+          $ {tvl < 1 ? "0" : NumberFormatter.format(tvl)}
+        </p>
+        <p className="text-sm -mt-0.5 text-customGray200"># TKN</p>
+      </td>
+
+      <td className="text-right text-lg">{formatTwoDecimals(apy)}%</td>
+
+      <td className="text-right text-lg">{formatTwoDecimals(minGaugeApy)}%</td>
+
+      <td className="text-right text-lg">{formatTwoDecimals(maxGaugeApy)}%</td>
+
+      <td className="text-right text-lg text-primaryGreen">x{boost}</td>
+    </tr>
+  );
 }
