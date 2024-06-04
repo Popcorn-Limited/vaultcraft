@@ -5,6 +5,9 @@ import { Abi, Address, isAddress } from "viem";
 import { ADDRESS_ZERO } from "@/lib/constants";
 import { PublicClient } from "wagmi";
 
+import clsx, { type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
 export function validateInput(value: string | number): {
   formatted: string;
   isValid: boolean;
@@ -39,7 +42,7 @@ export async function handleCallResult({
       showSuccessToast(successMessage);
       return true;
     } catch (error: any) {
-      console.log({ error })
+      console.log({ error });
       showErrorToast(error.shortMessage);
       return false;
     }
@@ -89,7 +92,7 @@ export function cleanTokenSymbol(token: Token): string {
   return token.symbol;
 }
 
-export function noOp() { }
+export function noOp() {}
 
 export const beautifyAddress = (addr: string) =>
   `${addr.slice(0, 4)}...${addr.slice(-5, 5)}`;
@@ -152,7 +155,6 @@ export function extractRevertReason(error: any): string {
   return error;
 }
 
-
 export type SimulationContract = {
   address: Address;
   abi: Abi;
@@ -173,7 +175,7 @@ export async function simulateCall({
   functionName,
   publicClient,
   args,
-  value
+  value,
 }: SimulateProps): Promise<SimulationResponse> {
   try {
     const { request } = await publicClient.simulateContract({
@@ -183,11 +185,13 @@ export async function simulateCall({
       // @ts-ignore
       functionName,
       args,
-      value
+      value,
     });
     return { request: request, success: true, error: null };
   } catch (error: any) {
-    console.log({ simError: error })
+    console.log({ simError: error });
     return { request: null, success: false, error: error.shortMessage };
   }
 }
+
+export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
