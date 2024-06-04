@@ -4,6 +4,7 @@ import { Address, useAccount, useBalance } from "wagmi";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import {
   NumberFormatter,
+  formatAndRoundNumber,
   formatTwoDecimals,
 } from "@/lib/utils/formatBigNumber";
 import useNetworkFilter from "@/lib/useNetworkFilter";
@@ -287,10 +288,13 @@ function VaultRow({
     minGaugeApy = 0,
     tvl,
     apy,
+    vault: vaultAddress,
     chainId,
   } = vaultData;
 
   const [tokens] = useAtom(tokensAtom);
+
+  const vault = tokens[chainId]?.[vaultAddress] ?? {};
   const dataAsset = tokens[chainId]?.[asset] ?? {};
   const dataGauge = tokens[chainId]?.[gauge!] ?? {};
 
@@ -327,12 +331,26 @@ function VaultRow({
       </td>
 
       <td className="text-right">
-        <p className="text-lg">00000.993</p>
+        <p className="text-lg">
+          {formatAndRoundNumber(dataAsset.balance, dataAsset.decimals)}
+        </p>
         <p className="text-sm -mt-0.5 text-customGray200"># TKN</p>
       </td>
 
       <td className="text-right">
-        <p className="text-lg">$ 254.23K</p>
+        <p className="text-lg">
+          ${" "}
+          {dataGauge
+            ? NumberFormatter.format(
+                (dataGauge.balance * dataGauge.price) /
+                  10 ** dataGauge.decimals +
+                  (vault?.balance! * vault?.price!) / 10 ** vault?.decimals!
+              )
+            : formatAndRoundNumber(
+                vault?.balance! * vault?.price!,
+                vault?.decimals!
+              )}
+        </p>
         <p className="text-sm -mt-0.5 text-customGray200"># TKN</p>
       </td>
 
