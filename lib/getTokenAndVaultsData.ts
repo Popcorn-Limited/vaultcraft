@@ -202,8 +202,14 @@ async function prepareVaultsData(chainId: number, client: PublicClient): Promise
     allowFailure: false,
   });
 
+  const apyHistAll = await Promise.all(filteredVaults.map(async (vault: any) => {
+    if (vault.apyId.length > 0) return getApy(vault.apyId)
+    return []
+  }))
+
   let result: VaultDataByAddress = {};
   filteredVaults.forEach((vault: any, i: number) => {
+    const apyHist = apyHistAll[i]
     if (i > 0) i = i * 3;
 
     result[vault.address] = {
@@ -221,6 +227,8 @@ async function prepareVaultsData(chainId: number, client: PublicClient): Promise
       totalApy: 0,
       minGaugeApy: 0,
       maxGaugeApy: 0,
+      apyHist: apyHist,
+      apyId: vault.apyId,
       gaugeSupply: 0,
       workingSupply: 0,
       workingBalance: 0,
@@ -329,8 +337,8 @@ async function prepareVaults(vaultsData: VaultDataByAddress, assets: TokenByAddr
   return result;
 }
 
-async function getApy(strategy: Strategy) {
-  const { data } = await axios.get(`https://pro-api.llama.fi/${process.env.DEFILLAMA_API_KEY}/yields/chart/${strategy.apyId}`)
+async function getApy(apyId: string) {
+  const { data } = await axios.get(`https://pro-api.llama.fi/${process.env.DEFILLAMA_API_KEY}/yields/chart/${apyId}`)
   return data.data.map((entry: any) => { return { apy: entry.apy, apyBase: entry.apyBase, apyReward: entry.apyReward, date: new Date(entry.timestamp) } })
 }
 
