@@ -17,11 +17,6 @@ import { GAUGE_NETWORKS } from "pages/boost";
 import { AavePoolAddressProviderByChain, AaveUiPoolProviderByChain } from "@/lib/external/aave";
 import { vcx as getVcxPrice } from "@/lib/resolver/price/resolver";
 
-const STRATEGY_TO_ALTERNATE_ASSET: { [key: Address]: Address } = {
-  "0x9E0c5d524dc3Ff0aa734c52aa57ab623436364e6": "0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee",
-  "0xA84397004Abe8229CC481cE91BA850ECd8204822": "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7"
-}
-
 interface GetVaultsByChainProps {
   chain: Chain;
   account?: Address;
@@ -392,13 +387,8 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
       let apy = 0;
       let apyHist: LlamaApy[] = []
 
-      let assetAddress = desc.asset
-      if (Object.keys(STRATEGY_TO_ALTERNATE_ASSET).includes(address)) {
-        assetAddress = STRATEGY_TO_ALTERNATE_ASSET[address]
-      }
-
       try {
-        const strategyApy = await getApy(desc)
+        const strategyApy = await getApy(desc.apyId)
         apy = strategyApy[strategyApy.length - 1].apy;
         apyHist = strategyApy;
       } catch (e) {
