@@ -297,6 +297,7 @@ async function prepareAssets(addresses: Address[], chainId: number, client: Publ
 
     result[address] = {
       ...assets[address],
+      address: address,
       price: tokenPrice,
       balance: 0,
       totalSupply: Number(ts[i]),
@@ -475,6 +476,7 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
 
 
 async function addBalances(tokens: TokenByAddress, account: Address, client: PublicClient): Promise<TokenByAddress> {
+  console.log({ tokens })
   const balances = await client.multicall({
     contracts:
       Object.values(tokens)
