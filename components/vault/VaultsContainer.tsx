@@ -1,20 +1,13 @@
 import NoSSR from "react-no-ssr";
 import { Fragment, useEffect, useState } from "react";
-import { Address, useAccount, useBalance } from "wagmi";
+import { useAccount, useBalance } from "wagmi";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
-import {
-  NumberFormatter,
-  formatAndRoundNumber,
-  formatTwoDecimals,
-} from "@/lib/utils/formatBigNumber";
+import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import useNetworkFilter from "@/lib/useNetworkFilter";
-import SmartVault from "@/components/vault/SmartVault";
 import NetworkFilter from "@/components/network/NetworkFilter";
 import MainActionButton from "@/components/button/MainActionButton";
 import { useAtom } from "jotai";
 import { vaultsAtom } from "@/lib/atoms/vaults";
-import VaultsSorting from "@/components/vault/VaultsSorting";
-import SearchBar from "@/components/input/SearchBar";
 import { OptionTokenByChain, VCX } from "@/lib/constants";
 import Modal from "@/components/modal/Modal";
 import OptionTokenInterface from "@/components/optionToken/OptionTokenInterface";
@@ -27,20 +20,18 @@ import {
 } from "@/lib/atoms";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import OptionTokenExerciseModal from "@/components/optionToken/exercise/OptionTokenExerciseModal";
-import AssetWithName from "./AssetWithName";
 import { GoSearch } from "react-icons/go";
 import { MdClose } from "react-icons/md";
-import { cn } from "@/lib/utils/helpers";
+import VaultRow from "./VaultRow";
+
 interface VaultsContainerProps {
   hiddenVaults: AddressesByChain;
   displayVaults: AddressesByChain;
-  showDescription?: boolean;
 }
 
 export default function VaultsContainer({
   hiddenVaults,
   displayVaults,
-  showDescription = false,
 }: VaultsContainerProps): JSX.Element {
   const [showSearchInput, setShowSearchInput] = useState(false);
   const { address: account } = useAccount();
@@ -185,7 +176,7 @@ export default function VaultsContainer({
         <table className="w-full [&_td]:h-20 [&_th]:h-18 [&_td]:px-5 [&_th]:px-5">
           <thead className="bg-customNeutral200 border-b border-customNeutral100">
             <tr>
-              <th className="font-normalt">
+              <th>
                 <nav className="flex relative gap-3 [&_button:not(.bg-opacity-20)]:bg-opacity-0 [&_button:not(.bg-opacity-20)]:border-customGray100/40 [&_button:hover]:border-primaryYellow [&_button]:rounded-full [&_img]:w-5 [&_button]:px-5 [&_button]:py-2">
                   <fieldset
                     onBlurCapture={() => setShowSearchInput(false)}
@@ -272,102 +263,5 @@ export default function VaultsContainer({
         </table>
       </section>
     </NoSSR>
-  );
-}
-
-function VaultRow({
-  searchTerm,
-  ...vaultData
-}: VaultData & {
-  searchTerm?: string;
-}) {
-  const {
-    asset,
-    gauge,
-    maxGaugeApy = 0,
-    minGaugeApy = 0,
-    tvl,
-    apy,
-    vault: vaultAddress,
-    chainId,
-  } = vaultData;
-
-  const [tokens] = useAtom(tokensAtom);
-
-  const vault = tokens[chainId]?.[vaultAddress] ?? {};
-  const dataAsset = tokens[chainId]?.[asset] ?? {};
-  const dataGauge = tokens[chainId]?.[gauge!] ?? {};
-
-  let boost = Math.round(maxGaugeApy / minGaugeApy) || 0;
-  if (boost <= 1) boost = 1;
-
-  const searchData = [
-    vaultData.metadata?.vaultName,
-    dataAsset?.symbol,
-    dataAsset?.name,
-    dataGauge?.symbol,
-    dataGauge?.name,
-    ...(vaultData.metadata?.labels ?? []),
-    ...vaultData.strategies.map(
-      ({ metadata }) => `${metadata?.name}${metadata?.description}`
-    ),
-  ]
-    .join()
-    .toLowerCase();
-
-  return (
-    <tr
-      className={cn("border-b border-customNeutral100", {
-        hidden: searchTerm
-          ? !searchData.includes(searchTerm.toLowerCase())
-          : false,
-      })}
-    >
-      <td>
-        <AssetWithName
-          className="[&_h2]:font-normal pl-3 [&_h2]:text-lg"
-          vault={vaultData}
-        />
-      </td>
-
-      <td className="text-right">
-        <p className="text-lg">
-          {formatAndRoundNumber(dataAsset.balance, dataAsset.decimals)}
-        </p>
-        <p className="text-sm -mt-0.5 text-customGray200"># TKN</p>
-      </td>
-
-      <td className="text-right">
-        <p className="text-lg">
-          ${" "}
-          {dataGauge
-            ? NumberFormatter.format(
-                (dataGauge.balance * dataGauge.price) /
-                  10 ** dataGauge.decimals +
-                  (vault?.balance! * vault?.price!) / 10 ** vault?.decimals!
-              )
-            : formatAndRoundNumber(
-                vault?.balance! * vault?.price!,
-                vault?.decimals!
-              )}
-        </p>
-        <p className="text-sm -mt-0.5 text-customGray200"># TKN</p>
-      </td>
-
-      <td className="text-right whitespace-nowrap">
-        <p className="text-lg">
-          $ {tvl < 1 ? "0" : NumberFormatter.format(tvl)}
-        </p>
-        <p className="text-sm -mt-0.5 text-customGray200"># TKN</p>
-      </td>
-
-      <td className="text-right text-lg">{formatTwoDecimals(apy)}%</td>
-
-      <td className="text-right text-lg">{formatTwoDecimals(minGaugeApy)}%</td>
-
-      <td className="text-right text-lg">{formatTwoDecimals(maxGaugeApy)}%</td>
-
-      <td className="text-right text-lg text-primaryGreen">x{boost}</td>
-    </tr>
   );
 }
