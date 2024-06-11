@@ -1,5 +1,5 @@
 import Navbar from "@/components/navbar/Navbar";
-import { masaAtom, yieldOptionsAtom } from "@/lib/atoms/sdk";
+import { yieldOptionsAtom } from "@/lib/atoms/sdk";
 import { vaultsAtom } from "@/lib/atoms/vaults";
 import { RPC_URLS, SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { useAtom } from "jotai";
@@ -7,7 +7,6 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { CachedProvider, YieldOptions } from "vaultcraft-sdk";
 import { mainnet, useAccount, usePublicClient } from "wagmi";
 import Footer from "@/components/common/Footer";
-import { useMasaAnalyticsReact } from "@masa-finance/analytics-react";
 import { useRouter } from "next/router";
 import { Address, createPublicClient, http, zeroAddress } from "viem";
 import Modal from "@/components/modal/Modal";
@@ -164,38 +163,10 @@ export default function Page({
   const publicClient = usePublicClient();
 
   const [yieldOptions, setYieldOptions] = useAtom(yieldOptionsAtom);
-  const [masaSdk, setMasaSdk] = useAtom(masaAtom);
-
-  const {
-    fireEvent,
-    fireLoginEvent,
-    firePageViewEvent,
-    fireConnectWalletEvent,
-  } = useMasaAnalyticsReact({
-    clientApp: "VaultCraft",
-    clientName: "VaultCraft",
-    clientId: process.env.MASA_CLIENT_ID as string,
-  });
-
-  useEffect(() => {
-    void firePageViewEvent({
-      page: `https://app.vaultcraft.io${asPath}`,
-      user_address: account,
-      additionalEventData: { referral: query.ref },
-    });
-  }, [asPath]);
 
   useEffect(() => {
     if (!yieldOptions) {
       setUpYieldOptions().then((res: any) => setYieldOptions(res));
-    }
-    if (!masaSdk) {
-      setMasaSdk({
-        fireEvent,
-        fireLoginEvent,
-        firePageViewEvent,
-        fireConnectWalletEvent,
-      });
     }
   }, []);
 

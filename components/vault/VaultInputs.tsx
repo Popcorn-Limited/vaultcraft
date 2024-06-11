@@ -21,7 +21,6 @@ import handleVaultInteraction from "@/lib/vault/handleVaultInteraction";
 import ActionSteps from "@/components/vault/ActionSteps";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { useAtom } from "jotai";
-import { masaAtom } from "@/lib/atoms/sdk";
 import { useRouter } from "next/router";
 import { ActionStep, getSmartVaultActionSteps } from "@/lib/getActionSteps";
 import { vaultsAtom } from "@/lib/atoms/vaults";
@@ -55,7 +54,6 @@ export default function VaultInputs({
   const { switchNetworkAsync } = useSwitchNetwork();
   const { openConnectModal } = useConnectModal();
 
-  const [masaSdk] = useAtom(masaAtom);
   const [tokens, setTokens] = useAtom(tokensAtom);
   const [vaults, setVaults] = useAtom(vaultsAtom);
   const [tvl, setTVL] = useAtom(tvlAtom);
@@ -264,7 +262,6 @@ export default function VaultInputs({
       slippage,
       tradeTimeout,
       clients: { publicClient, walletClient },
-      fireEvent: masaSdk?.fireEvent,
       referral:
         !!query?.ref && isAddress(query.ref as string)
           ? getAddress(query.ref as string)

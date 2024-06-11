@@ -2,9 +2,9 @@ import { showLoadingToast } from "@/lib/toasts";
 import { Clients, SimulationResponse, Token, TokenByAddress, VaultData } from "@/lib/types";
 import { VaultAbi } from "@/lib/constants";
 import { Address, PublicClient } from "viem";
+import { FireEventArgs } from "@masa-finance/analytics-sdk";
 import { VaultRouterAbi } from "@/lib/constants/abi/VaultRouter";
 import { handleCallResult } from "@/lib/utils/helpers";
-import { FireEventArgs } from "@masa-finance/analytics-sdk";
 import { networkMap } from "@/lib/utils/connectors";
 import mutateTokenBalance from "./mutateTokenBalance";
 
