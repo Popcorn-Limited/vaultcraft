@@ -1,6 +1,6 @@
 import AssetWithName from "@/components/vault/AssetWithName";
 import { vaultsAtom } from "@/lib/atoms/vaults";
-import { VaultFees, VaultData, Token, Strategy } from "@/lib/types";
+import { VaultFees, VaultData, Token, Strategy, TokenByAddress } from "@/lib/types";
 import { useAtom } from "jotai";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
@@ -8,7 +8,7 @@ import NoSSR from "react-no-ssr";
 import { createConfig, erc20ABI, useAccount } from "wagmi";
 import axios from "axios";
 import { Address, createPublicClient, extractChain, http, isAddress, zeroAddress } from "viem";
-import { AdminProxyByChain, MultiStrategyVaultAbi, VaultAbi, VaultControllerByChain } from "@/lib/constants";
+import { AdminProxyByChain, GaugeAbi, MultiStrategyVaultAbi, VaultAbi, VaultControllerByChain } from "@/lib/constants";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 import * as chains from "viem/chains";
 import { ProtocolName, YieldOptions } from "vaultcraft-sdk";
@@ -23,7 +23,6 @@ import VaultTakeFees from "@/components/vault/management/vault/Fees";
 import VaultStrategiesConfiguration from "@/components/vault/management/vault/Strategies";
 import VaultRebalance from "@/components/vault/management/vault/Rebalance";
 import { tokensAtom } from "@/lib/atoms";
-import Highcharts, { chart } from "highcharts";
 import InputNumber from "@/components/input/InputNumber";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import MainActionButton from "@/components/button/MainActionButton";
@@ -34,6 +33,8 @@ import { showSuccessToast } from "@/lib/toasts";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { Square2StackIcon } from "@heroicons/react/24/outline";
 import LeftArrowIcon from "@/components/svg/LeftArrowIcon";
+import ApyChart from "@/components/vault/management/vault/ApyChart";
+import NetFlowChart from "@/components/vault/management/vault/NetFlowChart";
 
 async function getLogs(vault: VaultData, asset: Token) {
   const client = createPublicClient({
@@ -383,8 +384,69 @@ export default function Index() {
             </div>
           </section>
 
-          <ApyChart strategy={vaultData.strategies[0]} />
-          <NetFlowChart logs={logs} asset={asset} />
+          <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-8 text-white">
+            <h2 className="text-white font-bold text-2xl">Informations</h2>
+            <p className="text-white">
+              {vaultData.metadata.description && vaultData.metadata.description?.split("-LINK- ").length > 0 ?
+                <>{vaultData.metadata.description?.split("-LINK- ")[0]}{" "}
+                  <a href={vaultData.metadata.description?.split("-LINK- ")[1]} target="_blank" className="text-secondaryBlue">here</a></>
+                : <>{vaultData.metadata.description}</>
+              }
+            </p>
+
+            <div className="flex flex-row items-center">
+              <ApyChart strategy={vaultData.strategies[0]} />
+              <NetFlowChart logs={logs} asset={asset} />
+            </div>
+
+            <div className="md:flex md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4 mt-4">
+
+              <div className="w-full md:w-10/12 border border-customNeutral100 rounded-lg p-4">
+                <p className="text-white font-normal">Vault address:</p>
+                <div className="flex flex-row items-center justify-between">
+                  <p className="font-bold text-white">
+                    {vaultData.address.slice(0, 6)}...{vaultData.address.slice(-4)}
+                  </p>
+                  <div className='w-6 h-6 group/vaultAddress'>
+                    <CopyToClipboard text={vaultData.address} onCopy={() => showSuccessToast("Vault address copied!")}>
+                      <Square2StackIcon className="text-white group-hover/vaultAddress:text-primaryYellow" />
+                    </CopyToClipboard>
+                  </div>
+                </div>
+              </div>
+
+              <div className="w-full md:w-10/12 border border-customNeutral100 rounded-lg p-4">
+                <p className="text-white font-normal">Asset address:</p>
+                <div className="flex flex-row items-center justify-between">
+                  <p className="font-bold text-white">
+                    {vaultData.asset.slice(0, 6)}...{vaultData.asset.slice(-4)}
+                  </p>
+                  <div className='w-6 h-6 group/vaultAddress'>
+                    <CopyToClipboard text={vaultData.asset} onCopy={() => showSuccessToast("Asset address copied!")}>
+                      <Square2StackIcon className="text-white group-hover/vaultAddress:text-primaryYellow" />
+                    </CopyToClipboard>
+                  </div>
+                </div>
+              </div>
+
+              {vaultData.gauge &&
+                <div className="w-full md:w-10/12 border border-customNeutral100 rounded-lg p-4">
+                  <p className="text-white font-normal">Gauge address:</p>
+                  <div className="flex flex-row items-center justify-between">
+                    <p className="font-bold text-white">
+                      {vaultData.gauge.slice(0, 6)}...{vaultData.gauge.slice(-4)}
+                    </p>
+                    <div className='w-6 h-6 group/gaugeAddress'>
+                      <CopyToClipboard text={vaultData.gauge} onCopy={() => showSuccessToast("Gauge address copied!")}>
+                        <Square2StackIcon className="text-white group-hover/gaugeAddress:text-primaryYellow" />
+                      </CopyToClipboard>
+                    </div>
+                  </div>
+                </div>
+              }
+
+            </div>
+          </section>
 
           <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-8 text-white">
             <h2 className="text-white font-bold text-2xl">Vault Settings</h2>
@@ -458,6 +520,14 @@ export default function Index() {
               </p>
             )}
           </section>
+
+
+          {vaultData.gauge &&
+            <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-8 text-white">
+              <h2 className="text-white font-bold text-2xl">Manage Gauge Rewards</h2>
+
+            </section>
+          }
         </div>
       ) : (
         <p className="text-white">Loading...</p>
@@ -466,363 +536,56 @@ export default function Index() {
   );
 }
 
-function initBarChart(elem: null | HTMLElement, data: any[], setShowModal: Function, setModalContent: Function) {
-  if (!elem) return;
-
-  Highcharts.chart(elem,
-    {
-      chart: {
-        type: 'column',
-        backgroundColor: "transparent",
-      },
-      title: {
-        text: '',
-        style: { color: "#fff" }
-      },
-      xAxis: {
-        categories: data.map(entry => String(entry.day)),
-        labels: {
-          style: {
-            color: "#fff",
-          },
-        }
-      },
-      yAxis: {
-        labels: {
-          style: {
-            color: "#fff",
-          },
-        },
-        title: {
-          text: "",
-        },
-      },
-      credits: {
-        enabled: false
-      },
-      legend: {
-        itemStyle: { color: "#fff" }
-      },
-      plotOptions: {
-        column: {
-          borderRadius: '25%',
-          point: {
-            events: {
-              click: function () {
-                setModalContent(data.find(d => d.day === Number(this.category)).logs)
-                setShowModal(true)
-              }
-            }
-          }
-        }
-      },
-      series: [
-        {
-          name: 'Deposit',
-          data: data.map(entry => entry.deposits),
-          type: "column"
-        },
-        {
-          name: 'Withdrawal',
-          data: data.map(entry => -entry.withdrawals),
-          type: "column"
-        },
-        {
-          name: 'Net',
-          data: data.map(entry => entry.net),
-          type: "column"
-        }
-      ]
-    },
-    () => ({})
-  );
-}
-
-function NetFlowChart({ logs, asset }: { logs: any[], asset?: Token }): JSX.Element {
-  const chartElem = useRef(null);
-
-  const [filterAddress, setFilterAddress] = useState<string>("0x")
-  const [from, setFrom] = useState<number>(0)
-  const [to, setTo] = useState<number>(logs.length - 1)
-
-  const [showModal, setShowModal] = useState(false)
-  const [modalContent, setModalContent] = useState<any[]>([])
-
-  useEffect(() => {
-    initBarChart(chartElem.current, logs.filter(log => log.deposits > 0 || log.withdrawals > 0), setShowModal, setModalContent)
-  }, [logs])
-
-  return (
-    <>
-      <Modal visibility={[showModal, setShowModal]}>
-        {modalContent.length > 0 ?
-          <table className="table-auto w-full">
-            <thead>
-              <tr>
-                <th scope="col" className="py-3.5 pl-4 pr-3 text-left font-semibold sm:pl-0">Type</th>
-                <th scope="col" className="px-3 py-3.5 text-left font-semibold">Value</th>
-                <th scope="col" className="px-3 py-3.5 text-left font-semibold">Address</th>
-                <th scope="col" className="px-3 py-3.5 text-left font-semibold">Tx Hash</th>
-              </tr>
-            </thead>
-            <tbody>
-              {modalContent.map(log =>
-                <tr key={log.transactionHash}>
-                  <td className="whitespace-nowrap py-4 pl-4 pr-3 font-medium sm:pl-0">
-                    <h2 className="text-lg text-white text-start">
-                      {log.eventName}
-                    </h2>
-                  </td>
-
-                  <td className="whitespace-nowrap px-3 py-4 text-gray-500 text-start">
-                    {Number(log.args.assets) / (10 ** asset?.decimals!)} {asset?.symbol!}
-                  </td>
-
-                  <td className="whitespace-nowrap px-3 py-4 text-gray-500 text-start">
-                    {log.args.owner}
-                  </td>
-
-                  <td className="whitespace-nowrap px-3 py-4 text-gray-500">
-                    <div className="flex flex-row items-center justify-between">
-                      {log.transactionHash.slice(0, 4)}...{log.transactionHash.slice(-4)}
-                      <div className='w-6 h-6 cursor-pointer group/txHash'>
-                        <CopyToClipboard text={log.transactionHash} onCopy={() => showSuccessToast("Tx Hash copied!")}>
-                          <Square2StackIcon className="text-white group-hover/txHash:text-primaryYellow" />
-                        </CopyToClipboard>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-          : <></>
-        }
-      </Modal>
-      <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-8">
-        <h2 className="text-white font-bold text-2xl">Vault In- and Outflows</h2>
-        <div className="flex flex-row items-end px-12 pt-4 pb-4 space-x-4 text-white">
-          <div>
-            <p>User Address</p>
-            <div className="border border-customGray500 rounded-md p-1">
-              <InputNumber
-                value={filterAddress}
-                onChange={(e) => setFilterAddress(e.currentTarget.value)}
-                type="text"
-              />
-            </div>
-          </div>
-          <div>
-            <p>From</p>
-            <div className="border border-customGray500 rounded-md p-1">
-              <InputNumber
-                value={from}
-                onChange={(e) => setFrom(Number(e.currentTarget.value))}
-                type="number"
-              />
-            </div>
-          </div>
-          <div>
-            <p>To</p>
-            <div className="border border-customGray500 rounded-md p-1">
-              <InputNumber
-                value={to}
-                onChange={(e) => setTo(Number(e.currentTarget.value))}
-                type="number"
-              />
-            </div>
-          </div>
-          <div className="w-40">
-            <MainActionButton
-              label="Filter"
-              handleClick={() =>
-                initBarChart(
-                  chartElem.current,
-                  logs.filter((_, i) => i >= from && i <= to)
-                    .filter(entry => filterAddress === "" ? true : entry.logs.some((log: any) => log.args.owner.toLowerCase().includes(filterAddress)))
-                    .filter(log => log.deposits > 0 || log.withdrawals > 0),
-                  setShowModal,
-                  setModalContent
-                )
-              }
-            />
-          </div>
-          <div className="w-40">
-            <SecondaryActionButton
-              label="Reset"
-              handleClick={() => {
-                setFilterAddress("0x");
-                setFrom(0);
-                setTo(logs.length - 1);
-                initBarChart(
-                  chartElem.current,
-                  logs.filter(log => log.deposits > 0 || log.withdrawals > 0),
-                  setShowModal,
-                  setModalContent
-                )
-              }}
-            />
-          </div>
-
-        </div>
-        <div className={`flex justify-center`} ref={chartElem} />
-      </section>
-    </>
-  )
-}
-
-function initMultiLineChart(elem: null | HTMLElement, data: any[]) {
-  if (!elem) return;
-
-  Highcharts.chart(elem, {
-    chart: {
+async function getRewardData(gauge: Address, chainId: number, tokens: TokenByAddress) {
+  const client = createPublicClient({
+    chain: extractChain({
+      chains: Object.values(chains),
       // @ts-ignore
-      zoomType: "xy",
-      backgroundColor: "transparent",
-    },
-    title: {
-      text: '',
-      style: { color: "#fff" }
-    },
-    tooltip: {
-      shared: true,
-    },
-    xAxis: {
-      type: "datetime",
-    },
-    yAxis: {
-      labels: {
-        style: {
-          color: "#fff",
-        },
-      },
-      title: {
-        text: "",
-      },
-    },
-    credits: {
-      enabled: false
-    },
-    legend: {
-      itemStyle: { color: "#fff" }
-    },
-    series: [
-      {
-        name: 'Total Apy',
-        data: data.map((d, i) => [Date.UTC(d.date.getFullYear(), d.date.getMonth(), d.date.getDate()), d.apy || 0]),
-        type: "line"
-      },
-      {
-        name: 'Base Apy',
-        data: data.map((d, i) => [Date.UTC(d.date.getFullYear(), d.date.getMonth(), d.date.getDate()), d.apyBase || 0]),
-        type: "line"
-      },
-      {
-        name: 'Reward Apy',
-        data: data.map((d, i) => [Date.UTC(d.date.getFullYear(), d.date.getMonth(), d.date.getDate()), d.apyReward || 0]),
-        type: "line"
-      },
-    ],
-    plotOptions: {
-      series: {
-        marker: {
-          enabled: false,
-          fillColor: "#7AFB79",
-          lineColor: "#7AFB79",
-          lineWidth: 1,
-        },
-        states: {
-          hover: {
-            enabled: true,
-            halo: {
-              size: 0,
-            },
-          },
-        },
-        pointStart: 1,
-      },
-    },
-  },
-    () => ({})
-  );
+      id: chainId,
+    }),
+    transport: http(RPC_URLS[chainId]),
+  });
 
+  const rewardLogs = await client.getContractEvents({
+    address: gauge,
+    abi: GaugeAbi,
+    eventName: "RewardDistributorUpdated",
+    fromBlock: "earliest",
+    toBlock: "latest"
+  })
+
+  if (rewardLogs.length > 0) {
+    const rewardData = await client.multicall({
+      contracts: rewardLogs.map(log => {
+        return {
+          address: gauge,
+          abi: GaugeAbi,
+          functionName: "reward_data",
+          args: [log.args.reward_token]
+        }
+      }),
+      allowFailure: false
+    }) as any[]
+
+
+  }
 }
 
-async function getApy(strategy: Strategy) {
-  const { data } = await axios.get(`https://pro-api.llama.fi/${process.env.DEFILLAMA_API_KEY}/yields/chart/${strategy.apyId}`)
-  return data.data.map((entry: any) => { return { apy: entry.apy, apyBase: entry.apyBase, apyReward: entry.apyReward, date: new Date(entry.timestamp) } })
-}
-
-function ApyChart({ strategy }: { strategy: Strategy }): JSX.Element {
-  const chartElem = useRef(null);
-
-  const [apyData, setApyData] = useState<any[]>([])
-  const [from, setFrom] = useState<number>(0)
-  const [to, setTo] = useState<number>(1)
-
-  useEffect(() => {
-    async function setUp() {
-      const _apyData = await getApy(strategy);
-      setApyData(_apyData);
-      setTo(_apyData.length - 1)
-      initMultiLineChart(chartElem.current, _apyData);
-    }
-    setUp()
-  }, [])
-
+function RewardBlob() {
   return (
-    <>
-      <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-8">
-        <h2 className="text-white font-bold text-2xl">Vault APY</h2>
-        <div className="flex flex-row items-end px-12 pt-4 pb-4 space-x-4 text-white">
-          <div>
-            <p>From</p>
-            <div className="border border-customGray500 rounded-md p-1">
-              <InputNumber
-                value={from}
-                onChange={(e) => setFrom(Number(e.currentTarget.value))}
-                type="number"
-              />
-            </div>
-          </div>
-          <div>
-            <p>To</p>
-            <div className="border border-customGray500 rounded-md p-1">
-              <InputNumber
-                value={to}
-                onChange={(e) => setTo(Number(e.currentTarget.value))}
-                type="number"
-              />
-            </div>
-          </div>
-          <div className="w-40">
-            <MainActionButton
-              label="Filter"
-              handleClick={() =>
-                initMultiLineChart(
-                  chartElem.current,
-                  apyData.filter((_, i) => i >= from && i <= to)
-                )
-              }
-            />
-          </div>
-          <div className="w-40">
-            <SecondaryActionButton
-              label="Reset"
-              handleClick={() => {
-                setFrom(0);
-                setTo(apyData.length - 1);
-                initMultiLineChart(
-                  chartElem.current,
-                  apyData
-                )
-              }}
-            />
-          </div>
-
-        </div>
-        <div className={`flex justify-center`} ref={chartElem} />
-      </section>
-    </>
+    <div>
+      <p>Reward Token</p>
+      <p>Rate</p>
+      <p>Remaining Rewards</p>
+      <p>Period Finish</p>
+      <p>Distributor</p>
+      <div>
+        <p>Add Rewards</p>
+        <p>Amount:</p>
+        <p>New period Finish</p>
+        <p>New rate</p>
+        <p>Total Payout</p>
+      </div>
+    </div>
   )
 }
