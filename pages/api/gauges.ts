@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { Address, PublicClient, createPublicClient, http } from "viem";
+import { Address, PublicClient, createPublicClient, getAddress, http } from "viem";
 import { ChainById, RPC_URLS, networkMap } from "@/lib/utils/connectors";
-import { GaugeAbi, GaugeControllerAbi, VCX, VaultAbi } from "@/lib/constants";
+import { ERC20Abi, GaugeAbi, GaugeControllerAbi, VCX, VaultAbi } from "@/lib/constants";
 import { vcx as getVcxPrice } from "@/lib/resolver/price/resolver";
 import { mainnet } from "wagmi";
 import axios from "axios";
@@ -90,22 +90,52 @@ export default async function handler(
     allowFailure: false,
   });
 
-  const finalGaugeData: { [key: Address]: { address: Address, vault: Address, lowerAPR: number, upperAPR: number } } = {};
+  const vcxPriceInUsd = await getVcxPrice({ address: VCX, chainId: mainnet.id, client: undefined });
+
+  const finalGaugeData: {
+    [key: Address]:
+    {
+      address: Address;
+      vault: Address;
+      lowerAPR: number;
+      upperAPR: number;
+      rewardApy: number;
+      minGaugeApy: number;
+      maxGaugeApy: number;
+    }
+  } = {};
 
   await Promise.all(
     gauges.map(async (gauge, i) => {
       const gaugeType = Number(gaugeTypes[i]);
       const gaugeData = await getGaugeData(gauge, gaugeType);
+
+      const vaultAssetPriceInUsd = await getVaultAssetPrice(
+        gaugeData.vault,
+        gaugeTypeToChainId[gaugeType]
+      );
+
       const apy = await calculateGaugeApr(
         gaugeData,
+        vaultAssetPriceInUsd,
+        vcxPriceInUsd
+      );
+
+      const rewardApy = await getRewardsApy(
+        gauge,
+        gaugeData.workingSupply,
+        vaultAssetPriceInUsd,
         gaugeTypeToChainId[gaugeType]
       );
 
       finalGaugeData[gauge] = {
         address: gauge,
         vault: gaugeData.vault!,
-        lowerAPR: apy.lowerAPR,
-        upperAPR: apy.upperAPR,
+        lowerAPR: apy.lowerAPR + rewardApy,
+        upperAPR: apy.upperAPR + rewardApy,
+        rewardApy: rewardApy,
+        minGaugeApy: apy.lowerAPR,
+        maxGaugeApy: apy.lowerAPR
       };
     })
   );
@@ -115,12 +145,12 @@ export default async function handler(
     .json(finalGaugeData);
 }
 
-function thisPeriodTimestamp() {
+function thisPeriodTimestamp(): number {
   const week = 604800 * 1000;
   return (Math.floor(Date.now() / week) * week) / 1000;
 }
 
-async function getTokenPrice(token: Address, chainId: number) {
+async function getTokenPrice(token: Address, chainId: number): Promise<number> {
   const key = `${networkMap[chainId].toLowerCase()}:${token}`;
 
   const { data } = await axios.get(
@@ -129,7 +159,18 @@ async function getTokenPrice(token: Address, chainId: number) {
   return data.coins[key]?.price;
 }
 
-async function getVaultAssetPrice(vault: Address, chainId: number) {
+async function getTokenPrices(tokens: Address[], chainId: number): Promise<number[]> {
+  const { data: priceData } = await axios.get(
+    `https://pro-api.llama.fi/${process.env.DEFILLAMA_API_KEY}/coins/prices/current/${String(
+      tokens.map(
+        (token) => `${networkMap[chainId].toLowerCase()}:${token}`
+      )
+    )}`
+  )
+  return Object.keys(priceData.coins).map(key => priceData.coins[key]?.price || 0)
+}
+
+async function getVaultAssetPrice(vault: Address, chainId: number): Promise<number> {
   const asset = await clientByChainId[chainId].readContract({
     address: vault,
     abi: VaultAbi,
@@ -139,18 +180,12 @@ async function getVaultAssetPrice(vault: Address, chainId: number) {
   return await getTokenPrice(asset, chainId);
 }
 
-async function calculateGaugeApr(gaugeData: any, chainId: number) {
-  const vaultAssetPriceInUsd = await getVaultAssetPrice(
-    gaugeData.vault,
-    chainId
-  );
-  const vcxPriceInUsd = await getVcxPrice({ address: VCX, chainId: mainnet.id, client: undefined });
-
+async function calculateGaugeApr(gaugeData: any, vaultPrice: number, vcxPrice: number) {
   // calculate the lowerAPR and upperAPR
   let lowerAPR = 0;
   let upperAPR = 0;
   // 25% discount for oVCX
-  const oVcxPriceUSD = vcxPriceInUsd * 0.25;
+  const oVcxPriceUSD = vcxPrice * 0.25;
 
   const relative_inflation =
     gaugeData.inflationRate * gaugeData.cappedRelativeWeight;
@@ -158,7 +193,7 @@ async function calculateGaugeApr(gaugeData: any, chainId: number) {
     const annualRewardUSD = relative_inflation * 86400 * 365 * oVcxPriceUSD;
     const workingSupplyUSD =
       (gaugeData.workingSupply > 0 ? gaugeData.workingSupply : 1e18) *
-      vaultAssetPriceInUsd *
+      vaultPrice *
       1e9;
 
     lowerAPR =
@@ -166,19 +201,6 @@ async function calculateGaugeApr(gaugeData: any, chainId: number) {
       workingSupplyUSD /
       (100 / gaugeData.tokenlessProduction);
     upperAPR = annualRewardUSD / workingSupplyUSD;
-
-    console.log({
-      vault: gaugeData.vault,
-      chainId,
-      vaultAssetPriceInUsd,
-      vcxPriceInUsd,
-      annualRewardUSD,
-      workingSupplyUSD,
-      workingSupply: gaugeData.workingSupply,
-      decimals: gaugeData.decimals,
-      lowerAPR,
-      upperAPR,
-    });
   }
 
   return {
@@ -281,14 +303,10 @@ async function getGaugeData(gauge: Address, gaugeType: number) {
     allowFailure: false,
   });
 
-  console.log({ vaultData });
-
   const assetsPerShare =
     Number(vaultData[3]) > 0
       ? (Number(vaultData[2]) + 1) / (Number(vaultData[3]) + 1e9)
       : Number(1e-9);
-
-  console.log({ assetsPerShare });
 
   return {
     vault: gaugeData[3],
@@ -299,4 +317,52 @@ async function getGaugeData(gauge: Address, gaugeType: number) {
     workingSupply:
       (assetsPerShare * Number(vaultData[1])) / 10 ** Number(vaultData[0]),
   };
+}
+
+
+async function getRewardsApy(gauge: Address, workingSupply: number, vaultPrice: number, chainId: number) {
+  const client = clientByChainId[chainId];
+
+  // get all reward token via events
+  const rewardLogs = await client.getContractEvents({
+    address: gauge,
+    abi: GaugeAbi,
+    eventName: "RewardDistributorUpdated",
+    fromBlock: "earliest",
+    toBlock: "latest"
+  })
+
+  if (rewardLogs.length > 0) {
+    const rewardData = await client.multicall({
+      contracts: rewardLogs.map(log => {
+        return {
+          address: gauge,
+          abi: GaugeAbi,
+          functionName: "reward_data",
+          args: [log.args.reward_token]
+        }
+      }),
+      allowFailure: false
+    }) as any[]
+
+    const decimalData = await client.multicall({
+      contracts: rewardLogs.map(log => {
+        return {
+          address: log.args.reward_token!,
+          abi: ERC20Abi,
+          functionName: "decimals",
+        }
+      }),
+      allowFailure: false
+    }) as number[]
+
+    const prices = await getTokenPrices(rewardLogs.map(log => getAddress(log.args.reward_token!)), chainId)
+    const annualRewardUSD: number = rewardData.reduce((a, b, i) => a + (((b[3] * 86400 * 365) / (10 ** decimalData[i])) * prices[i]), 0)
+    const workingSupplyUSD =
+      (workingSupply > 0 ? workingSupply : 1e18) *
+      vaultPrice *
+      1e9;
+    return annualRewardUSD / workingSupplyUSD
+  }
+  return 0
 }
