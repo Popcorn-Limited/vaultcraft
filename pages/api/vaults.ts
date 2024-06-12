@@ -3,6 +3,8 @@ import axios from "axios";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 import { createPublicClient, http, type Address, type PublicClient } from "viem";
 import { ERC20Abi, VaultAbi } from "@/lib/constants/abi";
+import { GaugeData } from "@/lib/types";
+import getGauges from "@/lib/gauges/getGauges";
 
 type Vault = {
     address: Address;
@@ -95,9 +97,7 @@ export default async function handler(
 
     const defillamaApy = await getDefillamaApy();
     // gauges contains ALL gauges for all chains
-    const gauges = (await axios.get(
-        "https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/gauge-apy-data.json"
-    )).data as Gauges;
+    const gauges = await getGauges();
 
     // retrieve APY data for vault
     for (const vault of Object.values(vaults)) {

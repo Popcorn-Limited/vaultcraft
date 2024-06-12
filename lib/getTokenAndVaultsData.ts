@@ -91,11 +91,7 @@ export async function getTokenAndVaultsData({
   // Add gauges
   if (GAUGE_NETWORKS.includes(client.chain.id)) {
 
-    const gauges = (
-      await axios.get(
-        `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/gauge-apy-data.json`
-      )
-    ).data as GaugeData;
+    const gauges = (await axios.get(`/api/gauges`)).data as GaugeData;
 
     await Promise.all(
       Object.values(vaultsData).map(async (vault, i) => {

@@ -54,7 +54,7 @@ export type VaultData = {
   minGaugeApy: number;
   maxGaugeApy: number;
   apyHist: LlamaApy[];
-  apyId:string;
+  apyId: string;
   gaugeSupply: number;
   workingSupply: number;
   workingBalance: number;
@@ -145,6 +145,9 @@ export type GaugeData = {
     vault: Address;
     lowerAPR: number;
     upperAPR: number;
+    rewardApy: number;
+    minGaugeApy: number;
+    maxGaugeApy: number;
   };
 }
 
