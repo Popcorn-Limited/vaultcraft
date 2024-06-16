@@ -32,6 +32,7 @@ import { RPC_URLS } from "@/lib/utils/connectors";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 
 import BoostVaultRow from "@/components/vault/BoostVaultRow";
+import ResponsiveTooltip from "@/components/common/Tooltip";
 
 export const GAUGE_NETWORKS = [1, 10, 42161];
 
@@ -203,7 +204,11 @@ function VePopContainer() {
               you change it.
             </p>
           </div>
-          <div className="bg-customNeutral200 border border-customNeutral100 rounded-lg px-6 py-4">
+
+          <div
+            id="rewards-tooltip-inner"
+            className="bg-customNeutral200 cursor-pointer border border-customNeutral100 rounded-lg px-6 py-4"
+          >
             <p className="text-base opacity-80">Emissions per week</p>
             <div className="flex flex-row items-center justify-between">
               <img
@@ -216,6 +221,17 @@ function VePopContainer() {
               </p>
             </div>
           </div>
+
+          <ResponsiveTooltip
+            id="rewards-tooltip-inner"
+            content={
+              <p className="w-52">
+                oVCX rewards accrue weekly, not daily. Distributions happen
+                post-contract funding. Note: You still earn oVCX even without
+                the boost.
+              </p>
+            }
+          />
         </section>
 
         <section className="pb-12 md:py-10 px-4 md:px-8 md:flex md:flex-row md:justify-between space-y-4 md:space-y-0 md:space-x-8">
