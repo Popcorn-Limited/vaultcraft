@@ -24,6 +24,7 @@ import {
   safeWallet,
   okxWallet,
 } from "@rainbow-me/rainbowkit/wallets";
+import { Analytics } from "@vercel/analytics/react"
 
 const { chains, publicClient } = configureChains(
   [...SUPPORTED_NETWORKS],
@@ -155,6 +156,7 @@ export default function App({ Component, pageProps }: AppProps) {
           }}
         />
         <Toaster />
+        <Analytics />
         <WagmiConfig config={config}>
           <RainbowKitProvider chains={chains} modalSize="compact">
             <NoSSR>
