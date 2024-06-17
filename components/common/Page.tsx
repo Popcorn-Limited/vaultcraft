@@ -181,23 +181,44 @@ export default function Page({
 
   useEffect(() => {
     async function getData() {
+      console.log(`FETCHING APP DATA (${new Date()})`)
+      const getDataStart = Number(new Date())
+
       // get vaultsData and tokens
       const newVaultsData: { [key: number]: VaultData[] } = {}
       const newTokens: { [key: number]: TokenByAddress } = {}
+
+      console.log(`Fetching Token and Vaults Data (${new Date()})`)
+      let start = Number(new Date())
+
       await Promise.all(
         SUPPORTED_NETWORKS.map(async (chain) => {
+          console.log(`Fetching Data for chain ${chain.id} (${new Date()})`)
+          let chainStart = Number(new Date())
+
           const { vaultsData, tokens } = await getTokenAndVaultsDataByChain({
             chain,
             account: account || zeroAddress,
             yieldOptions: yieldOptions as YieldOptions,
           })
+
+          console.log(`Completed fetching Data for chain ${chain.id} (${new Date()})`)
+          console.log(`Took ${Number(new Date()) - chainStart}ms to load`)
+
           newVaultsData[chain.id] = vaultsData
           newTokens[chain.id] = tokens;
         })
       )
 
+      console.log(`Completed fetching Token and Vaults Data (${new Date()})`)
+      console.log(`Took ${Number(new Date()) - start}ms to load`)
+
+
       const newReserveData: { [key: number]: ReserveData[] } = {}
       const newUserAccountData: { [key: number]: UserAccountData } = {}
+
+      console.log(`Fetching AaveData (${new Date()})`)
+      start = Number(new Date())
 
       await Promise.all(
         SUPPORTED_NETWORKS.map(async (chain) => {
@@ -221,6 +242,14 @@ export default function Page({
         })
       )
 
+      console.log(`Completed fetching AaveData (${new Date()})`)
+      console.log(`Took ${Number(new Date()) - start}ms to load`)
+
+
+      console.log(`Fetching TVL (${new Date()})`)
+      start = Number(new Date())
+
+
       const vaultTVL = SUPPORTED_NETWORKS.map(chain => newVaultsData[chain.id]).flat().reduce((a, b) => a + b.tvl, 0)
       const lockVaultTVL = 520000 // @dev hardcoded since we removed lock vaults
       let stakingTVL = 0
@@ -229,6 +258,10 @@ export default function Page({
       } catch (e) {
         stakingTVL = 762000
       }
+
+      console.log(`Completed fetching TVL (${new Date()})`)
+      console.log(`Took ${Number(new Date()) - start}ms to load`)
+
 
       setTVL({
         vault: vaultTVL,
@@ -242,6 +275,9 @@ export default function Page({
       setAaveAccountData(newUserAccountData)
 
       if (account) {
+        console.log(`Fetching Networth (${new Date()})`)
+        start = Number(new Date())
+
         const vaultNetworth = SUPPORTED_NETWORKS.map(chain =>
           Object.values(newTokens[chain.id])).flat().filter(t => t.type === TokenType.Vault || t.type === TokenType.Gauge)
           .reduce((a, b) => a + ((b.balance / (10 ** b.decimals)) * b.price), 0)
@@ -262,6 +298,14 @@ export default function Page({
         const stakeNetworth = (Number(stake.amount) / 1e18) * newTokens[1][VCX_LP].price;
         const lockVaultNetworth = 0 // @dev hardcoded since we removed lock vaults
 
+        console.log(`Completed fetching Networth (${new Date()})`)
+        console.log(`Took ${Number(new Date()) - start}ms to load`)
+
+
+        console.log(`Fetching GaugeRewards (${new Date()})`)
+        start = Number(new Date())
+
+
         const newRewards: { [key: number]: GaugeRewards } = {}
         await Promise.all(GAUGE_NETWORKS.map(async (chain) =>
           newRewards[chain] = await getGaugeRewards({
@@ -272,6 +316,10 @@ export default function Page({
           })
         ))
 
+        console.log(`Completed fetching GaugeRewards (${new Date()})`)
+        console.log(`Took ${Number(new Date()) - start}ms to load`)
+
+
         setNetworth({
           vault: vaultNetworth,
           lockVault: lockVaultNetworth,
@@ -281,12 +329,21 @@ export default function Page({
         })
         setGaugeRewards(newRewards);
 
+        console.log(`Fetching Vaultron (${new Date()})`)
+        start = Number(new Date())
+
         const newVaultronStats = await fetchVaultron(account, createPublicClient({
           chain: polygon,
           transport: http(RPC_URLS[137]),
         }))
+
+        console.log(`Completed fetching Vaultron (${new Date()})`)
+        console.log(`Took ${Number(new Date()) - start}ms to load`)
+
         setVaultronStats(newVaultronStats)
       }
+      console.log(`COMPLETED FETCHING APP DATA (${new Date()})`)
+      console.log(`Took ${Number(new Date()) - getDataStart}ms to load`)
     }
     if (yieldOptions) getData();
   }, [yieldOptions, account]);
