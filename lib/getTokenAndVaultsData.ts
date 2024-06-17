@@ -2,6 +2,7 @@ import {
   Address,
   Chain,
   createPublicClient,
+  getAddress,
   http,
   zeroAddress,
 } from "viem";
@@ -208,10 +209,10 @@ async function prepareVaultsData(chainId: number, client: PublicClient): Promise
     const apyHist = apyHistAll[i]
     if (i > 0) i = i * 3;
 
-    result[vault.address] = {
-      address: vault.address,
-      vault: vault.address,
-      asset: vault.assetAddress,
+    result[getAddress(vault.address)] = {
+      address: getAddress(vault.address),
+      vault: getAddress(vault.address),
+      asset: getAddress(vault.assetAddress),
       gauge: undefined,
       chainId: vault.chainId,
       fees: vault.fees,
@@ -235,12 +236,12 @@ async function prepareVaultsData(chainId: number, client: PublicClient): Promise
           : undefined,
         description: vault.description || undefined,
         type: vault.type,
-        creator: vault.creator,
-        feeRecipient: vault.feeRecipient,
+        creator: getAddress(vault.creator) || zeroAddress,
+        feeRecipient: getAddress(vault.feeRecipient) || zeroAddress,
       },
       strategies: vault.strategies.map((strategy: Address) => {
         return {
-          address: strategy,
+          address: getAddress(strategy),
           metadata: {
             name: "",
             description: "",
@@ -296,9 +297,9 @@ async function prepareAssets(addresses: Address[], chainId: number, client: Publ
       tokenPrice = vcxPrice * 0.25
     }
 
-    result[address] = {
-      ...assets[address],
-      address: address,
+    result[getAddress(address)] = {
+      ...assets[getAddress(address)],
+      address: getAddress(address),
       price: tokenPrice,
       balance: 0,
       totalSupply: Number(ts[i]),
@@ -321,8 +322,9 @@ async function prepareVaults(vaultsData: VaultDataByAddress, assets: TokenByAddr
       vault.totalSupply > 0 ? (vault.totalAssets + 1) / (vault.totalSupply + 1e9) : Number(1e-9);
     const price = (assetsPerShare * assets[vault.asset].price) * 1e9; // @dev normalize vault price for previews (watch this if errors occur)
 
-    result[vault.address] = {
-      ...vaultTokens[vault.address],
+    result[getAddress(vault.address)] = {
+      ...vaultTokens[getAddress(vault.address)],
+      address: getAddress(vault.address),
       price,
       balance: 0,
       totalSupply: vault.totalSupply,
