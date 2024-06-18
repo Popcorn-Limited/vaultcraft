@@ -2,20 +2,22 @@ import {
   Address,
   Chain,
   createPublicClient,
+  getAddress,
   http,
   zeroAddress,
 } from "viem";
 import { PublicClient, erc20ABI, mainnet } from "wagmi";
 import axios from "axios";
 import { VaultAbi } from "@/lib/constants/abi/Vault";
-import { GaugeData, LlamaApy, Strategy, Token, TokenByAddress, TokenType, VaultData, VaultDataByAddress, VaultLabel } from "@/lib/types";
+import { GaugeData, LlamaApy, Token, TokenByAddress, TokenType, VaultData, VaultDataByAddress, VaultLabel } from "@/lib/types";
 import { ERC20Abi, GaugeAbi, OptionTokenByChain, VCX, VCX_LP, VeTokenByChain, XVCXByChain, ZapAssetAddressesByChain, xLayer } from "@/lib/constants";
 import { RPC_URLS, networkMap } from "@/lib/utils/connectors";
-import { ProtocolName, YieldOptions } from "vaultcraft-sdk";
+import { YieldOptions } from "vaultcraft-sdk";
 import { AavePoolUiAbi } from "@/lib/constants/abi/Aave";
 import { GAUGE_NETWORKS } from "pages/boost";
 import { AavePoolAddressProviderByChain, AaveUiPoolProviderByChain } from "@/lib/external/aave";
 import { vcx as getVcxPrice } from "@/lib/resolver/price/resolver";
+import getFraxlendApy from "@/lib/external/fraxlend/getFraxlendApy";
 
 interface GetVaultsByChainProps {
   chain: Chain;
@@ -203,10 +205,10 @@ async function prepareVaultsData(chainId: number, client: PublicClient): Promise
     const apyHist = apyHistAll[i]
     if (i > 0) i = i * 3;
 
-    result[vault.address] = {
-      address: vault.address,
-      vault: vault.address,
-      asset: vault.assetAddress,
+    result[getAddress(vault.address)] = {
+      address: getAddress(vault.address),
+      vault: getAddress(vault.address),
+      asset: getAddress(vault.assetAddress),
       gauge: undefined,
       chainId: vault.chainId,
       fees: vault.fees,
@@ -230,12 +232,12 @@ async function prepareVaultsData(chainId: number, client: PublicClient): Promise
           : undefined,
         description: vault.description || undefined,
         type: vault.type,
-        creator: vault.creator,
-        feeRecipient: vault.feeRecipient,
+        creator: getAddress(vault.creator) || zeroAddress,
+        feeRecipient: getAddress(vault.feeRecipient) || zeroAddress,
       },
       strategies: vault.strategies.map((strategy: Address) => {
         return {
-          address: strategy,
+          address: getAddress(strategy),
           metadata: {
             name: "",
             description: "",
@@ -291,9 +293,9 @@ async function prepareAssets(addresses: Address[], chainId: number, client: Publ
       tokenPrice = vcxPrice * 0.25
     }
 
-    result[address] = {
-      ...assets[address],
-      address: address,
+    result[getAddress(address)] = {
+      ...assets[getAddress(address)],
+      address: getAddress(address),
       price: tokenPrice,
       balance: 0,
       totalSupply: Number(ts[i]),
@@ -316,8 +318,9 @@ async function prepareVaults(vaultsData: VaultDataByAddress, assets: TokenByAddr
       vault.totalSupply > 0 ? (vault.totalAssets + 1) / (vault.totalSupply + 1e9) : Number(1e-9);
     const price = (assetsPerShare * assets[vault.asset].price) * 1e9; // @dev normalize vault price for previews (watch this if errors occur)
 
-    result[vault.address] = {
-      ...vaultTokens[vault.address],
+    result[getAddress(vault.address)] = {
+      ...vaultTokens[getAddress(vault.address)],
+      address: getAddress(vault.address),
       price,
       balance: 0,
       totalSupply: vault.totalSupply,
@@ -329,9 +332,19 @@ async function prepareVaults(vaultsData: VaultDataByAddress, assets: TokenByAddr
   return result;
 }
 
-async function getApy(apyId: string) {
-  const { data } = await axios.get(`https://pro-api.llama.fi/${process.env.DEFILLAMA_API_KEY}/yields/chart/${apyId}`)
-  return data.data.map((entry: any) => { return { apy: entry.apy, apyBase: entry.apyBase, apyReward: entry.apyReward, date: new Date(entry.timestamp) } })
+async function getCustomApy(address: Address, apyId: string, chainId: number): Promise<LlamaApy[]> {
+  return getFraxlendApy(address, chainId)
+}
+
+async function getApy(apyId: string): Promise<LlamaApy[]> {
+  try {
+    const { data } = await axios.get(`https://pro-api.llama.fi/${process.env.DEFILLAMA_API_KEY}/yields/chart/${apyId}`)
+    return data.data.map((entry: any) => { return { apy: entry.apy, apyBase: entry.apyBase, apyReward: entry.apyReward, date: new Date(entry.timestamp) } })
+  } catch (e) {
+    console.log("ERROR FETCHING APY ", + apyId)
+    console.log(e)
+    return []
+  }
 }
 
 export async function addStrategyData(vaults: VaultDataByAddress, chainId: number, client: PublicClient, yieldOptions: YieldOptions): Promise<VaultDataByAddress> {
@@ -385,11 +398,12 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
       let apyHist: LlamaApy[] = []
 
       try {
-        const strategyApy = await getApy(desc.apyId)
+        const strategyApy = desc.apySource === "custom" ? await getCustomApy(address, desc.apyId, chainId) : await getApy(desc.apyId)
         apy = strategyApy[strategyApy.length - 1].apy;
         apyHist = strategyApy;
       } catch (e) {
-
+        console.log(`ERROR FETCHING APY: ${address} - ${desc.apySource}=${desc.apyId}`)
+        console.log(e)
       }
 
       strategies[address] = {

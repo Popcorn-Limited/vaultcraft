@@ -19,6 +19,7 @@ export const IconByProtocol: { [key: string]: string } = {
   Origin: "https://icons.llamao.fi/icons/protocols/origin-defi?w=48&h=48",
   Stargate: "https://icons.llamao.fi/icons/protocols/stargate?w=48&h=48",
   Yearn: "https://icons.llamao.fi/icons/protocols/yearn-finance?w=48&h=48",
+  Pendle: "https://icons.llamao.fi/icons/protocols/pendle?w=48&h=48",
   Pirex: "https://icons.llamao.fi/icons/protocols/pirex?w=48&h=48",
   Sommelier: "https://icons.llamao.fi/icons/protocols/sommelier?w=48&h=48",
   Frax: "https://icons.llamao.fi/icons/protocols/frax?w=48&h=48",

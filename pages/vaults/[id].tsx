@@ -175,7 +175,7 @@ export default function Index() {
                       {asset ? `${formatAndRoundNumber(
                         asset.balance,
                         asset.decimals
-                      )} TKN` : "0 TKN"}
+                      )} ${asset.symbol}` : "0 TKN"}
                     </p>
                   </div>
 
@@ -194,7 +194,7 @@ export default function Index() {
                       {`${!!gauge ?
                         NumberFormatter.format(((gauge.balance) / 10 ** gauge.decimals) + ((vault?.balance!) / 10 ** vault?.decimals!))
                         : formatAndRoundNumber(vault?.balance!, vault?.decimals!)
-                        } TKN`}
+                        } ${asset?.symbol!}`}
                     </p>
                   </div>
 
@@ -204,7 +204,7 @@ export default function Index() {
                       $ {vaultData.tvl < 1 ? "0" : NumberFormatter.format(vaultData.tvl)}
                     </p>
                     <p className="text-xl whitespace-nowrap text-customGray300 -mt-2">
-                      {asset ? `${formatAndRoundNumber(vaultData.totalAssets, asset.decimals)} TKN` : "0 TKN"}
+                      {asset ? `${formatAndRoundNumber(vaultData.totalAssets, asset.decimals)} ${asset?.symbol!}` : "0 TKN"}
                     </p>
                   </div>
 
