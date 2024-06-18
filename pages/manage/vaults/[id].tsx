@@ -723,7 +723,6 @@ function RewardColumn({ gauge, reward, token, chainId }: { gauge: Address, rewar
   const { switchNetworkAsync } = useSwitchNetwork();
   const [tokens, setTokens] = useAtom(tokensAtom);
 
-
   const [amount, setAmount] = useState<string>("0");
 
   function handleChangeInput(e: any) {
@@ -742,11 +741,8 @@ function RewardColumn({ gauge, reward, token, chainId }: { gauge: Address, rewar
   }
 
   async function handleFundReward() {
-    console.log("handle")
     let val = Number(amount)
-    console.log({ val, account, publicClient: !!publicClient, walletClient: !!walletClient })
     if (val === 0 || !account || !publicClient || !walletClient) return
-    console.log("blub", chain?.id, chainId)
     val = val * (10 ** token.decimals)
 
     if (chain?.id !== Number(chainId)) {
@@ -762,8 +758,6 @@ function RewardColumn({ gauge, reward, token, chainId }: { gauge: Address, rewar
       walletClient
     }
 
-    console.log(val, token, gauge)
-
     const success = await handleAllowance({
       token: token.address,
       spender: gauge,
@@ -771,8 +765,6 @@ function RewardColumn({ gauge, reward, token, chainId }: { gauge: Address, rewar
       account: account,
       clients
     })
-
-
 
     if (success) {
       await fundReward({
@@ -785,8 +777,6 @@ function RewardColumn({ gauge, reward, token, chainId }: { gauge: Address, rewar
       })
     }
   }
-
-  console.log({ reward })
 
   return (
     <tr>
@@ -801,8 +791,8 @@ function RewardColumn({ gauge, reward, token, chainId }: { gauge: Address, rewar
           <strong>${token?.symbol ?? "TKN"}</strong>
         </nav>
       </td>
-      <td className="text-left">{reward.rate}</td>
-      <td className="text-left">{reward.remainingRewards}</td>
+      <td className="text-left">{formatAndRoundNumber(reward.rate, token.decimals)} {token?.symbol!}/s</td>
+      <td className="text-left">{formatAndRoundNumber(reward.remainingRewards, token.decimals)} {token?.symbol!}</td>
       <td className="text-left">
         {reward.periodFinish.toLocaleDateString()}
       </td>
@@ -825,8 +815,8 @@ function RewardColumn({ gauge, reward, token, chainId }: { gauge: Address, rewar
               allowInput={true}
             />
           </div>
-          <div className="w-40 h-14">
-            <MainActionButton label="Fund Rewards" handleClick={handleFundReward} disabled={!account || account !== reward.distributor} />
+          <div className="ml-4">
+            <MainActionButton label="Fund Rewards" handleClick={handleFundReward} disabled={!account || account !== reward.distributor} className="h-14" />
           </div>
         </div>
       </td>

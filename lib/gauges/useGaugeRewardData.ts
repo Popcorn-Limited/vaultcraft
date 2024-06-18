@@ -37,7 +37,7 @@ export async function getRewardData(gauge: Address, chainId: number) {
     const currentTimestamp = Math.floor(Date.now() / 1000);
     return rewardData.map((value, index) => {
       const periodFinish = new Date(Number(value.period_finish) * 1000);
-      const rate = Number(value.rate);
+      const rate = Number(value.rate) / 1e18;
       const remainingTime = Number(value.period_finish) - currentTimestamp;
 
       return {
