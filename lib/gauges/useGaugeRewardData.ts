@@ -16,7 +16,7 @@ export async function getRewardData(gauge: Address, chainId: number) {
     eventName: chainId === chains.mainnet.id ? "RewardDistributorUpdated" : "AddReward",
     fromBlock: "earliest",
     toBlock: "latest",
-  });
+  }) as any[];
 
   let rewardData = []
 
@@ -27,7 +27,7 @@ export async function getRewardData(gauge: Address, chainId: number) {
           address: gauge,
           abi: ChildGaugeAbi,
           functionName: "reward_data",
-          args: [args.reward_token],
+          args: [args.reward_token as Address],
         };
       }),
       allowFailure: false,

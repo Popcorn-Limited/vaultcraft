@@ -356,3 +356,49 @@ export async function transmitRewards({ gauges, account, address, clients }
     clients
   })
 }
+
+
+interface FundRewardProps {
+  gauge: Address;
+  rewardToken: Address;
+  amount: number;
+  account: Address;
+  clients: Clients;
+  tokensAtom: [{ [key: number]: TokenByAddress }, Function]
+}
+
+export async function fundReward({
+  gauge,
+  rewardToken,
+  amount,
+  account,
+  clients,
+  tokensAtom
+}: FundRewardProps): Promise<boolean> {
+  showLoadingToast("Fund Gauge Reward...");
+
+  const success = await handleCallResult({
+    successMessage: "Funded Gauge Reward successfully!",
+    simulationResponse: await simulateCall({
+      account,
+      contract: {
+        address: gauge,
+        abi: GaugeAbi,
+      },
+      functionName: "deposit_reward_token",
+      publicClient: clients.publicClient,
+      args: [rewardToken, amount],
+    }),
+    clients,
+  });
+
+  if (success) {
+    mutateTokenBalance({
+      tokensToUpdate: [rewardToken],
+      account,
+      tokensAtom,
+      chainId: clients.publicClient.chain.id
+    })
+  }
+  return success
+}

@@ -17,13 +17,14 @@ import {
   useState,
 } from "react";
 import NoSSR from "react-no-ssr";
-import { createConfig, erc20ABI, useAccount, useContractWrite } from "wagmi";
+import { createConfig, erc20ABI, useAccount, useContractWrite, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
 import axios from "axios";
 import {
   Address,
   createPublicClient,
   extractChain,
   formatEther,
+  formatUnits,
   getContract,
   http,
   isAddress,
@@ -56,11 +57,11 @@ import MainActionButton from "@/components/button/MainActionButton";
 import {
   NumberFormatter,
   formatAndRoundNumber,
+  safeRound,
 } from "@/lib/utils/formatBigNumber";
 import {
-  beautifyAddress,
   roundToTwoDecimalPlaces,
-  useRkAccountModal,
+  validateInput,
 } from "@/lib/utils/helpers";
 import Modal from "@/components/modal/Modal";
 import { showSuccessToast } from "@/lib/toasts";
@@ -71,6 +72,10 @@ import ApyChart from "@/components/vault/management/vault/ApyChart";
 import NetFlowChart from "@/components/vault/management/vault/NetFlowChart";
 import { votingPeriodEnd } from "@/components/boost/StakingInterface";
 import TokenIcon from "@/components/common/TokenIcon";
+import { getRewardData } from "@/lib/gauges/useGaugeRewardData";
+import InputTokenWithError from "@/components/input/InputTokenWithError";
+import { fundReward } from "@/lib/gauges/interactions";
+import { handleAllowance } from "@/lib/approve";
 
 async function getLogs(vault: VaultData, asset: Token) {
   const client = createPublicClient({
@@ -641,7 +646,7 @@ export default function Index() {
               <h2 className="text-white font-bold text-2xl">
                 Manage Gauge Rewards
               </h2>
-              <RewardData gauge={vaultData.gauge} chainId={vaultData.chainId} />
+              <RewardsSection gauge={vaultData.gauge} chainId={vaultData.chainId} />
             </section>
           )}
         </div>
@@ -652,10 +657,17 @@ export default function Index() {
   );
 }
 
-function RewardData({ gauge, chainId }: { gauge: Address; chainId: number }) {
+function RewardsSection({ gauge, chainId }: { gauge: Address; chainId: number }) {
   const { address: account } = useAccount();
 
   const [tokens] = useAtom(tokensAtom);
+
+  const [rewardData, setRewardData] = useState<any[]>([])
+
+  useEffect(() => {
+    getRewardData(gauge, chainId).then(res => setRewardData(res))
+  }, [gauge])
+
   // const { write } = useContractWrite({
   //   abi: GaugeAbi,
   //   address: gauge,
@@ -681,59 +693,143 @@ function RewardData({ gauge, chainId }: { gauge: Address; chainId: number }) {
           <th className="font-normal text-left hidden lg:table-cell">
             Distributor
           </th>
-          <th className="font-normal text-right">Claimable</th>
+          <th className="font-normal text-left hidden lg:table-cell">
+            Fund Rewards
+          </th>
         </tr>
-        {rewardData?.map(
-          ({
-            distributor,
-            address: tokenAddress,
-            remainingRewards,
-            periodFinish,
-            rate,
-          }) => {
-            const periodEnd = votingPeriodEnd(Number(periodFinish) * 1000);
-            const token = tokens[chainId]?.[tokenAddress as any];
-
-            return (
-              <tr key={`reward-gauge-${tokenAddress}`}>
-                <td className="!pl-0">
-                  <nav className="flex items-center gap-2">
-                    <TokenIcon
-                      imageSize="w-9 h-9 border border-customNeutral100 rounded-full"
-                      token={tokenAddress as any}
-                      icon={token?.logoURI}
-                      chainId={chainId}
-                    />
-                    <strong>${token?.symbol ?? "TKN"}</strong>
-                  </nav>
-                </td>
-                <td className="text-left">{Number(rate)}</td>
-                <td className="text-left">{formatEther(remainingRewards)}</td>
-                <td className="text-left">
-                  {periodEnd[0]}d : {periodEnd[1]}h
-                  <span className="hidden lg:inline">: {periodEnd[2]}m</span>
-                </td>
-                <td className="text-left hidden lg:table-cell">
-                  {distributor}
-                </td>
-              </tr>
-            );
-          }
-        )}
+        {rewardData.length > 0 ?
+          rewardData?.map(reward =>
+            <RewardColumn
+              key={`reward-gauge-${reward.address}`}
+              gauge={gauge}
+              reward={reward}
+              token={tokens[chainId][reward.address]}
+              chainId={chainId}
+            />
+          )
+          : <p>No rewards</p>
+        }
       </table>
     </Fragment>
   );
 }
 
-function CardContainer({
-  children,
-  className,
-}: PropsWithChildren<{ className?: string }>) {
+
+function RewardColumn({ gauge, reward, token, chainId }: { gauge: Address, reward: any, token: Token, chainId: number }): JSX.Element {
+  const { address: account } = useAccount();
+  const publicClient = usePublicClient({ chainId });
+  const { data: walletClient } = useWalletClient();
+  const { chain } = useNetwork();
+  const { switchNetworkAsync } = useSwitchNetwork();
+  const [tokens, setTokens] = useAtom(tokensAtom);
+
+
+  const [amount, setAmount] = useState<string>("0");
+
+  function handleChangeInput(e: any) {
+    const value = e.currentTarget.value;
+    setAmount(validateInput(value).isValid ? value : "0");
+  }
+
+  function handleMaxClick() {
+    if (!token) return;
+    const stringBal = token.balance.toLocaleString("fullwide", {
+      useGrouping: false,
+    });
+    const rounded = safeRound(BigInt(stringBal), token.decimals);
+    const formatted = formatUnits(rounded, token.decimals);
+    handleChangeInput({ currentTarget: { value: formatted } });
+  }
+
+  async function handleFundReward() {
+    console.log("handle")
+    let val = Number(amount)
+    console.log({ val, account, publicClient: !!publicClient, walletClient: !!walletClient })
+    if (val === 0 || !account || !publicClient || !walletClient) return
+    console.log("blub", chain?.id, chainId)
+    val = val * (10 ** token.decimals)
+
+    if (chain?.id !== Number(chainId)) {
+      try {
+        await switchNetworkAsync?.(Number(chainId));
+      } catch (error) {
+        return;
+      }
+    }
+
+    const clients = {
+      publicClient,
+      walletClient
+    }
+
+    console.log(val, token, gauge)
+
+    const success = await handleAllowance({
+      token: token.address,
+      spender: gauge,
+      amount: val,
+      account: account,
+      clients
+    })
+
+
+
+    if (success) {
+      await fundReward({
+        gauge,
+        rewardToken: token.address,
+        amount: val,
+        account,
+        clients,
+        tokensAtom: [tokens, setTokens]
+      })
+    }
+  }
+
+  console.log({ reward })
+
   return (
-    <div
-      className={`w-full md:w-10/12 border border-customNeutral100 rounded-lg p-4 px-6 ${className}`}
-    >
-      {children}
-    </div>
-  );
+    <tr>
+      <td className="!pl-0">
+        <nav className="flex items-center gap-2">
+          <TokenIcon
+            imageSize="w-9 h-9 border border-customNeutral100 rounded-full"
+            token={token}
+            icon={token.logoURI}
+            chainId={chainId}
+          />
+          <strong>${token?.symbol ?? "TKN"}</strong>
+        </nav>
+      </td>
+      <td className="text-left">{reward.rate}</td>
+      <td className="text-left">{reward.remainingRewards}</td>
+      <td className="text-left">
+        {reward.periodFinish.toLocaleDateString()}
+      </td>
+      <td className="text-left hidden lg:table-cell">
+        {reward.distributor}
+      </td>
+      <td className="text-left hidden lg:table-cell">
+        <div className="flex flex-row">
+          <div>
+            <InputTokenWithError
+              onSelectToken={() => { }}
+              onMaxClick={handleMaxClick}
+              chainId={chainId}
+              value={amount}
+              onChange={handleChangeInput}
+              selectedToken={token}
+              errorMessage={""}
+              tokenList={[]}
+              allowSelection={false}
+              allowInput={true}
+            />
+          </div>
+          <div className="w-40 h-14">
+            <MainActionButton label="Fund Rewards" handleClick={handleFundReward} disabled={!account || account !== reward.distributor} />
+          </div>
+        </div>
+      </td>
+    </tr>
+  )
 }
