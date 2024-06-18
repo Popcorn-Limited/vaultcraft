@@ -69,10 +69,6 @@ import { Square2StackIcon } from "@heroicons/react/24/outline";
 import LeftArrowIcon from "@/components/svg/LeftArrowIcon";
 import ApyChart from "@/components/vault/management/vault/ApyChart";
 import NetFlowChart from "@/components/vault/management/vault/NetFlowChart";
-import {
-  AccountClaimableRewards,
-  useRewardData,
-} from "@/lib/gauges/useGaugeRewardData";
 import { votingPeriodEnd } from "@/components/boost/StakingInterface";
 import TokenIcon from "@/components/common/TokenIcon";
 
@@ -381,17 +377,17 @@ export default function Index() {
                   <p className="text-3xl font-bold whitespace-nowrap text-white leading-0">
                     {asset
                       ? `$ ${formatAndRoundNumber(
-                          asset.balance * asset.price,
-                          asset.decimals
-                        )}`
+                        asset.balance * asset.price,
+                        asset.decimals
+                      )}`
                       : "$ 0"}
                   </p>
                   <p className="text-xl whitespace-nowrap text-customGray300 -mt-2">
                     {asset
                       ? `${formatAndRoundNumber(
-                          asset.balance,
-                          asset.decimals
-                        )} TKN`
+                        asset.balance,
+                        asset.decimals
+                      )} TKN`
                       : "0 TKN"}
                   </p>
                 </div>
@@ -402,33 +398,31 @@ export default function Index() {
                   </p>
                   <p className="text-3xl font-bold whitespace-nowrap text-white">
                     {vaultData
-                      ? `${
-                          !!gauge
-                            ? NumberFormatter.format(
-                                (gauge.balance * gauge.price) /
-                                  10 ** gauge.decimals +
-                                  (vault?.balance! * vault?.price!) /
-                                    10 ** vault?.decimals!
-                              )
-                            : formatAndRoundNumber(
-                                vault?.balance! * vault?.price!,
-                                vault?.decimals!
-                              )
-                        }`
+                      ? `${!!gauge
+                        ? NumberFormatter.format(
+                          (gauge.balance * gauge.price) /
+                          10 ** gauge.decimals +
+                          (vault?.balance! * vault?.price!) /
+                          10 ** vault?.decimals!
+                        )
+                        : formatAndRoundNumber(
+                          vault?.balance! * vault?.price!,
+                          vault?.decimals!
+                        )
+                      }`
                       : "0"}
                   </p>
                   <p className="text-xl whitespace-nowrap text-customGray300 -mt-2">
-                    {`${
-                      !!gauge
-                        ? NumberFormatter.format(
-                            gauge.balance / 10 ** gauge.decimals +
-                              vault?.balance! / 10 ** vault?.decimals!
-                          )
-                        : formatAndRoundNumber(
-                            vault?.balance!,
-                            vault?.decimals!
-                          )
-                    } TKN`}
+                    {`${!!gauge
+                      ? NumberFormatter.format(
+                        gauge.balance / 10 ** gauge.decimals +
+                        vault?.balance! / 10 ** vault?.decimals!
+                      )
+                      : formatAndRoundNumber(
+                        vault?.balance!,
+                        vault?.decimals!
+                      )
+                      } TKN`}
                   </p>
                 </div>
 
@@ -445,9 +439,9 @@ export default function Index() {
                   <p className="text-xl whitespace-nowrap text-customGray300 -mt-2">
                     {asset
                       ? `${formatAndRoundNumber(
-                          vaultData.totalAssets,
-                          asset.decimals
-                        )} TKN`
+                        vaultData.totalAssets,
+                        asset.decimals
+                      )} TKN`
                       : "0 TKN"}
                   </p>
                 </div>
@@ -499,14 +493,6 @@ export default function Index() {
               <ApyChart strategy={vaultData.strategies[0]} />
               <NetFlowChart logs={logs} asset={asset} />
             </div>
-
-            <CardContainer>
-              <h2 className="text-white font-bold text-xl mb-2 mt-2">
-                Reward Tokens
-              </h2>
-
-              <RewardData gauge={gauge?.address!} chainId={gauge?.chainId!} />
-            </CardContainer>
 
             <div className="md:flex mt-12 md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4">
               <div className="w-full md:w-10/12 border border-customNeutral100 rounded-lg p-4 px-6">
@@ -655,6 +641,7 @@ export default function Index() {
               <h2 className="text-white font-bold text-2xl">
                 Manage Gauge Rewards
               </h2>
+              <RewardData gauge={vaultData.gauge} chainId={vaultData.chainId} />
             </section>
           )}
         </div>
@@ -666,28 +653,22 @@ export default function Index() {
 }
 
 function RewardData({ gauge, chainId }: { gauge: Address; chainId: number }) {
-  const { address } = useAccount();
-  const { openAccountModal } = useRkAccountModal();
+  const { address: account } = useAccount();
 
   const [tokens] = useAtom(tokensAtom);
-  const { write } = useContractWrite({
-    abi: GaugeAbi,
-    address: gauge,
-    functionName: "claim_rewards",
-  });
+  // const { write } = useContractWrite({
+  //   abi: GaugeAbi,
+  //   address: gauge,
+  //   functionName: "claim_rewards",
+  // });
 
-  const { data: rewardData } = useRewardData(gauge, chainId);
 
-  if ((rewardData?.length ?? 0) <= 0) {
-    return <p>No tokens have been setup yet.</p>;
-  }
-
-  function handleClaimRewards() {
-    if (!address) return openAccountModal();
-    write({
-      args: [address, zeroAddress],
-    });
-  }
+  // function handleClaimRewards() {
+  //   if (!address) return openAccountModal();
+  //   write({
+  //     args: [address, zeroAddress],
+  //   });
+  // }
 
   return (
     <Fragment>
@@ -735,28 +716,11 @@ function RewardData({ gauge, chainId }: { gauge: Address; chainId: number }) {
                 <td className="text-left hidden lg:table-cell">
                   {distributor}
                 </td>
-                <AccountClaimableRewards
-                  rewardToken={tokenAddress as any}
-                  chainId={chainId}
-                  gauge={gauge}
-                >
-                  {({ data }) => {
-                    return (
-                      <td className="text-left">
-                        {formatEther(data ?? BigInt(0))}
-                      </td>
-                    );
-                  }}
-                </AccountClaimableRewards>
               </tr>
             );
           }
         )}
       </table>
-      <SecondaryActionButton
-        handleClick={handleClaimRewards}
-        label="Claim all rewards"
-      />
     </Fragment>
   );
 }

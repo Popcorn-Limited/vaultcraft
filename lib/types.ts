@@ -139,16 +139,18 @@ export interface Clients {
   walletClient: WalletClient;
 }
 
+export type GaugeDataByAddress = {
+  [key: Address]: GaugeData
+}
+
 export type GaugeData = {
-  [key: Address]: {
-    address: Address;
-    vault: Address;
-    lowerAPR: number;
-    upperAPR: number;
-    rewardApy: number;
-    minGaugeApy: number;
-    maxGaugeApy: number;
-  };
+  address: Address;
+  vault: Address;
+  lowerAPR: number;
+  upperAPR: number;
+  rewardApy: number;
+  minGaugeApy: number;
+  maxGaugeApy: number;
 }
 
 export enum SmartVaultActionType {

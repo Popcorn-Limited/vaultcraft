@@ -1,5 +1,4 @@
 import { formatUnits, parseUnits } from "viem";
-import { ZERO } from "@/lib/constants";
 
 const MILLION = 1e6;
 const THOUSAND = 1e3;

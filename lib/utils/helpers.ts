@@ -5,12 +5,6 @@ import { Abi, Address, isAddress } from "viem";
 import { ADDRESS_ZERO } from "@/lib/constants";
 import { PublicClient } from "wagmi";
 
-import {
-  useAccountModal,
-  useChainModal,
-  useConnectModal,
-} from "@rainbow-me/rainbowkit";
-
 export function validateInput(value: string | number): {
   formatted: string;
   isValid: boolean;
@@ -196,13 +190,3 @@ export async function simulateCall({
     return { request: null, success: false, error: error.shortMessage };
   }
 }
-
-export const useRkAccountModal = () => {
-  const { openChainModal = noOp } = useChainModal();
-  const { openConnectModal = openChainModal } = useConnectModal();
-  const { openAccountModal = openConnectModal } = useAccountModal();
-
-  return {
-    openAccountModal,
-  };
-};

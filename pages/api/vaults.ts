@@ -3,8 +3,8 @@ import axios from "axios";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 import { createPublicClient, http, type Address, type PublicClient } from "viem";
 import { ERC20Abi, VaultAbi } from "@/lib/constants/abi";
-import { GaugeData } from "@/lib/types";
-import getGauges from "@/lib/gauges/getGauges";
+import { Strategy } from "@/lib/types";
+import getGaugeApys from "@/lib/gauges/getGaugeApys";
 
 type Vault = {
     address: Address;
@@ -31,29 +31,8 @@ type Vaults = {
     [address: Address]: Vault;
 };
 
-type Strategy = {
-    address: Address;
-    asset: Address;
-    name: string;
-    description: string;
-    apyId: string;
-    apySource: "defillama" | "custom";
-    resolver: string;
-};
-
 type Strategies = {
-    [address: Address]: Strategy;
-};
-
-type Gauge = {
-    address: Address;
-    vault: Address;
-    lowerAPR: number;
-    upperAPR: number;
-};
-
-type Gauges = {
-    [address: Address]: Gauge;
+    [address: Address]: Strategy
 };
 
 // see https://github.com/Popcorn-Limited/defi-db/tree/main/archive/vaults
@@ -96,8 +75,9 @@ export default async function handler(
     )).data as Strategies;
 
     const defillamaApy = await getDefillamaApy();
+
     // gauges contains ALL gauges for all chains
-    const gauges = await getGauges();
+    const gauges = await getGaugeApys(Object.values(vaults).filter(vault => !!vault.gauge).map(vault => vault.gauge), Number(req.query.chainId));
 
     // retrieve APY data for vault
     for (const vault of Object.values(vaults)) {
