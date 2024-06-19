@@ -1,8 +1,8 @@
 import { Address, createPublicClient, http } from "viem";
+import * as chains from "viem/chains";
 import { ChildGaugeAbi, GaugeAbi } from "@/lib/constants";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
-import * as chains from "viem/chains";
-import { useAccount, useContractRead } from "wagmi";
+import { ClaimableReward, TokenByAddress } from "@/lib/types";
 
 export async function getRewardData(gauge: Address, chainId: number) {
   const client = createPublicClient({
@@ -52,44 +52,44 @@ export async function getRewardData(gauge: Address, chainId: number) {
   return []
 }
 
-export const useClaimableRewards = ({
-  gauge,
-  chainId,
-  rewardToken,
-}: {
-  gauge: Address;
-  rewardToken: Address;
-  chainId: number;
-}) => {
-  const { address } = useAccount();
-  return useContractRead({
-    abi: GaugeAbi,
-    chainId,
-    enabled: Boolean(address && gauge && rewardToken),
+
+
+export async function getClaimableRewards({ gauge, account, tokens, chainId }: { gauge: Address; account: Address; tokens: TokenByAddress, chainId: number; }):
+  Promise<ClaimableReward[]> {
+  const client = createPublicClient({
+    chain: ChainById[chainId],
+    transport: http(RPC_URLS[chainId]),
+  })
+
+  const rewardLogs = await client.getContractEvents({
     address: gauge,
-    functionName: "claimable_reward",
-    args: [address!, rewardToken],
-  });
-};
+    abi: chainId === chains.mainnet.id ? GaugeAbi : ChildGaugeAbi,
+    eventName: chainId === chains.mainnet.id ? "RewardDistributorUpdated" : "AddReward",
+    fromBlock: "earliest",
+    toBlock: "latest",
+  }) as any[];
 
-export function AccountClaimableRewards({
-  gauge,
-  chainId,
-  rewardToken,
-  children,
-}: {
-  gauge: Address;
-  rewardToken: Address;
-  chainId: number;
-  children: (
-    claimableRewards: ReturnType<typeof useClaimableRewards>
-  ) => JSX.Element;
-}) {
-  const query = useClaimableRewards({
-    gauge,
-    chainId,
-    rewardToken,
-  });
-
-  return children(query);
+  if (rewardLogs.length > 0) {
+    const rewardData = (await client.multicall({
+      contracts: rewardLogs.map(({ args }) => {
+        return {
+          address: gauge,
+          abi: ChildGaugeAbi,
+          functionName: "claimable_reward",
+          args: [account, args.reward_token as Address],
+        };
+      }),
+      allowFailure: false,
+    })) as any[];
+    return rewardData.map((val, i) => {
+      const rewardToken = tokens[rewardLogs[i].args.reward_token]
+      const amount = Number(val) / (10 ** rewardToken.decimals);
+      return {
+        token: rewardToken,
+        amount: amount,
+        value: amount * rewardToken.price
+      }
+    })
+  }
+  return []
 }

@@ -50,9 +50,10 @@ export type VaultData = {
   depositLimit: number;
   tvl: number;
   apy: number;
-  totalApy: number;
   minGaugeApy: number;
   maxGaugeApy: number;
+  rewardApy: number;
+  totalApy: number;
   apyHist: LlamaApy[];
   apyId: string;
   gaugeSupply: number;
@@ -151,6 +152,12 @@ export type GaugeData = {
   rewardApy: number;
   minGaugeApy: number;
   maxGaugeApy: number;
+}
+
+export type ClaimableReward = {
+  token: Token;
+  amount: number;
+  value: number;
 }
 
 export enum SmartVaultActionType {

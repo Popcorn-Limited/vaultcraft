@@ -402,3 +402,26 @@ export async function fundReward({
   }
   return success
 }
+
+export async function claimRewards({
+  gauge,
+  account,
+  clients,
+}: { gauge: Address, account: Address, clients: Clients }): Promise<boolean> {
+  showLoadingToast("Claim Gauge Reward...");
+
+  const success = await handleCallResult({
+    successMessage: "Claim Gauge Reward successfully!",
+    simulationResponse: await simulateCall({
+      account,
+      contract: {
+        address: gauge,
+        abi: GaugeAbi,
+      },
+      functionName: "claim_rewards",
+      publicClient: clients.publicClient,
+    }),
+    clients,
+  });
+  return success
+}

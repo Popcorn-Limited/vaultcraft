@@ -668,20 +668,6 @@ function RewardsSection({ gauge, chainId }: { gauge: Address; chainId: number })
     getRewardData(gauge, chainId).then(res => setRewardData(res))
   }, [gauge])
 
-  // const { write } = useContractWrite({
-  //   abi: GaugeAbi,
-  //   address: gauge,
-  //   functionName: "claim_rewards",
-  // });
-
-
-  // function handleClaimRewards() {
-  //   if (!address) return openAccountModal();
-  //   write({
-  //     args: [address, zeroAddress],
-  //   });
-  // }
-
   return (
     <Fragment>
       <table className="mb-8 [&_th]:px-6 [&_th]:h-12 [&_td]:px-6 [&_td]:h-12">

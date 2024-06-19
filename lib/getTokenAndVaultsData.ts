@@ -172,9 +172,10 @@ async function prepareVaultsData(chainId: number, client: PublicClient): Promise
       depositLimit: Number(dynamicValues[i + 2]),
       tvl: 0,
       apy: 0,
-      totalApy: 0,
       minGaugeApy: 0,
       maxGaugeApy: 0,
+      rewardApy: 0,
+      totalApy: 0,
       apyHist: apyHist,
       apyId: vault.apyId,
       gaugeSupply: 0,
@@ -371,8 +372,9 @@ async function addGaugeData(vaultsData: VaultDataByAddress, gauges: TokenByAddre
         const vault = Object.values(vaultsData).find(vault => vault.gauge === gauge.address)
 
         if (vault) {
-          vault.minGaugeApy = gaugeApys[gauge.address]?.lowerAPR || 0;
-          vault.maxGaugeApy = gaugeApys[gauge.address]?.upperAPR || 0;
+          vault.minGaugeApy = gaugeApys[gauge.address]?.minGaugeApy || 0;
+          vault.maxGaugeApy = gaugeApys[gauge.address]?.maxGaugeApy || 0;
+          vault.rewardApy = gaugeApys[gauge.address]?.rewardApy || 0
           vault.totalApy += gaugeApys[gauge.address]?.upperAPR || 0;
 
           const boostRes = await client.multicall({

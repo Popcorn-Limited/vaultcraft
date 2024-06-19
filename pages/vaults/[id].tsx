@@ -1,6 +1,6 @@
 import AssetWithName from "@/components/vault/AssetWithName";
 import { vaultsAtom } from "@/lib/atoms/vaults";
-import { Strategy, Token, VaultData } from "@/lib/types";
+import { ClaimableReward, Strategy, Token, VaultData } from "@/lib/types";
 import { useAtom } from "jotai";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
@@ -28,6 +28,8 @@ import CardStat from "@/components/common/CardStat";
 import ProtocolIcon, { IconByProtocol } from "@/components/common/ProtocolIcon";
 import InputNumber from "@/components/input/InputNumber";
 import Highcharts, { chart } from "highcharts";
+import { getClaimableRewards } from "@/lib/gauges/useGaugeRewardData";
+import { claimRewards } from "@/lib/gauges/interactions";
 
 export default function Index() {
   const router = useRouter();
@@ -50,6 +52,8 @@ export default function Index() {
   const [vault, setVault] = useState<Token>();
   const [gauge, setGauge] = useState<Token>();
 
+  const [claimableRewards, setClaimableRewards] = useState<ClaimableReward[]>([])
+
   useEffect(() => {
     if (!vaultData && yieldOptions && Object.keys(query).length > 0 && Object.keys(vaults).length > 0) {
       const chainIdQuery = query?.chainId! as string
@@ -68,6 +72,16 @@ export default function Index() {
         if (foundVault.gauge) {
           setGauge(tokens[chainId][foundVault.gauge])
           newTokenOptions.push(tokens[chainId][foundVault.gauge])
+
+          if (account) {
+            getClaimableRewards({
+              gauge: foundVault.gauge,
+              account,
+              tokens: tokens[chainId],
+              chainId
+            })
+              .then(res => setClaimableRewards(res))
+          }
         }
         setTokenOptions(newTokenOptions)
         setVaultData(foundVault)
@@ -133,6 +147,34 @@ export default function Index() {
           publicClient
         })
       })
+    }
+  }
+
+  async function handleClaimRewards() {
+    if (!vaultData || !account) return
+
+    if (chain?.id !== vaultData?.chainId) {
+      try {
+        await switchNetworkAsync?.(vaultData?.chainId);
+      } catch (error) {
+        return;
+      }
+    }
+
+    const success = await claimRewards({
+      gauge: vaultData.gauge!,
+      account: account,
+      clients: { publicClient, walletClient: walletClient! }
+    })
+
+    if (success) {
+      await mutateTokenBalance({
+        tokensToUpdate: claimableRewards.map(reward => reward.token.address),
+        account,
+        tokensAtom: [tokens, setTokens],
+        chainId: vaultData?.chainId
+      })
+      setClaimableRewards([])
     }
   }
 
@@ -240,28 +282,44 @@ export default function Index() {
 
                 <div className="flex flex-row md:gap-6 md:w-fit md:pl-12">
                   <div className="flex w-full gap-y-4 md:gap-10 md:w-fit">
-                    <div className="w-1/2 md:w-max">
+                    <div className="w-1/3 md:w-max">
                       <p className="w-max leading-6 text-base text-customGray100 md:text-white">My oVCX</p>
                       <p className="w-max text-3xl font-bold whitespace-nowrap text-white">
                         {`$${oBal && tokens[1][VCX] ? NumberFormatter.format(oBal * (tokens[1][VCX].price * 0.25)) : "0"}`}
                       </p>
                     </div>
 
-                    <div className="w-1/2 md:w-max">
+                    <div className="w-1/3 md:w-max">
                       <p className="w-max leading-6 text-base text-customGray100 md:text-white">Claimable oVCX</p>
                       <p className="w-max text-3xl font-bold whitespace-nowrap text-white">
                         {`$${gaugeRewards && tokens[1][VCX] ?
                           NumberFormatter.format((Number(gaugeRewards?.[vaultData.chainId]?.total || 0) / 1e18) * (tokens[1][VCX].price * 0.25)) : "0"}`}
                       </p>
                     </div>
+
+                    {claimableRewards.length > 0 &&
+                      <div className="w-1/3 md:w-max">
+                        <p className="w-max leading-6 text-base text-customGray100 md:text-white">Claimable Rewards</p>
+                        <p className="w-max text-3xl font-bold whitespace-nowrap text-white">
+                          {`$${NumberFormatter.format(claimableRewards.reduce((a, b) => a + b.value, 0))}`}
+                        </p>
+                      </div>
+                    }
                   </div>
 
-                  <div className="hidden md:block md:mt-auto w-fit mb-8">
+                  <div className="hidden md:block md:mt-auto w-fit mb-8 space-y-2">
                     <MainActionButton
                       label="Claim oVCX"
                       handleClick={handleClaim}
                       disabled={!gaugeRewards || gaugeRewards?.[vaultData.chainId]?.total < 0}
                     />
+                    {claimableRewards.length > 0 &&
+                      <SecondaryActionButton
+                        label="Claim Rewards"
+                        handleClick={handleClaimRewards}
+                        disabled={!account}
+                      />
+                    }
                   </div>
                 </div>
                 <div className="md:hidden">
@@ -270,6 +328,13 @@ export default function Index() {
                     handleClick={handleClaim}
                     disabled={!gaugeRewards || gaugeRewards?.[vaultData.chainId]?.total < 0}
                   />
+                  {claimableRewards.length > 0 &&
+                    <SecondaryActionButton
+                      label="Claim Rewards"
+                      handleClick={handleClaimRewards}
+                      disabled={!account}
+                    />
+                  }
                 </div>
               </div>
             </section>
