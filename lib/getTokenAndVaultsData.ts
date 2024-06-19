@@ -9,15 +9,16 @@ import {
 import { PublicClient, erc20ABI, mainnet } from "wagmi";
 import axios from "axios";
 import { VaultAbi } from "@/lib/constants/abi/Vault";
-import { GaugeData, LlamaApy, Token, TokenByAddress, TokenType, VaultData, VaultDataByAddress, VaultLabel } from "@/lib/types";
-import { ERC20Abi, GaugeAbi, OptionTokenByChain, VCX, VCX_LP, VeTokenByChain, XVCXByChain, ZapAssetAddressesByChain, xLayer } from "@/lib/constants";
+import { GaugeDataByAddress, LlamaApy, Token, TokenByAddress, TokenType, VaultData, VaultDataByAddress, VaultLabel } from "@/lib/types";
+import { ChildGaugeAbi, ERC20Abi, GaugeAbi, OptionTokenByChain, VCX, VCX_LP, VeTokenByChain, XVCXByChain, ZapAssetAddressesByChain, xLayer } from "@/lib/constants";
 import { RPC_URLS, networkMap } from "@/lib/utils/connectors";
 import { YieldOptions } from "vaultcraft-sdk";
 import { AavePoolUiAbi } from "@/lib/constants/abi/Aave";
 import { GAUGE_NETWORKS } from "pages/boost";
 import { AavePoolAddressProviderByChain, AaveUiPoolProviderByChain } from "@/lib/external/aave";
-import { vcx as getVcxPrice } from "@/lib/resolver/price/resolver";
 import getFraxlendApy from "@/lib/external/fraxlend/getFraxlendApy";
+import { prepareAssets, prepareVaults, addBalances, prepareGauges } from "@/lib/tokens";
+import getGaugeApys from "@/lib/gauges/getGaugeApys";
 
 interface GetVaultsByChainProps {
   chain: Chain;
@@ -27,28 +28,14 @@ interface GetVaultsByChainProps {
 
 export default async function getTokenAndVaultsDataByChain({
   chain,
-  account,
+  account = zeroAddress,
   yieldOptions,
 }: GetVaultsByChainProps): Promise<{ vaultsData: VaultData[], tokens: TokenByAddress }> {
   const client = createPublicClient({
     chain,
     transport: http(RPC_URLS[chain.id]),
   });
-  return getTokenAndVaultsData({ account, client, yieldOptions });
-}
-
-interface GetVaultsProps {
-  account?: Address;
-  client: PublicClient;
-  yieldOptions: YieldOptions;
-}
-
-export async function getTokenAndVaultsData({
-  account = zeroAddress,
-  client,
-  yieldOptions,
-}: GetVaultsProps): Promise<{ vaultsData: VaultData[], tokens: TokenByAddress }> {
-  const chainId = client.chain.id;
+  const chainId = chain.id;
 
   let vaultsData = await prepareVaultsData(chainId, client)
   vaultsData = await addStrategyData(vaultsData, chainId, client, yieldOptions)
@@ -79,81 +66,45 @@ export async function getTokenAndVaultsData({
       .forEach(d => uniqueAssetAdresses.push(d.underlyingAsset))
   }
 
+  // Add reward token addresses
+  if (GAUGE_NETWORKS.includes(client.chain.id)) {
+    // @ts-ignore
+    for (let [i, vault] of Object.values(vaultsData).entries()) {
+      if (vault.gauge !== zeroAddress) {
+        const rewardLog = await client.getContractEvents({
+          address: vault.gauge,
+          abi: chainId === mainnet.id ? GaugeAbi : ChildGaugeAbi,
+          eventName: chainId === mainnet.id ? "RewardDistributorUpdated" : "AddReward",
+          fromBlock: "earliest",
+          toBlock: "latest",
+        }) as any[]
+
+        rewardLog.forEach((log) => {
+          if (!uniqueAssetAdresses.includes(log.args.reward_token)) {
+            uniqueAssetAdresses.push(log.args.reward_token);
+          }
+        });
+      }
+    }
+  }
+
   const assets = await prepareAssets(uniqueAssetAdresses, chainId, client);
 
-  const vaults = await prepareVaults(vaultsData, assets, chainId)
+  const vaults = await prepareVaults(vaultsData, assets, chainId);
+
+  const gauges = await prepareGauges(Object.values(vaultsData).filter(vault => vault.gauge !== zeroAddress), vaults, client);
 
   // calc vault tvl
   Object.values(vaultsData).forEach(vault => {
     vault.tvl = (vault.totalAssets * assets[vault.asset].price) / (10 ** assets[vault.asset].decimals);
   });
 
-  const gaugeTokens: TokenByAddress = {}
-
-  // Add gauges
-  if (GAUGE_NETWORKS.includes(client.chain.id)) {
-
-    const gauges = (
-      await axios.get(
-        `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/gauge-apy-data.json`
-      )
-    ).data as GaugeData;
-
-    await Promise.all(
-      Object.values(vaultsData).map(async (vault, i) => {
-        const foundGauge = Object.values(gauges).find(
-          (gauge) => gauge.vault === vault.address
-        );
-
-        if (!!foundGauge) {
-          vault.gauge = foundGauge.address;
-          vault.minGaugeApy = gauges[foundGauge.address]?.lowerAPR || 0;
-          vault.maxGaugeApy = gauges[foundGauge.address]?.upperAPR || 0;
-          vault.totalApy += gauges[foundGauge.address]?.upperAPR || 0;
-
-          const boostRes = await client.multicall({
-            contracts: [{
-              address: foundGauge.address,
-              abi: GaugeAbi,
-              functionName: "totalSupply"
-            },
-            {
-              address: foundGauge.address,
-              abi: GaugeAbi,
-              functionName: "working_supply"
-            },
-            {
-              address: foundGauge.address,
-              abi: GaugeAbi,
-              functionName: "working_balances",
-              args: [account]
-            }],
-            allowFailure: false
-          })
-
-          vaultsData[vault.address].gaugeSupply = Number(boostRes[0])
-          vaultsData[vault.address].workingSupply = Number(boostRes[1])
-          vaultsData[vault.address].workingBalance = Number(boostRes[2])
-
-          // Add gauge to tokens
-          gaugeTokens[foundGauge.address] = {
-            address: foundGauge.address,
-            name: `${vaults[vault.address].name}-gauge`,
-            symbol: `st-${vaults[vault.address].symbol}`,
-            decimals: vaults[vault.address].decimals,
-            logoURI: "/images/tokens/vcx.svg", // wont be used, just here for consistency
-            balance: 0,
-            totalSupply: Number(boostRes[0]),
-            price: vaults[vault.address].price,
-            chainId: vault.chainId,
-            type: TokenType.Gauge
-          }
-        }
-      })
-    );
+  // Add gauge data
+  if (Object.keys(gauges).length > 0) {
+    vaultsData = await addGaugeData(vaultsData, gauges, account, client)
   }
 
-  let tokens = { ...assets, ...vaults, ...gaugeTokens }
+  let tokens = { ...assets, ...vaults, ...gauges }
   if (account !== zeroAddress) {
     tokens = await addBalances(tokens, account, client)
   }
@@ -213,7 +164,7 @@ async function prepareVaultsData(chainId: number, client: PublicClient): Promise
       address: getAddress(vault.address),
       vault: getAddress(vault.address),
       asset: getAddress(vault.assetAddress),
-      gauge: undefined,
+      gauge: getAddress(vault.gauge || zeroAddress),
       chainId: vault.chainId,
       fees: vault.fees,
       totalAssets: Number(dynamicValues[i]),
@@ -221,9 +172,10 @@ async function prepareVaultsData(chainId: number, client: PublicClient): Promise
       depositLimit: Number(dynamicValues[i + 2]),
       tvl: 0,
       apy: 0,
-      totalApy: 0,
       minGaugeApy: 0,
       maxGaugeApy: 0,
+      rewardApy: 0,
+      totalApy: 0,
       apyHist: apyHist,
       apyId: vault.apyId,
       gaugeSupply: 0,
@@ -236,8 +188,8 @@ async function prepareVaultsData(chainId: number, client: PublicClient): Promise
           : undefined,
         description: vault.description || undefined,
         type: vault.type,
-        creator: getAddress(vault.creator) || zeroAddress,
-        feeRecipient: getAddress(vault.feeRecipient) || zeroAddress,
+        creator: getAddress(vault.creator || zeroAddress),
+        feeRecipient: getAddress(vault.feeRecipient || zeroAddress),
       },
       strategies: vault.strategies.map((strategy: Address) => {
         return {
@@ -256,84 +208,6 @@ async function prepareVaultsData(chainId: number, client: PublicClient): Promise
   })
 
   return result
-}
-
-async function prepareAssets(addresses: Address[], chainId: number, client: PublicClient): Promise<TokenByAddress> {
-  const { data: assets } = await axios.get(
-    `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/assets/tokens/${chainId}.json`
-  );
-
-  const { data: priceData } = await axios.get(
-    `https://pro-api.llama.fi/${process.env.DEFILLAMA_API_KEY}/coins/prices/current/${String(
-      addresses.map(
-        (address) => `${networkMap[chainId].toLowerCase()}:${address}`
-      )
-    )}`
-  );
-
-  const vcxPrice = await getVcxPrice({ address: VCX, chainId: mainnet.id, client: undefined })
-
-  const ts = await client.multicall({
-    contracts: addresses
-      .map((address: Address) => {
-        return {
-          address: address,
-          abi: erc20ABI,
-          functionName: "totalSupply"
-        }
-      })
-      .flat(),
-    allowFailure: false,
-  });
-
-
-  let result: TokenByAddress = {}
-  addresses.forEach((address, i) => {
-    let tokenPrice = Number(priceData.coins[`${networkMap[chainId].toLowerCase()}:${address}`]?.price) || 0
-
-    if (address === VCX) {
-      tokenPrice = vcxPrice
-    } else if (address === OptionTokenByChain[chainId]) {
-      tokenPrice = vcxPrice * 0.25
-    }
-
-    result[getAddress(address)] = {
-      ...assets[getAddress(address)],
-      address: getAddress(address),
-      price: tokenPrice,
-      balance: 0,
-      totalSupply: Number(ts[i]),
-      chainId: chainId,
-      type: TokenType.Asset
-    }
-  })
-
-  return result;
-}
-
-async function prepareVaults(vaultsData: VaultDataByAddress, assets: TokenByAddress, chainId: number): Promise<TokenByAddress> {
-  const { data: vaultTokens } = await axios.get(
-    `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/vaults/tokens/${chainId}.json`
-  );
-
-  let result: TokenByAddress = {}
-  Object.values(vaultsData).forEach(vault => {
-    const assetsPerShare =
-      vault.totalSupply > 0 ? (vault.totalAssets + 1) / (vault.totalSupply + 1e9) : Number(1e-9);
-    const price = (assetsPerShare * assets[vault.asset].price) * 1e9; // @dev normalize vault price for previews (watch this if errors occur)
-
-    result[getAddress(vault.address)] = {
-      ...vaultTokens[getAddress(vault.address)],
-      address: getAddress(vault.address),
-      price,
-      balance: 0,
-      totalSupply: vault.totalSupply,
-      chainId: chainId,
-      type: TokenType.Vault
-    }
-  })
-
-  return result;
 }
 
 async function getCustomApy(address: Address, apyId: string, chainId: number): Promise<LlamaApy[]> {
@@ -489,25 +363,45 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
 }
 
 
-async function addBalances(tokens: TokenByAddress, account: Address, client: PublicClient): Promise<TokenByAddress> {
-  const balances = await client.multicall({
-    contracts:
-      Object.values(tokens)
-        .map((token: Token) => {
-          return {
-            address: token.address,
-            abi: ERC20Abi,
-            functionName: "balanceOf",
-            args: [account]
-          }
-        })
-        .flat(),
-    allowFailure: false
-  })
+async function addGaugeData(vaultsData: VaultDataByAddress, gauges: TokenByAddress, account: Address, client: PublicClient): Promise<VaultDataByAddress> {
+  const gaugeApys = await getGaugeApys(Object.keys(gauges) as Address[], client.chain.id);
 
-  Object.values(tokens).forEach((token: Token, i: number) => {
-    token.balance = Number(balances[i])
-  })
+  await Promise.all(
+    Object.values(gauges).map(
+      async (gauge, i) => {
+        const vault = Object.values(vaultsData).find(vault => vault.gauge === gauge.address)
 
-  return tokens
+        if (vault) {
+          vault.minGaugeApy = gaugeApys[gauge.address]?.minGaugeApy || 0;
+          vault.maxGaugeApy = gaugeApys[gauge.address]?.maxGaugeApy || 0;
+          vault.rewardApy = gaugeApys[gauge.address]?.rewardApy || 0
+          vault.totalApy += gaugeApys[gauge.address]?.upperAPR || 0;
+
+          const boostRes = await client.multicall({
+            contracts: [
+              {
+                address: gauge.address,
+                abi: GaugeAbi,
+                functionName: "working_supply"
+              },
+              {
+                address: gauge.address,
+                abi: GaugeAbi,
+                functionName: "working_balances",
+                args: [account]
+              }],
+            allowFailure: false
+          })
+
+          vault.gaugeSupply = gauge.totalSupply
+          vault.workingSupply = Number(boostRes[0])
+          vault.workingBalance = Number(boostRes[1])
+
+          vaultsData[vault.address] = vault;
+        }
+      }
+    )
+  );
+
+  return vaultsData;
 }

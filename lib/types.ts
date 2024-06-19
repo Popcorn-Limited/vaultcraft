@@ -50,11 +50,12 @@ export type VaultData = {
   depositLimit: number;
   tvl: number;
   apy: number;
-  totalApy: number;
   minGaugeApy: number;
   maxGaugeApy: number;
+  rewardApy: number;
+  totalApy: number;
   apyHist: LlamaApy[];
-  apyId:string;
+  apyId: string;
   gaugeSupply: number;
   workingSupply: number;
   workingBalance: number;
@@ -139,13 +140,24 @@ export interface Clients {
   walletClient: WalletClient;
 }
 
+export type GaugeDataByAddress = {
+  [key: Address]: GaugeData
+}
+
 export type GaugeData = {
-  [key: Address]: {
-    address: Address;
-    vault: Address;
-    lowerAPR: number;
-    upperAPR: number;
-  };
+  address: Address;
+  vault: Address;
+  lowerAPR: number;
+  upperAPR: number;
+  rewardApy: number;
+  minGaugeApy: number;
+  maxGaugeApy: number;
+}
+
+export type ClaimableReward = {
+  token: Token;
+  amount: number;
+  value: number;
 }
 
 export enum SmartVaultActionType {

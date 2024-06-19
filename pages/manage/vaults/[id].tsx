@@ -1,14 +1,42 @@
 import AssetWithName from "@/components/vault/AssetWithName";
 import { vaultsAtom } from "@/lib/atoms/vaults";
-import { VaultFees, VaultData, Token, Strategy } from "@/lib/types";
+import {
+  VaultFees,
+  VaultData,
+  Token,
+  Strategy,
+  TokenByAddress,
+} from "@/lib/types";
 import { useAtom } from "jotai";
 import { useRouter } from "next/router";
-import { useEffect, useRef, useState } from "react";
+import {
+  Fragment,
+  PropsWithChildren,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import NoSSR from "react-no-ssr";
-import { createConfig, erc20ABI, useAccount } from "wagmi";
+import { createConfig, erc20ABI, useAccount, useContractWrite, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
 import axios from "axios";
-import { Address, createPublicClient, extractChain, http, isAddress, zeroAddress } from "viem";
-import { AdminProxyByChain, MultiStrategyVaultAbi, VaultAbi, VaultControllerByChain } from "@/lib/constants";
+import {
+  Address,
+  createPublicClient,
+  extractChain,
+  formatEther,
+  formatUnits,
+  getContract,
+  http,
+  isAddress,
+  zeroAddress,
+} from "viem";
+import {
+  AdminProxyByChain,
+  GaugeAbi,
+  MultiStrategyVaultAbi,
+  VaultAbi,
+  VaultControllerByChain,
+} from "@/lib/constants";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 import * as chains from "viem/chains";
 import { ProtocolName, YieldOptions } from "vaultcraft-sdk";
@@ -23,34 +51,50 @@ import VaultTakeFees from "@/components/vault/management/vault/Fees";
 import VaultStrategiesConfiguration from "@/components/vault/management/vault/Strategies";
 import VaultRebalance from "@/components/vault/management/vault/Rebalance";
 import { tokensAtom } from "@/lib/atoms";
-import Highcharts, { chart } from "highcharts";
 import InputNumber from "@/components/input/InputNumber";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import MainActionButton from "@/components/button/MainActionButton";
-import { NumberFormatter, formatAndRoundNumber } from "@/lib/utils/formatBigNumber";
-import { roundToTwoDecimalPlaces } from "@/lib/utils/helpers";
+import {
+  NumberFormatter,
+  formatAndRoundNumber,
+  safeRound,
+} from "@/lib/utils/formatBigNumber";
+import {
+  roundToTwoDecimalPlaces,
+  validateInput,
+} from "@/lib/utils/helpers";
 import Modal from "@/components/modal/Modal";
 import { showSuccessToast } from "@/lib/toasts";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { Square2StackIcon } from "@heroicons/react/24/outline";
 import LeftArrowIcon from "@/components/svg/LeftArrowIcon";
+import ApyChart from "@/components/vault/management/vault/ApyChart";
+import NetFlowChart from "@/components/vault/management/vault/NetFlowChart";
+import { votingPeriodEnd } from "@/components/boost/StakingInterface";
+import TokenIcon from "@/components/common/TokenIcon";
+import { getRewardData } from "@/lib/gauges/useGaugeRewardData";
+import InputTokenWithError from "@/components/input/InputTokenWithError";
+import { fundReward } from "@/lib/gauges/interactions";
+import { handleAllowance } from "@/lib/approve";
 
 async function getLogs(vault: VaultData, asset: Token) {
   const client = createPublicClient({
     chain: ChainById[vault.chainId],
     transport: http(RPC_URLS[vault.chainId]),
-  })
+  });
 
   const initLog = await client.getContractEvents({
     address: vault.address,
     abi: VaultAbi,
     eventName: "VaultInitialized",
     fromBlock: "earliest",
-    toBlock: "latest"
-  })
-  const creationBlockNumber = initLog[0].blockNumber
-  const creationBlock = await client.getBlock({ blockNumber: creationBlockNumber })
-  const creationTime = new Date(Number(creationBlock.timestamp) * 1000)
+    toBlock: "latest",
+  });
+  const creationBlockNumber = initLog[0].blockNumber;
+  const creationBlock = await client.getBlock({
+    blockNumber: creationBlockNumber,
+  });
+  const creationTime = new Date(Number(creationBlock.timestamp) * 1000);
   const creationDate = Date.UTC(
     creationTime.getFullYear(),
     creationTime.getMonth(),
@@ -58,53 +102,61 @@ async function getLogs(vault: VaultData, asset: Token) {
     0,
     0,
     0
-  )
+  );
 
   const depositLogs = await client.getContractEvents({
     address: vault.address,
     abi: VaultAbi,
     eventName: "Deposit",
     fromBlock: creationBlockNumber,
-    toBlock: "latest"
-  })
+    toBlock: "latest",
+  });
   const withdrawLogs = await client.getContractEvents({
     address: vault.address,
     abi: VaultAbi,
     eventName: "Withdraw",
     fromBlock: creationBlockNumber,
-    toBlock: "latest"
-  })
+    toBlock: "latest",
+  });
 
-  const latestBlock = await client.getBlock({ blockTag: "latest" })
+  const latestBlock = await client.getBlock({ blockTag: "latest" });
 
-  let result = []
-  let startBlock = creationBlockNumber - BigInt(Math.floor((Number(creationBlock.timestamp) - (creationDate / 1000)) / 13))
-  let day = 0
+  let result = [];
+  let startBlock =
+    creationBlockNumber -
+    BigInt(
+      Math.floor((Number(creationBlock.timestamp) - creationDate / 1000) / 13)
+    );
+  let day = 0;
   while (startBlock < latestBlock.number) {
-    const newBlock = startBlock + BigInt(7200)
+    const newBlock = startBlock + BigInt(7200);
 
-    const deposits = depositLogs.filter(log => log.blockNumber > startBlock && log.blockNumber < newBlock)
-    const withdrawals = withdrawLogs.filter(log => log.blockNumber > startBlock && log.blockNumber < newBlock)
+    const deposits = depositLogs.filter(
+      (log) => log.blockNumber > startBlock && log.blockNumber < newBlock
+    );
+    const withdrawals = withdrawLogs.filter(
+      (log) => log.blockNumber > startBlock && log.blockNumber < newBlock
+    );
 
-    const totalDeposits = deposits.reduce((acc, obj) => acc + Number(obj.args.assets), 0) / (10 ** asset.decimals)
-    const totalWithdrawals = withdrawals.reduce((acc, obj) => acc + Number(obj.args.assets), 0) / (10 ** asset.decimals)
-    const netFlows = totalDeposits - totalWithdrawals
+    const totalDeposits =
+      deposits.reduce((acc, obj) => acc + Number(obj.args.assets), 0) /
+      10 ** asset.decimals;
+    const totalWithdrawals =
+      withdrawals.reduce((acc, obj) => acc + Number(obj.args.assets), 0) /
+      10 ** asset.decimals;
+    const netFlows = totalDeposits - totalWithdrawals;
     result.push({
       day,
-      logs: [
-        ...deposits,
-        ...withdrawals
-      ],
+      logs: [...deposits, ...withdrawals],
       deposits: totalDeposits,
       withdrawals: totalWithdrawals,
-      net: netFlows
+      net: netFlows,
     });
 
-
-    startBlock = newBlock
-    day += 1
+    startBlock = newBlock;
+    day += 1;
   }
-  return result
+  return result;
 }
 
 export interface VaultSettings {
@@ -151,9 +203,9 @@ function getMulticalls(vault: VaultData) {
     },
     {
       ...vaultContract,
-      functionName: "owner"
-    }
-  ]
+      functionName: "owner",
+    },
+  ];
 
   if (vault.strategies.length > 1) {
     return [
@@ -165,8 +217,8 @@ function getMulticalls(vault: VaultData) {
         ...vaultContract,
         functionName: "proposedStrategyTime",
       },
-      ...result
-    ]
+      ...result,
+    ];
   } else {
     return [
       {
@@ -177,8 +229,8 @@ function getMulticalls(vault: VaultData) {
         ...vaultContract,
         functionName: "proposedAdapterTime",
       },
-      ...result
-    ]
+      ...result,
+    ];
   }
 }
 
@@ -213,7 +265,7 @@ async function getVaultSettings(
     paused: res[4],
     feeBalance: Number(res[5]),
     accruedFees: Number(res[6]) + Number(res[7]),
-    owner: res[8]
+    owner: res[8],
   };
 }
 
@@ -224,7 +276,7 @@ const DEFAULT_TABS = [
   "Take Fees",
   "Deposit Limit",
   "Pausing",
-]
+];
 
 export default function Index() {
   const router = useRouter();
@@ -245,36 +297,50 @@ export default function Index() {
   const [settings, setSettings] = useState<VaultSettings>();
   const [callAddress, setCallAddress] = useState<Address>();
 
-  const [logs, setLogs] = useState<any[]>([])
-  const [availableTabs, setAvailableTabs] = useState<string[]>(DEFAULT_TABS)
+  const [logs, setLogs] = useState<any[]>([]);
+  const [availableTabs, setAvailableTabs] = useState<string[]>(DEFAULT_TABS);
   const [tab, setTab] = useState<string>("Strategy");
-
 
   useEffect(() => {
     async function setupVault() {
-      const vault_ = vaults[Number(query?.chainId)].find(vault => vault.address === query?.id)
+      const vault_ = vaults[Number(query?.chainId)].find(
+        (vault) => vault.address === query?.id
+      );
 
       if (vault_) {
+        const logs_ = await getLogs(
+          vault_,
+          tokens[vault_.chainId][vault_.asset]
+        );
+        const settings_ = await getVaultSettings(vault_, yieldOptions!);
 
-        const logs_ = await getLogs(vault_, tokens[vault_.chainId][vault_.asset])
-        const settings_ = await getVaultSettings(vault_, yieldOptions!)
-
-        setAsset(tokens[vault_.chainId][vault_.asset])
-        setVault(tokens[vault_.chainId][vault_.vault])
-        if (vault_.gauge) setGauge(tokens[vault_.chainId][vault_.gauge])
+        setAsset(tokens[vault_.chainId][vault_.asset]);
+        setVault(tokens[vault_.chainId][vault_.vault]);
+        if (vault_.gauge) setGauge(tokens[vault_.chainId][vault_.gauge]);
 
         setVaultData(vault_);
         setSettings(settings_);
-        setCallAddress(settings_.owner === AdminProxyByChain[vault_.chainId] ? VaultControllerByChain[vault_.chainId] : vault_.address)
-        setLogs(logs_)
+        setCallAddress(
+          settings_.owner === AdminProxyByChain[vault_.chainId]
+            ? VaultControllerByChain[vault_.chainId]
+            : vault_.address
+        );
+        setLogs(logs_);
 
         if (vault_.strategies.length > 1) {
-          setAvailableTabs(["Rebalance", ...DEFAULT_TABS])
-          setTab("Rebalance")
+          setAvailableTabs(["Rebalance", ...DEFAULT_TABS]);
+          setTab("Rebalance");
         }
       }
     }
-    if (!vaultData && query && Object.keys(vaults).length > 0 && Object.keys(tokens).length > 0 && yieldOptions) setupVault()
+    if (
+      !vaultData &&
+      query &&
+      Object.keys(vaults).length > 0 &&
+      Object.keys(tokens).length > 0 &&
+      yieldOptions
+    )
+      setupVault();
   }, [vaults, tokens, query, vaultData, yieldOptions]);
 
   function changeTab(tab: string) {
@@ -288,7 +354,13 @@ export default function Index() {
           <button
             className="border border-customGray500 rounded-lg flex flex-row items-center px-4 py-2 ml-4 md:ml-8 mt-10"
             type="button"
-            onClick={() => router.push((!!query?.ref && isAddress(query.ref as string)) ? `/manage/vaults?ref=${query.ref}` : "/manage/vaults")}
+            onClick={() =>
+              router.push(
+                !!query?.ref && isAddress(query.ref as string)
+                  ? `/manage/vaults?ref=${query.ref}`
+                  : "/manage/vaults"
+              )
+            }
           >
             <div className="w-5 h-5">
               <LeftArrowIcon color="#FFF" />
@@ -303,22 +375,25 @@ export default function Index() {
 
             <div className="w-full md:flex md:flex-row md:justify-between space-y-4 md:space-y-0 mt-4 md:mt-0">
               <div className="flex flex-wrap md:flex-row md:pr-10 md:w-fit gap-y-4 md:gap-10">
-
                 <div className="w-1/2 md:w-[120px]">
                   <p className="leading-6 text-base text-customGray100 md:text-white">
                     Your Wallet
                   </p>
                   <p className="text-3xl font-bold whitespace-nowrap text-white leading-0">
-                    {asset ? `$ ${formatAndRoundNumber(
-                      asset.balance * asset.price,
-                      asset.decimals
-                    )}` : "$ 0"}
+                    {asset
+                      ? `$ ${formatAndRoundNumber(
+                        asset.balance * asset.price,
+                        asset.decimals
+                      )}`
+                      : "$ 0"}
                   </p>
                   <p className="text-xl whitespace-nowrap text-customGray300 -mt-2">
-                    {asset ? `${formatAndRoundNumber(
-                      asset.balance,
-                      asset.decimals
-                    )} TKN` : "0 TKN"}
+                    {asset
+                      ? `${formatAndRoundNumber(
+                        asset.balance,
+                        asset.decimals
+                      )} TKN`
+                      : "0 TKN"}
                   </p>
                 </div>
 
@@ -327,64 +402,160 @@ export default function Index() {
                     Deposits
                   </p>
                   <p className="text-3xl font-bold whitespace-nowrap text-white">
-                    {vaultData ?
-                      `${!!gauge ?
-                        NumberFormatter.format(((gauge.balance * gauge.price) / 10 ** gauge.decimals) + ((vault?.balance! * vault?.price!) / 10 ** vault?.decimals!))
-                        : formatAndRoundNumber(vault?.balance! * vault?.price!, vault?.decimals!)
-                      }` : "0"}
+                    {vaultData
+                      ? `${!!gauge
+                        ? NumberFormatter.format(
+                          (gauge.balance * gauge.price) /
+                          10 ** gauge.decimals +
+                          (vault?.balance! * vault?.price!) /
+                          10 ** vault?.decimals!
+                        )
+                        : formatAndRoundNumber(
+                          vault?.balance! * vault?.price!,
+                          vault?.decimals!
+                        )
+                      }`
+                      : "0"}
                   </p>
                   <p className="text-xl whitespace-nowrap text-customGray300 -mt-2">
-                    {`${!!gauge ?
-                      NumberFormatter.format(((gauge.balance) / 10 ** gauge.decimals) + ((vault?.balance!) / 10 ** vault?.decimals!))
-                      : formatAndRoundNumber(vault?.balance!, vault?.decimals!)
+                    {`${!!gauge
+                      ? NumberFormatter.format(
+                        gauge.balance / 10 ** gauge.decimals +
+                        vault?.balance! / 10 ** vault?.decimals!
+                      )
+                      : formatAndRoundNumber(
+                        vault?.balance!,
+                        vault?.decimals!
+                      )
                       } TKN`}
                   </p>
                 </div>
 
                 <div className="w-1/2 md:w-max">
-                  <p className="leading-6 text-base text-customGray100 md:text-white">TVL</p>
+                  <p className="leading-6 text-base text-customGray100 md:text-white">
+                    TVL
+                  </p>
                   <p className="text-3xl font-bold whitespace-nowrap text-white">
-                    $ {vaultData.tvl < 1 ? "0" : NumberFormatter.format(vaultData.tvl)}
+                    ${" "}
+                    {vaultData.tvl < 1
+                      ? "0"
+                      : NumberFormatter.format(vaultData.tvl)}
                   </p>
                   <p className="text-xl whitespace-nowrap text-customGray300 -mt-2">
-                    {asset ? `${formatAndRoundNumber(vaultData.totalAssets, asset.decimals)} TKN` : "0 TKN"}
+                    {asset
+                      ? `${formatAndRoundNumber(
+                        vaultData.totalAssets,
+                        asset.decimals
+                      )} TKN`
+                      : "0 TKN"}
                   </p>
                 </div>
 
                 <div className="w-1/2 md:w-max">
-                  <p className="w-max leading-6 text-base text-customGray100 md:text-white">vAPY</p>
+                  <p className="w-max leading-6 text-base text-customGray100 md:text-white">
+                    vAPY
+                  </p>
                   <p className="text-3xl font-bold whitespace-nowrap text-white">
-                    {`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.apy))} %`}
+                    {`${NumberFormatter.format(
+                      roundToTwoDecimalPlaces(vaultData.apy)
+                    )} %`}
                   </p>
                 </div>
-                {
-                  vaultData.minGaugeApy ? (
-                    <div className="w-1/2 md:w-max">
-                      <p className="w-max leading-6 text-base text-customGray100 md:text-white">Min Rewards</p>
-                      <p className="text-3xl font-bold whitespace-nowrap text-white">
-                        {`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.minGaugeApy))} %`}
-                      </p>
-                    </div>
-                  )
-                    : <></>
-                }
-                {
-                  vaultData.maxGaugeApy ? (
-                    <div className="w-1/2 md:w-max">
-                      <p className="w-max leading-6 text-base text-customGray100 md:text-white">Max Rewards</p>
-                      <p className="text-3xl font-bold whitespace-nowrap text-white">
-                        {`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.maxGaugeApy))} %`}
-                      </p>
-                    </div>
-                  )
-                    : <></>
-                }
+                {vaultData.minGaugeApy ? (
+                  <div className="w-1/2 md:w-max">
+                    <p className="w-max leading-6 text-base text-customGray100 md:text-white">
+                      Min Rewards
+                    </p>
+                    <p className="text-3xl font-bold whitespace-nowrap text-white">
+                      {`${NumberFormatter.format(
+                        roundToTwoDecimalPlaces(vaultData.minGaugeApy)
+                      )} %`}
+                    </p>
+                  </div>
+                ) : (
+                  <></>
+                )}
+                {vaultData.maxGaugeApy ? (
+                  <div className="w-1/2 md:w-max">
+                    <p className="w-max leading-6 text-base text-customGray100 md:text-white">
+                      Max Rewards
+                    </p>
+                    <p className="text-3xl font-bold whitespace-nowrap text-white">
+                      {`${NumberFormatter.format(
+                        roundToTwoDecimalPlaces(vaultData.maxGaugeApy)
+                      )} %`}
+                    </p>
+                  </div>
+                ) : (
+                  <></>
+                )}
               </div>
             </div>
           </section>
 
-          <ApyChart strategy={vaultData.strategies[0]} />
-          <NetFlowChart logs={logs} asset={asset} />
+          <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-8 text-white">
+            <div className="grid md:grid-cols-2 mb-12">
+              <ApyChart strategy={vaultData.strategies[0]} />
+              <NetFlowChart logs={logs} asset={asset} />
+            </div>
+
+            <div className="md:flex mt-12 md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4">
+              <div className="w-full md:w-10/12 border border-customNeutral100 rounded-lg p-4 px-6">
+                <p className="text-white font-normal">Vault address:</p>
+                <div className="flex flex-row items-center justify-between">
+                  <p className="font-bold text-white">
+                    {vaultData.address.slice(0, 6)}...
+                    {vaultData.address.slice(-4)}
+                  </p>
+                  <div className="w-6 h-6 group/vaultAddress">
+                    <CopyToClipboard
+                      text={vaultData.address}
+                      onCopy={() => showSuccessToast("Vault address copied!")}
+                    >
+                      <Square2StackIcon className="text-white group-hover/vaultAddress:text-primaryYellow" />
+                    </CopyToClipboard>
+                  </div>
+                </div>
+              </div>
+
+              <div className="w-full md:w-10/12 border border-customNeutral100 rounded-lg p-4">
+                <p className="text-white font-normal">Asset address:</p>
+                <div className="flex flex-row items-center justify-between">
+                  <p className="font-bold text-white">
+                    {vaultData.asset.slice(0, 6)}...{vaultData.asset.slice(-4)}
+                  </p>
+                  <div className="w-6 h-6 group/vaultAddress">
+                    <CopyToClipboard
+                      text={vaultData.asset}
+                      onCopy={() => showSuccessToast("Asset address copied!")}
+                    >
+                      <Square2StackIcon className="text-white group-hover/vaultAddress:text-primaryYellow" />
+                    </CopyToClipboard>
+                  </div>
+                </div>
+              </div>
+
+              {vaultData.gauge && (
+                <div className="w-full md:w-10/12 border border-customNeutral100 rounded-lg p-4">
+                  <p className="text-white font-normal">Gauge address:</p>
+                  <div className="flex flex-row items-center justify-between">
+                    <p className="font-bold text-white">
+                      {vaultData.gauge.slice(0, 6)}...
+                      {vaultData.gauge.slice(-4)}
+                    </p>
+                    <div className="w-6 h-6 group/gaugeAddress">
+                      <CopyToClipboard
+                        text={vaultData.gauge}
+                        onCopy={() => showSuccessToast("Gauge address copied!")}
+                      >
+                        <Square2StackIcon className="text-white group-hover/gaugeAddress:text-primaryYellow" />
+                      </CopyToClipboard>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </section>
 
           <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-8 text-white">
             <h2 className="text-white font-bold text-2xl">Vault Settings</h2>
@@ -396,27 +567,30 @@ export default function Index() {
                   activeTab={tab}
                   setActiveTab={changeTab}
                 />
-                {(settings && callAddress) ? (
+                {settings && callAddress ? (
                   <div>
                     {tab === "Rebalance" && (
-                      <VaultRebalance vaultData={vaultData}
+                      <VaultRebalance
+                        vaultData={vaultData}
                         settings={settings}
-                        callAddress={callAddress} />
+                        callAddress={callAddress}
+                      />
                     )}
                     {tab === "Strategy" && (
                       <>
-                        {vaultData.strategies.length > 1
-                          ? <VaultStrategiesConfiguration
+                        {vaultData.strategies.length > 1 ? (
+                          <VaultStrategiesConfiguration
                             vaultData={vaultData}
                             settings={settings}
                             callAddress={callAddress}
                           />
-                          : <VaultStrategyConfiguration
+                        ) : (
+                          <VaultStrategyConfiguration
                             vaultData={vaultData}
                             settings={settings}
                             callAddress={callAddress}
                           />
-                        }
+                        )}
                       </>
                     )}
                     {tab === "Fee Configuration" && (
@@ -441,10 +615,18 @@ export default function Index() {
                       />
                     )}
                     {tab === "Take Fees" && (
-                      <VaultTakeFees vaultData={vaultData} settings={settings} callAddress={callAddress} />
+                      <VaultTakeFees
+                        vaultData={vaultData}
+                        settings={settings}
+                        callAddress={callAddress}
+                      />
                     )}
                     {tab === "Pausing" && (
-                      <VaultPausing vaultData={vaultData} settings={settings} callAddress={callAddress} />
+                      <VaultPausing
+                        vaultData={vaultData}
+                        settings={settings}
+                        callAddress={callAddress}
+                      />
                     )}
                   </div>
                 ) : (
@@ -453,11 +635,20 @@ export default function Index() {
               </>
             ) : (
               <p className="text-white">
-                Only the Vault Creator ({vaultData.metadata.creator}) has access to
-                this page.
+                Only the Vault Creator ({vaultData.metadata.creator}) has access
+                to this page.
               </p>
             )}
           </section>
+
+          {vaultData.gauge && (
+            <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-8 text-white">
+              <h2 className="text-white font-bold text-2xl">
+                Manage Gauge Rewards
+              </h2>
+              <RewardsSection gauge={vaultData.gauge} chainId={vaultData.chainId} />
+            </section>
+          )}
         </div>
       ) : (
         <p className="text-white">Loading...</p>
@@ -466,363 +657,153 @@ export default function Index() {
   );
 }
 
-function initBarChart(elem: null | HTMLElement, data: any[], setShowModal: Function, setModalContent: Function) {
-  if (!elem) return;
+function RewardsSection({ gauge, chainId }: { gauge: Address; chainId: number }) {
+  const [tokens] = useAtom(tokensAtom);
 
-  Highcharts.chart(elem,
-    {
-      chart: {
-        type: 'column',
-        backgroundColor: "transparent",
-      },
-      title: {
-        text: '',
-        style: { color: "#fff" }
-      },
-      xAxis: {
-        categories: data.map(entry => String(entry.day)),
-        labels: {
-          style: {
-            color: "#fff",
-          },
-        }
-      },
-      yAxis: {
-        labels: {
-          style: {
-            color: "#fff",
-          },
-        },
-        title: {
-          text: "",
-        },
-      },
-      credits: {
-        enabled: false
-      },
-      legend: {
-        itemStyle: { color: "#fff" }
-      },
-      plotOptions: {
-        column: {
-          borderRadius: '25%',
-          point: {
-            events: {
-              click: function () {
-                setModalContent(data.find(d => d.day === Number(this.category)).logs)
-                setShowModal(true)
-              }
-            }
-          }
-        }
-      },
-      series: [
-        {
-          name: 'Deposit',
-          data: data.map(entry => entry.deposits),
-          type: "column"
-        },
-        {
-          name: 'Withdrawal',
-          data: data.map(entry => -entry.withdrawals),
-          type: "column"
-        },
-        {
-          name: 'Net',
-          data: data.map(entry => entry.net),
-          type: "column"
-        }
-      ]
-    },
-    () => ({})
-  );
-}
-
-function NetFlowChart({ logs, asset }: { logs: any[], asset?: Token }): JSX.Element {
-  const chartElem = useRef(null);
-
-  const [filterAddress, setFilterAddress] = useState<string>("0x")
-  const [from, setFrom] = useState<number>(0)
-  const [to, setTo] = useState<number>(logs.length - 1)
-
-  const [showModal, setShowModal] = useState(false)
-  const [modalContent, setModalContent] = useState<any[]>([])
+  const [rewardData, setRewardData] = useState<any[]>([])
 
   useEffect(() => {
-    initBarChart(chartElem.current, logs.filter(log => log.deposits > 0 || log.withdrawals > 0), setShowModal, setModalContent)
-  }, [logs])
+    getRewardData(gauge, chainId).then(res => setRewardData(res))
+  }, [gauge])
 
   return (
-    <>
-      <Modal visibility={[showModal, setShowModal]}>
-        {modalContent.length > 0 ?
-          <table className="table-auto w-full">
-            <thead>
-              <tr>
-                <th scope="col" className="py-3.5 pl-4 pr-3 text-left font-semibold sm:pl-0">Type</th>
-                <th scope="col" className="px-3 py-3.5 text-left font-semibold">Value</th>
-                <th scope="col" className="px-3 py-3.5 text-left font-semibold">Address</th>
-                <th scope="col" className="px-3 py-3.5 text-left font-semibold">Tx Hash</th>
-              </tr>
-            </thead>
-            <tbody>
-              {modalContent.map(log =>
-                <tr key={log.transactionHash}>
-                  <td className="whitespace-nowrap py-4 pl-4 pr-3 font-medium sm:pl-0">
-                    <h2 className="text-lg text-white text-start">
-                      {log.eventName}
-                    </h2>
-                  </td>
-
-                  <td className="whitespace-nowrap px-3 py-4 text-gray-500 text-start">
-                    {Number(log.args.assets) / (10 ** asset?.decimals!)} {asset?.symbol!}
-                  </td>
-
-                  <td className="whitespace-nowrap px-3 py-4 text-gray-500 text-start">
-                    {log.args.owner}
-                  </td>
-
-                  <td className="whitespace-nowrap px-3 py-4 text-gray-500">
-                    <div className="flex flex-row items-center justify-between">
-                      {log.transactionHash.slice(0, 4)}...{log.transactionHash.slice(-4)}
-                      <div className='w-6 h-6 cursor-pointer group/txHash'>
-                        <CopyToClipboard text={log.transactionHash} onCopy={() => showSuccessToast("Tx Hash copied!")}>
-                          <Square2StackIcon className="text-white group-hover/txHash:text-primaryYellow" />
-                        </CopyToClipboard>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-          : <></>
+    <Fragment>
+      <table className="mb-8 [&_th]:px-6 [&_th]:h-12 [&_td]:px-6 [&_td]:h-12">
+        <tr className="border-b">
+          <th className="font-normal text-left !pl-0">Token</th>
+          <th className="font-normal text-left">Rate</th>
+          <th className="font-normal text-left">Remaining Rewards</th>
+          <th className="font-normal text-left">Period Finish</th>
+          <th className="font-normal text-left hidden lg:table-cell">
+            Distributor
+          </th>
+          <th className="font-normal text-left hidden lg:table-cell">
+            Fund Rewards
+          </th>
+        </tr>
+        {rewardData.length > 0 ?
+          rewardData?.map(reward =>
+            <RewardColumn
+              key={`reward-gauge-${reward.address}`}
+              gauge={gauge}
+              reward={reward}
+              token={tokens[chainId][reward.address]}
+              chainId={chainId}
+            />
+          )
+          : <p>No rewards</p>
         }
-      </Modal>
-      <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-8">
-        <h2 className="text-white font-bold text-2xl">Vault In- and Outflows</h2>
-        <div className="flex flex-row items-end px-12 pt-4 pb-4 space-x-4 text-white">
-          <div>
-            <p>User Address</p>
-            <div className="border border-customGray500 rounded-md p-1">
-              <InputNumber
-                value={filterAddress}
-                onChange={(e) => setFilterAddress(e.currentTarget.value)}
-                type="text"
-              />
-            </div>
-          </div>
-          <div>
-            <p>From</p>
-            <div className="border border-customGray500 rounded-md p-1">
-              <InputNumber
-                value={from}
-                onChange={(e) => setFrom(Number(e.currentTarget.value))}
-                type="number"
-              />
-            </div>
-          </div>
-          <div>
-            <p>To</p>
-            <div className="border border-customGray500 rounded-md p-1">
-              <InputNumber
-                value={to}
-                onChange={(e) => setTo(Number(e.currentTarget.value))}
-                type="number"
-              />
-            </div>
-          </div>
-          <div className="w-40">
-            <MainActionButton
-              label="Filter"
-              handleClick={() =>
-                initBarChart(
-                  chartElem.current,
-                  logs.filter((_, i) => i >= from && i <= to)
-                    .filter(entry => filterAddress === "" ? true : entry.logs.some((log: any) => log.args.owner.toLowerCase().includes(filterAddress)))
-                    .filter(log => log.deposits > 0 || log.withdrawals > 0),
-                  setShowModal,
-                  setModalContent
-                )
-              }
-            />
-          </div>
-          <div className="w-40">
-            <SecondaryActionButton
-              label="Reset"
-              handleClick={() => {
-                setFilterAddress("0x");
-                setFrom(0);
-                setTo(logs.length - 1);
-                initBarChart(
-                  chartElem.current,
-                  logs.filter(log => log.deposits > 0 || log.withdrawals > 0),
-                  setShowModal,
-                  setModalContent
-                )
-              }}
-            />
-          </div>
-
-        </div>
-        <div className={`flex justify-center`} ref={chartElem} />
-      </section>
-    </>
-  )
-}
-
-function initMultiLineChart(elem: null | HTMLElement, data: any[]) {
-  if (!elem) return;
-
-  Highcharts.chart(elem, {
-    chart: {
-      // @ts-ignore
-      zoomType: "xy",
-      backgroundColor: "transparent",
-    },
-    title: {
-      text: '',
-      style: { color: "#fff" }
-    },
-    tooltip: {
-      shared: true,
-    },
-    xAxis: {
-      type: "datetime",
-    },
-    yAxis: {
-      labels: {
-        style: {
-          color: "#fff",
-        },
-      },
-      title: {
-        text: "",
-      },
-    },
-    credits: {
-      enabled: false
-    },
-    legend: {
-      itemStyle: { color: "#fff" }
-    },
-    series: [
-      {
-        name: 'Total Apy',
-        data: data.map((d, i) => [Date.UTC(d.date.getFullYear(), d.date.getMonth(), d.date.getDate()), d.apy || 0]),
-        type: "line"
-      },
-      {
-        name: 'Base Apy',
-        data: data.map((d, i) => [Date.UTC(d.date.getFullYear(), d.date.getMonth(), d.date.getDate()), d.apyBase || 0]),
-        type: "line"
-      },
-      {
-        name: 'Reward Apy',
-        data: data.map((d, i) => [Date.UTC(d.date.getFullYear(), d.date.getMonth(), d.date.getDate()), d.apyReward || 0]),
-        type: "line"
-      },
-    ],
-    plotOptions: {
-      series: {
-        marker: {
-          enabled: false,
-          fillColor: "#7AFB79",
-          lineColor: "#7AFB79",
-          lineWidth: 1,
-        },
-        states: {
-          hover: {
-            enabled: true,
-            halo: {
-              size: 0,
-            },
-          },
-        },
-        pointStart: 1,
-      },
-    },
-  },
-    () => ({})
+      </table>
+    </Fragment>
   );
-
 }
 
-async function getApy(strategy: Strategy) {
-  const { data } = await axios.get(`https://pro-api.llama.fi/${process.env.DEFILLAMA_API_KEY}/yields/chart/${strategy.apyId}`)
-  return data.data.map((entry: any) => { return { apy: entry.apy, apyBase: entry.apyBase, apyReward: entry.apyReward, date: new Date(entry.timestamp) } })
-}
 
-function ApyChart({ strategy }: { strategy: Strategy }): JSX.Element {
-  const chartElem = useRef(null);
+function RewardColumn({ gauge, reward, token, chainId }: { gauge: Address, reward: any, token: Token, chainId: number }): JSX.Element {
+  const { address: account } = useAccount();
+  const publicClient = usePublicClient({ chainId });
+  const { data: walletClient } = useWalletClient();
+  const { chain } = useNetwork();
+  const { switchNetworkAsync } = useSwitchNetwork();
+  const [tokens, setTokens] = useAtom(tokensAtom);
 
-  const [apyData, setApyData] = useState<any[]>([])
-  const [from, setFrom] = useState<number>(0)
-  const [to, setTo] = useState<number>(1)
+  const [amount, setAmount] = useState<string>("0");
 
-  useEffect(() => {
-    async function setUp() {
-      const _apyData = await getApy(strategy);
-      setApyData(_apyData);
-      setTo(_apyData.length - 1)
-      initMultiLineChart(chartElem.current, _apyData);
+  function handleChangeInput(e: any) {
+    const value = e.currentTarget.value;
+    setAmount(validateInput(value).isValid ? value : "0");
+  }
+
+  function handleMaxClick() {
+    if (!token) return;
+    const stringBal = token.balance.toLocaleString("fullwide", {
+      useGrouping: false,
+    });
+    const rounded = safeRound(BigInt(stringBal), token.decimals);
+    const formatted = formatUnits(rounded, token.decimals);
+    handleChangeInput({ currentTarget: { value: formatted } });
+  }
+
+  async function handleFundReward() {
+    let val = Number(amount)
+    if (val === 0 || !account || !publicClient || !walletClient) return
+    val = val * (10 ** token.decimals)
+
+    if (chain?.id !== Number(chainId)) {
+      try {
+        await switchNetworkAsync?.(Number(chainId));
+      } catch (error) {
+        return;
+      }
     }
-    setUp()
-  }, [])
+
+    const clients = {
+      publicClient,
+      walletClient
+    }
+
+    const success = await handleAllowance({
+      token: token.address,
+      spender: gauge,
+      amount: val,
+      account: account,
+      clients
+    })
+
+    if (success) {
+      await fundReward({
+        gauge,
+        rewardToken: token.address,
+        amount: val,
+        account,
+        clients,
+        tokensAtom: [tokens, setTokens]
+      })
+    }
+  }
 
   return (
-    <>
-      <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-8">
-        <h2 className="text-white font-bold text-2xl">Vault APY</h2>
-        <div className="flex flex-row items-end px-12 pt-4 pb-4 space-x-4 text-white">
+    <tr>
+      <td className="!pl-0">
+        <nav className="flex items-center gap-2">
+          <TokenIcon
+            imageSize="w-9 h-9 border border-customNeutral100 rounded-full"
+            token={token}
+            icon={token.logoURI}
+            chainId={chainId}
+          />
+          <strong>${token?.symbol ?? "TKN"}</strong>
+        </nav>
+      </td>
+      <td className="text-left">{formatAndRoundNumber(reward.rate, token.decimals)} {token?.symbol!}/s</td>
+      <td className="text-left">{formatAndRoundNumber(reward.remainingRewards, token.decimals)} {token?.symbol!}</td>
+      <td className="text-left">
+        {reward.periodFinish.toLocaleDateString()}
+      </td>
+      <td className="text-left hidden lg:table-cell">
+        {reward.distributor}
+      </td>
+      <td className="text-left hidden lg:table-cell">
+        <div className="flex flex-row">
           <div>
-            <p>From</p>
-            <div className="border border-customGray500 rounded-md p-1">
-              <InputNumber
-                value={from}
-                onChange={(e) => setFrom(Number(e.currentTarget.value))}
-                type="number"
-              />
-            </div>
-          </div>
-          <div>
-            <p>To</p>
-            <div className="border border-customGray500 rounded-md p-1">
-              <InputNumber
-                value={to}
-                onChange={(e) => setTo(Number(e.currentTarget.value))}
-                type="number"
-              />
-            </div>
-          </div>
-          <div className="w-40">
-            <MainActionButton
-              label="Filter"
-              handleClick={() =>
-                initMultiLineChart(
-                  chartElem.current,
-                  apyData.filter((_, i) => i >= from && i <= to)
-                )
-              }
+            <InputTokenWithError
+              onSelectToken={() => { }}
+              onMaxClick={handleMaxClick}
+              chainId={chainId}
+              value={amount}
+              onChange={handleChangeInput}
+              selectedToken={token}
+              errorMessage={""}
+              tokenList={[]}
+              allowSelection={false}
+              allowInput={true}
             />
           </div>
-          <div className="w-40">
-            <SecondaryActionButton
-              label="Reset"
-              handleClick={() => {
-                setFrom(0);
-                setTo(apyData.length - 1);
-                initMultiLineChart(
-                  chartElem.current,
-                  apyData
-                )
-              }}
-            />
+          <div className="ml-4">
+            <MainActionButton label="Fund Rewards" handleClick={handleFundReward} disabled={!account || account !== reward.distributor} className="h-14" />
           </div>
-
         </div>
-        <div className={`flex justify-center`} ref={chartElem} />
-      </section>
-    </>
+      </td>
+    </tr>
   )
 }
