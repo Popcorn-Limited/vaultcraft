@@ -658,8 +658,6 @@ export default function Index() {
 }
 
 function RewardsSection({ gauge, chainId }: { gauge: Address; chainId: number }) {
-  const { address: account } = useAccount();
-
   const [tokens] = useAtom(tokensAtom);
 
   const [rewardData, setRewardData] = useState<any[]>([])
