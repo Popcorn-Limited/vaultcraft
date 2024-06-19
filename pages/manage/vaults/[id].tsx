@@ -375,187 +375,88 @@ export default function Index() {
 
             <div className="w-full md:flex md:flex-row md:justify-between space-y-4 md:space-y-0 mt-4 md:mt-0">
               <div className="flex flex-wrap md:flex-row md:pr-10 md:w-fit gap-y-4 md:gap-10">
-                <div className="w-1/2 md:w-[120px]">
+
+                <div className="w-1/2 md:w-max">
                   <p className="leading-6 text-base text-customGray100 md:text-white">
                     Your Wallet
                   </p>
                   <p className="text-3xl font-bold whitespace-nowrap text-white leading-0">
-                    {asset
-                      ? `$ ${formatAndRoundNumber(
-                        asset.balance * asset.price,
-                        asset.decimals
-                      )}`
-                      : "$ 0"}
+                    {asset ? `$ ${NumberFormatter.format(asset.balance * asset.price / (10 ** asset.decimals))}` : "$ 0"}
                   </p>
                   <p className="text-xl whitespace-nowrap text-customGray300 -mt-2">
-                    {asset
-                      ? `${formatAndRoundNumber(
-                        asset.balance,
-                        asset.decimals
-                      )} TKN`
-                      : "0 TKN"}
+                    {asset ? `$ ${NumberFormatter.format(asset.balance / (10 ** asset.decimals))} ${asset.symbol}` : "0 TKN"}
                   </p>
                 </div>
 
-                <div className="w-1/2 md:w-[120px]">
+                <div className="w-1/2 md:w-max">
                   <p className="leading-6 text-base text-customGray100 md:text-white">
                     Deposits
                   </p>
                   <p className="text-3xl font-bold whitespace-nowrap text-white">
-                    {vaultData
-                      ? `${!!gauge
-                        ? NumberFormatter.format(
-                          (gauge.balance * gauge.price) /
-                          10 ** gauge.decimals +
-                          (vault?.balance! * vault?.price!) /
-                          10 ** vault?.decimals!
-                        )
-                        : formatAndRoundNumber(
-                          vault?.balance! * vault?.price!,
-                          vault?.decimals!
-                        )
-                      }`
-                      : "0"}
+                    {vaultData ?
+                      `${!!gauge ?
+                        NumberFormatter.format(((gauge.balance * gauge.price) / 10 ** gauge.decimals) + ((vault?.balance! * vault?.price!) / 10 ** vault?.decimals!))
+                        : formatAndRoundNumber(vault?.balance! * vault?.price!, vault?.decimals!)
+                      }` : "0"}
                   </p>
                   <p className="text-xl whitespace-nowrap text-customGray300 -mt-2">
-                    {`${!!gauge
-                      ? NumberFormatter.format(
-                        gauge.balance / 10 ** gauge.decimals +
-                        vault?.balance! / 10 ** vault?.decimals!
-                      )
-                      : formatAndRoundNumber(
-                        vault?.balance!,
-                        vault?.decimals!
-                      )
-                      } TKN`}
+                    {`${!!gauge ?
+                      NumberFormatter.format(((gauge.balance) / 10 ** gauge.decimals) + ((vault?.balance!) / 10 ** vault?.decimals!))
+                      : formatAndRoundNumber(vault?.balance!, vault?.decimals!)
+                      } ${asset?.symbol!}`}
                   </p>
                 </div>
 
                 <div className="w-1/2 md:w-max">
-                  <p className="leading-6 text-base text-customGray100 md:text-white">
-                    TVL
-                  </p>
+                  <p className="leading-6 text-base text-customGray100 md:text-white">TVL</p>
                   <p className="text-3xl font-bold whitespace-nowrap text-white">
-                    ${" "}
-                    {vaultData.tvl < 1
-                      ? "0"
-                      : NumberFormatter.format(vaultData.tvl)}
+                    $ {vaultData.tvl < 1 ? "0" : NumberFormatter.format(vaultData.tvl)}
                   </p>
                   <p className="text-xl whitespace-nowrap text-customGray300 -mt-2">
-                    {asset
-                      ? `${formatAndRoundNumber(
-                        vaultData.totalAssets,
-                        asset.decimals
-                      )} TKN`
-                      : "0 TKN"}
+                    {asset ? `${NumberFormatter.format(vaultData.totalAssets / (10 ** asset.decimals))} ${asset?.symbol!}` : "0 TKN"}
                   </p>
                 </div>
 
                 <div className="w-1/2 md:w-max">
-                  <p className="w-max leading-6 text-base text-customGray100 md:text-white">
-                    vAPY
-                  </p>
+                  <p className="w-max leading-6 text-base text-customGray100 md:text-white">vAPY</p>
                   <p className="text-3xl font-bold whitespace-nowrap text-white">
-                    {`${NumberFormatter.format(
-                      roundToTwoDecimalPlaces(vaultData.apy)
-                    )} %`}
+                    {`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.apy))} %`}
                   </p>
                 </div>
-                {vaultData.minGaugeApy ? (
-                  <div className="w-1/2 md:w-max">
-                    <p className="w-max leading-6 text-base text-customGray100 md:text-white">
-                      Min Rewards
-                    </p>
-                    <p className="text-3xl font-bold whitespace-nowrap text-white">
-                      {`${NumberFormatter.format(
-                        roundToTwoDecimalPlaces(vaultData.minGaugeApy)
-                      )} %`}
-                    </p>
-                  </div>
-                ) : (
-                  <></>
-                )}
-                {vaultData.maxGaugeApy ? (
-                  <div className="w-1/2 md:w-max">
-                    <p className="w-max leading-6 text-base text-customGray100 md:text-white">
-                      Max Rewards
-                    </p>
-                    <p className="text-3xl font-bold whitespace-nowrap text-white">
-                      {`${NumberFormatter.format(
-                        roundToTwoDecimalPlaces(vaultData.maxGaugeApy)
-                      )} %`}
-                    </p>
-                  </div>
-                ) : (
-                  <></>
-                )}
-              </div>
-            </div>
-          </section>
-
-          <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-8 text-white">
-            <div className="grid md:grid-cols-2 mb-12">
-              <ApyChart strategy={vaultData.strategies[0]} />
-              <NetFlowChart logs={logs} asset={asset} />
-            </div>
-
-            <div className="md:flex mt-12 md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4">
-              <div className="w-full md:w-10/12 border border-customNeutral100 rounded-lg p-4 px-6">
-                <p className="text-white font-normal">Vault address:</p>
-                <div className="flex flex-row items-center justify-between">
-                  <p className="font-bold text-white">
-                    {vaultData.address.slice(0, 6)}...
-                    {vaultData.address.slice(-4)}
-                  </p>
-                  <div className="w-6 h-6 group/vaultAddress">
-                    <CopyToClipboard
-                      text={vaultData.address}
-                      onCopy={() => showSuccessToast("Vault address copied!")}
-                    >
-                      <Square2StackIcon className="text-white group-hover/vaultAddress:text-primaryYellow" />
-                    </CopyToClipboard>
-                  </div>
-                </div>
-              </div>
-
-              <div className="w-full md:w-10/12 border border-customNeutral100 rounded-lg p-4">
-                <p className="text-white font-normal">Asset address:</p>
-                <div className="flex flex-row items-center justify-between">
-                  <p className="font-bold text-white">
-                    {vaultData.asset.slice(0, 6)}...{vaultData.asset.slice(-4)}
-                  </p>
-                  <div className="w-6 h-6 group/vaultAddress">
-                    <CopyToClipboard
-                      text={vaultData.asset}
-                      onCopy={() => showSuccessToast("Asset address copied!")}
-                    >
-                      <Square2StackIcon className="text-white group-hover/vaultAddress:text-primaryYellow" />
-                    </CopyToClipboard>
-                  </div>
-                </div>
-              </div>
-
-              {vaultData.gauge && (
-                <div className="w-full md:w-10/12 border border-customNeutral100 rounded-lg p-4">
-                  <p className="text-white font-normal">Gauge address:</p>
-                  <div className="flex flex-row items-center justify-between">
-                    <p className="font-bold text-white">
-                      {vaultData.gauge.slice(0, 6)}...
-                      {vaultData.gauge.slice(-4)}
-                    </p>
-                    <div className="w-6 h-6 group/gaugeAddress">
-                      <CopyToClipboard
-                        text={vaultData.gauge}
-                        onCopy={() => showSuccessToast("Gauge address copied!")}
-                      >
-                        <Square2StackIcon className="text-white group-hover/gaugeAddress:text-primaryYellow" />
-                      </CopyToClipboard>
+                {
+                  vaultData.minGaugeApy ? (
+                    <div className="w-1/2 md:w-max">
+                      <p className="w-max leading-6 text-base text-customGray100 md:text-white">Min Rewards</p>
+                      <p className="text-3xl font-bold whitespace-nowrap text-white">
+                        {`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.minGaugeApy))} %`}
+                      </p>
                     </div>
-                  </div>
-                </div>
-              )}
+                  )
+                    : <></>
+                }
+                {
+                  vaultData.maxGaugeApy ? (
+                    <div className="w-1/2 md:w-max">
+                      <p className="w-max leading-6 text-base text-customGray100 md:text-white">Max Rewards</p>
+                      <p className="text-3xl font-bold whitespace-nowrap text-white">
+                        {`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.maxGaugeApy))} %`}
+                      </p>
+                    </div>
+                  )
+                    : <></>
+                }
+              </div>
             </div>
           </section>
+
+          {vaultData.gauge && (
+            <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-8 text-white">
+              <h2 className="text-white font-bold text-2xl">
+                Manage Gauge Rewards
+              </h2>
+              <RewardsSection gauge={vaultData.gauge} chainId={vaultData.chainId} />
+            </section>
+          )}
 
           <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-8 text-white">
             <h2 className="text-white font-bold text-2xl">Vault Settings</h2>
@@ -641,14 +542,70 @@ export default function Index() {
             )}
           </section>
 
-          {vaultData.gauge && (
-            <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-8 text-white">
-              <h2 className="text-white font-bold text-2xl">
-                Manage Gauge Rewards
-              </h2>
-              <RewardsSection gauge={vaultData.gauge} chainId={vaultData.chainId} />
-            </section>
-          )}
+          <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-8 text-white">
+            <div className="grid md:grid-cols-2 mb-12">
+              <ApyChart strategy={vaultData.strategies[0]} />
+              <NetFlowChart logs={logs} asset={asset} />
+            </div>
+
+            <div className="md:flex mt-12 md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4">
+              <div className="w-full md:w-10/12 border border-customNeutral100 rounded-lg p-4 px-6">
+                <p className="text-white font-normal">Vault address:</p>
+                <div className="flex flex-row items-center justify-between">
+                  <p className="font-bold text-white">
+                    {vaultData.address.slice(0, 6)}...
+                    {vaultData.address.slice(-4)}
+                  </p>
+                  <div className="w-6 h-6 group/vaultAddress">
+                    <CopyToClipboard
+                      text={vaultData.address}
+                      onCopy={() => showSuccessToast("Vault address copied!")}
+                    >
+                      <Square2StackIcon className="text-white group-hover/vaultAddress:text-primaryYellow" />
+                    </CopyToClipboard>
+                  </div>
+                </div>
+              </div>
+
+              <div className="w-full md:w-10/12 border border-customNeutral100 rounded-lg p-4">
+                <p className="text-white font-normal">Asset address:</p>
+                <div className="flex flex-row items-center justify-between">
+                  <p className="font-bold text-white">
+                    {vaultData.asset.slice(0, 6)}...{vaultData.asset.slice(-4)}
+                  </p>
+                  <div className="w-6 h-6 group/vaultAddress">
+                    <CopyToClipboard
+                      text={vaultData.asset}
+                      onCopy={() => showSuccessToast("Asset address copied!")}
+                    >
+                      <Square2StackIcon className="text-white group-hover/vaultAddress:text-primaryYellow" />
+                    </CopyToClipboard>
+                  </div>
+                </div>
+              </div>
+
+              {vaultData.gauge && (
+                <div className="w-full md:w-10/12 border border-customNeutral100 rounded-lg p-4">
+                  <p className="text-white font-normal">Gauge address:</p>
+                  <div className="flex flex-row items-center justify-between">
+                    <p className="font-bold text-white">
+                      {vaultData.gauge.slice(0, 6)}...
+                      {vaultData.gauge.slice(-4)}
+                    </p>
+                    <div className="w-6 h-6 group/gaugeAddress">
+                      <CopyToClipboard
+                        text={vaultData.gauge}
+                        onCopy={() => showSuccessToast("Gauge address copied!")}
+                      >
+                        <Square2StackIcon className="text-white group-hover/gaugeAddress:text-primaryYellow" />
+                      </CopyToClipboard>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </section>
+
         </div>
       ) : (
         <p className="text-white">Loading...</p>
@@ -668,7 +625,7 @@ function RewardsSection({ gauge, chainId }: { gauge: Address; chainId: number })
 
   return (
     <Fragment>
-      <table className="mb-8 [&_th]:px-6 [&_th]:h-12 [&_td]:px-6 [&_td]:h-12">
+      <table className="mb-8 [&_th]:px-6 [&_th]:h-12 [&_td]:px-6 [&_td]:h-12 w-full">
         <tr className="border-b">
           <th className="font-normal text-left !pl-0">Token</th>
           <th className="font-normal text-left">Rate</th>

@@ -25,8 +25,7 @@ import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import CardStat from "@/components/common/CardStat";
-import ProtocolIcon, { IconByProtocol } from "@/components/common/ProtocolIcon";
-import InputNumber from "@/components/input/InputNumber";
+import { IconByProtocol } from "@/components/common/ProtocolIcon";
 import Highcharts, { chart } from "highcharts";
 import { getClaimableRewards } from "@/lib/gauges/useGaugeRewardData";
 import { claimRewards } from "@/lib/gauges/interactions";
@@ -208,16 +207,10 @@ export default function Index() {
                       Your Wallet
                     </p>
                     <p className="text-3xl font-bold whitespace-nowrap text-white leading-0">
-                      {asset ? `$ ${formatAndRoundNumber(
-                        asset.balance * asset.price,
-                        asset.decimals
-                      )}` : "$ 0"}
+                      {asset ? `$ ${NumberFormatter.format(asset.balance * asset.price / (10 ** asset.decimals))}` : "$ 0"}
                     </p>
                     <p className="text-xl whitespace-nowrap text-customGray300 -mt-2">
-                      {asset ? `${formatAndRoundNumber(
-                        asset.balance,
-                        asset.decimals
-                      )} ${asset.symbol}` : "0 TKN"}
+                      {asset ? `$ ${NumberFormatter.format(asset.balance / (10 ** asset.decimals))} ${asset.symbol}` : "0 TKN"}
                     </p>
                   </div>
 
@@ -246,7 +239,7 @@ export default function Index() {
                       $ {vaultData.tvl < 1 ? "0" : NumberFormatter.format(vaultData.tvl)}
                     </p>
                     <p className="text-xl whitespace-nowrap text-customGray300 -mt-2">
-                      {asset ? `${formatAndRoundNumber(vaultData.totalAssets, asset.decimals)} ${asset?.symbol!}` : "0 TKN"}
+                      {asset ? `${NumberFormatter.format(vaultData.totalAssets / (10 ** asset.decimals))} ${asset?.symbol!}` : "0 TKN"}
                     </p>
                   </div>
 
@@ -296,7 +289,6 @@ export default function Index() {
                           NumberFormatter.format((Number(gaugeRewards?.[vaultData.chainId]?.total || 0) / 1e18) * (tokens[1][VCX].price * 0.25)) : "0"}`}
                       </p>
                     </div>
-
                     {claimableRewards.length > 0 &&
                       <div className="w-1/3 md:w-max">
                         <p className="w-max leading-6 text-base text-customGray100 md:text-white">Claimable Rewards</p>
@@ -328,13 +320,6 @@ export default function Index() {
                     handleClick={handleClaim}
                     disabled={!gaugeRewards || gaugeRewards?.[vaultData.chainId]?.total < 0}
                   />
-                  {claimableRewards.length > 0 &&
-                    <SecondaryActionButton
-                      label="Claim Rewards"
-                      handleClick={handleClaimRewards}
-                      disabled={!account}
-                    />
-                  }
                 </div>
               </div>
             </section>
