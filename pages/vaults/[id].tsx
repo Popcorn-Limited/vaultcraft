@@ -1,48 +1,33 @@
-import AssetWithName from "@/components/vault/AssetWithName";
 import { vaultsAtom } from "@/lib/atoms/vaults";
-import { ClaimableReward, Strategy, Token, VaultData } from "@/lib/types";
+import { Token, VaultData } from "@/lib/types";
 import { useAtom } from "jotai";
 import { useRouter } from "next/router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import NoSSR from "react-no-ssr";
-import { erc20ABI, useAccount, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
-import { Address, WalletClient, createPublicClient, http, isAddress, zeroAddress } from "viem";
 import { yieldOptionsAtom } from "@/lib/atoms/sdk";
-import { NumberFormatter, formatAndRoundNumber, formatNumber } from "@/lib/utils/formatBigNumber";
+import { NumberFormatter, formatNumber } from "@/lib/utils/formatBigNumber";
 import { roundToTwoDecimalPlaces } from "@/lib/utils/helpers";
-import MainActionButton from "@/components/button/MainActionButton";
-import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
-import { claimOPop } from "@/lib/optionToken/interactions";
 import VaultInputs from "@/components/vault/VaultInputs";
 import { showSuccessToast } from "@/lib/toasts";
 import CopyToClipboard from "react-copy-to-clipboard";
-import { ArrowDownIcon, Square2StackIcon } from "@heroicons/react/24/outline";
-import { gaugeRewardsAtom, tokensAtom } from "@/lib/atoms";
+import { Square2StackIcon } from "@heroicons/react/24/outline";
+import { tokensAtom } from "@/lib/atoms";
 import LeftArrowIcon from "@/components/svg/LeftArrowIcon";
 import ManageLoanInterface from "@/components/lending/ManageLoanInterface";
-import { MinterByChain, OptionTokenByChain, VCX, VE_VCX, VeTokenByChain, ZapAssetAddressesByChain } from "@/lib/constants";
-import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
-import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
+import { VeTokenByChain, ZapAssetAddressesByChain } from "@/lib/constants";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import CardStat from "@/components/common/CardStat";
-import { IconByProtocol } from "@/components/common/ProtocolIcon";
-import Highcharts, { chart } from "highcharts";
-import { getClaimableRewards } from "@/lib/gauges/useGaugeRewardData";
-import { claimRewards } from "@/lib/gauges/interactions";
+import StrategyDescription from "@/components/vault/StrategyDescription";
+import ApyChart from "@/components/vault/ApyChart";
+import VaultHero from "@/components/vault/VaultHero";
+import { isAddress } from "viem";
 
 export default function Index() {
   const router = useRouter();
   const { query } = router;
-
-  const { chain } = useNetwork();
-  const { switchNetworkAsync } = useSwitchNetwork();
-  const { address: account } = useAccount();
-  const publicClient = usePublicClient();
-  const { data: walletClient } = useWalletClient();
-
   const [yieldOptions] = useAtom(yieldOptionsAtom);
 
-  const [tokens, setTokens] = useAtom(tokensAtom)
+  const [tokens] = useAtom(tokensAtom)
   const [vaults] = useAtom(vaultsAtom);
   const [vaultData, setVaultData] = useState<VaultData>();
 
@@ -51,7 +36,6 @@ export default function Index() {
   const [vault, setVault] = useState<Token>();
   const [gauge, setGauge] = useState<Token>();
 
-  const [claimableRewards, setClaimableRewards] = useState<ClaimableReward[]>([])
 
   useEffect(() => {
     if (!vaultData && yieldOptions && Object.keys(query).length > 0 && Object.keys(vaults).length > 0) {
@@ -71,16 +55,6 @@ export default function Index() {
         if (foundVault.gauge) {
           setGauge(tokens[chainId][foundVault.gauge])
           newTokenOptions.push(tokens[chainId][foundVault.gauge])
-
-          if (account) {
-            getClaimableRewards({
-              gauge: foundVault.gauge,
-              account,
-              tokens: tokens[chainId],
-              chainId
-            })
-              .then(res => setClaimableRewards(res))
-          }
         }
         setTokenOptions(newTokenOptions)
         setVaultData(foundVault)
@@ -88,94 +62,7 @@ export default function Index() {
     }
   }, [vaults, query, vaultData]);
 
-  const [oBal, setOBal] = useState<number>(0)
-
-  useEffect(() => {
-    async function getOToken() {
-      const client = createPublicClient({
-        chain: ChainById[vaultData?.chainId!],
-        transport: http(RPC_URLS[vaultData?.chainId!]),
-      })
-      const newOBal = client.readContract({
-        address: OptionTokenByChain[vaultData?.chainId!],
-        abi: erc20ABI,
-        functionName: "balanceOf",
-        args: [account!]
-      })
-      setOBal(Number(newOBal) / 1e18)
-    }
-    if (account && vaultData) getOToken()
-  }, [account])
-
-  const [gaugeRewards, setGaugeRewards] = useAtom(gaugeRewardsAtom);
-
   const [showLoanManagementModal, setShowLoanManagementModal] = useState(false)
-
-  async function handleClaim() {
-    if (!vaultData || !account) return
-
-    if (chain?.id !== vaultData?.chainId) {
-      try {
-        await switchNetworkAsync?.(vaultData?.chainId);
-      } catch (error) {
-        return;
-      }
-    }
-
-    const success = await claimOPop({
-      gauges: [vaultData.gauge || zeroAddress],
-      chainId: vaultData.chainId!,
-      account: account as Address,
-      minter: MinterByChain[vaultData?.chainId],
-      clients: { publicClient, walletClient: walletClient! }
-    })
-
-    if (success) {
-      await mutateTokenBalance({
-        tokensToUpdate: [OptionTokenByChain[vaultData?.chainId]],
-        account,
-        tokensAtom: [tokens, setTokens],
-        chainId: vaultData?.chainId
-      })
-      setGaugeRewards({
-        ...gaugeRewards,
-        [vaultData?.chainId]: await getGaugeRewards({
-          gauges: vaults[vaultData?.chainId].filter(vault => vault.gauge && vault.gauge !== zeroAddress).map(vault => vault.gauge) as Address[],
-          account: account,
-          chainId: vaultData?.chainId,
-          publicClient
-        })
-      })
-    }
-  }
-
-  async function handleClaimRewards() {
-    if (!vaultData || !account) return
-
-    if (chain?.id !== vaultData?.chainId) {
-      try {
-        await switchNetworkAsync?.(vaultData?.chainId);
-      } catch (error) {
-        return;
-      }
-    }
-
-    const success = await claimRewards({
-      gauge: vaultData.gauge!,
-      account: account,
-      clients: { publicClient, walletClient: walletClient! }
-    })
-
-    if (success) {
-      await mutateTokenBalance({
-        tokensToUpdate: claimableRewards.map(reward => reward.token.address),
-        account,
-        tokensAtom: [tokens, setTokens],
-        chainId: vaultData?.chainId
-      })
-      setClaimableRewards([])
-    }
-  }
 
   return <NoSSR>
     {
@@ -193,136 +80,11 @@ export default function Index() {
               </div>
               <p className="text-white leading-0 mt-1 ml-2">Back to Vaults</p>
             </button>
-            <section className="md:border-b border-customNeutral100 pt-10 pb-6 px-4 md:px-8 ">
 
-              <div className="w-full mb-8">
-                <AssetWithName vault={vaultData} size={3} />
-              </div>
-
-              <div className="w-full md:flex md:flex-row md:justify-between space-y-4 md:space-y-0 mt-4 md:mt-0">
-                <div className="flex flex-wrap md:flex-row md:pr-10 md:w-fit gap-y-4 md:gap-10">
-
-                  <div className="w-1/2 md:w-max">
-                    <p className="leading-6 text-base text-customGray100 md:text-white">
-                      Your Wallet
-                    </p>
-                    <p className="text-3xl font-bold whitespace-nowrap text-white leading-0">
-                      {asset ? `$ ${NumberFormatter.format(asset.balance * asset.price / (10 ** asset.decimals))}` : "$ 0"}
-                    </p>
-                    <p className="text-xl whitespace-nowrap text-customGray300 -mt-2">
-                      {asset ? `$ ${NumberFormatter.format(asset.balance / (10 ** asset.decimals))} ${asset.symbol}` : "0 TKN"}
-                    </p>
-                  </div>
-
-                  <div className="w-1/2 md:w-max">
-                    <p className="leading-6 text-base text-customGray100 md:text-white">
-                      Deposits
-                    </p>
-                    <p className="text-3xl font-bold whitespace-nowrap text-white">
-                      {vaultData ?
-                        `${!!gauge ?
-                          NumberFormatter.format(((gauge.balance * gauge.price) / 10 ** gauge.decimals) + ((vault?.balance! * vault?.price!) / 10 ** vault?.decimals!))
-                          : formatAndRoundNumber(vault?.balance! * vault?.price!, vault?.decimals!)
-                        }` : "0"}
-                    </p>
-                    <p className="text-xl whitespace-nowrap text-customGray300 -mt-2">
-                      {`${!!gauge ?
-                        NumberFormatter.format(((gauge.balance) / 10 ** gauge.decimals) + ((vault?.balance!) / 10 ** vault?.decimals!))
-                        : formatAndRoundNumber(vault?.balance!, vault?.decimals!)
-                        } ${asset?.symbol!}`}
-                    </p>
-                  </div>
-
-                  <div className="w-1/2 md:w-max">
-                    <p className="leading-6 text-base text-customGray100 md:text-white">TVL</p>
-                    <p className="text-3xl font-bold whitespace-nowrap text-white">
-                      $ {vaultData.tvl < 1 ? "0" : NumberFormatter.format(vaultData.tvl)}
-                    </p>
-                    <p className="text-xl whitespace-nowrap text-customGray300 -mt-2">
-                      {asset ? `${NumberFormatter.format(vaultData.totalAssets / (10 ** asset.decimals))} ${asset?.symbol!}` : "0 TKN"}
-                    </p>
-                  </div>
-
-                  <div className="w-1/2 md:w-max">
-                    <p className="w-max leading-6 text-base text-customGray100 md:text-white">vAPY</p>
-                    <p className="text-3xl font-bold whitespace-nowrap text-white">
-                      {`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.apy))} %`}
-                    </p>
-                  </div>
-                  {
-                    vaultData.gaugeData?.lowerAPR ? (
-                      <div className="w-1/2 md:w-max">
-                        <p className="w-max leading-6 text-base text-customGray100 md:text-white">Min Rewards</p>
-                        <p className="text-3xl font-bold whitespace-nowrap text-white">
-                          {`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.gaugeData?.lowerAPR))} %`}
-                        </p>
-                      </div>
-                    )
-                      : <></>
-                  }
-                  {
-                    vaultData.gaugeData?.upperAPR ? (
-                      <div className="w-1/2 md:w-max">
-                        <p className="w-max leading-6 text-base text-customGray100 md:text-white">Max Rewards</p>
-                        <p className="text-3xl font-bold whitespace-nowrap text-white">
-                          {`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.gaugeData?.upperAPR))} %`}
-                        </p>
-                      </div>
-                    )
-                      : <></>
-                  }
-                </div>
-
-                <div className="flex flex-row md:gap-6 md:w-fit md:pl-12">
-                  <div className="flex w-full gap-y-4 md:gap-10 md:w-fit">
-                    <div className="w-1/3 md:w-max">
-                      <p className="w-max leading-6 text-base text-customGray100 md:text-white">My oVCX</p>
-                      <p className="w-max text-3xl font-bold whitespace-nowrap text-white">
-                        {`$${oBal && tokens[1][VCX] ? NumberFormatter.format(oBal * (tokens[1][VCX].price * 0.25)) : "0"}`}
-                      </p>
-                    </div>
-
-                    <div className="w-1/3 md:w-max">
-                      <p className="w-max leading-6 text-base text-customGray100 md:text-white">Claimable oVCX</p>
-                      <p className="w-max text-3xl font-bold whitespace-nowrap text-white">
-                        {`$${gaugeRewards && tokens[1][VCX] ?
-                          NumberFormatter.format((Number(gaugeRewards?.[vaultData.chainId]?.total || 0) / 1e18) * (tokens[1][VCX].price * 0.25)) : "0"}`}
-                      </p>
-                    </div>
-                    {claimableRewards.length > 0 &&
-                      <div className="w-1/3 md:w-max">
-                        <p className="w-max leading-6 text-base text-customGray100 md:text-white">Claimable Rewards</p>
-                        <p className="w-max text-3xl font-bold whitespace-nowrap text-white">
-                          {`$${NumberFormatter.format(claimableRewards.reduce((a, b) => a + b.value, 0))}`}
-                        </p>
-                      </div>
-                    }
-                  </div>
-
-                  <div className="hidden md:block md:mt-auto w-fit mb-8 space-y-2">
-                    <MainActionButton
-                      label="Claim oVCX"
-                      handleClick={handleClaim}
-                      disabled={!gaugeRewards || gaugeRewards?.[vaultData.chainId]?.total < 0}
-                    />
-                    {claimableRewards.length > 0 &&
-                      <SecondaryActionButton
-                        label="Claim Rewards"
-                        handleClick={handleClaimRewards}
-                        disabled={!account}
-                      />
-                    }
-                  </div>
-                </div>
-                <div className="md:hidden">
-                  <MainActionButton
-                    label="Claim oVCX"
-                    handleClick={handleClaim}
-                    disabled={!gaugeRewards || gaugeRewards?.[vaultData.chainId]?.total < 0}
-                  />
-                </div>
-              </div>
-            </section>
+            {vaultData
+              ? <VaultHero vaultData={vaultData} asset={asset} vault={vault} gauge={gauge} showClaim />
+              : <section className="md:border-b border-customNeutral100 pt-10 pb-6 px-4 md:px-8 "></section>
+            }
 
             <section className="w-full md:flex md:flex-row md:justify-between md:space-x-8 py-10 px-4 md:px-8">
               <div className="w-full md:w-1/3">
@@ -339,9 +101,6 @@ export default function Index() {
               </div>
 
               <div className="w-full md:w-2/3 mt-8 md:mt-0 space-y-4">
-
-
-
                 {(gauge && gauge?.balance > 0) &&
                   <div className="bg-customNeutral200 p-6 rounded-lg">
                     <p className="text-white text-2xl font-bold mb-4">Your Boost 🚀</p>
@@ -447,7 +206,7 @@ export default function Index() {
                   <p className="text-white text-2xl font-bold">Strategies</p>
                   {asset &&
                     vaultData.strategies.map((strategy, i) =>
-                      <StrategyDesc
+                      <StrategyDescription
                         key={`${strategy.resolver}-${i}`}
                         strategy={strategy}
                         asset={asset}
@@ -465,207 +224,4 @@ export default function Index() {
         <p className="text-white ml-4 md:ml-8">Loading...</p>
     }
   </NoSSR >
-}
-
-
-function StrategyDesc({ strategy, asset, i, stratLen }: { strategy: Strategy, asset: Token, i: number, stratLen: number }) {
-  return <div
-    className={`py-4 ${i + 1 < stratLen ? "border-b border-customGray500" : ""}`}
-  >
-    <div className="w-max flex flex-row items-center mb-2">
-      <img
-        src={IconByProtocol[strategy.metadata.name] || "/images/tokens/vcx.svg"}
-        className={`h-7 w-7 mr-2 mb-1.5 rounded-full border border-white`}
-      />
-      <h2 className="text-2xl font-bold text-white">
-        {strategy.metadata.name}
-      </h2>
-    </div>
-    <p className='text-white'>
-      {strategy.metadata.description} { }
-    </p>
-    {strategy.apySource === "defillama" &&
-      <p className='text-white'>
-        View on <a href={`https://defillama.com/yields/pool/${strategy.apyId}`} target="_blank" className="text-secondaryBlue">Defillama</a>
-      </p>
-    }
-    <div className="mt-2 md:flex md:flex-row md:items-center">
-      <CardStat
-        id={`${strategy.resolver}-${i}-allocation`}
-        label="Allocation"
-        tooltip="Total value of all assets deposited into this strategy"
-      >
-        <span className="md:flex md:flex-row md:items-center w-full md:space-x-2">
-          <p className="text-white text-xl leading-6 md:leading-8 text-end md:text-start">
-            $ {formatAndRoundNumber(strategy.allocation * asset?.price!, asset?.decimals!)}
-          </p>
-          <p className="hidden md:block text-white">|</p>
-          <p className="text-white text-xl leading-6 md:leading-8 text-end md:text-start">
-            {NumberFormatter.format(roundToTwoDecimalPlaces(strategy.allocationPerc * 100))} %
-          </p>
-        </span>
-      </CardStat>
-      <CardStat
-        id={`${strategy.resolver}-${i}-apy`}
-        label="APY"
-        value={`${NumberFormatter.format(roundToTwoDecimalPlaces(strategy.apy))} %`}
-        tooltip="Current variable apy of the strategy"
-      />
-    </div>
-  </div>
-}
-
-function initMultiLineChart(elem: null | HTMLElement, data: any[]) {
-  if (!elem) return;
-
-  Highcharts.chart(elem, {
-    chart: {
-      // @ts-ignore
-      zoomType: "xy",
-      backgroundColor: "transparent",
-    },
-    title: {
-      text: '',
-      style: { color: "#fff" }
-    },
-    tooltip: {
-      shared: true,
-    },
-    xAxis: {
-      type: "datetime",
-      labels: {
-        style: {
-          color: "#fff"
-        }
-      }
-    },
-    yAxis: {
-      labels: {
-        style: {
-          color: "#fff",
-        },
-      },
-      title: {
-        text: "",
-      },
-    },
-    credits: {
-      enabled: false
-    },
-    legend: {
-      itemStyle: { color: "#fff" }
-    },
-    series: [
-      {
-        name: 'Total Apy',
-        data: data.map((d, i) => [Date.UTC(d.date.getFullYear(), d.date.getMonth(), d.date.getDate()), d.apy || 0]),
-        type: "line"
-      },
-      {
-        name: 'Base Apy',
-        data: data.map((d, i) => [Date.UTC(d.date.getFullYear(), d.date.getMonth(), d.date.getDate()), d.apyBase || 0]),
-        type: "line"
-      },
-      {
-        name: 'Reward Apy',
-        data: data.map((d, i) => [Date.UTC(d.date.getFullYear(), d.date.getMonth(), d.date.getDate()), d.apyReward || 0]),
-        type: "line"
-      },
-    ],
-    plotOptions: {
-      series: {
-        marker: {
-          enabled: false,
-          fillColor: "#7AFB79",
-          lineColor: "#7AFB79",
-          lineWidth: 1,
-        },
-        states: {
-          hover: {
-            enabled: true,
-            halo: {
-              size: 0,
-            },
-          },
-        },
-        pointStart: 1,
-      },
-    },
-  },
-    () => ({})
-  );
-
-}
-
-function ApyChart({ vault }: { vault: VaultData }): JSX.Element {
-  const chartElem = useRef(null);
-
-  const [apyData, setApyData] = useState<any[]>([])
-  const [from, setFrom] = useState<number>(0)
-  const [to, setTo] = useState<number>(1)
-
-  useEffect(() => {
-    async function setUp() {
-      setApyData(vault.apyHist);
-      setTo(vault.apyHist.length - 1)
-      initMultiLineChart(chartElem.current, vault.apyHist);
-    }
-    setUp()
-  }, [])
-
-  return (
-    <>
-      <div className="bg-customNeutral200 p-6 rounded-lg">
-        <h2 className="text-white font-bold text-2xl">Vault APY</h2>
-        {/* <div className="flex flex-row items-end px-12 pt-4 pb-4 space-x-4 text-white">
-          <div>
-            <p>From</p>
-            <div className="border border-customGray500 rounded-md p-1">
-              <InputNumber
-                value={from}
-                onChange={(e) => setFrom(Number(e.currentTarget.value))}
-                type="number"
-              />
-            </div>
-          </div>
-          <div>
-            <p>To</p>
-            <div className="border border-customGray500 rounded-md p-1">
-              <InputNumber
-                value={to}
-                onChange={(e) => setTo(Number(e.currentTarget.value))}
-                type="number"
-              />
-            </div>
-          </div>
-          <div className="w-40">
-            <MainActionButton
-              label="Filter"
-              handleClick={() =>
-                initMultiLineChart(
-                  chartElem.current,
-                  apyData.filter((_, i) => i >= from && i <= to)
-                )
-              }
-            />
-          </div>
-          <div className="w-40">
-            <SecondaryActionButton
-              label="Reset"
-              handleClick={() => {
-                setFrom(0);
-                setTo(apyData.length - 1);
-                initMultiLineChart(
-                  chartElem.current,
-                  apyData
-                )
-              }}
-            />
-          </div>
-
-        </div> */}
-        <div className={`flex justify-center`} ref={chartElem} />
-      </div>
-    </>
-  )
 }

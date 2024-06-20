@@ -371,7 +371,7 @@ async function addGaugeData(vaultsData: VaultDataByAddress, tokens: TokenByAddre
     const vault = vaultsData[gaugeData.vault]
 
     if (vault) {
-      vault.totalApy += gaugeData.upperAPR + gaugeData.rewardApy || 0;
+      vault.totalApy += gaugeData.upperAPR + gaugeData.rewardApy.apy || 0;
       vault.gaugeData = gaugeData;
 
       vaultsData[vault.address] = vault;

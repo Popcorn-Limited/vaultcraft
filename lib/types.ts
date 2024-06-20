@@ -142,9 +142,21 @@ export type GaugeData = {
   lowerAPR: number;
   upperAPR: number;
   annualRewardValue: number;
-  rewardApy: number;
+  rewardApy: RewardApy;
   workingSupply: number;
   workingBalance: number;
+}
+
+export type RewardApy = {
+  rewards: TokenReward[];
+  annualRewardValue: number;
+  apy: number;
+}
+
+export type TokenReward = {
+  address: Address;
+  emissions: number;
+  emissionsValue: number
 }
 
 export type ClaimableReward = {

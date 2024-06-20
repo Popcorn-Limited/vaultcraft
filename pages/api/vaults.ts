@@ -246,8 +246,8 @@ export default async function handler(
 
         const gaugeData = gaugesData.find(data => data.vault === vault.address)
         if (gaugeData) {
-            vault.gaugeLowerApr = gaugeData.lowerAPR + gaugeData.rewardApy;
-            vault.gaugeUpperApr = gaugeData.upperAPR + gaugeData.rewardApy;
+            vault.gaugeLowerApr = gaugeData.lowerAPR + gaugeData.rewardApy.apy;
+            vault.gaugeUpperApr = gaugeData.upperAPR + gaugeData.rewardApy.apy;
         }
     }
 

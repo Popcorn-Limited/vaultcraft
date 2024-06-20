@@ -3,7 +3,7 @@ import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 import { ChildGaugeAbi, GaugeAbi, VCX, } from "@/lib/constants";
 import { vcx as getVcxPrice } from "@/lib/resolver/price/resolver";
 import { erc20ABI, mainnet } from "wagmi";
-import { GaugeData, TokenByAddress, VaultDataByAddress } from "@/lib/types";
+import { GaugeData, RewardApy, TokenByAddress, VaultDataByAddress } from "@/lib/types";
 import { thisPeriodTimestamp } from "./utils";
 
 const HIDDEN_GAUGES = [
@@ -219,12 +219,14 @@ async function getChildGaugesData({
       chainId
     })
 
+    const annualEmissions = ((Number(mainnetData[i].rate) / 1e18) * (Number(mainnetData[i + 1]) / 1e18)) * 86400 * 365
     return {
       vault: vault.address,
       gauge: vault.gauge!,
       lowerAPR,
       upperAPR,
-      annualRewardValue: ((Number(mainnetData[i].rate) / 1e18) * (Number(mainnetData[i + 1]) / 1e18)) * 86400 * 365 * ovcxPrice,
+      annualEmissions: annualEmissions,
+      annualRewardValue: annualEmissions * ovcxPrice,
       rewardApy,
       workingSupply: Number(chainData[n + 1]),
       workingBalance: Number(chainData[n + 2])
@@ -286,7 +288,7 @@ async function getRewardsApy({
   vaultPrice: number,
   tokens: TokenByAddress,
   chainId: number
-}): Promise<number> {
+}): Promise<RewardApy> {
   const client = clientByChainId[chainId];
 
   // get all reward token via events
@@ -299,7 +301,7 @@ async function getRewardsApy({
   }) as any[];
 
   if (rewardLogs.length > 0) {
-    const rewardData = await client.multicall({
+    const rewardRes = await client.multicall({
       contracts: rewardLogs.map(log => {
         return {
           address: gauge,
@@ -311,17 +313,22 @@ async function getRewardsApy({
       allowFailure: false
     }) as any[]
 
-    const annualRewardUSD: number = rewardData.reduce(
-      (a, b, i) => a + (
-        (((Number(b.rate) / 1e18) * 86400 * 365)
-          / (10 ** tokens[rewardLogs[i].args.reward_token!].decimals))
-        * tokens[rewardLogs[i].args.reward_token!].price),
-      0)
+    const rewardData = rewardRes.map((data, i) => {
+      const rewardAddress = rewardLogs[i].args.reward_token!;
+      const emissions = ((Number(data.rate) / 1e18) * 86400 * 365) / (10 ** tokens[rewardAddress].decimals)
+      return {
+        address: rewardAddress,
+        emissions: emissions,
+        emissionsValue: emissions * tokens[rewardAddress].price
+      }
+    })
+
+    const annualRewardUSD: number = rewardData.reduce((a, b,) => a + b.emissionsValue, 0)
     const workingSupplyUSD =
       (workingSupply > 0 ? workingSupply : 1e18) *
       vaultPrice *
       1e9;
-    return (annualRewardUSD / workingSupplyUSD) * 100
+    return { rewards: rewardData, annualRewardValue: annualRewardUSD, apy: (annualRewardUSD / workingSupplyUSD) * 100 }
   }
-  return 0
+  return { rewards: [], annualRewardValue: 0, apy: 0 }
 }

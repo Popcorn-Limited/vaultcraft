@@ -67,14 +67,16 @@ export default function VaultStats({
           label="Min Rewards Apy"
           value={`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData?.gaugeData?.lowerAPR))} %`}
           tooltip="Minimum oVCX boost APR based on most current epoch&apos;s distribution"
-        />}
+        />
+      }
       {vaultData?.gaugeData?.upperAPR &&
         <CardStat
           id={`${baseTooltipId}-maxRewards`}
           label="Max Rewards Apy"
           value={`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData?.gaugeData?.upperAPR))} %`}
           tooltip="Maximum oVCX boost APR based on most current epoch&apos;s distribution"
-        />}
+        />
+      }
     </div>
   );
 }

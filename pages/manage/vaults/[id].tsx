@@ -51,7 +51,6 @@ import VaultTakeFees from "@/components/vault/management/vault/Fees";
 import VaultStrategiesConfiguration from "@/components/vault/management/vault/Strategies";
 import VaultRebalance from "@/components/vault/management/vault/Rebalance";
 import { tokensAtom } from "@/lib/atoms";
-import InputNumber from "@/components/input/InputNumber";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import MainActionButton from "@/components/button/MainActionButton";
 import {
@@ -63,19 +62,19 @@ import {
   roundToTwoDecimalPlaces,
   validateInput,
 } from "@/lib/utils/helpers";
-import Modal from "@/components/modal/Modal";
 import { showSuccessToast } from "@/lib/toasts";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { Square2StackIcon } from "@heroicons/react/24/outline";
 import LeftArrowIcon from "@/components/svg/LeftArrowIcon";
 import ApyChart from "@/components/vault/management/vault/ApyChart";
 import NetFlowChart from "@/components/vault/management/vault/NetFlowChart";
-import { votingPeriodEnd } from "@/components/boost/StakingInterface";
 import TokenIcon from "@/components/common/TokenIcon";
 import { getRewardData } from "@/lib/gauges/useGaugeRewardData";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import { fundReward } from "@/lib/gauges/interactions";
 import { handleAllowance } from "@/lib/approve";
+import LargeCardStat from "@/components/common/LargeCardStat";
+import VaultHero from "@/components/vault/VaultHero";
 
 async function getLogs(vault: VaultData, asset: Token) {
   const client = createPublicClient({
@@ -368,86 +367,10 @@ export default function Index() {
             <p className="text-white leading-0 mt-1 ml-2">Back to Vaults</p>
           </button>
 
-          <section className="md:border-b border-customNeutral100 pt-10 pb-6 px-4 md:px-8">
-            <div className="w-full mb-8">
-              <AssetWithName vault={vaultData} size={3} />
-            </div>
-
-            <div className="w-full md:flex md:flex-row md:justify-between space-y-4 md:space-y-0 mt-4 md:mt-0">
-              <div className="flex flex-wrap md:flex-row md:pr-10 md:w-fit gap-y-4 md:gap-10">
-
-                <div className="w-1/2 md:w-max">
-                  <p className="leading-6 text-base text-customGray100 md:text-white">
-                    Your Wallet
-                  </p>
-                  <p className="text-3xl font-bold whitespace-nowrap text-white leading-0">
-                    {asset ? `$ ${NumberFormatter.format(asset.balance * asset.price / (10 ** asset.decimals))}` : "$ 0"}
-                  </p>
-                  <p className="text-xl whitespace-nowrap text-customGray300 -mt-2">
-                    {asset ? `$ ${NumberFormatter.format(asset.balance / (10 ** asset.decimals))} ${asset.symbol}` : "0 TKN"}
-                  </p>
-                </div>
-
-                <div className="w-1/2 md:w-max">
-                  <p className="leading-6 text-base text-customGray100 md:text-white">
-                    Deposits
-                  </p>
-                  <p className="text-3xl font-bold whitespace-nowrap text-white">
-                    {vaultData ?
-                      `${!!gauge ?
-                        NumberFormatter.format(((gauge.balance * gauge.price) / 10 ** gauge.decimals) + ((vault?.balance! * vault?.price!) / 10 ** vault?.decimals!))
-                        : formatAndRoundNumber(vault?.balance! * vault?.price!, vault?.decimals!)
-                      }` : "0"}
-                  </p>
-                  <p className="text-xl whitespace-nowrap text-customGray300 -mt-2">
-                    {`${!!gauge ?
-                      NumberFormatter.format(((gauge.balance) / 10 ** gauge.decimals) + ((vault?.balance!) / 10 ** vault?.decimals!))
-                      : formatAndRoundNumber(vault?.balance!, vault?.decimals!)
-                      } ${asset?.symbol!}`}
-                  </p>
-                </div>
-
-                <div className="w-1/2 md:w-max">
-                  <p className="leading-6 text-base text-customGray100 md:text-white">TVL</p>
-                  <p className="text-3xl font-bold whitespace-nowrap text-white">
-                    $ {vaultData.tvl < 1 ? "0" : NumberFormatter.format(vaultData.tvl)}
-                  </p>
-                  <p className="text-xl whitespace-nowrap text-customGray300 -mt-2">
-                    {asset ? `${NumberFormatter.format(vaultData.totalAssets / (10 ** asset.decimals))} ${asset?.symbol!}` : "0 TKN"}
-                  </p>
-                </div>
-
-                <div className="w-1/2 md:w-max">
-                  <p className="w-max leading-6 text-base text-customGray100 md:text-white">vAPY</p>
-                  <p className="text-3xl font-bold whitespace-nowrap text-white">
-                    {`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.apy))} %`}
-                  </p>
-                </div>
-                {
-                  vaultData.gaugeData?.lowerAPR ? (
-                    <div className="w-1/2 md:w-max">
-                      <p className="w-max leading-6 text-base text-customGray100 md:text-white">Min Rewards</p>
-                      <p className="text-3xl font-bold whitespace-nowrap text-white">
-                        {`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.gaugeData?.lowerAPR))} %`}
-                      </p>
-                    </div>
-                  )
-                    : <></>
-                }
-                {
-                  vaultData.gaugeData?.upperAPR ? (
-                    <div className="w-1/2 md:w-max">
-                      <p className="w-max leading-6 text-base text-customGray100 md:text-white">Max Rewards</p>
-                      <p className="text-3xl font-bold whitespace-nowrap text-white">
-                        {`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.gaugeData?.upperAPR))} %`}
-                      </p>
-                    </div>
-                  )
-                    : <></>
-                }
-              </div>
-            </div>
-          </section>
+          {vaultData
+            ? <VaultHero vaultData={vaultData} asset={asset} vault={vault} gauge={gauge} showClaim={false} />
+            : <section className="md:border-b border-customNeutral100 pt-10 pb-6 px-4 md:px-8 "></section>
+          }
 
           {vaultData.gauge && (
             <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-8 text-white">
