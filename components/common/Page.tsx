@@ -309,7 +309,7 @@ export default function Page({
         const newRewards: { [key: number]: GaugeRewards } = {}
         await Promise.all(GAUGE_NETWORKS.map(async (chain) =>
           newRewards[chain] = await getGaugeRewards({
-            gauges: newVaultsData[chain].filter(vault => !!vault.gauge).map(vault => vault.gauge) as Address[],
+            gauges: newVaultsData[chain].filter(vault => vault.gauge && vault.gauge !== zeroAddress).map(vault => vault.gauge) as Address[],
             account: account as Address,
             chainId: chain,
             publicClient

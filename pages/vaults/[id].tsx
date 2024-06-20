@@ -140,7 +140,7 @@ export default function Index() {
       setGaugeRewards({
         ...gaugeRewards,
         [vaultData?.chainId]: await getGaugeRewards({
-          gauges: vaults[vaultData?.chainId].filter(vault => !!vault.gauge).map(vault => vault.gauge) as Address[],
+          gauges: vaults[vaultData?.chainId].filter(vault => vault.gauge && vault.gauge !== zeroAddress).map(vault => vault.gauge) as Address[],
           account: account,
           chainId: vaultData?.chainId,
           publicClient

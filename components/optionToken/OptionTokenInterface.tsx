@@ -78,7 +78,7 @@ export default function OptionTokenInterface({ setShowOptionTokenModal }: Option
       setGaugeRewards({
         ...gaugeRewards,
         [chainId]: await getGaugeRewards({
-          gauges: vaults[chainId].filter(vault => !!vault.gauge).map(vault => vault.gauge) as Address[],
+          gauges: vaults[chainId].filter(vault => vault.gauge && vault.gauge !== zeroAddress).map(vault => vault.gauge) as Address[],
           account: account!,
           chainId: chainId,
           publicClient
