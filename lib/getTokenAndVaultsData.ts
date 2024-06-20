@@ -6,19 +6,19 @@ import {
   http,
   zeroAddress,
 } from "viem";
-import { PublicClient, erc20ABI, mainnet } from "wagmi";
+import { PublicClient, mainnet } from "wagmi";
 import axios from "axios";
 import { VaultAbi } from "@/lib/constants/abi/Vault";
-import { GaugeDataByAddress, LlamaApy, Token, TokenByAddress, TokenType, VaultData, VaultDataByAddress, VaultLabel } from "@/lib/types";
+import { LlamaApy, TokenByAddress, VaultData, VaultDataByAddress, VaultLabel } from "@/lib/types";
 import { ChildGaugeAbi, ERC20Abi, GaugeAbi, OptionTokenByChain, VCX, VCX_LP, VeTokenByChain, XVCXByChain, ZapAssetAddressesByChain, xLayer } from "@/lib/constants";
-import { RPC_URLS, networkMap } from "@/lib/utils/connectors";
+import { RPC_URLS } from "@/lib/utils/connectors";
 import { YieldOptions } from "vaultcraft-sdk";
 import { AavePoolUiAbi } from "@/lib/constants/abi/Aave";
 import { GAUGE_NETWORKS } from "pages/boost";
 import { AavePoolAddressProviderByChain, AaveUiPoolProviderByChain } from "@/lib/external/aave";
 import getFraxlendApy from "@/lib/external/fraxlend/getFraxlendApy";
 import { prepareAssets, prepareVaults, addBalances, prepareGauges } from "@/lib/tokens";
-import getGaugeApys from "@/lib/gauges/getGaugeApys";
+import getGaugesData from "@/lib/gauges/getGaugeData";
 
 interface GetVaultsByChainProps {
   chain: Chain;
@@ -94,19 +94,20 @@ export default async function getTokenAndVaultsDataByChain({
 
   const gauges = await prepareGauges(Object.values(vaultsData).filter(vault => vault.gauge !== zeroAddress), vaults, client);
 
-  // calc vault tvl
+  // Add balances
+  let tokens = { ...assets, ...vaults, ...gauges }
+  if (account !== zeroAddress) {
+    tokens = await addBalances(tokens, account, client)
+  }
+
+  // Calc vault tvl
   Object.values(vaultsData).forEach(vault => {
     vault.tvl = (vault.totalAssets * assets[vault.asset].price) / (10 ** assets[vault.asset].decimals);
   });
 
-  // Add gauge data
+  // add gauge data
   if (Object.keys(gauges).length > 0) {
-    vaultsData = await addGaugeData(vaultsData, gauges, account, client)
-  }
-
-  let tokens = { ...assets, ...vaults, ...gauges }
-  if (account !== zeroAddress) {
-    tokens = await addBalances(tokens, account, client)
+    vaultsData = await addGaugeData(vaultsData, tokens, account, chainId)
   }
 
   return { vaultsData: Object.values(vaultsData), tokens };
@@ -160,6 +161,11 @@ async function prepareVaultsData(chainId: number, client: PublicClient): Promise
     const apyHist = apyHistAll[i]
     if (i > 0) i = i * 3;
 
+    const totalAssets = Number(dynamicValues[i])
+    const totalSupply = Number(dynamicValues[i + 1])
+    const assetsPerShare =
+      totalSupply > 0 ? (totalAssets + 1) / (totalSupply + 1e9) : Number(1e-9);
+
     result[getAddress(vault.address)] = {
       address: getAddress(vault.address),
       vault: getAddress(vault.address),
@@ -167,20 +173,16 @@ async function prepareVaultsData(chainId: number, client: PublicClient): Promise
       gauge: getAddress(vault.gauge || zeroAddress),
       chainId: vault.chainId,
       fees: vault.fees,
-      totalAssets: Number(dynamicValues[i]),
-      totalSupply: Number(dynamicValues[i + 1]),
+      totalAssets: totalAssets,
+      totalSupply: totalSupply,
+      assetsPerShare: assetsPerShare,
       depositLimit: Number(dynamicValues[i + 2]),
       tvl: 0,
       apy: 0,
-      minGaugeApy: 0,
-      maxGaugeApy: 0,
-      rewardApy: 0,
       totalApy: 0,
       apyHist: apyHist,
       apyId: vault.apyId,
-      gaugeSupply: 0,
-      workingSupply: 0,
-      workingBalance: 0,
+      gaugeData: undefined,
       metadata: {
         vaultName: vault.name ? vault.name : undefined,
         labels: vault.labels
@@ -362,46 +364,19 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
   return vaults
 }
 
+async function addGaugeData(vaultsData: VaultDataByAddress, tokens: TokenByAddress, account: Address, chainId: number): Promise<VaultDataByAddress> {
+  const gaugesData = await getGaugesData({ vaultsData, tokens, account, chainId });
 
-async function addGaugeData(vaultsData: VaultDataByAddress, gauges: TokenByAddress, account: Address, client: PublicClient): Promise<VaultDataByAddress> {
-  const gaugeApys = await getGaugeApys(Object.keys(gauges) as Address[], client.chain.id);
+  gaugesData.forEach(gaugeData => {
+    const vault = vaultsData[gaugeData.vault]
 
-  await Promise.all(
-    Object.values(gauges).map(
-      async (gauge, i) => {
-        const vault = Object.values(vaultsData).find(vault => vault.gauge === gauge.address)
+    if (vault) {
+      vault.totalApy += gaugeData.upperAPR + gaugeData.rewardApy || 0;
+      vault.gaugeData = gaugeData;
 
-        if (vault) {
-          vault.minGaugeApy = gaugeApys[gauge.address]?.minGaugeApy || 0;
-          vault.maxGaugeApy = gaugeApys[gauge.address]?.maxGaugeApy || 0;
-          vault.rewardApy = gaugeApys[gauge.address]?.rewardApy || 0
-          vault.totalApy += gaugeApys[gauge.address]?.upperAPR || 0;
-
-          const boostRes = await client.multicall({
-            contracts: [
-              {
-                address: gauge.address,
-                abi: GaugeAbi,
-                functionName: "working_supply"
-              },
-              {
-                address: gauge.address,
-                abi: GaugeAbi,
-                functionName: "working_balances",
-                args: [account]
-              }],
-            allowFailure: false
-          })
-
-          vault.gaugeSupply = gauge.totalSupply
-          vault.workingSupply = Number(boostRes[0])
-          vault.workingBalance = Number(boostRes[1])
-
-          vaultsData[vault.address] = vault;
-        }
-      }
-    )
-  );
+      vaultsData[vault.address] = vault;
+    }
+  });
 
   return vaultsData;
 }

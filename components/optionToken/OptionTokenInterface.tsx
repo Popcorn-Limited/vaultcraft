@@ -54,6 +54,10 @@ export default function OptionTokenInterface({ setShowOptionTokenModal }: Option
       }
     }
 
+    console.log(gaugeRewards[chainId].amounts
+      ?.filter((gauge) => Number(gauge.amount) > 0)
+      .map((gauge) => gauge.address))
+
     const success = await claimOPop({
       gauges: gaugeRewards[chainId].amounts
         ?.filter((gauge) => Number(gauge.amount) > 0)

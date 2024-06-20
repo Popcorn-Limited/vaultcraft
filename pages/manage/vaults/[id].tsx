@@ -424,22 +424,22 @@ export default function Index() {
                   </p>
                 </div>
                 {
-                  vaultData.minGaugeApy ? (
+                  vaultData.gaugeData?.lowerAPR ? (
                     <div className="w-1/2 md:w-max">
                       <p className="w-max leading-6 text-base text-customGray100 md:text-white">Min Rewards</p>
                       <p className="text-3xl font-bold whitespace-nowrap text-white">
-                        {`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.minGaugeApy))} %`}
+                        {`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.gaugeData?.lowerAPR))} %`}
                       </p>
                     </div>
                   )
                     : <></>
                 }
                 {
-                  vaultData.maxGaugeApy ? (
+                  vaultData.gaugeData?.upperAPR ? (
                     <div className="w-1/2 md:w-max">
                       <p className="w-max leading-6 text-base text-customGray100 md:text-white">Max Rewards</p>
                       <p className="text-3xl font-bold whitespace-nowrap text-white">
-                        {`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.maxGaugeApy))} %`}
+                        {`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.gaugeData?.upperAPR))} %`}
                       </p>
                     </div>
                   )
@@ -681,6 +681,31 @@ function RewardColumn({ gauge, reward, token, chainId }: { gauge: Address, rewar
     handleChangeInput({ currentTarget: { value: formatted } });
   }
 
+  async function handleApprove() {
+    let val = Number(amount)
+    if (val === 0 || !account || !publicClient || !walletClient) return
+    val = val * (10 ** token.decimals)
+
+    if (chain?.id !== Number(chainId)) {
+      try {
+        await switchNetworkAsync?.(Number(chainId));
+      } catch (error) {
+        return;
+      }
+    }
+
+    handleAllowance({
+      token: token.address,
+      spender: gauge,
+      amount: val,
+      account: account,
+      clients: {
+        publicClient,
+        walletClient
+      }
+    })
+  }
+
   async function handleFundReward() {
     let val = Number(amount)
     if (val === 0 || !account || !publicClient || !walletClient) return
@@ -694,29 +719,17 @@ function RewardColumn({ gauge, reward, token, chainId }: { gauge: Address, rewar
       }
     }
 
-    const clients = {
-      publicClient,
-      walletClient
-    }
-
-    const success = await handleAllowance({
-      token: token.address,
-      spender: gauge,
+    fundReward({
+      gauge,
+      rewardToken: token.address,
       amount: val,
-      account: account,
-      clients
+      account,
+      clients: {
+        publicClient,
+        walletClient
+      },
+      tokensAtom: [tokens, setTokens]
     })
-
-    if (success) {
-      await fundReward({
-        gauge,
-        rewardToken: token.address,
-        amount: val,
-        account,
-        clients,
-        tokensAtom: [tokens, setTokens]
-      })
-    }
   }
 
   return (
@@ -757,6 +770,7 @@ function RewardColumn({ gauge, reward, token, chainId }: { gauge: Address, rewar
             />
           </div>
           <div className="ml-4">
+            <SecondaryActionButton label="Approve" handleClick={handleApprove} disabled={!account || account !== reward.distributor} className="h-14" />
             <MainActionButton label="Fund Rewards" handleClick={handleFundReward} disabled={!account || account !== reward.distributor} className="h-14" />
           </div>
         </div>

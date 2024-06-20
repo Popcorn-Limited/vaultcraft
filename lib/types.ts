@@ -47,18 +47,14 @@ export type VaultData = {
   fees: VaultFees;
   totalAssets: number;
   totalSupply: number;
+  assetsPerShare: number;
   depositLimit: number;
   tvl: number;
   apy: number;
-  minGaugeApy: number;
-  maxGaugeApy: number;
-  rewardApy: number;
   totalApy: number;
   apyHist: LlamaApy[];
   apyId: string;
-  gaugeSupply: number;
-  workingSupply: number;
-  workingBalance: number;
+  gaugeData?: GaugeData;
   metadata: VaultMetadata;
   strategies: Strategy[];
 };
@@ -140,18 +136,15 @@ export interface Clients {
   walletClient: WalletClient;
 }
 
-export type GaugeDataByAddress = {
-  [key: Address]: GaugeData
-}
-
 export type GaugeData = {
-  address: Address;
   vault: Address;
+  gauge: Address;
   lowerAPR: number;
   upperAPR: number;
+  annualRewardValue: number;
   rewardApy: number;
-  minGaugeApy: number;
-  maxGaugeApy: number;
+  workingSupply: number;
+  workingBalance: number;
 }
 
 export type ClaimableReward = {

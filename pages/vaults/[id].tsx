@@ -250,22 +250,22 @@ export default function Index() {
                     </p>
                   </div>
                   {
-                    vaultData.minGaugeApy ? (
+                    vaultData.gaugeData?.lowerAPR ? (
                       <div className="w-1/2 md:w-max">
                         <p className="w-max leading-6 text-base text-customGray100 md:text-white">Min Rewards</p>
                         <p className="text-3xl font-bold whitespace-nowrap text-white">
-                          {`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.minGaugeApy))} %`}
+                          {`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.gaugeData?.lowerAPR))} %`}
                         </p>
                       </div>
                     )
                       : <></>
                   }
                   {
-                    vaultData.maxGaugeApy ? (
+                    vaultData.gaugeData?.upperAPR ? (
                       <div className="w-1/2 md:w-max">
                         <p className="w-max leading-6 text-base text-customGray100 md:text-white">Max Rewards</p>
                         <p className="text-3xl font-bold whitespace-nowrap text-white">
-                          {`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.maxGaugeApy))} %`}
+                          {`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.gaugeData?.upperAPR))} %`}
                         </p>
                       </div>
                     )
@@ -349,19 +349,19 @@ export default function Index() {
                       <CardStat
                         id="your-apy"
                         label="Your Rewards APY"
-                        value={`${formatNumber((vaultData.workingBalance / (gauge?.balance || 0)) * vaultData.maxGaugeApy)} %`}
-                        tooltip={`Your rewards APY depends on the proportion of locked liquidity, veVCX, you provide relative to the total veVCX held by all gauge holders. For instance, to receive the maximum rewards APY, if you own 10% of the supply of Gauge A you also would need to own 10% of cumulative veVCX supply of all gauge share holders to earn the maximum rewards apy of ${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.maxGaugeApy))} %. Liquidity providers are guaranteed a minimum rewards apy of ${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.minGaugeApy))}`}
+                        value={`${formatNumber((vaultData.gaugeData?.workingBalance! / (gauge?.balance || 0)) * vaultData.gaugeData?.upperAPR!)} %`}
+                        tooltip={`Your rewards APY depends on the proportion of locked liquidity, veVCX, you provide relative to the total veVCX held by all gauge holders. For instance, to receive the maximum rewards APY, if you own 10% of the supply of Gauge A you also would need to own 10% of cumulative veVCX supply of all gauge share holders to earn the maximum rewards apy of ${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.gaugeData?.upperAPR!))} %. Liquidity providers are guaranteed a minimum rewards apy of ${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.gaugeData?.lowerAPR!))}`}
                       />
                       <CardStat
                         id="boost"
                         label="Your Boost"
-                        value={`${formatNumber((vaultData.workingBalance / (gauge?.balance || 0)) * 5)} X`}
+                        value={`${formatNumber((vaultData.gaugeData?.workingBalance! / (gauge?.balance || 0)) * 5)} X`}
                         tooltip="Your Boost depends on the proportion of locked liquidity, veVCX, you provide relative to the total veVCX held by all gauge holders. For instance, to receive the maximum 5x boost, if you own 10% of the supply of Gauge A you also would need to own 10% of cumulative veVCX supply of all gauge share holders to earn the maximum boost of 5x. Liquidity providers are guaranteed a minimum boost of 1x."
                       />
                       <CardStat
                         id="ve-missing"
                         label="VeVCX Missing for max Boost"
-                        value={`${formatNumber((((gauge?.balance || 0) / vaultData.gaugeSupply) * (tokens[vaultData.chainId][VeTokenByChain[vaultData.chainId]].totalSupply / 1e18)) - (tokens[vaultData.chainId][VeTokenByChain[vaultData.chainId]].balance / 1e18))} VeVCX`}
+                        value={`${formatNumber((((gauge?.balance || 0) / vaultData.gaugeData?.workingSupply!) * (tokens[vaultData.chainId][VeTokenByChain[vaultData.chainId]].totalSupply / 1e18)) - (tokens[vaultData.chainId][VeTokenByChain[vaultData.chainId]].balance / 1e18))} VeVCX`}
                         tooltip="The amount of locked liquidity, veVCX, required to earn the maximum boost in oVCX rewards per epoch."
                       />
                     </div>

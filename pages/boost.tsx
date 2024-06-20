@@ -6,7 +6,7 @@ import {
   usePublicClient,
   useWalletClient,
 } from "wagmi";
-import { Address, WalletClient, createPublicClient, http } from "viem";
+import { Address, WalletClient, createPublicClient, http, zeroAddress } from "viem";
 import { useEffect, useState } from "react";
 import { VoteData, hasAlreadyVoted } from "@/lib/gauges/hasAlreadyVoted";
 import { AddressesByChain, VaultData } from "@/lib/types";
@@ -94,7 +94,7 @@ function VePopContainer() {
       const _hiddenGauges = await getHiddenGauges();
       setHiddenGauges(_hiddenGauges);
 
-      const vaultsWithGauges = Object.values(vaults).flat().filter((vault) => !!vault.gauge)
+      const vaultsWithGauges = Object.values(vaults).flat().filter((vault) => vault.gauge !== zeroAddress)
       setGaugeVaults(vaultsWithGauges);
 
       const rate = await createPublicClient({

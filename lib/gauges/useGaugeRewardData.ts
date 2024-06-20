@@ -21,17 +21,17 @@ export async function getRewardData(gauge: Address, chainId: number) {
   let rewardData = []
 
   if (rewardLogs.length > 0) {
-    rewardData = (await client.multicall({
-      contracts: rewardLogs.map(({ args }) => {
-        return {
-          address: gauge,
-          abi: ChildGaugeAbi,
-          functionName: "reward_data",
-          args: [args.reward_token as Address],
-        };
+    rewardData = await client.multicall({
+      contracts: rewardLogs.map(log => {
+          return {
+              address: gauge,
+              abi: chainId === chains.mainnet.id ? GaugeAbi : ChildGaugeAbi,
+              functionName: "reward_data",
+              args: [log.args.reward_token]
+          }
       }),
-      allowFailure: false,
-    })) as any[];
+      allowFailure: false
+  }) as any[];
 
 
     const currentTimestamp = Math.floor(Date.now() / 1000);
