@@ -12,7 +12,7 @@ import {
 import MainActionButton from "@/components/button/MainActionButton";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import { claimOPop } from "@/lib/optionToken/interactions";
-import { WalletClient } from "viem";
+import { WalletClient, zeroAddress } from "viem";
 import { llama } from "@/lib/resolver/price/resolver";
 import { MinterByChain, OptionTokenByChain, VCX } from "@/lib/constants";
 import { useAtom } from "jotai";
