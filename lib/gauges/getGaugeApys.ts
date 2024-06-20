@@ -78,7 +78,7 @@ async function getGaugeApy(gauge: Address, chainId: number, vcxPriceInUsd: numbe
     upperAPR: apy.upperAPR + rewardApy,
     rewardApy: rewardApy,
     minGaugeApy: apy.lowerAPR,
-    maxGaugeApy: apy.lowerAPR
+    maxGaugeApy: apy.upperAPR
   };
 }
 
