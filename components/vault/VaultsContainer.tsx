@@ -86,7 +86,7 @@ export default function VaultsContainer({
                 id="total-tvl"
                 label="TVL"
                 value={`$${NumberFormatter.format(tvl.vault)}`}
-                tooltip=""
+                tooltip="Total value locked (TVL) is the amount of user funds deposited in Smart Vaults."
               />
             </div>
 
@@ -95,7 +95,7 @@ export default function VaultsContainer({
                 id="total-deposits"
                 label="Deposits"
                 value={`$${NumberFormatter.format(networth.vault)}`}
-                tooltip=""
+                tooltip="Value of your smart vault deposits across all blockchains."
               />
             </div>
           </div>
@@ -112,7 +112,7 @@ export default function VaultsContainer({
                     )
                     : "0"
                     }`}
-                  tooltip=""
+                  tooltip="Value of oVCX held in your wallet across all blockchains."
                 />
 
               </div>
@@ -128,7 +128,7 @@ export default function VaultsContainer({
                     )
                     : "0"
                     }`}
-                  tooltip=""
+                  tooltip="Cumulative calue of claimable oVCX from vaults across all blockchains."
                 />
               </div>
             </div>

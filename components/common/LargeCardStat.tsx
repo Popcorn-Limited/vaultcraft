@@ -1,12 +1,11 @@
 import ResponsiveTooltip from "@/components/common/Tooltip";
 import { CardStatProps } from "@/components/common/CardStat";
 
-export default function LargeCardStat({ id, label, value, secondaryValue, children, tooltip }: CardStatProps): JSX.Element {
+export default function LargeCardStat({ id, label, value, secondaryValue, children, tooltip, tooltipChild }: CardStatProps): JSX.Element {
   return (
-    <div className="w-full">
+    <div className="w-full cursor-pointer" id={id}>
       <p
         className="text-white font-normal whitespace-nowrap w-1/2 md:w-full"
-        id={id}
       >
         {label}
       </p>
@@ -24,12 +23,20 @@ export default function LargeCardStat({ id, label, value, secondaryValue, childr
         </>
       }
 
-      {tooltip !== "" &&
+      {
+        tooltip && tooltip !== "" &&
         <ResponsiveTooltip
           id={id}
           content={
             <p className="w-52">{tooltip}</p>
           }
+        />
+      }
+      {
+        !tooltip && tooltipChild &&
+        <ResponsiveTooltip
+          id={id}
+          content={tooltipChild}
         />
       }
     </div>

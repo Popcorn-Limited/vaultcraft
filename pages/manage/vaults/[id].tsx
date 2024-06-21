@@ -4,42 +4,33 @@ import {
   VaultFees,
   VaultData,
   Token,
-  Strategy,
-  TokenByAddress,
 } from "@/lib/types";
 import { useAtom } from "jotai";
 import { useRouter } from "next/router";
 import {
   Fragment,
-  PropsWithChildren,
   useEffect,
-  useRef,
   useState,
 } from "react";
 import NoSSR from "react-no-ssr";
-import { createConfig, erc20ABI, useAccount, useContractWrite, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
-import axios from "axios";
+import { useAccount, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
 import {
   Address,
   createPublicClient,
   extractChain,
-  formatEther,
   formatUnits,
-  getContract,
   http,
   isAddress,
-  zeroAddress,
 } from "viem";
 import {
   AdminProxyByChain,
-  GaugeAbi,
   MultiStrategyVaultAbi,
   VaultAbi,
   VaultControllerByChain,
 } from "@/lib/constants";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 import * as chains from "viem/chains";
-import { ProtocolName, YieldOptions } from "vaultcraft-sdk";
+import { YieldOptions } from "vaultcraft-sdk";
 import { yieldOptionsAtom } from "@/lib/atoms/sdk";
 import TabSelector from "@/components/common/TabSelector";
 import VaultStrategyConfiguration from "@/components/vault/management/vault/Strategy";
@@ -53,15 +44,8 @@ import VaultRebalance from "@/components/vault/management/vault/Rebalance";
 import { tokensAtom } from "@/lib/atoms";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import MainActionButton from "@/components/button/MainActionButton";
-import {
-  NumberFormatter,
-  formatAndRoundNumber,
-  safeRound,
-} from "@/lib/utils/formatBigNumber";
-import {
-  roundToTwoDecimalPlaces,
-  validateInput,
-} from "@/lib/utils/helpers";
+import { formatAndRoundNumber, safeRound } from "@/lib/utils/formatBigNumber";
+import { validateInput, } from "@/lib/utils/helpers";
 import { showSuccessToast } from "@/lib/toasts";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { Square2StackIcon } from "@heroicons/react/24/outline";
@@ -73,7 +57,6 @@ import { getRewardData } from "@/lib/gauges/useGaugeRewardData";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import { fundReward } from "@/lib/gauges/interactions";
 import { handleAllowance } from "@/lib/approve";
-import LargeCardStat from "@/components/common/LargeCardStat";
 import VaultHero from "@/components/vault/VaultHero";
 
 async function getLogs(vault: VaultData, asset: Token) {

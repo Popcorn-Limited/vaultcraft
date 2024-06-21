@@ -17,13 +17,13 @@ export default function Hero(): JSX.Element {
               id="networth-deposits"
               label="Deposits"
               value={`$ ${networth.vault > 0.01 ? NumberFormatter.format(networth.vault) : "0"}`}
-              tooltip=""
+              tooltip="This value aggregates your Smart Vault holdings across all blockchain networks."
             />
             <LargeCardStat
               id="networth-staked"
               label="Staked"
               value={`$ ${networth.stake > 0.01 ? NumberFormatter.format(networth.stake) : "0"}`}
-              tooltip=""
+              tooltip="This value shows the value of your staked assets."
             />
           </div>
 
@@ -32,13 +32,13 @@ export default function Hero(): JSX.Element {
               id="networth-wallet"
               label="Wallet"
               value={`$ ${networth.wallet > 0.01 ? NumberFormatter.format(networth.wallet) : "0"}`}
-              tooltip=""
+              tooltip="This value aggregates the value of assets across all blockchain networks in your wallet that are usable on VaultCraft."
             />
             <LargeCardStat
               id="networth-total"
               label="Net Worth"
               value={`$ ${networth.stake > 0.01 ? NumberFormatter.format(networth.stake) : "0"}`}
-              tooltip=""
+              tooltip="This value aggregates your VaultCraft-related holdings across all blockchain networks."
             />
           </div>
           <div className="flex flex-row items-center md:w-fit">
@@ -46,7 +46,7 @@ export default function Hero(): JSX.Element {
               id="networth-xp"
               label="XP"
               value={`${vaultronStats.xp} XP`}
-              tooltip=""
+              tooltip="This value shows your Vaultron XP used to determine your allocation in future airdrops"
             />
           </div>
         </div>
@@ -61,7 +61,7 @@ export default function Hero(): JSX.Element {
                 id="tvl"
                 label="Total Value Locked"
                 value={`$ ${tvl.total > 0.01 ? NumberFormatter.format(tvl.total) : "0"}`}
-                tooltip=""
+                tooltip="Total value locked (TVL) is the amount of user funds deposited in VaultCraft products."
               />
             </div>
           </div>

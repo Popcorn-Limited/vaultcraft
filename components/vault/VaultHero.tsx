@@ -24,7 +24,7 @@ export default function VaultHero({ vaultData, asset, vault, gauge, showClaim = 
               label="Your Wallet"
               value={asset ? `$ ${NumberFormatter.format(asset.balance * asset.price / (10 ** asset.decimals))}` : "$ 0"}
               secondaryValue={asset ? `$ ${NumberFormatter.format(asset.balance / (10 ** asset.decimals))} ${asset.symbol}` : "0 TKN"}
-              tooltip=""
+              tooltip="Value of deposit assets held in your wallet"
             />
           </div>
           <div className="w-1/2 md:w-max">
@@ -40,7 +40,7 @@ export default function VaultHero({ vaultData, asset, vault, gauge, showClaim = 
                 NumberFormatter.format(((gauge.balance) / 10 ** gauge.decimals) + ((vault?.balance!) / 10 ** vault?.decimals!))
                 : formatAndRoundNumber(vault?.balance!, vault?.decimals!)
                 } ${asset?.symbol!}`}
-              tooltip=""
+              tooltip="Value of your vault deposits"
             />
           </div>
           <div className="w-1/2 md:w-max">
@@ -49,7 +49,7 @@ export default function VaultHero({ vaultData, asset, vault, gauge, showClaim = 
               label="TVL"
               value={`$ ${vaultData.tvl < 1 ? "0" : NumberFormatter.format(vaultData.tvl)}`}
               secondaryValue={asset ? `${NumberFormatter.format(vaultData.totalAssets / (10 ** asset.decimals))} ${asset?.symbol!}` : "0 TKN"}
-              tooltip=""
+              tooltip="Total value of all assets deposited into the vault"
             />
           </div>
           <div className="w-1/2 md:w-max">
@@ -57,17 +57,17 @@ export default function VaultHero({ vaultData, asset, vault, gauge, showClaim = 
               id={"vapy"}
               label="vAPY"
               value={`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.apy))} %`}
-              tooltip=""
+              tooltip="Current variable APY of the vault"
             />
           </div>
           {vaultData.gaugeData?.lowerAPR ?
             (
               <div className="w-1/2 md:w-max">
                 <LargeCardStat
-                  id={"min-rewards"}
-                  label="Min Rewards"
+                  id={"min-boost"}
+                  label="Min Boost APR"
                   value={`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.gaugeData?.lowerAPR))} %`}
-                  tooltip=""
+                  tooltip={`Minimum oVCX boost APR based on most current epoch's distribution. (Based on the current emissions for this gauge of ${NumberFormatter.format(vaultData?.gaugeData.annualEmissions)} oVCX p. year)`}
                 />
               </div>
             )
@@ -77,10 +77,10 @@ export default function VaultHero({ vaultData, asset, vault, gauge, showClaim = 
             (
               <div className="w-1/2 md:w-max">
                 <LargeCardStat
-                  id={"max-rewards"}
-                  label="Max Rewards"
+                  id={"max-boost"}
+                  label="Max Boost APR"
                   value={`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.gaugeData?.upperAPR))} %`}
-                  tooltip={`${vaultData.gaugeData.annualEmissions}`}
+                  tooltip={`Maximum oVCX boost APR based on most current epoch's distribution. (Based on the current emissions for this gauge of ${NumberFormatter.format(vaultData?.gaugeData.annualEmissions)} oVCX p. year)`}
                 />
               </div>
             )
@@ -93,7 +93,14 @@ export default function VaultHero({ vaultData, asset, vault, gauge, showClaim = 
                   id={"add-rewards"}
                   label="Add. Rewards"
                   value={`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.gaugeData?.rewardApy.apy))} %`}
-                  tooltip=""
+                  tooltipChild={
+                    <div className="w-28">
+                      <p className="font-bold">Annual Rewards</p>
+                      {vaultData.gaugeData?.rewardApy.rewards.map(reward =>
+                        <p key={reward.address}>{NumberFormatter.format(reward.emissions)} {tokens[vaultData.chainId][reward.address].symbol}</p>
+                      )}
+                    </div>
+                  }
                 />
               </div>
             )

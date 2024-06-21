@@ -30,7 +30,7 @@ export default function VaultStats({
         label="Your Wallet"
         value={`$ ${formatAndRoundNumber(asset.balance * asset.price, asset.decimals)}`}
         secondaryValue={`${formatAndRoundNumber(asset.balance, asset.decimals)} ${asset.symbol}`}
-        tooltip="Deposit assets held in your wallet"
+        tooltip="Value of deposit assets held in your wallet"
       />
       <CardStat
         id={`${baseTooltipId}-deposit`}
@@ -59,22 +59,22 @@ export default function VaultStats({
         id={`${baseTooltipId}-vApy`}
         label="vAPY"
         value={`${vaultData.apy ? `${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.apy))}` : "0"} %`}
-        tooltip="Current variable apy of the vault"
+        tooltip="Current variable APY of the vault"
       />
       {vaultData?.gaugeData?.lowerAPR &&
         <CardStat
-          id={`${baseTooltipId}-minRewards`}
-          label="Min Rewards Apy"
+          id={`${baseTooltipId}-minBoost`}
+          label="Min Boost APR"
           value={`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData?.gaugeData?.lowerAPR))} %`}
-          tooltip="Minimum oVCX boost APR based on most current epoch&apos;s distribution"
+          tooltip={`Minimum oVCX boost APR based on most current epoch's distribution. (Based on the current emissions for this gauge of ${NumberFormatter.format(vaultData?.gaugeData.annualEmissions / 5)} oVCX p. year)`}
         />
       }
       {vaultData?.gaugeData?.upperAPR &&
         <CardStat
-          id={`${baseTooltipId}-maxRewards`}
-          label="Max Rewards Apy"
+          id={`${baseTooltipId}-maxBoost`}
+          label="Max Boost APR"
           value={`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData?.gaugeData?.upperAPR))} %`}
-          tooltip="Maximum oVCX boost APR based on most current epoch&apos;s distribution"
+          tooltip={`Maximum oVCX boost APR based on most current epoch's distribution. (Based on the current emissions for this gauge of ${NumberFormatter.format(vaultData?.gaugeData.annualEmissions)} oVCX p. year)`}
         />
       }
     </div>

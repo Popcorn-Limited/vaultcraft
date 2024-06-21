@@ -162,7 +162,7 @@ export default function VaultClaimSection({ vaultData }: { vaultData: VaultData 
           }
         </div>
 
-        <div className="hidden md:block md:mt-auto w-40 mb-8 space-y-2">
+        <div className="hidden md:block md:mt-auto w-52 mb-8 space-y-2">
           <MainActionButton
             label="Claim oVCX"
             handleClick={handleClaim}
