@@ -128,7 +128,7 @@ export default function VaultsContainer({
                     )
                     : "0"
                     }`}
-                  tooltip="Cumulative calue of claimable oVCX from vaults across all blockchains."
+                  tooltip="Cumulative value of claimable oVCX from vaults across all blockchains."
                 />
               </div>
             </div>

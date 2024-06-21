@@ -136,7 +136,7 @@ export default function VaultClaimSection({ vaultData }: { vaultData: VaultData 
               id={"my-ovcx"}
               label="My oVCX"
               value={`$${oBal && tokens[1][VCX] ? NumberFormatter.format(oBal * (tokens[1][VCX].price * 0.25)) : "0"}`}
-              tooltip=""
+              tooltip="Value of oVCX held in your wallet across all blockchains."
             />
           </div>
 
@@ -147,7 +147,7 @@ export default function VaultClaimSection({ vaultData }: { vaultData: VaultData 
               value={`$${gaugeRewards && tokens[1][VCX]
                 ? NumberFormatter.format((Number(gaugeRewards?.[vaultData.chainId]?.total || 0) / 1e18) * (tokens[1][VCX].price * 0.25))
                 : "0"}`}
-              tooltip=""
+              tooltip="Cumulative value of claimable oVCX from vaults across all blockchains."
             />
           </div>
           {claimableRewards.length > 0 &&
@@ -156,7 +156,7 @@ export default function VaultClaimSection({ vaultData }: { vaultData: VaultData 
                 id={"claimable-rewards"}
                 label="Claimable Rewards"
                 value={`$${NumberFormatter.format(claimableRewards.reduce((a, b) => a + b.value, 0))}`}
-                tooltip=""
+                tooltip="Cumulative value of claimable rewards of this vault."
               />
             </div>
           }
