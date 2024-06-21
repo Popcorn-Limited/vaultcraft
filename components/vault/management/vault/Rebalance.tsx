@@ -1,33 +1,21 @@
 import MainActionButton from "@/components/button/MainActionButton";
-import SecondaryActionButton from "@/components/button/SecondaryActionButton";
-import ProtocolIcon, { IconByProtocol } from "@/components/common/ProtocolIcon";
+import { IconByProtocol } from "@/components/common/ProtocolIcon";
 import TabSelector from "@/components/common/TabSelector";
 import InputNumber from "@/components/input/InputNumber";
-import Modal from "@/components/modal/Modal";
 import { tokensAtom } from "@/lib/atoms";
 import { yieldOptionsAtom } from "@/lib/atoms/sdk";
-import { ADDRESS_ZERO, AdminProxyByChain, VaultControllerByChain } from "@/lib/constants";
 import { addStrategyData } from "@/lib/getTokenAndVaultsData";
 import { Token, VaultAllocation, VaultData } from "@/lib/types";
-import { NumberFormatter } from "@/lib/utils/formatBigNumber";
-import { roundToTwoDecimalPlaces, validateInput } from "@/lib/utils/helpers";
-import { acceptStrategy, allocateToStrategies, deallocateFromStrategies, proposeStrategy } from "@/lib/vault/management/interactions";
-import axios from "axios";
+import { validateInput } from "@/lib/utils/helpers";
+import { allocateToStrategies, deallocateFromStrategies } from "@/lib/vault/management/interactions";
 import { useAtom } from "jotai";
-import { VaultSettings } from "pages/manage/vaults/[id]";
 import { useEffect, useState } from "react";
-import { ProtocolName, VaultController, YieldOptions } from "vaultcraft-sdk";
-import { Address, WalletClient, getAddress, isAddress, zeroAddress } from "viem";
 import { useAccount, useBalance, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
 
 export default function VaultRebalance({
   vaultData,
-  callAddress,
-  settings,
 }: {
   vaultData: VaultData;
-  callAddress: Address;
-  settings: VaultSettings;
 }): JSX.Element {
   const { address: account } = useAccount();
   const publicClient = usePublicClient();

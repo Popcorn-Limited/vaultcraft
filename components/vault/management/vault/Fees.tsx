@@ -3,18 +3,16 @@ import { tokensAtom } from "@/lib/atoms";
 import { VaultData } from "@/lib/types";
 import { takeFees } from "@/lib/vault/management/interactions";
 import { useAtom } from "jotai";
-import { VaultSettings } from "pages/manage/vaults/[id]";
-import { WalletClient } from "viem";
 import { Address, useAccount, usePublicClient, useWalletClient } from "wagmi";
 
 export default function VaultTakeFees({
   vaultData,
   callAddress,
-  settings,
+  accruedFees,
 }: {
   vaultData: VaultData;
   callAddress: Address;
-  settings: VaultSettings;
+  accruedFees: number;
 }): JSX.Element {
   const { address: account } = useAccount();
   const publicClient = usePublicClient();
@@ -34,7 +32,7 @@ export default function VaultTakeFees({
           <div className="w-full">
             <p>
               Accumulated Fees:{" "}
-              {settings?.accruedFees / 10 ** tokens[vaultData.chainId][vaultData.asset].decimals}{" "}
+              {accruedFees / 10 ** tokens[vaultData.chainId][vaultData.asset].decimals}{" "}
               {tokens[vaultData.chainId][vaultData.asset].symbol}
             </p>
             <div className="w-40 mt-4">

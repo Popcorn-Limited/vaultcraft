@@ -2,19 +2,16 @@ import MainActionButton from "@/components/button/MainActionButton";
 import Input from "@/components/input/Input";
 import { VaultData } from "@/lib/types";
 import { changeFeeRecipient } from "@/lib/vault/management/interactions";
-import { VaultSettings } from "pages/manage/vaults/[id]";
 import { FormEventHandler, useState } from "react";
-import { Address, WalletClient, isAddress, zeroAddress } from "viem";
+import { Address, isAddress, zeroAddress } from "viem";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 
 export default function VaultFeeRecipient({
   vaultData,
   callAddress,
-  settings,
 }: {
   vaultData: VaultData;
   callAddress: Address;
-  settings: VaultSettings;
 }): JSX.Element {
   const { address: account } = useAccount();
   const publicClient = usePublicClient();

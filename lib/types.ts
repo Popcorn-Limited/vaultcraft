@@ -292,3 +292,14 @@ export type VaultAllocation = {
   index: bigint;
   amount: bigint;
 };
+
+export type VaultV1Settings = {
+  proposedStrategies: Address[];
+  proposedStrategyTime: number;
+  proposedFees: VaultFees;
+  proposedFeeTime: number;
+  paused: boolean;
+  feeBalance: number;
+  accruedFees: number;
+  owner: Address;
+}

@@ -1,30 +1,21 @@
 import MainActionButton from "@/components/button/MainActionButton";
-import SecondaryActionButton from "@/components/button/SecondaryActionButton";
-import ProtocolIcon from "@/components/common/ProtocolIcon";
 import InputNumber from "@/components/input/InputNumber";
-import Modal from "@/components/modal/Modal";
-import { yieldOptionsAtom } from "@/lib/atoms/sdk";
-import { ADDRESS_ZERO, AdminProxyByChain, VaultControllerByChain } from "@/lib/constants";
 import { VaultData } from "@/lib/types";
-import { NumberFormatter } from "@/lib/utils/formatBigNumber";
-import { roundToTwoDecimalPlaces } from "@/lib/utils/helpers";
-import { acceptStrategies, acceptStrategy, proposeStrategies, proposeStrategy } from "@/lib/vault/management/interactions";
-import axios from "axios";
-import { useAtom } from "jotai";
-import { VaultSettings } from "pages/manage/vaults/[id]";
-import { useEffect, useState } from "react";
-import { ProtocolName, VaultController, YieldOptions } from "vaultcraft-sdk";
-import { Address, WalletClient, getAddress, isAddress, zeroAddress } from "viem";
+import { acceptStrategies, proposeStrategies } from "@/lib/vault/management/interactions";
+import { useState } from "react";
+import { Address, getAddress, isAddress, zeroAddress } from "viem";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 
 export default function VaultStrategiesConfiguration({
   vaultData,
   callAddress,
-  settings,
+  proposedStrategies,
+  proposedStrategyTime
 }: {
   vaultData: VaultData;
   callAddress: Address;
-  settings: VaultSettings;
+  proposedStrategies: Address[];
+  proposedStrategyTime: number;
 }): JSX.Element {
   const { address: account } = useAccount();
   const publicClient = usePublicClient();
@@ -51,11 +42,11 @@ export default function VaultStrategiesConfiguration({
               {vaultData.strategies.map(strategy => <p key={strategy.address}>{strategy.address}</p>)}
             </div>
 
-            {settings.proposedStrategies.length > 0 && (
+            {proposedStrategies.length > 0 && (
               <div className="mt-4">
                 <h2 className="text-xl">Proposed Strategy</h2>
                 <div className="mt-1 border border-customGray500 p-4 rounded-md">
-                  {settings.proposedStrategies.map(strategy => <p key={strategy}>{strategy}</p>)}
+                  {proposedStrategies.map(strategy => <p key={strategy}>{strategy}</p>)}
                 </div>
               </div>
             )}
@@ -86,7 +77,7 @@ export default function VaultStrategiesConfiguration({
                     walletClient: walletClient!,
                   }
                 })}
-                disabled={Number(settings.proposedStrategyTime) === 0}
+                disabled={proposedStrategyTime === 0}
               />
             </div>
             <div className="w-60 mt-4">

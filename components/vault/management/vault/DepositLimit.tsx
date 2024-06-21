@@ -4,19 +4,16 @@ import { tokensAtom } from "@/lib/atoms";
 import { VaultData } from "@/lib/types";
 import { changeDepositLimit } from "@/lib/vault/management/interactions";
 import { useAtom } from "jotai";
-import { VaultSettings } from "pages/manage/vaults/[id]";
 import { FormEventHandler, useState } from "react";
-import { Address, WalletClient, maxUint256 } from "viem";
+import { Address, maxUint256 } from "viem";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 
 export default function VaultDepositLimit({
   vaultData,
   callAddress,
-  settings,
 }: {
   vaultData: VaultData;
   callAddress: Address;
-  settings: VaultSettings;
 }): JSX.Element {
   const { address: account } = useAccount();
   const publicClient = usePublicClient();
