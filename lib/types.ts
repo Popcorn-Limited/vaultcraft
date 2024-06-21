@@ -96,7 +96,8 @@ export type VaultMetadata = {
   type:
   | "single-asset-vault-v1"
   | "single-asset-lock-vault-v1"
-  | "multi-strategy-vault-v1";
+  | "multi-strategy-vault-v1"
+  | "multi-strategy-vault-v2";
   creator: Address;
   feeRecipient: Address;
 };
