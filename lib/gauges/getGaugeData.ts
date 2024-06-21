@@ -124,12 +124,14 @@ async function getMainnetGaugesData({
       chainId: 1
     })
 
+    const annualEmissions = ((Number(mainnetData[i + 1]) / 1e18) * (Number(mainnetData[i + 2]) / 1e18)) * 86400 * 365
     return {
       vault: vault.address,
       gauge: vault.gauge!,
       lowerAPR,
       upperAPR,
-      annualRewardValue: ((Number(mainnetData[i + 1]) / 1e18) * (Number(mainnetData[i + 2]) / 1e18)) * 86400 * 365 * ovcxPrice,
+      annualEmissions: annualEmissions,
+      annualRewardValue: annualEmissions * ovcxPrice,
       rewardApy,
       workingSupply: Number(mainnetData[i + 3]),
       workingBalance: Number(mainnetData[i + 4])

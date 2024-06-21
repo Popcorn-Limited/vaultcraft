@@ -141,6 +141,7 @@ export type GaugeData = {
   gauge: Address;
   lowerAPR: number;
   upperAPR: number;
+  annualEmissions: number;
   annualRewardValue: number;
   rewardApy: RewardApy;
   workingSupply: number;

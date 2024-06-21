@@ -4,8 +4,11 @@ import AssetWithName from "@/components/vault/AssetWithName";
 import { NumberFormatter, formatAndRoundNumber } from "@/lib/utils/formatBigNumber";
 import { roundToTwoDecimalPlaces } from "@/lib/utils/helpers";
 import VaultClaimSection from "@/components/vault/VaultClaimSection";
+import { useAtom } from "jotai";
+import { tokensAtom } from "@/lib/atoms";
 
 export default function VaultHero({ vaultData, asset, vault, gauge, showClaim = false }: { vaultData: VaultData, asset?: Token, vault?: Token, gauge?: Token, showClaim?: boolean }): JSX.Element {
+  const [tokens] = useAtom(tokensAtom);
   return (
     <section className="md:border-b border-customNeutral100 pt-10 pb-6 px-4 md:px-8 ">
 
@@ -77,6 +80,19 @@ export default function VaultHero({ vaultData, asset, vault, gauge, showClaim = 
                   id={"max-rewards"}
                   label="Max Rewards"
                   value={`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.gaugeData?.upperAPR))} %`}
+                  tooltip={`${vaultData.gaugeData.annualEmissions}`}
+                />
+              </div>
+            )
+            : <></>
+          }
+          {vaultData.gaugeData?.rewardApy.apy ?
+            (
+              <div className="w-1/2 md:w-max">
+                <LargeCardStat
+                  id={"add-rewards"}
+                  label="Add. Rewards"
+                  value={`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.gaugeData?.rewardApy.apy))} %`}
                   tooltip=""
                 />
               </div>
