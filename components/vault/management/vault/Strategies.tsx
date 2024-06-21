@@ -10,12 +10,14 @@ export default function VaultStrategiesConfiguration({
   vaultData,
   callAddress,
   proposedStrategies,
-  proposedStrategyTime
+  proposedStrategyTime,
+  disabled
 }: {
   vaultData: VaultData;
   callAddress: Address;
   proposedStrategies: Address[];
   proposedStrategyTime: number;
+  disabled: boolean;
 }): JSX.Element {
   const { address: account } = useAccount();
   const publicClient = usePublicClient();
@@ -77,7 +79,7 @@ export default function VaultStrategiesConfiguration({
                     walletClient: walletClient!,
                   }
                 })}
-                disabled={proposedStrategyTime === 0}
+                disabled={disabled || proposedStrategyTime === 0}
               />
             </div>
             <div className="w-60 mt-4">
@@ -95,7 +97,7 @@ export default function VaultStrategiesConfiguration({
                     },
                   })
                 }
-                disabled={!inputValue.split(",").every(addr => isAddress(addr) && getAddress(addr) !== zeroAddress)}
+                disabled={disabled || !inputValue.split(",").every(addr => isAddress(addr) && getAddress(addr) !== zeroAddress)}
               />
             </div>
           </div>

@@ -8,10 +8,12 @@ export default function VaultPausing({
   vaultData,
   callAddress,
   paused,
+  disabled
 }: {
   vaultData: VaultData;
   callAddress: Address;
   paused: boolean;
+  disabled: boolean;
 }): JSX.Element {
   const { address: account } = useAccount();
   const publicClient = usePublicClient();

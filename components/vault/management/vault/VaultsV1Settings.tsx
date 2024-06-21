@@ -1,5 +1,5 @@
 import TabSelector from "@/components/common/TabSelector";
-import { MultiStrategyVaultAbi, VaultAbi } from "@/lib/constants";
+import { AdminProxyByChain, MultiStrategyVaultAbi, VaultAbi, VaultControllerByChain } from "@/lib/constants";
 import { VaultData, VaultV1Settings } from "@/lib/types";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 import { useEffect, useState } from "react";
@@ -16,11 +16,10 @@ import VaultPausing from "@/components/vault/management/vault/Pausing";
 
 const DEFAULT_TABS = [
   "Strategy",
-  "Fee Configuration",
-  "Fee Recipient",
-  "Take Fees",
   "Deposit Limit",
   "Pausing",
+  "Fee Configuration",
+  "Fee Recipient",
 ];
 
 function getMulticalls(vault: VaultData) {
@@ -124,9 +123,26 @@ export default function VaultsV1Settings({ vaultData }: { vaultData: VaultData, 
   const [tab, setTab] = useState<string>("Strategy");
 
   useEffect(() => {
+    getVaultSettings(vaultData).then(res => {
+      setCallAddress(
+        res.owner === AdminProxyByChain[vaultData.chainId]
+          ? VaultControllerByChain[vaultData.chainId]
+          : vaultData.address
+      );
+      setSettings(res);
+    });
+    
+    let tabs = DEFAULT_TABS
+    if (vaultData.metadata.type !== "multi-strategy-vault-v1") {
+      tabs.push("Take Fees")
+    }
+
     if (vaultData.strategies.length > 1) {
-      setAvailableTabs(["Rebalance", ...DEFAULT_TABS]);
+      tabs = ["Rebalance", ...tabs]
+      setAvailableTabs(tabs)
       setTab("Rebalance");
+    } else {
+      setAvailableTabs(tabs);
     }
   }, [vaultData]);
 
@@ -138,83 +154,80 @@ export default function VaultsV1Settings({ vaultData }: { vaultData: VaultData, 
   return (
     <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-8 text-white">
       <h2 className="text-white font-bold text-2xl">Vault Settings</h2>
-      {account === vaultData.metadata.creator ? (
-        <>
-          <TabSelector
-            className="mt-6 mb-12"
-            availableTabs={availableTabs}
-            activeTab={tab}
-            setActiveTab={changeTab}
-          />
-          {settings && callAddress ? (
-            <div>
-              {tab === "Rebalance" && (
-                <VaultRebalance
-                  vaultData={vaultData}
-                />
-              )}
-              {tab === "Strategy" && (
-                <>
-                  {vaultData.strategies.length > 1 ? (
-                    <VaultStrategiesConfiguration
-                      vaultData={vaultData}
-                      proposedStrategies={settings.proposedStrategies}
-                      proposedStrategyTime={settings.proposedStrategyTime}
-                      callAddress={callAddress}
-                    />
-                  ) : (
-                    <VaultStrategyConfiguration
-                      vaultData={vaultData}
-                      proposedStrategies={settings.proposedStrategies}
-                      proposedStrategyTime={settings.proposedStrategyTime}
-                      callAddress={callAddress}
-                    />
-                  )}
-                </>
-              )}
-              {tab === "Fee Configuration" && (
-                <VaultFeeConfiguration
-                  vaultData={vaultData}
-                  proposedFeeTime={settings.proposedFeeTime}
-                  callAddress={callAddress}
-                />
-              )}
-              {tab === "Fee Recipient" && (
-                <VaultFeeRecipient
-                  vaultData={vaultData}
-                  callAddress={callAddress}
-                />
-              )}
-              {tab === "Deposit Limit" && (
-                <VaultDepositLimit
-                  vaultData={vaultData}
-                  callAddress={callAddress}
-                />
-              )}
-              {tab === "Take Fees" && (
-                <VaultTakeFees
-                  vaultData={vaultData}
-                  accruedFees={settings.accruedFees}
-                  callAddress={callAddress}
-                />
-              )}
-              {tab === "Pausing" && (
-                <VaultPausing
-                  vaultData={vaultData}
-                  paused={settings.paused}
-                  callAddress={callAddress}
-                />
-              )}
-            </div>
-          ) : (
-            <p className="text-white">Loading...</p>
+      <TabSelector
+        className="mt-6 mb-12"
+        availableTabs={availableTabs}
+        activeTab={tab}
+        setActiveTab={changeTab}
+      />
+      {settings && callAddress ? (
+        <div>
+          {tab === "Rebalance" && (
+            <VaultRebalance
+              vaultData={vaultData}
+            />
           )}
-        </>
+          {tab === "Strategy" && (
+            <>
+              {vaultData.strategies.length > 1 ? (
+                <VaultStrategiesConfiguration
+                  vaultData={vaultData}
+                  proposedStrategies={settings.proposedStrategies}
+                  proposedStrategyTime={settings.proposedStrategyTime}
+                  callAddress={callAddress}
+                  disabled={account !== vaultData.metadata.creator}
+                />
+              ) : (
+                <VaultStrategyConfiguration
+                  vaultData={vaultData}
+                  proposedStrategies={settings.proposedStrategies}
+                  proposedStrategyTime={settings.proposedStrategyTime}
+                  callAddress={callAddress}
+                  disabled={account !== vaultData.metadata.creator}
+                />
+              )}
+            </>
+          )}
+          {tab === "Fee Configuration" && (
+            <VaultFeeConfiguration
+              vaultData={vaultData}
+              proposedFeeTime={settings.proposedFeeTime}
+              callAddress={callAddress}
+              disabled={account !== vaultData.metadata.creator}
+            />
+          )}
+          {tab === "Fee Recipient" && (
+            <VaultFeeRecipient
+              vaultData={vaultData}
+              callAddress={callAddress}
+              disabled={account !== vaultData.metadata.creator}
+            />
+          )}
+          {tab === "Deposit Limit" && (
+            <VaultDepositLimit
+              vaultData={vaultData}
+              callAddress={callAddress}
+              disabled={account !== vaultData.metadata.creator}
+            />
+          )}
+          {tab === "Take Fees" && (
+            <VaultTakeFees
+              vaultData={vaultData}
+              accruedFees={settings.accruedFees}
+              callAddress={callAddress}
+            />
+          )}
+          {tab === "Pausing" && (
+            <VaultPausing
+              vaultData={vaultData}
+              paused={settings.paused}
+              callAddress={callAddress}
+              disabled={account !== vaultData.metadata.creator}
+            />
+          )}
+        </div>
       ) : (
-        <p className="text-white">
-          Only the Vault Creator ({vaultData.metadata.creator}) has access
-          to this page.
-        </p>
+        <p className="text-white">Loading...</p>
       )}
     </section>
   )

@@ -12,10 +12,12 @@ export default function VaultFeeConfiguration({
   vaultData,
   callAddress,
   proposedFeeTime,
+  disabled
 }: {
   vaultData: VaultData;
   callAddress: Address;
   proposedFeeTime: number;
+  disabled: boolean;
 }): JSX.Element {
   const { address: account } = useAccount();
   const publicClient = usePublicClient();
@@ -80,6 +82,7 @@ export default function VaultFeeConfiguration({
                   },
                 })
               }
+              disabled={disabled}
             />
           ) : (
             <MainActionButton
@@ -110,6 +113,7 @@ export default function VaultFeeConfiguration({
                   },
                 })
               }
+              disabled={disabled}
             />
           )}
         </div>

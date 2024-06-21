@@ -9,9 +9,11 @@ import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 export default function VaultFeeRecipient({
   vaultData,
   callAddress,
+  disabled
 }: {
   vaultData: VaultData;
   callAddress: Address;
+  disabled: boolean;
 }): JSX.Element {
   const { address: account } = useAccount();
   const publicClient = usePublicClient();
@@ -58,6 +60,7 @@ export default function VaultFeeRecipient({
               })
             }
             disabled={
+              disabled ||
               feeRecipient === vaultData.metadata.feeRecipient ||
               !isAddress(feeRecipient) ||
               feeRecipient === zeroAddress
