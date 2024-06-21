@@ -67,7 +67,7 @@ export default function VaultHero({ vaultData, asset, vault, gauge, showClaim = 
                   id={"min-boost"}
                   label="Min Boost APR"
                   value={`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.gaugeData?.lowerAPR))} %`}
-                  tooltip={`Minimum oVCX boost APR based on most current epoch's distribution. (Based on the current emissions for this gauge of ${NumberFormatter.format(vaultData?.gaugeData.annualEmissions)} oVCX p. year)`}
+                  tooltip={`Minimum oVCX boost APR based on most current epoch's distribution. (Based on the current emissions for this gauge of ${NumberFormatter.format(vaultData?.gaugeData.annualEmissions / 5)} oVCX p. year)`}
                 />
               </div>
             )
