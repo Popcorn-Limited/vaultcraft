@@ -20,7 +20,7 @@ import CardStat from "@/components/common/CardStat";
 import StrategyDescription from "@/components/vault/StrategyDescription";
 import ApyChart from "@/components/vault/ApyChart";
 import VaultHero from "@/components/vault/VaultHero";
-import { isAddress } from "viem";
+import { isAddress, zeroAddress } from "viem";
 
 export default function Index() {
   const router = useRouter();
@@ -42,6 +42,7 @@ export default function Index() {
       const chainIdQuery = query?.chainId! as string
       const chainId = Number(chainIdQuery.replace("?", "").replace("&", ""))
       const foundVault = vaults[chainId].find(vault => vault.address === query?.id)
+      console.log(foundVault)
       if (foundVault) {
         const newTokenOptions = [
           tokens[chainId][foundVault.asset],
@@ -52,7 +53,7 @@ export default function Index() {
         setAsset(tokens[chainId][foundVault.asset])
         setVault(tokens[chainId][foundVault.vault])
 
-        if (foundVault.gauge) {
+        if (foundVault.gauge && foundVault.gauge !== zeroAddress) {
           setGauge(tokens[chainId][foundVault.gauge])
           newTokenOptions.push(tokens[chainId][foundVault.gauge])
         }
@@ -63,6 +64,8 @@ export default function Index() {
   }, [vaults, query, vaultData]);
 
   const [showLoanManagementModal, setShowLoanManagementModal] = useState(false)
+
+  console.log(tokenOptions)
 
   return <NoSSR>
     {
@@ -183,7 +186,7 @@ export default function Index() {
                       </div>
                     </div>
 
-                    {vaultData.gauge &&
+                    {vaultData.gauge && vaultData.gauge !== zeroAddress &&
                       <div className="w-full md:w-10/12 border border-customNeutral100 rounded-lg p-4">
                         <p className="text-white font-normal">Gauge address:</p>
                         <div className="flex flex-row items-center justify-between">
