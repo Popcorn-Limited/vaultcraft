@@ -105,14 +105,14 @@ async function getMainnetGaugesData({
   return Promise.all(vaultsWithGauges.map(async (vault, i) => {
     if (i > 0) i = i * 5
 
-    const workingSupplyAssets = (vault.assetsPerShare * Number(mainnetData[i])) / (10 ** tokens[vault.address].decimals);
+    const workingSupplyAssets = (vault.assetsPerShare * Number(mainnetData[i])) / (10 ** (tokens[vault.asset].decimals))
 
     const { lowerAPR, upperAPR } = calcBaseApy({
       inflationRate: Number(mainnetData[i + 1]) / 1e18,
       cappedRelativeWeight: Number(mainnetData[i + 2]) / 1e18,
       workingSupply: workingSupplyAssets,
       tokenlessProduction: 20,
-      vaultPrice: tokens[vault.address].price,
+      assetPrice: tokens[vault.asset].price,
       ovcxPrice: ovcxPrice
     })
 
@@ -209,7 +209,7 @@ async function getChildGaugesData({
       cappedRelativeWeight: Number(mainnetData[i + 1]) / 1e18,
       workingSupply: workingSupplyAssets,
       tokenlessProduction: 20,
-      vaultPrice: tokens[vault.address].price,
+      assetPrice: tokens[vault.asset].price,
       ovcxPrice: ovcxPrice
     })
 
@@ -242,14 +242,14 @@ function calcBaseApy({
   cappedRelativeWeight,
   workingSupply,
   tokenlessProduction,
-  vaultPrice,
+  assetPrice,
   ovcxPrice
 }: {
   inflationRate: number,
   cappedRelativeWeight: number,
   workingSupply: number,
   tokenlessProduction: number,
-  vaultPrice: number,
+  assetPrice: number,
   ovcxPrice: number
 }): { lowerAPR: number, upperAPR: number } {
   // calculate the lowerAPR and upperAPR
@@ -260,10 +260,7 @@ function calcBaseApy({
     inflationRate * cappedRelativeWeight;
   if (relative_inflation > 0) {
     const annualRewardUSD = relative_inflation * 86400 * 365 * ovcxPrice;
-    const workingSupplyUSD =
-      (workingSupply > 0 ? workingSupply : 1e18) *
-      vaultPrice *
-      1e9;
+    const workingSupplyUSD = (workingSupply > 0 ? workingSupply : 1e18) * assetPrice;
 
     lowerAPR =
       annualRewardUSD /
@@ -326,10 +323,7 @@ async function getRewardsApy({
     })
 
     const annualRewardUSD: number = rewardData.reduce((a, b,) => a + b.emissionsValue, 0)
-    const workingSupplyUSD =
-      (workingSupply > 0 ? workingSupply : 1e18) *
-      vaultPrice *
-      1e9;
+    const workingSupplyUSD = (workingSupply > 0 ? workingSupply : 1e18) * vaultPrice;
     return { rewards: rewardData, annualRewardValue: annualRewardUSD, apy: (annualRewardUSD / workingSupplyUSD) * 100 }
   }
   return { rewards: [], annualRewardValue: 0, apy: 0 }
