@@ -17,6 +17,7 @@ import ApyChart from "@/components/vault/management/vault/ApyChart";
 import NetFlowChart from "@/components/vault/management/vault/NetFlowChart";
 import VaultHero from "@/components/vault/VaultHero";
 import RewardsSection from "@/components/vault/management/vault/RewardsSection";
+import VaultsV1Settings from "@/components/vault/management/vault/VaultsV1Settings";
 
 async function getLogs(vault: VaultData, asset: Token) {
   const client = createPublicClient({
@@ -106,7 +107,7 @@ export default function Index() {
 
   const [yieldOptions] = useAtom(yieldOptionsAtom);
 
-  const [vaults, setVaults] = useAtom(vaultsAtom);
+  const [vaults] = useAtom(vaultsAtom);
   const [tokens] = useAtom(tokensAtom);
 
   const [asset, setAsset] = useState<Token>();
@@ -245,6 +246,11 @@ export default function Index() {
               )}
             </div>
           </section>
+
+          {vaultData.metadata.type === "multi-strategy-vault-v2"
+            ? <></>
+            : <VaultsV1Settings vaultData={vaultData} />
+          }
 
         </div>
       ) : (
