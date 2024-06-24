@@ -37,7 +37,7 @@ export default function Hero(): JSX.Element {
             <LargeCardStat
               id="networth-total"
               label="Net Worth"
-              value={`$ ${networth.stake > 0.01 ? NumberFormatter.format(networth.stake) : "0"}`}
+              value={`$ ${networth.total > 0.01 ? NumberFormatter.format(networth.total) : "0"}`}
               tooltip="This value aggregates your VaultCraft-related holdings across all blockchain networks."
             />
           </div>
