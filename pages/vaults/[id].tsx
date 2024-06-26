@@ -150,7 +150,7 @@ export default function Index() {
                 <div className="bg-customNeutral200 p-6 rounded-lg">
                   <p className="text-white text-2xl font-bold">Information</p>
                   <p className="text-white">
-                    {vaultData.metadata.description && vaultData.metadata.description?.split("-LINK- ").length > 0 ?
+                    {vaultData.metadata.description && vaultData.metadata.description?.split("-LINK- ").length > 1 ?
                       <>{vaultData.metadata.description?.split("-LINK- ")[0]}{" "}
                         <a href={vaultData.metadata.description?.split("-LINK- ")[1]} target="_blank" className="text-secondaryBlue">here</a></>
                       : <>{vaultData.metadata.description}</>

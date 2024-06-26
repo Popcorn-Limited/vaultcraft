@@ -18,7 +18,7 @@ export default function StrategyDescription({ strategy, asset, i, stratLen }: { 
       </h2>
     </div>
     <p className='text-white'>
-      {strategy.metadata.description && strategy.metadata.description?.split("-LINK- ").length > 0 ?
+      {strategy.metadata.description && strategy.metadata.description?.split("-LINK- ").length > 1 ?
         <>{strategy.metadata.description?.split("-LINK- ")[0]}{" "}
           <a href={strategy.metadata.description?.split("-LINK- ")[1]} target="_blank" className="text-secondaryBlue">here</a></>
         : <>{strategy.metadata.description}</>
