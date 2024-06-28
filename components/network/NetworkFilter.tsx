@@ -75,10 +75,7 @@ export default function NetworkFilter({
                 : ChainId[activeNetwork]}
             </p>
           </div>
-          <ChevronDownIcon
-            className="w-5 h-5 text-white"
-            aria-hidden="true"
-          />
+          <ChevronDownIcon className="w-5 h-5 text-white" aria-hidden="true" />
         </button>
       </div>
       <div className="no-select-dot absolute left-0">
