@@ -4,6 +4,7 @@ import { ChainId, SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import NetworkFilter from "@/components/network/NetworkFilter";
 import type { VaultData } from "@/lib/types";
 
+import { cn } from "@/lib/utils/helpers";
 import { GoSearch } from "react-icons/go";
 import { MdClose } from "react-icons/md";
 import VaultRow from "./VaultRow";
@@ -69,12 +70,19 @@ export default function VaultsTable({
                   )}
                 </fieldset>
 
-                <NetworkFilter
-                  supportedNetworks={SUPPORTED_NETWORKS.map(
-                    (chain) => chain.id
+                <div
+                  className={cn(
+                    "flex items-center",
+                    SHOW_INPUT_SEARCH && "opacity-0 pointer-events-none"
                   )}
-                  selectNetwork={onSelectNetwork}
-                />
+                >
+                  <NetworkFilter
+                    supportedNetworks={SUPPORTED_NETWORKS.map(
+                      (chain) => chain.id
+                    )}
+                    selectNetwork={onSelectNetwork}
+                  />
+                </div>
               </nav>
             </th>
             <th className="font-normal text-right whitespace-nowrap">
