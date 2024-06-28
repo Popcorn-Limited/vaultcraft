@@ -23,6 +23,12 @@ import OptionTokenExerciseModal from "@/components/optionToken/exercise/OptionTo
 import { GoSearch } from "react-icons/go";
 import { MdClose } from "react-icons/md";
 import VaultRow from "./VaultRow";
+import useIsBreakPoint from "@/lib/useIsMobile";
+import VaultCard from "./VaultCard";
+
+import SearchBar from "@/components/input/SearchBar";
+import VaultsSorting from "@/components/vault/VaultsSorting";
+import VaultsTable from "./VaultsTable";
 
 interface VaultsContainerProps {
   hiddenVaults: AddressesByChain;
@@ -67,7 +73,20 @@ export default function VaultsContainer({
     setSearchTerm(value);
   }
 
+  const isSmallScreen = useIsBreakPoint("lg");
+
   const SHOW_INPUT_SEARCH = showSearchInput || searchTerm.length > 0;
+
+  const formattedVaults = vaults
+    .filter(
+      (vault) => SHOW_INPUT_SEARCH || selectedNetworks.includes(vault.chainId)
+    )
+    .filter((vault) =>
+      Object.keys(displayVaults).length > 0
+        ? displayVaults[vault.chainId].includes(vault.address)
+        : !hiddenVaults[vault.chainId].includes(vault.address)
+    )
+    .sort((a, b) => b.tvl - a.tvl);
 
   return (
     <NoSSR>
@@ -172,96 +191,45 @@ export default function VaultsContainer({
         </div>
       </section>
 
-      <section className="text-white mt-12 w-full border rounded-xl overflow-hidden border-customNeutral100">
-        <table className="w-full [&_td]:h-20 [&_th]:h-18 [&_td]:px-5 [&_th]:px-5">
-          <thead className="bg-customNeutral200 border-b border-customNeutral100">
-            <tr>
-              <th>
-                <nav className="flex relative gap-3 [&_button:not(.bg-opacity-20)]:bg-opacity-0 [&_button:not(.bg-opacity-20)]:border-customGray100/40 [&_button:hover]:border-primaryYellow [&_button]:rounded-full [&_img]:w-5 [&_button]:px-5 [&_button]:py-2">
-                  <fieldset
-                    onBlurCapture={() => setShowSearchInput(false)}
-                    onClick={() => setShowSearchInput(true)}
-                    role="button"
-                  >
-                    <button className="w-12 pointer-events-none h-10 grid place-items-center border !p-0 !rounded-lg">
-                      <GoSearch className="scale-110" />
-                    </button>
+      {isSmallScreen && (
+        <nav className="px-5 mt-8 [&_.my-10]:my-0 whitespace-nowrap flex flex-col smmd:flex-row gap-4 mb-10">
+          <NetworkFilter
+            supportedNetworks={SUPPORTED_NETWORKS.map((chain) => chain.id)}
+            selectNetwork={selectNetwork}
+          />
 
-                    {SHOW_INPUT_SEARCH && (
-                      <Fragment>
-                        <div className="absolute pointer-events-none w-12 z-[1] top-1/2 left-0 -translate-y-1/2 grid place-items-center">
-                          <GoSearch className="scale-110" />
-                        </div>
+          <section className="flex gap-3 flex-grow items-center justify-end">
+            <SearchBar
+              className="w-full smmd:w-auto h-[3.25rem] !border-customGray500"
+              searchTerm={searchTerm}
+              handleSearch={handleSearch}
+            />
+            <VaultsSorting
+              className="[&_button]:h-[3.25rem]"
+              vaultState={[vaults, setVaults]}
+            />
+          </section>
+        </nav>
+      )}
 
-                        <input
-                          autoFocus
-                          value={searchTerm}
-                          placeholder="Search"
-                          onInput={(e) => handleSearch(e.currentTarget.value)}
-                          className="absolute pl-14 pr-4 font-normal inset-0 border outline-none border-customGray100/40 rounded-lg bg-customNeutral200"
-                          type="text"
-                        />
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSearchTerm("");
-                            setShowSearchInput(false);
-                          }}
-                          className="absolute z-[1] flex items-center h-full !p-0 w-8 top-0 right-0"
-                        >
-                          <MdClose className="text-xl scale-105" />
-                        </button>
-                      </Fragment>
-                    )}
-                  </fieldset>
-
-                  <NetworkFilter
-                    supportedNetworks={SUPPORTED_NETWORKS.map(
-                      (chain) => chain.id
-                    )}
-                    selectNetwork={selectNetwork}
-                  />
-                </nav>
-              </th>
-              <th className="font-normal text-right whitespace-nowrap">
-                Your Wallet
-              </th>
-              <th className="font-normal text-right whitespace-nowrap">
-                Your Deposit
-              </th>
-              <th className="font-normal text-right">TVL</th>
-              <th className="font-normal text-right">vAPR</th>
-              <th className="font-normal text-right whitespace-nowrap">
-                Min Rewards APY
-              </th>
-              <th className="font-normal text-right whitespace-nowrap">
-                Max Rewards APY
-              </th>
-              <th className="font-normal text-right">Boost</th>
-            </tr>
-          </thead>
-          <tbody>
-            {vaults
-              .filter(
-                (vault) =>
-                  SHOW_INPUT_SEARCH || selectedNetworks.includes(vault.chainId)
-              )
-              .filter((vault) =>
-                Object.keys(displayVaults).length > 0
-                  ? displayVaults[vault.chainId].includes(vault.address)
-                  : !hiddenVaults[vault.chainId].includes(vault.address)
-              )
-              .sort((a, b) => b.tvl - a.tvl)
-              .map((vaultData, i) => (
-                <VaultRow
-                  {...vaultData}
-                  searchTerm={searchTerm}
-                  key={`item-${i}`}
-                />
-              ))}
-          </tbody>
-        </table>
-      </section>
+      {isSmallScreen ? (
+        <section className="px-4 gap-6 md:gap-10 grid smmd:grid-cols-2">
+          {formattedVaults.map((vaultData) => (
+            <VaultCard
+              {...vaultData}
+              key={`sm-mb-${vaultData.address}`}
+              searchTerm={searchTerm}
+            />
+          ))}
+        </section>
+      ) : (
+        <VaultsTable
+          vaults={formattedVaults}
+          searchTerm={searchTerm}
+          onSearchTermChange={setSearchTerm}
+          onSelectNetwork={selectNetwork}
+        />
+      )}
     </NoSSR>
   );
 }
