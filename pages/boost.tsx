@@ -274,14 +274,6 @@ function VePopContainer() {
           </div>
         </section>
 
-        <section className="text-white px-4 md:px-8 mt-12 mb-10">
-          <h1 className="text-2xl md:text-3xl font-normal">All vaults</h1>
-          <p className="text-base opacity-80">
-            Zap any asset into Smart Vaults for the best yield for your crypto
-            across DeFi
-          </p>
-        </section>
-
         {gaugeVaults?.length > 0 ? (
           <Fragment>
             {isSmallScreen ? (

@@ -13,6 +13,7 @@ import { tokensAtom } from "@/lib/atoms";
 import { cn } from "@/lib/utils/helpers";
 import { useRouter } from "next/router";
 import AssetWithName from "./AssetWithName";
+import CardStat from "../common/CardStat";
 
 export default function VaultCard({
   searchTerm,
@@ -31,18 +32,15 @@ export default function VaultCard({
     vault: vaultAddress,
     chainId,
   } = vaultData;
-
-  const maxGaugeApy = gaugeData?.upperAPR || 0;
-  const minGaugeApy = gaugeData?.lowerAPR || 0;
-
   const [tokens] = useAtom(tokensAtom);
 
   const vault = tokens[chainId]?.[vaultAddress] ?? {};
   const dataAsset = tokens[chainId]?.[asset] ?? {};
   const dataGauge = tokens[chainId]?.[gauge!] ?? {};
 
-  let boost = Math.round(maxGaugeApy / minGaugeApy) || 0;
-  if (boost <= 1) boost = 1;
+  const boost = ((vaultData.gaugeData?.workingBalance! / (dataGauge?.balance || 0)) * 5) || 1
+
+  const baseTooltipId = vault.address.slice(1);
 
   const searchData = [
     vaultData.metadata?.vaultName,
@@ -82,53 +80,70 @@ export default function VaultCard({
         vault={vaultData}
       />
 
-      <div className="grid mt-6 gap-4 grid-cols-3">
-        <Content title="Your Wallet">
-          <p className="text-2xl">
-            {formatAndRoundNumber(dataAsset.balance, dataAsset.decimals)}
-          </p>
-          <p className="text-sm -mt-0.5 text-customGray200"># TKN</p>
-        </Content>
-
-        <Content title="Your Deposit">
-          <p className="text-2xl">
-            ${" "}
-            {dataGauge
-              ? NumberFormatter.format(
-                  (dataGauge.balance * dataGauge.price) /
-                    10 ** dataGauge.decimals +
-                    (vault?.balance! * vault?.price!) / 10 ** vault?.decimals!
-                )
-              : formatAndRoundNumber(
-                  vault?.balance! * vault?.price!,
-                  vault?.decimals!
-                )}
-          </p>
-          <p className="text-sm -mt-0.5 text-customGray200"># TKN</p>
-        </Content>
-
-        <Content title="TVL">
-          <p className="text-2xl">
-            $ {tvl < 1 ? "0" : NumberFormatter.format(tvl)}
-          </p>
-          <p className="text-sm -mt-0.5 text-customGray200"># TKN</p>
-        </Content>
-
-        <Content title="vAPR">
-          <p className="text-2xl">{formatTwoDecimals(apy)}%</p>
-        </Content>
-
-        <Content className="col-span-2" title="Min Boost APY">
-          <p className="text-2xl">{formatTwoDecimals(minGaugeApy)}%</p>
-        </Content>
-
-        <Content title="Boost">
-          <p className="text-2xl text-primaryGreen">x{boost}</p>
-        </Content>
-
-        <Content className="col-span-2" title="Max Boost APY">
-          <p className="text-2xl">{formatTwoDecimals(maxGaugeApy)}%</p>
-        </Content>
+      <div className="w-full md:flex md:flex-wrap md:justify-between md:gap-4">
+        <CardStat
+          id={`${baseTooltipId}-wallet`}
+          label="Your Wallet"
+          value={`$ ${formatAndRoundNumber(dataAsset.balance * dataAsset.price, dataAsset.decimals)}`}
+          secondaryValue={`${formatAndRoundNumber(dataAsset.balance, dataAsset.decimals)} ${dataAsset.symbol}`}
+          tooltip="Value of deposit assets held in your wallet"
+        />
+        <CardStat
+          id={`${baseTooltipId}-deposit`}
+          label="Your Deposit"
+          value={`$ ${!!gauge ?
+            NumberFormatter.format(((dataGauge.balance * dataGauge.price) / 10 ** dataGauge.decimals) + ((vault?.balance! * vault?.price!) / 10 ** vault?.decimals!))
+            : formatAndRoundNumber(vault?.balance! * vault?.price!, vault?.decimals!)
+            }`}
+          secondaryValue={`${!!gauge ?
+            NumberFormatter.format(((dataGauge.balance) / 10 ** dataGauge.decimals) + ((vault?.balance!) / 10 ** vault?.decimals!))
+            : formatAndRoundNumber(vault?.balance!, vault?.decimals!)
+            } ${dataAsset.symbol}`}
+          tooltip="Value of your vault deposits"
+        />
+        <CardStat
+          id={`${baseTooltipId}-tvl`}
+          label="TVL"
+          value={`$ ${vaultData.tvl < 1 ? "0" : NumberFormatter.format(vaultData.tvl)}`}
+          secondaryValue={`${formatAndRoundNumber(vaultData.totalAssets, dataAsset.decimals)} ${dataAsset.symbol}`}
+          tooltip="Total value of all assets deposited into the vault"
+        />
+        <CardStat
+          id={`${baseTooltipId}-vApy`}
+          label="vAPY"
+          value={`${formatTwoDecimals(vaultData.apy)} %`}
+          tooltip="Current variable APY of the vault"
+        />
+        {vaultData?.gaugeData?.upperAPR && vaultData?.gaugeData?.upperAPR > 0
+          ?
+          <>
+            <CardStat
+              id={`${baseTooltipId}-minBoost`}
+              label="Min Boost APR"
+              value={`${formatTwoDecimals(vaultData?.gaugeData?.lowerAPR)} %`}
+              tooltip={`Minimum oVCX boost APR based on most current epoch's distribution. (Based on the current emissions for this gauge of ${NumberFormatter.format(vaultData?.gaugeData.annualEmissions / 5)} oVCX p. year)`}
+            />
+            <CardStat
+              id={`${baseTooltipId}-maxBoost`}
+              label="Max Boost APR"
+              value={`${formatTwoDecimals(vaultData?.gaugeData?.upperAPR)} %`}
+              tooltip={`Maximum oVCX boost APR based on most current epoch's distribution. (Based on the current emissions for this gauge of ${NumberFormatter.format(vaultData?.gaugeData.annualEmissions)} oVCX p. year)`}
+            />
+            <CardStat
+              id="boost"
+              label="Your Boost"
+              value={`${formatTwoDecimals(boost)} X`}
+              tooltip="Your Boost depends on the proportion of locked liquidity, veVCX, you provide relative to the total veVCX held by all gauge holders. For instance, to receive the maximum 5x boost, if you own 10% of the supply of Gauge A you also would need to own 10% of cumulative veVCX supply of all gauge share holders to earn the maximum boost of 5x. Liquidity providers are guaranteed a minimum boost of 1x."
+            />
+            <CardStat
+              id="your-apy"
+              label="Your Boost APY"
+              value={`${formatTwoDecimals(boost * vaultData.gaugeData?.lowerAPR!)} %`}
+              tooltip={`Your rewards APY depends on the proportion of locked liquidity, veVCX, you provide relative to the total veVCX held by all gauge holders. For instance, to receive the maximum rewards APY, if you own 10% of the supply of Gauge A you also would need to own 10% of cumulative veVCX supply of all gauge share holders to earn the maximum rewards apy of ${formatTwoDecimals(vaultData.gaugeData?.upperAPR!)} %. Liquidity providers are guaranteed a minimum rewards apy of ${formatTwoDecimals(vaultData.gaugeData?.lowerAPR!)}`}
+            />
+          </>
+          : <></>
+        }
       </div>
     </div>
   );
