@@ -9,7 +9,13 @@ import {
   useWalletClient,
 } from "wagmi";
 import { Fragment, useEffect, useState } from "react";
-import { Address, WalletClient, createPublicClient, http, zeroAddress } from "viem";
+import {
+  Address,
+  WalletClient,
+  createPublicClient,
+  http,
+  zeroAddress,
+} from "viem";
 import { VoteData, hasAlreadyVoted } from "@/lib/gauges/hasAlreadyVoted";
 import { AddressesByChain, VaultData } from "@/lib/types";
 import StakingInterface from "@/components/boost/StakingInterface";
@@ -95,7 +101,9 @@ function VePopContainer() {
       const _hiddenGauges = await getHiddenGauges();
       setHiddenGauges(_hiddenGauges);
 
-      const vaultsWithGauges = Object.values(vaults).flat().filter((vault) => vault.gauge !== zeroAddress)
+      const vaultsWithGauges = Object.values(vaults)
+        .flat()
+        .filter((vault) => vault.gauge !== zeroAddress);
       setGaugeVaults(vaultsWithGauges);
 
       const rate = await createPublicClient({
@@ -222,9 +230,11 @@ function VePopContainer() {
 
           <div
             id="rewards-tooltip-inner"
-            className="bg-customNeutral200 cursor-pointer border border-customNeutral100 rounded-lg px-6 py-4"
+            className="bg-customNeutral200 mt-6 lg:mt-0 cursor-pointer border border-customNeutral100 rounded-lg px-6 py-4"
           >
-            <p className="text-base opacity-80">Emissions per week</p>
+            <p className="text-base opacity-80 whitespace-nowrap">
+              Emissions per week
+            </p>
             <div className="flex flex-row items-center justify-between">
               <img
                 src={"/images/tokens/oVcx.svg"}

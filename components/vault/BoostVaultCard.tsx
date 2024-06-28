@@ -174,7 +174,7 @@ export default function BoostVaultCard({
           </div>
         </Content>
 
-        <fieldset className="select-none mt-2 col-span-2 w-full flex items-center">
+        <fieldset className="select-none mb-4 mt-2 col-span-2 w-full flex items-center">
           <Slider
             railStyle={{
               backgroundColor: isVotingAvailable ? "#FFFFFF" : "#AFAFAF",
