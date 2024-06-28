@@ -1,8 +1,10 @@
-export * from "./abi";
-export * from "./addresses";
 import { Token } from "../types";
 import { maxInt256, maxUint256, zeroAddress } from "viem";
 import axios from "axios";
+
+export * from "./abi";
+export * from "./addresses";
+export * from "./customChains";
 
 export async function getAssetsByChain(chainId: number): Promise<Token[]> {
   const { data: assets } = await axios.get(
@@ -15,6 +17,7 @@ export async function getAssetsByChain(chainId: number): Promise<Token[]> {
 }
 
 export const ADDRESS_ZERO = zeroAddress;
+export const ALT_NATIVE_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 export const MAX_INT256 = maxInt256;
 export const MAX_UINT256 = maxUint256;
 export const MINUS_ONE = BigInt(-0x01);

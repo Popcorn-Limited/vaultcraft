@@ -4,19 +4,18 @@ import { tokensAtom } from "@/lib/atoms";
 import { VaultData } from "@/lib/types";
 import { changeDepositLimit } from "@/lib/vault/management/interactions";
 import { useAtom } from "jotai";
-import { VaultSettings } from "pages/manage/vaults/[id]";
 import { FormEventHandler, useState } from "react";
-import { Address, WalletClient, maxUint256 } from "viem";
+import { Address, maxUint256 } from "viem";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 
 export default function VaultDepositLimit({
   vaultData,
   callAddress,
-  settings,
+  disabled
 }: {
   vaultData: VaultData;
   callAddress: Address;
-  settings: VaultSettings;
+  disabled: boolean;
 }): JSX.Element {
   const { address: account } = useAccount();
   const publicClient = usePublicClient();
@@ -59,11 +58,6 @@ export default function VaultDepositLimit({
         <div className="w-60 mt-4">
           <MainActionButton
             label="Change Deposit Limit"
-            disabled={
-              Number(depositLimit) ===
-              vaultData.depositLimit / 10 ** tokens[vaultData.chainId][vaultData.asset].decimals ||
-              Number(depositLimit) === 0
-            }
             handleClick={() =>
               changeDepositLimit({
                 depositLimit: Number(depositLimit),
@@ -75,6 +69,12 @@ export default function VaultDepositLimit({
                   walletClient: walletClient!,
                 },
               })
+            }
+            disabled={
+              disabled ||
+              Number(depositLimit) ===
+              vaultData.depositLimit / 10 ** tokens[vaultData.chainId][vaultData.asset].decimals ||
+              Number(depositLimit) === 0
             }
           />
         </div>

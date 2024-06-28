@@ -1,28 +1,23 @@
 import MainActionButton from "@/components/button/MainActionButton";
-import SecondaryActionButton from "@/components/button/SecondaryActionButton";
-import ProtocolIcon from "@/components/common/ProtocolIcon";
 import InputNumber from "@/components/input/InputNumber";
-import Modal from "@/components/modal/Modal";
-import { yieldOptionsAtom } from "@/lib/atoms/sdk";
-import { ADDRESS_ZERO, AdminProxyByChain, VaultControllerByChain } from "@/lib/constants";
 import { VaultData } from "@/lib/types";
-import { NumberFormatter } from "@/lib/utils/formatBigNumber";
-import { roundToTwoDecimalPlaces } from "@/lib/utils/helpers";
 import { acceptStrategy, proposeStrategy } from "@/lib/vault/management/interactions";
-import { VaultSettings } from "pages/manage/vaults/[id]";
-import { useEffect, useState } from "react";
-import { ProtocolName, VaultController, YieldOptions } from "vaultcraft-sdk";
-import { Address, WalletClient, getAddress, isAddress, zeroAddress } from "viem";
+import { useState } from "react";
+import { Address, getAddress, isAddress, zeroAddress } from "viem";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 
 export default function VaultStrategyConfiguration({
   vaultData,
   callAddress,
-  settings,
+  proposedStrategies,
+  proposedStrategyTime,
+  disabled
 }: {
   vaultData: VaultData;
   callAddress: Address;
-  settings: VaultSettings;
+  proposedStrategies: Address[];
+  proposedStrategyTime: number;
+  disabled: boolean;
 }): JSX.Element {
   const { address: account } = useAccount();
   const publicClient = usePublicClient();
@@ -49,11 +44,11 @@ export default function VaultStrategyConfiguration({
               <p>{vaultData.strategies[0].address}</p>
             </div>
 
-            {settings.proposedStrategies[0] !== zeroAddress && (
+            {proposedStrategies[0] !== zeroAddress && (
               <div className="mt-4">
                 <h2 className="text-xl">Proposed Strategy</h2>
                 <div className="mt-1 border border-customGray500 p-4 rounded-md">
-                  <p>{settings.proposedStrategies[0]}</p>
+                  <p>{proposedStrategies[0]}</p>
                 </div>
               </div>
             )}
@@ -84,7 +79,7 @@ export default function VaultStrategyConfiguration({
                     walletClient: walletClient!,
                   }
                 })}
-                disabled={Number(settings.proposedStrategyTime) === 0}
+                disabled={disabled || proposedStrategyTime === 0}
               />
             </div>
             <div className="w-60 mt-4">
@@ -102,7 +97,7 @@ export default function VaultStrategyConfiguration({
                     },
                   })
                 }
-                disabled={newStrategy === zeroAddress || !isAddress(newStrategy)}
+                disabled={disabled || newStrategy === zeroAddress || !isAddress(newStrategy)}
               />
             </div>
           </div>

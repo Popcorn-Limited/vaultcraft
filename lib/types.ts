@@ -47,18 +47,24 @@ export type VaultData = {
   fees: VaultFees;
   totalAssets: number;
   totalSupply: number;
+  assetsPerShare: number;
   depositLimit: number;
   tvl: number;
   apy: number;
   totalApy: number;
-  minGaugeApy: number;
-  maxGaugeApy: number;
-  gaugeSupply: number;
-  workingSupply: number;
-  workingBalance: number;
+  apyHist: LlamaApy[];
+  apyId: string;
+  gaugeData?: GaugeData;
   metadata: VaultMetadata;
   strategies: Strategy[];
 };
+
+export type LlamaApy = {
+  apy: number;
+  apyBase: number;
+  apyReward: number;
+  date: Date;
+}
 
 export type Strategy = {
   address: Address;
@@ -67,6 +73,7 @@ export type Strategy = {
   allocation: number;
   allocationPerc: number;
   apy: number;
+  apyHist: LlamaApy[];
   apyId: string;
   apySource: "custom" | "defillama"
 }
@@ -89,7 +96,8 @@ export type VaultMetadata = {
   type:
   | "single-asset-vault-v1"
   | "single-asset-lock-vault-v1"
-  | "multi-strategy-vault-v1";
+  | "multi-strategy-vault-v1"
+  | "multi-strategy-vault-v2";
   creator: Address;
   feeRecipient: Address;
 };
@@ -130,12 +138,33 @@ export interface Clients {
 }
 
 export type GaugeData = {
-  [key: Address]: {
-    address: Address;
-    vault: Address;
-    lowerAPR: number;
-    upperAPR: number;
-  };
+  vault: Address;
+  gauge: Address;
+  lowerAPR: number;
+  upperAPR: number;
+  annualEmissions: number;
+  annualRewardValue: number;
+  rewardApy: RewardApy;
+  workingSupply: number;
+  workingBalance: number;
+}
+
+export type RewardApy = {
+  rewards: TokenReward[];
+  annualRewardValue: number;
+  apy: number;
+}
+
+export type TokenReward = {
+  address: Address;
+  emissions: number;
+  emissionsValue: number
+}
+
+export type ClaimableReward = {
+  token: Token;
+  amount: number;
+  value: number;
 }
 
 export enum SmartVaultActionType {
@@ -230,7 +259,8 @@ export enum ZapProvider {
   zeroX,
   oneInch,
   paraSwap,
-  openOcean
+  openOcean,
+  kyberSwap
 }
 
 export type TokenByAddress = {
@@ -262,3 +292,14 @@ export type VaultAllocation = {
   index: bigint;
   amount: bigint;
 };
+
+export type VaultV1Settings = {
+  proposedStrategies: Address[];
+  proposedStrategyTime: number;
+  proposedFees: VaultFees;
+  proposedFeeTime: number;
+  paused: boolean;
+  feeBalance: number;
+  accruedFees: number;
+  owner: Address;
+}

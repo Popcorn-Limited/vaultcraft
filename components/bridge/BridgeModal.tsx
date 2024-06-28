@@ -197,7 +197,7 @@ export default function BridgeModal({ show }: { show: [boolean, Dispatch<SetStat
           </div>
           <div className="w-full bg-primaryYellow bg-opacity-30 border border-primaryYellow rounded-lg p-4">
             <p className="text-primaryYellow">
-              Note that bridging is performed in batches. It might take up to 3 hours before you receive the tokens in your wallet.
+              Note that bridging is performed in batches. It might take up to 12 hours before you receive the tokens in your wallet.
             </p>
           </div>
           <div className="mt-6">
@@ -206,8 +206,21 @@ export default function BridgeModal({ show }: { show: [boolean, Dispatch<SetStat
               handleClick={handleMainAction}
             />
           </div>
+          <p className="text-start mt-4">
+            If you encounter issues with this interface try using {" "}
+            <a href={
+              activeTab === "OP -> ETH" ?
+                "https://bridge.connext.network/VCX-from-optimism-to-ethereum?symbol=VCX"
+                : "https://bridge.connext.network/VCX-from-arbitrum-to-ethereum?symbol=VCX"
+            }
+              target="_blank"
+              className="text-secondaryBlue">
+              Connext
+            </a>
+            {" "} directly
+          </p>
         </>
       }
-    </Modal>
+    </Modal >
   )
 }

@@ -6,15 +6,20 @@ import MainActionButton from "@/components/button/MainActionButton";
 import useLockedBalanceOf from "@/lib/gauges/useLockedBalanceOf";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import { formatEther } from "viem";
-import { OptionTokenByChain, VCX_LP, VOTING_ESCROW, ZERO } from "@/lib/constants";
+import {
+  OptionTokenByChain,
+  VCX_LP,
+  VOTING_ESCROW,
+  ZERO,
+} from "@/lib/constants";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import NetworkSticker from "../network/NetworkSticker";
 import TokenIcon from "../common/TokenIcon";
 import { useAtom } from "jotai";
 import { tokensAtom } from "@/lib/atoms";
 
-function votingPeriodEnd(): number[] {
-  const periodEnd = getVotePeriodEndTime();
+export function votingPeriodEnd(timestamp?: number): number[] {
+  const periodEnd = timestamp ? timestamp : getVotePeriodEndTime();
   const interval = { start: new Date(), end: periodEnd };
   const timeUntilEnd = intervalToDuration(interval);
   const formattedTime = [
@@ -38,11 +43,11 @@ export default function StakingInterface({
   setShowMangementModal,
   setShowLpModal,
   setShowBridgeModal,
-  setShowSyncModal
+  setShowSyncModal,
 }: StakingInterfaceProps): JSX.Element {
   const { address: account } = useAccount();
 
-  const [tokens] = useAtom(tokensAtom)
+  const [tokens] = useAtom(tokensAtom);
 
   const { data: lockedBal } = useLockedBalanceOf({
     chainId: 1,
@@ -65,7 +70,9 @@ export default function StakingInterface({
   return (
     <>
       <div className="w-full lg:w-1/2 bg-transparent border border-customNeutral100 rounded-3xl p-8 text-white">
-        <h3 className="text-2xl pb-6 border-b border-customNeutral100">veVCX</h3>
+        <h3 className="text-2xl pb-6 border-b border-customNeutral100">
+          veVCX
+        </h3>
         <div className="flex flex-col mt-6 gap-4">
           <span className="flex flex-row items-center justify-between ml-2">
             <div className="flex flex-row items-center">

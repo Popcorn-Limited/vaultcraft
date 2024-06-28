@@ -1,17 +1,16 @@
 import React from "react";
-import StatusWithLabel, {
-  StatusWithLabelProps,
-} from "@/components/common/StatusWithLabel";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { isAddress } from "viem";
+import LargeCardStat from "@/components/common/LargeCardStat";
+import { CardStatProps } from "@/components/common/CardStat";
 
 export interface ProductProps {
   title: JSX.Element;
   description: string;
   route: string;
   handleClick?: Function;
-  stats?: StatusWithLabelProps[];
+  stats?: CardStatProps[];
   customContent?: JSX.Element;
   badge?: string;
 }
@@ -56,11 +55,12 @@ export default function Product({
       <div className="flex justify-between w-full">
         {stats &&
           stats.map((stat, i) => (
-            <StatusWithLabel
-              key={i}
-              content={stat.content}
+            <LargeCardStat
+              key={stat.id}
+              id={stat.id}
               label={stat.label}
-              infoIconProps={stat.infoIconProps}
+              value={stat.value}
+              tooltip={stat.tooltip}
             />
           ))}
       </div>

@@ -1,5 +1,5 @@
 import Navbar from "@/components/navbar/Navbar";
-import { masaAtom, yieldOptionsAtom } from "@/lib/atoms/sdk";
+import { yieldOptionsAtom } from "@/lib/atoms/sdk";
 import { vaultsAtom } from "@/lib/atoms/vaults";
 import { RPC_URLS, SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { useAtom } from "jotai";
@@ -7,7 +7,6 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { CachedProvider, YieldOptions } from "vaultcraft-sdk";
 import { mainnet, useAccount, usePublicClient } from "wagmi";
 import Footer from "@/components/common/Footer";
-import { useMasaAnalyticsReact } from "@masa-finance/analytics-react";
 import { useRouter } from "next/router";
 import { Address, createPublicClient, http, zeroAddress } from "viem";
 import Modal from "@/components/modal/Modal";
@@ -36,7 +35,7 @@ import { GAUGE_NETWORKS } from "pages/boost";
 import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
 import axios from "axios";
 import { fetchAaveData } from "@/lib/external/aave";
-import { VCX_LP, VE_VCX, VotingEscrowAbi } from "@/lib/constants";
+import { VCX_LP, VE_VCX, VotingEscrowAbi, xLayer } from "@/lib/constants";
 import fetchVaultron from "@/lib/vaultron";
 import { polygon } from "viem/chains";
 
@@ -178,38 +177,10 @@ export default function Page({
   const publicClient = usePublicClient();
 
   const [yieldOptions, setYieldOptions] = useAtom(yieldOptionsAtom);
-  const [masaSdk, setMasaSdk] = useAtom(masaAtom);
-
-  const {
-    fireEvent,
-    fireLoginEvent,
-    firePageViewEvent,
-    fireConnectWalletEvent,
-  } = useMasaAnalyticsReact({
-    clientApp: "VaultCraft",
-    clientName: "VaultCraft",
-    clientId: process.env.MASA_CLIENT_ID as string,
-  });
-
-  useEffect(() => {
-    void firePageViewEvent({
-      page: `https://app.vaultcraft.io${asPath}`,
-      user_address: account,
-      additionalEventData: { referral: query.ref },
-    });
-  }, [asPath]);
 
   useEffect(() => {
     if (!yieldOptions) {
       setUpYieldOptions().then((res: any) => setYieldOptions(res));
-    }
-    if (!masaSdk) {
-      setMasaSdk({
-        fireEvent,
-        fireLoginEvent,
-        firePageViewEvent,
-        fireConnectWalletEvent,
-      });
     }
   }, []);
 
@@ -224,50 +195,87 @@ export default function Page({
 
   useEffect(() => {
     async function getData() {
+      console.log(`FETCHING APP DATA (${new Date()})`)
+      const getDataStart = Number(new Date())
+
       // get vaultsData and tokens
-      const newVaultsData: { [key: number]: VaultData[] } = {};
-      const newTokens: { [key: number]: TokenByAddress } = {};
+      const newVaultsData: { [key: number]: VaultData[] } = {}
+      const newTokens: { [key: number]: TokenByAddress } = {}
+
+      console.log(`Fetching Token and Vaults Data (${new Date()})`)
+      let start = Number(new Date())
+
       await Promise.all(
         SUPPORTED_NETWORKS.map(async (chain) => {
+          console.log(`Fetching Data for chain ${chain.id} (${new Date()})`)
+          let chainStart = Number(new Date())
+
           const { vaultsData, tokens } = await getTokenAndVaultsDataByChain({
             chain,
             account: account || zeroAddress,
             yieldOptions: yieldOptions as YieldOptions,
-          });
-          newVaultsData[chain.id] = vaultsData;
+          })
+
+          console.log(`Completed fetching Data for chain ${chain.id} (${new Date()})`)
+          console.log(`Took ${Number(new Date()) - chainStart}ms to load`)
+
+          newVaultsData[chain.id] = vaultsData
           newTokens[chain.id] = tokens;
         })
       );
 
-      const newReserveData: { [key: number]: ReserveData[] } = {};
-      const newUserAccountData: { [key: number]: UserAccountData } = {};
+      console.log(`Completed fetching Token and Vaults Data (${new Date()})`)
+      console.log(`Took ${Number(new Date()) - start}ms to load`)
+
+
+      const newReserveData: { [key: number]: ReserveData[] } = {}
+      const newUserAccountData: { [key: number]: UserAccountData } = {}
+
+      console.log(`Fetching AaveData (${new Date()})`)
+      start = Number(new Date())
 
       await Promise.all(
         SUPPORTED_NETWORKS.map(async (chain) => {
-          const res = await fetchAaveData(
-            account || zeroAddress,
-            newTokens[chain.id],
-            chain
-          );
-          newReserveData[chain.id] = res.reserveData;
-          newUserAccountData[chain.id] = res.userAccountData;
+          if (chain.id === xLayer.id) {
+            newReserveData[chain.id] = []
+            newUserAccountData[chain.id] = {
+              totalCollateral: 0,
+              totalBorrowed: 0,
+              netValue: 0,
+              totalSupplyRate: 0,
+              totalBorrowRate: 0,
+              netRate: 0,
+              ltv: 0,
+              healthFactor: 0
+            }
+          } else {
+            const res = await fetchAaveData(account || zeroAddress, newTokens[chain.id], chain)
+            newReserveData[chain.id] = res.reserveData
+            newUserAccountData[chain.id] = res.userAccountData
+          }
         })
       );
 
-      const vaultTVL = SUPPORTED_NETWORKS.map(
-        (chain) => newVaultsData[chain.id]
-      )
-        .flat()
-        .reduce((a, b) => a + b.tvl, 0);
-      const lockVaultTVL = 520000; // @dev hardcoded since we removed lock vaults
-      let stakingTVL = 0;
+      console.log(`Completed fetching AaveData (${new Date()})`)
+      console.log(`Took ${Number(new Date()) - start}ms to load`)
+
+
+      console.log(`Fetching TVL (${new Date()})`)
+      start = Number(new Date())
+
+
+      const vaultTVL = SUPPORTED_NETWORKS.map(chain => newVaultsData[chain.id]).flat().reduce((a, b) => a + b.tvl, 0)
+      const lockVaultTVL = 520000 // @dev hardcoded since we removed lock vaults
+      let stakingTVL = 0
       try {
-        stakingTVL = await axios
-          .get("https://api.llama.fi/protocol/vaultcraft")
-          .then((res) => res.data.currentChainTvls["staking"]);
+        stakingTVL = await axios.get(`https://pro-api.llama.fi/${process.env.DEFILLAMA_API_KEY}/api/protocol/vaultcraft`).then(res => res.data.currentChainTvls["staking"])
       } catch (e) {
         stakingTVL = 762000;
       }
+
+      console.log(`Completed fetching TVL (${new Date()})`)
+      console.log(`Took ${Number(new Date()) - start}ms to load`)
+
 
       setTVL({
         vault: vaultTVL,
@@ -281,20 +289,15 @@ export default function Page({
       setAaveAccountData(newUserAccountData);
 
       if (account) {
-        const vaultNetworth = SUPPORTED_NETWORKS.map((chain) =>
-          Object.values(newTokens[chain.id])
-        )
-          .flat()
-          .filter(
-            (t) => t.type === TokenType.Vault || t.type === TokenType.Gauge
-          )
-          .reduce((a, b) => a + (b.balance / 10 ** b.decimals) * b.price, 0);
-        const assetNetworth = SUPPORTED_NETWORKS.map((chain) =>
-          Object.values(newTokens[chain.id])
-        )
-          .flat()
-          .filter((t) => t.type === TokenType.Asset)
-          .reduce((a, b) => a + (b.balance / 10 ** b.decimals) * b.price, 0);
+        console.log(`Fetching Networth (${new Date()})`)
+        start = Number(new Date())
+
+        const vaultNetworth = SUPPORTED_NETWORKS.map(chain =>
+          Object.values(newTokens[chain.id])).flat().filter(t => t.type === TokenType.Vault || t.type === TokenType.Gauge)
+          .reduce((a, b) => a + ((b.balance / (10 ** b.decimals)) * b.price), 0)
+        const assetNetworth = SUPPORTED_NETWORKS.map(chain =>
+          Object.values(newTokens[chain.id])).flat().filter(t => t.type === TokenType.Asset)
+          .reduce((a, b) => a + ((b.balance / (10 ** b.decimals)) * b.price), 0)
 
         const stake = await createPublicClient({
           chain: mainnet,
@@ -310,20 +313,27 @@ export default function Page({
           (Number(stake.amount) / 1e18) * newTokens[1][VCX_LP].price;
         const lockVaultNetworth = 0; // @dev hardcoded since we removed lock vaults
 
-        const newRewards: { [key: number]: GaugeRewards } = {};
-        await Promise.all(
-          GAUGE_NETWORKS.map(
-            async (chain) =>
-              (newRewards[chain] = await getGaugeRewards({
-                gauges: newVaultsData[chain]
-                  .filter((vault) => !!vault.gauge)
-                  .map((vault) => vault.gauge) as Address[],
-                account: account as Address,
-                chainId: chain,
-                publicClient,
-              }))
-          )
-        );
+        console.log(`Completed fetching Networth (${new Date()})`)
+        console.log(`Took ${Number(new Date()) - start}ms to load`)
+
+
+        console.log(`Fetching GaugeRewards (${new Date()})`)
+        start = Number(new Date())
+
+
+        const newRewards: { [key: number]: GaugeRewards } = {}
+        await Promise.all(GAUGE_NETWORKS.map(async (chain) =>
+          newRewards[chain] = await getGaugeRewards({
+            gauges: newVaultsData[chain].filter(vault => vault.gauge && vault.gauge !== zeroAddress).map(vault => vault.gauge) as Address[],
+            account: account as Address,
+            chainId: chain,
+            publicClient
+          })
+        ))
+
+        console.log(`Completed fetching GaugeRewards (${new Date()})`)
+        console.log(`Took ${Number(new Date()) - start}ms to load`)
+
 
         setNetworth({
           vault: vaultNetworth,
@@ -335,15 +345,21 @@ export default function Page({
         });
         setGaugeRewards(newRewards);
 
-        const newVaultronStats = await fetchVaultron(
-          account,
-          createPublicClient({
-            chain: polygon,
-            transport: http(RPC_URLS[137]),
-          })
-        );
-        setVaultronStats(newVaultronStats);
+        console.log(`Fetching Vaultron (${new Date()})`)
+        start = Number(new Date())
+
+        const newVaultronStats = await fetchVaultron(account, createPublicClient({
+          chain: polygon,
+          transport: http(RPC_URLS[137]),
+        }))
+
+        console.log(`Completed fetching Vaultron (${new Date()})`)
+        console.log(`Took ${Number(new Date()) - start}ms to load`)
+
+        setVaultronStats(newVaultronStats)
       }
+      console.log(`COMPLETED FETCHING APP DATA (${new Date()})`)
+      console.log(`Took ${Number(new Date()) - getDataStart}ms to load`)
     }
     if (yieldOptions) getData();
   }, [yieldOptions, account]);

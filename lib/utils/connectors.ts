@@ -5,6 +5,7 @@ import {
   optimism,
   polygon,
 } from "viem/chains";
+import { xLayer } from "@/lib/constants";
 
 export enum ChainId {
   Ethereum = 1,
@@ -18,55 +19,9 @@ export enum ChainId {
   EthSepolia = 11155111,
   ArbSepolia = 421614,
   ALL = 0,
-  polygonMumbai = 80001
+  polygonMumbai = 80001,
+  XLayer = 196
 }
-
-export enum named {
-  all = "-1",
-  eth = "1",
-  goerly = "5",
-  arb = "42161",
-  poly = "137",
-  localhost = "1337",
-  bnb = "56",
-  remotefork = "31338",
-  op = "10",
-  ALL = 0,
-}
-
-export enum ChainIdHex {
-  Ethereum = "0x1",
-  Goerli = "0x5",
-  Arbitrum = "0xa4b1",
-  Polygon = "0x89",
-  Localhost = "0x7a69",
-  BNB = "0x38",
-  Optimism = "0xa",
-}
-
-export const HexToChain = {
-  "0x1": ChainId.Ethereum,
-  "0x5": ChainId.Goerli,
-  "0xa4b1": ChainId.Arbitrum,
-  "0x89": ChainId.Polygon,
-  "0x7a69": ChainId.Localhost,
-  "0x38": ChainId.BNB,
-  "0xa": ChainId.Optimism,
-};
-
-export const supportedChainIds = [
-  ChainId.Ethereum,
-  ChainId.Goerli,
-  ChainId.Arbitrum,
-  ChainId.Polygon,
-  ChainId.Localhost,
-  ChainId.BNB,
-  ChainId.RemoteFork,
-  ChainId.Optimism,
-  ChainId.EthSepolia,
-  ChainId.ArbSepolia,
-  ChainId.ALL,
-];
 
 export const networkMap: { [key: number]: string } = {
   [ChainId.Ethereum]: "Ethereum",
@@ -80,6 +35,7 @@ export const networkMap: { [key: number]: string } = {
   [ChainId.EthSepolia]: "EthSepolia",
   [ChainId.ArbSepolia]: "ArbSepolia",
   [ChainId.ALL]: "All Networks",
+  [ChainId.XLayer]: "XLayer"
 };
 
 export const networkLogos: { [key: number]: string } = {
@@ -94,7 +50,7 @@ export const networkLogos: { [key: number]: string } = {
   [ChainId.RemoteFork]: "/images/networks/ethTestnet.svg",
   [ChainId.EthSepolia]: "/images/networks/ethTestnet.svg",
   [ChainId.ArbSepolia]: "/images/networks/arbTestnet.svg",
-
+  [ChainId.XLayer]: "/images/networks/xLayer.png"
 };
 export const RPC_URLS: { [key: number]: string } = {
   [ChainId.Ethereum]: `https://eth-mainnet.alchemyapi.io/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`,
@@ -107,14 +63,15 @@ export const RPC_URLS: { [key: number]: string } = {
   [ChainId.RemoteFork]: `http://localhost:8545`,
   [ChainId.EthSepolia]: "https://ethereum-sepolia.publicnode.com",
   [ChainId.ArbSepolia]: "https://sepolia-rollup.arbitrum.io/rpc",
-
+  [ChainId.XLayer]: "https://rpc.xlayer.tech"
 };
 
-export const SUPPORTED_NETWORKS = [mainnet, polygon, optimism, arbitrum]
+export const SUPPORTED_NETWORKS = [mainnet, polygon, optimism, arbitrum, xLayer]
 
 export const ChainById: { [key: number]: Chain } = {
   1: mainnet,
   137: polygon,
   10: optimism,
-  42161: arbitrum
+  42161: arbitrum,
+  196: xLayer
 }

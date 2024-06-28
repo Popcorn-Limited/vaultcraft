@@ -29,8 +29,8 @@ export default function VaultStats({
         id={`${baseTooltipId}-wallet`}
         label="Your Wallet"
         value={`$ ${formatAndRoundNumber(asset.balance * asset.price, asset.decimals)}`}
-        secondaryValue={`${formatAndRoundNumber(asset.balance, asset.decimals)} TKN`}
-        tooltip="Deposit assets held in your wallet"
+        secondaryValue={`${formatAndRoundNumber(asset.balance, asset.decimals)} ${asset.symbol}`}
+        tooltip="Value of deposit assets held in your wallet"
       />
       <CardStat
         id={`${baseTooltipId}-deposit`}
@@ -45,36 +45,40 @@ export default function VaultStats({
         secondaryValue={`${!!gauge ?
           NumberFormatter.format(((gauge.balance) / 10 ** gauge.decimals) + ((vault?.balance!) / 10 ** vault?.decimals!))
           : formatAndRoundNumber(vault?.balance!, vault?.decimals!)
-          } TKN`}
+          } ${asset.symbol}`}
         tooltip="Value of your vault deposits"
       />
       <CardStat
         id={`${baseTooltipId}-tvl`}
         label="TVL"
         value={`$ ${vaultData.tvl < 1 ? "0" : NumberFormatter.format(vaultData.tvl)}`}
-        secondaryValue={`${formatAndRoundNumber(vaultData.totalAssets, asset.decimals)} TKN`}
+        secondaryValue={`${formatAndRoundNumber(vaultData.totalAssets, asset.decimals)} ${asset.symbol}`}
         tooltip="Total value of all assets deposited into the vault"
       />
       <CardStat
         id={`${baseTooltipId}-vApy`}
         label="vAPY"
         value={`${vaultData.apy ? `${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.apy))}` : "0"} %`}
-        tooltip="Current variable apy of the vault"
+        tooltip="Current variable APY of the vault"
       />
-      {vaultData?.minGaugeApy > 0 &&
-        <CardStat
-          id={`${baseTooltipId}-minRewards`}
-          label="Min Rewards Apy"
-          value={`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData?.minGaugeApy))} %`}
-          tooltip="Minimum oVCX boost APR based on most current epoch&apos;s distribution"
-        />}
-      {vaultData?.maxGaugeApy > 0 &&
-        <CardStat
-          id={`${baseTooltipId}-maxRewards`}
-          label="Max Rewards Apy"
-          value={`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData?.maxGaugeApy))} %`}
-          tooltip="Maximum oVCX boost APR based on most current epoch&apos;s distribution"
-        />}
+      {vaultData?.gaugeData?.lowerAPR && vaultData?.gaugeData?.lowerAPR > 0
+        ? <CardStat
+          id={`${baseTooltipId}-minBoost`}
+          label="Min Boost APR"
+          value={`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData?.gaugeData?.lowerAPR))} %`}
+          tooltip={`Minimum oVCX boost APR based on most current epoch's distribution. (Based on the current emissions for this gauge of ${NumberFormatter.format(vaultData?.gaugeData.annualEmissions / 5)} oVCX p. year)`}
+        />
+        : <></>
+      }
+      {vaultData?.gaugeData?.upperAPR && vaultData?.gaugeData?.upperAPR > 0
+        ? <CardStat
+          id={`${baseTooltipId}-maxBoost`}
+          label="Max Boost APR"
+          value={`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData?.gaugeData?.upperAPR))} %`}
+          tooltip={`Maximum oVCX boost APR based on most current epoch's distribution. (Based on the current emissions for this gauge of ${NumberFormatter.format(vaultData?.gaugeData.annualEmissions)} oVCX p. year)`}
+        />
+        : <></>
+      }
     </div>
   );
 }

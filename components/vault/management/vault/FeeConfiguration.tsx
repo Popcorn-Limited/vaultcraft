@@ -1,22 +1,23 @@
 import MainActionButton from "@/components/button/MainActionButton";
 import FeeConfiguration from "@/components/deploymentSections/FeeConfiguration";
 import { feeAtom } from "@/lib/atoms";
-import { VaultFees, VaultData } from "@/lib/types";
+import { VaultData } from "@/lib/types";
 import { acceptFees, proposeFees } from "@/lib/vault/management/interactions";
 import { useAtom } from "jotai";
-import { VaultSettings } from "pages/manage/vaults/[id]";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Address, parseUnits, zeroAddress } from "viem";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 
 export default function VaultFeeConfiguration({
   vaultData,
   callAddress,
-  settings,
+  proposedFeeTime,
+  disabled
 }: {
   vaultData: VaultData;
   callAddress: Address;
-  settings: VaultSettings;
+  proposedFeeTime: number;
+  disabled: boolean;
 }): JSX.Element {
   const { address: account } = useAccount();
   const publicClient = usePublicClient();
@@ -44,7 +45,7 @@ export default function VaultFeeConfiguration({
           their funds if they dislike the change. After three days the change
           can be accepted.
         </p>
-        {Number(settings.proposedFeeTime) > 0 ? (
+        {proposedFeeTime > 0 ? (
           <div className="mt-4">
             <p className="font-bold">Proposed Fee Configuration</p>
             <p>Deposit: {vaultData.fees.deposit / 1e16} %</p>
@@ -67,7 +68,7 @@ export default function VaultFeeConfiguration({
           </>
         )}
         <div className="w-60 mt-4">
-          {Number(settings.proposedFeeTime) > 0 ? (
+          {proposedFeeTime > 0 ? (
             <MainActionButton
               label="Accept new Fee"
               handleClick={() =>
@@ -81,6 +82,7 @@ export default function VaultFeeConfiguration({
                   },
                 })
               }
+              disabled={disabled}
             />
           ) : (
             <MainActionButton
@@ -111,6 +113,7 @@ export default function VaultFeeConfiguration({
                   },
                 })
               }
+              disabled={disabled}
             />
           )}
         </div>

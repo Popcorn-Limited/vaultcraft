@@ -12,7 +12,7 @@ import {
 import MainActionButton from "@/components/button/MainActionButton";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import { claimOPop } from "@/lib/optionToken/interactions";
-import { WalletClient } from "viem";
+import { WalletClient, zeroAddress } from "viem";
 import { llama } from "@/lib/resolver/price/resolver";
 import { MinterByChain, OptionTokenByChain, VCX } from "@/lib/constants";
 import { useAtom } from "jotai";
@@ -54,6 +54,10 @@ export default function OptionTokenInterface({ setShowOptionTokenModal }: Option
       }
     }
 
+    console.log(gaugeRewards[chainId].amounts
+      ?.filter((gauge) => Number(gauge.amount) > 0)
+      .map((gauge) => gauge.address))
+
     const success = await claimOPop({
       gauges: gaugeRewards[chainId].amounts
         ?.filter((gauge) => Number(gauge.amount) > 0)
@@ -74,7 +78,7 @@ export default function OptionTokenInterface({ setShowOptionTokenModal }: Option
       setGaugeRewards({
         ...gaugeRewards,
         [chainId]: await getGaugeRewards({
-          gauges: vaults[chainId].filter(vault => !!vault.gauge).map(vault => vault.gauge) as Address[],
+          gauges: vaults[chainId].filter(vault => vault.gauge && vault.gauge !== zeroAddress).map(vault => vault.gauge) as Address[],
           account: account!,
           chainId: chainId,
           publicClient

@@ -29,6 +29,7 @@ import VaultCard from "./VaultCard";
 import SearchBar from "@/components/input/SearchBar";
 import VaultsSorting from "@/components/vault/VaultsSorting";
 import VaultsTable from "./VaultsTable";
+import LargeCardStat from "@/components/common/LargeCardStat";
 
 interface VaultsContainerProps {
   hiddenVaults: AddressesByChain;
@@ -109,61 +110,54 @@ export default function VaultsContainer({
         <div className="w-full lg:justify-end lg:w-8/12 md:divide-x md:flex md:flex-row space-y-4 md:space-y-0 mt-4 md:mt-0">
           <div className="flex flex-row items-center md:pr-10 gap-10 md:w-fit">
             <div className="w-[120px] md:w-max">
-              <p className="leading-6 text-base text-customGray100 md:text-white">
-                TVL
-              </p>
-              <div className="text-3xl font-bold whitespace-nowrap text-white">
-                {`$${NumberFormatter.format(tvl.vault)}`}
-              </div>
+              <LargeCardStat
+                id="total-tvl"
+                label="TVL"
+                value={`$${NumberFormatter.format(tvl.vault)}`}
+                tooltip="Total value locked (TVL) is the amount of user funds deposited in Smart Vaults."
+              />
             </div>
 
             <div className="w-[120px] md:w-max">
-              <p className="leading-6 text-base text-customGray100 md:text-white">
-                Deposits
-              </p>
-              <div className="text-3xl font-bold whitespace-nowrap text-white">
-                {`$${NumberFormatter.format(networth.vault)}`}
-              </div>
+              <LargeCardStat
+                id="total-deposits"
+                label="Deposits"
+                value={`$${NumberFormatter.format(networth.vault)}`}
+                tooltip="Value of your smart vault deposits across all blockchains."
+              />
             </div>
           </div>
 
           <div className="flex flex-row items-center md:gap-6 md:w-fit md:pl-12">
             <div className="flex gap-10 w-fit">
               <div className="w-[120px] md:w-max">
-                <p className="w-max leading-6 text-base text-customGray100 md:text-white">
-                  My oVCX
-                </p>
-                <div className="w-max text-3xl font-bold whitespace-nowrap text-white">
-                  {`$${
-                    oBal && tokens[1] && tokens[1][VCX]
-                      ? NumberFormatter.format(
-                          (Number(oBal?.value) / 1e18) *
-                            (tokens[1][VCX].price * 0.25)
-                        )
-                      : "0"
-                  }`}
-                </div>
+                <LargeCardStat
+                  id="total-my-ovcx"
+                  label="My oVCX"
+                  value={`$${oBal && tokens[1] && tokens[1][VCX]
+                    ? NumberFormatter.format(
+                      (Number(oBal?.value) / 1e18) * (tokens[1][VCX].price * 0.25)
+                    )
+                    : "0"
+                    }`}
+                  tooltip="Value of oVCX held in your wallet across all blockchains."
+                />
+
               </div>
 
               <div className="w-[120px] md:w-max">
-                <p className="w-max leading-6 text-base text-customGray100 md:text-white">
-                  Claimable oVCX
-                </p>
-                <div className="w-max text-3xl font-bold whitespace-nowrap text-white">
-                  {`$${
-                    gaugeRewards && tokens[1] && tokens[1][VCX]
-                      ? NumberFormatter.format(
-                          (Number(
-                            gaugeRewards?.[1]?.total +
-                              gaugeRewards?.[10]?.total +
-                              gaugeRewards?.[42161]?.total || 0
-                          ) /
-                            1e18) *
-                            (tokens[1][VCX].price * 0.25)
-                        )
-                      : "0"
-                  }`}
-                </div>
+                <LargeCardStat
+                  id="total-claimable-ovcx"
+                  label="Claimable oVCX"
+                  value={`$${gaugeRewards && tokens[1] && tokens[1][VCX]
+                    ? NumberFormatter.format(
+                      (Number(gaugeRewards?.[1]?.total + gaugeRewards?.[10]?.total + gaugeRewards?.[42161]?.total || 0) / 1e18) *
+                      (tokens[1][VCX].price * 0.25)
+                    )
+                    : "0"
+                    }`}
+                  tooltip="Cumulative value of claimable oVCX from vaults across all blockchains."
+                />
               </div>
             </div>
 

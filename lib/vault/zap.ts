@@ -4,6 +4,9 @@ import { showErrorToast, showSuccessToast } from "@/lib/toasts";
 import { AddressByChain, Clients, Token, TokenByAddress, ZapProvider } from "@/lib/types";
 import { handleAllowance } from "@/lib/approve";
 import mutateTokenBalance from "./mutateTokenBalance";
+import { mainnet, arbitrum, optimism, polygon } from "viem/chains";
+import { xLayer } from "@/lib/constants";
+import { networkMap } from "../utils/connectors";
 
 
 interface BaseProps {
@@ -23,7 +26,7 @@ interface ZapProps extends BaseProps {
 }
 
 const ZeroXBaseUrlByChain: { [key: number]: string } = {
-  1: "https://api.0x.org/",
+  [mainnet.id]: "https://api.0x.org/",
 }
 
 async function getZapTransaction({ chainId, sellToken, buyToken, amount, account, zapProvider, slippage = 100, tradeTimeout = 60 }: BaseProps): Promise<any> {
@@ -71,6 +74,34 @@ async function getZapTransaction({ chainId, sellToken, buyToken, amount, account
         ignoreChecks: true
       });
       return { from: paraSwapData.from, to: paraSwapData.to, data: paraSwapData.data, value: paraSwapData.value }
+    case ZapProvider.kyberSwap:
+      const targetPathConfig = {
+        params: {
+          tokenIn: sellToken.address,
+          tokenOut: buyToken.address,
+          amountIn: amount.toLocaleString("fullwide", { useGrouping: false })
+        }
+      };
+
+      const { data: kyberRoute } = await axios.get(
+        `https://aggregator-api.kyberswap.com/${networkMap[chainId].toLowerCase()}/api/v1/routes`,
+        targetPathConfig
+      )
+
+      // Configure the request body (refer to Docs for the full list)
+      const requestBody = {
+        routeSummary: kyberRoute.data.routeSummary,
+        sender: account,
+        recipient: account,
+        slippageTolerance: slippage
+      }
+
+      const { data: kyberSwapData } = await axios.post(
+        `https://aggregator-api.kyberswap.com/${networkMap[chainId].toLowerCase()}/api/v1/routes`,
+        requestBody
+      )
+
+      return { from: account, to: kyberSwapData.data.routerAddress, data: kyberSwapData.data.data, value: "0" }
   }
 }
 
@@ -87,7 +118,7 @@ export default async function zap({
   tokensAtom }: ZapProps): Promise<boolean> {
   const transaction = await getZapTransaction({ chainId, sellToken, buyToken, amount, account, zapProvider, slippage, tradeTimeout })
   console.log({ transaction })
-  
+
   try {
     const hash = await clients.walletClient.sendTransaction(transaction)
     const receipt = await clients.publicClient.waitForTransactionReceipt({ hash })
@@ -117,36 +148,49 @@ interface HandleZapAllowanceProps {
 }
 
 const EnsoRouterByChain: AddressByChain = {
-  1: "0x80EbA3855878739F4710233A8a19d89Bdd2ffB8E",
-  137: "0x80EbA3855878739F4710233A8a19d89Bdd2ffB8E",
-  10: "0x80EbA3855878739F4710233A8a19d89Bdd2ffB8E",
-  42161: "0x80EbA3855878739F4710233A8a19d89Bdd2ffB8E"
+  [mainnet.id]: "0x80EbA3855878739F4710233A8a19d89Bdd2ffB8E",
+  [polygon.id]: "0x80EbA3855878739F4710233A8a19d89Bdd2ffB8E",
+  [optimism.id]: "0x80EbA3855878739F4710233A8a19d89Bdd2ffB8E",
+  [arbitrum.id]: "0x80EbA3855878739F4710233A8a19d89Bdd2ffB8E",
+  [xLayer.id]: zeroAddress
 }
 
 const OneInchRouterByChain: AddressByChain = {
-  1: "0x1111111254EEB25477B68fb85Ed929f73A960582",
-  137: "0x1111111254EEB25477B68fb85Ed929f73A960582",
-  10: "0x1111111254EEB25477B68fb85Ed929f73A960582",
-  42161: "0x1111111254EEB25477B68fb85Ed929f73A960582"
+  [mainnet.id]: "0x1111111254EEB25477B68fb85Ed929f73A960582",
+  [polygon.id]: "0x1111111254EEB25477B68fb85Ed929f73A960582",
+  [optimism.id]: "0x1111111254EEB25477B68fb85Ed929f73A960582",
+  [arbitrum.id]: "0x1111111254EEB25477B68fb85Ed929f73A960582",
+  [xLayer.id]: zeroAddress
 }
 
 const ParaSwapRouterByChain: AddressByChain = {
-  1: "0xDEF171Fe48CF0115B1d80b88dc8eAB59176FEe57",
-  137: "0xDEF171Fe48CF0115B1d80b88dc8eAB59176FEe57",
-  10: "0xDEF171Fe48CF0115B1d80b88dc8eAB59176FEe57",
-  42161: "0xDEF171Fe48CF0115B1d80b88dc8eAB59176FEe57"
+  [mainnet.id]: "0xDEF171Fe48CF0115B1d80b88dc8eAB59176FEe57",
+  [polygon.id]: "0xDEF171Fe48CF0115B1d80b88dc8eAB59176FEe57",
+  [optimism.id]: "0xDEF171Fe48CF0115B1d80b88dc8eAB59176FEe57",
+  [arbitrum.id]: "0xDEF171Fe48CF0115B1d80b88dc8eAB59176FEe57",
+  [xLayer.id]: zeroAddress
+}
+
+const KyberswapRouterByChain: AddressByChain = {
+  [mainnet.id]: "0x6131B5fae19EA4f9D964eAc0408E4408b66337b5",
+  [polygon.id]: "0x6131B5fae19EA4f9D964eAc0408E4408b66337b5",
+  [optimism.id]: "0x6131B5fae19EA4f9D964eAc0408E4408b66337b5",
+  [arbitrum.id]: "0x6131B5fae19EA4f9D964eAc0408E4408b66337b5",
+  [xLayer.id]: "0x6131B5fae19EA4f9D964eAc0408E4408b66337b5"
 }
 
 async function getZapSpender({ account, chainId, zapProvider }: { account: Address, chainId: number, zapProvider: ZapProvider }): Promise<Address> {
   switch (zapProvider) {
     case ZapProvider.enso:
-      return getAddress(EnsoRouterByChain[chainId])
+      return getAddress(EnsoRouterByChain[chainId]);
     case ZapProvider.zeroX:
       return zeroAddress
     case ZapProvider.oneInch:
-      return getAddress(OneInchRouterByChain[chainId])
+      return getAddress(OneInchRouterByChain[chainId]);
     case ZapProvider.paraSwap:
-      return getAddress(ParaSwapRouterByChain[chainId])
+      return getAddress(ParaSwapRouterByChain[chainId]);
+    case ZapProvider.kyberSwap:
+      return getAddress(KyberswapRouterByChain[chainId])
     default:
       return zeroAddress
   }
@@ -174,7 +218,12 @@ interface GetZapQuoteProps extends GetZapProviderProps {
   zapProvider: ZapProvider
 }
 
-async function getZapQuote({ sellToken, buyToken, amount, chainId, account, zapProvider }: GetZapQuoteProps): Promise<{ zapProvider: ZapProvider, out: number }> {
+export async function getZapQuote({ sellToken, buyToken, amount, chainId, account, zapProvider }: GetZapQuoteProps): Promise<{ zapProvider: ZapProvider, out: number }> {
+  // Check if ZapProvider is supported on that chain
+  const spender = await getZapSpender({ account, chainId, zapProvider })
+  if (spender === zeroAddress) return { zapProvider: ZapProvider.notFound, out: 0 }
+
+  // Fetch Quote
   switch (zapProvider) {
     case ZapProvider.enso:
       try {
@@ -209,6 +258,25 @@ async function getZapQuote({ sellToken, buyToken, amount, chainId, account, zapP
           data: { priceRoute }
         } = await axios.get(`https://apiv5.paraswap.io/prices/?srcToken=${sellToken.address}&destToken=${buyToken.address}&amount=${amount.toLocaleString("fullwide", { useGrouping: false })}&srcDecimals=${sellToken.decimals}&destDecimals=${buyToken.decimals}&side=SELL&network=${chainId}`);
         return { zapProvider, out: Number(priceRoute.destAmount) }
+      } catch {
+        return { zapProvider: ZapProvider.notFound, out: 0 }
+      }
+    case ZapProvider.kyberSwap:
+      try {
+        const targetPathConfig = {
+          params: {
+            tokenIn: sellToken.address,
+            tokenOut: buyToken.address,
+            amountIn: amount.toLocaleString("fullwide", { useGrouping: false })
+          }
+        };
+
+        const { data: kyberData } = await axios.get(
+          `https://aggregator-api.kyberswap.com/${networkMap[chainId].toLowerCase()}/api/v1/routes`,
+          targetPathConfig
+        )
+
+        return { zapProvider, out: Number(kyberData.data.routeSummary.amountOut) }
       } catch {
         return { zapProvider: ZapProvider.notFound, out: 0 }
       }

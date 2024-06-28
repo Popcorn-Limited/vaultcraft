@@ -113,13 +113,13 @@ export default function Gauge({
             <CardStat
               id={`${baseTooltipId}-minRewards`}
               label="Min Rewards Apy"
-              value={`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData?.minGaugeApy))} %`}
+              value={`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData?.gaugeData?.lowerAPR!))} %`}
               tooltip="Minimum oVCX boost APR based on most current epoch&apos;s distribution"
             />
             <CardStat
               id={`${baseTooltipId}-maxRewards`}
               label="Max Rewards Apy"
-              value={`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData?.maxGaugeApy))} %`}
+              value={`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData?.gaugeData?.upperAPR!))} %`}
               tooltip="Maximum oVCX boost APR based on most current epoch&apos;s distribution"
             />
             <CardStat

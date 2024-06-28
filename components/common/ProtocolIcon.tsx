@@ -7,7 +7,10 @@ export const IconByProtocol: { [key: string]: string } = {
   Aura: "https://icons.llamao.fi/icons/protocols/aura?w=48&h=48",
   Balancer: "https://icons.llamao.fi/icons/protocols/balancer?w=48&h=48",
   Beefy: "https://icons.llamao.fi/icons/protocols/beefy?w=48&h=48",
+  Bedrock: "https://icons.llamao.fi/icons/protocols/bedrock?w=48&h=48",
   Compound: "https://icons.llamao.fi/icons/protocols/compound?w=48&h=48",
+  CompoundV2: "https://icons.llamao.fi/icons/protocols/compound?w=48&h=48",
+  CompoundV3: "https://icons.llamao.fi/icons/protocols/compound?w=48&h=48",
   Convex: "https://icons.llamao.fi/icons/protocols/convex-finance?w=48&h=48",
   Curve: "https://icons.llamao.fi/icons/protocols/curve?w=48&h=48",
   CurveGauge: "https://icons.llamao.fi/icons/protocols/curve?w=48&h=48",
@@ -16,6 +19,7 @@ export const IconByProtocol: { [key: string]: string } = {
   Origin: "https://icons.llamao.fi/icons/protocols/origin-defi?w=48&h=48",
   Stargate: "https://icons.llamao.fi/icons/protocols/stargate?w=48&h=48",
   Yearn: "https://icons.llamao.fi/icons/protocols/yearn-finance?w=48&h=48",
+  Pendle: "https://icons.llamao.fi/icons/protocols/pendle?w=48&h=48",
   Pirex: "https://icons.llamao.fi/icons/protocols/pirex?w=48&h=48",
   Sommelier: "https://icons.llamao.fi/icons/protocols/sommelier?w=48&h=48",
   Frax: "https://icons.llamao.fi/icons/protocols/frax?w=48&h=48",
@@ -24,7 +28,7 @@ export const IconByProtocol: { [key: string]: string } = {
   Stader: "https://icons.llamao.fi/icons/protocols/stader?w=48&h=48",
   KelpDAO: "https://icons.llamao.fi/icons/protocols/kelp-dao?w=48&h=48",
   Ion: "https://www.app.ionprotocol.io/logo.svg",
-  Multistrategy:"/images/tokens/vcx.svg"
+  Multistrategy: "/images/tokens/vcx.svg"
 };
 
 const iconSize: { [key: number]: string } = {

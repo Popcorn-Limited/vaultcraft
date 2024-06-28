@@ -1,5 +1,4 @@
 import { formatUnits, parseUnits } from "viem";
-import { ZERO } from "@/lib/constants";
 import { roundToTwoDecimalPlaces } from "./helpers";
 
 const MILLION = 1e6;
