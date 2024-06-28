@@ -3,7 +3,6 @@ import { useAtom } from "jotai";
 import { useAccount } from "wagmi";
 
 import Slider from "rc-slider";
-import "rc-slider/assets/index.css";
 
 import {
   NumberFormatter,
@@ -175,7 +174,7 @@ export default function BoostVaultRow({
             <span>Emitted tokens:</span>
             <strong className="text-lg">
               {actualUserPower != amount
-                ? `${(amount / 100).toFixed(2) || 0}%`
+                ? `${amount ? (amount / 100).toFixed(2) : 0}%`
                 : "-"}
             </strong>
           </nav>
@@ -186,7 +185,7 @@ export default function BoostVaultRow({
             <span>New allocation:</span>
             <strong className="text-lg">
               {actualUserPower != amount
-                ? `${(amount / 100).toFixed(2) || 0}%`
+                ? `${amount ? (amount / 100).toFixed(2) : 0}%`
                 : "-"}
             </strong>
           </nav>
@@ -197,7 +196,7 @@ export default function BoostVaultRow({
             <div className="flex items-center gap-2 whitespace-nowrap min-w-[12rem]">
               <span>My Votes:</span>
               <strong className="text-lg mr-1">
-                {(amount / 100).toFixed(2) || 0}%
+                {amount ? (amount / 100).toFixed(2) : 0}%
               </strong>
               <Badge>x{boost}</Badge>
             </div>

@@ -18,7 +18,8 @@ import { VaultData } from "@/lib/types";
 import ManageLoanInterface from "@/components/lending/ManageLoanInterface";
 import { getHealthFactorColor } from "@/lib/external/aave";
 import { isAddress } from "viem";
-import ProtocolIcon from "../common/ProtocolIcon";
+
+import Badge from "@/components/vault/Badge";
 
 export default function Navbar(): JSX.Element {
   const router = useRouter();
@@ -76,7 +77,7 @@ export default function Navbar(): JSX.Element {
         />
       )}
       <div className="flex container flex-row items-center justify-between w-full py-8 px-4 md:px-8 z-10">
-        <div className="flex flex-row items-center">
+        <div className="flex flex-row items-center gap-6">
           <div>
             <Link
               href={
@@ -93,6 +94,12 @@ export default function Navbar(): JSX.Element {
               />
             </Link>
           </div>
+          <Badge
+            className="rounded text-base py-2 px-4 hidden sm:block"
+            variant="primaryYellow"
+          >
+            Beta
+          </Badge>
         </div>
         <div className="flex flex-row items-center space-x-4">
           <div className="hidden md:block">

@@ -4,13 +4,19 @@ import type { PropsWithChildren } from "react";
 function Badge({
   children,
   className,
+  variant = "primaryGreen",
 }: PropsWithChildren<{
   className?: string;
+  variant?: "primaryGreen" | "primaryYellow";
 }>) {
   return (
     <div
       className={cn(
-        "bg-customNeutral100/40 px-3 py-0.5 rounded-xl inline-block text-primaryGreen",
+        "px-3 py-0.5 rounded-xl inline-block",
+        variant === "primaryGreen" &&
+          "bg-customNeutral100/40 text-primaryGreen",
+        variant === "primaryYellow" &&
+          "bg-primaryYellow/[0.15] text-primaryYellow",
         className
       )}
     >

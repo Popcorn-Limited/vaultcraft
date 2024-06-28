@@ -1,4 +1,6 @@
 import NoSSR from "react-no-ssr";
+import "rc-slider/assets/index.css";
+
 import {
   mainnet,
   useAccount,
@@ -6,13 +8,12 @@ import {
   usePublicClient,
   useWalletClient,
 } from "wagmi";
-import { Address, WalletClient, createPublicClient, http } from "viem";
+import { Address, createPublicClient, http } from "viem";
 import { Fragment, useEffect, useState } from "react";
 import { VoteData, hasAlreadyVoted } from "@/lib/gauges/hasAlreadyVoted";
 import { AddressesByChain, VaultData } from "@/lib/types";
 import StakingInterface from "@/components/boost/StakingInterface";
 import { sendVotes } from "@/lib/gauges/interactions";
-import Gauge from "@/components/boost/Gauge";
 import LockModal from "@/components/boost/modals/lock/LockModal";
 import ManageLockModal from "@/components/boost/modals/manage/ManageLockModal";
 import OptionTokenExerciseModal from "@/components/optionToken/exercise/OptionTokenExerciseModal";
@@ -31,8 +32,10 @@ import BroadcastVeBalanceInterface from "@/components/boost/modals/manage/Broadc
 import { RPC_URLS } from "@/lib/utils/connectors";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 
-import BoostVaultRow from "@/components/vault/BoostVaultRow";
 import ResponsiveTooltip from "@/components/common/Tooltip";
+import BoostVaultsTable from "@/components/boost/BoostVaultsTable";
+import useIsBreakPoint from "@/lib/useIsMobile";
+import BoostVaultCard from "@/components/vault/BoostVaultCard";
 
 export const GAUGE_NETWORKS = [1, 10, 42161];
 
@@ -163,6 +166,20 @@ function VePopContainer() {
 
   const selectedNetworks = GAUGE_NETWORKS;
 
+  const formattedVaults = gaugeVaults
+    .filter((vault) => selectedNetworks.includes(vault.chainId))
+    .sort((a, b) => b.tvl - a.tvl)
+    .map((vault) => ({
+      ...vault,
+      isDeprecated: (hiddenGauges ?? {})[vault.chainId]?.includes(vault.gauge!),
+    }))
+    .sort(({ isDeprecated: a }, { isDeprecated: b }) =>
+      // Sort deprecated vaults to the end
+      a === b ? 0 : a ? 1 : -1
+    );
+
+  const isSmallScreen = useIsBreakPoint("lg");
+
   return (
     <>
       <LockModal
@@ -259,69 +276,29 @@ function VePopContainer() {
 
         {gaugeVaults?.length > 0 ? (
           <Fragment>
-            <section className="text-white mt-12 w-full border rounded-xl overflow-hidden border-customNeutral100">
-              <table className="w-full [&_td]:h-20 [&_th]:h-18 [&_td]:px-5 [&_th]:px-5">
-                <thead className="bg-customNeutral200 border-b border-customNeutral100">
-                  <tr>
-                    <th />
-                    <th className="font-normal text-left whitespace-nowrap">
-                      TVL
-                    </th>
-                    <th className="font-normal text-right whitespace-nowrap">
-                      Min Boost
-                    </th>
-                    <th className="font-normal text-right whitespace-nowrap">
-                      Max Boost
-                    </th>
-                    <th className="font-normal text-right whitespace-nowrap">
-                      Current Weight
-                    </th>
-                    <th className="font-normal text-right whitespace-nowrap">
-                      Upcoming Weight
-                    </th>
-                    <th className="font-normal text-right whitespace-nowrap">
-                      Tokens emitted
-                    </th>
-                    <th className="font-normal text-right whitespace-nowrap">
-                      Upcoming Tokens
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {gaugeVaults
-                    .filter((vault) => selectedNetworks.includes(vault.chainId))
-                    .sort((a, b) => b.tvl - a.tvl)
-                    .map((vault) => ({
-                      ...vault,
-                      isDeprecated: (hiddenGauges ?? {})[
-                        vault.chainId
-                      ]?.includes(vault.gauge!),
-                    }))
-                    .sort(({ isDeprecated: a }, { isDeprecated: b }) =>
-                      // Sort deprecated vaults to the end
-                      a === b ? 0 : a ? 1 : -1
-                    )
-                    .map(
-                      (
-                        vault: VaultData & {
-                          isDeprecated: boolean;
-                        }
-                      ) => (
-                        <BoostVaultRow
-                          {...vault}
-                          isVotingAvailable={
-                            voteData.find((v) => v.gauge === vault.gauge)
-                              ?.canVote!
-                          }
-                          handleVotes={handleVotes}
-                          votes={votes}
-                          key={`boost-vault-${vault.address}`}
-                        />
-                      )
-                    )}
-                </tbody>
-              </table>
-            </section>
+            {isSmallScreen ? (
+              <section className="px-4 gap-6 md:gap-10 grid md:grid-cols-2">
+                {formattedVaults.map((vaultData) => (
+                  <BoostVaultCard
+                    {...vaultData}
+                    isVotingAvailable={
+                      voteData.find((v) => v.gauge === vaultData.gauge)
+                        ?.canVote!
+                    }
+                    handleVotes={handleVotes}
+                    votes={votes}
+                    key={`sm-mb-${vaultData.address}`}
+                  />
+                ))}
+              </section>
+            ) : (
+              <BoostVaultsTable
+                handleVotes={handleVotes}
+                vaults={formattedVaults}
+                voteData={voteData}
+                votes={votes}
+              />
+            )}
           </Fragment>
         ) : (
           <p className="text-white text-center py-12">Loading Gauges...</p>

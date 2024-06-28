@@ -67,7 +67,7 @@ export default function VaultCard({
         );
       }}
       className={cn(
-        "p-6 overflow-hidden rounded-3xl border border-customNeutral100 group hover:bg-customNeutral200 cursor-pointer",
+        "p-8 overflow-hidden rounded-3xl border border-customNeutral100 group hover:bg-customNeutral200 cursor-pointer",
         {
           hidden: searchTerm
             ? !searchData.includes(searchTerm.toLowerCase())
@@ -80,7 +80,7 @@ export default function VaultCard({
         vault={vaultData}
       />
 
-      <div className="grid mt-4 gap-4 grid-cols-3">
+      <div className="grid mt-6 gap-4 grid-cols-3">
         <Content title="Your Wallet">
           <p className="text-2xl">
             {formatAndRoundNumber(dataAsset.balance, dataAsset.decimals)}
