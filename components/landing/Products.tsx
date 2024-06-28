@@ -8,7 +8,11 @@ import { useAtom } from "jotai";
 import Link from "next/link";
 import { tvlAtom } from "@/lib/atoms";
 import Modal from "@/components/modal/Modal";
-import { ChevronLeftIcon, ChevronRightIcon, InformationCircleIcon } from "@heroicons/react/24/outline";
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  InformationCircleIcon,
+} from "@heroicons/react/24/outline";
 import InfoIconWithTooltip from "@/components/common/InfoIconWithTooltip";
 import TokenIcon from "@/components/common/TokenIcon";
 import { Token } from "@/lib/types";
@@ -70,7 +74,9 @@ export default function Products(): JSX.Element {
                     id="depositor-tooltip"
                     content={
                       <div className="w-60">
-                        <p className="text-white font-bold mb-2">Depositors Earn</p>
+                        <p className="text-white font-bold mb-2">
+                          Depositors Earn
+                        </p>
                         <div className="space-y-2">
                           <p className="text-white">Vault APY</p>
                           <p className="text-white">Restaking APY</p>
@@ -88,7 +94,9 @@ export default function Products(): JSX.Element {
                             <p className="text-white">Eigenlayer Points</p>
                             <TokenIcon
                               token={{} as Token}
-                              icon={"https://icons.llamao.fi/icons/protocols/eigenlayer?w=48&h=48"}
+                              icon={
+                                "https://icons.llamao.fi/icons/protocols/eigenlayer?w=48&h=48"
+                              }
                               chainId={1}
                               imageSize="w-6 h-6 mb-1 ml-1"
                             />
@@ -137,7 +145,12 @@ export default function Products(): JSX.Element {
                 id: "smart-vault-tvl",
                 label: "TVL",
                 value: `$${NumberFormatter.format(tvl.vault)}`,
-                tooltip: "The total value of assets held <br /> by the underlying smart contracts."
+                tooltip: (
+                  <p>
+                    The total value of assets held <br /> by the underlying
+                    smart contracts.
+                  </p>
+                ),
               },
             ]}
             route="vaults"
@@ -156,7 +169,6 @@ export default function Products(): JSX.Element {
                       <div className="w-60">
                         <p className="text-white font-bold mb-2">Earn XP</p>
                         <div className="space-y-2">
-
                           <div className="w-full flex flex-row items-center justify-between">
                             <p className="text-white">Buy VCX</p>
                             <div className="flex flex-row items-center">
@@ -235,12 +247,20 @@ export default function Products(): JSX.Element {
             stats={[]}
             route="boost"
           />
-          <div className="w-full lg:max-w-full h-[640px] relative flex flex-col space-y-4 md:mx-2">
+          <div className="w-full lg:max-w-full min-h-[40rem] relative flex flex-col space-y-4 md:mx-2">
             <Link
-              href={(!!query?.ref && isAddress(query.ref as string)) ? `vaultron?ref=${query.ref}` : `vaultron`}
+              href={
+                !!query?.ref && isAddress(query.ref as string)
+                  ? `vaultron?ref=${query.ref}`
+                  : `vaultron`
+              }
             >
-              <div className="rounded w-full h-[208px] bg-customNeutral300 border border-customNeutral100 border-opacity-75 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:opacity-50 flex flex-col justify-start bg-cover"
-                style={{ backgroundImage: "url('https://resolve.mercle.xyz/ipfs/bafkreibn26tzshouo6ayr33uhwwqzxpp5h6zgzitzgxwhsacsuuxoo7fuq')" }}
+              <div
+                className="rounded w-full min-h-[9rem] bg-customNeutral300 border border-customNeutral100 border-opacity-75 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:opacity-50 flex flex-col justify-start bg-cover"
+                style={{
+                  backgroundImage:
+                    "url('https://resolve.mercle.xyz/ipfs/bafkreibn26tzshouo6ayr33uhwwqzxpp5h6zgzitzgxwhsacsuuxoo7fuq')",
+                }}
               >
                 <h2 className="text-white text-2xl leading-none mb-2 py-6 px-8">
                   Vaultron
@@ -248,8 +268,12 @@ export default function Products(): JSX.Element {
               </div>
             </Link>
             <Link
-              href={(!!query?.ref && isAddress(query.ref as string)) ? `create-vault?ref=${query.ref}` : `create-vault`}
-              className="rounded w-full h-[128px] relative flex flex-col bg-customNeutral300 border border-customNeutral100 border-opacity-75 smmd:items-center py-6 px-6 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:bg-customNeutral200"
+              href={
+                !!query?.ref && isAddress(query.ref as string)
+                  ? `create-vault?ref=${query.ref}`
+                  : `create-vault`
+              }
+              className="rounded w-full min-h-[9rem] relative flex flex-col bg-customNeutral300 border border-customNeutral100 border-opacity-75 smmd:items-center py-6 px-6 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:bg-customNeutral200"
             >
               <div className="col-span-12 md:col-span-4 xs:self-start">
                 <div className="relative flex flex-row">
@@ -257,12 +281,18 @@ export default function Products(): JSX.Element {
                     Create Vaults
                   </h2>
                 </div>
-                <p className="mt-2 text-white">Customize and deploy your own Smart Vault</p>
+                <p className="mt-2 text-white">
+                  Customize and deploy your own Smart Vault
+                </p>
               </div>
             </Link>
             <Link
-              href={(!!query?.ref && isAddress(query.ref as string)) ? `stats?ref=${query.ref}` : `stats`}
-              className="rounded w-full h-[128px] relative flex flex-col bg-customNeutral300 border border-customNeutral100 border-opacity-75 smmd:items-center py-6 px-6 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:bg-customNeutral200"
+              href={
+                !!query?.ref && isAddress(query.ref as string)
+                  ? `stats?ref=${query.ref}`
+                  : `stats`
+              }
+              className="rounded w-full min-h-[9rem] relative flex flex-col bg-customNeutral300 border border-customNeutral100 border-opacity-75 smmd:items-center py-6 px-6 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:bg-customNeutral200"
             >
               <div className="col-span-12 md:col-span-4 xs:self-start">
                 <div className="relative flex flex-row">
@@ -270,18 +300,21 @@ export default function Products(): JSX.Element {
                     VaultCraft Stats
                   </h2>
                 </div>
-                <p className="mt-2 text-white">See all stats regarding VCX and VaultCraft</p>
+                <p className="mt-2 text-white">
+                  See all stats regarding VCX and VaultCraft
+                </p>
               </div>
             </Link>
             <div
-              className="rounded w-full h-[128px] relative flex flex-col bg-customNeutral300 border border-customNeutral100 border-opacity-75 smmd:items-center
+              className="rounded w-full min-h-[9rem] relative flex flex-col bg-customNeutral300 border border-customNeutral100 border-opacity-75 smmd:items-center
               py-6 px-6 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:bg-customNeutral200"
             >
               <CopyToClipboard
                 text={`https://app.vaultcraft.io/vaults?ref=${account}`}
-                onCopy={() => account
-                  ? showSuccessToast("Referal link copied!")
-                  : showErrorToast("Connect your Wallet to copy referal link")
+                onCopy={() =>
+                  account
+                    ? showSuccessToast("Referal link copied!")
+                    : showErrorToast("Connect your Wallet to copy referal link")
                 }
               >
                 <div className="col-span-12 md:col-span-4 xs:self-start">
@@ -296,7 +329,7 @@ export default function Products(): JSX.Element {
             </div>
           </div>
         </div>
-      </section >
+      </section>
     </>
   );
 }
@@ -305,79 +338,108 @@ const TutorialImageByStep: { [key: number]: string } = {
   1: "/images/tutorial/desktop/1.png",
   2: "/images/tutorial/desktop/2.png",
   3: "/images/tutorial/desktop/3.png",
-}
+};
 
 const TutorialTitleByStep: { [key: number]: string } = {
   1: "Deposit into a Smart Vault",
   2: "Get and Lock VCX-LP",
   3: "Vote on Gauges",
-}
+};
 
 function Tutorial(): JSX.Element {
-  const [step, setStep] = useState<number>(1)
+  const [step, setStep] = useState<number>(1);
 
   function handleStep(newStep: number) {
-    if (newStep === 0) newStep = 3
-    if (newStep === 4) newStep = 1
-    setStep(newStep)
+    if (newStep === 0) newStep = 3;
+    if (newStep === 4) newStep = 1;
+    setStep(newStep);
   }
 
-  return <div className="flex flex-row justify-between">
-    <div className="text-start space-y-8 w-full lg:w-1/3 xl:w-1/2 lg:pr-8">
-      <div className="">
-        <h2 className="text-lg font-bold text-primaryYellow border-b border-customGray500 pb-2">Step 1</h2>
-        <div className="flex flex-row justify-between">
-          <ul className="list-inside list-disc mt-2 ml-4">
-            <li>Deposit into Smart Vaults 🪙</li>
-            <li>Borrow and deposit more ♻️</li>
-            <li>Earn 10%+ base APY 🙂</li>
-            <li>Earn 25%+ APY with perpetual call options (oVCX) 😏</li>
-            <li>Mint Vaultron NFT to earn XP Points for future airdrops 🪂</li>
-          </ul>
+  return (
+    <div className="flex flex-row justify-between">
+      <div className="text-start space-y-8 w-full lg:w-1/3 xl:w-1/2 lg:pr-8">
+        <div className="">
+          <h2 className="text-lg font-bold text-primaryYellow border-b border-customGray500 pb-2">
+            Step 1
+          </h2>
+          <div className="flex flex-row justify-between">
+            <ul className="list-inside list-disc mt-2 ml-4">
+              <li>Deposit into Smart Vaults 🪙</li>
+              <li>Borrow and deposit more ♻️</li>
+              <li>Earn 10%+ base APY 🙂</li>
+              <li>Earn 25%+ APY with perpetual call options (oVCX) 😏</li>
+              <li>
+                Mint Vaultron NFT to earn XP Points for future airdrops 🪂
+              </li>
+            </ul>
+          </div>
+          <img
+            src={TutorialImageByStep[1]}
+            className="rounded-md mt-4 md:w-2/3 lg:hidden"
+          />
         </div>
-        <img src={TutorialImageByStep[1]} className="rounded-md mt-4 md:w-2/3 lg:hidden" />
+        <div>
+          <h2 className="text-lg font-bold text-primaryYellow border-b border-customGray500 pb-2">
+            Step 2
+          </h2>
+          <div className="flex flex-row justify-between">
+            <ul className="list-inside list-disc mt-2 ml-4">
+              <li>Provide liquidity in the 80 VCX 20 WETH Balancer Pool 🤓</li>
+              <li>
+                Lock the VCX LP token on app.vaultcraft.io for voting power 🗳️
+              </li>
+              <li>Earn multiples on you oVCX 🚀</li>
+            </ul>
+          </div>
+          <img
+            src={TutorialImageByStep[2]}
+            className="rounded-md mt-4 md:w-2/3 lg:hidden"
+          />
+        </div>
+        <div>
+          <h2 className="text-lg font-bold text-primaryYellow border-b border-customGray500 pb-2">
+            Step 3
+          </h2>
+          <div className="flex flex-row justify-between">
+            <ul className="list-inside list-disc mt-2 ml-4">
+              <li>Claim your oVCX rewards 🫴 </li>
+              <li>
+                Exercise for VCX, and then you can either
+                <ul className="list-inside list-disc ml-6">
+                  <li>HODL 💎</li>
+                  <li>
+                    Provide more liquidity to earn higher multiples on oVCX 😝
+                  </li>
+                  <li>Arbitrage instantly for 25% ROI on Balancer 🤪</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+          <img
+            src={TutorialImageByStep[3]}
+            className="rounded-md mt-4 md:w-2/3 lg:hidden"
+          />
+        </div>
       </div>
-      <div>
-        <h2 className="text-lg font-bold text-primaryYellow border-b border-customGray500 pb-2">Step 2</h2>
-        <div className="flex flex-row justify-between">
-          <ul className="list-inside list-disc mt-2 ml-4">
-            <li>Provide liquidity in the 80 VCX 20 WETH Balancer Pool 🤓</li>
-            <li>Lock the VCX LP token on app.vaultcraft.io for voting power 🗳️</li>
-            <li>Earn multiples on you oVCX 🚀</li>
-          </ul>
+      <div className="hidden lg:block lg:w-2/3 h-fit rounded-md border border-customGray500 bg-customNeutral300 px-4 pb-16 pt-4">
+        <div className="flex flex-row justify-between mb-2">
+          <div className="flex flex-row items-end">
+            <p className="mb-1 mr-2">{step}/3</p>
+            <h2 className="text-3xl">{TutorialTitleByStep[step]}</h2>
+          </div>
+          <div className="w-1/5 flex flex-row justify-end items-center">
+            <ChevronLeftIcon
+              className="opacity-100 text-primaryYellow h-8 cursor-pointer hover:opacity-50"
+              onClick={() => handleStep(step - 1)}
+            />
+            <ChevronRightIcon
+              className="opacity-100 text-primaryYellow h-8 cursor-pointer hover:opacity-50"
+              onClick={() => handleStep(step + 1)}
+            />
+          </div>
         </div>
-        <img src={TutorialImageByStep[2]} className="rounded-md mt-4 md:w-2/3 lg:hidden" />
-      </div>
-      <div>
-        <h2 className="text-lg font-bold text-primaryYellow border-b border-customGray500 pb-2">Step 3</h2>
-        <div className="flex flex-row justify-between">
-          <ul className="list-inside list-disc mt-2 ml-4">
-            <li>Claim your oVCX rewards 🫴 </li>
-            <li>
-              Exercise for VCX, and then you can either
-              <ul className="list-inside list-disc ml-6">
-                <li>HODL 💎</li>
-                <li>Provide more liquidity to earn higher multiples on oVCX 😝</li>
-                <li>Arbitrage instantly for 25% ROI on Balancer 🤪</li>
-              </ul>
-            </li>
-          </ul>
-        </div>
-        <img src={TutorialImageByStep[3]} className="rounded-md mt-4 md:w-2/3 lg:hidden" />
+        <img src={TutorialImageByStep[step]} className="rounded-md" />
       </div>
     </div>
-    <div className="hidden lg:block lg:w-2/3 h-fit rounded-md border border-customGray500 bg-customNeutral300 px-4 pb-16 pt-4">
-      <div className="flex flex-row justify-between mb-2">
-        <div className="flex flex-row items-end">
-          <p className="mb-1 mr-2">{step}/3</p>
-          <h2 className="text-3xl">{TutorialTitleByStep[step]}</h2>
-        </div>
-        <div className="w-1/5 flex flex-row justify-end items-center">
-          <ChevronLeftIcon className="opacity-100 text-primaryYellow h-8 cursor-pointer hover:opacity-50" onClick={() => handleStep(step - 1)} />
-          <ChevronRightIcon className="opacity-100 text-primaryYellow h-8 cursor-pointer hover:opacity-50" onClick={() => handleStep(step + 1)} />
-        </div>
-      </div>
-      <img src={TutorialImageByStep[step]} className="rounded-md" />
-    </div>
-  </div>
+  );
 }
