@@ -25,13 +25,15 @@ export default function VaultCard({
   const {
     asset,
     gauge,
-    maxGaugeApy = 0,
-    minGaugeApy = 0,
+    gaugeData,
     tvl,
     apy,
     vault: vaultAddress,
     chainId,
   } = vaultData;
+
+  const maxGaugeApy = gaugeData?.upperAPR || 0;
+  const minGaugeApy = gaugeData?.lowerAPR || 0;
 
   const [tokens] = useAtom(tokensAtom);
 

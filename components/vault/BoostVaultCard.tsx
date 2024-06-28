@@ -44,12 +44,14 @@ export default function BoostVaultCard({
   const {
     asset,
     gauge,
-    maxGaugeApy = 0,
-    minGaugeApy = 0,
+    gaugeData,
     tvl,
     vault: vaultAddress,
     chainId,
   } = vaultData;
+
+  const maxGaugeApy = gaugeData?.upperAPR || 0;
+  const minGaugeApy = gaugeData?.lowerAPR || 0;
 
   const { data: weights } = useGaugeWeights({
     address: vaultData.gauge as any,
