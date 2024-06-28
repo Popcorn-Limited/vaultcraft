@@ -78,7 +78,7 @@ export default function VaultCard({
       )}
     >
       <AssetWithName
-        className="pl-2 [&_h2]:text-lg flex-nowrap [&_.flex-wrap]:flex-nowrap"
+        className="pl-2 [&_.relative]:shrink-0 [&_h2]:text-lg flex-nowrap [&_.flex-wrap]:flex-nowrap"
         vault={vaultData}
       />
 

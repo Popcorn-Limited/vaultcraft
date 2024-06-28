@@ -77,7 +77,7 @@ export default function VaultRow({
     >
       <td>
         <AssetWithName
-          className="[&_h2]:font-normal whitespace-nowrap pl-3 [&_h2]:text-lg"
+          className="[&_h2]:font-normal [&_.relative]:shrink-0 [&_.relative]:whitespace-nowrap pl-3 [&_h2]:text-lg"
           vault={vaultData}
         />
       </td>

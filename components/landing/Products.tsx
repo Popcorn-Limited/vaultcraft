@@ -256,7 +256,7 @@ export default function Products(): JSX.Element {
               }
             >
               <div
-                className="rounded w-full min-h-[9rem] bg-customNeutral300 border border-customNeutral100 border-opacity-75 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:opacity-50 flex flex-col justify-start bg-cover"
+                className="rounded w-full min-h-[12rem] bg-customNeutral300 border border-customNeutral100 border-opacity-75 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:opacity-50 flex flex-col justify-start bg-cover"
                 style={{
                   backgroundImage:
                     "url('https://resolve.mercle.xyz/ipfs/bafkreibn26tzshouo6ayr33uhwwqzxpp5h6zgzitzgxwhsacsuuxoo7fuq')",

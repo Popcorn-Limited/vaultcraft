@@ -20,9 +20,6 @@ import {
 } from "@/lib/atoms";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import OptionTokenExerciseModal from "@/components/optionToken/exercise/OptionTokenExerciseModal";
-import { GoSearch } from "react-icons/go";
-import { MdClose } from "react-icons/md";
-import VaultRow from "./VaultRow";
 import useIsBreakPoint from "@/lib/useIsMobile";
 import VaultCard from "./VaultCard";
 
@@ -40,7 +37,6 @@ export default function VaultsContainer({
   hiddenVaults,
   displayVaults,
 }: VaultsContainerProps): JSX.Element {
-  const [showSearchInput, setShowSearchInput] = useState(false);
   const { address: account } = useAccount();
 
   const [vaultsData] = useAtom(vaultsAtom);
@@ -76,7 +72,7 @@ export default function VaultsContainer({
 
   const isSmallScreen = useIsBreakPoint("lg");
 
-  const SHOW_INPUT_SEARCH = showSearchInput || searchTerm.length > 0;
+  const SHOW_INPUT_SEARCH = searchTerm.length > 0;
 
   const formattedVaults = vaults
     .filter(
@@ -86,8 +82,7 @@ export default function VaultsContainer({
       Object.keys(displayVaults).length > 0
         ? displayVaults[vault.chainId].includes(vault.address)
         : !hiddenVaults[vault.chainId].includes(vault.address)
-    )
-    .sort((a, b) => b.tvl - a.tvl);
+    );
 
   return (
     <NoSSR>
@@ -134,28 +129,35 @@ export default function VaultsContainer({
                 <LargeCardStat
                   id="total-my-ovcx"
                   label="My oVCX"
-                  value={`$${oBal && tokens[1] && tokens[1][VCX]
-                    ? NumberFormatter.format(
-                      (Number(oBal?.value) / 1e18) * (tokens[1][VCX].price * 0.25)
-                    )
-                    : "0"
-                    }`}
+                  value={`$${
+                    oBal && tokens[1] && tokens[1][VCX]
+                      ? NumberFormatter.format(
+                          (Number(oBal?.value) / 1e18) *
+                            (tokens[1][VCX].price * 0.25)
+                        )
+                      : "0"
+                  }`}
                   tooltip="Value of oVCX held in your wallet across all blockchains."
                 />
-
               </div>
 
               <div className="w-[120px] md:w-max">
                 <LargeCardStat
                   id="total-claimable-ovcx"
                   label="Claimable oVCX"
-                  value={`$${gaugeRewards && tokens[1] && tokens[1][VCX]
-                    ? NumberFormatter.format(
-                      (Number(gaugeRewards?.[1]?.total + gaugeRewards?.[10]?.total + gaugeRewards?.[42161]?.total || 0) / 1e18) *
-                      (tokens[1][VCX].price * 0.25)
-                    )
-                    : "0"
-                    }`}
+                  value={`$${
+                    gaugeRewards && tokens[1] && tokens[1][VCX]
+                      ? NumberFormatter.format(
+                          (Number(
+                            gaugeRewards?.[1]?.total +
+                              gaugeRewards?.[10]?.total +
+                              gaugeRewards?.[42161]?.total || 0
+                          ) /
+                            1e18) *
+                            (tokens[1][VCX].price * 0.25)
+                        )
+                      : "0"
+                  }`}
                   tooltip="Cumulative value of claimable oVCX from vaults across all blockchains."
                 />
               </div>
@@ -186,7 +188,7 @@ export default function VaultsContainer({
       </section>
 
       {isSmallScreen && (
-        <nav className="px-5 mt-8 [&_.my-10]:my-0 whitespace-nowrap flex flex-col smmd:flex-row gap-4 mb-10">
+        <nav className="px-5 [&_>*]:shrink-0 mt-8 [&_.my-10]:my-0 whitespace-nowrap flex flex-col smmd:flex-row gap-4 mb-10">
           <NetworkFilter
             supportedNetworks={SUPPORTED_NETWORKS.map((chain) => chain.id)}
             selectNetwork={selectNetwork}
@@ -194,7 +196,7 @@ export default function VaultsContainer({
 
           <section className="flex gap-3 flex-grow items-center justify-end">
             <SearchBar
-              className="w-full smmd:w-auto h-[3.25rem] !border-customGray500"
+              className="!w-full [&_input]:w-full smmd:!w-auto h-[3.25rem] !border-customGray500"
               searchTerm={searchTerm}
               handleSearch={handleSearch}
             />

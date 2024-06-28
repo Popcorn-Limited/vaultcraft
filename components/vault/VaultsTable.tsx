@@ -7,7 +7,10 @@ import type { VaultData } from "@/lib/types";
 import { cn } from "@/lib/utils/helpers";
 import { GoSearch } from "react-icons/go";
 import { MdClose } from "react-icons/md";
+import { TiArrowUnsorted } from "react-icons/ti";
+
 import VaultRow from "./VaultRow";
+import { VAULT_SORTING_TYPE, sort } from "./VaultsSorting";
 
 export default function VaultsTable({
   vaults,
@@ -20,6 +23,10 @@ export default function VaultsTable({
   onSearchTermChange: (searchTerm: string) => void;
   onSelectNetwork: (chainId: ChainId) => void;
 }): JSX.Element {
+  const [sorting, setSorting] = useState<VAULT_SORTING_TYPE>(
+    VAULT_SORTING_TYPE.mostTvl
+  );
+
   const [showSearchInput, setShowSearchInput] = useState(false);
 
   const SHOW_INPUT_SEARCH = showSearchInput || searchTerm.length > 0;
@@ -91,8 +98,36 @@ export default function VaultsTable({
             <th className="font-normal text-right whitespace-nowrap">
               Your Deposit
             </th>
-            <th className="font-normal text-right">TVL</th>
-            <th className="font-normal text-right">vAPR</th>
+            <th className="font-normal text-right">
+              <button
+                onClick={() => {
+                  setSorting(
+                    sorting === VAULT_SORTING_TYPE.mostTvl
+                      ? VAULT_SORTING_TYPE.lessTvl
+                      : VAULT_SORTING_TYPE.mostTvl
+                  );
+                }}
+                className="flex items-center gap-1"
+              >
+                <span>TVL</span>
+                <TiArrowUnsorted className="mb-0.5" />
+              </button>
+            </th>
+            <th className="font-normal text-right">
+              <button
+                onClick={() => {
+                  setSorting(
+                    sorting === VAULT_SORTING_TYPE.mostvAPR
+                      ? VAULT_SORTING_TYPE.lessvAPR
+                      : VAULT_SORTING_TYPE.mostvAPR
+                  );
+                }}
+                className="flex items-center gap-1"
+              >
+                <span>vAPR</span>
+                <TiArrowUnsorted className="mb-0.5" />
+              </button>
+            </th>
             <th className="font-normal text-right whitespace-nowrap">
               Min Rewards APY
             </th>
@@ -103,7 +138,7 @@ export default function VaultsTable({
           </tr>
         </thead>
         <tbody>
-          {vaults.map((vaultData, i) => (
+          {sort(sorting, vaults).map((vaultData, i) => (
             <VaultRow
               {...vaultData}
               searchTerm={searchTerm}

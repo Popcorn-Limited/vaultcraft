@@ -1,5 +1,5 @@
 import PseudoRadioButton from "@/components/button/PseudoRadioButton";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import PopUpModal from "@/components/modal/PopUpModal";
 import SwitchIcon from "@/components/svg/SwitchIcon";
 import { VaultData } from "@/lib/types";
@@ -33,28 +33,16 @@ export default function VaultsSorting({
   );
 
   function sortVaults(sortType: VAULT_SORTING_TYPE) {
-    setVaults(sort(sortType, vaults));
     setSortingType(sortType);
+    // force update
+    setVaults([...sort(sortType, vaults)]);
     setOpenSorting((prevState) => !prevState);
   }
 
-  function sort(
-    sortType: VAULT_SORTING_TYPE,
-    vaults: VaultData[]
-  ) {
-    switch (sortType) {
-      case VAULT_SORTING_TYPE.mostTvl:
-        return vaults.sort((a, b) => b.tvl - a.tvl);
-      case VAULT_SORTING_TYPE.lessTvl:
-        return vaults.sort((a, b) => a.tvl - b.tvl);
-      case VAULT_SORTING_TYPE.mostvAPR:
-        return vaults.sort((a, b) => b.totalApy - a.totalApy);
-      case VAULT_SORTING_TYPE.lessvAPR:
-        return vaults.sort((a, b) => a.totalApy - b.totalApy);
-      default:
-        return vaults;
-    }
-  }
+  useEffect(() => {
+    setVaults([...sort(sortingType, vaults)]);
+    // apply sorting on initial load
+  }, [vaults.length]);
 
   return (
     <div className={`relative ${className}`}>
@@ -77,18 +65,18 @@ export default function VaultsSorting({
       {openFilter && !isLessThenMdScreenSize && (
         <div
           ref={dropdownRef}
-          className="hidden md:block absolute w-[180px] p-2 border border-customGray500 top-16 bg-customNeutral300 rounded-lg right-0"
+          className="hidden md:flex flex-col absolute w-[180px] p-2 border border-customGray500 top-16 bg-customNeutral300 rounded-lg right-0"
         >
           <button
             className={`
-                            py-2 w-full 
+                            py-2 w-full
                             cursor-pointer
-                            text-white 
-                            rounded-lg 
-                            hover:bg-customNeutral200 
-                            transition 
-                            ease-in-out 
-                            duration-250 
+                            text-white
+                            rounded-lg
+                            hover:bg-customNeutral200
+                            transition
+                            ease-in-out
+                            duration-250
                             ${
                               sortingType === VAULT_SORTING_TYPE.mostTvl
                                 ? "bg-customNeutral100"
@@ -102,11 +90,11 @@ export default function VaultsSorting({
           <button
             className={`
                             py-2 w-full
-                            text-white 
-                            rounded-lg 
-                            hover:bg-customNeutral200 
-                            transition 
-                            ease-in-out 
+                            text-white
+                            rounded-lg
+                            hover:bg-customNeutral200
+                            transition
+                            ease-in-out
                             duration-250
                             ${
                               sortingType === VAULT_SORTING_TYPE.lessTvl
@@ -120,12 +108,12 @@ export default function VaultsSorting({
           </button>
           <button
             className={`
-                            py-2 w-full 
-                            text-white 
-                            rounded-lg 
-                            hover:bg-customNeutral200 
-                            transition 
-                            ease-in-out 
+                            py-2 w-full
+                            text-white
+                            rounded-lg
+                            hover:bg-customNeutral200
+                            transition
+                            ease-in-out
                             duration-250
                             ${
                               sortingType === VAULT_SORTING_TYPE.mostvAPR
@@ -139,13 +127,13 @@ export default function VaultsSorting({
           </button>
           <button
             className={`
-                            py-2 
-                            w-full 
-                            text-white 
-                            rounded-lg 
-                            hover:bg-customNeutral200 
-                            transition 
-                            ease-in-out 
+                            py-2
+                            w-full
+                            text-white
+                            rounded-lg
+                            hover:bg-customNeutral200
+                            transition
+                            ease-in-out
                             duration-250
                             ${
                               sortingType === VAULT_SORTING_TYPE.lessvAPR
@@ -197,4 +185,19 @@ export default function VaultsSorting({
       )}
     </div>
   );
+}
+
+export function sort(sortType: VAULT_SORTING_TYPE, vaults: VaultData[]) {
+  switch (sortType) {
+    case VAULT_SORTING_TYPE.mostTvl:
+      return vaults.sort((a, b) => b.tvl - a.tvl);
+    case VAULT_SORTING_TYPE.lessTvl:
+      return vaults.sort((a, b) => a.tvl - b.tvl);
+    case VAULT_SORTING_TYPE.mostvAPR:
+      return vaults.sort((a, b) => b.totalApy - a.totalApy);
+    case VAULT_SORTING_TYPE.lessvAPR:
+      return vaults.sort((a, b) => a.totalApy - b.totalApy);
+    default:
+      return vaults;
+  }
 }
