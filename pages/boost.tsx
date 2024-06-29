@@ -42,10 +42,15 @@ import ResponsiveTooltip from "@/components/common/Tooltip";
 import BoostVaultsTable from "@/components/boost/BoostVaultsTable";
 import useIsBreakPoint from "@/lib/useIsMobile";
 import BoostVaultCard from "@/components/vault/BoostVaultCard";
+import useWeeklyEmissions from "@/lib/gauges/useWeeklyEmissions";
 
 export const GAUGE_NETWORKS = [1, 10, 42161];
 
+let hiddenGauges: AddressesByChain = {};
 async function getHiddenGauges(): Promise<AddressesByChain> {
+  // If we already have the hidden gauges, return them immediately
+  if (Object.keys(hiddenGauges).length > 0) return hiddenGauges;
+
   const result: AddressesByChain = {};
   await Promise.all(
     GAUGE_NETWORKS.map(async (chain) => {
@@ -55,6 +60,7 @@ async function getHiddenGauges(): Promise<AddressesByChain> {
       result[chain] = res.data;
     })
   );
+  hiddenGauges = result;
   return result;
 }
 
@@ -69,12 +75,13 @@ function VePopContainer() {
     token: VOTING_ESCROW,
     watch: true,
   });
-  const [weeklyEmissions, setWeeklyEmissions] = useState<number>(0);
+
+  const { data: weeklyEmissions = 0 } = useWeeklyEmissions();
 
   const [initalLoad, setInitalLoad] = useState<boolean>(false);
   const [accountLoad, setAccountLoad] = useState<boolean>(false);
 
-  const [vaults, setVaults] = useAtom(vaultsAtom);
+  const [vaults] = useAtom(vaultsAtom);
   const [gaugeVaults, setGaugeVaults] = useState<VaultData[]>([]);
   const [initialVotes, setInitialVotes] = useState<{ [key: Address]: number }>(
     {}
@@ -105,17 +112,6 @@ function VePopContainer() {
         .flat()
         .filter((vault) => vault.gauge !== zeroAddress);
       setGaugeVaults(vaultsWithGauges);
-
-      const rate = await createPublicClient({
-        chain: mainnet,
-        transport: http(RPC_URLS[1]),
-      }).readContract({
-        address: TOKEN_ADMIN,
-        abi: TokenAdminAbi,
-        functionName: "rate",
-      });
-      // Emissions per second * seconds per week
-      setWeeklyEmissions((Number(rate) / 1e18) * 604800);
 
       if (
         vaultsWithGauges.length > 0 &&
@@ -174,7 +170,7 @@ function VePopContainer() {
 
   const formattedVaults = gaugeVaults
     .filter((vault) => selectedNetworks.includes(vault.chainId))
-    .sort((a, b) => b.tvl - a.tvl)
+    .sort((a, b) => b.tvl - a.tvl) // Sort by TVL
     .map((vault) => ({
       ...vault,
       isDeprecated: (hiddenGauges ?? {})[vault.chainId]?.includes(vault.gauge!),
@@ -274,13 +270,7 @@ function VePopContainer() {
           </div>
         </section>
 
-        <section className="text-white px-4 md:px-8 mt-12 mb-10">
-          <h1 className="text-2xl md:text-3xl font-normal">All vaults</h1>
-          <p className="text-base opacity-80">
-            Zap any asset into Smart Vaults for the best yield for your crypto
-            across DeFi
-          </p>
-        </section>
+        <div className="border-b border-customNeutral100 w-full mb-12" />
 
         {gaugeVaults?.length > 0 ? (
           <Fragment>
