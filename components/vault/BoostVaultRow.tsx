@@ -17,6 +17,7 @@ import useGaugeWeights from "@/lib/gauges/useGaugeWeights";
 
 import TokenIcon from "@/components/common/TokenIcon";
 import useWeeklyEmissions from "@/lib/gauges/useWeeklyEmissions";
+import { LABELS_WITH_TOOLTIP } from "../boost/BoostVaultsTable";
 
 export default function BoostVaultRow({
   isDeprecated,
@@ -189,7 +190,9 @@ export default function BoostVaultRow({
         <td />
         <td colSpan={2} className="border-t border-customNeutral100 !pr-0">
           <nav className="flex whitespace-nowrap gap-2 items-center">
-            <span>Emitted tokens:</span>
+            <span className="inline-flex items-center">
+              {LABELS_WITH_TOOLTIP.emittedTokens}:
+            </span>
             <strong className="text-lg">
               {relativeWeight > 0
                 ? NumberFormatter.format(weeklyEmissions * relativeWeight)
@@ -200,7 +203,9 @@ export default function BoostVaultRow({
 
         <td colSpan={2} className="border-t border-customNeutral100 !pr-0">
           <nav className="flex whitespace-nowrap gap-2 items-center">
-            <span>New allocation:</span>
+            <span className="inline-flex items-center">
+              {LABELS_WITH_TOOLTIP.newAllocation}:
+            </span>
             <strong className="text-lg">
               {actualUserPower != amount
                 ? `${relativeWeight.toFixed(2)}%`
@@ -212,7 +217,9 @@ export default function BoostVaultRow({
         <td colSpan={3} className="border-t border-customNeutral100">
           <nav className="flex items-center gap-4">
             <div className="flex items-center gap-2 whitespace-nowrap min-w-[12rem]">
-              <span>My Votes:</span>
+              <span className="inline-flex items-center">
+                {LABELS_WITH_TOOLTIP.myVotes}:
+              </span>
               <strong className="text-lg inline-block">
                 {amount ? (amount / 100).toFixed(2) : 0}%
               </strong>

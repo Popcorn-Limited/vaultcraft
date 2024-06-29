@@ -17,6 +17,7 @@ import useGaugeWeights from "@/lib/gauges/useGaugeWeights";
 
 import TokenIcon from "@/components/common/TokenIcon";
 import useWeeklyEmissions from "@/lib/gauges/useWeeklyEmissions";
+import { LABELS_WITH_TOOLTIP } from "@/components/boost/BoostVaultsTable";
 
 export default function BoostVaultCard({
   isDeprecated,
@@ -43,14 +44,7 @@ export default function BoostVaultCard({
 
   const { address: account } = useAccount();
 
-  const {
-    asset,
-    gauge,
-    gaugeData,
-    tvl,
-    vault: vaultAddress,
-    chainId,
-  } = vaultData;
+  const { gaugeData, tvl } = vaultData;
 
   const maxGaugeApy = gaugeData?.upperAPR || 0;
   const minGaugeApy = gaugeData?.lowerAPR || 0;
@@ -61,13 +55,6 @@ export default function BoostVaultCard({
     chainId: vaultData.chainId,
   });
 
-  const [tokens] = useAtom(tokensAtom);
-
-  const vault = tokens[chainId]?.[vaultAddress] ?? {};
-  const dataAsset = tokens[chainId]?.[asset] ?? {};
-  const dataGauge = tokens[chainId]?.[gauge!] ?? {};
-
-  console.debug({ vault, dataAsset, dataGauge, vaultData });
   const GAUGE_ADDRESS = vaultData.gauge!;
 
   const allocations = {
@@ -132,37 +119,43 @@ export default function BoostVaultCard({
       <AssetWithName className="-mt-1 -translate-x-0.5" vault={vaultData} />
 
       <div className="flex flex-col sm:grid mt-8 md:mt-6 gap-4 xs:grid-cols-3">
-        <Content title="TVL">
+        <Content title={LABELS_WITH_TOOLTIP.tvl}>
           <p>$ {tvl < 1 ? "0" : NumberFormatter.format(tvl)}</p>
         </Content>
 
-        <Content title="Min Boost">
+        <Content title={LABELS_WITH_TOOLTIP.minBoost}>
           <p>{formatTwoDecimals(minGaugeApy)}%</p>
         </Content>
 
-        <Content title="Max Boost">
+        <Content title={LABELS_WITH_TOOLTIP.maxBoost}>
           <p>{formatTwoDecimals(maxGaugeApy)}%</p>
         </Content>
 
-        <Content className="hidden sm:block" title="Tokens Emitted">
+        <Content
+          className="hidden sm:block"
+          title={LABELS_WITH_TOOLTIP.tokensEmitted}
+        >
           {TOKENTS_EMITED}
         </Content>
 
-        <Content title="Current Weight">
+        <Content title={LABELS_WITH_TOOLTIP.currentWeight}>
           <p>{allocations.current.toFixed(2)}%</p>
         </Content>
 
-        <Content title="Upcoming Weight">
+        <Content title={LABELS_WITH_TOOLTIP.upcomingWeight}>
           <p>{allocations.upcoming.toFixed(2)}%</p>
         </Content>
 
         <div className="border-t border-customNeutral100 my-4 -mx-2 sm:hidden" />
 
-        <Content className="sm:hidden" title="Tokens Emitted">
+        <Content
+          className="sm:hidden"
+          title={LABELS_WITH_TOOLTIP.tokensEmitted}
+        >
           {TOKENTS_EMITED}
         </Content>
 
-        <Content title="Upcoming Tokens">
+        <Content title={LABELS_WITH_TOOLTIP.upcomingTokens}>
           <nav className="flex [&_img]:brightness-125 [&_img]:saturate-150 gap-2 items-center">
             <TokenIcon
               chainId={1}
@@ -178,7 +171,10 @@ export default function BoostVaultCard({
           </nav>
         </Content>
 
-        <Content className="hidden sm:block col-span-2" title="My Votes">
+        <Content
+          className="hidden sm:block col-span-2"
+          title={LABELS_WITH_TOOLTIP.myVotes}
+        >
           {MY_VOTES}
         </Content>
       </div>
@@ -186,7 +182,10 @@ export default function BoostVaultCard({
       <div className="border-t border-customNeutral100 mt-8 -mx-2" />
 
       <div className="grid mt-8 gap-4 sm:grid-cols-3">
-        <Content className="whitespace-nowrap" title="Emitted Tokens">
+        <Content
+          className="whitespace-nowrap"
+          title={LABELS_WITH_TOOLTIP.emittedTokens}
+        >
           <p>
             {relativeWeight > 0
               ? NumberFormatter.format(weeklyEmissions * relativeWeight)
@@ -194,13 +193,16 @@ export default function BoostVaultCard({
           </p>
         </Content>
 
-        <Content className="whitespace-nowrap" title="New allocation">
+        <Content
+          className="whitespace-nowrap"
+          title={LABELS_WITH_TOOLTIP.newAllocation}
+        >
           <p>
             {actualUserPower != amount ? `${relativeWeight.toFixed(2)}%` : "-"}
           </p>
         </Content>
 
-        <Content className="sm:hidden" title="My Votes">
+        <Content className="sm:hidden" title={LABELS_WITH_TOOLTIP.myVotes}>
           {MY_VOTES}
         </Content>
 
@@ -243,7 +245,7 @@ function Content({
   children,
   className,
 }: PropsWithChildren<{
-  title: string;
+  title: string | JSX.Element;
   className?: string;
 }>) {
   return (
