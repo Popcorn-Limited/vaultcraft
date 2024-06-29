@@ -15,8 +15,8 @@ import AssetWithName from "./AssetWithName";
 import { Fragment, useState } from "react";
 import useGaugeWeights from "@/lib/gauges/useGaugeWeights";
 
-import TokenIcon from "../common/TokenIcon";
-import Badge from "./Badge";
+import TokenIcon from "@/components/common/TokenIcon";
+import useWeeklyEmissions from "@/lib/gauges/useWeeklyEmissions";
 
 export default function BoostVaultRow({
   isDeprecated,
@@ -30,6 +30,8 @@ export default function BoostVaultRow({
   votes: { [key: string]: number };
   handleVotes: (value: number, address: Address) => void;
 }) {
+  const { data: weeklyEmissions = 0 } = useWeeklyEmissions();
+
   if (
     isDeprecated &&
     !vaultData.metadata?.labels?.includes(VaultLabel.deprecated)
@@ -68,11 +70,17 @@ export default function BoostVaultRow({
   console.debug({ vault, dataAsset, dataGauge, vaultData });
   const GAUGE_ADDRESS = vaultData.gauge!;
 
-  let boost = Math.round(maxGaugeApy / minGaugeApy) || 0;
-  if (boost <= 1) boost = 1;
+  const allocations = {
+    current: Number(weights?.[0] || 0) / 1e16,
+    upcoming: Number(weights?.[1] || 0) / 1e16,
+  };
 
-  const actualUserPower = Number(weights?.[2].power);
-  const [amount, setAmount] = useState(Number(weights?.[2].power));
+  const totalWeight = Number(weights?.[3] || 0) / 1e16;
+  const actualUserPower = Number(weights?.[2].power || 0);
+
+  const [amount, setAmount] = useState(actualUserPower);
+
+  const relativeWeight = (amount / totalWeight) * 100;
 
   function onChange(value: number) {
     // As long as you keep moving the slider, `value` continues to count to the max value(10000). This sometimes makes the
@@ -147,7 +155,11 @@ export default function BoostVaultRow({
               icon="/images/tokens/oVcx.svg"
               imageSize="w-6 h-6"
             />
-            <span className="pt-0.5">2,500</span>
+            <span className="pt-0.5">
+              {NumberFormatter.format(
+                weeklyEmissions * (allocations.current / 100)
+              )}
+            </span>
           </nav>
         </td>
 
@@ -159,7 +171,11 @@ export default function BoostVaultRow({
               icon="/images/tokens/oVcx.svg"
               imageSize="w-6 h-6"
             />
-            <span className="pt-0.5">2,500</span>
+            <span className="pt-0.5">
+              {NumberFormatter.format(
+                weeklyEmissions * (allocations.upcoming / 100)
+              )}
+            </span>
           </nav>
         </td>
       </tr>
@@ -175,8 +191,8 @@ export default function BoostVaultRow({
           <nav className="flex whitespace-nowrap gap-2 items-center">
             <span>Emitted tokens:</span>
             <strong className="text-lg">
-              {actualUserPower != amount
-                ? `${amount ? (amount / 100).toFixed(2) : 0}%`
+              {relativeWeight > 0
+                ? NumberFormatter.format(weeklyEmissions * relativeWeight)
                 : "-"}
             </strong>
           </nav>
@@ -187,7 +203,7 @@ export default function BoostVaultRow({
             <span>New allocation:</span>
             <strong className="text-lg">
               {actualUserPower != amount
-                ? `${amount ? (amount / 100).toFixed(2) : 0}%`
+                ? `${relativeWeight.toFixed(2)}%`
                 : "-"}
             </strong>
           </nav>
@@ -197,10 +213,9 @@ export default function BoostVaultRow({
           <nav className="flex items-center gap-4">
             <div className="flex items-center gap-2 whitespace-nowrap min-w-[12rem]">
               <span>My Votes:</span>
-              <strong className="text-lg mr-1">
+              <strong className="text-lg inline-block">
                 {amount ? (amount / 100).toFixed(2) : 0}%
               </strong>
-              <Badge>x{boost}</Badge>
             </div>
 
             <span className="whitespace-nowrap">Vote %</span>

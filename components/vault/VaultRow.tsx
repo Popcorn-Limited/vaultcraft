@@ -39,7 +39,8 @@ export default function VaultRow({
   const dataAsset = tokens[chainId]?.[asset] ?? {};
   const dataGauge = tokens[chainId]?.[gauge!] ?? {};
 
-  const boost = ((vaultData.gaugeData?.workingBalance! / (dataGauge?.balance || 0)) * 5) || 1
+  let boost = Math.round(maxGaugeApy / minGaugeApy) || 0;
+  if (boost <= 1) boost = 1;
 
   const searchData = [
     vaultData.metadata?.vaultName,
@@ -83,32 +84,33 @@ export default function VaultRow({
 
       <td className="text-right">
         <p className="text-lg">
-          {formatAndRoundNumber(dataAsset.balance * dataAsset.price, dataAsset.decimals)}
+          {formatAndRoundNumber(dataAsset.balance, dataAsset.decimals)}
         </p>
-        <p className="text-sm -mt-0.5 text-customGray200">{formatAndRoundNumber(dataAsset.balance, dataAsset.decimals)} {dataAsset.symbol}</p>
+        <p className="text-sm -mt-0.5 text-customGray200"># TKN</p>
       </td>
 
       <td className="text-right">
         <p className="text-lg">
           ${" "}
-          {!!gauge ?
-            NumberFormatter.format(((dataGauge.balance * dataGauge.price) / 10 ** dataGauge.decimals) + ((vault?.balance! * vault?.price!) / 10 ** vault?.decimals!))
-            : formatAndRoundNumber(vault?.balance! * vault?.price!, vault?.decimals!)
-          }
+          {dataGauge
+            ? NumberFormatter.format(
+                (dataGauge.balance * dataGauge.price) /
+                  10 ** dataGauge.decimals +
+                  (vault?.balance! * vault?.price!) / 10 ** vault?.decimals!
+              )
+            : formatAndRoundNumber(
+                vault?.balance! * vault?.price!,
+                vault?.decimals!
+              )}
         </p>
-        <p className="text-sm -mt-0.5 text-customGray200">
-          {!!gauge ?
-            NumberFormatter.format(((dataGauge.balance) / 10 ** dataGauge.decimals) + ((vault?.balance!) / 10 ** vault?.decimals!))
-            : formatAndRoundNumber(vault?.balance!, vault?.decimals!)
-          } {dataAsset.symbol}
-        </p>
+        <p className="text-sm -mt-0.5 text-customGray200"># TKN</p>
       </td>
 
       <td className="text-right whitespace-nowrap">
         <p className="text-lg">
           $ {tvl < 1 ? "0" : NumberFormatter.format(tvl)}
         </p>
-        <p className="text-sm -mt-0.5 text-customGray200">{formatAndRoundNumber(vaultData.totalAssets, dataAsset.decimals)} {dataAsset.symbol}</p>
+        <p className="text-sm -mt-0.5 text-customGray200"># TKN</p>
       </td>
 
       <td className="text-right text-lg">{formatTwoDecimals(apy)}%</td>
@@ -117,7 +119,7 @@ export default function VaultRow({
 
       <td className="text-right text-lg">{formatTwoDecimals(maxGaugeApy)}%</td>
 
-      <td className="text-right text-lg text-primaryGreen">x{formatTwoDecimals(boost)}</td>
+      <td className="text-right text-lg text-primaryGreen">x{boost}</td>
     </tr>
   );
 }

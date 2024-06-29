@@ -15,8 +15,8 @@ import AssetWithName from "./AssetWithName";
 import { type PropsWithChildren, useState } from "react";
 import useGaugeWeights from "@/lib/gauges/useGaugeWeights";
 
-import TokenIcon from "../common/TokenIcon";
-import Badge from "./Badge";
+import TokenIcon from "@/components/common/TokenIcon";
+import useWeeklyEmissions from "@/lib/gauges/useWeeklyEmissions";
 
 export default function BoostVaultCard({
   isDeprecated,
@@ -30,6 +30,8 @@ export default function BoostVaultCard({
   votes: { [key: string]: number };
   handleVotes: (value: number, address: Address) => void;
 }) {
+  const { data: weeklyEmissions = 0 } = useWeeklyEmissions();
+
   if (
     isDeprecated &&
     !vaultData.metadata?.labels?.includes(VaultLabel.deprecated)
@@ -68,11 +70,17 @@ export default function BoostVaultCard({
   console.debug({ vault, dataAsset, dataGauge, vaultData });
   const GAUGE_ADDRESS = vaultData.gauge!;
 
-  let boost = Math.round(maxGaugeApy / minGaugeApy) || 0;
-  if (boost <= 1) boost = 1;
+  const allocations = {
+    current: Number(weights?.[0] || 0) / 1e16,
+    upcoming: Number(weights?.[1] || 0) / 1e16,
+  };
 
-  const actualUserPower = Number(weights?.[2].power);
-  const [amount, setAmount] = useState(Number(weights?.[2].power));
+  const totalWeight = Number(weights?.[3] || 0) / 1e16;
+  const actualUserPower = Number(weights?.[2].power || 0);
+
+  const [amount, setAmount] = useState(actualUserPower);
+
+  const relativeWeight = (amount / totalWeight) * 100;
 
   function onChange(value: number) {
     // As long as you keep moving the slider, `value` continues to count to the max value(10000). This sometimes makes the
@@ -97,46 +105,61 @@ export default function BoostVaultCard({
     setAmount(value);
   }
 
+  const TOKENTS_EMITED = (
+    <nav className="flex [&_img]:brightness-125 [&_img]:saturate-150 gap-2 items-center">
+      <TokenIcon
+        chainId={1}
+        token={{} as any}
+        icon="/images/tokens/oVcx.svg"
+        imageSize="w-6 h-6"
+      />
+      <span className="pt-0.5 text-xl">
+        {NumberFormatter.format(weeklyEmissions * (allocations.current / 100))}
+      </span>
+    </nav>
+  );
+
+  const MY_VOTES = (
+    <p>
+      {actualUserPower != amount
+        ? `${amount ? (amount / 100).toFixed(2) : 0}%`
+        : "-"}
+    </p>
+  );
+
   return (
     <div className="p-8 overflow-hidden rounded-3xl border border-customNeutral100 group">
-      <AssetWithName
-        className="pl-2 [&_h2]:text-lg flex-nowrap [&_.flex-wrap]:flex-nowrap"
-        vault={vaultData}
-      />
+      <AssetWithName className="-mt-1 -translate-x-0.5" vault={vaultData} />
 
-      <div className="grid mt-6 gap-4 grid-cols-2">
+      <div className="flex flex-col sm:grid mt-8 md:mt-6 gap-4 xs:grid-cols-3">
         <Content title="TVL">
-          <p className="text-2xl">
-            $ {tvl < 1 ? "0" : NumberFormatter.format(tvl)}
-          </p>
+          <p>$ {tvl < 1 ? "0" : NumberFormatter.format(tvl)}</p>
         </Content>
 
         <Content title="Min Boost">
-          <p className="text-2xl">{formatTwoDecimals(minGaugeApy)}%</p>
+          <p>{formatTwoDecimals(minGaugeApy)}%</p>
         </Content>
 
         <Content title="Max Boost">
-          <p className="text-2xl">{formatTwoDecimals(maxGaugeApy)}%</p>
+          <p>{formatTwoDecimals(maxGaugeApy)}%</p>
+        </Content>
+
+        <Content className="hidden sm:block" title="Tokens Emitted">
+          {TOKENTS_EMITED}
         </Content>
 
         <Content title="Current Weight">
-          <p className="text-2xl">5%</p>
-        </Content>
-
-        <Content title="Tokens Emitted">
-          <nav className="flex [&_img]:brightness-125 [&_img]:saturate-150 gap-2 items-center">
-            <TokenIcon
-              chainId={1}
-              token={{} as any}
-              icon="/images/tokens/oVcx.svg"
-              imageSize="w-6 h-6"
-            />
-            <span className="pt-0.5 text-xl">2,500</span>
-          </nav>
+          <p>{allocations.current.toFixed(2)}%</p>
         </Content>
 
         <Content title="Upcoming Weight">
-          <p className="text-2xl">5%</p>
+          <p>{allocations.upcoming.toFixed(2)}%</p>
+        </Content>
+
+        <div className="border-t border-customNeutral100 my-4 -mx-2 sm:hidden" />
+
+        <Content className="sm:hidden" title="Tokens Emitted">
+          {TOKENTS_EMITED}
         </Content>
 
         <Content title="Upcoming Tokens">
@@ -147,34 +170,41 @@ export default function BoostVaultCard({
               icon="/images/tokens/oVcx.svg"
               imageSize="w-6 h-6"
             />
-            <span className="pt-0.5 text-xl">2,500</span>
+            <span className="pt-0.5 text-xl">
+              {NumberFormatter.format(
+                weeklyEmissions * (allocations.upcoming / 100)
+              )}
+            </span>
           </nav>
+        </Content>
+
+        <Content className="hidden sm:block col-span-2" title="My Votes">
+          {MY_VOTES}
         </Content>
       </div>
 
-      <div className="border-t border-customNeutral100 w-full mt-6" />
+      <div className="border-t border-customNeutral100 mt-8 -mx-2" />
 
-      <div className="grid mt-6 gap-4 grid-cols-2">
-        <Content title="Emitted Tokens">
-          <p className="text-2xl">
-            $ {tvl < 1 ? "0" : NumberFormatter.format(tvl)}
+      <div className="grid mt-8 gap-4 sm:grid-cols-3">
+        <Content className="whitespace-nowrap" title="Emitted Tokens">
+          <p>
+            {relativeWeight > 0
+              ? NumberFormatter.format(weeklyEmissions * relativeWeight)
+              : "-"}
           </p>
         </Content>
 
-        <Content title="New allocation">
-          <p className="text-2xl">{formatTwoDecimals(minGaugeApy)}%</p>
+        <Content className="whitespace-nowrap" title="New allocation">
+          <p>
+            {actualUserPower != amount ? `${relativeWeight.toFixed(2)}%` : "-"}
+          </p>
         </Content>
 
-        <Content className="col-span-2" title="My Votes">
-          <div className="flex items-center gap-2 whitespace-nowrap">
-            <strong className="text-lg mr-1">
-              {amount ? (amount / 100).toFixed(2) : 0}%
-            </strong>
-            <Badge>x{boost}</Badge>
-          </div>
+        <Content className="sm:hidden" title="My Votes">
+          {MY_VOTES}
         </Content>
 
-        <fieldset className="select-none mb-4 mt-2 col-span-2 w-full flex items-center">
+        <fieldset className="select-none w-full mb-4 mt-2 sm:col-span-3 flex items-center">
           <Slider
             railStyle={{
               backgroundColor: isVotingAvailable ? "#FFFFFF" : "#AFAFAF",
@@ -217,7 +247,12 @@ function Content({
   className?: string;
 }>) {
   return (
-    <div className={cn("text-white", className)}>
+    <div
+      className={cn(
+        "text-white [&_p]:text-xl [&_p]:sm:text-2xl flex items-center justify-between sm:block",
+        className
+      )}
+    >
       <h2>{title}</h2>
       {children}
     </div>

@@ -129,13 +129,14 @@ export default function VaultsContainer({
                 <LargeCardStat
                   id="total-my-ovcx"
                   label="My oVCX"
-                  value={`$${oBal && tokens[1] && tokens[1][VCX]
-                    ? NumberFormatter.format(
-                      (Number(oBal?.value) / 1e18) *
-                      (tokens[1][VCX].price * 0.25)
-                    )
-                    : "0"
-                    }`}
+                  value={`$${
+                    oBal && tokens[1] && tokens[1][VCX]
+                      ? NumberFormatter.format(
+                          (Number(oBal?.value) / 1e18) *
+                            (tokens[1][VCX].price * 0.25)
+                        )
+                      : "0"
+                  }`}
                   tooltip="Value of oVCX held in your wallet across all blockchains."
                 />
               </div>
@@ -144,18 +145,19 @@ export default function VaultsContainer({
                 <LargeCardStat
                   id="total-claimable-ovcx"
                   label="Claimable oVCX"
-                  value={`$${gaugeRewards && tokens[1] && tokens[1][VCX]
-                    ? NumberFormatter.format(
-                      (Number(
-                        gaugeRewards?.[1]?.total +
-                        gaugeRewards?.[10]?.total +
-                        gaugeRewards?.[42161]?.total || 0
-                      ) /
-                        1e18) *
-                      (tokens[1][VCX].price * 0.25)
-                    )
-                    : "0"
-                    }`}
+                  value={`$${
+                    gaugeRewards && tokens[1] && tokens[1][VCX]
+                      ? NumberFormatter.format(
+                          (Number(
+                            gaugeRewards?.[1]?.total +
+                              gaugeRewards?.[10]?.total +
+                              gaugeRewards?.[42161]?.total || 0
+                          ) /
+                            1e18) *
+                            (tokens[1][VCX].price * 0.25)
+                        )
+                      : "0"
+                  }`}
                   tooltip="Cumulative value of claimable oVCX from vaults across all blockchains."
                 />
               </div>
@@ -185,7 +187,7 @@ export default function VaultsContainer({
         </div>
       </section>
 
-      <div className="md:hidden">
+      {isSmallScreen && (
         <nav className="px-5 [&_>*]:shrink-0 mt-8 [&_.my-10]:my-0 whitespace-nowrap flex flex-col smmd:flex-row gap-4 mb-10">
           <NetworkFilter
             supportedNetworks={SUPPORTED_NETWORKS.map((chain) => chain.id)}
@@ -204,6 +206,9 @@ export default function VaultsContainer({
             />
           </section>
         </nav>
+      )}
+
+      {isSmallScreen ? (
         <section className="px-4 gap-6 md:gap-10 grid smmd:grid-cols-2">
           {formattedVaults.map((vaultData) => (
             <VaultCard
@@ -213,16 +218,14 @@ export default function VaultsContainer({
             />
           ))}
         </section>
-      </div>
-
-      <div className="hidden md:block">
+      ) : (
         <VaultsTable
           vaults={formattedVaults}
           searchTerm={searchTerm}
           onSearchTermChange={setSearchTerm}
           onSelectNetwork={selectNetwork}
         />
-      </div>
+      )}
     </NoSSR>
   );
 }
