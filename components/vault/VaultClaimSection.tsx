@@ -172,7 +172,7 @@ export default function VaultClaimSection({ vaultData }: { vaultData: VaultData 
             <SecondaryActionButton
               label="Claim Rewards"
               handleClick={handleClaimRewards}
-              disabled={!account}
+              disabled={true}
             />
           }
         </div>
