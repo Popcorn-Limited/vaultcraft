@@ -170,8 +170,8 @@ function RewardColumn({ gauge, reward, token, chainId }: { gauge: Address, rewar
             />
           </div>
           <div className="ml-4">
-            <SecondaryActionButton label="Approve" handleClick={handleApprove} disabled={!account || account !== reward.distributor} className="h-14" />
-            <MainActionButton label="Fund Rewards" handleClick={handleFundReward} disabled={!account || account !== reward.distributor} className="h-14" />
+            <SecondaryActionButton label="Approve" handleClick={handleApprove} disabled={true} className="h-14" />
+            <MainActionButton label="Fund Rewards" handleClick={handleFundReward} disabled={true} className="h-14" />
           </div>
         </div>
       </td>
