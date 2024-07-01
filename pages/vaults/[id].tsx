@@ -65,8 +65,6 @@ export default function Index() {
 
   const [showLoanManagementModal, setShowLoanManagementModal] = useState(false)
 
-  console.log(tokenOptions)
-
   return <NoSSR>
     {
       (vaultData && tokenOptions.length > 0) ? (
