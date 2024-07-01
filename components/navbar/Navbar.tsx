@@ -94,12 +94,6 @@ export default function Navbar(): JSX.Element {
               />
             </Link>
           </div>
-          <Badge
-            className="rounded text-base py-2 px-4 hidden sm:block"
-            variant="primaryYellow"
-          >
-            Beta
-          </Badge>
         </div>
         <div className="flex flex-row items-center space-x-4">
           <div className="hidden md:block">

@@ -179,19 +179,23 @@ export const LABELS_WITH_TOOLTIP = {
     </WithTooltip>
   ),
   vAPR: (
-    <WithTooltip content="Current Variable APR of the vault">vAPR</WithTooltip>
+    <WithTooltip content="Current Variable APR of the vault">
+      vAPR
+    </WithTooltip>
   ),
   minRewardsAPY: (
     <WithTooltip content="Minimum oVCX boost APR based on most current epoch's distribution">
-      Min Rewards APY
+      Min Boost
     </WithTooltip>
   ),
   maxRewardsAPY: (
     <WithTooltip content="Maximum oVCX boost APR based on most current epoch's distribution">
-      Max Rewards APY
+      Max Boost
     </WithTooltip>
   ),
   boost: (
-    <WithTooltip content="Current APR Boost for this vault">Boost</WithTooltip>
+    <WithTooltip content="Current APR Boost for this vault">
+      Boost
+    </WithTooltip>
   ),
 };
