@@ -11,6 +11,7 @@ import { TiArrowUnsorted } from "react-icons/ti";
 
 import VaultRow from "./VaultRow";
 import { VAULT_SORTING_TYPE, sort } from "./VaultsSorting";
+import { WithTooltip } from "@/components/common/Tooltip";
 
 export default function VaultsTable({
   vaults,
@@ -93,10 +94,10 @@ export default function VaultsTable({
               </nav>
             </th>
             <th className="font-normal text-right whitespace-nowrap">
-              Your Wallet
+              {LABELS_WITH_TOOLTIP.yourWallet}
             </th>
             <th className="font-normal text-right whitespace-nowrap">
-              Your Deposit
+              {LABELS_WITH_TOOLTIP.yourDeposit}
             </th>
             <th className="font-normal text-right">
               <button
@@ -109,7 +110,7 @@ export default function VaultsTable({
                 }}
                 className="flex items-center gap-1"
               >
-                <span>TVL</span>
+                {LABELS_WITH_TOOLTIP.tvl}
                 <TiArrowUnsorted className="mb-0.5" />
               </button>
             </th>
@@ -124,20 +125,30 @@ export default function VaultsTable({
                 }}
                 className="flex items-center gap-1"
               >
-                <span>vAPR</span>
+                {LABELS_WITH_TOOLTIP.vAPR}
                 <TiArrowUnsorted className="mb-0.5" />
               </button>
             </th>
             <th className="font-normal text-right whitespace-nowrap">
-              Min Rewards APY
+              {LABELS_WITH_TOOLTIP.minRewardsAPY}
             </th>
             <th className="font-normal text-right whitespace-nowrap">
-              Max Rewards APY
+              {LABELS_WITH_TOOLTIP.maxRewardsAPY}
             </th>
-            <th className="font-normal text-right">Boost</th>
+            <th className="font-normal text-right">
+              {LABELS_WITH_TOOLTIP.boost}
+            </th>
           </tr>
         </thead>
         <tbody>
+          {vaults.length === 0 && (
+            <tr>
+              <td className="text-center" colSpan={8}>
+                Loading vaults...
+              </td>
+            </tr>
+          )}
+
           {sort(sorting, vaults).map((vaultData, i) => (
             <VaultRow
               {...vaultData}
@@ -150,3 +161,37 @@ export default function VaultsTable({
     </section>
   );
 }
+
+export const LABELS_WITH_TOOLTIP = {
+  tvl: (
+    <WithTooltip content="Total value of all assets deposited into the vault">
+      TVL
+    </WithTooltip>
+  ),
+  yourWallet: (
+    <WithTooltip content="Value of deposit assets held in your wallet">
+      Your Wallet
+    </WithTooltip>
+  ),
+  yourDeposit: (
+    <WithTooltip content="Value of your vault deposits">
+      Your Deposit
+    </WithTooltip>
+  ),
+  vAPR: (
+    <WithTooltip content="Current Variable APR of the vault">vAPR</WithTooltip>
+  ),
+  minRewardsAPY: (
+    <WithTooltip content="Minimum oVCX boost APR based on most current epoch's distribution">
+      Min Rewards APY
+    </WithTooltip>
+  ),
+  maxRewardsAPY: (
+    <WithTooltip content="Maximum oVCX boost APR based on most current epoch's distribution">
+      Max Rewards APY
+    </WithTooltip>
+  ),
+  boost: (
+    <WithTooltip content="Current APR Boost for this vault">Boost</WithTooltip>
+  ),
+};

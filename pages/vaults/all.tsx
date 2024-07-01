@@ -4,30 +4,32 @@ import { AddressesByChain } from "@/lib/types";
 import axios from "axios";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { useEffect, useState } from "react";
+import useSWR from "swr";
 
 async function getHiddenVaults(): Promise<AddressesByChain> {
-  const result: AddressesByChain = {}
+  const result: AddressesByChain = {};
   await Promise.all(
     SUPPORTED_NETWORKS.map(async (chain) => {
       const res = await axios.get(
         `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/vaults/hidden/${chain.id}.json`
-      )
-      result[chain.id] = res.data
+      );
+      result[chain.id] = res.data;
     })
-  )
+  );
   return result;
 }
 
 const Vaults: NextPage = () => {
-  const [hiddenVaults, setHiddenVaults] = useState<AddressesByChain>({})
+  const { data: hiddenVaults } = useSWR("popcorn-vaults", {
+    fetcher: () => getHiddenVaults(),
+    dedupingInterval: 15 * 60 * 1000, // 15 minutes
+  });
 
-  useEffect(() => {
-    getHiddenVaults().then(res => setHiddenVaults(res))
-  }, [])
-
-  return Object.keys(hiddenVaults).length > 0 ?
+  return Object.keys(hiddenVaults).length > 0 ? (
     <VaultsContainer hiddenVaults={hiddenVaults} displayVaults={{}} />
-    : <p className="text-white">Loading...</p>;
+  ) : (
+    <p className="text-white">Loading...</p>
+  );
 };
 
 export default Vaults;
