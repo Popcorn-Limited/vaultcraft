@@ -16,6 +16,7 @@ import { claimRewards } from "@/lib/gauges/interactions";
 import LargeCardStat from "../common/LargeCardStat";
 import MainActionButton from "../button/MainActionButton";
 import { getClaimableRewards } from "@/lib/gauges/useGaugeRewardData";
+import ResponsiveTooltip from "../common/Tooltip";
 
 export default function VaultClaimSection({ vaultData }: { vaultData: VaultData }) {
   const { chain } = useNetwork();
@@ -163,17 +164,36 @@ export default function VaultClaimSection({ vaultData }: { vaultData: VaultData 
         </div>
 
         <div className="hidden md:block md:mt-auto w-52 mb-8 space-y-2">
-          <MainActionButton
-            label="Claim oVCX"
-            handleClick={handleClaim}
-            disabled={!gaugeRewards || gaugeRewards?.[vaultData.chainId]?.total < 0}
-          />
-          {claimableRewards.length > 0 &&
-            <SecondaryActionButton
-              label="Claim Rewards"
-              handleClick={handleClaimRewards}
-              disabled={true}
+          {vaultData.address === "0xD3A17928245064B6DF5095a76e277fe441D538a4" ?
+            <div className="w-full cursor-pointer" id={"ovcx-rewards-tooltip"}>
+              <MainActionButton
+                label="Claim oVCX"
+                handleClick={handleClaim}
+                disabled={true}
+              />
+              <ResponsiveTooltip
+                id={"ovcx-rewards-tooltip"}
+                content={<p>ARB and oVCX rewards will be claimable on 08 July 2024</p>}
+              />
+            </div>
+            : <MainActionButton
+              label="Claim oVCX"
+              handleClick={handleClaim}
+              disabled={!gaugeRewards || gaugeRewards?.[vaultData.chainId]?.total < 0}
             />
+          }
+          {claimableRewards.length > 0 &&
+            <div className="w-full cursor-pointer" id={"claim-rewards-tooltip"}>
+              <SecondaryActionButton
+                label="Claim Rewards"
+                handleClick={handleClaimRewards}
+                disabled={true}
+              />
+              <ResponsiveTooltip
+                id={"claim-rewards-tooltip"}
+                content={<p>ARB and oVCX rewards will be claimable on 08 July 2024</p>}
+              />
+            </div>
           }
         </div>
       </div>
