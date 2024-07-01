@@ -3,6 +3,8 @@ import { NumberFormatter, formatAndRoundNumber } from "@/lib/utils/formatBigNumb
 import CardStat from "@/components/common/CardStat";
 import { Token, VaultData } from "@/lib/types";
 import { roundToTwoDecimalPlaces } from "@/lib/utils/helpers";
+import { useAtom } from "jotai";
+import { tokensAtom } from "@/lib/atoms";
 
 interface VaultStatProps {
   vaultData: VaultData;
@@ -21,6 +23,7 @@ export default function VaultStats({
   account,
   zapAvailable,
 }: VaultStatProps): JSX.Element {
+  const [tokens] = useAtom(tokensAtom);
   const baseTooltipId = vault.address.slice(1);
 
   return (
@@ -61,21 +64,39 @@ export default function VaultStats({
         value={`${vaultData.apy ? `${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.apy))}` : "0"} %`}
         tooltip="Current variable APY of the vault"
       />
-      {vaultData?.gaugeData?.lowerAPR && vaultData?.gaugeData?.lowerAPR > 0
-        ? <CardStat
-          id={`${baseTooltipId}-minBoost`}
-          label="Min Boost APR"
-          value={`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData?.gaugeData?.lowerAPR))} %`}
-          tooltip={`Minimum oVCX boost APR based on most current epoch's distribution. (Based on the current emissions for this gauge of ${NumberFormatter.format(vaultData?.gaugeData.annualEmissions / 5)} oVCX p. year)`}
-        />
+      {vaultData?.gaugeData?.upperAPR && vaultData?.gaugeData?.upperAPR > 0
+        ? <>
+          <CardStat
+            id={`${baseTooltipId}-minBoost`}
+            label="Min Boost APR"
+            value={`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData?.gaugeData?.lowerAPR))} %`}
+            tooltip={`Minimum oVCX boost APR based on most current epoch's distribution. (Based on the current emissions for this gauge of ${NumberFormatter.format(vaultData?.gaugeData.annualEmissions / 5)} oVCX p. year)`}
+          />
+          <CardStat
+            id={`${baseTooltipId}-maxBoost`}
+            label="Max Boost APR"
+            value={`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData?.gaugeData?.upperAPR))} %`}
+            tooltip={`Maximum oVCX boost APR based on most current epoch's distribution. (Based on the current emissions for this gauge of ${NumberFormatter.format(vaultData?.gaugeData.annualEmissions)} oVCX p. year)`}
+          />
+        </>
         : <></>
       }
-      {vaultData?.gaugeData?.upperAPR && vaultData?.gaugeData?.upperAPR > 0
+      {vaultData?.gaugeData?.rewardApy && vaultData?.gaugeData?.rewardApy.apy > 0
         ? <CardStat
-          id={`${baseTooltipId}-maxBoost`}
-          label="Max Boost APR"
-          value={`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData?.gaugeData?.upperAPR))} %`}
-          tooltip={`Maximum oVCX boost APR based on most current epoch's distribution. (Based on the current emissions for this gauge of ${NumberFormatter.format(vaultData?.gaugeData.annualEmissions)} oVCX p. year)`}
+          id={`${baseTooltipId}-rewardApy`}
+          label="Reward APR"
+          value={`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData?.gaugeData?.rewardApy.apy))} %`}
+          tooltipChild={
+            <div className="w-28">
+              <p className="font-bold">Annual Rewards</p>
+              {vaultData.gaugeData?.rewardApy.rewards.map((reward) => (
+                <p key={reward.address}>
+                  {NumberFormatter.format(reward.emissions)}{" "}
+                  {tokens[vaultData.chainId][reward.address].symbol}
+                </p>
+              ))}
+            </div>
+          }
         />
         : <></>
       }
