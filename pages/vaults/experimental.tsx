@@ -12,7 +12,6 @@ const Vaults: NextPage = () => {
         10: ["0x10710562d45a5356d32aD27Eea9f61F6ec44Cc19"],
         42161: ["0xcede40B40F7AF69f5Aa6b12D75fd5eA9cE138b93", "0xC9ed56fbCbc3f0CE764D38e039cdaF36aa3c284c"]
       }}
-      showDescription
     />
   );
 };

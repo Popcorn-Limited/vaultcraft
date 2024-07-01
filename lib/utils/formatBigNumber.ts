@@ -1,4 +1,5 @@
 import { formatUnits, parseUnits } from "viem";
+import { roundToTwoDecimalPlaces } from "./helpers";
 
 const MILLION = 1e6;
 const THOUSAND = 1e3;
@@ -94,3 +95,11 @@ export function safeRound(bn: bigint, decimals = 18): bigint {
   const roundingValue = parseUnits("1", roundingDecimals);
   return (bn / roundingValue) * roundingValue;
 }
+
+export const formatTwoDecimals = (value: number): string => {
+  if (Number.isFinite(value) && value > 0) {
+    return NumberFormatter.format(roundToTwoDecimalPlaces(value));
+  }
+
+  return "0";
+};

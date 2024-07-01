@@ -11,7 +11,7 @@ input {
   outline: none;
 }
 
-input:focus {
+input:not(.border):focus {
   outline: none;
   border: none;
 }

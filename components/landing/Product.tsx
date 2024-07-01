@@ -22,17 +22,21 @@ export default function Product({
   badge,
   customContent,
   route,
-  handleClick
+  handleClick,
 }: ProductProps): JSX.Element {
   const router = useRouter();
   const { query } = router;
 
   return (
     <Link
-      href={(!!query?.ref && isAddress(query.ref as string)) ? `${route}?ref=${query.ref}` : `/${route}`}
+      href={
+        !!query?.ref && isAddress(query.ref as string)
+          ? `${route}?ref=${query.ref}`
+          : `/${route}`
+      }
       // @ts-ignore
-      onClick={handleClick ? handleClick : () => { }}
-      className="group border rounded w-full lg:max-w-full h-[640px] relative flex flex-col bg-customNeutral300 border-customNeutral100 border-opacity-75 smmd:items-center 
+      onClick={handleClick ? handleClick : () => {}}
+      className="group border rounded w-full lg:max-w-full min-h-[40rem] relative flex flex-col bg-customNeutral300 border-customNeutral100 border-opacity-75 smmd:items-center
       py-6 px-8 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:bg-customNeutral200"
     >
       {badge && (
@@ -43,9 +47,7 @@ export default function Product({
         />
       )}
       <div className="col-span-12 md:col-span-4 xs:self-start flex-1">
-        <div className="relative flex flex-row">
-          {title}
-        </div>
+        <div className="relative flex flex-row">{title}</div>
         <p className="mt-2 text-white">{description}</p>
       </div>
 

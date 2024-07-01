@@ -12,6 +12,13 @@ module.exports = {
   ],
 
   theme: {
+    container: {
+      padding: "2rem",
+      center: true,
+      screens: {
+        lglaptop: "1366px",
+      },
+    },
     screens: {
       xs: "400px",
       // => @media (min-"440px) { ... }
@@ -95,13 +102,12 @@ module.exports = {
 
         primaryGreen: "#7AFB79",
         primaryYellow: "#DFFF1C",
-
-        secondaryYellow:"#FFE650",
-        secondaryBlue:"#87C1F8",
-        secondaryPink:"#E93BD5",
-        secondaryFuchsia:"#F289E6",
-        secondaryPurple:"#9B55FF",
-        secondaryViolet:"#C391FF",
+        secondaryYellow: "#FFE650",
+        secondaryBlue: "#87C1F8",
+        secondaryPink: "#E93BD5",
+        secondaryFuchsia: "#F289E6",
+        secondaryPurple: "#9B55FF",
+        secondaryViolet: "#C391FF",
       },
       fontSize: {
         zero: "0rem",

@@ -5,6 +5,9 @@ import { Abi, Address, isAddress } from "viem";
 import { ADDRESS_ZERO } from "@/lib/constants";
 import { PublicClient } from "wagmi";
 
+import clsx, { type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
 export function validateInput(value: string | number): {
   formatted: string;
   isValid: boolean;
@@ -190,3 +193,5 @@ export async function simulateCall({
     return { request: null, success: false, error: error.shortMessage };
   }
 }
+
+export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
