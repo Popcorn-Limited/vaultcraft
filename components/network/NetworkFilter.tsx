@@ -4,6 +4,8 @@ import Image from "next/image";
 import { useState } from "react";
 import { ChainId, networkLogos } from "@/lib/utils/connectors";
 import PopUpModal from "@/components/modal/PopUpModal";
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
+
 
 interface NetworkFilterProps {
   supportedNetworks: ChainId[];
@@ -24,34 +26,26 @@ export default function NetworkFilter({
   return (
     <>
       <div className="hidden md:flex flex-row items-center space-x-2">
-        <PseudoRadioButton
-          key={"all"}
-          label={
-            <Image
-              src={networkLogos[ChainId.ALL]}
-              alt={"All"}
-              height="24"
-              width="24"
-            />
-          }
-          handleClick={() => setActiveAndSelectedNetwork(ChainId.ALL)}
-          isActive={activeNetwork == ChainId.ALL}
-        />
-        {supportedNetworks.map((network) => (
-          <PseudoRadioButton
-            key={network}
-            label={
-              <Image
-                src={networkLogos[network]}
-                alt={ChainId[network]}
-                height="24"
-                width="24"
-              />
-            }
-            handleClick={() => setActiveAndSelectedNetwork(network)}
-            isActive={activeNetwork == network}
-          />
-        ))}
+        <Menu>
+          <MenuButton>My account</MenuButton>
+          <MenuItems anchor="bottom">
+            <MenuItem>
+              <a className="block data-[focus]:bg-blue-100" href="/settings">
+                Settings
+              </a>
+            </MenuItem>
+            <MenuItem>
+              <a className="block data-[focus]:bg-blue-100" href="/support">
+                Support
+              </a>
+            </MenuItem>
+            <MenuItem>
+              <a className="block data-[focus]:bg-blue-100" href="/license">
+                License
+              </a>
+            </MenuItem>
+          </MenuItems>
+        </Menu>
       </div>
 
       <div className="block md:hidden my-10 xs:my-0">

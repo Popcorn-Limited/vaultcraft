@@ -83,6 +83,7 @@ export default function VaultsContainer({
         ? displayVaults[vault.chainId].includes(vault.address)
         : !hiddenVaults[vault.chainId].includes(vault.address)
     );
+  console.log({ vaults, formattedVaults })
 
   return (
     <NoSSR>
