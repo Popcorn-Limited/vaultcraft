@@ -2,9 +2,6 @@ import "../styles/globals.css";
 import "@rainbow-me/rainbowkit/styles.css";
 import type { AppProps } from "next/app";
 import localFont from "next/font/local";
-import { WagmiConfig, configureChains, createConfig, sepolia } from "wagmi";
-import { alchemyProvider } from "wagmi/providers/alchemy";
-import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { Toaster } from "react-hot-toast";
 import Head from "next/head";
@@ -33,7 +30,7 @@ const { chains, publicClient } = configureChains(
       apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY as string,
     }),
     jsonRpcProvider({
-      rpc: (chain) => ({ http: chain.rpcUrls.default.http[0] }),
+      rpc: (chain: any) => ({ http: chain.rpcUrls.default.http[0] }),
     }),
   ],
   {

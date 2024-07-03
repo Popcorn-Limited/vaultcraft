@@ -1,11 +1,11 @@
 import { intervalToDuration } from "date-fns";
-import { Dispatch, SetStateAction } from "react";
-import { Address, useAccount, useBalance } from "wagmi";
+import { Dispatch, SetStateAction, useEffect } from "react";
+import { useAccount, useBalance, useBlockNumber } from "wagmi";
 import { getVotePeriodEndTime } from "@/lib/gauges/utils";
 import MainActionButton from "@/components/button/MainActionButton";
 import useLockedBalanceOf from "@/lib/gauges/useLockedBalanceOf";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
-import { formatEther } from "viem";
+import { Address, formatEther } from "viem";
 import {
   OptionTokenByChain,
   VCX_LP,
@@ -46,7 +46,7 @@ export default function StakingInterface({
   setShowSyncModal,
 }: StakingInterfaceProps): JSX.Element {
   const { address: account } = useAccount();
-
+  const { data: blockNumber } = useBlockNumber({ watch: true })
   const [tokens] = useAtom(tokensAtom);
 
   const { data: lockedBal } = useLockedBalanceOf({
@@ -54,18 +54,21 @@ export default function StakingInterface({
     address: VOTING_ESCROW,
     account: account as Address,
   });
-  const { data: veBal } = useBalance({
+  const { data: veBal, refetch: refetchVeBal } = useBalance({
     chainId: 1,
     address: account,
     token: VOTING_ESCROW,
-    watch: true,
   });
-  const { data: LpBal } = useBalance({
+  const { data: LpBal, refetch: refetchLpBal } = useBalance({
     chainId: 1,
     address: account,
-    token: VCX_LP,
-    watch: true,
+    token: VCX_LP
   });
+
+  useEffect(() => {
+    refetchVeBal();
+    refetchLpBal();
+  }, [blockNumber])
 
   return (
     <>

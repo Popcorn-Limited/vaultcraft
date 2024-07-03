@@ -1,11 +1,9 @@
-import { Address } from "viem";
+import { Address, erc20Abi } from "viem";
 import { handleAllowance } from "@/lib/approve";
 import { SmartVaultActionType, Clients, Token, VaultData, ZapProvider, TokenByAddress } from "@/lib/types";
 import { vaultDeposit, vaultDepositAndStake, vaultRedeem, vaultUnstakeAndWithdraw } from "@/lib/vault/interactions";
 import zap, { handleZapAllowance } from "@/lib/vault/zap";
 import { gaugeDeposit, gaugeWithdraw } from "@/lib/gauges/interactions";
-import { erc20ABI } from "wagmi";
-import { FireEventArgs } from "@masa-finance/analytics-sdk";
 import { VaultRouterByChain } from "@/lib/constants";
 
 interface HandleVaultInteractionProps {
@@ -33,7 +31,7 @@ interface HandleVaultInteractionProps {
       asset_amount,
       asset_ticker,
       additionalEventData,
-    }: FireEventArgs
+    }: any
   ) => Promise<void>;
   referral?: Address;
   tokensAtom: [{ [key: number]: TokenByAddress }, Function]
@@ -208,7 +206,7 @@ export default async function handleVaultInteraction({
           postBal = Number(
             await clients.publicClient.readContract({
               address: vaultData.asset,
-              abi: erc20ABI,
+              abi: erc20Abi,
               functionName: "balanceOf",
               args: [account],
             })
@@ -225,7 +223,7 @@ export default async function handleVaultInteraction({
           postBal = Number(
             await clients.publicClient.readContract({
               address: vaultData.asset,
-              abi: erc20ABI,
+              abi: erc20Abi,
               functionName: "balanceOf",
               args: [account],
             })
@@ -272,7 +270,7 @@ export default async function handleVaultInteraction({
           postBal = Number(
             await clients.publicClient.readContract({
               address: vaultData.asset,
-              abi: erc20ABI,
+              abi: erc20Abi,
               functionName: "balanceOf",
               args: [account]
             })
@@ -317,7 +315,7 @@ export default async function handleVaultInteraction({
           postBal = Number(
             await clients.publicClient.readContract({
               address: vaultData.asset,
-              abi: erc20ABI,
+              abi: erc20Abi,
               functionName: "balanceOf",
               args: [account]
             }))
@@ -332,7 +330,7 @@ export default async function handleVaultInteraction({
           postBal = Number(
             await clients.publicClient.readContract({
               address: vaultData.asset,
-              abi: erc20ABI,
+              abi: erc20Abi,
               functionName: "balanceOf",
               args: [account]
             }))
