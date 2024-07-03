@@ -20,6 +20,13 @@ import getFraxlendApy from "@/lib/external/fraxlend/getFraxlendApy";
 import { prepareAssets, prepareVaults, addBalances, prepareGauges } from "@/lib/tokens";
 import getGaugesData from "@/lib/gauges/getGaugeData";
 
+const EMPTY_LLAMA_APY_ENTRY: LlamaApy = {
+  apy: 0,
+  apyBase: 0,
+  apyReward: 0,
+  date: new Date(),
+}
+
 interface GetVaultsByChainProps {
   chain: Chain;
   account?: Address;
@@ -217,7 +224,7 @@ async function getCustomApy(address: Address, apyId: string, chainId: number): P
     case "fraxlend":
       return getFraxlendApy(address, chainId);
     default:
-      return []
+      return [EMPTY_LLAMA_APY_ENTRY]
   }
 }
 
@@ -228,7 +235,7 @@ async function getApy(apyId: string): Promise<LlamaApy[]> {
   } catch (e) {
     console.log("ERROR FETCHING APY ", + apyId)
     console.log(e)
-    return []
+    return [EMPTY_LLAMA_APY_ENTRY]
   }
 }
 
@@ -281,13 +288,14 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
       const desc = strategyDescriptions[address]
       let apy = 0;
       let apyHist: LlamaApy[] = []
-
+      let strategyApy
       try {
-        const strategyApy = desc.apySource === "custom" ? await getCustomApy(address, desc.apyId, chainId) : await getApy(desc.apyId)
+        strategyApy = desc.apySource === "custom" ? await getCustomApy(address, desc.apyId, chainId) : await getApy(desc.apyId)
         apy = strategyApy[strategyApy.length - 1].apy;
         apyHist = strategyApy;
       } catch (e) {
-        console.log(`ERROR FETCHING APY: ${address} - ${desc.apySource}=${desc.apyId}`)
+        console.log(strategyApy)
+        console.log(`ERROR FETCHING APY: ${address}`)
         console.log(e)
       }
 
@@ -360,7 +368,7 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
 
       n += 1
     })
-
+    
     // assign apy
     vaults[address].apy = apy;
     vaults[address].totalApy = apy;
