@@ -213,7 +213,12 @@ async function prepareVaultsData(chainId: number, client: PublicClient): Promise
 }
 
 async function getCustomApy(address: Address, apyId: string, chainId: number): Promise<LlamaApy[]> {
-  return getFraxlendApy(address, chainId)
+  switch (apyId) {
+    case "fraxlend":
+      return getFraxlendApy(address, chainId);
+    default:
+      return []
+  }
 }
 
 async function getApy(apyId: string): Promise<LlamaApy[]> {
