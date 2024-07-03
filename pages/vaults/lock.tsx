@@ -177,7 +177,7 @@ export default function LockVaults() {
                         handleClick={() => exitLockVault({
                           account: account!,
                           vault: vault.address,
-                          clients: { publicClient, walletClient: walletClient! },
+                          clients: { publicClient: publicClient!, walletClient: walletClient! },
                         })}
                         disabled={!vault.unlocked}
                       />

@@ -1,8 +1,5 @@
 import {
-  Abi,
   Address,
-  PublicClient,
-  WalletClient,
   parseEther,
   zeroAddress,
 } from "viem";
@@ -397,7 +394,7 @@ export async function fundReward({
       tokensToUpdate: [rewardToken],
       account,
       tokensAtom,
-      chainId: clients.publicClient.chain.id
+      chainId: clients.publicClient?.chain?.id || 1
     })
   }
   return success

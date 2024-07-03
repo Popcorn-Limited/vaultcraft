@@ -3,11 +3,9 @@ import InputTokenWithError from "@/components/input/InputTokenWithError";
 import MainActionButton from "@/components/button/MainActionButton";
 import { useEffect, useState } from "react";
 import {
-  erc20ABI,
   useAccount,
-  useNetwork,
   usePublicClient,
-  useSwitchNetwork,
+  useSwitchChain,
   useWalletClient,
 } from "wagmi";
 import TabSelector from "@/components/common/TabSelector";
@@ -16,7 +14,7 @@ import { validateInput } from "@/lib/utils/helpers";
 import Modal from "@/components/modal/Modal";
 import InputNumber from "@/components/input/InputNumber";
 import { safeRound } from "@/lib/utils/formatBigNumber";
-import { formatUnits, getAddress, isAddress, maxUint256 } from "viem";
+import { erc20Abi, formatUnits, getAddress, isAddress, maxUint256 } from "viem";
 import handleVaultInteraction from "@/lib/vault/handleVaultInteraction";
 import ActionSteps from "@/components/vault/ActionSteps";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
@@ -49,9 +47,8 @@ export default function VaultInputs({
   const { query } = useRouter();
   const publicClient = usePublicClient({ chainId });
   const { data: walletClient } = useWalletClient();
-  const { address: account } = useAccount();
-  const { chain } = useNetwork();
-  const { switchNetworkAsync } = useSwitchNetwork();
+  const { address: account, chain } = useAccount();
+  const { switchChainAsync } = useSwitchChain();
   const { openConnectModal } = useConnectModal();
 
   const [tokens, setTokens] = useAtom(tokensAtom);
@@ -216,7 +213,7 @@ export default function VaultInputs({
 
     if (chain?.id !== Number(chainId)) {
       try {
-        await switchNetworkAsync?.(Number(chainId));
+        await switchChainAsync?.({ chainId: Number(chainId) });
       } catch (error) {
         return;
       }
@@ -261,7 +258,7 @@ export default function VaultInputs({
       zapProvider: newZapProvider,
       slippage,
       tradeTimeout,
-      clients: { publicClient, walletClient },
+      clients: { publicClient: publicClient!, walletClient },
       referral:
         !!query?.ref && isAddress(query.ref as string)
           ? getAddress(query.ref as string)
@@ -279,9 +276,9 @@ export default function VaultInputs({
     setStepCounter(newStepCounter);
 
     if (newStepCounter === steps.length && success) {
-      const newSupply = await publicClient.readContract({
+      const newSupply = await publicClient?.readContract({
         address: vaultData.address,
-        abi: erc20ABI,
+        abi: erc20Abi,
         functionName: "totalSupply"
       })
       const index = vaults[vaultData.chainId].findIndex(v => v.address === vaultData.address)

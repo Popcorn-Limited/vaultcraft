@@ -3,7 +3,7 @@ import { vaultsAtom } from "@/lib/atoms/vaults";
 import { ReserveData, Token, UserAccountData, VaultData } from "@/lib/types";
 import { useAtom } from "jotai";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { useAccount, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
+import { useAccount, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
 import { formatUnits, zeroAddress } from "viem";
 import { formatNumber, formatToFixedDecimals, safeRound } from "@/lib/utils/formatBigNumber";
 import { validateInput } from "@/lib/utils/helpers";
@@ -26,11 +26,10 @@ const LOAN_TABS = ["Supply", "Borrow", "Repay", "Withdraw"]
 export default function ManageLoanInterface({ visibilityState, vaultData }: { visibilityState: [boolean, Dispatch<SetStateAction<boolean>>], vaultData: VaultData }): JSX.Element {
   const [visible, setVisible] = visibilityState
 
-  const { address: account } = useAccount();
+  const { address: account, chain } = useAccount();
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient()
-  const { chain } = useNetwork();
-  const { switchNetworkAsync } = useSwitchNetwork();
+  const { switchChainAsync } = useSwitchChain();
   const { openConnectModal } = useConnectModal();
 
   const [reserveData, setAaveReserveData] = useAtom(aaveReserveDataAtom)
@@ -212,7 +211,7 @@ export default function ManageLoanInterface({ visibilityState, vaultData }: { vi
 
     if (chain?.id !== Number(vaultData.chainId)) {
       try {
-        await switchNetworkAsync?.(Number(vaultData.chainId));
+        await switchChainAsync?.({ chainId: vaultData.chainId });
       } catch (error) {
         return
       }
@@ -239,7 +238,7 @@ export default function ManageLoanInterface({ visibilityState, vaultData }: { vi
       amount: val,
       inputToken,
       account,
-      clients: { publicClient, walletClient },
+      clients: { publicClient: publicClient!, walletClient },
     })
     const success = await aaveInteraction()
 

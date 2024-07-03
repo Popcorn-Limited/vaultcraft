@@ -1,10 +1,10 @@
-import { Address, PublicClient, createPublicClient, http, zeroAddress } from "viem";
+import { Address, PublicClient, createPublicClient, erc20Abi, http, zeroAddress } from "viem";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 import { ChildGaugeAbi, GaugeAbi, VCX, } from "@/lib/constants";
 import { vcx as getVcxPrice } from "@/lib/resolver/price/resolver";
-import { erc20ABI, mainnet } from "wagmi";
 import { GaugeData, RewardApy, TokenByAddress, VaultDataByAddress } from "@/lib/types";
 import { thisPeriodTimestamp } from "./utils";
+import { mainnet } from "viem/chains";
 
 const HIDDEN_GAUGES = [
   "0x38098e3600665168eBE4d827D24D0416efC24799", // Deployment script ran out of gas and somehow added a random address into the gauges which now breaks these calls
@@ -68,11 +68,12 @@ async function getMainnetGaugesData({
 }): Promise<GaugeData[]> {
   const vaultsWithGauges = Object.values(vaultsData).filter(vault => vault.gauge !== zeroAddress)
 
+  // @ts-ignore
   const mainnetData = await clientByChainId[1].multicall({
     contracts: vaultsWithGauges.map(vault => [
       {
         address: vault.address,
-        abi: erc20ABI,
+        abi: erc20Abi,
         functionName: "balanceOf",
         args: [vault.gauge!],
       },
@@ -176,7 +177,7 @@ async function getChildGaugesData({
     contracts: vaultsWithGauges.map(vault => [
       {
         address: vault.address,
-        abi: erc20ABI,
+        abi: erc20Abi,
         functionName: "balanceOf",
         args: [vault.gauge!],
       },
@@ -303,6 +304,7 @@ async function getRewardsApy({
   }) as any[];
 
   if (rewardLogs.length > 0) {
+    // @ts-ignore
     const rewardRes = await client.multicall({
       contracts: rewardLogs.map(log => {
         return {

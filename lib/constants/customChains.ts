@@ -3,7 +3,6 @@ import { Chain } from "viem";
 export const xLayer = {
   id: 196,
   name: 'X Layer',
-  network: "xLayer",
   nativeCurrency: { name: 'OKB', symbol: 'OKB', decimals: 18 },
   rpcUrls: {
     default: { http: ['https://rpc.xlayer.tech'] },

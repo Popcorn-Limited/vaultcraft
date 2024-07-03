@@ -1,13 +1,11 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
 import { ChainById, RPC_URLS, networkMap } from "@/lib/utils/connectors";
-import { createPublicClient, getAddress, http, zeroAddress, type Address, type PublicClient } from "viem";
+import { createPublicClient, erc20Abi, getAddress, http, zeroAddress, type Address, type PublicClient } from "viem";
 import { ChildGaugeAbi, ERC20Abi, GaugeAbi, VaultAbi } from "@/lib/constants/abi";
 import { Strategy, TokenByAddress, VaultDataByAddress } from "@/lib/types";
 import getGaugesData from "@/lib/gauges/getGaugeData";
-import { fi } from "date-fns/locale";
-import { erc20ABI, mainnet } from "wagmi";
-import { vaultronAtom } from "@/lib/atoms";
+import { mainnet } from "viem/chains";
 
 type Vault = {
     address: Address;
@@ -150,7 +148,7 @@ export default async function handler(
                 return [
                     {
                         address: token,
-                        abi: erc20ABI,
+                        abi: erc20Abi,
                         functionName: "decimals"
                     },
                 ]

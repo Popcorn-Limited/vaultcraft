@@ -10,29 +10,30 @@ import { validateInput } from "@/lib/utils/helpers";
 import { allocateToStrategies, deallocateFromStrategies } from "@/lib/vault/management/interactions";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
-import { useAccount, useBalance, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
+import { useAccount, useBalance, useBlockNumber, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
 
 export default function VaultRebalance({
   vaultData,
 }: {
   vaultData: VaultData;
 }): JSX.Element {
-  const { address: account } = useAccount();
+  const { address: account, chain } = useAccount();
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
-  const { chain } = useNetwork();
-  const { switchNetworkAsync } = useSwitchNetwork();
+  const { switchChainAsync } = useSwitchChain();
 
   const [yieldOptions] = useAtom(yieldOptionsAtom)
   const [tokens] = useAtom(tokensAtom)
   const [asset, setAsset] = useState<Token>()
 
-  const { data: float } = useBalance({
+  const { data: blockNumber } = useBlockNumber({ watch: true })
+  const { data: float, refetch } = useBalance({
     chainId: vaultData.chainId,
     address: vaultData.address,
     token: vaultData.asset,
-    watch: true,
   });
+
+  useEffect(() => { refetch() }, [blockNumber])
 
   const [activeTab, setActiveTab] = useState<string>("Deallocate")
   const [inputValues, setInputValues] = useState<string[]>(vaultData.strategies.map(s => "0"))
@@ -78,7 +79,7 @@ export default function VaultRebalance({
 
     if (chain?.id !== vaultData.chainId) {
       try {
-        await switchNetworkAsync?.(vaultData.chainId);
+        await switchChainAsync?.({ chainId: vaultData.chainId });
       } catch (error) {
         return;
       }
@@ -104,13 +105,13 @@ export default function VaultRebalance({
         vaultData,
         account,
         clients: {
-          publicClient,
+          publicClient: publicClient!,
           walletClient: walletClient!,
         }
       })
 
       if (success) {
-        const updatedVault = await addStrategyData({ [vaultData.address]: vaultData }, vaultData.chainId, publicClient, yieldOptions)
+        const updatedVault = await addStrategyData({ [vaultData.address]: vaultData }, vaultData.chainId, publicClient!, yieldOptions)
         vaultData = updatedVault[vaultData.address]
       }
       return
@@ -130,13 +131,13 @@ export default function VaultRebalance({
         vaultData,
         account,
         clients: {
-          publicClient,
+          publicClient: publicClient!,
           walletClient: walletClient!,
         }
       })
 
       if (success) {
-        const updatedVault = await addStrategyData({ [vaultData.address]: vaultData }, vaultData.chainId, publicClient, yieldOptions)
+        const updatedVault = await addStrategyData({ [vaultData.address]: vaultData }, vaultData.chainId, publicClient!, yieldOptions)
         vaultData = updatedVault[vaultData.address]
       }
       return

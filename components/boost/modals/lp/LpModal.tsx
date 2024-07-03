@@ -1,13 +1,11 @@
 import {
-  Address,
   useAccount,
-  useNetwork,
   usePublicClient,
-  useSwitchNetwork,
+  useSwitchChain,
   useWalletClient,
 } from "wagmi";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { WalletClient } from "viem";
+import { Address, WalletClient } from "viem";
 import Modal from "@/components/modal/Modal";
 import MainActionButton from "@/components/button/MainActionButton";
 import LpInfo from "@/components/boost/modals/lp/LpInfo";
@@ -26,9 +24,8 @@ export default function LpModal({
 }: {
   show: [boolean, Dispatch<SetStateAction<boolean>>];
 }): JSX.Element {
-  const { address: account } = useAccount();
-  const { chain } = useNetwork();
-  const { switchNetworkAsync } = useSwitchNetwork();
+  const { address: account, chain } = useAccount();
+  const { switchChainAsync } = useSwitchChain();
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
 
@@ -62,7 +59,7 @@ export default function LpModal({
 
     if (chain?.id !== Number(1)) {
       try {
-        await switchNetworkAsync?.(Number(1));
+        await switchChainAsync?.({ chainId: 1 });
       } catch (error) {
         return;
       }
@@ -82,7 +79,7 @@ export default function LpModal({
           account: account as Address,
           spender: BALANCER_VAULT,
           clients: {
-            publicClient,
+            publicClient: publicClient!,
             walletClient: walletClient!,
           },
         });
@@ -94,7 +91,7 @@ export default function LpModal({
           account: account,
           spender: BALANCER_VAULT,
           clients: {
-            publicClient,
+            publicClient: publicClient!,
             walletClient: walletClient!,
           },
         });
@@ -107,7 +104,7 @@ export default function LpModal({
           ],
           account: account,
           clients: {
-            publicClient,
+            publicClient: publicClient!,
             walletClient: walletClient!,
           },
         });

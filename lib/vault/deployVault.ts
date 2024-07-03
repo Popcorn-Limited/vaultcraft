@@ -1,6 +1,5 @@
 import { toast } from "react-hot-toast";
-import { Address, parseUnits } from "viem";
-import { PublicClient, WalletClient } from "wagmi";
+import { PublicClient, WalletClient, parseUnits } from "viem";
 import {
   ADDRESS_ZERO,
   EMPTY_BYTES,

@@ -1,9 +1,9 @@
 import { showErrorToast, showSuccessToast } from "@/lib/toasts";
 import { Clients, SimulationResponse, Token } from "@/lib/types";
 import { InitParam, InitParamRequirement } from "@/lib/atoms/adapter";
-import { Abi, Address, isAddress } from "viem";
+import { Abi, Address, PublicClient, formatUnits, isAddress } from "viem";
 import { ADDRESS_ZERO } from "@/lib/constants";
-import { PublicClient } from "wagmi";
+import { numberToFormattedString, safeRound } from "./formatBigNumber";
 
 export function validateInput(value: string | number): {
   formatted: string;
@@ -89,7 +89,7 @@ export function cleanTokenSymbol(token: Token): string {
   return token.symbol;
 }
 
-export function noOp() {}
+export function noOp() { }
 
 export const beautifyAddress = (addr: string) =>
   `${addr.slice(0, 4)}...${addr.slice(-5, 5)}`;
@@ -189,4 +189,14 @@ export async function simulateCall({
     console.log({ simError: error });
     return { request: null, success: false, error: error.shortMessage };
   }
+}
+
+export function handleChangeInput(e: any, setter: Function) {
+  const value = e.currentTarget.value;
+  setter(validateInput(value).isValid ? value : "0");
+}
+
+export function handleMaxClick(token: Token, setter: Function) {
+  const formatted = numberToFormattedString(token.balance, token.decimals)
+  setter(validateInput(formatted).isValid ? formatted : "0");
 }

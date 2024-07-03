@@ -2,8 +2,8 @@ import { vaultsAtom } from "@/lib/atoms/vaults";
 import { ClaimableReward, VaultData } from "@/lib/types";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
-import { erc20ABI, useAccount, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
-import { Address, createPublicClient, http, zeroAddress } from "viem";
+import { useAccount, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
+import { Address, createPublicClient, erc20Abi, http, zeroAddress } from "viem";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import getGaugeRewards from "@/lib/gauges/getGaugeRewards";
 import { claimOPop } from "@/lib/optionToken/interactions";
@@ -19,9 +19,8 @@ import { getClaimableRewards } from "@/lib/gauges/useGaugeRewardData";
 import ResponsiveTooltip from "../common/Tooltip";
 
 export default function VaultClaimSection({ vaultData }: { vaultData: VaultData }) {
-  const { chain } = useNetwork();
-  const { switchNetworkAsync } = useSwitchNetwork();
-  const { address: account } = useAccount();
+  const { switchChainAsync } = useSwitchChain();
+  const { address: account, chain } = useAccount();
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
 
@@ -42,7 +41,7 @@ export default function VaultClaimSection({ vaultData }: { vaultData: VaultData 
       })
       const newOBal = client.readContract({
         address: OptionTokenByChain[vaultData?.chainId!],
-        abi: erc20ABI,
+        abi: erc20Abi,
         functionName: "balanceOf",
         args: [account!]
       })
@@ -67,7 +66,7 @@ export default function VaultClaimSection({ vaultData }: { vaultData: VaultData 
 
     if (chain?.id !== vaultData?.chainId) {
       try {
-        await switchNetworkAsync?.(vaultData?.chainId);
+        await switchChainAsync?.({ chainId: vaultData?.chainId });
       } catch (error) {
         return;
       }
@@ -76,7 +75,7 @@ export default function VaultClaimSection({ vaultData }: { vaultData: VaultData 
     const success = await claimRewards({
       gauge: vaultData.gauge!,
       account: account,
-      clients: { publicClient, walletClient: walletClient! }
+      clients: { publicClient: publicClient!, walletClient: walletClient! }
     })
 
     if (success) {
@@ -95,7 +94,7 @@ export default function VaultClaimSection({ vaultData }: { vaultData: VaultData 
 
     if (chain?.id !== vaultData?.chainId) {
       try {
-        await switchNetworkAsync?.(vaultData?.chainId);
+        await switchChainAsync?.({ chainId: vaultData?.chainId });
       } catch (error) {
         return;
       }
@@ -106,7 +105,7 @@ export default function VaultClaimSection({ vaultData }: { vaultData: VaultData 
       chainId: vaultData.chainId!,
       account: account as Address,
       minter: MinterByChain[vaultData?.chainId],
-      clients: { publicClient, walletClient: walletClient! }
+      clients: { publicClient: publicClient!, walletClient: walletClient! }
     })
 
     if (success) {
@@ -122,7 +121,7 @@ export default function VaultClaimSection({ vaultData }: { vaultData: VaultData 
           gauges: vaults[vaultData?.chainId].filter(vault => vault.gauge && vault.gauge !== zeroAddress).map(vault => vault.gauge) as Address[],
           account: account,
           chainId: vaultData?.chainId,
-          publicClient
+          publicClient: publicClient!
         })
       })
     }

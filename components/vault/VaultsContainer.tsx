@@ -45,13 +45,6 @@ export default function VaultsContainer({
   const [tokens] = useAtom(tokensAtom)
   const [gaugeRewards] = useAtom(gaugeRewardsAtom)
 
-  const { data: oBal } = useBalance({
-    chainId: 1,
-    address: account,
-    token: OptionTokenByChain[1],
-    watch: true,
-  });
-
   const [selectedNetworks, selectNetwork] = useNetworkFilter(
     SUPPORTED_NETWORKS.map((network) => network.id)
   );
@@ -106,9 +99,9 @@ export default function VaultsContainer({
                 <LargeCardStat
                   id="total-my-ovcx"
                   label="My oVCX"
-                  value={`$${oBal && tokens[1] && tokens[1][VCX]
+                  value={`$${tokens[1][OptionTokenByChain[1]].balance && tokens[1] && tokens[1][VCX]
                     ? NumberFormatter.format(
-                      (Number(oBal?.value) / 1e18) * (tokens[1][VCX].price * 0.25)
+                      (tokens[1][OptionTokenByChain[1]].balance / 1e18) * (tokens[1][VCX].price * 0.25)
                     )
                     : "0"
                     }`}

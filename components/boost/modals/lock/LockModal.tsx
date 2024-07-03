@@ -1,13 +1,11 @@
 import {
-  Address,
   useAccount,
-  useNetwork,
   usePublicClient,
-  useSwitchNetwork,
+  useSwitchChain,
   useWalletClient,
 } from "wagmi";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { parseUnits, WalletClient } from "viem";
+import { Address, parseUnits, WalletClient } from "viem";
 import Modal from "@/components/modal/Modal";
 import MainActionButton from "@/components/button/MainActionButton";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
@@ -19,10 +17,10 @@ import { handleAllowance } from "@/lib/approve";
 import { createLock } from "@/lib/gauges/interactions";
 import ActionSteps from "@/components/vault/ActionSteps";
 import { ActionStep, LOCK_VCX_LP_STEPS } from "@/lib/getActionSteps";
-import { VCX_LP, VE_VCX, VOTING_ESCROW } from "@/lib/constants";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
 import { useAtom } from "jotai";
 import { tokensAtom } from "@/lib/atoms";
+import { VCX_LP, VOTING_ESCROW } from "@/lib/constants/addresses";
 
 interface LockModalProps {
   show: [boolean, Dispatch<SetStateAction<boolean>>];
@@ -33,10 +31,8 @@ export default function LockModal({
   show,
   setShowLpModal,
 }: LockModalProps): JSX.Element {
-  const { address: account } = useAccount();
-
-  const { chain } = useNetwork();
-  const { switchNetworkAsync } = useSwitchNetwork();
+  const { address: account, chain } = useAccount();
+  const { switchChainAsync } = useSwitchChain();
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
 
@@ -76,7 +72,7 @@ export default function LockModal({
 
     if (chain?.id !== Number(1)) {
       try {
-        await switchNetworkAsync?.(Number(1));
+        await switchChainAsync?.({ chainId: 1 });
       } catch (error) {
         return;
       }
@@ -96,7 +92,7 @@ export default function LockModal({
           account: account as Address,
           spender: VOTING_ESCROW,
           clients: {
-            publicClient,
+            publicClient: publicClient!,
             walletClient: walletClient!,
           },
         });
@@ -107,7 +103,7 @@ export default function LockModal({
           amount: val,
           days,
           account: account,
-          clients: { publicClient, walletClient: walletClient! },
+          clients: { publicClient: publicClient!, walletClient: walletClient! },
         });
         if (success) {
           await mutateTokenBalance({

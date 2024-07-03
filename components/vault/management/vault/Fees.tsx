@@ -3,7 +3,8 @@ import { tokensAtom } from "@/lib/atoms";
 import { VaultData } from "@/lib/types";
 import { takeFees } from "@/lib/vault/management/interactions";
 import { useAtom } from "jotai";
-import { Address, useAccount, usePublicClient, useWalletClient } from "wagmi";
+import { Address } from "viem";
+import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 
 export default function VaultTakeFees({
   vaultData,
@@ -44,7 +45,7 @@ export default function VaultTakeFees({
                     address: callAddress,
                     account: account as Address,
                     clients: {
-                      publicClient,
+                      publicClient:publicClient!,
                       walletClient: walletClient!,
                     },
                   })

@@ -8,7 +8,6 @@ import { mainnet, arbitrum, optimism, polygon } from "viem/chains";
 import { xLayer } from "@/lib/constants";
 import { networkMap } from "../utils/connectors";
 
-
 interface BaseProps {
   chainId: number;
   sellToken: Token;

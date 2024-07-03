@@ -1,12 +1,12 @@
 import {
   Address,
   Chain,
+  PublicClient,
   createPublicClient,
   getAddress,
   http,
   zeroAddress,
 } from "viem";
-import { PublicClient, mainnet } from "wagmi";
 import axios from "axios";
 import { VaultAbi } from "@/lib/constants/abi/Vault";
 import { LlamaApy, TokenByAddress, VaultData, VaultDataByAddress, VaultLabel } from "@/lib/types";
@@ -19,6 +19,8 @@ import { AavePoolAddressProviderByChain, AaveUiPoolProviderByChain } from "@/lib
 import getFraxlendApy from "@/lib/external/fraxlend/getFraxlendApy";
 import { prepareAssets, prepareVaults, addBalances, prepareGauges } from "@/lib/tokens";
 import getGaugesData from "@/lib/gauges/getGaugeData";
+import { VE_VCX } from "./constants/addresses";
+import { mainnet } from "viem/chains";
 
 const EMPTY_LLAMA_APY_ENTRY: LlamaApy = {
   apy: 0,
@@ -49,7 +51,7 @@ export default async function getTokenAndVaultsDataByChain({
 
   // Create token array
   const uniqueAssetAdresses: Address[] = [...ZapAssetAddressesByChain[chainId]];
-  if (chainId === 1) uniqueAssetAdresses.push(...[VCX, VCX_LP])
+  if (chainId === 1) uniqueAssetAdresses.push(...[VCX, VCX_LP, VE_VCX])
   if (GAUGE_NETWORKS.includes(chainId)) uniqueAssetAdresses.push(...[OptionTokenByChain[chainId], VeTokenByChain[chainId], XVCXByChain[chainId]])
 
 
@@ -69,8 +71,8 @@ export default async function getTokenAndVaultsDataByChain({
       functionName: 'getReservesData',
       args: [AavePoolAddressProviderByChain[chainId]],
     })
-    reserveData[0].filter(d => !d.isFrozen && !uniqueAssetAdresses.includes(d.underlyingAsset))
-      .forEach(d => uniqueAssetAdresses.push(d.underlyingAsset))
+    reserveData[0].filter((d: any) => !d.isFrozen && !uniqueAssetAdresses.includes(d.underlyingAsset))
+      .forEach((d: any) => uniqueAssetAdresses.push(d.underlyingAsset))
   }
 
   // Add reward token addresses
@@ -133,6 +135,7 @@ async function prepareVaultsData(chainId: number, client: PublicClient): Promise
     .filter((vault: any) => !hiddenVaults.includes(vault.address))
     .filter((vault: any) => vault.type !== "single-asset-lock-vault-v1")
 
+  // @ts-ignore
   const dynamicValues = await client.multicall({
     contracts: filteredVaults
       .map((vault: any) => {
@@ -368,7 +371,7 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
 
       n += 1
     })
-    
+
     // assign apy
     vaults[address].apy = apy;
     vaults[address].totalApy = apy;

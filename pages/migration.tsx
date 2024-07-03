@@ -13,21 +13,22 @@ import { ArrowDownIcon } from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
 import {
   Address,
+  PublicClient,
   WalletClient,
   formatEther,
   parseEther,
   zeroAddress,
 } from "viem";
 import {
-  PublicClient,
   useAccount,
   useBalance,
-  useNetwork,
   usePublicClient,
-  useSwitchNetwork,
+  useSwitchChain,
   useWalletClient,
 } from "wagmi";
 import { multiplyDecimals } from "@/lib/utils/formatBigNumber";
+import { tokensAtom } from "@/lib/atoms";
+import { useAtom } from "jotai";
 
 interface SimulateProps {
   address: Address;
@@ -103,51 +104,44 @@ async function migrate({
 }
 
 export default function Migration(): JSX.Element {
-  const { address: account } = useAccount();
+  const { address: account, chain } = useAccount();
   const publicClient = usePublicClient({ chainId: 1 });
   const { data: walletClient } = useWalletClient();
-  const { chain } = useNetwork();
-  const { switchNetworkAsync } = useSwitchNetwork();
+  const { switchChainAsync } = useSwitchChain();
+  const [tokens] = useAtom(tokensAtom);
 
-  const { data: vcxBal } = useBalance({
-    chainId: 1,
-    address: account || zeroAddress,
-    token: VCX,
-    watch: true,
-  });
   const [popBal, setPopBal] = useState<bigint>(ZERO);
 
   const [inputBalance, setInputBalance] = useState<string>("0");
 
   useEffect(() => {
     if (account) {
-      publicClient
-        .readContract({
-          address: "0x50a7c5a2aA566eB8AAFc80ffC62E984bFeCe334F",
-          abi: [
-            {
-              inputs: [
-                {
-                  internalType: "address",
-                  name: "account",
-                  type: "address",
-                },
-              ],
-              name: "spendableBalanceOf",
-              outputs: [
-                {
-                  internalType: "uint256",
-                  name: "",
-                  type: "uint256",
-                },
-              ],
-              stateMutability: "view",
-              type: "function",
-            },
-          ],
-          functionName: "spendableBalanceOf",
-          args: [account || zeroAddress],
-        })
+      publicClient?.readContract({
+        address: "0x50a7c5a2aA566eB8AAFc80ffC62E984bFeCe334F",
+        abi: [
+          {
+            inputs: [
+              {
+                internalType: "address",
+                name: "account",
+                type: "address",
+              },
+            ],
+            name: "spendableBalanceOf",
+            outputs: [
+              {
+                internalType: "uint256",
+                name: "",
+                type: "uint256",
+              },
+            ],
+            stateMutability: "view",
+            type: "function",
+          },
+        ],
+        functionName: "spendableBalanceOf",
+        args: [account || zeroAddress],
+      })
         .then((res) => setPopBal(res));
     }
   }, []);
@@ -163,7 +157,7 @@ export default function Migration(): JSX.Element {
 
     if (chain?.id !== 1) {
       try {
-        await switchNetworkAsync?.(1);
+        await switchChainAsync?.({ chainId: 1 });
       } catch (error) {
         return;
       }
@@ -175,7 +169,7 @@ export default function Migration(): JSX.Element {
       account,
       spender: VCX,
       clients: {
-        publicClient,
+        publicClient: publicClient!,
         walletClient,
       },
     });
@@ -185,7 +179,7 @@ export default function Migration(): JSX.Element {
         address: VCX,
         account,
         amount: val,
-        publicClient,
+        publicClient: publicClient!,
         walletClient,
       });
       if (migrateSuccess)
@@ -210,7 +204,7 @@ export default function Migration(): JSX.Element {
         </p>
       </div>
       <div className="px-6 md:px-8 py-10 border-t border-b border-customNeutral100 mt-6 md:mt-10 w-full">
-        {vcxBal ? (
+        {!!tokens[1][VCX].balance ? (
           <div className="rounded-lg w-full md:w-1/3 md:min-w-[870px] bg-customNeutral200 md:ml-auto md:mr-auto md:p-8 px-8 pt-6 pb-5 md:pl-11 border border-customNeutral100 [&_summary::-webkit-details-marker]:hidden">
             <InputTokenWithError
               onSelectToken={() => { }}
@@ -259,7 +253,7 @@ export default function Migration(): JSX.Element {
                 decimals: 18,
                 logoURI: "/images/tokens/vcx.svg",
                 balance: 0,
-                totalSupply:0,
+                totalSupply: 0,
                 price: 1,
               }}
               errorMessage={""}

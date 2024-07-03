@@ -2,7 +2,7 @@ import { Fragment, useState, useEffect } from "react";
 import Link from "next/link";
 import { Dialog, Transition } from "@headlessui/react";
 import { PowerIcon } from "@heroicons/react/24/solid";
-import { useNetwork, useAccount, useDisconnect } from "wagmi";
+import { useAccount, useDisconnect } from "wagmi";
 import { useChainModal, useConnectModal } from "@rainbow-me/rainbowkit";
 import { networkLogos } from "@/lib/utils/connectors";
 import MainActionButton from "@/components/button/MainActionButton";
@@ -18,7 +18,6 @@ import { VaultData } from "@/lib/types";
 import ManageLoanInterface from "@/components/lending/ManageLoanInterface";
 import { getHealthFactorColor } from "@/lib/external/aave";
 import { isAddress } from "viem";
-import ProtocolIcon from "../common/ProtocolIcon";
 
 export default function Navbar(): JSX.Element {
   const router = useRouter();
@@ -26,8 +25,7 @@ export default function Navbar(): JSX.Element {
   const { disconnect } = useDisconnect();
   const { openConnectModal } = useConnectModal();
   const { openChainModal } = useChainModal();
-  const { address } = useAccount();
-  const { chain } = useNetwork();
+  const { address: account, chain } = useAccount();
   const [menuVisible, toggleMenu] = useState<boolean>(false);
   const [logo, setLogo] = useState<string>(networkLogos[1]);
   const [chainName, setChainName] = useState<string>("Ethereum");
@@ -37,11 +35,11 @@ export default function Navbar(): JSX.Element {
   };
 
   useEffect(() => {
-    if (address && chain?.id) {
+    if (account && chain?.id) {
       setLogo(networkLogos[chain.id]);
       setChainName(chain.name);
     }
-  }, [chain?.id, address])
+  }, [chain?.id, account])
 
   const [userAccountData] = useAtom(aaveAccountDataAtom)
   const [vaults] = useAtom(vaultsAtom)
@@ -98,7 +96,7 @@ export default function Navbar(): JSX.Element {
               />
             </div>
           }
-          {address ? (
+          {account ? (
             <div className={`relative flex flex-container flex-row z-10`}>
               <div
                 className={`md:w-48 h-full py-2 px-4 md:px-6 flex flex-row items-center justify-between bg-transparent border border-customGray100 rounded-4xl cursor-pointer  text-white text-sm`}
@@ -112,7 +110,7 @@ export default function Navbar(): JSX.Element {
                 <div className="md:hidden w-2 h-2 bg-green-500 ml-1 rounded-full"></div>
                 <span className="hidden md:inline">|</span>
                 <p className="ml-2 leading-none hidden md:block">
-                  {address?.substring(0, 5)}...
+                  {account?.substring(0, 5)}...
                 </p>
                 <span className="hidden md:inline">|</span>
                 <PowerIcon
@@ -127,7 +125,7 @@ export default function Navbar(): JSX.Element {
               <MainActionButton
                 label="Connect Wallet"
                 handleClick={openConnectModal}
-                hidden={address ? true : false}
+                hidden={!!account}
               />
             </div>
           )}
@@ -153,7 +151,7 @@ export default function Navbar(): JSX.Element {
           </button>
         </div>
       </div >
-      <Transition.Root show={menuVisible} as={Fragment}>
+      {/* <Transition.Root show={menuVisible} as={Fragment}>
         <Dialog
           as="div"
           className="fixed inset-0 overflow-hidden z-50"
@@ -233,7 +231,7 @@ export default function Navbar(): JSX.Element {
             </Transition.Child>
           </div>
         </Dialog>
-      </Transition.Root>
+      </Transition.Root> */}
     </>
   );
 }

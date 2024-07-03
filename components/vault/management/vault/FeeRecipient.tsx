@@ -54,7 +54,7 @@ export default function VaultFeeRecipient({
                 address: callAddress,
                 account,
                 clients: {
-                  publicClient,
+                  publicClient: publicClient!,
                   walletClient: walletClient!,
                 },
               })

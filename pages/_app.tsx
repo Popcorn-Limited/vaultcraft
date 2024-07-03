@@ -2,7 +2,7 @@ import "../styles/globals.css";
 import "@rainbow-me/rainbowkit/styles.css";
 import type { AppProps } from "next/app";
 import localFont from "next/font/local";
-import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import { RainbowKitProvider, getDefaultConfig } from "@rainbow-me/rainbowkit";
 import { Toaster } from "react-hot-toast";
 import Head from "next/head";
 import { Provider } from "jotai";
@@ -22,56 +22,62 @@ import {
   okxWallet,
 } from "@rainbow-me/rainbowkit/wallets";
 import { Analytics } from "@vercel/analytics/react"
+import { WagmiProvider, http } from "wagmi";
+import { mainnet } from "viem/chains";
 
-const { chains, publicClient } = configureChains(
-  [...SUPPORTED_NETWORKS],
-  [
-    alchemyProvider({
-      apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY as string,
-    }),
-    jsonRpcProvider({
-      rpc: (chain: any) => ({ http: chain.rpcUrls.default.http[0] }),
-    }),
-  ],
-  {
-    pollingInterval: 7_000,
-    stallTimeout: 5_000, // time to change to another RPC if failed
-  }
-);
+// const { chains, publicClient } = configureChains(
+//   [...SUPPORTED_NETWORKS],
+//   [
+//     alchemyProvider({
+//       apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY as string,
+//     }),
+//     jsonRpcProvider({
+//       rpc: (chain: any) => ({ http: chain.rpcUrls.default.http[0] }),
+//     }),
+//   ],
+//   {
+//     pollingInterval: 7_000,
+//     stallTimeout: 5_000, // time to change to another RPC if failed
+//   }
+// );
+
+
+
+// const connectors = connectorsForWallets([
+//   {
+//     groupName: "Suggested",
+//     wallets: [
+//       injectedWallet({ chains }),
+//       rainbowWallet({ projectId: PROJECT_ID, chains }),
+//       metaMaskWallet({ projectId: PROJECT_ID, chains }),
+//       rabbyWallet({ chains }),
+//     ],
+//   },
+//   {
+//     groupName: "Others",
+//     wallets: [
+//       coinbaseWallet({ chains, appName: "VaultCraft" }),
+//       walletConnectWallet({
+//         projectId: PROJECT_ID,
+//         chains,
+//       }),
+//       coin98Wallet({ projectId: PROJECT_ID, chains }),
+//       safeWallet({ chains }),
+//       okxWallet({ chains, projectId: PROJECT_ID })
+//     ],
+//   },
+// ]);
 
 const PROJECT_ID = "9b83e8f348c7515d3f94d83f95a05749"
 
-const connectors = connectorsForWallets([
-  {
-    groupName: "Suggested",
-    wallets: [
-      injectedWallet({ chains }),
-      rainbowWallet({ projectId: PROJECT_ID, chains }),
-      metaMaskWallet({ projectId: PROJECT_ID, chains }),
-      rabbyWallet({ chains }),
-    ],
+const config = getDefaultConfig({
+  appName: 'VaultCraft',
+  projectId: PROJECT_ID,
+  chains: SUPPORTED_NETWORKS,
+  transports: {
+    [mainnet.id]: http(),
   },
-  {
-    groupName: "Others",
-    wallets: [
-      coinbaseWallet({ chains, appName: "VaultCraft" }),
-      walletConnectWallet({
-        projectId: PROJECT_ID,
-        chains,
-      }),
-      coin98Wallet({ projectId: PROJECT_ID, chains }),
-      safeWallet({ chains }),
-      okxWallet({ chains, projectId: PROJECT_ID })
-    ],
-  },
-]);
-
-const config = createConfig({
-  autoConnect: true,
-  connectors,
-  publicClient,
-});
-
+})
 const nextFont = localFont({
   src: [
     {
@@ -154,8 +160,8 @@ export default function App({ Component, pageProps }: AppProps) {
         />
         <Toaster />
         <Analytics />
-        <WagmiConfig config={config}>
-          <RainbowKitProvider chains={chains} modalSize="compact">
+        <WagmiProvider config={config}>
+          <RainbowKitProvider modalSize="compact">
             <NoSSR>
               <Provider>
                 <Page>
@@ -164,7 +170,7 @@ export default function App({ Component, pageProps }: AppProps) {
               </Provider>
             </NoSSR>
           </RainbowKitProvider>
-        </WagmiConfig>
+        </WagmiProvider>
       </main>
     </>
   );

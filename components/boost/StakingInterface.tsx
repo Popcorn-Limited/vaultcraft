@@ -6,17 +6,13 @@ import MainActionButton from "@/components/button/MainActionButton";
 import useLockedBalanceOf from "@/lib/gauges/useLockedBalanceOf";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import { Address, formatEther } from "viem";
-import {
-  OptionTokenByChain,
-  VCX_LP,
-  VOTING_ESCROW,
-  ZERO,
-} from "@/lib/constants";
+import { OptionTokenByChain, VCX_LP, VOTING_ESCROW } from "@/lib/constants/addresses";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
-import NetworkSticker from "../network/NetworkSticker";
-import TokenIcon from "../common/TokenIcon";
+import NetworkSticker from "@/components/network/NetworkSticker";
+import TokenIcon from "@/components/common/TokenIcon";
 import { useAtom } from "jotai";
 import { tokensAtom } from "@/lib/atoms";
+import { ZERO } from "@/lib/constants";
 
 export function votingPeriodEnd(timestamp?: number): number[] {
   const periodEnd = timestamp ? timestamp : getVotePeriodEndTime();

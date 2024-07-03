@@ -3,8 +3,8 @@ import { AdminProxyByChain, MultiStrategyVaultAbi, VaultAbi, VaultControllerByCh
 import { VaultData, VaultV1Settings } from "@/lib/types";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 import { useEffect, useState } from "react";
-import { createPublicClient, http } from "viem";
-import { Address, useAccount } from "wagmi";
+import { createPublicClient, http, Address } from "viem";
+import { useAccount } from "wagmi";
 import VaultRebalance from "@/components/vault/management/vault/Rebalance";
 import VaultStrategiesConfiguration from "@/components/vault/management/vault/Strategies";
 import VaultStrategyConfiguration from "@/components/vault/management/vault/Strategy";
@@ -92,6 +92,7 @@ async function getVaultSettings(vault: VaultData,): Promise<VaultV1Settings> {
     transport: http(RPC_URLS[vault.chainId]),
   });
 
+  // @ts-ignore
   const res: any[] = await client.multicall({
     contracts: getMulticalls(vault),
     allowFailure: false,
@@ -131,7 +132,7 @@ export default function VaultsV1Settings({ vaultData }: { vaultData: VaultData, 
       );
       setSettings(res);
     });
-    
+
     let tabs = DEFAULT_TABS
     if (vaultData.metadata.type !== "multi-strategy-vault-v1") {
       tabs.push("Take Fees")

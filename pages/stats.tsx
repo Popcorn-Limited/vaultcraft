@@ -358,7 +358,7 @@ export default function Vaults() {
           circulatingsupply: number;
         }>
       >("https://api.dune.com/api/v1/query/3238349/results", duneOpts),
-      publicClient.readContract({
+      publicClient?.readContract({
         address: BALANCER_VAULT,
         abi: BalancerVaultAbi,
         functionName: "getPoolTokens",
@@ -404,7 +404,7 @@ export default function Vaults() {
           total_number: number;
         }>
       >("https://api.dune.com/api/v1/query/3237039/results", duneOpts),
-      publicClient.readContract({
+      publicClient?.readContract({
         address: VOTING_ESCROW,
         abi: VotingEscrowAbi,
         functionName: "supply",

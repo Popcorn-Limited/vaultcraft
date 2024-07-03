@@ -1,8 +1,7 @@
 import { Address, zeroAddress } from "viem";
 import { AddressByChain } from "@/lib/types";
-import { mainnet } from "wagmi";
-import { arbitrum, aurora, avalanche, bsc, fantom, optimism, polygon } from "viem/chains";
-import { xLayer } from "./customChains";
+import { mainnet, arbitrum, aurora, avalanche, bsc, fantom, optimism, polygon } from "viem/chains";
+import { xLayer } from "@/lib/constants/customChains";
 
 export const VCX: Address = "0xcE246eEa10988C495B4A90a905Ee9237a0f91543";
 export const VCX_LP: Address = "0x577A7f7EE659Aa14Dc16FD384B3F8078E23F1920";
