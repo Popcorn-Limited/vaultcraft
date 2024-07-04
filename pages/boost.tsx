@@ -137,8 +137,8 @@ function VePopContainer() {
         setCanCastVote(!!account && tokens[1][VE_VCX].balance > 0);
       }
     }
-    if (!account && !initalLoad && Object.keys(vaults).length > 0) initialSetup();
-    if (account && !accountLoad && !!tokens[1][VE_VCX].balance && Object.keys(vaults).length > 0) initialSetup();
+    if (!account && !initalLoad && Object.keys(tokens).length > 0 && Object.keys(vaults).length > 0) initialSetup();
+    if (account && !accountLoad && Object.keys(tokens).length > 0 && Object.keys(vaults).length > 0) initialSetup();
   }, [account, initalLoad, accountLoad, vaults]);
 
   function handleVotes(val: number, index: Address) {
@@ -163,8 +163,9 @@ function VePopContainer() {
     setSearchTerm(value);
   }
 
-  return (
+  return Object.keys(tokens).length > 0 ? (
     <>
+
       <LockModal
         show={[showLockModal, setShowLockModal]}
         setShowLpModal={setShowLpModal}
@@ -309,7 +310,8 @@ function VePopContainer() {
         </div>
       </div>
     </>
-  );
+  )
+    : <p className="text-white">Loading...</p>
 }
 
 export default function VeVCX() {
