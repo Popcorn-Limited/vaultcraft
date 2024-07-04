@@ -328,6 +328,7 @@ export default function Vaults() {
   }
 
   async function init() {
+    if (!publicClient) return
     const duneOpts = {
       headers: {
         "x-dune-api-key": process.env.DUNE_API_KEY,
@@ -358,7 +359,7 @@ export default function Vaults() {
           circulatingsupply: number;
         }>
       >("https://api.dune.com/api/v1/query/3238349/results", duneOpts),
-      publicClient?.readContract({
+      publicClient.readContract({
         address: BALANCER_VAULT,
         abi: BalancerVaultAbi,
         functionName: "getPoolTokens",
@@ -404,7 +405,7 @@ export default function Vaults() {
           total_number: number;
         }>
       >("https://api.dune.com/api/v1/query/3237039/results", duneOpts),
-      publicClient?.readContract({
+      publicClient.readContract({
         address: VOTING_ESCROW,
         abi: VotingEscrowAbi,
         functionName: "supply",
@@ -423,7 +424,7 @@ export default function Vaults() {
     ]);
 
     const vcxInUsd = tokens[1][VCX].price
-    const wethInUsd =tokens[1][WETH].price
+    const wethInUsd = tokens[1][WETH].price
     const lpInUsd = tokens[1][VCX_LP].price
     const tvlByTime = Object.keys(
       llamaRes.data.tokensInUsd.slice(-1)[0].tokens

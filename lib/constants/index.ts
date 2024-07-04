@@ -4,7 +4,6 @@ import axios from "axios";
 
 export * from "./addresses"
 export * from "./abi";
-export * from "./customChains";
 
 export async function getAssetsByChain(chainId: number): Promise<Token[]> {
   const { data: assets } = await axios.get(

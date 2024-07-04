@@ -4,8 +4,8 @@ import {
   mainnet,
   optimism,
   polygon,
+  xLayer,
 } from "viem/chains";
-import { xLayer } from "@/lib/constants";
 
 export enum ChainId {
   Ethereum = 1,
@@ -66,7 +66,7 @@ export const RPC_URLS: { [key: number]: string } = {
   [ChainId.XLayer]: "https://rpc.xlayer.tech"
 };
 
-export const SUPPORTED_NETWORKS = [mainnet, polygon, optimism, arbitrum, xLayer]
+export const SUPPORTED_NETWORKS: Chain[] = [mainnet, polygon, optimism, arbitrum, xLayer]
 
 export const ChainById: { [key: number]: Chain } = {
   1: mainnet,

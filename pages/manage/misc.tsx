@@ -60,7 +60,8 @@ function SetOptionTokenOracleParams(): JSX.Element {
   }>({ multiplier: 0, secs: 0, ago: 0, minPrice: 0 });
 
   async function getValues() {
-    const res = await publicClient?.multicall({
+    if (!publicClient) return
+    const res = await publicClient.multicall({
       contracts: [
         {
           address: OVCX_ORACLE,
@@ -95,7 +96,7 @@ function SetOptionTokenOracleParams(): JSX.Element {
 
   useEffect(() => {
     if (values.multiplier === 0) getValues();
-  }, [values]);
+  }, [values, publicClient]);
 
   function handleChangeInput(
     value: string,

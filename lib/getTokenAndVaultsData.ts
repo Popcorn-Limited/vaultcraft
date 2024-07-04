@@ -10,7 +10,7 @@ import {
 import axios from "axios";
 import { VaultAbi } from "@/lib/constants/abi/Vault";
 import { LlamaApy, TokenByAddress, VaultData, VaultDataByAddress, VaultLabel } from "@/lib/types";
-import { ChildGaugeAbi, ERC20Abi, GaugeAbi, OptionTokenByChain, VCX, VCX_LP, VeTokenByChain, XVCXByChain, ZapAssetAddressesByChain, xLayer } from "@/lib/constants";
+import { ChildGaugeAbi, ERC20Abi, GaugeAbi, OptionTokenByChain, VCX, VCX_LP, VeTokenByChain, XVCXByChain, ZapAssetAddressesByChain } from "@/lib/constants";
 import { RPC_URLS } from "@/lib/utils/connectors";
 import { YieldOptions } from "vaultcraft-sdk";
 import { AavePoolUiAbi } from "@/lib/constants/abi/Aave";
@@ -20,7 +20,7 @@ import getFraxlendApy from "@/lib/external/fraxlend/getFraxlendApy";
 import { prepareAssets, prepareVaults, addBalances, prepareGauges } from "@/lib/tokens";
 import getGaugesData from "@/lib/gauges/getGaugeData";
 import { VE_VCX } from "./constants/addresses";
-import { mainnet } from "viem/chains";
+import { mainnet, xLayer } from "viem/chains";
 
 const EMPTY_LLAMA_APY_ENTRY: LlamaApy = {
   apy: 0,

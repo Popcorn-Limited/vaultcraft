@@ -8,7 +8,7 @@ import Head from "next/head";
 import { Provider } from "jotai";
 import NoSSR from "react-no-ssr";
 import Page from "@/components/common/Page";
-import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
+import { RPC_URLS, SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { connectorsForWallets } from "@rainbow-me/rainbowkit";
 import {
   injectedWallet,
@@ -23,61 +23,55 @@ import {
 } from "@rainbow-me/rainbowkit/wallets";
 import { Analytics } from "@vercel/analytics/react"
 import { WagmiProvider, http } from "wagmi";
-import { mainnet } from "viem/chains";
-
-// const { chains, publicClient } = configureChains(
-//   [...SUPPORTED_NETWORKS],
-//   [
-//     alchemyProvider({
-//       apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY as string,
-//     }),
-//     jsonRpcProvider({
-//       rpc: (chain: any) => ({ http: chain.rpcUrls.default.http[0] }),
-//     }),
-//   ],
-//   {
-//     pollingInterval: 7_000,
-//     stallTimeout: 5_000, // time to change to another RPC if failed
-//   }
-// );
-
-
-
-// const connectors = connectorsForWallets([
-//   {
-//     groupName: "Suggested",
-//     wallets: [
-//       injectedWallet({ chains }),
-//       rainbowWallet({ projectId: PROJECT_ID, chains }),
-//       metaMaskWallet({ projectId: PROJECT_ID, chains }),
-//       rabbyWallet({ chains }),
-//     ],
-//   },
-//   {
-//     groupName: "Others",
-//     wallets: [
-//       coinbaseWallet({ chains, appName: "VaultCraft" }),
-//       walletConnectWallet({
-//         projectId: PROJECT_ID,
-//         chains,
-//       }),
-//       coin98Wallet({ projectId: PROJECT_ID, chains }),
-//       safeWallet({ chains }),
-//       okxWallet({ chains, projectId: PROJECT_ID })
-//     ],
-//   },
-// ]);
+import { arbitrum, mainnet, optimism, polygon, xLayer } from "viem/chains";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const PROJECT_ID = "9b83e8f348c7515d3f94d83f95a05749"
+
+const connectors = connectorsForWallets([
+  {
+    groupName: "Suggested",
+    wallets: [
+      injectedWallet,
+      walletConnectWallet,
+      safeWallet,
+      rabbyWallet,
+    ],
+  },
+  {
+    groupName: "Others",
+    wallets: [
+      coinbaseWallet,
+      coin98Wallet,
+      okxWallet,
+      rainbowWallet
+    ],
+  },
+],
+  {
+    appName: "VaultCraft",
+    projectId: PROJECT_ID
+  }
+);
+
 
 const config = getDefaultConfig({
   appName: 'VaultCraft',
   projectId: PROJECT_ID,
+  // @ts-ignore
   chains: SUPPORTED_NETWORKS,
   transports: {
-    [mainnet.id]: http(),
+    [mainnet.id]: http(RPC_URLS[mainnet.id]),
+    [polygon.id]: http(RPC_URLS[polygon.id]),
+    [optimism.id]: http(RPC_URLS[optimism.id]),
+    [arbitrum.id]: http(RPC_URLS[arbitrum.id]),
+    [xLayer.id]: http(RPC_URLS[xLayer.id]),
   },
+  connectors
 })
+
+const queryClient = new QueryClient()
+
 const nextFont = localFont({
   src: [
     {
@@ -161,17 +155,20 @@ export default function App({ Component, pageProps }: AppProps) {
         <Toaster />
         <Analytics />
         <WagmiProvider config={config}>
-          <RainbowKitProvider modalSize="compact">
-            <NoSSR>
-              <Provider>
-                <Page>
-                  <Component {...pageProps} />
-                </Page>
-              </Provider>
-            </NoSSR>
-          </RainbowKitProvider>
+          <QueryClientProvider client={queryClient}>
+            <RainbowKitProvider modalSize="compact">
+              <NoSSR>
+                <Provider>
+                  <Page>
+                    { /* @ts-ignore */}
+                    <Component {...pageProps} />
+                  </Page>
+                </Provider>
+              </NoSSR>
+            </RainbowKitProvider>
+          </QueryClientProvider>
         </WagmiProvider>
-      </main>
+      </main >
     </>
   );
 }

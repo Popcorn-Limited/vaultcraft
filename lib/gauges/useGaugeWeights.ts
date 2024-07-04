@@ -38,7 +38,6 @@ export default function useGaugeWeights({
         args: [account || zeroAddress, address],
       },
     ],
-    enabled: !!address && !!chainId,
     allowFailure: false,
   });
 }

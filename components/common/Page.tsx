@@ -11,17 +11,17 @@ import { useRouter } from "next/router";
 import { Address, createPublicClient, http, zeroAddress } from "viem";
 import Modal from "@/components/modal/Modal";
 import MainActionButton from "../button/MainActionButton";
-import { availableZapAssetAtom, gaugeRewardsAtom, networthAtom, tokensAtom, tvlAtom, vaultronAtom, zapAssetsAtom } from "@/lib/atoms";
-import { ReserveData, Token, TokenByAddress, TokenType, UserAccountData, VaultData, VaultDataByAddress } from "@/lib/types";
+import { gaugeRewardsAtom, networthAtom, tokensAtom, tvlAtom, vaultronAtom, zapAssetsAtom } from "@/lib/atoms";
+import { ReserveData, TokenByAddress, TokenType, UserAccountData, VaultData, VaultDataByAddress } from "@/lib/types";
 import getTokenAndVaultsDataByChain from "@/lib/getTokenAndVaultsData";
 import { aaveAccountDataAtom, aaveReserveDataAtom } from "@/lib/atoms/lending";
 import { GAUGE_NETWORKS } from "pages/boost";
 import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
 import axios from "axios";
 import { fetchAaveData } from "@/lib/external/aave";
-import { VotingEscrowAbi, xLayer } from "@/lib/constants";
+import { VotingEscrowAbi } from "@/lib/constants";
 import fetchVaultron from "@/lib/vaultron";
-import { mainnet, polygon } from "viem/chains";
+import { mainnet, polygon, xLayer } from "viem/chains";
 import { VCX_LP, VE_VCX } from "@/lib/constants/addresses";
 
 async function setUpYieldOptions() {

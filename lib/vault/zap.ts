@@ -4,9 +4,8 @@ import { showErrorToast, showSuccessToast } from "@/lib/toasts";
 import { AddressByChain, Clients, Token, TokenByAddress, ZapProvider } from "@/lib/types";
 import { handleAllowance } from "@/lib/approve";
 import mutateTokenBalance from "./mutateTokenBalance";
-import { mainnet, arbitrum, optimism, polygon } from "viem/chains";
-import { xLayer } from "@/lib/constants";
-import { networkMap } from "../utils/connectors";
+import { mainnet, arbitrum, optimism, polygon, xLayer } from "viem/chains";
+import { networkMap } from "@/lib/utils/connectors";
 
 interface BaseProps {
   chainId: number;

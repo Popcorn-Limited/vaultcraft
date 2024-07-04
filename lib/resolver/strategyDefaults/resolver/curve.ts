@@ -57,6 +57,7 @@ export async function curve({
     (gauge) => !GaugeTypesToSkip.includes(gauge.type)
   );
 
+  // @ts-ignore
   const lpToken = await client.multicall({
     contracts: filtered.map((gauge, idx) => {
       return {
