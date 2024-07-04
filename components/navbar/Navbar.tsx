@@ -1,6 +1,6 @@
 import { Fragment, useState, useEffect } from "react";
 import Link from "next/link";
-import { Dialog, Transition } from "@headlessui/react";
+import { Dialog, DialogPanel, Transition } from "@headlessui/react";
 import { PowerIcon } from "@heroicons/react/24/solid";
 import { useAccount, useDisconnect } from "wagmi";
 import { useChainModal, useConnectModal } from "@rainbow-me/rainbowkit";
@@ -55,6 +55,9 @@ export default function Navbar(): JSX.Element {
       if (foundVault) setVaultData(foundVault)
     }
   }, [query, chain])
+
+
+  console.log({ menuVisible })
 
   return (
     <>
@@ -151,87 +154,78 @@ export default function Navbar(): JSX.Element {
           </button>
         </div>
       </div >
-      {/* <Transition.Root show={menuVisible} as={Fragment}>
-        <Dialog
-          as="div"
-          className="fixed inset-0 overflow-hidden z-50"
-          onClose={() => toggleMenu(false)}
-        >
+      <Transition show={menuVisible} as={Fragment}>
+        <div className={`fixed inset-0 bg-black bg-opacity-50 backdrop-blur transition-opacity 
+            data-[closed]:opacity-0 
+            data-[enter]:duration-300 data-[enter]:data-[closed]:ease-out
+            data-[leave]:duration-200 data-[leave]:data-[closed]:ease-in
+              `} />
+        <Dialog as="div" className="relative z-50" open={menuVisible} onClose={() => toggleMenu(false)}>
+          <div className="fixed inset-0 overflow-hidden">
+            <div className="absolute inset-0 overflow-hidden">
+              <div className="fixed inset-x-0 top-0 bottom-0 w-[320px] flex">
+                <DialogPanel className="h-full w-full flex flex-col justify-between pt-12 px-8 shadow-xl bg-primaryYellow overflow-y-scroll">
+                  <div className="flex flex-1 flex-col w-full space-y-4">
+                    <div className="mb-6">
+                      <Link href={(!!query?.ref && isAddress(query.ref as string)) ? `/?ref=${query.ref}` : `/`} passHref>
+                        <img
+                          src="/images/icons/popLogoBlack.svg"
+                          alt="Logo"
+                          className="w-12 h-12 md:w-10 md:h-10 text-white"
+                        />
+                      </Link>
+                    </div>
+                    <div
+                      className="flex flex-col space-y-6 flex-1"
+                      onClick={() => toggleMenu(false)}
+                    >
+                      <NavbarLinks />
+                      <div className="md:hidden">
+                        <BuyVCXButton />
+                      </div>
+                    </div>
+                    <div className="pt-12 md:pt-0">
+                      <p className="text-customNeutral200">
+                        VaultCraft is a DeFi yield-optimizing protocol with
+                        customizable asset strategies that instantly zap your
+                        crypto from any chain into the highest yield-generating
+                        products across DeFi in 1 click.
+                      </p>
+                      <div className="flex justify-between pb-12 mt-12">
+                        <SocialMediaLinks
+                          color="#23262F"
+                          color2="#dfff1c"
+                          size="24"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </DialogPanel>
+              </div>
+            </div>
+          </div>
+
           <button
-            className={`text-customGray500 absolute top-8 right-8 p-6 bg-customNeutral100 z-50 rounded-full flex justify-center items-center w-12 h-12`}
-            onClick={() => toggleMenu(!menuVisible)}
+            className="text-customGray500 fixed top-8 right-8 p-6 bg-customNeutral100 z-50 rounded-full flex justify-center items-center w-12 h-12"
+            onClick={() => toggleMenu(false)}
           >
             <div className="block w-10 bg-transparent">
               <span
                 aria-hidden="true"
-                className={`block h-0.5 w-8 bg-white transform transition duration-500 ease-in-out rounded-3xl ${menuVisible ? "rotate-45 translate-y-0.5" : "-translate-y-2"
-                  }`}
+                className={`block h-0.5 w-8 bg-white transform transition duration-500 ease-in-out rounded-3xl ${menuVisible ? "rotate-45 translate-y-0.5" : "-translate-y-2"}`}
               ></span>
               <span
                 aria-hidden="true"
-                className={`block h-0.5 w-8 bg-white transform transition duration-500 ease-in-out rounded-3xl ${menuVisible ? "opacity-0" : "opacity-100"
-                  }`}
+                className={`block h-0.5 w-8 bg-white transform transition duration-500 ease-in-out rounded-3xl ${menuVisible ? "opacity-0" : "opacity-100"}`}
               ></span>
               <span
                 aria-hidden="true"
-                className={`block h-0.5 w-8 bg-white transform transition duration-500 ease-in-out rounded-3xl ${menuVisible ? "-rotate-45 -translate-y-0.5" : "translate-y-2"
-                  }`}
+                className={`block h-0.5 w-8 bg-white transform transition duration-500 ease-in-out rounded-3xl ${menuVisible ? "-rotate-45 -translate-y-0.5" : "translate-y-2"}`}
               ></span>
             </div>
           </button>
-          <div className="absolute bg-black bg-opacity-50 top-0 h-full w-full backdrop-blur transition-opacity" />
-          <Dialog.Overlay className="absolute inset-0" />
-          <div className="fixed inset-x-0 top-0 bottom-0 w-[320px] flex bg-transparent">
-            <Transition.Child
-              as={Fragment}
-              enter="transform transition ease-in-out duration-500 sm:duration-700"
-              enterFrom="-translate-x-full"
-              enterTo="translate-x-0"
-              leave="transform transition ease-in-out duration-500 sm:duration-700"
-              leaveFrom="translate-x-0"
-              leaveTo="-translate-x-full"
-            >
-              <div className="h-full w-full flex flex-col justify-between pt-12 px-8 shadow-xl bg-primaryYellow overflow-y-scroll">
-                <div className="flex flex-1 flex-col w-full space-y-4">
-                  <div className="mb-6">
-                    <Link href={(!!query?.ref && isAddress(query.ref as string)) ? `/?ref=${query.ref}` : `/`} passHref>
-                      <img
-                        src="/images/icons/popLogoBlack.svg"
-                        alt="Logo"
-                        className="w-12 h-12 md:w-10 md:h-10 text-white"
-                      />
-                    </Link>
-                  </div>
-                  <div
-                    className="flex flex-col space-y-6 flex-1"
-                    onClick={() => toggleMenu(false)}
-                  >
-                    <NavbarLinks />
-                    <div className="md:hidden">
-                      <BuyVCXButton />
-                    </div>
-                  </div>
-                  <div className="pt-12 md:pt-0">
-                    <p className="text-customNeutral200">
-                      VaultCraft is a DeFi yield-optimizing protocol with
-                      customizable asset strategies that instantly zap your
-                      crypto from any chain into the highest yield-generating
-                      products across DeFi in 1 click.
-                    </p>
-                    <div className="flex justify-between pb-12 mt-12">
-                      <SocialMediaLinks
-                        color="#23262F"
-                        color2="#dfff1c"
-                        size="24"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Transition.Child>
-          </div>
         </Dialog>
-      </Transition.Root> */}
+      </Transition>
     </>
   );
 }
