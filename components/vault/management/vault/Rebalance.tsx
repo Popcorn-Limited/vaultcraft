@@ -111,7 +111,7 @@ export default function VaultRebalance({
       })
 
       if (success) {
-        const updatedVault = await addStrategyData({ [vaultData.address]: vaultData }, vaultData.chainId, publicClient!, yieldOptions)
+        const updatedVault = await addStrategyData({ [vaultData.address]: vaultData }, vaultData.chainId, publicClient!)
         vaultData = updatedVault[vaultData.address]
       }
       return
@@ -137,7 +137,7 @@ export default function VaultRebalance({
       })
 
       if (success) {
-        const updatedVault = await addStrategyData({ [vaultData.address]: vaultData }, vaultData.chainId, publicClient!, yieldOptions)
+        const updatedVault = await addStrategyData({ [vaultData.address]: vaultData }, vaultData.chainId, publicClient!)
         vaultData = updatedVault[vaultData.address]
       }
       return
