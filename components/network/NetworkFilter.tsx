@@ -27,23 +27,56 @@ export default function NetworkFilter({
     <>
       <div className="hidden md:flex flex-row items-center space-x-2">
         <Menu>
-          <MenuButton>Networks</MenuButton>
-          <MenuItems anchor="bottom">
+          <MenuButton
+            className="w-full py-2 px-5 flex flex-row items-center justify-between space-x-1 rounded-4xl border border-white"
+          >
+            <div className="flex items-center">
+              <Image
+                src={networkLogos[activeNetwork]}
+                alt={"activeNetwork"}
+                height="24"
+                width="24"
+              />
+              <p className="ml-4 mt-1 text-white">
+                {activeNetwork === ChainId.ALL
+                  ? "All Networks"
+                  : ChainId[activeNetwork]}
+              </p>
+            </div>
+            <ChevronDownIcon className="w-5 h-5 text-white" aria-hidden="true" />
+          </MenuButton>
+          <MenuItems anchor="bottom" className="bg-customNeutral200 border border-customGray500 rounded-xl w-48 mt-2 px-3 py-2 space-y-1">
             <MenuItem>
-              <a className="block data-[focus]:bg-blue-100" href="/settings">
-                Settings
-              </a>
+              <div
+                className="flex flex-row items-center w-full cursor-pointer hover:bg-customNeutral100 px-1 py-1 rounded-xl"
+                onClick={() => setActiveAndSelectedNetwork(ChainId.ALL)}
+              >
+                <Image
+                  src={networkLogos[ChainId.ALL]}
+                  alt={ChainId[ChainId.ALL]}
+                  height="24"
+                  width="24"
+                />
+                <p className="ml-4 mb-0.5 text-white">All Networks</p>
+              </div>
             </MenuItem>
-            <MenuItem>
-              <a className="block data-[focus]:bg-blue-100" href="/support">
-                Support
-              </a>
-            </MenuItem>
-            <MenuItem>
-              <a className="block data-[focus]:bg-blue-100" href="/license">
-                License
-              </a>
-            </MenuItem>
+            {supportedNetworks.map((network) => (
+              <MenuItem>
+                <div
+                  className="flex flex-row items-center w-full cursor-pointer hover:bg-customNeutral100 px-1 py-1 rounded-xl"
+                  onClick={() => setActiveAndSelectedNetwork(network)}
+                  key={network}
+                >
+                  <Image
+                    src={networkLogos[network]}
+                    alt={ChainId[network]}
+                    height="24"
+                    width="24"
+                  />
+                  <p className="ml-4 mb-0.5 text-white">{ChainId[network]}</p>
+                </div>
+              </MenuItem>
+            ))}
           </MenuItems>
         </Menu>
       </div>

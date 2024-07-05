@@ -13,7 +13,7 @@ export default function SearchBar({
   return (
     <div
       className={cn(
-        "md:w-96 flex px-6 py-3 items-center rounded-lg border border-customGray300 border-opacity-40 group/search hover:border-opacity-80 gap-2",
+        "md:w-96 flex px-6 py-4 items-center rounded-lg border border-customGray300 border-opacity-40 group/search hover:border-opacity-80 gap-2",
         className
       )}
     >

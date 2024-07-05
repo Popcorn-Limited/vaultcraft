@@ -104,7 +104,9 @@ export default function VaultRow({
         <p className="text-lg">
           $ {walletValue < 1 ? "0" : NumberFormatter.format(walletValue)}
         </p>
-        <p className="text-sm -mt-0.5 text-customGray200">{walletValue < 1 ? "0" : formatAndRoundNumber(asset.balance, asset.decimals)} {asset.symbol}</p>
+        <p className="text-sm -mt-0.5 text-customGray200">
+          {walletValue < 1 ? "0" : formatAndRoundNumber(asset.balance, asset.decimals)} {asset.symbol}
+        </p>
       </td>
 
       <td className="text-right">
@@ -126,14 +128,34 @@ export default function VaultRow({
         <p className="text-lg">
           $ {tvl < 1 ? "0" : NumberFormatter.format(tvl)}
         </p>
-        <p className="text-sm -mt-0.5 text-customGray200">{formatAndRoundNumber(vaultData.totalAssets, asset.decimals)} {asset.symbol}</p>
+        <p className="text-sm -mt-0.5 text-customGray200">
+          {formatAndRoundNumber(vaultData.totalAssets, asset.decimals)} {asset.symbol}
+        </p>
       </td>
 
       <td className="text-right text-lg">{formatTwoDecimals(apy)}%</td>
 
-      <td className="text-right text-lg">{formatTwoDecimals(gaugeData?.lowerAPR || 0)}%</td>
+      <td className="text-right text-lg">
+        <p className="text-lg">
+          {formatTwoDecimals(gaugeData?.lowerAPR || 0)}%
+        </p>
+        {gaugeData && gaugeData?.rewardApy.apy > 0 &&
+          <p className="text-sm -mt-0.5 text-customGray200">
+            + {formatTwoDecimals(gaugeData?.rewardApy.apy)}%
+          </p>
+        }
+      </td>
 
-      <td className="text-right text-lg">{formatTwoDecimals(gaugeData?.upperAPR || 0)}%</td>
+      <td className="text-right text-lg">
+        <p className="text-lg">
+          {formatTwoDecimals(gaugeData?.upperAPR || 0)}%
+        </p>
+        {gaugeData && gaugeData?.rewardApy.apy > 0 &&
+          <p className="text-sm -mt-0.5 text-customGray200">
+            + {formatTwoDecimals(gaugeData?.rewardApy.apy)}%
+          </p>
+        }
+      </td>
 
       <td className="text-right text-lg text-primaryGreen">x{formatTwoDecimals(boost)}</td>
     </tr>

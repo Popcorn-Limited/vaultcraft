@@ -44,7 +44,7 @@ export default function VaultsTable({
                   onClick={() => setShowSearchInput(true)}
                   role="button"
                 >
-                  <button className="w-12 pointer-events-none h-10 grid place-items-center border !p-0 !rounded-lg">
+                  <button className="w-12 pointer-events-none h-11 grid place-items-center border !p-0 !rounded-lg">
                     <GoSearch className="scale-110" />
                   </button>
 

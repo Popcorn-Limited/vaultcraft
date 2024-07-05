@@ -157,17 +157,6 @@ export default function VaultsContainer({
         </div>
       </section>
 
-      {/* <section className="my-10 px-4 md:px-8 md:flex flex-row items-center justify-between">
-        <NetworkFilter
-          supportedNetworks={SUPPORTED_NETWORKS.map((chain) => chain.id)}
-          selectNetwork={selectNetwork}
-        />
-        <SecondaryActionButton
-          label="Exercise oVCX"
-          handleClick={() => setShowExerciseModal(true)}
-        />
-      </section> */}
-
       <div className="md:hidden">
         <nav className="px-5 [&_>*]:shrink-0 mt-8 [&_.my-10]:my-0 whitespace-nowrap flex flex-col smmd:flex-row gap-4 mb-10">
           <NetworkFilter
@@ -177,12 +166,12 @@ export default function VaultsContainer({
 
           <section className="flex gap-3 flex-grow items-center justify-end">
             <SearchBar
-              className="!w-full [&_input]:w-full smmd:!w-auto h-[3.25rem] !border-customGray500"
+              className="!w-full [&_input]:w-full smmd:!w-auto h-[3.5rem] !border-customGray500"
               searchTerm={searchTerm}
               handleSearch={handleSearch}
             />
             <VaultsSorting
-              className="[&_button]:h-[3.25rem]"
+              className="[&_button]:h-[3.5rem]"
               vaultState={[vaults, setVaults]}
             />
           </section>
