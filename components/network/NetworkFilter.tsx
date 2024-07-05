@@ -27,7 +27,7 @@ export default function NetworkFilter({
     <>
       <div className="hidden md:flex flex-row items-center space-x-2">
         <Menu>
-          <MenuButton>My account</MenuButton>
+          <MenuButton>Networks</MenuButton>
           <MenuItems anchor="bottom">
             <MenuItem>
               <a className="block data-[focus]:bg-blue-100" href="/settings">

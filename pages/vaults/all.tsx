@@ -4,7 +4,6 @@ import { AddressesByChain } from "@/lib/types";
 import axios from "axios";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { useEffect, useState } from "react";
-import useSWR from "swr";
 
 async function getHiddenVaults(): Promise<AddressesByChain> {
   const result: AddressesByChain = {};
@@ -20,10 +19,11 @@ async function getHiddenVaults(): Promise<AddressesByChain> {
 }
 
 const Vaults: NextPage = () => {
-  const { data: hiddenVaults } = useSWR("popcorn-vaults", {
-    fetcher: () => getHiddenVaults(),
-    dedupingInterval: 15 * 60 * 1000, // 15 minutes
-  });
+  const [hiddenVaults, setHiddenVaults] = useState<AddressesByChain>({})
+
+  useEffect(() => {
+    getHiddenVaults().then(res => setHiddenVaults(res))
+  }, [])
 
   return Object.keys(hiddenVaults).length > 0 ? (
     <VaultsContainer hiddenVaults={hiddenVaults} displayVaults={{}} />
