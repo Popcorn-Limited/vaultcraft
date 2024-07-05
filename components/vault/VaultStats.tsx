@@ -38,7 +38,6 @@ export default function VaultStats({
     setDepositValue(depositValue_)
   }, [vault, gauge, asset])
 
-
   return (
     <div className="w-full md:flex md:flex-wrap md:justify-between md:gap-4">
       <CardStat
@@ -51,11 +50,7 @@ export default function VaultStats({
       <CardStat
         id={`${baseTooltipId}-deposit`}
         label="Your Deposit"
-        value={`$ ${depositValue < 1 ? "0"
-          : `${!!gauge ?
-            NumberFormatter.format(((gauge.balance * gauge.price) / 10 ** asset?.decimals!) + ((vault?.balance! * vault?.price!) / 10 ** asset?.decimals!))
-            : formatAndRoundNumber(vault?.balance! * vault?.price!, asset?.decimals!)
-          }`}`}
+        value={`$ ${depositValue}`}
         secondaryValue={`${depositValue < 1 ? "0" :
           `${!!gauge ?
             NumberFormatter.format(((gauge.balance) / 10 ** gauge.decimals) + ((vault?.balance!) / 10 ** vault?.decimals!))

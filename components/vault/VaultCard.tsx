@@ -1,6 +1,6 @@
-import type { PropsWithChildren } from "react";
+import { useEffect, useState, type PropsWithChildren } from "react";
 
-import { isAddress } from "viem";
+import { isAddress, zeroAddress } from "viem";
 import { useAtom } from "jotai";
 
 import {
@@ -8,7 +8,7 @@ import {
   formatAndRoundNumber,
   formatTwoDecimals,
 } from "@/lib/utils/formatBigNumber";
-import type { VaultData } from "@/lib/types";
+import type { Token, VaultData } from "@/lib/types";
 import { tokensAtom } from "@/lib/atoms";
 import { cn } from "@/lib/utils/helpers";
 import { useRouter } from "next/router";
@@ -24,30 +24,50 @@ export default function VaultCard({
   const { query, ...router } = useRouter();
 
   const {
-    asset,
-    gauge,
+    asset: assetAddress,
     gaugeData,
+    gauge: gaugeAddress,
     tvl,
     apy,
     vault: vaultAddress,
     chainId,
   } = vaultData;
+
   const [tokens] = useAtom(tokensAtom);
+  const [asset, setAsset] = useState<Token>();
+  const [vault, setVault] = useState<Token>();
+  const [gauge, setGauge] = useState<Token>();
+  const [walletValue, setWalletValue] = useState<number>(0)
+  const [depositValue, setDepositValue] = useState<number>(0)
 
-  const vault = tokens[chainId]?.[vaultAddress] ?? {};
-  const dataAsset = tokens[chainId]?.[asset] ?? {};
-  const dataGauge = tokens[chainId]?.[gauge!] ?? {};
+  useEffect(() => {
+    if (vaultData) {
+      const asset_ = tokens[chainId][assetAddress];
+      const vault_ = tokens[chainId][vaultAddress];
+      const gauge_ = gaugeAddress && gaugeAddress !== zeroAddress ? tokens[chainId][gaugeAddress] : undefined
 
-  const boost = ((vaultData.gaugeData?.workingBalance! / (dataGauge?.balance || 0)) * 5) || 1
+      let depositValue_ = (vault_.balance * vault_.price) / (10 ** vault_.decimals)
+      if (gauge_) depositValue_ += (gauge_.balance * gauge_.price) / (10 ** gauge_.decimals)
 
-  const baseTooltipId = vault.address.slice(1);
+      setWalletValue((asset_.balance * asset_.price) / (10 ** asset_.decimals))
+      setDepositValue(depositValue_)
+
+      setAsset(asset_);
+      setVault(vault_);
+      setGauge(gauge_);
+    }
+  }, [vaultData])
+
+  const boost = ((vaultData.gaugeData?.workingBalance! / (gauge?.balance || 0)) * 5) || 1
+
+  const baseTooltipId = vaultData.address.slice(1);
 
   const searchData = [
     vaultData.metadata?.vaultName,
-    dataAsset?.symbol,
-    dataAsset?.name,
-    dataGauge?.symbol,
-    dataGauge?.name,
+    asset?.symbol,
+    asset?.name,
+    gauge?.symbol,
+    gauge?.name,
     ...(vaultData.metadata?.labels ?? []),
     ...vaultData.strategies.map(
       ({ metadata }) => `${metadata?.name}${metadata?.description}`
@@ -56,6 +76,7 @@ export default function VaultCard({
     .join()
     .toLowerCase();
 
+  if (!vaultData || !asset || !vault) return <></>;
   return (
     <div
       role="button"
@@ -84,28 +105,28 @@ export default function VaultCard({
         <CardStat
           id={`${baseTooltipId}-wallet`}
           label="Your Wallet"
-          value={`$ ${formatAndRoundNumber(dataAsset.balance * dataAsset.price, dataAsset.decimals)}`}
-          secondaryValue={`${formatAndRoundNumber(dataAsset.balance, dataAsset.decimals)} ${dataAsset.symbol}`}
+          value={`$ ${walletValue < 1 ? "0" : NumberFormatter.format(walletValue)}`}
+          secondaryValue={`${walletValue < 1 ? "0" : formatAndRoundNumber(asset.balance, asset.decimals)} ${asset.symbol}`}
           tooltip="Value of deposit assets held in your wallet"
         />
         <CardStat
           id={`${baseTooltipId}-deposit`}
           label="Your Deposit"
-          value={`$ ${!!gauge ?
-            NumberFormatter.format(((dataGauge.balance * dataGauge.price) / 10 ** dataGauge.decimals) + ((vault?.balance! * vault?.price!) / 10 ** vault?.decimals!))
-            : formatAndRoundNumber(vault?.balance! * vault?.price!, vault?.decimals!)
-            }`}
-          secondaryValue={`${!!gauge ?
-            NumberFormatter.format(((dataGauge.balance) / 10 ** dataGauge.decimals) + ((vault?.balance!) / 10 ** vault?.decimals!))
-            : formatAndRoundNumber(vault?.balance!, vault?.decimals!)
-            } ${dataAsset.symbol}`}
+          value={`$ ${depositValue < 1 ? "0" : NumberFormatter.format(depositValue)}`}
+          secondaryValue={`${depositValue < 1 ? "0" :
+            (
+              !!gauge ?
+                NumberFormatter.format(((gauge.balance) / 10 ** gauge.decimals) + ((vault?.balance!) / 10 ** vault?.decimals!))
+                : formatAndRoundNumber(vault?.balance!, vault?.decimals!)
+            )
+            } ${asset.symbol}`}
           tooltip="Value of your vault deposits"
         />
         <CardStat
           id={`${baseTooltipId}-tvl`}
           label="TVL"
           value={`$ ${vaultData.tvl < 1 ? "0" : NumberFormatter.format(vaultData.tvl)}`}
-          secondaryValue={`${formatAndRoundNumber(vaultData.totalAssets, dataAsset.decimals)} ${dataAsset.symbol}`}
+          secondaryValue={`${formatAndRoundNumber(vaultData.totalAssets, asset.decimals)} ${asset.symbol}`}
           tooltip="Total value of all assets deposited into the vault"
         />
         <CardStat
@@ -121,12 +142,14 @@ export default function VaultCard({
               id={`${baseTooltipId}-minBoost`}
               label="Min Boost APR"
               value={`${formatTwoDecimals(vaultData?.gaugeData?.lowerAPR)} %`}
+              secondaryValue={gaugeData && gaugeData?.rewardApy.apy > 0 ? `+ ${formatTwoDecimals(gaugeData?.rewardApy.apy)}%` : undefined}
               tooltip={`Minimum oVCX boost APR based on most current epoch's distribution. (Based on the current emissions for this gauge of ${NumberFormatter.format(vaultData?.gaugeData.annualEmissions / 5)} oVCX p. year)`}
             />
             <CardStat
               id={`${baseTooltipId}-maxBoost`}
               label="Max Boost APR"
               value={`${formatTwoDecimals(vaultData?.gaugeData?.upperAPR)} %`}
+              secondaryValue={gaugeData && gaugeData?.rewardApy.apy > 0 ? `+ ${formatTwoDecimals(gaugeData?.rewardApy.apy)}%` : undefined}
               tooltip={`Maximum oVCX boost APR based on most current epoch's distribution. (Based on the current emissions for this gauge of ${NumberFormatter.format(vaultData?.gaugeData.annualEmissions)} oVCX p. year)`}
             />
             <CardStat

@@ -61,11 +61,10 @@ export default function NetworkFilter({
               </div>
             </MenuItem>
             {supportedNetworks.map((network) => (
-              <MenuItem>
+              <MenuItem key={network}>
                 <div
                   className="flex flex-row items-center w-full cursor-pointer hover:bg-customNeutral100 px-1 py-1 rounded-xl"
                   onClick={() => setActiveAndSelectedNetwork(network)}
-                  key={network}
                 >
                   <Image
                     src={networkLogos[network]}
