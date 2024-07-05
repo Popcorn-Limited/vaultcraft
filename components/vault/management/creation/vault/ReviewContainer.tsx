@@ -2,12 +2,9 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 import { useAtom } from "jotai";
 import {
-  WalletClient,
-  mainnet,
   useAccount,
-  useNetwork,
   usePublicClient,
-  useSwitchNetwork,
+  useSwitchChain,
   useWalletClient,
 } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
@@ -28,7 +25,7 @@ import MainActionButton from "@/components/button/MainActionButton";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import Modal from "@/components/modal/Modal";
 import { deployVault } from "@/lib/vault/deployVault";
-import { stringToHex } from "viem";
+import { WalletClient, stringToHex } from "viem";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { VaultCreationContainerProps } from ".";
 import VaultCreationCard from "@/components/vault/management/creation/VaultCreationCard";
@@ -41,10 +38,9 @@ export default function ReviewContainer({
   const router = useRouter();
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
-  const { address: account } = useAccount();
+  const { address: account, chain } = useAccount();
   const { openConnectModal } = useConnectModal();
-  const { switchNetwork } = useSwitchNetwork();
-  const { chain } = useNetwork();
+  const { switchChain } = useSwitchChain();
 
   const [adapter] = useAtom(adapterAtom);
   const [strategyData] = useAtom(strategyDeploymentAtom);
@@ -71,13 +67,13 @@ export default function ReviewContainer({
     // Deploy is currently only available on mainnet
     // @ts-ignore
     if (!SUPPORTED_NETWORKS.map((network) => network.id).includes(chain.id))
-      switchNetwork?.(Number(mainnet.id));
+      switchChain?.({ chainId: 1 });
 
     setIsLoading(true);
     deployVault(
       chain,
       walletClient as WalletClient,
-      publicClient,
+      publicClient!,
       fees,
       asset,
       limit,

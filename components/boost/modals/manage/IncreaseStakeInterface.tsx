@@ -1,14 +1,13 @@
-import { Dispatch, FormEventHandler, SetStateAction, useMemo } from "react";
-import { Address, useAccount, useBalance, useToken } from "wagmi";
+import { Dispatch, SetStateAction } from "react";
 import {
   formatAndRoundBigNumber,
-  safeRound,
 } from "@/lib/utils/formatBigNumber";
-import { VCX_LP, ZERO } from "@/lib/constants";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import { calcDaysToUnlock, calculateVeOut } from "@/lib/gauges/utils";
-import { validateInput } from "@/lib/utils/helpers";
-import { formatEther } from "viem";
+import { handleChangeInput, handleMaxClick, validateInput } from "@/lib/utils/helpers";
+import { useAtom } from "jotai";
+import { tokensAtom } from "@/lib/atoms";
+import { VCX_LP } from "@/lib/constants/addresses";
 
 interface IncreaseStakeInterfaceProps {
   amountState: [string, Dispatch<SetStateAction<string>>];
@@ -21,33 +20,8 @@ export default function IncreaseStakeInterface({
   lockedBal,
   showLpModal,
 }: IncreaseStakeInterfaceProps): JSX.Element {
-  const { address: account } = useAccount();
-  const { data: lpToken } = useToken({
-    chainId: 1,
-    address: VCX_LP,
-  });
-  const { data: lpBal } = useBalance({
-    chainId: 1,
-    address: account,
-    token: VCX_LP,
-  });
-
+  const [tokens] = useAtom(tokensAtom);
   const [amount, setAmount] = amountState;
-
-  const errorMessage = useMemo(() => {
-    return (Number(amount) || 0) > Number(lpBal?.formatted)
-      ? "* Balance not available"
-      : "";
-  }, [amount, lpBal?.formatted]);
-
-  const handleMaxClick = () =>
-    setAmount(formatEther(safeRound(lpBal?.value || ZERO, 18)));
-
-  const handleChangeInput: FormEventHandler<HTMLInputElement> = ({
-    currentTarget: { value },
-  }) => {
-    setAmount(validateInput(value).isValid ? value : "0");
-  };
 
   return (
     <div className="space-y-8 mb-8 text-start">
@@ -57,22 +31,17 @@ export default function IncreaseStakeInterface({
         <p className="text-white font-semibold">Amount VCX</p>
         <InputTokenWithError
           captionText={``}
-          onSelectToken={() => {}}
-          onMaxClick={handleMaxClick}
+          onSelectToken={() => { }}
+          onMaxClick={() => handleMaxClick(tokens[1][VCX_LP], setAmount)}
           chainId={1}
           value={String(amount)}
-          onChange={handleChangeInput}
-          selectedToken={
-            {
-              ...lpToken,
-              name: "VCX-LP",
-              symbol: "VCX-LP",
-              decimals: 18,
-              price: 1,
-              balance: Number(lpBal?.value || 0),
-            } as any
+          onChange={(e) => handleChangeInput(e, setAmount)}
+          selectedToken={tokens[1][VCX_LP]}
+          errorMessage={
+            Number(amount) > (tokens[1][VCX_LP].balance / 1e18)
+              ? "Insufficient Balance"
+              : ""
           }
-          errorMessage={errorMessage}
           allowInput
           tokenList={[]}
           getToken={() =>
@@ -108,9 +77,9 @@ export default function IncreaseStakeInterface({
           <p className="text-customGray100">
             {Number(amount) > 0
               ? calculateVeOut(
-                  Number(amount) + Number(lockedBal?.amount) / 1e18,
-                  calcDaysToUnlock(Number(lockedBal?.end))
-                ).toFixed(2)
+                Number(amount) + Number(lockedBal?.amount) / 1e18,
+                calcDaysToUnlock(Number(lockedBal?.end))
+              ).toFixed(2)
               : "Enter the amount to view your voting power"}
           </p>
         </div>

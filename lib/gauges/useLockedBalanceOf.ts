@@ -1,5 +1,6 @@
-import { Address, useContractRead } from "wagmi";
 import { VotingEscrowAbi } from "@/lib/constants";
+import { Address } from "viem";
+import { useReadContract } from "wagmi";
 
 export interface LockedBalance {
   amount: bigint;
@@ -15,14 +16,12 @@ export default function useLockedBalanceOf({
   address: Address;
   account: Address;
 }) {
-  return useContractRead({
+  return useReadContract({
     address,
     chainId: Number(chainId),
     abi: VotingEscrowAbi,
     functionName: "locked",
     args: (!!account && [account]) || [],
     scopeKey: `lockedBalanceOf:${chainId}:${address}:${account}`,
-    enabled: !!(chainId && address && account),
-    watch: true,
   });
 }

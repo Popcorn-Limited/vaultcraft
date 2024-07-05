@@ -1,8 +1,9 @@
 import { Address, PublicClient, zeroAddress } from "viem";
-import { useContractReads } from "wagmi";
 import { getVotePeriodEndTime } from "@/lib/gauges/utils";
-import { GAUGE_CONTROLLER, GaugeControllerAbi } from "@/lib/constants";
+import { GaugeControllerAbi } from "@/lib/constants";
 import { VoteUserSlopes } from "@/lib/types";
+import { GAUGE_CONTROLLER } from "@/lib/constants/addresses";
+import { useReadContracts } from "wagmi";
 
 export default function useGaugeWeights({
   address,
@@ -19,7 +20,7 @@ export default function useGaugeWeights({
     abi: GaugeControllerAbi,
   };
 
-  return useContractReads({
+  return useReadContracts({
     contracts: [
       {
         ...contract,
@@ -43,7 +44,6 @@ export default function useGaugeWeights({
         args: [address],
       },
     ],
-    enabled: !!address && !!chainId,
     allowFailure: false,
   });
 }
@@ -57,7 +57,8 @@ export async function voteUserSlopes({
   publicClient: PublicClient;
   account?: Address;
 }): Promise<VoteUserSlopes[]> {
-  return await publicClient.multicall({
+  // @ts-ignore
+  return publicClient.multicall({
     contracts: gaugeAddresses.map((gaugeAddress) => {
       return {
         address: GAUGE_CONTROLLER,

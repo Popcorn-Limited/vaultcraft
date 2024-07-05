@@ -328,6 +328,7 @@ export default function Vaults() {
   }
 
   async function init() {
+    if (!publicClient) return
     const duneOpts = {
       headers: {
         "x-dune-api-key": process.env.DUNE_API_KEY,
@@ -423,7 +424,7 @@ export default function Vaults() {
     ]);
 
     const vcxInUsd = tokens[1][VCX].price
-    const wethInUsd =tokens[1][WETH].price
+    const wethInUsd = tokens[1][WETH].price
     const lpInUsd = tokens[1][VCX_LP].price
     const tvlByTime = Object.keys(
       llamaRes.data.tokensInUsd.slice(-1)[0].tokens

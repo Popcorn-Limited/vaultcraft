@@ -1,10 +1,10 @@
-import { Address, PublicClient, createPublicClient, http, zeroAddress } from "viem";
+import { Address, PublicClient, createPublicClient, erc20Abi, http, zeroAddress } from "viem";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 import { ChildGaugeAbi, GaugeAbi, VCX, } from "@/lib/constants";
 import { vcx as getVcxPrice } from "@/lib/resolver/price/resolver";
-import { erc20ABI, mainnet } from "wagmi";
 import { GaugeData, RewardApy, TokenByAddress, VaultDataByAddress } from "@/lib/types";
 import { thisPeriodTimestamp } from "./utils";
+import { mainnet } from "viem/chains";
 
 const HIDDEN_GAUGES = [
   "0x38098e3600665168eBE4d827D24D0416efC24799", // Deployment script ran out of gas and somehow added a random address into the gauges which now breaks these calls
@@ -68,11 +68,12 @@ async function getMainnetGaugesData({
 }): Promise<GaugeData[]> {
   const vaultsWithGauges = Object.values(vaultsData).filter(vault => vault.gauge !== zeroAddress)
 
+  // @ts-ignore
   const mainnetData = await clientByChainId[1].multicall({
     contracts: vaultsWithGauges.map(vault => [
       {
         address: vault.address,
-        abi: erc20ABI,
+        abi: erc20Abi,
         functionName: "balanceOf",
         args: [vault.gauge!],
       },
@@ -105,21 +106,21 @@ async function getMainnetGaugesData({
   return Promise.all(vaultsWithGauges.map(async (vault, i) => {
     if (i > 0) i = i * 5
 
-    const workingSupplyAssets = (vault.assetsPerShare * Number(mainnetData[i])) / (10 ** tokens[vault.address].decimals);
+    const workingSupplyAssets = (vault.assetsPerShare * Number(mainnetData[i])) / (10 ** tokens[vault.asset].decimals);
 
     const { lowerAPR, upperAPR } = calcBaseApy({
       inflationRate: Number(mainnetData[i + 1]) / 1e18,
       cappedRelativeWeight: Number(mainnetData[i + 2]) / 1e18,
       workingSupply: workingSupplyAssets,
       tokenlessProduction: 20,
-      vaultPrice: tokens[vault.address].price,
+      vaultPrice: tokens[vault.asset].price,
       ovcxPrice: ovcxPrice
     })
 
     const rewardApy = await getRewardsApy({
       gauge: vault.gauge!,
       workingSupply: workingSupplyAssets,
-      vaultPrice: tokens[vault.address].price,
+      vaultPrice: tokens[vault.asset].price,
       tokens: tokens,
       chainId: 1
     })
@@ -176,7 +177,7 @@ async function getChildGaugesData({
     contracts: vaultsWithGauges.map(vault => [
       {
         address: vault.address,
-        abi: erc20ABI,
+        abi: erc20Abi,
         functionName: "balanceOf",
         args: [vault.gauge!],
       },
@@ -202,21 +203,21 @@ async function getChildGaugesData({
       i = i * 2
     }
 
-    const workingSupplyAssets = (vault.assetsPerShare * Number(chainData[n])) / (10 ** tokens[vault.address].decimals)
+    const workingSupplyAssets = (vault.assetsPerShare * Number(chainData[n])) / (10 ** tokens[vault.asset].decimals)
 
     const { lowerAPR, upperAPR } = calcBaseApy({
       inflationRate: Number(mainnetData[i].rate) / 1e18,
       cappedRelativeWeight: Number(mainnetData[i + 1]) / 1e18,
       workingSupply: workingSupplyAssets,
       tokenlessProduction: 20,
-      vaultPrice: tokens[vault.address].price,
+      vaultPrice: tokens[vault.asset].price,
       ovcxPrice: ovcxPrice
     })
 
     const rewardApy = await getRewardsApy({
       gauge: vault.gauge!,
       workingSupply: workingSupplyAssets,
-      vaultPrice: tokens[vault.address].price,
+      vaultPrice: tokens[vault.asset].price,
       tokens: tokens,
       chainId
     })
@@ -261,9 +262,7 @@ function calcBaseApy({
   if (relative_inflation > 0) {
     const annualRewardUSD = relative_inflation * 86400 * 365 * ovcxPrice;
     const workingSupplyUSD =
-      (workingSupply > 0 ? workingSupply : 1e18) *
-      vaultPrice *
-      1e9;
+      (workingSupply > 0 ? workingSupply : 1e18) * vaultPrice;
 
     lowerAPR =
       annualRewardUSD /
@@ -303,6 +302,7 @@ async function getRewardsApy({
   }) as any[];
 
   if (rewardLogs.length > 0) {
+    // @ts-ignore
     const rewardRes = await client.multicall({
       contracts: rewardLogs.map(log => {
         return {
@@ -327,9 +327,7 @@ async function getRewardsApy({
 
     const annualRewardUSD: number = rewardData.reduce((a, b,) => a + b.emissionsValue, 0)
     const workingSupplyUSD =
-      (workingSupply > 0 ? workingSupply : 1e18) *
-      vaultPrice *
-      1e9;
+      (workingSupply > 0 ? workingSupply : 1e18) * vaultPrice;
     return { rewards: rewardData, annualRewardValue: annualRewardUSD, apy: (annualRewardUSD / workingSupplyUSD) * 100 }
   }
   return { rewards: [], annualRewardValue: 0, apy: 0 }

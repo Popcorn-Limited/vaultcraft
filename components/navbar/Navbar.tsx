@@ -1,8 +1,8 @@
 import { Fragment, useState, useEffect } from "react";
 import Link from "next/link";
-import { Dialog, Transition } from "@headlessui/react";
+import { Dialog, DialogPanel, Transition } from "@headlessui/react";
 import { PowerIcon } from "@heroicons/react/24/solid";
-import { useNetwork, useAccount, useDisconnect } from "wagmi";
+import { useAccount, useDisconnect } from "wagmi";
 import { useChainModal, useConnectModal } from "@rainbow-me/rainbowkit";
 import { networkLogos } from "@/lib/utils/connectors";
 import MainActionButton from "@/components/button/MainActionButton";
@@ -19,16 +19,13 @@ import ManageLoanInterface from "@/components/lending/ManageLoanInterface";
 import { getHealthFactorColor } from "@/lib/external/aave";
 import { isAddress } from "viem";
 
-import Badge from "@/components/vault/Badge";
-
 export default function Navbar(): JSX.Element {
   const router = useRouter();
   const { query } = router;
   const { disconnect } = useDisconnect();
   const { openConnectModal } = useConnectModal();
   const { openChainModal } = useChainModal();
-  const { address } = useAccount();
-  const { chain } = useNetwork();
+  const { address: account, chain } = useAccount();
   const [menuVisible, toggleMenu] = useState<boolean>(false);
   const [logo, setLogo] = useState<string>(networkLogos[1]);
   const [chainName, setChainName] = useState<string>("Ethereum");
@@ -38,11 +35,11 @@ export default function Navbar(): JSX.Element {
   };
 
   useEffect(() => {
-    if (address && chain?.id) {
+    if (account && chain?.id) {
       setLogo(networkLogos[chain.id]);
       setChainName(chain.name);
     }
-  }, [chain?.id, address]);
+  }, [chain?.id, account])
 
   const [userAccountData] = useAtom(aaveAccountDataAtom);
   const [vaults] = useAtom(vaultsAtom);
@@ -127,7 +124,7 @@ export default function Navbar(): JSX.Element {
               />
             </div>
           )}
-          {address ? (
+          {account ? (
             <div className={`relative flex flex-container flex-row z-10`}>
               <div
                 className={`md:w-48 h-full py-2 px-4 md:px-6 flex flex-row items-center justify-between bg-transparent border border-customGray100 rounded-4xl cursor-pointer  text-white text-sm`}
@@ -141,7 +138,7 @@ export default function Navbar(): JSX.Element {
                 <div className="md:hidden w-2 h-2 bg-green-500 ml-1 rounded-full"></div>
                 <span className="hidden md:inline">|</span>
                 <p className="ml-2 leading-none hidden md:block">
-                  {address?.substring(0, 5)}...
+                  {account?.substring(0, 5)}...
                 </p>
                 <span className="hidden md:inline">|</span>
                 <PowerIcon
@@ -156,7 +153,7 @@ export default function Navbar(): JSX.Element {
               <MainActionButton
                 label="Connect Wallet"
                 handleClick={openConnectModal}
-                hidden={address ? true : false}
+                hidden={!!account}
               />
             </div>
           )}
@@ -166,116 +163,94 @@ export default function Navbar(): JSX.Element {
           >
             <span
               aria-hidden="true"
-              className={`block h-1 md:h-0.5 w-8 bg-white ease-in-out rounded-3xl ${
-                menuVisible ? "rotate-45 translate-y-1" : "-translate-y-2"
-              }`}
+              className={`block h-1 md:h-0.5 w-8 bg-white ease-in-out rounded-3xl ${menuVisible ? "rotate-45 translate-y-1" : "-translate-y-2"
+                }`}
             ></span>
             <span
               aria-hidden="true"
-              className={`block h-1 md:h-0.5 w-8 bg-white ease-in-out rounded-3xl ${
-                menuVisible ? "opacity-0" : "opacity-100"
-              }`}
+              className={`block h-1 md:h-0.5 w-8 bg-white ease-in-out rounded-3xl ${menuVisible ? "opacity-0" : "opacity-100"
+                }`}
             ></span>
             <span
               aria-hidden="true"
-              className={`block h-1 md:h-0.5 w-8 bg-white ease-in-out rounded-3xl ${
-                menuVisible ? "-rotate-45 -translate-y-1" : "translate-y-2"
-              }`}
+              className={`block h-1 md:h-0.5 w-8 bg-white ease-in-out rounded-3xl ${menuVisible ? "-rotate-45 -translate-y-1" : "translate-y-2"
+                }`}
             ></span>
           </button>
         </div>
-      </div>
-      <Transition.Root show={menuVisible} as={Fragment}>
-        <Dialog
-          as="div"
-          className="fixed inset-0 overflow-hidden z-50"
-          onClose={() => toggleMenu(false)}
-        >
+      </div >
+      <Transition show={menuVisible} as={Fragment}>
+        <div className={`fixed inset-0 bg-black bg-opacity-50 backdrop-blur transition-opacity 
+            data-[closed]:opacity-0 
+            data-[enter]:duration-300 data-[enter]:data-[closed]:ease-out
+            data-[leave]:duration-200 data-[leave]:data-[closed]:ease-in
+              `} />
+        <Dialog as="div" className="relative z-50" open={menuVisible} onClose={() => toggleMenu(false)}>
+          <div className="fixed inset-0 overflow-hidden">
+            <div className="absolute inset-0 overflow-hidden">
+              <div className="fixed inset-x-0 top-0 bottom-0 w-[320px] flex">
+                <DialogPanel className="h-full w-full flex flex-col justify-between pt-12 px-8 shadow-xl bg-primaryYellow overflow-y-scroll">
+                  <div className="flex flex-1 flex-col w-full space-y-4">
+                    <div className="mb-6">
+                      <Link href={(!!query?.ref && isAddress(query.ref as string)) ? `/?ref=${query.ref}` : `/`} passHref>
+                        <img
+                          src="/images/icons/popLogoBlack.svg"
+                          alt="Logo"
+                          className="w-12 h-12 md:w-10 md:h-10 text-white"
+                        />
+                      </Link>
+                    </div>
+                    <div
+                      className="flex flex-col space-y-6 flex-1"
+                      onClick={() => toggleMenu(false)}
+                    >
+                      <NavbarLinks />
+                      <div className="md:hidden">
+                        <BuyVCXButton />
+                      </div>
+                    </div>
+                    <div className="pt-12 md:pt-0">
+                      <p className="text-customNeutral200">
+                        VaultCraft is a DeFi yield-optimizing protocol with
+                        customizable asset strategies that instantly zap your
+                        crypto from any chain into the highest yield-generating
+                        products across DeFi in 1 click.
+                      </p>
+                      <div className="flex justify-between pb-12 mt-12">
+                        <SocialMediaLinks
+                          color="#23262F"
+                          color2="#dfff1c"
+                          size="24"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </DialogPanel>
+              </div>
+            </div>
+          </div>
+
           <button
-            className={`text-customGray500 absolute top-8 right-8 p-6 bg-customNeutral100 z-50 rounded-full flex justify-center items-center w-12 h-12`}
-            onClick={() => toggleMenu(!menuVisible)}
+            className="text-customGray500 fixed top-8 right-8 p-6 bg-customNeutral100 z-50 rounded-full flex justify-center items-center w-12 h-12"
+            onClick={() => toggleMenu(false)}
           >
             <div className="block w-10 bg-transparent">
               <span
                 aria-hidden="true"
-                className={`block h-0.5 w-8 bg-white transform transition duration-500 ease-in-out rounded-3xl ${
-                  menuVisible ? "rotate-45 translate-y-0.5" : "-translate-y-2"
-                }`}
+                className={`block h-0.5 w-8 bg-white transform transition duration-500 ease-in-out rounded-3xl ${menuVisible ? "rotate-45 translate-y-0.5" : "-translate-y-2"}`}
               ></span>
               <span
                 aria-hidden="true"
-                className={`block h-0.5 w-8 bg-white transform transition duration-500 ease-in-out rounded-3xl ${
-                  menuVisible ? "opacity-0" : "opacity-100"
-                }`}
+                className={`block h-0.5 w-8 bg-white transform transition duration-500 ease-in-out rounded-3xl ${menuVisible ? "opacity-0" : "opacity-100"}`}
               ></span>
               <span
                 aria-hidden="true"
-                className={`block h-0.5 w-8 bg-white transform transition duration-500 ease-in-out rounded-3xl ${
-                  menuVisible ? "-rotate-45 -translate-y-0.5" : "translate-y-2"
-                }`}
+                className={`block h-0.5 w-8 bg-white transform transition duration-500 ease-in-out rounded-3xl ${menuVisible ? "-rotate-45 -translate-y-0.5" : "translate-y-2"}`}
               ></span>
             </div>
           </button>
-          <div className="absolute bg-black bg-opacity-50 top-0 h-full w-full backdrop-blur transition-opacity" />
-          <Dialog.Overlay className="absolute inset-0" />
-          <div className="fixed inset-x-0 top-0 bottom-0 w-[320px] flex bg-transparent">
-            <Transition.Child
-              as={Fragment}
-              enter="transform transition ease-in-out duration-500 sm:duration-700"
-              enterFrom="-translate-x-full"
-              enterTo="translate-x-0"
-              leave="transform transition ease-in-out duration-500 sm:duration-700"
-              leaveFrom="translate-x-0"
-              leaveTo="-translate-x-full"
-            >
-              <div className="h-full w-full flex flex-col justify-between pt-12 px-8 shadow-xl bg-primaryYellow overflow-y-scroll">
-                <div className="flex flex-1 flex-col w-full space-y-4">
-                  <div className="mb-6">
-                    <Link
-                      href={
-                        !!query?.ref && isAddress(query.ref as string)
-                          ? `/?ref=${query.ref}`
-                          : `/`
-                      }
-                      passHref
-                    >
-                      <img
-                        src="/images/icons/popLogoBlack.svg"
-                        alt="Logo"
-                        className="w-12 h-12 md:w-10 md:h-10 text-white"
-                      />
-                    </Link>
-                  </div>
-                  <div
-                    className="flex flex-col space-y-6 flex-1"
-                    onClick={() => toggleMenu(false)}
-                  >
-                    <NavbarLinks />
-                    <div className="md:hidden">
-                      <BuyVCXButton />
-                    </div>
-                  </div>
-                  <div className="pt-12 md:pt-0">
-                    <p className="text-customNeutral200">
-                      VaultCraft is a DeFi yield-optimizing protocol with
-                      customizable asset strategies that instantly zap your
-                      crypto from any chain into the highest yield-generating
-                      products across DeFi in 1 click.
-                    </p>
-                    <div className="flex justify-between pb-12 mt-12">
-                      <SocialMediaLinks
-                        color="#23262F"
-                        color2="#dfff1c"
-                        size="24"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Transition.Child>
-          </div>
         </Dialog>
-      </Transition.Root>
+      </Transition>
     </>
   );
 }

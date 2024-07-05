@@ -42,7 +42,6 @@ export default function Index() {
       const chainIdQuery = query?.chainId! as string
       const chainId = Number(chainIdQuery.replace("?", "").replace("&", ""))
       const foundVault = vaults[chainId].find(vault => vault.address === query?.id)
-      console.log(foundVault)
       if (foundVault) {
         const newTokenOptions = [
           tokens[chainId][foundVault.asset],
@@ -64,8 +63,6 @@ export default function Index() {
   }, [vaults, query, vaultData]);
 
   const [showLoanManagementModal, setShowLoanManagementModal] = useState(false)
-
-  console.log(tokenOptions)
 
   return <NoSSR>
     {

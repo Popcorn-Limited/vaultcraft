@@ -5,39 +5,24 @@ import { RPC_URLS, SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { useAtom } from "jotai";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { CachedProvider, YieldOptions } from "vaultcraft-sdk";
-import { mainnet, useAccount, usePublicClient } from "wagmi";
+import { useAccount, usePublicClient } from "wagmi";
 import Footer from "@/components/common/Footer";
 import { useRouter } from "next/router";
 import { Address, createPublicClient, http, zeroAddress } from "viem";
 import Modal from "@/components/modal/Modal";
 import MainActionButton from "../button/MainActionButton";
-import {
-  availableZapAssetAtom,
-  gaugeRewardsAtom,
-  networthAtom,
-  tokensAtom,
-  tvlAtom,
-  vaultronAtom,
-  zapAssetsAtom,
-} from "@/lib/atoms";
-import {
-  ReserveData,
-  Token,
-  TokenByAddress,
-  TokenType,
-  UserAccountData,
-  VaultData,
-  VaultDataByAddress,
-} from "@/lib/types";
+import { gaugeRewardsAtom, networthAtom, tokensAtom, tvlAtom, vaultronAtom } from "@/lib/atoms";
+import { ReserveData, TokenByAddress, TokenType, UserAccountData, VaultData } from "@/lib/types";
 import getTokenAndVaultsDataByChain from "@/lib/getTokenAndVaultsData";
 import { aaveAccountDataAtom, aaveReserveDataAtom } from "@/lib/atoms/lending";
 import { GAUGE_NETWORKS } from "pages/boost";
 import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
 import axios from "axios";
 import { fetchAaveData } from "@/lib/external/aave";
-import { VCX_LP, VE_VCX, VotingEscrowAbi, xLayer } from "@/lib/constants";
+import { VotingEscrowAbi } from "@/lib/constants";
 import fetchVaultron from "@/lib/vaultron";
-import { polygon } from "viem/chains";
+import { mainnet, polygon, xLayer } from "viem/chains";
+import { VCX_LP, VE_VCX } from "@/lib/constants/addresses";
 
 async function setUpYieldOptions() {
   const ttl = 360_000;
@@ -172,7 +157,6 @@ export default function Page({
   children: JSX.Element;
 }): JSX.Element {
   const router = useRouter();
-  const { query, asPath } = router;
   const { address: account } = useAccount();
   const publicClient = usePublicClient();
 
@@ -327,7 +311,7 @@ export default function Page({
             gauges: newVaultsData[chain].filter(vault => vault.gauge && vault.gauge !== zeroAddress).map(vault => vault.gauge) as Address[],
             account: account as Address,
             chainId: chain,
-            publicClient
+            publicClient: publicClient!
           })
         ))
 

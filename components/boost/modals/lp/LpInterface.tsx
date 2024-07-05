@@ -7,12 +7,15 @@ import {
 } from "react";
 import { useAccount, useBalance, useToken } from "wagmi";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
-import { safeRound } from "@/lib/utils/formatBigNumber";
+import { numberToFormattedString, safeRound } from "@/lib/utils/formatBigNumber";
 import { validateInput } from "@/lib/utils/helpers";
 import { formatEther } from "viem";
 import { llama } from "@/lib/resolver/price/resolver";
 import { PlusIcon } from "@heroicons/react/24/outline";
-import { VCX, VCX_LP, WETH, ZERO } from "@/lib/constants";
+import { ZERO } from "@/lib/constants";
+import { VCX, WETH } from "@/lib/constants/addresses";
+import { tokensAtom } from "@/lib/atoms";
+import { useAtom } from "jotai";
 
 interface LpInterfaceInterfaceProps {
   vcxAmountState: [string, Dispatch<SetStateAction<string>>];
@@ -23,67 +26,35 @@ export default function LpInterface({
   vcxAmountState,
   wethAmountState,
 }: LpInterfaceInterfaceProps): JSX.Element {
-  const { address: account } = useAccount();
-
   const [vcxAmount, setVcxAmount] = vcxAmountState;
   const [wethAmount, setWethAmount] = wethAmountState;
-
-  const { data: vcxBal } = useBalance({
-    chainId: 1,
-    address: account,
-    token: VCX,
-  });
-  const { data: wethBal } = useBalance({
-    chainId: 1,
-    address: account,
-    token: WETH,
-  });
-
-  const { data: lp } = useToken({ chainId: 1, address: VCX_LP });
-  const { data: vcx } = useToken({ chainId: 1, address: VCX });
-  const { data: weth } = useToken({ chainId: 1, address: WETH });
-
-  const [vcxPrice, setVCXPrice] = useState<number>(0);
-  const [wethPrice, setWethPrice] = useState<number>(0);
-
-  const [initialLoad, setInitialLoad] = useState<boolean>(false);
-
-  useEffect(() => {
-    async function setUpPrices() {
-      setInitialLoad(true);
-
-      const wethInUsd = await llama({ address: WETH, chainId: 1 });
-      const vcxInUsd = await llama({ address: VCX, chainId: 1 });
-      setWethPrice(wethInUsd);
-      setVCXPrice(vcxInUsd);
-    }
-    if (!initialLoad) setUpPrices();
-  }, [initialLoad]);
+  const [tokens] = useAtom(tokensAtom)
 
   function handleMaxWeth() {
-    const maxEth = formatEther(safeRound(wethBal?.value || ZERO, 18));
+    const maxEth = numberToFormattedString(tokens[1][WETH].balance, tokens[1][WETH].decimals)
 
     setWethAmount(maxEth);
     setVcxAmount(getVcxAmount(Number(maxEth)));
   }
 
   function handleMaxOPop() {
-    const maxOPop = formatEther(safeRound(vcxBal?.value || ZERO, 18));
+    const maxVcx = numberToFormattedString(tokens[1][VCX].balance, tokens[1][VCX].decimals)
 
-    setWethAmount(getWethAmount(Number(maxOPop)));
-    setVcxAmount(maxOPop);
+
+    setWethAmount(getWethAmount(Number(maxVcx)));
+    setVcxAmount(maxVcx);
   }
 
   function getWethAmount(oVcxAmount: number) {
-    const vcxValue = oVcxAmount * vcxPrice;
+    const vcxValue = oVcxAmount * tokens[1][VCX].price;
 
-    return String((vcxValue * 0.25) / wethPrice);
+    return String((vcxValue * 0.25) / tokens[1][WETH].price);
   }
 
   function getVcxAmount(paymentAmount: number) {
-    const wethValue = paymentAmount * wethPrice;
+    const wethValue = paymentAmount * tokens[1][WETH].price;
 
-    return String((wethValue * 4) / vcxPrice);
+    return String((wethValue * 4) / tokens[1][VCX].price);
   }
 
   const handleVcxInput: FormEventHandler<HTMLInputElement> = ({
@@ -108,24 +79,15 @@ export default function LpInterface({
       <div className="mt-8">
         <InputTokenWithError
           captionText={"Amount VCX"}
-          onSelectToken={() => {}}
+          onSelectToken={() => { }}
           onMaxClick={handleMaxOPop}
           chainId={1}
           value={vcxAmount}
           onChange={handleVcxInput}
           allowInput={true}
-          selectedToken={
-            {
-              ...vcx,
-              name: "VCX",
-              symbol: "VCX",
-              decimals: 18,
-              logoURI: "/images/tokens/vcx.svg",
-              balance: vcxBal?.value || ZERO,
-            } as any
-          }
+          selectedToken={tokens[1][VCX]}
           errorMessage={
-            Number(vcxAmount) > Number(vcxBal?.value) / 1e18
+            Number(vcxAmount) > (tokens[1][VCX].balance / 1e18)
               ? "Insufficient Balance"
               : ""
           }
@@ -137,25 +99,16 @@ export default function LpInterface({
 
         <InputTokenWithError
           captionText={"Amount WETH"}
-          onSelectToken={() => {}}
+          onSelectToken={() => { }}
           onMaxClick={handleMaxWeth}
           chainId={1}
           value={wethAmount}
           onChange={handleWethInput}
           allowInput={true}
-          selectedToken={
-            {
-              ...weth,
-              name: "WETH",
-              symbol: "WETH",
-              decimals: 18,
-              logoURI: "https://etherscan.io/token/images/weth_28.png",
-              balance: wethBal?.value || ZERO,
-            } as any
-          }
+          selectedToken={tokens[1][WETH]}
           tokenList={[]}
           errorMessage={
-            Number(wethAmount) > Number(wethBal?.value) / 1e18
+            Number(wethAmount) > (tokens[1][WETH].balance / 1e18)
               ? "Insufficient Balance"
               : ""
           }

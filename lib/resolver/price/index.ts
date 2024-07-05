@@ -1,5 +1,4 @@
-import { Address } from "viem";
-import { PublicClient } from "wagmi";
+import { Address, PublicClient } from "viem";
 import { llama, vcx } from "./resolver";
 
 export type PriceResolverParams = {

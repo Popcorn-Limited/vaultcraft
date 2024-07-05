@@ -5,25 +5,25 @@ import InputTokenWithError from "@/components/input/InputTokenWithError";
 import MainActionButton from "@/components/button/MainActionButton";
 import ActionSteps from "@/components/vault/ActionSteps";
 import { safeRound } from "@/lib/utils/formatBigNumber";
-import { Address, encodeAbiParameters, formatUnits, parseEther } from "viem";
-import { handleCallResult, simulateCall, validateInput } from "@/lib/utils/helpers";
+import { encodeAbiParameters, formatUnits } from "viem";
+import { validateInput } from "@/lib/utils/helpers";
 import { ArrowDownIcon } from "@heroicons/react/24/outline";
-import { LockboxAdapterByChain, VCX, XVCXByChain } from "@/lib/constants";
-import { PublicClient, mainnet, useAccount, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
-import { AddressByChain, Clients, SmartVaultActionType, Token } from "@/lib/types";
+import { LockboxAdapterByChain, VCX, XVCXByChain } from "@/lib/constants/addresses";
+import { SmartVaultActionType, Token } from "@/lib/types";
 import { ActionStep, getSmartVaultActionSteps } from "@/lib/getActionSteps";
 import { handleAllowance } from "@/lib/approve";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
 import { tokensAtom } from "@/lib/atoms";
 import { useAtom } from "jotai";
 import bridgeToken, { DestinationIdByChain } from "@/lib/bridging/bridgeToken";
+import { useAccount, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
+import { mainnet } from "viem/chains";
 
 export default function BridgeModal({ show }: { show: [boolean, Dispatch<SetStateAction<boolean>>] }): JSX.Element {
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
-  const { address: account } = useAccount();
-  const { chain } = useNetwork();
-  const { switchNetworkAsync } = useSwitchNetwork();
+  const { address: account, chain } = useAccount();
+  const { switchChainAsync } = useSwitchChain();
 
   const [tokens, setTokens] = useAtom(tokensAtom)
 
@@ -83,7 +83,7 @@ export default function BridgeModal({ show }: { show: [boolean, Dispatch<SetStat
 
     if (chain?.id !== Number(chainId)) {
       try {
-        await switchNetworkAsync?.(Number(chainId));
+        await switchChainAsync?.({ chainId: Number(chainId) });
       } catch (error) {
         return;
       }
@@ -103,7 +103,7 @@ export default function BridgeModal({ show }: { show: [boolean, Dispatch<SetStat
           account: account!,
           spender: LockboxAdapterByChain[chainId],
           clients: {
-            publicClient,
+            publicClient: publicClient!,
             walletClient: walletClient!,
           },
         });
@@ -120,7 +120,7 @@ export default function BridgeModal({ show }: { show: [boolean, Dispatch<SetStat
           slippage: 0,
           callData: chainId === mainnet.id ? "0x" : encodeAbiParameters([{ name: "recipient", type: "address" }], [account!]),
           account: account!,
-          clients: { publicClient, walletClient: walletClient! },
+          clients: { publicClient: publicClient!, walletClient: walletClient! },
           chainId
         });
         if (success) {

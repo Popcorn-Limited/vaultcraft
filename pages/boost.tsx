@@ -2,7 +2,6 @@ import NoSSR from "react-no-ssr";
 import "rc-slider/assets/index.css";
 
 import {
-  mainnet,
   useAccount,
   useBalance,
   usePublicClient,
@@ -29,14 +28,19 @@ import { vaultsAtom } from "@/lib/atoms/vaults";
 import OptionTokenInterface from "@/components/optionToken/OptionTokenInterface";
 import LpModal from "@/components/boost/modals/lp/LpModal";
 import { voteUserSlopes } from "@/lib/gauges/useGaugeWeights";
-
-import { TOKEN_ADMIN, TokenAdminAbi, VOTING_ESCROW } from "@/lib/constants";
+import NetworkFilter from "@/components/network/NetworkFilter";
+import SearchBar from "@/components/input/SearchBar";
+import VaultsSorting from "@/components/vault/VaultsSorting";
+import useNetworkFilter from "@/lib/useNetworkFilter";
+import { TOKEN_ADMIN, TokenAdminAbi, VE_VCX, VOTING_ESCROW } from "@/lib/constants";
 import Modal from "@/components/modal/Modal";
 import BridgeModal from "@/components/bridge/BridgeModal";
 import axios from "axios";
 import BroadcastVeBalanceInterface from "@/components/boost/modals/manage/BroadcastVeBalanceInterface";
 import { RPC_URLS } from "@/lib/utils/connectors";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
+import { tokensAtom } from "@/lib/atoms";
+import { mainnet } from "viem/chains";
 
 import ResponsiveTooltip from "@/components/common/Tooltip";
 import BoostVaultsTable from "@/components/boost/BoostVaultsTable";
@@ -65,18 +69,12 @@ async function getHiddenGauges(): Promise<AddressesByChain> {
 }
 
 function VePopContainer() {
-  const { address: account } = useAccount();
+  const { address: account, chain } = useAccount();
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
+  const [tokens] = useAtom(tokensAtom);
 
-  const { data: veBal } = useBalance({
-    chainId: 1,
-    address: account,
-    token: VOTING_ESCROW,
-    watch: true,
-  });
-
-  const { data: weeklyEmissions = 0 } = useWeeklyEmissions();
+  const [weeklyEmissions, setWeeklyEmissions] = useState<number>(0)
 
   const [initalLoad, setInitalLoad] = useState<boolean>(false);
   const [accountLoad, setAccountLoad] = useState<boolean>(false);
@@ -116,14 +114,14 @@ function VePopContainer() {
       if (
         vaultsWithGauges.length > 0 &&
         Object.keys(votes).length === 0 &&
-        publicClient.chain.id === 1
+        chain?.id === 1
       ) {
         const initialVotes: { [key: Address]: number } = {};
         const voteUserSlopesData = await voteUserSlopes({
           gaugeAddresses: vaultsWithGauges?.map(
             (vault: VaultData) => vault.gauge as Address
           ),
-          publicClient,
+          publicClient: publicClient!,
           account: account as Address,
         });
         vaultsWithGauges.forEach((vault, index) => {
@@ -138,17 +136,15 @@ function VePopContainer() {
           addresses: vaultsWithGauges?.map(
             (vault: VaultData) => vault.gauge as Address
           ),
-          publicClient,
+          publicClient: publicClient!,
           account: account as Address,
         });
         setVoteData(voteData_);
-        setCanCastVote(!!account && Number(veBal?.value) > 0);
+        setCanCastVote(!!account && tokens[1][VE_VCX].balance > 0);
       }
     }
-    if (!account && !initalLoad && Object.keys(vaults).length > 0)
-      initialSetup();
-    if (account && !accountLoad && !!veBal && Object.keys(vaults).length > 0)
-      initialSetup();
+    if (!account && !initalLoad && Object.keys(tokens).length > 0 && Object.keys(vaults).length > 0) initialSetup();
+    if (account && !accountLoad && Object.keys(tokens).length > 0 && Object.keys(vaults).length > 0) initialSetup();
   }, [account, initalLoad, accountLoad, vaults]);
 
   function handleVotes(val: number, index: Address) {
@@ -182,8 +178,9 @@ function VePopContainer() {
 
   const isSmallScreen = useIsBreakPoint("lg");
 
-  return (
+  return Object.keys(tokens).length > 0 ? (
     <>
+
       <LockModal
         show={[showLockModal, setShowLockModal]}
         setShowLpModal={setShowLpModal}
@@ -307,7 +304,7 @@ function VePopContainer() {
             <p className="mt-1">
               Voting power used:{" "}
               <span className="font-bold">
-                {veBal && veBal.value && Object.keys(votes).length > 0
+                {tokens[1][VE_VCX].balance && Object.keys(votes).length > 0
                   ? (
                       Object.values(votes).reduce((a, b) => a + b, 0) / 100
                     ).toFixed(2)
@@ -326,7 +323,7 @@ function VePopContainer() {
                     prevVotes: initialVotes,
                     account: account as Address,
                     clients: {
-                      publicClient,
+                      publicClient: publicClient!,
                       walletClient: walletClient!,
                     },
                   })
@@ -337,7 +334,8 @@ function VePopContainer() {
         </div>
       </div>
     </>
-  );
+  )
+    : <p className="text-white">Loading...</p>
 }
 
 export default function VeVCX() {

@@ -1,8 +1,5 @@
 import {
-  Abi,
   Address,
-  PublicClient,
-  WalletClient,
   parseEther,
   zeroAddress,
 } from "viem";
@@ -397,7 +394,7 @@ export async function fundReward({
       tokensToUpdate: [rewardToken],
       account,
       tokensAtom,
-      chainId: clients.publicClient.chain.id
+      chainId: clients.publicClient?.chain?.id || 1
     })
   }
   return success
@@ -410,7 +407,24 @@ export async function claimRewards({
 }: { gauge: Address, account: Address, clients: Clients }): Promise<boolean> {
   showLoadingToast("Claim Gauge Reward...");
 
-  const success = await handleCallResult({
+  /// Deal with the misconfgured ARB USDC Compound Gauge
+  if (gauge === "0xc9aD14cefb29506534a973F7E0E97e68eCe4fa3f") {
+    return handleCallResult({
+      successMessage: "Claim Gauge Reward successfully!",
+      simulationResponse: await simulateCall({
+        account,
+        contract: {
+          address: "0x6ee09de47c67a858ae84ab0848a50ca2278bc959",
+          abi: ClaimerAbi,
+        },
+        functionName: "claim",
+        publicClient: clients.publicClient,
+      }),
+      clients,
+    });
+  }
+
+  return handleCallResult({
     successMessage: "Claim Gauge Reward successfully!",
     simulationResponse: await simulateCall({
       account,
@@ -423,5 +437,6 @@ export async function claimRewards({
     }),
     clients,
   });
-  return success
 }
+
+const ClaimerAbi = [{ "inputs": [{ "internalType": "address", "name": "gauge_", "type": "address" }, { "internalType": "address", "name": "rewardToken_", "type": "address" }], "stateMutability": "nonpayable", "type": "constructor" }, { "inputs": [], "name": "claim", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "gauge", "outputs": [{ "internalType": "contract ILiquidityGauge", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "rewardToken", "outputs": [{ "internalType": "contract IERC20", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" }] as const

@@ -75,7 +75,7 @@ export default function VaultStrategyConfiguration({
                   vaultData,
                   account,
                   clients: {
-                    publicClient,
+                    publicClient:publicClient!,
                     walletClient: walletClient!,
                   }
                 })}
@@ -92,7 +92,7 @@ export default function VaultStrategyConfiguration({
                     vaultData,
                     account,
                     clients: {
-                      publicClient,
+                      publicClient:publicClient!,
                       walletClient: walletClient!,
                     },
                   })

@@ -37,27 +37,20 @@ export default function VaultsContainer({
   hiddenVaults,
   displayVaults,
 }: VaultsContainerProps): JSX.Element {
-  const { address: account } = useAccount();
-
   const [vaultsData] = useAtom(vaultsAtom);
   const [vaults, setVaults] = useState<VaultData[]>([]);
 
   useEffect(() => {
-    if (Object.keys(vaultsData).length > 0)
+    if (Object.keys(vaultsData).length > 0) {
+      console.log(Object.keys(vaultsData).length)
       setVaults(SUPPORTED_NETWORKS.map((chain) => vaultsData[chain.id]).flat());
+    }
   }, [vaultsData]);
 
   const [tvl] = useAtom(tvlAtom);
   const [networth] = useAtom(networthAtom);
   const [tokens] = useAtom(tokensAtom);
   const [gaugeRewards] = useAtom(gaugeRewardsAtom);
-
-  const { data: oBal } = useBalance({
-    chainId: 1,
-    address: account,
-    token: OptionTokenByChain[1],
-    watch: true,
-  });
 
   const [selectedNetworks, selectNetwork] = useNetworkFilter(
     SUPPORTED_NETWORKS.map((network) => network.id)
@@ -70,35 +63,29 @@ export default function VaultsContainer({
     setSearchTerm(value);
   }
 
-  const isSmallScreen = useIsBreakPoint("lg");
-
-  const SHOW_INPUT_SEARCH = searchTerm.length > 0;
-
   const formattedVaults = vaults
     .filter(
-      (vault) => SHOW_INPUT_SEARCH || selectedNetworks.includes(vault.chainId)
+      (vault) => searchTerm.length > 0 || selectedNetworks.includes(vault.chainId)
     )
     .filter((vault) =>
       Object.keys(displayVaults).length > 0
         ? displayVaults[vault.chainId].includes(vault.address)
         : !hiddenVaults[vault.chainId].includes(vault.address)
     );
-  console.log({ vaults, formattedVaults })
+  console.log({ vaults, formattedVaults, vaultsData })
 
-  return (
-    <NoSSR>
+  return Object.keys(tokens).length > 0 ? (
+    <NoSSR >
       <Modal visibility={[showOptionTokenModal, setShowOptionTokenModal]}>
         <OptionTokenInterface />
       </Modal>
-      <OptionTokenExerciseModal
-        show={[showExerciseModal, setShowExerciseModal]}
-      />
+      <OptionTokenExerciseModal show={[showExerciseModal, setShowExerciseModal]} />
       <section className="md:border-b border-customNeutral100 md:flex md:flex-row items-center justify-between py-10 px-4 md:px-8 md:gap-4">
         <div className="w-full md:w-max">
           <h1 className="text-5xl font-normal m-0 mb-4 md:mb-2 leading-0 text-white md:text-3xl leading-none">
             Smart Vaults
           </h1>
-          <p className="text-customGray100 md:text-white md:opacity-80 max-w-xs">
+          <p className="text-customGray100 md:text-white md:opacity-80">
             Automate your returns in single-asset deposit yield strategies.
           </p>
         </div>
@@ -130,15 +117,15 @@ export default function VaultsContainer({
                 <LargeCardStat
                   id="total-my-ovcx"
                   label="My oVCX"
-                  value={`$${oBal && tokens[1] && tokens[1][VCX]
+                  value={`$${tokens[1][OptionTokenByChain[1]].balance && tokens[1] && tokens[1][VCX]
                     ? NumberFormatter.format(
-                      (Number(oBal?.value) / 1e18) *
-                      (tokens[1][VCX].price * 0.25)
+                      (tokens[1][OptionTokenByChain[1]].balance / 1e18) * (tokens[1][VCX].price * 0.25)
                     )
                     : "0"
                     }`}
                   tooltip="Value of oVCX held in your wallet across all blockchains."
                 />
+
               </div>
 
               <div className="w-[120px] md:w-max">
@@ -147,12 +134,7 @@ export default function VaultsContainer({
                   label="Claimable oVCX"
                   value={`$${gaugeRewards && tokens[1] && tokens[1][VCX]
                     ? NumberFormatter.format(
-                      (Number(
-                        gaugeRewards?.[1]?.total +
-                        gaugeRewards?.[10]?.total +
-                        gaugeRewards?.[42161]?.total || 0
-                      ) /
-                        1e18) *
+                      (Number(gaugeRewards?.[1]?.total + gaugeRewards?.[10]?.total + gaugeRewards?.[42161]?.total || 0) / 1e18) *
                       (tokens[1][VCX].price * 0.25)
                     )
                     : "0"
@@ -185,6 +167,17 @@ export default function VaultsContainer({
           </div>
         </div>
       </section>
+
+      {/* <section className="my-10 px-4 md:px-8 md:flex flex-row items-center justify-between">
+        <NetworkFilter
+          supportedNetworks={SUPPORTED_NETWORKS.map((chain) => chain.id)}
+          selectNetwork={selectNetwork}
+        />
+        <SecondaryActionButton
+          label="Exercise oVCX"
+          handleClick={() => setShowExerciseModal(true)}
+        />
+      </section> */}
 
       <div className="md:hidden">
         <nav className="px-5 [&_>*]:shrink-0 mt-8 [&_.my-10]:my-0 whitespace-nowrap flex flex-col smmd:flex-row gap-4 mb-10">
@@ -224,6 +217,7 @@ export default function VaultsContainer({
           onSelectNetwork={selectNetwork}
         />
       </div>
-    </NoSSR>
-  );
+    </NoSSR >
+  )
+    : <p className="text-white">Loading...</p>
 }

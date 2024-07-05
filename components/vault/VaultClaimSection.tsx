@@ -2,15 +2,8 @@ import { vaultsAtom } from "@/lib/atoms/vaults";
 import { ClaimableReward, VaultData } from "@/lib/types";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
-import {
-  erc20ABI,
-  useAccount,
-  useNetwork,
-  usePublicClient,
-  useSwitchNetwork,
-  useWalletClient,
-} from "wagmi";
-import { Address, createPublicClient, http, zeroAddress } from "viem";
+import { useAccount, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
+import { Address, createPublicClient, erc20Abi, http, zeroAddress } from "viem";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import getGaugeRewards from "@/lib/gauges/getGaugeRewards";
 import { claimOPop } from "@/lib/optionToken/interactions";
@@ -23,15 +16,11 @@ import { claimRewards } from "@/lib/gauges/interactions";
 import LargeCardStat from "../common/LargeCardStat";
 import MainActionButton from "../button/MainActionButton";
 import { getClaimableRewards } from "@/lib/gauges/useGaugeRewardData";
+  import ResponsiveTooltip from "../common/Tooltip";
 
-export default function VaultClaimSection({
-  vaultData,
-}: {
-  vaultData: VaultData;
-}) {
-  const { chain } = useNetwork();
-  const { switchNetworkAsync } = useSwitchNetwork();
-  const { address: account } = useAccount();
+export default function VaultClaimSection({ vaultData }: { vaultData: VaultData }) {
+  const { switchChainAsync } = useSwitchChain();
+  const { address: account, chain } = useAccount();
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
 
@@ -54,7 +43,7 @@ export default function VaultClaimSection({
       });
       const newOBal = client.readContract({
         address: OptionTokenByChain[vaultData?.chainId!],
-        abi: erc20ABI,
+        abi: erc20Abi,
         functionName: "balanceOf",
         args: [account!],
       });
@@ -78,7 +67,7 @@ export default function VaultClaimSection({
 
     if (chain?.id !== vaultData?.chainId) {
       try {
-        await switchNetworkAsync?.(vaultData?.chainId);
+        await switchChainAsync?.({ chainId: vaultData?.chainId });
       } catch (error) {
         return;
       }
@@ -87,8 +76,8 @@ export default function VaultClaimSection({
     const success = await claimRewards({
       gauge: vaultData.gauge!,
       account: account,
-      clients: { publicClient, walletClient: walletClient! },
-    });
+      clients: { publicClient: publicClient!, walletClient: walletClient! }
+    })
 
     if (success) {
       await mutateTokenBalance({
@@ -106,7 +95,7 @@ export default function VaultClaimSection({
 
     if (chain?.id !== vaultData?.chainId) {
       try {
-        await switchNetworkAsync?.(vaultData?.chainId);
+        await switchChainAsync?.({ chainId: vaultData?.chainId });
       } catch (error) {
         return;
       }
@@ -117,8 +106,8 @@ export default function VaultClaimSection({
       chainId: vaultData.chainId!,
       account: account as Address,
       minter: MinterByChain[vaultData?.chainId],
-      clients: { publicClient, walletClient: walletClient! },
-    });
+      clients: { publicClient: publicClient!, walletClient: walletClient! }
+    })
 
     if (success) {
       await mutateTokenBalance({
@@ -135,9 +124,9 @@ export default function VaultClaimSection({
             .map((vault) => vault.gauge) as Address[],
           account: account,
           chainId: vaultData?.chainId,
-          publicClient,
-        }),
-      });
+          publicClient: publicClient!
+        })
+      })
     }
   }
 
@@ -149,11 +138,10 @@ export default function VaultClaimSection({
             <LargeCardStat
               id={"my-ovcx"}
               label="My oVCX"
-              value={`$${
-                oBal && tokens[1][VCX]
-                  ? NumberFormatter.format(oBal * (tokens[1][VCX].price * 0.25))
-                  : "0"
-              }`}
+              value={`$${oBal && tokens[1][VCX]
+                ? NumberFormatter.format(oBal * (tokens[1][VCX].price * 0.25))
+                : "0"
+                }`}
               tooltip="Value of oVCX held in your wallet across all blockchains."
             />
           </div>
@@ -162,15 +150,14 @@ export default function VaultClaimSection({
             <LargeCardStat
               id={"claimable-ovcx"}
               label="Claimable oVCX"
-              value={`$${
-                gaugeRewards && tokens[1][VCX]
-                  ? NumberFormatter.format(
-                      (Number(gaugeRewards?.[vaultData.chainId]?.total || 0) /
-                        1e18) *
-                        (tokens[1][VCX].price * 0.25)
-                    )
-                  : "0"
-              }`}
+              value={`$${gaugeRewards && tokens[1][VCX]
+                ? NumberFormatter.format(
+                  (Number(gaugeRewards?.[vaultData.chainId]?.total || 0) /
+                    1e18) *
+                  (tokens[1][VCX].price * 0.25)
+                )
+                : "0"
+                }`}
               tooltip="Cumulative value of claimable oVCX from vaults across all blockchains."
             />
           </div>

@@ -1,6 +1,7 @@
 import { ADDRESS_ZERO } from "@/lib/constants";
-import { Address, mainnet } from "wagmi";
 import { StrategyDefaultResolverParams } from "..";
+import { mainnet } from "viem/chains";
+import { Address } from "viem";
 
 // @dev Make sure the keys here are correct checksum addresses
 const WRAPPED_OTOKENS: { [key: string]: Address } = {

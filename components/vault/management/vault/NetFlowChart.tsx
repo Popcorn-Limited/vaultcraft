@@ -1,7 +1,6 @@
 import { Token } from "@/lib/types";
 import MainActionButton from "@/components/button/MainActionButton";
 import InputNumber from "@/components/input/InputNumber";
-import { Strategy } from "@/lib/types";
 import { useEffect, useRef, useState } from "react";
 import Highcharts, { chart } from "highcharts";
 import Modal from "@/components/modal/Modal";

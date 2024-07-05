@@ -77,7 +77,7 @@ export default function VaultFeeConfiguration({
                   address: callAddress,
                   account,
                   clients: {
-                    publicClient,
+                    publicClient: publicClient!,
                     walletClient: walletClient!,
                   },
                 })
@@ -108,7 +108,7 @@ export default function VaultFeeConfiguration({
                   address: callAddress,
                   account,
                   clients: {
-                    publicClient,
+                    publicClient: publicClient!,
                     walletClient: walletClient!,
                   },
                 })
