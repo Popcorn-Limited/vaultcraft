@@ -56,9 +56,6 @@ export default function Navbar(): JSX.Element {
     }
   }, [query, chain])
 
-
-  console.log({ menuVisible })
-
   return (
     <>
       {(chain && Object.keys(vaultData).length > 0) &&

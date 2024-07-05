@@ -42,7 +42,6 @@ export default function Index() {
       const chainIdQuery = query?.chainId! as string
       const chainId = Number(chainIdQuery.replace("?", "").replace("&", ""))
       const foundVault = vaults[chainId].find(vault => vault.address === query?.id)
-      console.log(foundVault)
       if (foundVault) {
         const newTokenOptions = [
           tokens[chainId][foundVault.asset],

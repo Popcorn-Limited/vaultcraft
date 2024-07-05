@@ -8,17 +8,17 @@ export async function prepareVaults(vaultsData: VaultDataByAddress, assets: Toke
   );
 
   let result: TokenByAddress = {}
-  Object.values(vaultsData).forEach(vault => {
-    const assetsPerShare =
-      vault.totalSupply > 0 ? (vault.totalAssets + 1) / (vault.totalSupply + 1e9) : Number(1e-9);
-    const price = (assetsPerShare * assets[vault.asset].price) * 1e9; // @dev normalize vault price for previews (watch this if errors occur)
+  Object.values(vaultsData).forEach(vaultData => {
+    const vault = vaultTokens[getAddress(vaultData.address)];
+    const asset = assets[vaultData.asset];
+    const price = vaultData.assetsPerShare * asset.price
 
     result[getAddress(vault.address)] = {
       ...vaultTokens[getAddress(vault.address)],
       address: getAddress(vault.address),
       price,
       balance: 0,
-      totalSupply: vault.totalSupply,
+      totalSupply: vaultData.totalSupply,
       chainId: chainId,
       type: TokenType.Vault
     }
