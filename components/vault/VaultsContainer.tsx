@@ -80,7 +80,7 @@ export default function VaultsContainer({
         <OptionTokenInterface />
       </Modal>
       <OptionTokenExerciseModal show={[showExerciseModal, setShowExerciseModal]} />
-      <section className="md:border-b border-customNeutral100 md:flex md:flex-row items-center justify-between py-10 px-4 md:px-8 md:gap-4">
+      <section className="md:border-b border-customNeutral100 md:flex md:flex-row items-top justify-between py-4 md:py-10 px-4 md:px-0 md:gap-4">
         <div className="w-full md:w-max">
           <h1 className="text-5xl font-normal m-0 mb-4 md:mb-2 leading-0 text-white md:text-3xl leading-none">
             Smart Vaults
@@ -90,8 +90,8 @@ export default function VaultsContainer({
           </p>
         </div>
 
-        <div className="w-full lg:justify-end lg:w-8/12 md:divide-x md:flex md:flex-row space-y-4 md:space-y-0 mt-4 md:mt-0">
-          <div className="flex flex-row items-center md:pr-10 gap-10 md:w-fit">
+        <div className="w-full justify-end lg:w-8/12 md:flex md:flex-row space-y-4 md:space-y-0 mt-4 md:mt-0">
+          <div className="flex flex-row items-center md:pr-4 gap-8 md:w-fit">
             <div className="w-[120px] md:w-max">
               <LargeCardStat
                 id="total-tvl"
@@ -111,8 +111,8 @@ export default function VaultsContainer({
             </div>
           </div>
 
-          <div className="flex flex-row items-center md:gap-6 md:w-fit md:pl-12">
-            <div className="flex gap-10 w-fit">
+          <div className="flex flex-row items-center md:gap-4 md:w-fit md:pl-4">
+            <div className="flex gap-8 w-fit">
               <div className="w-[120px] md:w-max">
                 <LargeCardStat
                   id="total-my-ovcx"
@@ -143,19 +143,8 @@ export default function VaultsContainer({
                 />
               </div>
             </div>
-
-            <div className="hidden md:flex flex-row items-center w-100 space-x-4">
-              <MainActionButton
-                label="Claim oVCX"
-                handleClick={() => setShowOptionTokenModal(true)}
-              />
-              <SecondaryActionButton
-                label="Exercise oVCX"
-                handleClick={() => setShowExerciseModal(true)}
-              />
-            </div>
           </div>
-          <div className="md:hidden space-y-4">
+          <div className="w-full md:w-40 space-y-2 md:ml-4">
             <MainActionButton
               label="Claim oVCX"
               handleClick={() => setShowOptionTokenModal(true)}

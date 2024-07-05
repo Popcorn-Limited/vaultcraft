@@ -73,7 +73,7 @@ export default function Navbar(): JSX.Element {
           vaultData={vaultData}
         />
       )}
-      <div className="flex container flex-row items-center justify-between w-full py-8 px-4 md:px-8 z-10">
+      <div className="flex container flex-row items-center justify-between w-full py-8 px-4 md:px-0 z-10">
         <div className="flex flex-row items-center gap-6">
           <div>
             <Link

@@ -7,7 +7,7 @@ import VaultStats from "@/components/vault/VaultStats";
 import { useAtom } from 'jotai';
 import { tokensAtom } from '@/lib/atoms';
 import { useRouter } from 'next/router';
-import { isAddress } from "viem";
+import { isAddress, zeroAddress } from "viem";
 
 
 interface SmartVaultsProps {
@@ -34,12 +34,13 @@ export default function SmartVault({
 
   useEffect(() => {
     if (vaultData) {
-      setAsset(tokens[vaultData.chainId][vaultData.asset])
-      setVault(tokens[vaultData.chainId][vaultData.vault])
+      const asset_ = tokens[vaultData.chainId][vaultData.asset];
+      const vault_ = tokens[vaultData.chainId][vaultData.address];
+      const gauge_ = vaultData.gauge && vaultData.gauge !== zeroAddress ? tokens[vaultData.chainId][vaultData.gauge] : undefined
 
-      if (vaultData.gauge) {
-        setGauge(tokens[vaultData.chainId][vaultData.gauge])
-      }
+      setAsset(asset_);
+      setVault(vault_);
+      setGauge(gauge_);
     }
   }, [vaultData])
 

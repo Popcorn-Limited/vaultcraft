@@ -1,9 +1,8 @@
 import { createPublicClient, http } from "viem";
-import { mainnet } from "wagmi";
 import { RPC_URLS } from "@/lib/utils/connectors";
 import { TOKEN_ADMIN, TokenAdminAbi } from "@/lib/constants";
-
 import useSwr from "swr";
+import { mainnet } from "viem/chains";
 
 export default function useWeeklyEmissions() {
   return useSwr(`weeklyEmissions`, {
