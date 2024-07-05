@@ -180,7 +180,7 @@ export default function Navbar(): JSX.Element {
         </div>
       </div >
       <Transition show={menuVisible} as={Fragment}>
-        <div className={`fixed inset-0 bg-black bg-opacity-50 backdrop-blur transition-opacity 
+        <div className={`fixed inset-0 bg-black bg-opacity-50 backdrop-blur transition-opacity z-50
             data-[closed]:opacity-0 
             data-[enter]:duration-300 data-[enter]:data-[closed]:ease-out
             data-[leave]:duration-200 data-[leave]:data-[closed]:ease-in
