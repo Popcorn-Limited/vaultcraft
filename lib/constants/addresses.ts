@@ -67,6 +67,13 @@ export const OptionTokenByChain: AddressByChain = {
   [arbitrum.id]: "0x59a696bF34Eae5AD8Fd472020e3Bed410694a230"
 }
 
+export const WrappedOptionTokenByChain: AddressByChain = {
+  [mainnet.id]: "0x1AaAFe03A8a2E93A399DbCE03F88Bbaff1b08D60",
+  [optimism.id]: "0xAe5CbB42F0Afa59B90769df4b4c6D623896E4573",
+  [arbitrum.id]: "0xaF33642938172011f711bA530acc900Ae17620A7"
+}
+
+
 export const XVCXByChain: AddressByChain = {
   [mainnet.id]: "0x18445923592be303fbd3BC164ee685C7457051b4",
   [optimism.id]: "0xfe7950eC9AfE82538CEAC95735f1daf31829d066",
