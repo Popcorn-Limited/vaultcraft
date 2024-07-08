@@ -1,8 +1,8 @@
-import { Address } from "viem";
+import { Address, PublicClient } from "viem";
 import { ChildGaugeFactoryAbi, MinterAbi, OptionTokenAbi, OptionTokenByChain } from "@/lib/constants";
 import { Clients } from "@/lib/types";
 import { handleCallResult, simulateCall } from "@/lib/utils/helpers";
-import { PublicClient, mainnet } from "wagmi";
+import { mainnet } from "viem/chains";
 
 interface ExerciseOPopProps {
   amount: bigint;

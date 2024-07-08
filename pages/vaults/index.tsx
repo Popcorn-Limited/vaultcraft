@@ -1,5 +1,4 @@
 import type { NextPage } from "next";
-import { Address } from "wagmi";
 import VaultsContainer from "@/components/vault/VaultsContainer";
 import axios from "axios";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";

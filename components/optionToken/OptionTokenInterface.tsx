@@ -1,19 +1,16 @@
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import {
-  Address,
   useAccount,
   useBalance,
-  useNetwork,
   usePublicClient,
-  useSwitchNetwork,
+  useSwitchChain,
   useWalletClient,
 } from "wagmi";
 import MainActionButton from "@/components/button/MainActionButton";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import { claimOPop } from "@/lib/optionToken/interactions";
-import { WalletClient, zeroAddress } from "viem";
-import { llama } from "@/lib/resolver/price/resolver";
+import { Address, zeroAddress } from "viem";
 import { MinterByChain, OptionTokenByChain, VCX } from "@/lib/constants";
 import { useAtom } from "jotai";
 import { gaugeRewardsAtom, tokensAtom } from "@/lib/atoms";
@@ -28,9 +25,8 @@ interface OptionTokenInterfaceProps {
 }
 
 export default function OptionTokenInterface({ setShowOptionTokenModal }: OptionTokenInterfaceProps): JSX.Element {
-  const { chain } = useNetwork();
-  const { switchNetworkAsync, switchNetwork } = useSwitchNetwork();
-  const { address: account } = useAccount();
+  const { switchChainAsync } = useSwitchChain();
+  const { address: account, chain } = useAccount();
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
 
@@ -38,25 +34,14 @@ export default function OptionTokenInterface({ setShowOptionTokenModal }: Option
   const [vaults, setVaults] = useAtom(vaultsAtom)
   const [gaugeRewards, setGaugeRewards] = useAtom(gaugeRewardsAtom);
 
-  const { data: oBal } = useBalance({
-    chainId: 1,
-    address: account,
-    token: OptionTokenByChain[1],
-    watch: true,
-  });
-
   async function handleClaim(chainId: number) {
     if (chain?.id !== chainId) {
       try {
-        await switchNetworkAsync?.(chainId);
+        await switchChainAsync?.({ chainId });
       } catch (error) {
         return;
       }
     }
-
-    console.log(gaugeRewards[chainId].amounts
-      ?.filter((gauge) => Number(gauge.amount) > 0)
-      .map((gauge) => gauge.address))
 
     const success = await claimOPop({
       gauges: gaugeRewards[chainId].amounts
@@ -65,7 +50,7 @@ export default function OptionTokenInterface({ setShowOptionTokenModal }: Option
       chainId: chainId,
       account: account!,
       minter: MinterByChain[chainId],
-      clients: { publicClient, walletClient: walletClient! }
+      clients: { publicClient: publicClient!, walletClient: walletClient! }
     })
 
     if (success) {
@@ -81,7 +66,7 @@ export default function OptionTokenInterface({ setShowOptionTokenModal }: Option
           gauges: vaults[chainId].filter(vault => vault.gauge && vault.gauge !== zeroAddress).map(vault => vault.gauge) as Address[],
           account: account!,
           chainId: chainId,
-          publicClient
+          publicClient: publicClient!
         })
       })
     }
@@ -170,9 +155,9 @@ export default function OptionTokenInterface({ setShowOptionTokenModal }: Option
             <p className="ml-2">My oVCX</p>
           </div>
           <p className="font-bold">
-            {`$${oBal && tokens?.[1]?.[VCX]?.price > 0
+            {`$${tokens[1][OptionTokenByChain[1]].balance && tokens?.[1]?.[VCX]?.price > 0
               ? NumberFormatter.format(
-                (Number(oBal?.value) / 1e18) * (tokens?.[1]?.[VCX]?.price * 0.25)
+                (tokens[1][OptionTokenByChain[1]].balance / 1e18) * (tokens?.[1]?.[VCX]?.price * 0.25)
               )
               : "0"
               }`}

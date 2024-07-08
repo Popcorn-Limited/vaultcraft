@@ -1,13 +1,10 @@
 import {
-  Address,
   useAccount,
   useBalance,
-  useNetwork,
   usePublicClient,
-  useSwitchNetwork,
+  useSwitchChain,
   useWalletClient,
 } from "wagmi";
-import { WalletClient } from "viem";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import useLockedBalanceOf from "@/lib/gauges/useLockedBalanceOf";
 import Modal from "@/components/modal/Modal";
@@ -26,11 +23,12 @@ import IncreaseStakePreview from "@/components/boost/modals/manage/IncreaseStake
 import IncreaseTimeInterface from "@/components/boost/modals/manage/IncreaseTimeInterface";
 import IncreaseTimePreview from "@/components/boost/modals/manage/IncreaseTimePreview";
 import UnstakePreview from "@/components/boost/modals/manage/UnstakePreview";
-import { VCX_LP, VOTING_ESCROW } from "@/lib/constants";
+import { VCX_LP, VOTING_ESCROW } from "@/lib/constants/addresses";
 import BroadcastVeBalanceInterface from "./BroadcastVeBalanceInterface";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
 import { tokensAtom } from "@/lib/atoms";
 import { useAtom } from "jotai";
+import { Address } from "viem";
 
 export enum ManagementOption {
   IncreaseLock,
@@ -48,9 +46,8 @@ export default function ManageLockModal({
   setShowLpModal: Dispatch<SetStateAction<boolean>>;
   setShowSyncModal: Dispatch<SetStateAction<boolean>>;
 }): JSX.Element {
-  const { chain } = useNetwork();
-  const { switchNetworkAsync } = useSwitchNetwork();
-  const { address: account } = useAccount();
+  const { switchChainAsync } = useSwitchChain();
+  const { address: account, chain } = useAccount();
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
 
@@ -60,11 +57,6 @@ export default function ManageLockModal({
   const [step, setStep] = useState(0);
   const [mangementOption, setMangementOption] = useState();
 
-  const { data: veBal } = useBalance({
-    chainId: 1,
-    address: account,
-    token: VOTING_ESCROW,
-  });
   const { data: lockedBal } = useLockedBalanceOf({
     chainId: 1,
     address: VOTING_ESCROW,
@@ -90,7 +82,7 @@ export default function ManageLockModal({
 
     if (chain?.id !== Number(1)) {
       try {
-        await switchNetworkAsync?.(Number(1));
+        await switchChainAsync?.({ chainId: 1 });
       } catch (error) {
         return;
       }
@@ -98,7 +90,7 @@ export default function ManageLockModal({
     const val = Number(amount);
 
     const clients = {
-      publicClient,
+      publicClient: publicClient!,
       walletClient: walletClient!,
     };
 

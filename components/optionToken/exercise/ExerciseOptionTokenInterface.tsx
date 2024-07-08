@@ -6,23 +6,20 @@ import {
   useState,
 } from "react";
 import {
-  Address,
-  WalletClient,
-  mainnet,
   useAccount,
-  useNetwork,
   usePublicClient,
-  useSwitchNetwork,
+  useSwitchChain,
   useWalletClient,
 } from "wagmi";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import TokenIcon from "@/components/common/TokenIcon";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
-import { BalancerOracleAbi, ExerciseByChain, ExerciseOracleByChain, OVCX_ORACLE, OptionTokenByChain, VCX, VcxByChain, WETH, WethByChain, ZERO } from "@/lib/constants";
+import { BalancerOracleAbi, ZERO } from "@/lib/constants";
+import { ExerciseByChain, ExerciseOracleByChain, OVCX_ORACLE, OptionTokenByChain, VCX, VcxByChain, WETH, WethByChain } from "@/lib/constants/addresses";
 import { formatNumber, safeRound } from "@/lib/utils/formatBigNumber";
 import { validateInput } from "@/lib/utils/helpers";
 import { Token } from "@/lib/types";
-import { createPublicClient, formatEther, http, parseEther } from "viem";
+import { Address, createPublicClient, formatEther, http, parseEther } from "viem";
 import { useAtom } from "jotai";
 import { tokensAtom } from "@/lib/atoms";
 import ActionSteps from "../../vault/ActionSteps";
@@ -32,6 +29,7 @@ import { exerciseOPop } from "@/lib/optionToken/interactions";
 import { handleAllowance } from "@/lib/approve";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
+import { mainnet } from "viem/chains";
 
 const SLIPPAGE = 0.01; // @dev adding some slippage to the call -- TODO -> we should later allow users to change that
 
@@ -41,9 +39,8 @@ interface ExerciseOptionTokenInterfaceProps {
 }
 
 export default function ExerciseOptionTokenInterface({ chainId, setShowModal }: ExerciseOptionTokenInterfaceProps): JSX.Element {
-  const { chain } = useNetwork();
-  const { switchNetworkAsync } = useSwitchNetwork();
-  const { address: account } = useAccount();
+  const { switchChainAsync } = useSwitchChain();
+  const { address: account, chain } = useAccount();
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
 
@@ -141,7 +138,7 @@ export default function ExerciseOptionTokenInterface({ chainId, setShowModal }: 
 
     if (chain?.id !== chainId) {
       try {
-        await switchNetworkAsync?.(chainId);
+        await switchChainAsync?.({ chainId });
       } catch (error) {
         return;
       }
@@ -161,7 +158,7 @@ export default function ExerciseOptionTokenInterface({ chainId, setShowModal }: 
           account: account as Address,
           spender: ExerciseByChain[chainId],
           clients: {
-            publicClient,
+            publicClient: publicClient!,
             walletClient: walletClient!,
           },
         });
@@ -173,7 +170,7 @@ export default function ExerciseOptionTokenInterface({ chainId, setShowModal }: 
           account: account as Address,
           spender: ExerciseByChain[chainId],
           clients: {
-            publicClient,
+            publicClient: publicClient!,
             walletClient: walletClient!,
           },
         });
@@ -186,7 +183,7 @@ export default function ExerciseOptionTokenInterface({ chainId, setShowModal }: 
           ),
           maxPaymentAmount: parseEther(maxPaymentAmount),
           address: ExerciseByChain[chainId],
-          clients: { publicClient, walletClient: walletClient! },
+          clients: { publicClient: publicClient!, walletClient: walletClient! },
         });
         if (success) {
           await mutateTokenBalance({

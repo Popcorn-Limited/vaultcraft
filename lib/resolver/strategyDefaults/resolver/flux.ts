@@ -1,6 +1,7 @@
 import { ADDRESS_ZERO } from "@/lib/constants";
-import { Address, mainnet } from "wagmi";
 import { StrategyDefaultResolverParams } from "..";
+import { Address } from "viem";
+import { mainnet } from "viem/chains";
 
 // Flux is mainnet only.
 // @dev Make sure the keys here are correct checksum addresses

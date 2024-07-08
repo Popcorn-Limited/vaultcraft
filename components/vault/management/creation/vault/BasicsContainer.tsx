@@ -65,9 +65,9 @@ export default function BasicsContainer({
       const newAvailableAssetAddresses: { [key: number]: Address[] } = {};
       SUPPORTED_NETWORKS.forEach(
         async (chain) =>
-          (newAvailableAssetAddresses[chain.id] = await yieldOptions.getAssets(
-            chain.id
-          ))
+        (newAvailableAssetAddresses[chain.id] = await yieldOptions.getAssets(
+          chain.id
+        ))
       );
       setAvailableAssetAddresses(newAvailableAssetAddresses);
     }
@@ -85,7 +85,7 @@ export default function BasicsContainer({
         if (strategy.initParams && strategy.initParams.length > 0) {
           strategyDefaults = await resolveStrategyDefaults({
             chainId: chainId,
-            client: publicClient,
+            client: publicClient!,
             address: getAddress(asset.address),
             resolver: strategy.resolver,
           });
@@ -93,7 +93,7 @@ export default function BasicsContainer({
       } else {
         strategyDefaults = await resolveStrategyDefaults({
           chainId: chainId,
-          client: publicClient,
+          client: publicClient!,
           address: getAddress(asset.address),
           resolver: strategy.resolver,
         });

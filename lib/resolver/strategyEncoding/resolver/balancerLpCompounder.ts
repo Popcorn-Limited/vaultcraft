@@ -1,8 +1,7 @@
 import { MAX_INT256, MAX_UINT256, ZERO } from "@/lib/constants";
 import { balancerApiProxyCall } from "@/lib/external/balancer/router/call";
 import { BatchSwapStep } from "@/lib/external/balancer/router/interfaces";
-import { Address, encodeAbiParameters, getAddress, parseUnits } from "viem";
-import { PublicClient } from "wagmi";
+import { Address, PublicClient, encodeAbiParameters, getAddress, parseUnits } from "viem";
 import { StrategyEncodingResolverParams } from "@/lib/resolver/strategyEncoding";
 import { AddressByChain } from "@/lib/types";
 

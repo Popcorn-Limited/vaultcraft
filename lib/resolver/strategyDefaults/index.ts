@@ -1,4 +1,4 @@
-import { Address } from "viem";
+import { Address, PublicClient } from "viem";
 import {
   alpacaV1,
   alpacaV2,
@@ -25,7 +25,6 @@ import {
   yearn,
   yearnFactory,
 } from "./resolver";
-import { PublicClient } from "wagmi";
 
 export type StrategyDefaultResolverParams = {
   chainId: number;

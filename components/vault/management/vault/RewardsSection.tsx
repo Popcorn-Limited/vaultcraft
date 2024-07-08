@@ -12,7 +12,7 @@ import { validateInput } from "@/lib/utils/helpers";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { Address, formatUnits } from "viem";
-import { useAccount, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
+import { useAccount, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
 
 export default function RewardsSection({ gauge, chainId }: { gauge: Address; chainId: number }) {
   const [tokens] = useAtom(tokensAtom);
@@ -57,11 +57,10 @@ export default function RewardsSection({ gauge, chainId }: { gauge: Address; cha
 
 
 function RewardColumn({ gauge, reward, token, chainId }: { gauge: Address, reward: any, token: Token, chainId: number }): JSX.Element {
-  const { address: account } = useAccount();
+  const { address: account, chain } = useAccount();
   const publicClient = usePublicClient({ chainId });
   const { data: walletClient } = useWalletClient();
-  const { chain } = useNetwork();
-  const { switchNetworkAsync } = useSwitchNetwork();
+  const { switchChainAsync } = useSwitchChain();
   const [tokens, setTokens] = useAtom(tokensAtom);
 
   const [amount, setAmount] = useState<string>("0");
@@ -88,7 +87,7 @@ function RewardColumn({ gauge, reward, token, chainId }: { gauge: Address, rewar
 
     if (chain?.id !== Number(chainId)) {
       try {
-        await switchNetworkAsync?.(Number(chainId));
+        await switchChainAsync?.({ chainId });
       } catch (error) {
         return;
       }
@@ -113,7 +112,7 @@ function RewardColumn({ gauge, reward, token, chainId }: { gauge: Address, rewar
 
     if (chain?.id !== Number(chainId)) {
       try {
-        await switchNetworkAsync?.(Number(chainId));
+        await switchChainAsync?.({ chainId });
       } catch (error) {
         return;
       }

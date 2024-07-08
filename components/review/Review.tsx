@@ -85,7 +85,7 @@ export default function Review(): JSX.Element {
 
         strategyInitParams = await resolveStrategyEncoding({
           chainId: chainId,
-          client: publicClient,
+          client: publicClient!,
           address: getAddress(asset.address),
           params: strategyConfig.slice(1),
           resolver: strategy.resolver,

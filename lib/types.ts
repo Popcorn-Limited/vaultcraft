@@ -1,6 +1,5 @@
 import { ProtocolName } from "vaultcraft-sdk";
-import { Address } from "viem";
-import { PublicClient, WalletClient } from "wagmi";
+import { Address, PublicClient, WalletClient } from "viem";
 
 export type Token = {
   address: Address;

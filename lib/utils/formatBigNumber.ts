@@ -75,6 +75,13 @@ export function formatToFixedDecimals(value: number, decimals: number): string {
   ).toLocaleString();
 }
 
+
+export function numberToFormattedString(val: number, decimals: number): string {
+  const stringBal = val.toLocaleString("fullwide", { useGrouping: false })
+  const rounded = safeRound(BigInt(stringBal), decimals)
+  return formatUnits(rounded, decimals)
+}
+
 export const NumberFormatter = Intl.NumberFormat("en", {
   //@ts-ignore
   notation: "compact",

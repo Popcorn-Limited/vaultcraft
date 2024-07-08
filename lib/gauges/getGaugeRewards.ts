@@ -1,6 +1,5 @@
-import { Address } from "wagmi";
 import { GaugeAbi, ZERO } from "@/lib/constants";
-import { PublicClient, createPublicClient, http } from "viem";
+import { PublicClient, createPublicClient, http, Address } from "viem";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 
 interface GetGaugeRewardsProps {
@@ -21,6 +20,7 @@ export default async function getGaugeRewards({ gauges, account, publicClient, c
     transport: http(RPC_URLS[chainId]),
   })
 
+  // @ts-ignore
   const data = await client.multicall({
     contracts: gauges.map((address) => {
       return {

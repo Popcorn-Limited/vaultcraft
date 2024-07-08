@@ -1,22 +1,18 @@
 import { intervalToDuration } from "date-fns";
-import { Dispatch, SetStateAction } from "react";
-import { Address, useAccount, useBalance } from "wagmi";
+import { Dispatch, SetStateAction, useEffect } from "react";
+import { useAccount, useBalance, useBlockNumber } from "wagmi";
 import { getVotePeriodEndTime } from "@/lib/gauges/utils";
 import MainActionButton from "@/components/button/MainActionButton";
 import useLockedBalanceOf from "@/lib/gauges/useLockedBalanceOf";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
-import { formatEther } from "viem";
-import {
-  OptionTokenByChain,
-  VCX_LP,
-  VOTING_ESCROW,
-  ZERO,
-} from "@/lib/constants";
+import { Address, formatEther } from "viem";
+import { OptionTokenByChain, VCX_LP, VOTING_ESCROW } from "@/lib/constants/addresses";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
-import NetworkSticker from "../network/NetworkSticker";
-import TokenIcon from "../common/TokenIcon";
+import NetworkSticker from "@/components/network/NetworkSticker";
+import TokenIcon from "@/components/common/TokenIcon";
 import { useAtom } from "jotai";
 import { tokensAtom } from "@/lib/atoms";
+import { ZERO } from "@/lib/constants";
 
 export function votingPeriodEnd(timestamp?: number): number[] {
   const periodEnd = timestamp ? timestamp : getVotePeriodEndTime();
@@ -46,7 +42,7 @@ export default function StakingInterface({
   setShowSyncModal,
 }: StakingInterfaceProps): JSX.Element {
   const { address: account } = useAccount();
-
+  const { data: blockNumber } = useBlockNumber({ watch: true })
   const [tokens] = useAtom(tokensAtom);
 
   const { data: lockedBal } = useLockedBalanceOf({
@@ -54,18 +50,21 @@ export default function StakingInterface({
     address: VOTING_ESCROW,
     account: account as Address,
   });
-  const { data: veBal } = useBalance({
+  const { data: veBal, refetch: refetchVeBal } = useBalance({
     chainId: 1,
     address: account,
     token: VOTING_ESCROW,
-    watch: true,
   });
-  const { data: LpBal } = useBalance({
+  const { data: LpBal, refetch: refetchLpBal } = useBalance({
     chainId: 1,
     address: account,
-    token: VCX_LP,
-    watch: true,
+    token: VCX_LP
   });
+
+  useEffect(() => {
+    refetchVeBal();
+    refetchLpBal();
+  }, [blockNumber])
 
   return (
     <>

@@ -1,8 +1,9 @@
 import { TokenByAddress, TokenType, VaultData } from "@/lib/types";
-import { PublicClient, zeroAddress } from "viem";
+import { PublicClient } from "viem";
 import { GaugeAbi } from "../constants";
 
 export async function prepareGauges(vaultsWithGauges: VaultData[], vaults: TokenByAddress, client: PublicClient): Promise<TokenByAddress> {
+  // @ts-ignore
   const ts = await client.multicall({
     contracts: vaultsWithGauges.map(vault => {
       return {

@@ -1,5 +1,4 @@
-import { Address } from "viem";
-import { PublicClient } from "wagmi";
+import { Address, PublicClient } from "viem";
 import { VAULTRON, VaultronAbi } from "@/lib/constants";
 import { VaultronStats } from "@/lib/types";
 import axios from "axios";

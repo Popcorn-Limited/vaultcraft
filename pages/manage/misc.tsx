@@ -21,8 +21,8 @@ import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import NoSSR from "react-no-ssr";
 import { encodeAbiParameters, formatUnits, getAddress } from "viem";
-import { arbitrum, optimism } from "viem/chains";
-import { Address, mainnet, useAccount, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
+import { mainnet, optimism } from "viem/chains";
+import { useAccount, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
 
 async function simulateCall({
   address,
@@ -60,6 +60,7 @@ function SetOptionTokenOracleParams(): JSX.Element {
   }>({ multiplier: 0, secs: 0, ago: 0, minPrice: 0 });
 
   async function getValues() {
+    if (!publicClient) return
     const res = await publicClient.multicall({
       contracts: [
         {
@@ -95,7 +96,7 @@ function SetOptionTokenOracleParams(): JSX.Element {
 
   useEffect(() => {
     if (values.multiplier === 0) getValues();
-  }, [values]);
+  }, [values, publicClient]);
 
   function handleChangeInput(
     value: string,
@@ -122,7 +123,7 @@ function SetOptionTokenOracleParams(): JSX.Element {
         publicClient: publicClient,
       }),
       clients: {
-        publicClient,
+        publicClient: publicClient!,
         walletClient,
       },
     });
@@ -247,7 +248,7 @@ function RewardBridger() {
             gauges: inputValue.split(",").map(addr => getAddress(addr)),
             account: account!,
             address: ROOT_GAUGE_FACTORY,
-            clients: { publicClient, walletClient: walletClient! }
+            clients: { publicClient: publicClient!, walletClient: walletClient! }
           })
         }
         disabled={!account}
@@ -260,9 +261,8 @@ function RewardBridger() {
 function BridgeVCX() {
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
-  const { address: account } = useAccount();
-  const { chain } = useNetwork();
-  const { switchNetworkAsync } = useSwitchNetwork();
+  const { address: account, chain } = useAccount();
+  const { switchChainAsync } = useSwitchChain();
 
   const [tokens, setTokens] = useAtom(tokensAtom)
 
@@ -345,7 +345,7 @@ function BridgeVCX() {
 
     if (chain?.id !== Number(chainId)) {
       try {
-        await switchNetworkAsync?.(Number(chainId));
+        await switchChainAsync?.({ chainId });
       } catch (error) {
         return;
       }
@@ -367,7 +367,7 @@ function BridgeVCX() {
           account: account!,
           spender: LockboxAdapterByChain[chainId],
           clients: {
-            publicClient,
+            publicClient: publicClient!,
             walletClient: walletClient!,
           },
         });
@@ -384,7 +384,7 @@ function BridgeVCX() {
           slippage: 0,
           callData: chainId === mainnet.id ? "0x" : encodeAbiParameters([{ name: "recipient", type: "address" }], [account!]),
           account: account!,
-          clients: { publicClient, walletClient: walletClient! },
+          clients: { publicClient: publicClient!, walletClient: walletClient! },
           chainId
         });
         if (success) {
