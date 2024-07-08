@@ -32,6 +32,9 @@ export async function exerciseOPop({
       args: [amount, maxPaymentAmount, account],
     }),
     clients,
+    user: account,
+    target: address, 
+    functionName: "exercise"
   });
 }
 
@@ -58,5 +61,8 @@ export async function claimOPop({ gauges, chainId, account, minter, clients }: C
       args: [gauges],
     }),
     clients,
+    user: account,
+    target: minter, 
+    functionName: chainId === mainnet.id ? "mintMany" : "mint_many"
   });
 }

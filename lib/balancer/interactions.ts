@@ -85,5 +85,8 @@ export async function depositIntoPool({
       ],
     }),
     clients,
+    user: account,
+    target: BALANCER_VAULT, 
+    functionName: "joinPool"
   });
 }

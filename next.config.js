@@ -15,6 +15,7 @@ const nextConfig = {
     ENSO_API_KEY: process.env.ENSO_API_KEY,
     MASA_CLIENT_ID: process.env.MASA_CLIENT_ID,
     DEFILLAMA_API_KEY: process.env.DEFILLAMA_API_KEY,
+    DISCORD_WEBHOOK: process.env.DISCORD_WEBHOOK
   },
   async rewrites() {
     return [

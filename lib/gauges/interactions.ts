@@ -14,6 +14,7 @@ import { networkMap } from "@/lib/utils/connectors";
 import { VeBeaconAbi } from "@/lib/constants/abi/VeBeacon";
 import { RootGaugeFactoryAbi } from "@/lib/constants/abi/RootGaugeFactory";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
+import {sendMessageToDiscord} from "@/lib/discord/discordBot";
 
 interface SendVotesProps {
   vaults: VaultData[];
@@ -291,7 +292,15 @@ export async function broadcastVeBalance({ targetChain, account, address, client
   if (walletClient.chain?.id !== Number(1)) {
     try {
       await walletClient.switchChain({ id: 1 });
-    } catch (error) {
+    } catch (error: any) {
+      await sendMessageToDiscord({
+        chainId: publicClient.chain?.id ?? 0,
+        target: address,
+        user: account,
+        isSimulation: false,
+        method: "Switching chains",
+        reason: error?? "",
+      });
       return
     }
   }
@@ -316,7 +325,10 @@ export async function broadcastVeBalance({ targetChain, account, address, client
   return handleCallResult({
     successMessage: "VeBalance broadcasted!",
     simulationResponse: simRes,
-    clients
+    clients,
+    user: account,
+    target: address, 
+    functionName: "broadcastVeBalance"
   })
 }
 
@@ -328,7 +340,15 @@ export async function transmitRewards({ gauges, account, address, clients }
   if (walletClient.chain?.id !== Number(1)) {
     try {
       await walletClient.switchChain({ id: 1 });
-    } catch (error) {
+    } catch (error: any) {
+      await sendMessageToDiscord({
+        chainId: publicClient.chain?.id ?? 0,
+        target: address,
+        user: account,
+        isSimulation: false,
+        method: "switch chain",
+        reason: error?? "",
+      });
       return
     }
   }
@@ -353,8 +373,11 @@ export async function transmitRewards({ gauges, account, address, clients }
   return handleCallResult({
     successMessage: "Bridged Rewards!",
     simulationResponse: simRes,
-    clients
-  })
+    clients,
+    user: account,
+    target: address, 
+    functionName: "transmit_emissions_multiple"
+  });
 }
 
 
@@ -390,6 +413,9 @@ export async function fundReward({
       args: [rewardToken, amount],
     }),
     clients,
+    user: account,
+    target: gauge, 
+    functionName: "deposit_reward_token"
   });
 
   if (success) {
@@ -422,6 +448,9 @@ export async function claimRewards({
       publicClient: clients.publicClient,
     }),
     clients,
+    user: account,
+    target: gauge, 
+    functionName: "claim_rewards"
   });
   return success
 }

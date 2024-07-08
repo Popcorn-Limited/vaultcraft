@@ -137,6 +137,9 @@ export async function vaultDeposit({
       publicClient: clients.publicClient,
     }),
     clients,
+    user: account,
+    target: vaultData.address, 
+    functionName: "deposit"
   });
 
   if (success) {
@@ -207,6 +210,9 @@ export async function vaultRedeem({
       publicClient: clients.publicClient,
     }),
     clients,
+    user: account,
+    target: vaultData.address, 
+    functionName: "redeem"
   });
 
   if (success) {
@@ -259,6 +265,9 @@ export async function vaultDepositAndStake({
       publicClient: clients.publicClient,
     }),
     clients,
+    user: account,
+    target: router, 
+    functionName: "depositAndStake"
   });
   if (success) {
     mutateTokenBalance({
@@ -310,6 +319,9 @@ export async function vaultUnstakeAndWithdraw({
       publicClient: clients.publicClient,
     }),
     clients,
+    user: account,
+    target: router, 
+    functionName: "unstakeAndWithdraw"
   });
   if (success) {
     mutateTokenBalance({

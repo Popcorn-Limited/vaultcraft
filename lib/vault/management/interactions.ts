@@ -45,6 +45,9 @@ export async function allocateToStrategies({
       publicClient: clients.publicClient
     }),
     clients,
+    user: account,
+    target: vaultData.address, 
+    functionName: "pushFunds"
   });
 
   return success;
@@ -69,6 +72,9 @@ export async function deallocateFromStrategies({
       publicClient: clients.publicClient
     }),
     clients,
+    user: account,
+    target: vaultData.address, 
+    functionName: "pullFunds"
   });
 
   return success;
@@ -93,6 +99,9 @@ export async function proposeStrategies({
       publicClient: clients.publicClient
     }),
     clients,
+    user: account,
+    target: vaultData.address, 
+    functionName: "proposeStrategies"
   });
 
   return success;
@@ -115,6 +124,9 @@ export async function acceptStrategies({
       publicClient: clients.publicClient
     }),
     clients,
+    user: account,
+    target: vaultData.address, 
+    functionName: "changeStrategies"
   });
 
   return success;
@@ -146,6 +158,9 @@ export async function proposeStrategy({
       publicClient: clients.publicClient
     }),
     clients,
+    user: account,
+    target: address, 
+    functionName: "proposeAdapter"
   });
 
   return success;
@@ -176,6 +191,9 @@ export async function acceptStrategy({
       publicClient: clients.publicClient
     }),
     clients,
+    user: account,
+    target: address, 
+    functionName: "changeAdapter"
   });
 
   return success;
@@ -214,6 +232,9 @@ export async function proposeFees({
       publicClient: clients.publicClient
     }),
     clients,
+    user: account,
+    target: address, 
+    functionName: "proposeFees"
   });
 
   return success;
@@ -244,6 +265,9 @@ export async function acceptFees({
       publicClient: clients.publicClient
     }),
     clients,
+    user: account,
+    target: address, 
+    functionName: "changeFees"
   });
 
   return success;
@@ -275,6 +299,9 @@ export async function changeFeeRecipient({
       publicClient: clients.publicClient
     }),
     clients,
+    user: account,
+    target: address, 
+    functionName: "setFeeRecipient"
   });
 
   return success;
@@ -306,6 +333,9 @@ export async function changeDepositLimit({
       publicClient: clients.publicClient
     }),
     clients,
+    user: account,
+    target: address, 
+    functionName: "setDepositLimit"
   });
 
   return success;
@@ -336,6 +366,9 @@ export async function pauseVault({
       publicClient: clients.publicClient
     }),
     clients,
+    user: account,
+    target: address, 
+    functionName: "pause"
   });
 
   return success;
@@ -366,6 +399,9 @@ export async function unpauseVault({
       publicClient: clients.publicClient
     }),
     clients,
+    user: account,
+    target: address, 
+    functionName: "unpause"
   });
 
   return success;
@@ -391,5 +427,8 @@ export async function takeFees({
       publicClient: clients.publicClient
     }),
     clients,
+    user: account,
+    target: address, 
+    functionName: "takeManagementAndPerformanceFees"
   });
 }
