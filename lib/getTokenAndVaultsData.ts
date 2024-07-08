@@ -279,6 +279,7 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
   });
 
   // Get TotalAssets and TotalSupply
+  // @ts-ignore
   const taAndTs = await client.multicall({
     contracts: uniqueStrategyAdresses
       .map((address: Address) => {

@@ -32,13 +32,13 @@ export default function VaultHero({ vaultData, asset, vault, gauge, showClaim = 
               id={"deposits"}
               label="Deposits"
               value={vaultData ?
-                `${!!gauge ?
-                  NumberFormatter.format(((gauge.balance * gauge.price) / 10 ** asset?.decimals!) + ((vault?.balance! * vault?.price!) / 10 ** asset?.decimals!))
-                  : formatAndRoundNumber(vault?.balance! * vault?.price!, asset?.decimals!)
+                `$ ${!!gauge ?
+                  NumberFormatter.format(((gauge.balance * gauge.price) / 10 ** gauge?.decimals!) + ((vault?.balance! * vault?.price!) / 10 ** vault?.decimals!))
+                  : formatAndRoundNumber(vault?.balance! * vault?.price!, vault?.decimals!)
                 }` : "0"}
               secondaryValue={`${!!gauge ?
-                NumberFormatter.format(((gauge.balance) / 10 ** gauge.decimals) + ((vault?.balance!) / 10 ** vault?.decimals!))
-                : formatAndRoundNumber(vault?.balance!, vault?.decimals!)
+                NumberFormatter.format((gauge.balance * vaultData.assetsPerShare / (10 ** asset?.decimals!)) + (vault?.balance! * vaultData.assetsPerShare / (10 ** asset?.decimals!)))
+                : formatAndRoundNumber(vault?.balance! * vaultData.assetsPerShare, asset?.decimals!)
                 } ${asset?.symbol!}`}
               tooltip="Value of your vault deposits"
             />
