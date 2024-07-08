@@ -133,7 +133,16 @@ export default function VaultRow({
         </p>
       </td>
 
-      <td className="text-right text-lg">{formatTwoDecimals(apy)}%</td>
+      <td className="text-right text-lg">
+        <p className="text-lg">
+          {formatTwoDecimals(apy)}%
+        </p>
+        {gaugeData && gaugeData?.rewardApy.apy > 0 &&
+          <p className="text-sm -mt-0.5 text-customGray200">
+            + {formatTwoDecimals(gaugeData?.rewardApy.apy)}%
+          </p>
+        }
+      </td>
 
       <td className="text-right text-lg">
         <p className="text-lg">
@@ -157,7 +166,14 @@ export default function VaultRow({
         }
       </td>
 
-      <td className="text-right text-lg text-primaryGreen">x{formatTwoDecimals(boost)}</td>
+      <td className="text-right text-lg">
+        <p className="text-lg">
+          {formatTwoDecimals(gaugeData?.lowerAPR || 0 * boost)}%
+        </p>
+        <p className="text-sm -mt-0.5 text-customGray200">
+          x{boost}
+        </p>
+      </td>
     </tr>
   );
 }

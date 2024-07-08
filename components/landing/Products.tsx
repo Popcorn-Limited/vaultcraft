@@ -38,10 +38,9 @@ export default function Products(): JSX.Element {
       >
         <Tutorial />
       </Modal>
-      {/* @dev Product.tsx has `md:mx-2` so with `md:mx-6` that adds up to consistent mx-8*/}
-      <section className="py-12 md:py-10 mx-4 md:mx-6 h-max">
+      <section className="py-12 md:py-10 mx-4 md:mx-0 h-max">
         <p className="text-2xl mb-6 text-white smmd:hidden"> Our products </p>
-        <div className="flex flex-col gap-1 smmd:flex-wrap lg:flex-nowrap space-y-4 md:space-y-0 md:flex-row md:justify-between">
+        <div className="flex flex-col gap-1 smmd:flex-wrap lg:flex-nowrap space-y-4 md:space-y-0 md:space-x-4 md:flex-row md:justify-between">
           <Product
             title={
               <div className="flex flex-row w-full justify-between items-end">
@@ -247,7 +246,7 @@ export default function Products(): JSX.Element {
             stats={[]}
             route="boost"
           />
-          <div className="w-full lg:max-w-full min-h-[40rem] relative flex flex-col space-y-4 md:mx-2">
+          <div className="w-full lg:max-w-full min-h-[40rem] relative flex flex-col space-y-4">
             <Link
               href={
                 !!query?.ref && isAddress(query.ref as string)
@@ -256,7 +255,7 @@ export default function Products(): JSX.Element {
               }
             >
               <div
-                className="rounded w-full min-h-[12rem] bg-customNeutral300 border border-customNeutral100 border-opacity-75 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:opacity-50 flex flex-col justify-start bg-cover"
+                className="rounded w-full min-h-[12rem] bg-customNeutral300 border border-customNeutral100 border-opacity-75 hover:shadow-lg ease-in-out duration-250 hover:opacity-50 flex flex-col justify-start bg-cover"
                 style={{
                   backgroundImage:
                     "url('https://resolve.mercle.xyz/ipfs/bafkreibn26tzshouo6ayr33uhwwqzxpp5h6zgzitzgxwhsacsuuxoo7fuq')",
@@ -273,7 +272,7 @@ export default function Products(): JSX.Element {
                   ? `create-vault?ref=${query.ref}`
                   : `create-vault`
               }
-              className="rounded w-full min-h-[9rem] relative flex flex-col bg-customNeutral300 border border-customNeutral100 border-opacity-75 smmd:items-center py-6 px-6 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:bg-customNeutral200"
+              className="rounded w-full min-h-[9rem] relative flex flex-col bg-customNeutral300 border border-customNeutral100 border-opacity-75 smmd:items-center py-6 px-6  hover:shadow-lg ease-in-out duration-250 hover:bg-customNeutral200"
             >
               <div className="col-span-12 md:col-span-4 xs:self-start">
                 <div className="relative flex flex-row">
@@ -292,7 +291,7 @@ export default function Products(): JSX.Element {
                   ? `stats?ref=${query.ref}`
                   : `stats`
               }
-              className="rounded w-full min-h-[9rem] relative flex flex-col bg-customNeutral300 border border-customNeutral100 border-opacity-75 smmd:items-center py-6 px-6 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:bg-customNeutral200"
+              className="rounded w-full min-h-[9rem] relative flex flex-col bg-customNeutral300 border border-customNeutral100 border-opacity-75 smmd:items-center py-6 px-6 hover:shadow-lg ease-in-out duration-250 hover:bg-customNeutral200"
             >
               <div className="col-span-12 md:col-span-4 xs:self-start">
                 <div className="relative flex flex-row">
@@ -307,7 +306,7 @@ export default function Products(): JSX.Element {
             </Link>
             <div
               className="rounded w-full min-h-[9rem] relative flex flex-col bg-customNeutral300 border border-customNeutral100 border-opacity-75 smmd:items-center
-              py-6 px-6 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:bg-customNeutral200"
+              py-6 px-6 hover:shadow-lg ease-in-out duration-250 hover:bg-customNeutral200"
             >
               <CopyToClipboard
                 text={`https://app.vaultcraft.io/vaults?ref=${account}`}

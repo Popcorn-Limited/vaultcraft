@@ -195,7 +195,7 @@ export const LABELS_WITH_TOOLTIP = {
   ),
   boost: (
     <WithTooltip content="Current APR Boost for this vault">
-      Boost
+      Your Boost
     </WithTooltip>
   ),
 };

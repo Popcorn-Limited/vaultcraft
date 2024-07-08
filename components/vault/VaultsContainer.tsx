@@ -96,7 +96,7 @@ export default function VaultsContainer({
               <LargeCardStat
                 id="total-tvl"
                 label="TVL"
-                value={`$${NumberFormatter.format(tvl.vault)}`}
+                value={`$${tvl.vault < 1 ? "0" : NumberFormatter.format(tvl.vault)}`}
                 tooltip="Total value locked (TVL) is the amount of user funds deposited in Smart Vaults."
               />
             </div>
@@ -105,7 +105,7 @@ export default function VaultsContainer({
               <LargeCardStat
                 id="total-deposits"
                 label="Deposits"
-                value={`$${NumberFormatter.format(networth.vault)}`}
+                value={`$${networth.vault < 1 ? "0" : NumberFormatter.format(networth.vault)}`}
                 tooltip="Value of your smart vault deposits across all blockchains."
               />
             </div>

@@ -202,8 +202,8 @@ function VePopContainer() {
         <BroadcastVeBalanceInterface setShowModal={setShowSyncModal} />
       </Modal>
       <div className="static">
-        <section className="py-10 px-4 md:px-8 border-t md:border-t-0 md:border-b border-customNeutral100 lg:flex lg:flex-row items-center justify-between text-white">
-          <div className="lg:w-[1050px]">
+        <section className="w-full py-10 px-4 md:px-0 border-t md:border-t-0 md:border-b border-customNeutral100 md:flex md:flex-row items-center justify-between text-white">
+          <div className="">
             <h1 className="text-2xl md:text-3xl font-normal">
               Lock your{" "}
               <span className="text-primaryYellow font-bold md:font-normal md:underline md:decoration-solid">
@@ -221,38 +221,39 @@ function VePopContainer() {
             </p>
           </div>
 
-          <div
-            id="rewards-tooltip-inner"
-            className="bg-customNeutral200 mt-6 lg:mt-0 cursor-pointer border border-customNeutral100 rounded-lg px-6 py-4"
-          >
-            <p className="text-base opacity-80 whitespace-nowrap">
-              Emissions per week
-            </p>
-            <div className="flex flex-row items-center justify-between">
-              <img
-                src={"/images/tokens/oVcx.svg"}
-                alt="token icon"
-                className="w-6 h-6 object-contain rounded-full"
-              />
-              <p className="font-bold text-xl">
-                {NumberFormatter.format(weeklyEmissions)} oVCX
+          <div>
+            <div
+              id="rewards-tooltip-inner"
+              className="bg-customNeutral200 mt-6 lg:mt-0 cursor-pointer border border-customNeutral100 rounded-lg px-6 py-4"
+            >
+              <p className="text-base opacity-80 whitespace-nowrap">
+                Emissions per week
               </p>
+              <div className="flex flex-row items-center justify-between">
+                <img
+                  src={"/images/tokens/oVcx.svg"}
+                  alt="token icon"
+                  className="w-6 h-6 object-contain rounded-full"
+                />
+                <p className="font-bold text-xl">
+                  {NumberFormatter.format(weeklyEmissions)} oVCX
+                </p>
+              </div>
             </div>
+            <ResponsiveTooltip
+              id="rewards-tooltip-inner"
+              content={
+                <p className="w-52">
+                  oVCX rewards accrue weekly, not daily. Distributions happen
+                  post-contract funding. Note: You still earn oVCX even without
+                  the boost.
+                </p>
+              }
+            />
           </div>
-
-          <ResponsiveTooltip
-            id="rewards-tooltip-inner"
-            content={
-              <p className="w-52">
-                oVCX rewards accrue weekly, not daily. Distributions happen
-                post-contract funding. Note: You still earn oVCX even without
-                the boost.
-              </p>
-            }
-          />
         </section>
 
-        <section className="pb-12 md:py-10 px-4 md:px-8 md:flex md:flex-row md:justify-between space-y-4 md:space-y-0 md:space-x-8">
+        <section className="pb-12 md:py-10 px-4 md:px-0 md:flex md:flex-row md:justify-between space-y-4 md:space-y-0 md:space-x-8">
           <StakingInterface
             setShowLockModal={setShowLockModal}
             setShowMangementModal={setShowMangementModal}
@@ -306,8 +307,8 @@ function VePopContainer() {
               <span className="font-bold">
                 {tokens[1][VE_VCX].balance && Object.keys(votes).length > 0
                   ? (
-                      Object.values(votes).reduce((a, b) => a + b, 0) / 100
-                    ).toFixed(2)
+                    Object.values(votes).reduce((a, b) => a + b, 0) / 100
+                  ).toFixed(2)
                   : "0"}
                 %
               </span>

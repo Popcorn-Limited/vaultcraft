@@ -37,7 +37,7 @@ export default function Product({
       // @ts-ignore
       onClick={handleClick ? handleClick : () => {}}
       className="group border rounded w-full lg:max-w-full min-h-[40rem] relative flex flex-col bg-customNeutral300 border-customNeutral100 border-opacity-75 smmd:items-center
-      py-6 px-8 md:mx-2 hover:shadow-lg ease-in-out duration-250 hover:bg-customNeutral200"
+      py-6 px-8 hover:shadow-lg ease-in-out duration-250 hover:bg-customNeutral200"
     >
       {badge && (
         <img
