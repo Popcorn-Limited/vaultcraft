@@ -157,7 +157,8 @@ export type RewardApy = {
 export type TokenReward = {
   address: Address;
   emissions: number;
-  emissionsValue: number
+  emissionsValue: number;
+  apy: number;
 }
 
 export type ClaimableReward = {

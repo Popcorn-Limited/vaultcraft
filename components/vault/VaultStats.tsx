@@ -51,11 +51,12 @@ export default function VaultStats({
         id={`${baseTooltipId}-deposit`}
         label="Your Deposit"
         value={`$ ${depositValue}`}
-        secondaryValue={`${depositValue < 1 ? "0" :
+        secondaryValue={depositValue < 1 ?
+          "0" :
           `${!!gauge ?
-            NumberFormatter.format(((gauge.balance) / 10 ** gauge.decimals) + ((vault?.balance!) / 10 ** vault?.decimals!))
-            : formatAndRoundNumber(vault?.balance!, vault?.decimals!)
-          }`} ${asset.symbol}`}
+          NumberFormatter.format((gauge.balance * vaultData.assetsPerShare / (10 ** asset.decimals)) + (vault?.balance! * vaultData.assetsPerShare / (10 ** asset.decimals)))
+          : formatAndRoundNumber(vault?.balance! * vaultData.assetsPerShare, asset?.decimals!)
+          } ${asset.symbol}`}
         tooltip="Value of your vault deposits"
       />
       <CardStat
@@ -94,14 +95,13 @@ export default function VaultStats({
           label="Reward APR"
           value={`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData?.gaugeData?.rewardApy.apy))} %`}
           tooltipChild={
-            <div className="w-28">
+            <div className="w-42">
               <p className="font-bold">Annual Rewards</p>
-              {vaultData.gaugeData?.rewardApy.rewards.map((reward) => (
-                <p key={reward.address}>
-                  {NumberFormatter.format(reward.emissions)}{" "}
-                  {tokens[vaultData.chainId][reward.address].symbol}
-                </p>
-              ))}
+              {vaultData.gaugeData?.rewardApy.rewards
+                .filter(reward => reward.emissions > 0)
+                .map(reward =>
+                  <p key={reward.address}>{NumberFormatter.format(reward.emissions)} {tokens[vaultData.chainId][reward.address].symbol} | ${NumberFormatter.format(reward.emissionsValue)} | {NumberFormatter.format(roundToTwoDecimalPlaces(reward.apy))}%</p>
+                )}
             </div>
           }
         />

@@ -32,6 +32,8 @@ export default function VaultsTable({
 
   const SHOW_INPUT_SEARCH = showSearchInput || searchTerm.length > 0;
 
+  console.log(vaults)
+
   return (
     <section className="text-white mt-12 w-full border rounded-xl overflow-hidden border-customNeutral100">
       <table className="w-full [&_td]:h-20 [&_th]:h-18 [&_td]:px-5 [&_th]:px-5">

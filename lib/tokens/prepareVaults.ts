@@ -11,7 +11,7 @@ export async function prepareVaults(vaultsData: VaultDataByAddress, assets: Toke
   Object.values(vaultsData).forEach(vaultData => {
     const vault = vaultTokens[getAddress(vaultData.address)];
     const asset = assets[vaultData.asset];
-    const price = vaultData.assetsPerShare * asset.price
+    const price = (vaultData.assetsPerShare * (10 ** (vault.decimals - asset.decimals))) * asset.price
 
     result[getAddress(vault.address)] = {
       ...vaultTokens[getAddress(vault.address)],
