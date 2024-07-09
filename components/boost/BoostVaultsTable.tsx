@@ -20,7 +20,7 @@ export default function BoostVaultsTable({
       <table className="w-full [&_td]:h-20 [&_th]:h-18 [&_td]:px-5 [&_th]:px-5">
         <thead className="bg-customNeutral200 border-b border-customNeutral100">
           <tr>
-            <th />
+            <th/>
             <th className="font-normal text-left whitespace-nowrap">
               {LABELS_WITH_TOOLTIP.tvl}
             </th>

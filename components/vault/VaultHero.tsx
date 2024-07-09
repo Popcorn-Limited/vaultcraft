@@ -25,7 +25,7 @@ export default function VaultHero({
 }): JSX.Element {
   const [tokens] = useAtom(tokensAtom);
   return (
-    <section className="md:border-b border-customNeutral100 pt-10 pb-6 px-4 md:px-8 ">
+    <section className="md:border-b border-customNeutral100 pt-10 pb-6 px-4 md:px-0 ">
       <div className="w-full mb-8">
         <AssetWithName vault={vaultData} size={3} />
       </div>

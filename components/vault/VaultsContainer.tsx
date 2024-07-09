@@ -41,11 +41,10 @@ export default function VaultsContainer({
   const [vaults, setVaults] = useState<VaultData[]>([]);
 
   useEffect(() => {
-    if (Object.keys(vaultsData).length > 0) {
-      console.log(Object.keys(vaultsData).length)
+    if (Object.keys(vaultsData).length > 0 && vaults.length === 0) {
       setVaults(SUPPORTED_NETWORKS.map((chain) => vaultsData[chain.id]).flat());
     }
-  }, [vaultsData]);
+  }, [vaultsData, vaults]);
 
   const [tvl] = useAtom(tvlAtom);
   const [networth] = useAtom(networthAtom);
@@ -62,17 +61,6 @@ export default function VaultsContainer({
   function handleSearch(value: string) {
     setSearchTerm(value);
   }
-
-  const formattedVaults = vaults
-    .filter(
-      (vault) => searchTerm.length > 0 || selectedNetworks.includes(vault.chainId)
-    )
-    .filter((vault) =>
-      Object.keys(displayVaults).length > 0
-        ? displayVaults[vault.chainId].includes(vault.address)
-        : !hiddenVaults[vault.chainId].includes(vault.address)
-    );
-  console.log({ vaults, formattedVaults, vaultsData })
 
   return Object.keys(tokens).length > 0 ? (
     <NoSSR >
@@ -177,19 +165,35 @@ export default function VaultsContainer({
           </section>
         </nav>
         <section className="px-4 gap-6 md:gap-10 grid smmd:grid-cols-2">
-          {formattedVaults.map((vaultData) => (
-            <VaultCard
-              {...vaultData}
-              key={`sm-mb-${vaultData.address}`}
-              searchTerm={searchTerm}
-            />
-          ))}
+          {vaults
+            .filter(
+              (vault) => searchTerm.length > 0 || selectedNetworks.includes(vault.chainId)
+            )
+            .filter((vault) =>
+              Object.keys(displayVaults).length > 0
+                ? displayVaults[vault.chainId].includes(vault.address)
+                : !hiddenVaults[vault.chainId].includes(vault.address)
+            ).map((vaultData) => (
+              <VaultCard
+                {...vaultData}
+                key={`sm-mb-${vaultData.address}`}
+                searchTerm={searchTerm}
+              />
+            ))}
         </section>
       </div>
 
       <div className="hidden md:block">
         <VaultsTable
-          vaults={formattedVaults}
+          vaults={vaults
+            .filter(
+              (vault) => searchTerm.length > 0 || selectedNetworks.includes(vault.chainId)
+            )
+            .filter((vault) =>
+              Object.keys(displayVaults).length > 0
+                ? displayVaults[vault.chainId].includes(vault.address)
+                : !hiddenVaults[vault.chainId].includes(vault.address)
+            )}
           searchTerm={searchTerm}
           onSearchTermChange={setSearchTerm}
           onSelectNetwork={selectNetwork}
