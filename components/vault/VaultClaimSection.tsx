@@ -156,7 +156,16 @@ export default function VaultClaimSection({ vaultData }: { vaultData: VaultData 
                 id={"claimable-rewards"}
                 label="Claimable Rewards"
                 value={`$${NumberFormatter.format(claimableRewards.reduce((a, b) => a + b.value, 0))}`}
-                tooltip="Cumulative value of claimable rewards of this vault."
+                tooltipChild={
+                  <div className="w-42">
+                    <p className="font-bold">Claimable Rewards</p>
+                    {claimableRewards
+                      .filter(reward => reward.value > 0.1)
+                      .map(reward =>
+                        <p key={reward.token.address}>{NumberFormatter.format(reward.amount)} {reward.token.symbol} | ${NumberFormatter.format(reward.value)}</p>
+                      )}
+                  </div>
+                }
               />
             </div>
           }

@@ -86,12 +86,12 @@ export default function VaultStats({
           label="Reward APR"
           value={`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData?.gaugeData?.rewardApy.apy))} %`}
           tooltipChild={
-            <div className="w-28">
+            <div className="w-42">
               <p className="font-bold">Annual Rewards</p>
               {vaultData.gaugeData?.rewardApy.rewards
                 .filter(reward => reward.emissions > 0)
                 .map(reward =>
-                  <p key={reward.address}>{NumberFormatter.format(reward.emissions)} {tokens[vaultData.chainId][reward.address].symbol}</p>
+                  <p key={reward.address}>{NumberFormatter.format(reward.emissions)} {tokens[vaultData.chainId][reward.address].symbol} | ${NumberFormatter.format(reward.emissionsValue)} | {NumberFormatter.format(roundToTwoDecimalPlaces(reward.apy))}%</p>
                 )}
             </div>
           }

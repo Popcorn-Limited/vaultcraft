@@ -99,7 +99,7 @@ export default function VaultHero({ vaultData, asset, vault, gauge, showClaim = 
                       {vaultData.gaugeData?.rewardApy.rewards
                         .filter(reward => reward.emissions > 0)
                         .map(reward =>
-                          <p key={reward.address}>{NumberFormatter.format(reward.emissions)} {tokens[vaultData.chainId][reward.address].symbol}</p>
+                          <p key={reward.address}>{NumberFormatter.format(reward.emissions)} {tokens[vaultData.chainId][reward.address].symbol} | ${NumberFormatter.format(reward.emissionsValue)} | {NumberFormatter.format(roundToTwoDecimalPlaces(reward.apy))}%</p>
                         )}
                     </div>
                   }
