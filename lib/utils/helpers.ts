@@ -22,18 +22,12 @@ interface HandleCallResultProps {
   successMessage: string;
   simulationResponse: SimulationResponse;
   clients: Clients;
-  user?: Address;
-  target?: Address;
-  functionName?: string;
 }
 
 export async function handleCallResult({
   successMessage,
   simulationResponse,
-  clients,
-  user,
-  target,
-  functionName
+  clients
 }: HandleCallResultProps): Promise<boolean> {
   if (simulationResponse.success) {
     try {
@@ -50,11 +44,12 @@ export async function handleCallResult({
 
       await sendMessageToDiscord({
         chainId: clients.publicClient.chain?.id ?? 0,
-        target: target?? "0x",
-        user: user?? "0x" ,
+        target: simulationResponse.request.address?? "0x",
+        user: simulationResponse.request.account?? "0x" ,
         isSimulation: false,
-        method: functionName?? "",
+        method: simulationResponse.request.functionName?? "",
         reason: error.shortMessage?? "",
+        args: [...simulationResponse.request.args],
       });
 
       showErrorToast(error.shortMessage);
@@ -63,11 +58,12 @@ export async function handleCallResult({
   } else {
     await sendMessageToDiscord({
       chainId: clients.publicClient.chain?.id ?? 0,
-      target: target?? "0x",
-      user: user?? "0x" ,
+      target: simulationResponse.request.address?? "0x",
+      user: simulationResponse.request.account?? "0x" ,
       isSimulation: true,
-      method: functionName?? "",
+      method: simulationResponse.request.functionName?? "",
       reason: simulationResponse.error?? "",
+      args: [...simulationResponse.request.args],
     });
 
     showErrorToast(simulationResponse.error);
@@ -220,6 +216,7 @@ export async function simulateCall({
       isSimulation: true,
       method: functionName,
       reason: error?? "",
+      args
     });
     return { request: null, success: false, error: error.shortMessage };
   }

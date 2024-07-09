@@ -31,10 +31,7 @@ export async function exerciseOPop({
       publicClient: clients.publicClient as PublicClient,
       args: [amount, maxPaymentAmount, account],
     }),
-    clients,
-    user: account,
-    target: address, 
-    functionName: "exercise"
+    clients
   });
 }
 
@@ -60,9 +57,6 @@ export async function claimOPop({ gauges, chainId, account, minter, clients }: C
       publicClient: clients.publicClient,
       args: [gauges],
     }),
-    clients,
-    user: account,
-    target: minter, 
-    functionName: chainId === mainnet.id ? "mintMany" : "mint_many"
+    clients
   });
 }

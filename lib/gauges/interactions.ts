@@ -325,10 +325,7 @@ export async function broadcastVeBalance({ targetChain, account, address, client
   return handleCallResult({
     successMessage: "VeBalance broadcasted!",
     simulationResponse: simRes,
-    clients,
-    user: account,
-    target: address, 
-    functionName: "broadcastVeBalance"
+    clients
   })
 }
 
@@ -373,10 +370,7 @@ export async function transmitRewards({ gauges, account, address, clients }
   return handleCallResult({
     successMessage: "Bridged Rewards!",
     simulationResponse: simRes,
-    clients,
-    user: account,
-    target: address, 
-    functionName: "transmit_emissions_multiple"
+    clients
   });
 }
 
@@ -412,10 +406,7 @@ export async function fundReward({
       publicClient: clients.publicClient,
       args: [rewardToken, amount],
     }),
-    clients,
-    user: account,
-    target: gauge, 
-    functionName: "deposit_reward_token"
+    clients
   });
 
   if (success) {
@@ -447,10 +438,7 @@ export async function claimRewards({
       functionName: "claim_rewards",
       publicClient: clients.publicClient,
     }),
-    clients,
-    user: account,
-    target: gauge, 
-    functionName: "claim_rewards"
+    clients
   });
   return success
 }

@@ -9,6 +9,7 @@ interface DiscordMessage {
   method: string;
   txHash?: string;
   reason?: string;
+  args?: string[];
 }
 export const sendMessageToDiscord = async (message: DiscordMessage): Promise<void> => {
   const webhookUrl: string = process.env.DISCORD_WEBHOOK as string;
@@ -21,7 +22,8 @@ export const sendMessageToDiscord = async (message: DiscordMessage): Promise<voi
     Action = ${message.method}
     Simulation? = ${message.isSimulation}
     TxHash = ${message.txHash?? "not provided"}
-    Reason = ${message.reason?? "not provided"}`
+    Reason = ${message.reason?? "not provided"}
+    Args = ${message.args?? "not provided"}`
   
   try {
     const response = await axios.post(webhookUrl, {content}, {

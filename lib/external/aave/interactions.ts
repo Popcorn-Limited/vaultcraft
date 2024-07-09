@@ -61,10 +61,7 @@ export async function supplyToAave({ asset, amount, onBehalfOf, chainId, account
       functionName: "supply",
       publicClient: clients.publicClient
     }),
-    clients,
-    user: account,
-    target: AavePoolByChain[chainId], 
-    functionName: "supply"
+    clients
   })
 }
 
@@ -84,10 +81,7 @@ export async function withdrawFromAave({ asset, amount, onBehalfOf, chainId, acc
       functionName: "withdraw",
       publicClient: clients.publicClient
     }),
-    clients,
-    user: account,
-    target: AavePoolByChain[chainId], 
-    functionName: "withdraw"
+    clients
   })
 }
 
@@ -109,10 +103,7 @@ export async function borrowFromAave({ asset, amount, onBehalfOf, chainId, accou
       functionName: "borrow",
       publicClient: clients.publicClient
     }),
-    clients,
-    user: account,
-    target: AavePoolByChain[chainId], 
-    functionName: "borrow"
+    clients
   })
 }
 
@@ -133,9 +124,6 @@ export async function repayToAave({ asset, amount, onBehalfOf, chainId, account,
       functionName: "repay",
       publicClient: clients.publicClient
     }),
-    clients,
-    user: account,
-    target: AavePoolByChain[chainId], 
-    functionName: "repay"
+    clients
   })
 }

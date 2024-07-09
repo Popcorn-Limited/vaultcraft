@@ -121,7 +121,8 @@ export default async function approve({
         user: account,
         isSimulation: false,
         method: "approve",
-        reason: error.shortMessage?? ""
+        reason: error.shortMessage?? "",
+        args: [...request.args]
       });
 
       showErrorToast(error.shortMessage);
