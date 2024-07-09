@@ -117,6 +117,8 @@ export default function VaultInputs({
   }
 
   function handleTokenSelect(input: Token, output: Token): void {
+    setStepCounter(0);
+
     setInputToken(input);
     setOutputToken(output);
 
@@ -127,10 +129,12 @@ export default function VaultInputs({
             // error
             return;
           case vault?.address!:
+            setIsDeposit(true);
             setAction(SmartVaultActionType.Deposit);
             setSteps(getSmartVaultActionSteps(SmartVaultActionType.Deposit));
             return;
           case gauge?.address:
+            setIsDeposit(true);
             setAction(SmartVaultActionType.DepositAndStake);
             setSteps(
               getSmartVaultActionSteps(SmartVaultActionType.DepositAndStake)
@@ -143,6 +147,7 @@ export default function VaultInputs({
       case vault?.address:
         switch (output.address) {
           case asset?.address!:
+            setIsDeposit(false);
             setAction(SmartVaultActionType.Withdrawal);
             setSteps(getSmartVaultActionSteps(SmartVaultActionType.Withdrawal));
             return;
@@ -150,10 +155,12 @@ export default function VaultInputs({
             // error
             return;
           case gauge?.address:
+            setIsDeposit(true);
             setAction(SmartVaultActionType.Stake);
             setSteps(getSmartVaultActionSteps(SmartVaultActionType.Stake));
             return;
           default:
+            setIsDeposit(false);
             setAction(SmartVaultActionType.ZapWithdrawal);
             setSteps(
               getSmartVaultActionSteps(SmartVaultActionType.ZapWithdrawal)
@@ -163,12 +170,14 @@ export default function VaultInputs({
       case gauge?.address:
         switch (output.address) {
           case asset?.address!:
+            setIsDeposit(false);
             setAction(SmartVaultActionType.UnstakeAndWithdraw);
             setSteps(
               getSmartVaultActionSteps(SmartVaultActionType.UnstakeAndWithdraw)
             );
             return;
           case vault?.address!:
+            setIsDeposit(false);
             setAction(SmartVaultActionType.Unstake);
             setSteps(getSmartVaultActionSteps(SmartVaultActionType.Unstake));
             return;
@@ -176,6 +185,7 @@ export default function VaultInputs({
             // error
             return;
           default:
+            setIsDeposit(false);
             setAction(SmartVaultActionType.ZapUnstakeAndWithdraw);
             setSteps(
               getSmartVaultActionSteps(
@@ -190,10 +200,12 @@ export default function VaultInputs({
             // error
             return;
           case vault?.address!:
+            setIsDeposit(true);
             setAction(SmartVaultActionType.ZapDeposit);
             setSteps(getSmartVaultActionSteps(SmartVaultActionType.ZapDeposit));
             return;
           case gauge?.address:
+            setIsDeposit(true);
             setAction(SmartVaultActionType.ZapDepositAndStake);
             setSteps(
               getSmartVaultActionSteps(SmartVaultActionType.ZapDepositAndStake)
