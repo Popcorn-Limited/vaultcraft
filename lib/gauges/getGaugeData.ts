@@ -315,19 +315,24 @@ async function getRewardsApy({
       allowFailure: false
     }) as any[]
 
+    const workingSupplyUSD =
+      (workingSupply > 0 ? workingSupply : 1e18) * vaultPrice;
+
+
     const rewardData = rewardRes.map((data, i) => {
       const rewardAddress = rewardLogs[i].args.reward_token!;
-      const emissions = ((Number(data.rate) / 1e18) * 86400 * 365) / (10 ** tokens[rewardAddress].decimals)
+      const rewardEnded = Date.UTC(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()) >= Number(data.period_finish) * 1000
+      const emissions = rewardEnded ? 0 : ((Number(data.rate) / 1e18) * 86400 * 365) / (10 ** tokens[rewardAddress].decimals)
+      const emissionsValue = emissions * tokens[rewardAddress].price;
       return {
         address: rewardAddress,
         emissions: emissions,
-        emissionsValue: emissions * tokens[rewardAddress].price
+        emissionsValue: emissionsValue,
+        apy: (emissionsValue / workingSupplyUSD) * 100
       }
     })
 
     const annualRewardUSD: number = rewardData.reduce((a, b,) => a + b.emissionsValue, 0)
-    const workingSupplyUSD =
-      (workingSupply > 0 ? workingSupply : 1e18) * vaultPrice;
     return { rewards: rewardData, annualRewardValue: annualRewardUSD, apy: (annualRewardUSD / workingSupplyUSD) * 100 }
   }
   return { rewards: [], annualRewardValue: 0, apy: 0 }

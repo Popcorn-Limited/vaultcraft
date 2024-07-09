@@ -97,8 +97,7 @@ export default function VaultHero({ vaultData, asset, vault, gauge, showClaim = 
                     <div className="w-28">
                       <p className="font-bold">Annual Rewards</p>
                       {vaultData.gaugeData?.rewardApy.rewards
-                        .filter(reward => reward.address !== "0x9d2F299715D94d8A7E6F5eaa8E654E8c74a988A7"
-                          && reward.address !== "0x10393c20975cF177a3513071bC110f7962CD67da")
+                        .filter(reward => reward.emissions > 0)
                         .map(reward =>
                           <p key={reward.address}>{NumberFormatter.format(reward.emissions)} {tokens[vaultData.chainId][reward.address].symbol}</p>
                         )}

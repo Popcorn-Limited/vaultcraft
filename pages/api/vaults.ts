@@ -3,7 +3,7 @@ import axios from "axios";
 import { ChainById, RPC_URLS, networkMap } from "@/lib/utils/connectors";
 import { createPublicClient, erc20Abi, getAddress, http, zeroAddress, type Address, type PublicClient } from "viem";
 import { ChildGaugeAbi, ERC20Abi, GaugeAbi, VaultAbi } from "@/lib/constants/abi";
-import { Strategy, TokenByAddress, VaultDataByAddress } from "@/lib/types";
+import { Strategy, TokenByAddress, TokenReward, VaultDataByAddress } from "@/lib/types";
 import getGaugesData from "@/lib/gauges/getGaugeData";
 import { mainnet } from "viem/chains";
 
@@ -24,8 +24,11 @@ type Vault = {
     creator: Address;
     feeRecipeint: Address;
     baseApy?: number;
+    minBoost?: number;
+    maxBoost?: number;
     gaugeLowerApr?: number;
     gaugeUpperApr?: number;
+    rewards?: TokenReward[];
 };
 
 type Vaults = {
@@ -122,6 +125,7 @@ export default async function handler(
         }
     }
 
+    // @ts-ignore
     const vaultRes = await client.multicall({
         contracts: Object.values(vaults)
             .map((vault: any) => {
@@ -244,8 +248,11 @@ export default async function handler(
 
         const gaugeData = gaugesData.find(data => data.vault === vault.address)
         if (gaugeData) {
+            vault.minBoost = gaugeData.lowerAPR;
+            vault.maxBoost = gaugeData.upperAPR;
             vault.gaugeLowerApr = gaugeData.lowerAPR + gaugeData.rewardApy.apy;
             vault.gaugeUpperApr = gaugeData.upperAPR + gaugeData.rewardApy.apy;
+            vault.rewards = gaugeData.rewardApy.rewards
         }
     }
 
