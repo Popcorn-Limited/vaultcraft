@@ -1,20 +1,15 @@
 import { type Address } from "viem";
-import { useAtom } from "jotai";
 import { useAccount } from "wagmi";
-
 import Slider from "rc-slider";
-
 import {
   NumberFormatter,
   formatTwoDecimals,
 } from "@/lib/utils/formatBigNumber";
 import { VaultLabel, type VaultData } from "@/lib/types";
-import { tokensAtom } from "@/lib/atoms";
 import { cn } from "@/lib/utils/helpers";
-import AssetWithName from "./AssetWithName";
+import AssetWithName from "@/components/common/AssetWithName";
 import { type PropsWithChildren, useState } from "react";
 import useGaugeWeights from "@/lib/gauges/useGaugeWeights";
-
 import TokenIcon from "@/components/common/TokenIcon";
 import useWeeklyEmissions from "@/lib/gauges/useWeeklyEmissions";
 import { LABELS_WITH_TOOLTIP } from "@/components/boost/BoostVaultsTable";

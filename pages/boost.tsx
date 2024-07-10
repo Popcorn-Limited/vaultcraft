@@ -45,7 +45,7 @@ import { mainnet } from "viem/chains";
 import ResponsiveTooltip from "@/components/common/Tooltip";
 import BoostVaultsTable from "@/components/boost/BoostVaultsTable";
 import useIsBreakPoint from "@/lib/useIsMobile";
-import BoostVaultCard from "@/components/vault/BoostVaultCard";
+import BoostVaultCard from "@/components/boost/BoostVaultCard";
 import useWeeklyEmissions from "@/lib/gauges/useWeeklyEmissions";
 
 export const GAUGE_NETWORKS = [1, 10, 42161];

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
-import AssetWithName from "@/components/vault/AssetWithName";
+import AssetWithName from "@/components/common/AssetWithName";
 import { Token, VaultData, VaultLabel } from "@/lib/types";
 import Accordion from "@/components/common/Accordion";
 import CardStat from "@/components/common/CardStat";

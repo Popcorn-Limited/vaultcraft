@@ -1,6 +1,6 @@
 import { Token, VaultData } from "@/lib/types";
 import LargeCardStat from "@/components/common/LargeCardStat";
-import AssetWithName from "@/components/vault/AssetWithName";
+import AssetWithName from "@/components/common/AssetWithName";
 import {
   NumberFormatter,
   formatAndRoundNumber,

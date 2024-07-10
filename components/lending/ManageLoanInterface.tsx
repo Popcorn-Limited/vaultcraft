@@ -1,4 +1,4 @@
-import AssetWithName from "@/components/vault/AssetWithName";
+import AssetWithName from "@/components/common/AssetWithName";
 import { vaultsAtom } from "@/lib/atoms/vaults";
 import { ReserveData, Token, UserAccountData, VaultData } from "@/lib/types";
 import { useAtom } from "jotai";

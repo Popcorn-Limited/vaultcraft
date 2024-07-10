@@ -1,7 +1,7 @@
 import type { VaultData } from "@/lib/types";
 import type { Address } from "viem";
 
-import BoostVaultRow from "@/components/vault/BoostVaultRow";
+import BoostVaultRow from "@/components/boost/BoostVaultRow";
 import { WithTooltip } from "@/components/common/Tooltip";
 
 export default function BoostVaultsTable({

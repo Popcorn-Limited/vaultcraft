@@ -1,9 +1,7 @@
 import { type Address } from "viem";
 import { useAtom } from "jotai";
 import { useAccount } from "wagmi";
-
 import Slider from "rc-slider";
-
 import {
   NumberFormatter,
   formatTwoDecimals,
@@ -11,13 +9,12 @@ import {
 import { VaultLabel, type VaultData } from "@/lib/types";
 import { tokensAtom } from "@/lib/atoms";
 import { cn } from "@/lib/utils/helpers";
-import AssetWithName from "./AssetWithName";
+import AssetWithName from "@/components/common/AssetWithName";
 import { Fragment, useState } from "react";
 import useGaugeWeights from "@/lib/gauges/useGaugeWeights";
-
 import TokenIcon from "@/components/common/TokenIcon";
 import useWeeklyEmissions from "@/lib/gauges/useWeeklyEmissions";
-import { LABELS_WITH_TOOLTIP } from "../boost/BoostVaultsTable";
+import { LABELS_WITH_TOOLTIP } from "@/components/boost/BoostVaultsTable";
 
 export default function BoostVaultRow({
   isDeprecated,
@@ -252,7 +249,7 @@ export default function BoostVaultRow({
                 onChange={
                   isVotingAvailable
                     ? (val: any) => onChange(Number(val))
-                    : () => {}
+                    : () => { }
                 }
                 max={10000}
               />

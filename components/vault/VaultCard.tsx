@@ -12,8 +12,8 @@ import type { Token, VaultData } from "@/lib/types";
 import { tokensAtom } from "@/lib/atoms";
 import { cn } from "@/lib/utils/helpers";
 import { useRouter } from "next/router";
-import AssetWithName from "./AssetWithName";
-import CardStat from "../common/CardStat";
+import AssetWithName from "@/components/common/AssetWithName";
+import CardStat from "@/components/common/CardStat";
 
 export default function VaultCard({
   searchTerm,

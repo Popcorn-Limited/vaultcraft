@@ -20,12 +20,11 @@ import {
 } from "@/lib/atoms";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import OptionTokenExerciseModal from "@/components/optionToken/exercise/OptionTokenExerciseModal";
-import useIsBreakPoint from "@/lib/useIsMobile";
-import VaultCard from "./VaultCard";
+import VaultCard from "@/components/vault/VaultCard";
 
 import SearchBar from "@/components/input/SearchBar";
 import VaultsSorting from "@/components/vault/VaultsSorting";
-import VaultsTable from "./VaultsTable";
+import VaultsTable from "@/components/vault/VaultsTable";
 import LargeCardStat from "@/components/common/LargeCardStat";
 
 interface VaultsContainerProps {

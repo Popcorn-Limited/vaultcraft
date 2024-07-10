@@ -10,7 +10,7 @@ import type { Token, VaultData } from "@/lib/types";
 import { tokensAtom } from "@/lib/atoms";
 import { cn } from "@/lib/utils/helpers";
 import { useRouter } from "next/router";
-import AssetWithName from "./AssetWithName";
+import AssetWithName from "@/components/common/AssetWithName";
 import { useEffect, useState } from "react";
 
 export default function VaultRow({

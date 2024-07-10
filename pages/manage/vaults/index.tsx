@@ -1,5 +1,5 @@
 import NetworkFilter from "@/components/network/NetworkFilter";
-import AssetWithName from "@/components/vault/AssetWithName";
+import AssetWithName from "@/components/common/AssetWithName";
 import VaultStats from "@/components/vault/VaultStats";
 import { tokensAtom } from "@/lib/atoms";
 import { vaultsAtom } from "@/lib/atoms/vaults";

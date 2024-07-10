@@ -2,7 +2,7 @@ import NetworkSticker from "@/components/network/NetworkSticker";
 import TokenIcon from "@/components/common/TokenIcon";
 import { VaultData, VaultLabel } from "@/lib/types";
 import ProtocolIcon from "@/components/common/ProtocolIcon";
-import ResponsiveTooltip from "../common/Tooltip";
+import ResponsiveTooltip from "@/components/common/Tooltip";
 import { useAtom } from "jotai";
 import { tokensAtom } from "@/lib/atoms";
 import { cn } from "@/lib/utils/helpers";
