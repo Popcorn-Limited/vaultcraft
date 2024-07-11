@@ -39,10 +39,8 @@ export default function useGaugeWeights({
       },
       {
         ...contract,
-        functionName: "get_gauge_weight",
-        // Get the current total weight
-        args: [address],
-      },
+        functionName: "get_total_weight",
+      }
     ],
     allowFailure: false,
   });

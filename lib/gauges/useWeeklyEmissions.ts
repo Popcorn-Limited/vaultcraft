@@ -1,13 +1,14 @@
 import { createPublicClient, http } from "viem";
 import { RPC_URLS } from "@/lib/utils/connectors";
 import { TOKEN_ADMIN, TokenAdminAbi } from "@/lib/constants";
-import useSwr from "swr";
 import { mainnet } from "viem/chains";
+import { useEffect, useState } from "react";
 
 export default function useWeeklyEmissions() {
-  return useSwr(`weeklyEmissions`, {
-    dedupingInterval: 15 * 60 * 1000, // 15 minutes cache
-    fetcher: async () => {
+  const [rate, setRate] = useState<number>(0);
+
+  useEffect(() => {
+    async function loadRate() {
       const rate = await createPublicClient({
         chain: mainnet,
         transport: http(RPC_URLS[1]),
@@ -18,7 +19,10 @@ export default function useWeeklyEmissions() {
       });
 
       // Emissions per second * seconds per week
-      return (Number(rate) / 1e18) * 604800;
-    },
-  });
+      setRate((Number(rate) / 1e18) * 604800)
+    }
+    if (rate === 0) loadRate()
+  }, [rate])
+
+  return rate
 }

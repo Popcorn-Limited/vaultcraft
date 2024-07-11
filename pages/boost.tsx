@@ -1,18 +1,13 @@
 import NoSSR from "react-no-ssr";
 import "rc-slider/assets/index.css";
-
 import {
   useAccount,
-  useBalance,
   usePublicClient,
   useWalletClient,
 } from "wagmi";
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Address,
-  WalletClient,
-  createPublicClient,
-  http,
   zeroAddress,
 } from "viem";
 import { VoteData, hasAlreadyVoted } from "@/lib/gauges/hasAlreadyVoted";
@@ -28,23 +23,15 @@ import { vaultsAtom } from "@/lib/atoms/vaults";
 import OptionTokenInterface from "@/components/optionToken/OptionTokenInterface";
 import LpModal from "@/components/boost/modals/lp/LpModal";
 import { voteUserSlopes } from "@/lib/gauges/useGaugeWeights";
-import NetworkFilter from "@/components/network/NetworkFilter";
-import SearchBar from "@/components/input/SearchBar";
-import VaultsSorting from "@/components/vault/VaultsSorting";
-import useNetworkFilter from "@/lib/useNetworkFilter";
-import { TOKEN_ADMIN, TokenAdminAbi, VE_VCX, VOTING_ESCROW } from "@/lib/constants";
+import { VE_VCX } from "@/lib/constants";
 import Modal from "@/components/modal/Modal";
 import BridgeModal from "@/components/bridge/BridgeModal";
 import axios from "axios";
 import BroadcastVeBalanceInterface from "@/components/boost/modals/manage/BroadcastVeBalanceInterface";
-import { RPC_URLS } from "@/lib/utils/connectors";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import { tokensAtom } from "@/lib/atoms";
-import { mainnet } from "viem/chains";
-
 import ResponsiveTooltip from "@/components/common/Tooltip";
 import BoostVaultsTable from "@/components/boost/BoostVaultsTable";
-import useIsBreakPoint from "@/lib/useIsMobile";
 import BoostVaultCard from "@/components/boost/BoostVaultCard";
 import useWeeklyEmissions from "@/lib/gauges/useWeeklyEmissions";
 
@@ -74,7 +61,7 @@ function VePopContainer() {
   const { data: walletClient } = useWalletClient();
   const [tokens] = useAtom(tokensAtom);
 
-  const [weeklyEmissions, setWeeklyEmissions] = useState<number>(0)
+  const weeklyEmissions = useWeeklyEmissions();
 
   const [initalLoad, setInitalLoad] = useState<boolean>(false);
   const [accountLoad, setAccountLoad] = useState<boolean>(false);
@@ -176,8 +163,6 @@ function VePopContainer() {
       a === b ? 0 : a ? 1 : -1
     );
 
-  const isSmallScreen = useIsBreakPoint("lg");
-
   return Object.keys(tokens).length > 0 ? (
     <>
 
@@ -270,35 +255,33 @@ function VePopContainer() {
 
         <div className="border-b border-customNeutral100 w-full mb-12" />
 
-        {gaugeVaults?.length > 0 ? (
-          <Fragment>
-            {isSmallScreen ? (
-              <section className="px-4 gap-6 md:gap-10 grid md:grid-cols-2">
-                {formattedVaults.map((vaultData) => (
-                  <BoostVaultCard
-                    {...vaultData}
-                    isVotingAvailable={
-                      voteData.find((v) => v.gauge === vaultData.gauge)
-                        ?.canVote!
-                    }
-                    handleVotes={handleVotes}
-                    votes={votes}
-                    key={`sm-mb-${vaultData.address}`}
-                  />
-                ))}
-              </section>
-            ) : (
+        {gaugeVaults?.length > 0 ?
+          <>
+            <section className="md:hidden px-4 gap-6 md:gap-10">
+              {formattedVaults.map((vaultData) => (
+                <BoostVaultCard
+                  {...vaultData}
+                  isVotingAvailable={
+                    voteData.find((v) => v.gauge === vaultData.gauge)
+                      ?.canVote!
+                  }
+                  handleVotes={handleVotes}
+                  votes={votes}
+                  key={`sm-mb-${vaultData.address}`}
+                />
+              ))}
+            </section>
+            <div className="hidden md:block">
               <BoostVaultsTable
                 handleVotes={handleVotes}
                 vaults={formattedVaults}
                 voteData={voteData}
                 votes={votes}
               />
-            )}
-          </Fragment>
-        ) : (
-          <p className="text-white text-center py-12">Loading Gauges...</p>
-        )}
+            </div>
+          </>
+          : <p className="text-white text-center py-12">Loading Gauges...</p>
+        }
 
         <div className="fixed left-0 bottom-10 w-full">
           <div className="z-10 mx-auto w-60 md:w-104 bg-customNeutral200 px-6 py-4 rounded-lg flex flex-col md:flex-row items-center justify-between text-white border border-customNeutral100">

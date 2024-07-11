@@ -15,6 +15,7 @@ import useGaugeWeights from "@/lib/gauges/useGaugeWeights";
 import TokenIcon from "@/components/common/TokenIcon";
 import useWeeklyEmissions from "@/lib/gauges/useWeeklyEmissions";
 import { LABELS_WITH_TOOLTIP } from "@/components/boost/BoostVaultsTable";
+import { VE_VCX } from "@/lib/constants";
 
 export default function BoostVaultRow({
   isDeprecated,
@@ -28,7 +29,7 @@ export default function BoostVaultRow({
   votes: { [key: string]: number };
   handleVotes: (value: number, address: Address) => void;
 }) {
-  const { data: weeklyEmissions = 0 } = useWeeklyEmissions();
+  const weeklyEmissions = useWeeklyEmissions();
 
   if (
     isDeprecated &&
@@ -50,9 +51,6 @@ export default function BoostVaultRow({
     chainId,
   } = vaultData;
 
-  const maxGaugeApy = gaugeData?.upperAPR || 0;
-  const minGaugeApy = gaugeData?.lowerAPR || 0;
-
   const { data: weights } = useGaugeWeights({
     address: vaultData.gauge as any,
     account: account as any,
@@ -65,7 +63,6 @@ export default function BoostVaultRow({
   const dataAsset = tokens[chainId]?.[asset] ?? {};
   const dataGauge = tokens[chainId]?.[gauge!] ?? {};
 
-  console.debug({ vault, dataAsset, dataGauge, vaultData });
   const GAUGE_ADDRESS = vaultData.gauge!;
 
   const allocations = {
@@ -73,12 +70,13 @@ export default function BoostVaultRow({
     upcoming: Number(weights?.[1] || 0) / 1e16,
   };
 
-  const totalWeight = Number(weights?.[3] || 0) / 1e16;
   const actualUserPower = Number(weights?.[2].power || 0);
+  const totalWeight = Number(weights?.[3] || 0) / 1e18;
+  const currentWeight = (Number(weights?.[1] || 0) / 1e18) * totalWeight
 
   const [amount, setAmount] = useState(actualUserPower);
 
-  const relativeWeight = (amount / totalWeight) * 100;
+  const relativeWeight = ((currentWeight - (votes[GAUGE_ADDRESS] || 0) + ((amount / 10_000) * (tokens[1][VE_VCX].balance / 1e18))) / totalWeight);
 
   function onChange(value: number) {
     // As long as you keep moving the slider, `value` continues to count to the max value(10000). This sometimes makes the
@@ -130,11 +128,11 @@ export default function BoostVaultRow({
         </td>
 
         <td className="text-right text-lg">
-          {formatTwoDecimals(minGaugeApy)}%
+          {formatTwoDecimals(gaugeData?.lowerAPR || 0)}%
         </td>
 
         <td className="text-right text-lg">
-          {formatTwoDecimals(maxGaugeApy)}%
+          {formatTwoDecimals(gaugeData?.upperAPR || 0)}%
         </td>
 
         <td className="text-right text-lg">
@@ -192,7 +190,7 @@ export default function BoostVaultRow({
             </span>
             <strong className="text-lg">
               {relativeWeight > 0
-                ? NumberFormatter.format(weeklyEmissions * relativeWeight)
+                ? NumberFormatter.format((weeklyEmissions * relativeWeight))
                 : "-"}
             </strong>
           </nav>

@@ -26,7 +26,7 @@ export default function BoostVaultCard({
   votes: { [key: string]: number };
   handleVotes: (value: number, address: Address) => void;
 }) {
-  const { data: weeklyEmissions = 0 } = useWeeklyEmissions();
+  const weeklyEmissions = useWeeklyEmissions();
 
   if (
     isDeprecated &&
@@ -225,7 +225,7 @@ export default function BoostVaultCard({
             }}
             value={amount}
             onChange={
-              isVotingAvailable ? (val: any) => onChange(Number(val)) : () => {}
+              isVotingAvailable ? (val: any) => onChange(Number(val)) : () => { }
             }
             max={10000}
           />
