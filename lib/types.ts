@@ -62,6 +62,7 @@ export type LlamaApy = {
   apy: number;
   apyBase: number;
   apyReward: number;
+  tvl: number;
   date: Date;
 }
 

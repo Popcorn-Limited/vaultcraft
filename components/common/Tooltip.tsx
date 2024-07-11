@@ -49,9 +49,11 @@ export default function ResponsiveTooltip({
 export const WithTooltip = ({
   children,
   content,
+  tooltipChild,
   subId,
 }: PropsWithChildren<{
   content: string;
+  tooltipChild?: JSX.Element;
   subId?: string;
 }>) => {
   const id = `tooltip-${keccak256(toHex(content)).slice(2, 10)}${subId ?? ""}`;
@@ -62,9 +64,11 @@ export const WithTooltip = ({
       <ResponsiveTooltip
         id={id}
         content={
-          <p className="max-w-[20rem] !text-sm whitespace-normal text-left">
-            {content}
-          </p>
+          tooltipChild
+            ? tooltipChild
+            : <p className="max-w-[20rem] !text-sm whitespace-normal text-left">
+              {content}
+            </p>
         }
       />
     </span>

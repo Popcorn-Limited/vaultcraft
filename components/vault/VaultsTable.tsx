@@ -132,12 +132,6 @@ export default function VaultsTable({
               </button>
             </th>
             <th className="font-normal text-right whitespace-nowrap">
-              {LABELS_WITH_TOOLTIP.minRewardsAPY}
-            </th>
-            <th className="font-normal text-right whitespace-nowrap">
-              {LABELS_WITH_TOOLTIP.maxRewardsAPY}
-            </th>
-            <th className="font-normal text-right">
               {LABELS_WITH_TOOLTIP.boost}
             </th>
           </tr>
@@ -165,11 +159,6 @@ export default function VaultsTable({
 }
 
 export const LABELS_WITH_TOOLTIP = {
-  tvl: (
-    <WithTooltip content="Total value of all assets deposited into the vault">
-      TVL
-    </WithTooltip>
-  ),
   yourWallet: (
     <WithTooltip content="Value of deposit assets held in your wallet">
       Your Wallet
@@ -180,24 +169,19 @@ export const LABELS_WITH_TOOLTIP = {
       Your Deposit
     </WithTooltip>
   ),
+  tvl: (
+    <WithTooltip content="Total value of all assets deposited into the vault">
+      TVL
+    </WithTooltip>
+  ),
   vAPR: (
-    <WithTooltip content="Current Variable APR of the vault">
+    <WithTooltip content="Current Variable APR of the vault including your boost APR and additional rewards">
       vAPR
     </WithTooltip>
   ),
-  minRewardsAPY: (
-    <WithTooltip content="Minimum oVCX boost APR based on most current epoch's distribution">
-      Min Boost
-    </WithTooltip>
-  ),
-  maxRewardsAPY: (
-    <WithTooltip content="Maximum oVCX boost APR based on most current epoch's distribution">
-      Max Boost
-    </WithTooltip>
-  ),
   boost: (
-    <WithTooltip content="Current APR Boost for this vault">
-      Your Boost
+    <WithTooltip content="Earn additional oVCX rewards when depositing. This amount depends on your balance of veVCX and current oVCX emissions. (You always earn atleast the smaller APR)">
+      Boost
     </WithTooltip>
   ),
 };

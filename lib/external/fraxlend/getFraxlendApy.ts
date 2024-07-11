@@ -16,5 +16,5 @@ export default async function getFraxlendApy(address: Address, chainId: number):
   })
   const apy = (Number(currentRateInfo[3]) * 31557600) / 1e16 // (borrowRate per second * seconds per year) / 1e18 * 100
 
-  return [{ apy: apy, apyBase: apy, apyReward: 0, date: new Date() }]
+  return [{ apy: apy, apyBase: apy, apyReward: 0, tvl: 0, date: new Date() }]
 }

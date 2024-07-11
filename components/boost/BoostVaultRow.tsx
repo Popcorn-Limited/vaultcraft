@@ -127,52 +127,33 @@ export default function BoostVaultRow({
           $ {tvl < 1 ? "0" : NumberFormatter.format(tvl)}
         </td>
 
-        <td className="text-right text-lg">
-          {formatTwoDecimals(gaugeData?.lowerAPR || 0)}%
+        <td className="text-right">
+          <p className="text-lg">
+            {formatTwoDecimals(gaugeData?.upperAPR || 0)}%
+          </p>
+          <p className="text-sm -mt-0.5 text-customGray200">
+            {formatTwoDecimals(gaugeData?.lowerAPR || 0)}%
+          </p>
         </td>
 
-        <td className="text-right text-lg">
-          {formatTwoDecimals(gaugeData?.upperAPR || 0)}%
+        <td className="text-right">
+          <p className="text-lg">
+            {(Number(weights?.[0]) / 1e16).toFixed(2) || 0}%
+          </p>
+          <p className="text-sm -mt-0.5 text-customGray200">
+            {((Number(weights?.[1]) / 1e16) + relativeWeight).toFixed(2) || 0}%
+          </p>
         </td>
 
-        <td className="text-right text-lg">
-          {(Number(weights?.[0]) / 1e16).toFixed(2) || 0}%
-        </td>
-
-        <td className="text-right text-lg">
-          {(Number(weights?.[1]) / 1e16).toFixed(2) || 0}%
-        </td>
-
-        <td className="text-right text-lg">
-          <nav className="flex [&_img]:brightness-125 [&_img]:saturate-150 gap-2 items-center">
-            <TokenIcon
-              chainId={1}
-              token={{} as any}
-              icon="/images/tokens/oVcx.svg"
-              imageSize="w-6 h-6"
-            />
-            <span className="pt-0.5">
-              {NumberFormatter.format(
-                weeklyEmissions * (allocations.current / 100)
-              )}
-            </span>
-          </nav>
-        </td>
-
-        <td className="text-right text-lg">
-          <nav className="flex [&_img]:brightness-125 [&_img]:saturate-150 gap-2 items-center">
-            <TokenIcon
-              chainId={1}
-              token={{} as any}
-              icon="/images/tokens/oVcx.svg"
-              imageSize="w-6 h-6"
-            />
-            <span className="pt-0.5">
-              {NumberFormatter.format(
-                weeklyEmissions * (allocations.upcoming / 100)
-              )}
-            </span>
-          </nav>
+        <td className="text-right">
+          <p className="text-lg">
+            {NumberFormatter.format(
+              weeklyEmissions * (allocations.current / 100)
+            )}
+          </p>
+          <p className="text-sm -mt-0.5 text-customGray200">
+            {NumberFormatter.format((weeklyEmissions * relativeWeight))}
+          </p>
         </td>
       </tr>
 
@@ -183,7 +164,7 @@ export default function BoostVaultRow({
         )}
       >
         <td />
-        <td colSpan={2} className="border-t border-customNeutral100 !pr-0">
+        {/* <td colSpan={2} className="border-t border-customNeutral100 !pr-0">
           <nav className="flex whitespace-nowrap gap-2 items-center">
             <span className="inline-flex items-center">
               {LABELS_WITH_TOOLTIP.emittedTokens}:
@@ -194,9 +175,9 @@ export default function BoostVaultRow({
                 : "-"}
             </strong>
           </nav>
-        </td>
+        </td> */}
 
-        <td colSpan={2} className="border-t border-customNeutral100 !pr-0">
+        {/* <td colSpan={1} className="border-t border-customNeutral100 !pr-0">
           <nav className="flex whitespace-nowrap gap-2 items-center">
             <span className="inline-flex items-center">
               {LABELS_WITH_TOOLTIP.newAllocation}:
@@ -207,9 +188,9 @@ export default function BoostVaultRow({
                 : "-"}
             </strong>
           </nav>
-        </td>
+        </td> */}
 
-        <td colSpan={3} className="border-t border-customNeutral100">
+        <td colSpan={4} className="border-t border-customNeutral100">
           <nav className="flex items-center gap-4">
             <div className="flex items-center gap-2 whitespace-nowrap min-w-[12rem]">
               <span className="inline-flex items-center">

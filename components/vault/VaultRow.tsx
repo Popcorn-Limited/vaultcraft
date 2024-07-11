@@ -8,10 +8,12 @@ import {
 } from "@/lib/utils/formatBigNumber";
 import type { Token, VaultData } from "@/lib/types";
 import { tokensAtom } from "@/lib/atoms";
-import { cn } from "@/lib/utils/helpers";
+import { cn, roundToTwoDecimalPlaces } from "@/lib/utils/helpers";
 import { useRouter } from "next/router";
 import AssetWithName from "@/components/common/AssetWithName";
 import { useEffect, useState } from "react";
+import { WithTooltip } from "@/components/common/Tooltip";
+import { OptionTokenByChain } from "@/lib/constants";
 
 export default function VaultRow({
   searchTerm,
@@ -73,7 +75,7 @@ export default function VaultRow({
     .join()
     .toLowerCase();
 
-  if (!vaultData || !asset || !vault) return <></>;
+  if (!vaultData || !asset || !vault || Object.keys(tokens).length === 0) return <></>;
   return (
     <tr
       onClick={() => {
@@ -125,54 +127,48 @@ export default function VaultRow({
       </td>
 
       <td className="text-right whitespace-nowrap">
-        <p className="text-lg">
-          $ {tvl < 1 ? "0" : NumberFormatter.format(tvl)}
-        </p>
-        <p className="text-sm -mt-0.5 text-customGray200">
-          {formatAndRoundNumber(vaultData.totalAssets, asset.decimals)} {asset.symbol}
-        </p>
-      </td>
-
-      <td className="text-right text-lg">
-        <p className="text-lg">
-          {formatTwoDecimals(apy)}%
-        </p>
-        {gaugeData && gaugeData?.rewardApy.apy > 0 &&
-          <p className="text-sm -mt-0.5 text-customGray200">
-            + {formatTwoDecimals(gaugeData?.rewardApy.apy)}%
+        <WithTooltip content={`This Vault deploys its TVL $ ${tvl < 1 ? "0" : NumberFormatter.format(tvl)}
+        (${formatAndRoundNumber(vaultData.totalAssets, asset.decimals)} ${asset.symbol}) 
+        in $ ${formatTwoDecimals(vaultData.strategies.reduce((a, b) => a + b.apyHist[b.apyHist.length - 1].tvl, 0))} TVL of underlying protocols`}>
+          <p className="text-lg">
+            $ {tvl < 1 ? "0" : NumberFormatter.format(tvl)}
           </p>
-        }
-      </td>
-
-      <td className="text-right text-lg">
-        <p className="text-lg">
-          {formatTwoDecimals(gaugeData?.lowerAPR || 0)}%
-        </p>
-        {gaugeData && gaugeData?.rewardApy.apy > 0 &&
           <p className="text-sm -mt-0.5 text-customGray200">
-            + {formatTwoDecimals(gaugeData?.rewardApy.apy)}%
+            {formatAndRoundNumber(vaultData.totalAssets, asset.decimals)} {asset.symbol}
           </p>
-        }
+        </WithTooltip>
       </td>
 
       <td className="text-right text-lg">
-        <p className="text-lg">
-          {formatTwoDecimals(gaugeData?.upperAPR || 0)}%
-        </p>
-        {gaugeData && gaugeData?.rewardApy.apy > 0 &&
+        <WithTooltip
+          content={`vAPR-${vaultAddress}`}
+          tooltipChild={
+            <div className="w-42">
+              <p>{formatAndRoundNumber(vaultData.totalAssets * (apy / 100), asset.decimals)} {asset.symbol} | ${formatAndRoundNumber(vaultData.totalAssets * (apy / 100) * asset.price, asset.decimals)} | {formatTwoDecimals(apy)}%</p>
+              <p>{formatTwoDecimals(((gaugeData?.annualEmissions || 0) / 5) * boost)} oVCX | ${formatTwoDecimals(((gaugeData?.annualEmissions || 0) / 5) * boost * tokens[1][OptionTokenByChain[1]].price)} | {formatTwoDecimals(gaugeData?.lowerAPR || 0 * boost)}%</p>
+              {vaultData.gaugeData?.rewardApy.rewards
+                .filter(reward => reward.emissions > 0)
+                .map(reward =>
+                  <p key={reward.address}>{formatTwoDecimals(reward.emissions)} {tokens[vaultData.chainId][reward.address].symbol} | ${formatTwoDecimals(reward.emissionsValue)} | {formatTwoDecimals(reward.apy)}%</p>
+                )}
+            </div>
+          }
+        >
+          <p className="text-lg">
+            {formatTwoDecimals(apy + (gaugeData?.lowerAPR || 0 * boost) + (gaugeData?.rewardApy.apy || 0))}%
+          </p>
+        </WithTooltip>
+      </td>
+
+      <td className="text-right text-lg">
+        <WithTooltip content={`Earn between ${formatTwoDecimals(gaugeData?.lowerAPR || 0)}-${formatTwoDecimals(gaugeData?.upperAPR || 0)} % oVCX boost APR depending your balance of veVCX. (Based on the current emissions of ${formatTwoDecimals((gaugeData?.annualEmissions || 0) / 5)}-${formatTwoDecimals(gaugeData?.annualEmissions || 0)} oVCX p.Year)`}>
+          <p className="text-lg">
+            {formatTwoDecimals(gaugeData?.upperAPR || 0)}%
+          </p>
           <p className="text-sm -mt-0.5 text-customGray200">
-            + {formatTwoDecimals(gaugeData?.rewardApy.apy)}%
+            {formatTwoDecimals(gaugeData?.lowerAPR || 0)}%
           </p>
-        }
-      </td>
-
-      <td className="text-right text-lg">
-        <p className="text-lg">
-          {formatTwoDecimals(gaugeData?.lowerAPR || 0 * boost)}%
-        </p>
-        <p className="text-sm -mt-0.5 text-customGray200">
-          x{boost}
-        </p>
+        </WithTooltip>
       </td>
     </tr>
   );

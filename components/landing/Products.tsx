@@ -139,19 +139,6 @@ export default function Products(): JSX.Element {
               />
             }
             description="Deposit and optimize your yield with automated, non-custodial DeFi strategies"
-            stats={[
-              {
-                id: "smart-vault-tvl",
-                label: "TVL",
-                value: `$${NumberFormatter.format(tvl.vault)}`,
-                tooltip: (
-                  <p>
-                    The total value of assets held <br /> by the underlying
-                    smart contracts.
-                  </p>
-                ),
-              },
-            ]}
             route="vaults"
           />
           <Product

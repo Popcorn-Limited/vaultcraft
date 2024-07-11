@@ -20,27 +20,18 @@ export default function BoostVaultsTable({
       <table className="w-full [&_td]:h-20 [&_th]:h-18 [&_td]:px-5 [&_th]:px-5">
         <thead className="bg-customNeutral200 border-b border-customNeutral100">
           <tr>
-            <th/>
+            <th />
             <th className="font-normal text-left whitespace-nowrap">
               {LABELS_WITH_TOOLTIP.tvl}
             </th>
             <th className="font-normal text-right whitespace-nowrap">
-              {LABELS_WITH_TOOLTIP.minBoost}
+              {LABELS_WITH_TOOLTIP.boost}
             </th>
             <th className="font-normal text-right whitespace-nowrap">
-              {LABELS_WITH_TOOLTIP.maxBoost}
+              {LABELS_WITH_TOOLTIP.weight}
             </th>
             <th className="font-normal text-right whitespace-nowrap">
-              {LABELS_WITH_TOOLTIP.currentWeight}
-            </th>
-            <th className="font-normal text-right whitespace-nowrap">
-              {LABELS_WITH_TOOLTIP.upcomingWeight}
-            </th>
-            <th className="font-normal text-right whitespace-nowrap">
-              {LABELS_WITH_TOOLTIP.tokensEmitted}
-            </th>
-            <th className="font-normal text-right whitespace-nowrap">
-              {LABELS_WITH_TOOLTIP.upcomingTokens}
+              {LABELS_WITH_TOOLTIP.emission}
             </th>
           </tr>
         </thead>
@@ -68,33 +59,17 @@ export const LABELS_WITH_TOOLTIP = {
       TVL
     </WithTooltip>
   ),
-  minBoost: (
-    <WithTooltip content="Minimum oVCX boost APR based on most current epoch's distribution">
-      Min Boost
+  boost: (
+    <WithTooltip content="Earn additional oVCX rewards when depositing. This amount depends on your balance of veVCX and current oVCX emissions. (You always earn atleast the smaller APR)">
+      Boost
     </WithTooltip>
   ),
-
-  maxBoost: (
-    <WithTooltip content="Maximum oVCX boost APR based on most current epoch's distribution">
-      Max Boost
-    </WithTooltip>
-  ),
-  currentWeight: (
-    <WithTooltip content="Current allocation of weekly rewards for this gauge">
-      Current Weight
-    </WithTooltip>
-  ),
-  upcomingWeight: (
+  weight: (
     <WithTooltip content="Upcoming allocation of weekly rewards for this gauge">
       Upcoming Weight
     </WithTooltip>
   ),
-  tokensEmitted: (
-    <WithTooltip content="Total tokens created for this weekly allocation">
-      Tokens emitted
-    </WithTooltip>
-  ),
-  upcomingTokens: (
+  emission: (
     <WithTooltip content="Upcoming tokens to create for this weekly allocation">
       Upcoming Tokens
     </WithTooltip>

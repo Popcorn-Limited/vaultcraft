@@ -220,7 +220,7 @@ export default function OptionTokenInterface({ setShowOptionTokenModal }: Option
           setShowOptionTokenModal && (
             <div className="w-full md:w-60">
               <SecondaryActionButton
-                label="Exercise oVCX"
+                label="Exercise your oVCX"
                 handleClick={() => setShowOptionTokenModal(true)}
               />
             </div>
