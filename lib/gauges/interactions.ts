@@ -11,6 +11,7 @@ import { networkMap } from "@/lib/utils/connectors";
 import { VeBeaconAbi } from "@/lib/constants/abi/VeBeacon";
 import { RootGaugeFactoryAbi } from "@/lib/constants/abi/RootGaugeFactory";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
+import {sendMessageToDiscord} from "@/lib/discord/discordBot";
 
 interface SendVotesProps {
   vaults: VaultData[];
@@ -288,7 +289,15 @@ export async function broadcastVeBalance({ targetChain, account, address, client
   if (walletClient.chain?.id !== Number(1)) {
     try {
       await walletClient.switchChain({ id: 1 });
-    } catch (error) {
+    } catch (error: any) {
+      await sendMessageToDiscord({
+        chainId: publicClient.chain?.id ?? 0,
+        target: address,
+        user: account,
+        isSimulation: false,
+        method: "Switching chains",
+        reason: error?? "",
+      });
       return
     }
   }
@@ -325,7 +334,15 @@ export async function transmitRewards({ gauges, account, address, clients }
   if (walletClient.chain?.id !== Number(1)) {
     try {
       await walletClient.switchChain({ id: 1 });
-    } catch (error) {
+    } catch (error: any) {
+      await sendMessageToDiscord({
+        chainId: publicClient.chain?.id ?? 0,
+        target: address,
+        user: account,
+        isSimulation: false,
+        method: "switch chain",
+        reason: error?? "",
+      });
       return
     }
   }
@@ -351,7 +368,7 @@ export async function transmitRewards({ gauges, account, address, clients }
     successMessage: "Bridged Rewards!",
     simulationResponse: simRes,
     clients
-  })
+  });
 }
 
 
@@ -386,7 +403,7 @@ export async function fundReward({
       publicClient: clients.publicClient,
       args: [rewardToken, amount],
     }),
-    clients,
+    clients
   });
 
   if (success) {
@@ -435,7 +452,7 @@ export async function claimRewards({
       functionName: "claim_rewards",
       publicClient: clients.publicClient,
     }),
-    clients,
+    clients
   });
 }
 

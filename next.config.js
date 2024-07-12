@@ -14,6 +14,7 @@ const nextConfig = {
     DUNE_API_KEY: process.env.DUNE_API_KEY,
     ENSO_API_KEY: process.env.ENSO_API_KEY,
     DEFILLAMA_API_KEY: process.env.DEFILLAMA_API_KEY,
+    DISCORD_WEBHOOK: process.env.DISCORD_WEBHOOK
   },
   async rewrites() {
     return [

@@ -7,6 +7,7 @@ import {
 } from "@/lib/toasts";
 import { Clients, SimulationResponse } from "@/lib/types";
 import { UsdtAbi } from "@/lib/constants/abi/USDT";
+import {sendMessageToDiscord} from "@/lib/discord/discordBot";
 
 interface HandleAllowanceProps {
   token: Address;
@@ -114,10 +115,29 @@ export default async function approve({
       showSuccessToast("Approved assets for deposit!");
       return true;
     } catch (error: any) {
+      await sendMessageToDiscord({
+        chainId: publicClient.chain?.id ?? 0,
+        target: address,
+        user: account,
+        isSimulation: false,
+        method: "approve",
+        reason: error.shortMessage?? "",
+        args: [...request.args]
+      });
+
       showErrorToast(error.shortMessage);
       return false;
     }
   } else {
+    await sendMessageToDiscord({
+      chainId: publicClient.chain?.id ?? 0,
+      target: address,
+      user: account,
+      isSimulation: true,
+      method: "approve",
+      reason: simulationError?? "",
+    });
+
     showErrorToast(simulationError);
     return false;
   }

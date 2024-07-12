@@ -1,9 +1,10 @@
 import { showErrorToast, showSuccessToast } from "@/lib/toasts";
 import { Clients, SimulationResponse, Token } from "@/lib/types";
 import { InitParam, InitParamRequirement } from "@/lib/atoms/adapter";
-import { Abi, Address, PublicClient, formatUnits, isAddress } from "viem";
+import { Abi, Address, PublicClient, isAddress } from "viem";
 import { ADDRESS_ZERO } from "@/lib/constants";
-import { numberToFormattedString, safeRound } from "./formatBigNumber";
+import { sendMessageToDiscord } from "@/lib/discord/discordBot";
+import { numberToFormattedString } from "./formatBigNumber";
 
 export function validateInput(value: string | number): {
   formatted: string;
@@ -26,7 +27,7 @@ interface HandleCallResultProps {
 export async function handleCallResult({
   successMessage,
   simulationResponse,
-  clients,
+  clients
 }: HandleCallResultProps): Promise<boolean> {
   if (simulationResponse.success) {
     try {
@@ -40,10 +41,31 @@ export async function handleCallResult({
       return true;
     } catch (error: any) {
       console.log({ error });
+
+      await sendMessageToDiscord({
+        chainId: clients.publicClient.chain?.id ?? 0,
+        target: simulationResponse.request.address ?? "0x",
+        user: simulationResponse.request.account ?? "0x",
+        isSimulation: false,
+        method: simulationResponse.request.functionName ?? "",
+        reason: error.shortMessage ?? "",
+        args: [...simulationResponse.request.args],
+      });
+
       showErrorToast(error.shortMessage);
       return false;
     }
   } else {
+    await sendMessageToDiscord({
+      chainId: clients.publicClient.chain?.id ?? 0,
+      target: simulationResponse.request.address ?? "0x",
+      user: simulationResponse.request.account ?? "0x",
+      isSimulation: true,
+      method: simulationResponse.request.functionName ?? "",
+      reason: simulationResponse.error ?? "",
+      args: [...simulationResponse.request.args],
+    });
+
     showErrorToast(simulationResponse.error);
     return false;
   }
@@ -187,6 +209,15 @@ export async function simulateCall({
     return { request: request, success: true, error: null };
   } catch (error: any) {
     console.log({ simError: error });
+    await sendMessageToDiscord({
+      chainId: publicClient.chain?.id ?? 0,
+      target: contract.address,
+      user: account,
+      isSimulation: true,
+      method: functionName,
+      reason: error ?? "",
+      args
+    });
     return { request: null, success: false, error: error.shortMessage };
   }
 }

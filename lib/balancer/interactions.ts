@@ -84,6 +84,6 @@ export async function depositIntoPool({
         },
       ],
     }),
-    clients,
+    clients
   });
 }

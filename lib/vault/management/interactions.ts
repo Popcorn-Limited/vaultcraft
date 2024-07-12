@@ -44,7 +44,7 @@ export async function allocateToStrategies({
       args: allocations,
       publicClient: clients.publicClient
     }),
-    clients,
+    clients
   });
 
   return success;
@@ -68,7 +68,7 @@ export async function deallocateFromStrategies({
       args: allocations,
       publicClient: clients.publicClient
     }),
-    clients,
+    clients
   });
 
   return success;
@@ -92,7 +92,7 @@ export async function proposeStrategies({
       args: strategies,
       publicClient: clients.publicClient
     }),
-    clients,
+    clients
   });
 
   return success;
@@ -114,7 +114,7 @@ export async function acceptStrategies({
       functionName: "changeStrategies",
       publicClient: clients.publicClient
     }),
-    clients,
+    clients
   });
 
   return success;
@@ -145,7 +145,7 @@ export async function proposeStrategy({
       args,
       publicClient: clients.publicClient
     }),
-    clients,
+    clients
   });
 
   return success;
@@ -175,7 +175,7 @@ export async function acceptStrategy({
       args,
       publicClient: clients.publicClient
     }),
-    clients,
+    clients
   });
 
   return success;
@@ -213,7 +213,7 @@ export async function proposeFees({
       args,
       publicClient: clients.publicClient
     }),
-    clients,
+    clients
   });
 
   return success;
@@ -243,7 +243,7 @@ export async function acceptFees({
       args,
       publicClient: clients.publicClient
     }),
-    clients,
+    clients
   });
 
   return success;
@@ -274,7 +274,7 @@ export async function changeFeeRecipient({
       args,
       publicClient: clients.publicClient
     }),
-    clients,
+    clients
   });
 
   return success;
@@ -305,7 +305,7 @@ export async function changeDepositLimit({
       args,
       publicClient: clients.publicClient
     }),
-    clients,
+    clients
   });
 
   return success;
@@ -335,7 +335,7 @@ export async function pauseVault({
       args,
       publicClient: clients.publicClient
     }),
-    clients,
+    clients
   });
 
   return success;
@@ -365,7 +365,7 @@ export async function unpauseVault({
       args: [[vaultData.address]],
       publicClient: clients.publicClient
     }),
-    clients,
+    clients
   });
 
   return success;
@@ -390,6 +390,6 @@ export async function takeFees({
       functionName: "takeManagementAndPerformanceFees",
       publicClient: clients.publicClient
     }),
-    clients,
+    clients
   });
 }
