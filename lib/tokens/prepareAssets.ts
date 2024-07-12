@@ -3,7 +3,7 @@ import axios from "axios";
 import { TokenByAddress, TokenType } from "@/lib/types";
 import { networkMap } from "@/lib/utils/connectors";
 import { vcx as getVcxPrice } from "@/lib/resolver/price/resolver";
-import { OptionTokenByChain, VCX } from "@/lib/constants";
+import { OptionTokenByChain, VCX, WrappedOptionTokenByChain } from "@/lib/constants";
 import { mainnet } from "viem/chains";
 
 export async function prepareAssets(addresses: Address[], chainId: number, client: PublicClient): Promise<TokenByAddress> {
@@ -41,7 +41,7 @@ export async function prepareAssets(addresses: Address[], chainId: number, clien
 
     if (address === VCX) {
       tokenPrice = vcxPrice
-    } else if (address === OptionTokenByChain[chainId]) {
+    } else if (address === OptionTokenByChain[chainId] || address === WrappedOptionTokenByChain[chainId]) {
       tokenPrice = vcxPrice * 0.25
     }
 
