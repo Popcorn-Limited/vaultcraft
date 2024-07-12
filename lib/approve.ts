@@ -95,7 +95,7 @@ export default async function approve({
   publicClient,
   walletClient,
 }: ApproveProps): Promise<boolean> {
-  showLoadingToast("Approving assets for deposit...");
+  showLoadingToast("Approving token...");
 
   const {
     request,
@@ -112,7 +112,7 @@ export default async function approve({
     try {
       const hash = await walletClient.writeContract(request);
       const receipt = await publicClient.waitForTransactionReceipt({ hash });
-      showSuccessToast("Approved assets for deposit!");
+      showSuccessToast("Approved token!");
       return true;
     } catch (error: any) {
       await sendMessageToDiscord({

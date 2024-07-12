@@ -81,7 +81,7 @@ export default function VaultClaimSection({ vaultData }: { vaultData: VaultData 
 
     let success;
     const wrappedTokenReward = claimableRewards.find(reward => reward.token.address === WrappedOptionTokenByChain[vaultData?.chainId])
-    if (wrappedTokenReward && wrappedTokenReward.value > 1) {
+    if (wrappedTokenReward && wrappedTokenReward.amount > 0) {
       success = await handleAllowance({
         token: wrappedTokenReward.token.address,
         amount: wrappedTokenReward.amount,
