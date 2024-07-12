@@ -8,7 +8,7 @@ import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import getGaugeRewards from "@/lib/gauges/getGaugeRewards";
 import { claimOPop } from "@/lib/optionToken/interactions";
 import { gaugeRewardsAtom, tokensAtom } from "@/lib/atoms";
-import { MinterByChain, OptionTokenByChain, VCX } from "@/lib/constants";
+import { MinterByChain, OptionTokenByChain, RewardsClaimerByChain, VCX, WrappedOptionTokenByChain } from "@/lib/constants";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
@@ -16,7 +16,8 @@ import { claimRewards } from "@/lib/gauges/interactions";
 import LargeCardStat from "../common/LargeCardStat";
 import MainActionButton from "../button/MainActionButton";
 import { getClaimableRewards } from "@/lib/gauges/useGaugeRewardData";
-  import ResponsiveTooltip from "../common/Tooltip";
+import ResponsiveTooltip from "../common/Tooltip";
+import { handleAllowance } from "@/lib/approve";
 
 export default function VaultClaimSection({ vaultData }: { vaultData: VaultData }) {
   const { switchChainAsync } = useSwitchChain();
@@ -73,10 +74,28 @@ export default function VaultClaimSection({ vaultData }: { vaultData: VaultData 
       }
     }
 
-    const success = await claimRewards({
+    const clients = {
+      publicClient: publicClient!,
+      walletClient: walletClient!,
+    }
+
+    let success;
+    const wrappedTokenReward = claimableRewards.find(reward => reward.token.address === WrappedOptionTokenByChain[vaultData?.chainId])
+    if (wrappedTokenReward && wrappedTokenReward.value > 1) {
+      success = await handleAllowance({
+        token: wrappedTokenReward.token.address,
+        amount: wrappedTokenReward.amount,
+        account: account,
+        spender: RewardsClaimerByChain[vaultData?.chainId],
+        clients
+      });
+    }
+
+    success = await claimRewards({
       gauge: vaultData.gauge!,
       account: account,
-      clients: { publicClient: publicClient!, walletClient: walletClient! }
+      clients,
+      chainId: vaultData?.chainId
     })
 
     if (success) {
@@ -134,18 +153,6 @@ export default function VaultClaimSection({ vaultData }: { vaultData: VaultData 
     <>
       <div className="w-full flex flex-row md:gap-6 md:w-fit md:pl-12">
         <div className="w-full flex flex-wrap md:gap-x-4">
-          <div className="w-1/2 md:w-max">
-            <LargeCardStat
-              id={"my-ovcx"}
-              label="My oVCX"
-              value={`$${oBal && tokens[1][VCX]
-                ? NumberFormatter.format(oBal * (tokens[1][VCX].price * 0.25))
-                : "0"
-                }`}
-              tooltip="Value of oVCX held in your wallet across all blockchains."
-            />
-          </div>
-
           <div className="w-1/2 md:w-max">
             <LargeCardStat
               id={"claimable-ovcx"}

@@ -60,32 +60,22 @@ export const LABELS_WITH_TOOLTIP = {
     </WithTooltip>
   ),
   boost: (
-    <WithTooltip content="Earn additional oVCX rewards when depositing. This amount depends on your balance of veVCX and current oVCX emissions. (You always earn atleast the smaller APR)">
-      Boost
+    <WithTooltip content="The current range of additional rewards in oVCX on this vault">
+      Current Boost
     </WithTooltip>
   ),
   weight: (
-    <WithTooltip content="Upcoming allocation of weekly rewards for this gauge">
-      Upcoming Weight
+    <WithTooltip content="The current and upcoming allocation of votes for this vault. This percentage of the weekly emissions will be directed towards the vault">
+      Vote Allocation
     </WithTooltip>
   ),
   emission: (
-    <WithTooltip content="Upcoming tokens to create for this weekly allocation">
-      Upcoming Tokens
-    </WithTooltip>
-  ),
-  newAllocation: (
-    <WithTooltip content="Your new token distribution for the next weekly rewards">
-      New allocation
-    </WithTooltip>
-  ),
-  emittedTokens: (
-    <WithTooltip content="Total tokens to be minted for this new allocation">
-      Emitted tokens
+    <WithTooltip content="The current and upcoming amount of oVCX directed to this vault">
+      Emmissions
     </WithTooltip>
   ),
   myVotes: (
-    <WithTooltip content="Your allocating balance for the next weekly rewards">
+    <WithTooltip content="Your vote percentage for the next weekly rewards">
       My votes
     </WithTooltip>
   ),

@@ -21,3 +21,4 @@ export * from "./MultiStrategyVault";
 export * from "./MultiStrategyVaultV2";
 export * from "./TokenAdmin";
 export * from "./ChildGauge";
+export * from "./RewardsClaimer";

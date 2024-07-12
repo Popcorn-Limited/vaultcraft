@@ -73,6 +73,11 @@ export const WrappedOptionTokenByChain: AddressByChain = {
   [arbitrum.id]: "0xaF33642938172011f711bA530acc900Ae17620A7"
 }
 
+export const RewardsClaimerByChain: AddressByChain = {
+  [mainnet.id]: "0xa5F5e90304758250764Ad26CbdD04b68D6Ce5d2a",
+  [optimism.id]: "0x268823d2D666643721A15462De02987F77DE7bbf",
+  [arbitrum.id]: "0x925Efe4B78a823d6AB22Ac5894516b898293a9E5"
+}
 
 export const XVCXByChain: AddressByChain = {
   [mainnet.id]: "0x18445923592be303fbd3BC164ee685C7457051b4",

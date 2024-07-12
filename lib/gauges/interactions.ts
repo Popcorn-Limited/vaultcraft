@@ -5,7 +5,7 @@ import {
 } from "viem";
 import { Clients, TokenByAddress, VaultData } from "@/lib/types";
 import { showLoadingToast } from "@/lib/toasts";
-import { GAUGE_CONTROLLER, GaugeAbi, GaugeControllerAbi, VOTING_ESCROW, VotingEscrowAbi } from "@/lib/constants";
+import { GAUGE_CONTROLLER, GaugeAbi, GaugeControllerAbi, RewardsClaimerAbi, RewardsClaimerByChain, VOTING_ESCROW, VotingEscrowAbi } from "@/lib/constants";
 import { handleCallResult, simulateCall } from "@/lib/utils/helpers";
 import { networkMap } from "@/lib/utils/connectors";
 import { VeBeaconAbi } from "@/lib/constants/abi/VeBeacon";
@@ -404,7 +404,8 @@ export async function claimRewards({
   gauge,
   account,
   clients,
-}: { gauge: Address, account: Address, clients: Clients }): Promise<boolean> {
+  chainId
+}: { gauge: Address, account: Address, clients: Clients, chainId: number }): Promise<boolean> {
   showLoadingToast("Claim Gauge Reward...");
 
   /// Deal with the misconfgured ARB USDC Compound Gauge
@@ -429,10 +430,11 @@ export async function claimRewards({
     simulationResponse: await simulateCall({
       account,
       contract: {
-        address: gauge,
-        abi: GaugeAbi,
+        address: RewardsClaimerByChain[chainId],
+        abi: RewardsClaimerAbi,
       },
-      functionName: "claim_rewards",
+      functionName: "claimAndUnwrap",
+      args: [gauge],
       publicClient: clients.publicClient,
     }),
     clients,

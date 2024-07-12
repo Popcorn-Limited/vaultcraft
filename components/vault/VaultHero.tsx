@@ -4,6 +4,7 @@ import AssetWithName from "@/components/common/AssetWithName";
 import {
   NumberFormatter,
   formatAndRoundNumber,
+  formatTwoDecimals,
 } from "@/lib/utils/formatBigNumber";
 import { roundToTwoDecimalPlaces } from "@/lib/utils/helpers";
 import VaultClaimSection from "@/components/vault/VaultClaimSection";
@@ -24,6 +25,8 @@ export default function VaultHero({
   showClaim?: boolean;
 }): JSX.Element {
   const [tokens] = useAtom(tokensAtom);
+  const boost = ((vaultData.gaugeData?.workingBalance! / (gauge?.balance || 0)) * 5) || 1
+
   return (
     <section className="md:border-b border-customNeutral100 pt-10 pb-6 px-4 md:px-0 ">
       <div className="w-full mb-8">
@@ -39,15 +42,15 @@ export default function VaultHero({
               value={
                 asset
                   ? `$ ${NumberFormatter.format(
-                      (asset.balance * asset.price) / 10 ** asset.decimals
-                    )}`
+                    (asset.balance * asset.price) / 10 ** asset.decimals
+                  )}`
                   : "$ 0"
               }
               secondaryValue={
                 asset
                   ? `$ ${NumberFormatter.format(
-                      asset.balance / 10 ** asset.decimals
-                    )} ${asset.symbol}`
+                    asset.balance / 10 ** asset.decimals
+                  )} ${asset.symbol}`
                   : "0 TKN"
               }
               tooltip="Value of deposit assets held in your wallet"
@@ -73,17 +76,19 @@ export default function VaultHero({
             <LargeCardStat
               id={"tvl"}
               label="TVL"
-              value={`$ ${
-                vaultData.tvl < 1 ? "0" : NumberFormatter.format(vaultData.tvl)
-              }`}
+              value={`$ ${vaultData.tvl < 1 ? "0" : NumberFormatter.format(vaultData.tvl)
+                }`}
               secondaryValue={
                 asset
                   ? `${NumberFormatter.format(
-                      vaultData.totalAssets / 10 ** asset.decimals
-                    )} ${asset?.symbol!}`
+                    vaultData.totalAssets / 10 ** asset.decimals
+                  )} ${asset?.symbol!}`
                   : "0 TKN"
               }
-              tooltip="Total value of all assets deposited into the vault"
+              tooltip={`This Vault deploys its TVL $ ${vaultData.tvl < 1 ? "0" : formatTwoDecimals(vaultData.tvl)}
+                      (${formatAndRoundNumber(vaultData.totalAssets, asset?.decimals || 0)} ${asset?.symbol || "TKN"}) 
+                      in $ ${formatTwoDecimals(vaultData.strategies.reduce((a, b) => a + b.apyHist[b.apyHist.length - 1].tvl, 0))} 
+                      TVL of underlying protocols`}
             />
           </div>
           <div>
@@ -101,22 +106,10 @@ export default function VaultHero({
               <div className="w-1/2 md:w-max">
                 <LargeCardStat
                   id={"min-boost"}
-                  label="Min Boost APR"
-                  value={`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.gaugeData?.lowerAPR))} %`}
-                  tooltip={`Minimum oVCX boost APR based on most current epoch's distribution. (Based on the current emissions for this gauge of ${NumberFormatter.format(vaultData?.gaugeData.annualEmissions / 5)} oVCX p. year)`}
-                />
-              </div>
-            )
-            : <></>
-          }
-          {vaultData.gaugeData?.upperAPR ?
-            (
-              <div className="w-1/2 md:w-max">
-                <LargeCardStat
-                  id={"max-boost"}
-                  label="Max Boost APR"
-                  value={`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.gaugeData?.upperAPR))} %`}
-                  tooltip={`Maximum oVCX boost APR based on most current epoch's distribution. (Based on the current emissions for this gauge of ${NumberFormatter.format(vaultData?.gaugeData.annualEmissions)} oVCX p. year)`}
+                  label="Boost APR"
+                  value={`${formatTwoDecimals(vaultData.gaugeData?.lowerAPR || 0 * boost)} %`}
+                  tooltip={`Minimum oVCX boost APR based on most current epoch's distribution. (Based on the current emissions for this gauge of
+                     ${formatTwoDecimals((vaultData?.gaugeData.annualEmissions / 5) * boost)} oVCX p. year)`}
                 />
               </div>
             )

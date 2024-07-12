@@ -10,12 +10,13 @@ import { VaultLabel, type VaultData } from "@/lib/types";
 import { tokensAtom } from "@/lib/atoms";
 import { cn } from "@/lib/utils/helpers";
 import AssetWithName from "@/components/common/AssetWithName";
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import useGaugeWeights from "@/lib/gauges/useGaugeWeights";
 import TokenIcon from "@/components/common/TokenIcon";
 import useWeeklyEmissions from "@/lib/gauges/useWeeklyEmissions";
 import { LABELS_WITH_TOOLTIP } from "@/components/boost/BoostVaultsTable";
 import { VE_VCX } from "@/lib/constants";
+import { WithTooltip } from "../common/Tooltip";
 
 export default function BoostVaultRow({
   isDeprecated,
@@ -29,8 +30,6 @@ export default function BoostVaultRow({
   votes: { [key: string]: number };
   handleVotes: (value: number, address: Address) => void;
 }) {
-  const weeklyEmissions = useWeeklyEmissions();
-
   if (
     isDeprecated &&
     !vaultData.metadata?.labels?.includes(VaultLabel.deprecated)
@@ -40,30 +39,22 @@ export default function BoostVaultRow({
     vaultData.metadata.labels.push(VaultLabel.deprecated);
   }
 
-  const { address: account } = useAccount();
-
   const {
-    asset,
     gauge,
     gaugeData,
     tvl,
     vault: vaultAddress,
-    chainId,
   } = vaultData;
+
+  const { address: account } = useAccount();
+  const [tokens] = useAtom(tokensAtom);
+  const weeklyEmissions = useWeeklyEmissions();
 
   const { data: weights } = useGaugeWeights({
     address: vaultData.gauge as any,
     account: account as any,
     chainId: vaultData.chainId,
   });
-
-  const [tokens] = useAtom(tokensAtom);
-
-  const vault = tokens[chainId]?.[vaultAddress] ?? {};
-  const dataAsset = tokens[chainId]?.[asset] ?? {};
-  const dataGauge = tokens[chainId]?.[gauge!] ?? {};
-
-  const GAUGE_ADDRESS = vaultData.gauge!;
 
   const allocations = {
     current: Number(weights?.[0] || 0) / 1e16,
@@ -72,11 +63,13 @@ export default function BoostVaultRow({
 
   const actualUserPower = Number(weights?.[2].power || 0);
   const totalWeight = Number(weights?.[3] || 0) / 1e18;
-  const currentWeight = (Number(weights?.[1] || 0) / 1e18) * totalWeight
 
   const [amount, setAmount] = useState(actualUserPower);
+  const [relativeWeight, setRelativeWeight] = useState(0);
 
-  const relativeWeight = ((currentWeight - (votes[GAUGE_ADDRESS] || 0) + ((amount / 10_000) * (tokens[1][VE_VCX].balance / 1e18))) / totalWeight);
+  useEffect(() => {
+    if (relativeWeight === 0) setRelativeWeight(Number(weights?.[1] || 0) / 1e18)
+  }, [weights])
 
   function onChange(value: number) {
     // As long as you keep moving the slider, `value` continues to count to the max value(10000). This sometimes makes the
@@ -86,8 +79,7 @@ export default function BoostVaultRow({
     // be as high as it needs to be to make the potentialNewTotalVotes (cumulative total max) = 10000, therefor reaching
     // 100% votes.
 
-    const gaugeVotes = votes[GAUGE_ADDRESS] || 0;
-    console.debug({ gaugeVotes, value });
+    const gaugeVotes = votes[gauge!] || 0;
     const potentialNewTotalVotes =
       Object.values(votes).reduce((a, b) => a + b, 0) -
       gaugeVotes +
@@ -97,8 +89,14 @@ export default function BoostVaultRow({
       value = value - (potentialNewTotalVotes - 10000);
     }
 
-    handleVotes(value, GAUGE_ADDRESS);
+    const veBal = tokens[1][VE_VCX].balance / 1e18;
+    const userWeightImpact = (value / 10_000) * veBal
+    const currentWeight = (Number(weights?.[1] || 0) / 1e18) * totalWeight
+    const newRelativeWeight = (currentWeight + userWeightImpact) / totalWeight
+
+    handleVotes(value, gauge!);
     setAmount(value);
+    setRelativeWeight(newRelativeWeight)
   }
 
   return (
@@ -128,32 +126,38 @@ export default function BoostVaultRow({
         </td>
 
         <td className="text-right">
-          <p className="text-lg">
-            {formatTwoDecimals(gaugeData?.upperAPR || 0)}%
-          </p>
-          <p className="text-sm -mt-0.5 text-customGray200">
-            {formatTwoDecimals(gaugeData?.lowerAPR || 0)}%
-          </p>
+          <WithTooltip content={`Earn between ${formatTwoDecimals(gaugeData?.lowerAPR || 0)}-${formatTwoDecimals(gaugeData?.upperAPR || 0)} % oVCX boost APR depending your balance of veVCX. (Based on the current emissions of ${formatTwoDecimals((gaugeData?.annualEmissions || 0) / 5)}-${formatTwoDecimals(gaugeData?.annualEmissions || 0)} oVCX p.Year)`}>
+            <p className="text-lg">
+              {formatTwoDecimals(gaugeData?.upperAPR || 0)} %
+            </p>
+            <p className="text-sm -mt-0.5 text-customGray200">
+              {formatTwoDecimals(gaugeData?.lowerAPR || 0)} %
+            </p>
+          </WithTooltip>
         </td>
 
         <td className="text-right">
-          <p className="text-lg">
-            {(Number(weights?.[0]) / 1e16).toFixed(2) || 0}%
-          </p>
-          <p className="text-sm -mt-0.5 text-customGray200">
-            {((Number(weights?.[1]) / 1e16) + relativeWeight).toFixed(2) || 0}%
-          </p>
+          <WithTooltip content={`Currently there are ${(Number(weights?.[0]) / 1e16).toFixed(2) || 0}% of all votes assigned to this vault. Next week it will be ${((Number(weights?.[1]) / 1e16) + relativeWeight).toFixed(2) || 0}%`}>
+            <p className="text-lg">
+              {(Number(weights?.[0]) / 1e16).toFixed(2) || 0} %
+            </p>
+            <p className="text-sm -mt-0.5 text-customGray200">
+              {((Number(weights?.[1]) / 1e16) + relativeWeight).toFixed(2) || 0} %
+            </p>
+          </WithTooltip>
         </td>
 
         <td className="text-right">
-          <p className="text-lg">
-            {NumberFormatter.format(
-              weeklyEmissions * (allocations.current / 100)
-            )}
-          </p>
-          <p className="text-sm -mt-0.5 text-customGray200">
-            {NumberFormatter.format((weeklyEmissions * relativeWeight))}
-          </p>
+          <WithTooltip content={`This week this vault will receive ${NumberFormatter.format(weeklyEmissions * (allocations.current / 100))} oVCX. Based on votes for the next week the vaut will receive ${NumberFormatter.format((weeklyEmissions * relativeWeight))} oVCX next week`}>
+            <p className="text-lg">
+              {NumberFormatter.format(
+                weeklyEmissions * (allocations.current / 100)
+              )} oVCX
+            </p>
+            <p className="text-sm -mt-0.5 text-customGray200">
+              {NumberFormatter.format((weeklyEmissions * relativeWeight))} oVCX
+            </p>
+          </WithTooltip>
         </td>
       </tr>
 
@@ -164,32 +168,6 @@ export default function BoostVaultRow({
         )}
       >
         <td />
-        {/* <td colSpan={2} className="border-t border-customNeutral100 !pr-0">
-          <nav className="flex whitespace-nowrap gap-2 items-center">
-            <span className="inline-flex items-center">
-              {LABELS_WITH_TOOLTIP.emittedTokens}:
-            </span>
-            <strong className="text-lg">
-              {relativeWeight > 0
-                ? NumberFormatter.format((weeklyEmissions * relativeWeight))
-                : "-"}
-            </strong>
-          </nav>
-        </td> */}
-
-        {/* <td colSpan={1} className="border-t border-customNeutral100 !pr-0">
-          <nav className="flex whitespace-nowrap gap-2 items-center">
-            <span className="inline-flex items-center">
-              {LABELS_WITH_TOOLTIP.newAllocation}:
-            </span>
-            <strong className="text-lg">
-              {actualUserPower != amount
-                ? `${relativeWeight.toFixed(2)}%`
-                : "-"}
-            </strong>
-          </nav>
-        </td> */}
-
         <td colSpan={4} className="border-t border-customNeutral100">
           <nav className="flex items-center gap-4">
             <div className="flex items-center gap-2 whitespace-nowrap min-w-[12rem]">
@@ -197,7 +175,7 @@ export default function BoostVaultRow({
                 {LABELS_WITH_TOOLTIP.myVotes}:
               </span>
               <strong className="text-lg inline-block">
-                {amount ? (amount / 100).toFixed(2) : 0}%
+                {amount ? (amount / 100).toFixed(2) : 0} %
               </strong>
             </div>
 
@@ -236,6 +214,6 @@ export default function BoostVaultRow({
           </nav>
         </td>
       </tr>
-    </Fragment>
+    </Fragment >
   );
 }

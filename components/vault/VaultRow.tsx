@@ -144,13 +144,9 @@ export default function VaultRow({
           content={`vAPR-${vaultAddress}`}
           tooltipChild={
             <div className="w-42">
-              <p>{formatAndRoundNumber(vaultData.totalAssets * (apy / 100), asset.decimals)} {asset.symbol} | ${formatAndRoundNumber(vaultData.totalAssets * (apy / 100) * asset.price, asset.decimals)} | {formatTwoDecimals(apy)}%</p>
-              <p>{formatTwoDecimals(((gaugeData?.annualEmissions || 0) / 5) * boost)} oVCX | ${formatTwoDecimals(((gaugeData?.annualEmissions || 0) / 5) * boost * tokens[1][OptionTokenByChain[1]].price)} | {formatTwoDecimals(gaugeData?.lowerAPR || 0 * boost)}%</p>
-              {vaultData.gaugeData?.rewardApy.rewards
-                .filter(reward => reward.emissions > 0)
-                .map(reward =>
-                  <p key={reward.address}>{formatTwoDecimals(reward.emissions)} {tokens[vaultData.chainId][reward.address].symbol} | ${formatTwoDecimals(reward.emissionsValue)} | {formatTwoDecimals(reward.apy)}%</p>
-                )}
+              <p>Vault APR: {formatTwoDecimals(apy)} %</p>
+              {gaugeData?.lowerAPR && gaugeData?.lowerAPR > 0 ? <p>Your Boost: {formatTwoDecimals(gaugeData?.lowerAPR || 0 * boost)} %</p> : <></>}
+              {gaugeData?.rewardApy.apy && gaugeData?.rewardApy.apy > 0 ? <p>Additional Rewards: {formatTwoDecimals(gaugeData?.rewardApy.apy)} %</p> : <></>}
             </div>
           }
         >
