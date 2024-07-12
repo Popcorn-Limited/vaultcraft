@@ -31,7 +31,7 @@ export async function exerciseOPop({
       publicClient: clients.publicClient as PublicClient,
       args: [amount, maxPaymentAmount, account],
     }),
-    clients,
+    clients
   });
 }
 
@@ -57,6 +57,6 @@ export async function claimOPop({ gauges, chainId, account, minter, clients }: C
       publicClient: clients.publicClient,
       args: [gauges],
     }),
-    clients,
+    clients
   });
 }
