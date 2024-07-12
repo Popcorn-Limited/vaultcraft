@@ -12,7 +12,11 @@ interface DiscordMessage {
   args?: string[];
 }
 export const sendMessageToDiscord = async (message: DiscordMessage): Promise<void> => {
-  const webhookUrl: string = process.env.DISCORD_WEBHOOK as string;
+  if (message.reason?.includes("rejected")
+    || message.reason?.includes("does not match the target chain")
+    || message.reason?.includes("insufficient allowance")) {
+    return
+  }
 
   const title = "----------------- NEW MESSAGE -----------------"
   const content = `${title}
@@ -21,12 +25,12 @@ export const sendMessageToDiscord = async (message: DiscordMessage): Promise<voi
     User = ${message.user}
     Action = ${message.method}
     Simulation? = ${message.isSimulation}
-    TxHash = ${message.txHash?? "not provided"}
-    Reason = ${message.reason?? "not provided"}
-    Args = ${message.args?? "not provided"}`
-  
+    TxHash = ${message.txHash ?? "not provided"}
+    Reason = ${message.reason ?? "not provided"}
+    Args = ${message.args ?? "not provided"}`
+
   try {
-    const response = await axios.post(webhookUrl, {content}, {
+    const response = await axios.post(process.env.DISCORD_WEBHOOK!, { content }, {
       headers: {
         'Content-Type': 'application/json'
       },
