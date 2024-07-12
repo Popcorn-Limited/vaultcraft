@@ -221,7 +221,7 @@ export default function Index() {
         </>
       )
         :
-        <p className="text-white ml-4 md:ml-8">Loading...</p>
+        <p className="text-white ml-4 md:ml-0">Loading...</p>
     }
   </NoSSR >
 }

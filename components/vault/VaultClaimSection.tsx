@@ -31,25 +31,11 @@ export default function VaultClaimSection({ vaultData }: { vaultData: VaultData 
   const [claimableRewards, setClaimableRewards] = useState<ClaimableReward[]>(
     []
   );
-
   const [gaugeRewards, setGaugeRewards] = useAtom(gaugeRewardsAtom);
-
-  const [oBal, setOBal] = useState<number>(0);
+  const rewardValue = claimableRewards.reduce((a, b) => a + b.value, 0) || 0;
 
   useEffect(() => {
     async function getOToken() {
-      const client = createPublicClient({
-        chain: ChainById[vaultData?.chainId!],
-        transport: http(RPC_URLS[vaultData?.chainId!]),
-      });
-      const newOBal = client.readContract({
-        address: OptionTokenByChain[vaultData?.chainId!],
-        abi: erc20Abi,
-        functionName: "balanceOf",
-        args: [account!],
-      });
-      setOBal(Number(newOBal) / 1e18);
-
       if (vaultData.gauge && vaultData.gauge !== zeroAddress) {
         const newClaimableReward = await getClaimableRewards({
           gauge: vaultData.gauge,
@@ -168,12 +154,12 @@ export default function VaultClaimSection({ vaultData }: { vaultData: VaultData 
               tooltip="Cumulative value of claimable oVCX from vaults across all blockchains."
             />
           </div>
-          {claimableRewards.length > 0 && (
+          {claimableRewards.length > 0 && rewardValue > 0.1 ? (
             <div className="w-1/2 md:w-max">
               <LargeCardStat
                 id={"claimable-rewards"}
                 label="Claimable Rewards"
-                value={`$${NumberFormatter.format(claimableRewards.reduce((a, b) => a + b.value, 0))}`}
+                value={`$${NumberFormatter.format(rewardValue)}`}
                 tooltipChild={
                   <div className="w-42">
                     <p className="font-bold">Claimable Rewards</p>
@@ -186,7 +172,9 @@ export default function VaultClaimSection({ vaultData }: { vaultData: VaultData 
                 }
               />
             </div>
-          )}
+          )
+            : <></>
+          }
         </div>
 
         <div className="hidden md:block md:mt-auto w-52 mb-8 space-y-2">
@@ -197,7 +185,7 @@ export default function VaultClaimSection({ vaultData }: { vaultData: VaultData 
               !gaugeRewards || gaugeRewards?.[vaultData.chainId]?.total < 0
             }
           />
-          {claimableRewards.length > 0 && (
+          {claimableRewards.length > 0 && rewardValue > 0.1 && (
             <SecondaryActionButton
               label="Claim Rewards"
               handleClick={handleClaimRewards}
