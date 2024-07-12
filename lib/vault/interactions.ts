@@ -2,7 +2,6 @@ import { showLoadingToast } from "@/lib/toasts";
 import { Clients, SimulationResponse, Token, TokenByAddress, VaultData } from "@/lib/types";
 import { VaultAbi } from "@/lib/constants";
 import { Address, PublicClient } from "viem";
-import { FireEventArgs } from "@masa-finance/analytics-sdk";
 import { VaultRouterAbi } from "@/lib/constants/abi/VaultRouter";
 import { handleCallResult } from "@/lib/utils/helpers";
 import { networkMap } from "@/lib/utils/connectors";
@@ -25,7 +24,7 @@ interface VaultWriteProps {
       asset_amount,
       asset_ticker,
       additionalEventData,
-    }: FireEventArgs
+    }: any
   ) => Promise<void>;
   referral?: Address;
   tokensAtom: [{ [key: number]: TokenByAddress }, Function]

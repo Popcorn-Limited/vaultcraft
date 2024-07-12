@@ -1,5 +1,3 @@
-import { Dispatch } from "react";
-
 interface TabSelectorProps {
   activeTab: any;
   setActiveTab: Function;

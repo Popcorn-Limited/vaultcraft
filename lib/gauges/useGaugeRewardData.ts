@@ -21,6 +21,7 @@ export async function getRewardData(gauge: Address, chainId: number) {
   let rewardData = []
 
   if (rewardLogs.length > 0) {
+    // @ts-ignore
     rewardData = await client.multicall({
       contracts: rewardLogs.map(log => {
           return {

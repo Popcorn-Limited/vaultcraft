@@ -1,11 +1,11 @@
 import { Dispatch, FormEventHandler, SetStateAction, useMemo } from "react";
-import { useAccount, useBalance, useToken } from "wagmi";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import InputNumber from "@/components/input/InputNumber";
 import { calcUnlockTime, calculateVeOut } from "@/lib/gauges/utils";
-import { VCX_LP, ZERO } from "@/lib/constants";
-import { validateInput } from "@/lib/utils/helpers";
-import { formatEther } from "viem";
+import { handleMaxClick, validateInput } from "@/lib/utils/helpers";
+import { VCX_LP } from "@/lib/constants/addresses";
+import { useAtom } from "jotai";
+import { tokensAtom } from "@/lib/atoms";
 
 function LockTimeButton({
   label,
@@ -18,9 +18,8 @@ function LockTimeButton({
 }): JSX.Element {
   return (
     <button
-      className={`w-10 h-10 border border-customGray200 hover:bg-customNeutral200 rounded-lg ${
-        isActive ? "bg-white text-black" : "text-white"
-      }`}
+      className={`w-10 h-10 border border-customGray200 hover:bg-customNeutral200 rounded-lg ${isActive ? "bg-white text-black" : "text-white"
+        }`}
       onClick={() => handleClick()}
     >
       {label}
@@ -39,24 +38,9 @@ export default function LockVcxInterface({
   daysState,
   showLpModal,
 }: LockVcxInterfaceProps): JSX.Element {
-  const { address: account } = useAccount();
-  const { data: lpToken } = useToken({ chainId: 1, address: VCX_LP });
-  const { data: lpBal } = useBalance({
-    chainId: 1,
-    address: account,
-    token: VCX_LP,
-  });
-
+  const [tokens] = useAtom(tokensAtom);
   const [amount, setAmount] = amountState;
   const [days, setDays] = daysState;
-
-  const errorMessage = useMemo(() => {
-    return (Number(amount) || 0) > Number(lpBal?.formatted)
-      ? "* Balance not available"
-      : "";
-  }, [amount, lpBal?.formatted]);
-
-  const handleMaxClick = () => setAmount(formatEther(lpBal?.value || ZERO));
 
   const handleChangeInput: FormEventHandler<HTMLInputElement> = ({
     currentTarget: { value },
@@ -78,22 +62,17 @@ export default function LockVcxInterface({
         <p className="text-white font-semibold">Amount VCX-LP</p>
         <InputTokenWithError
           captionText={``}
-          onSelectToken={() => {}}
-          onMaxClick={handleMaxClick}
+          onSelectToken={() => { }}
+          onMaxClick={() => handleMaxClick(tokens[1][VCX_LP], setAmount)}
           chainId={1}
           value={String(amount)}
           onChange={handleChangeInput}
-          selectedToken={
-            {
-              ...lpToken,
-              name: "VCX-LP",
-              symbol: "VCX-LP",
-              decimals: 18,
-              price: 1,
-              balance: Number(lpBal?.value || 0),
-            } as any
+          selectedToken={tokens[1][VCX_LP]}
+          errorMessage={
+            Number(amount) > (tokens[1][VCX_LP].balance / 1e18)
+              ? "Insufficient Balance"
+              : ""
           }
-          errorMessage={errorMessage}
           allowInput
           tokenList={[]}
           getToken={() =>

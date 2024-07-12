@@ -1,16 +1,16 @@
 import {
   Address,
   Chain,
+  PublicClient,
   createPublicClient,
   getAddress,
   http,
   zeroAddress,
 } from "viem";
-import { PublicClient, mainnet } from "wagmi";
 import axios from "axios";
 import { VaultAbi } from "@/lib/constants/abi/Vault";
 import { LlamaApy, TokenByAddress, VaultData, VaultDataByAddress, VaultLabel } from "@/lib/types";
-import { ChildGaugeAbi, ERC20Abi, GaugeAbi, OptionTokenByChain, VCX, VCX_LP, VeTokenByChain, XVCXByChain, ZapAssetAddressesByChain, xLayer } from "@/lib/constants";
+import { ChildGaugeAbi, ERC20Abi, GaugeAbi, OptionTokenByChain, VCX, VCX_LP, VE_VCX, VeTokenByChain, XVCXByChain, ZapAssetAddressesByChain } from "@/lib/constants";
 import { RPC_URLS } from "@/lib/utils/connectors";
 import { YieldOptions } from "vaultcraft-sdk";
 import { AavePoolUiAbi } from "@/lib/constants/abi/Aave";
@@ -19,6 +19,8 @@ import { AavePoolAddressProviderByChain, AaveUiPoolProviderByChain } from "@/lib
 import getFraxlendApy from "@/lib/external/fraxlend/getFraxlendApy";
 import { prepareAssets, prepareVaults, addBalances, prepareGauges } from "@/lib/tokens";
 import getGaugesData from "@/lib/gauges/getGaugeData";
+import { mainnet, xLayer } from "viem/chains";
+
 
 const EMPTY_LLAMA_APY_ENTRY: LlamaApy = {
   apy: 0,
@@ -26,6 +28,7 @@ const EMPTY_LLAMA_APY_ENTRY: LlamaApy = {
   apyReward: 0,
   date: new Date(),
 }
+
 
 interface GetVaultsByChainProps {
   chain: Chain;
@@ -44,14 +47,22 @@ export default async function getTokenAndVaultsDataByChain({
   });
   const chainId = chain.id;
 
-  let vaultsData = await prepareVaultsData(chainId, client)
-  vaultsData = await addStrategyData(vaultsData, chainId, client, yieldOptions)
+  // Fetch vaults and strategy data from database
+  let vaultsData = await getInitialVaultsData(chainId, client)
+
+  // Add totalAssets, totalSupply, assetsPerShare and depositLimit
+  vaultsData = await addDynamicVaultsData(vaultsData, client)
+
+  // Add apyHist
+  vaultsData = await addApyHist(vaultsData)
+
+  // Add strategy data
+  vaultsData = await addStrategyData(vaultsData, chainId, client)
 
   // Create token array
   const uniqueAssetAdresses: Address[] = [...ZapAssetAddressesByChain[chainId]];
-  if (chainId === 1) uniqueAssetAdresses.push(...[VCX, VCX_LP])
+  if (chainId === 1) uniqueAssetAdresses.push(...[VCX, VCX_LP, VE_VCX])
   if (GAUGE_NETWORKS.includes(chainId)) uniqueAssetAdresses.push(...[OptionTokenByChain[chainId], VeTokenByChain[chainId], XVCXByChain[chainId]])
-
 
   // Add vault assets
   Object.values(vaultsData).forEach((vault) => {
@@ -59,7 +70,6 @@ export default async function getTokenAndVaultsDataByChain({
       uniqueAssetAdresses.push(vault.asset);
     }
   });
-
 
   // Add aave assets
   if (chainId !== xLayer.id) {
@@ -120,7 +130,7 @@ export default async function getTokenAndVaultsDataByChain({
   return { vaultsData: Object.values(vaultsData), tokens };
 }
 
-async function prepareVaultsData(chainId: number, client: PublicClient): Promise<VaultDataByAddress> {
+async function getInitialVaultsData(chainId: number, client: PublicClient): Promise<VaultDataByAddress> {
   const { data: allVaults } = await axios.get(
     `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/vaults/${chainId}.json`
   );
@@ -133,46 +143,8 @@ async function prepareVaultsData(chainId: number, client: PublicClient): Promise
     .filter((vault: any) => !hiddenVaults.includes(vault.address))
     .filter((vault: any) => vault.type !== "single-asset-lock-vault-v1")
 
-  const dynamicValues = await client.multicall({
-    contracts: filteredVaults
-      .map((vault: any) => {
-        return [
-          {
-            address: vault.address,
-            abi: VaultAbi,
-            functionName: "totalAssets"
-          },
-          {
-            address: vault.address,
-            abi: VaultAbi,
-            functionName: "totalSupply"
-          },
-          {
-            address: vault.address,
-            abi: VaultAbi,
-            functionName: "depositLimit"
-          },
-        ]
-      })
-      .flat(),
-    allowFailure: false,
-  });
-
-  const apyHistAll = await Promise.all(filteredVaults.map(async (vault: any) => {
-    if (vault.apyId.length > 0) return getApy(vault.apyId)
-    return []
-  }))
-
   let result: VaultDataByAddress = {};
   filteredVaults.forEach((vault: any, i: number) => {
-    const apyHist = apyHistAll[i]
-    if (i > 0) i = i * 3;
-
-    const totalAssets = Number(dynamicValues[i])
-    const totalSupply = Number(dynamicValues[i + 1])
-    const assetsPerShare =
-      totalSupply > 0 ? (totalAssets + 1) / (totalSupply + 1e9) : Number(1e-9);
-
     result[getAddress(vault.address)] = {
       address: getAddress(vault.address),
       vault: getAddress(vault.address),
@@ -180,14 +152,14 @@ async function prepareVaultsData(chainId: number, client: PublicClient): Promise
       gauge: getAddress(vault.gauge || zeroAddress),
       chainId: vault.chainId,
       fees: vault.fees,
-      totalAssets: totalAssets,
-      totalSupply: totalSupply,
-      assetsPerShare: assetsPerShare,
-      depositLimit: Number(dynamicValues[i + 2]),
+      totalAssets: 0,
+      totalSupply: 0,
+      assetsPerShare: 0,
+      depositLimit: 0,
       tvl: 0,
       apy: 0,
       totalApy: 0,
-      apyHist: apyHist,
+      apyHist: [],
       apyId: vault.apyId,
       gaugeData: undefined,
       metadata: {
@@ -219,6 +191,63 @@ async function prepareVaultsData(chainId: number, client: PublicClient): Promise
   return result
 }
 
+
+async function addDynamicVaultsData(vaults: VaultDataByAddress, client: PublicClient): Promise<VaultDataByAddress> {
+  // @ts-ignore
+  const dynamicValues = await client.multicall({
+    contracts: Object.values(vaults)
+      .map((vault: any) => {
+        return [
+          {
+            address: vault.address,
+            abi: VaultAbi,
+            functionName: "totalAssets"
+          },
+          {
+            address: vault.address,
+            abi: VaultAbi,
+            functionName: "totalSupply"
+          },
+          {
+            address: vault.address,
+            abi: VaultAbi,
+            functionName: "depositLimit"
+          },
+        ]
+      })
+      .flat(),
+    allowFailure: false,
+  });
+
+  Object.values(vaults).forEach((vault: any, i: number) => {
+    if (i > 0) i = i * 3;
+    const totalAssets = Number(dynamicValues[i]);
+    const totalSupply = Number(dynamicValues[i + 1]);
+
+    vaults[vault.address].totalAssets = totalAssets
+    vaults[vault.address].totalSupply = totalSupply
+    vaults[vault.address].depositLimit = Number(dynamicValues[i + 2])
+    vaults[vault.address].assetsPerShare = totalSupply > 0 ? totalAssets / totalSupply : Number(1)
+  })
+
+  return vaults;
+}
+
+
+async function addApyHist(vaults: VaultDataByAddress): Promise<VaultDataByAddress> {
+  const apyHistAll = await Promise.all(Object.values(vaults).map(async (vault: any) => {
+    if (vault.apyId.length > 0) return getApy(vault.apyId)
+    return []
+  }))
+
+  Object.values(vaults).forEach((vault: any, i: number) => {
+    vaults[vault.address].apyHist = apyHistAll[i]
+  })
+
+  return vaults
+}
+
+
 async function getCustomApy(address: Address, apyId: string, chainId: number): Promise<LlamaApy[]> {
   switch (apyId) {
     case "fraxlend":
@@ -239,7 +268,7 @@ async function getApy(apyId: string): Promise<LlamaApy[]> {
   }
 }
 
-export async function addStrategyData(vaults: VaultDataByAddress, chainId: number, client: PublicClient, yieldOptions: YieldOptions): Promise<VaultDataByAddress> {
+export async function addStrategyData(vaults: VaultDataByAddress, chainId: number, client: PublicClient): Promise<VaultDataByAddress> {
   const uniqueStrategyAdresses: Address[] = [];
   Object.values(vaults).forEach((vault) => {
     vault.strategies.forEach((strategy: any) => {
@@ -250,6 +279,7 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
   });
 
   // Get TotalAssets and TotalSupply
+  // @ts-ignore
   const taAndTs = await client.multicall({
     contracts: uniqueStrategyAdresses
       .map((address: Address) => {
@@ -283,19 +313,18 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
       const totalAssets = Number(taAndTs[i]);
       const totalSupply = Number(taAndTs[i + 1]);
       const assetsPerShare =
-        totalSupply > 0 ? (totalAssets + 1) / (totalSupply + 1e9) : Number(1e-9);
+        totalSupply > 0 ? totalAssets / totalSupply : Number(1);
 
       const desc = strategyDescriptions[address]
       let apy = 0;
       let apyHist: LlamaApy[] = []
-      let strategyApy
+
       try {
-        strategyApy = desc.apySource === "custom" ? await getCustomApy(address, desc.apyId, chainId) : await getApy(desc.apyId)
+        const strategyApy = desc.apySource === "custom" ? await getCustomApy(address, desc.apyId, chainId) : await getApy(desc.apyId)
         apy = strategyApy[strategyApy.length - 1].apy;
         apyHist = strategyApy;
       } catch (e) {
-        console.log(strategyApy)
-        console.log(`ERROR FETCHING APY: ${address}`)
+        console.log(`ERROR FETCHING APY: ${address} - ${desc.apySource}=${desc.apyId}`)
         console.log(e)
       }
 
@@ -368,7 +397,7 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
 
       n += 1
     })
-    
+
     // assign apy
     vaults[address].apy = apy;
     vaults[address].totalApy = apy;

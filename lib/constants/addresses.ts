@@ -1,8 +1,6 @@
 import { Address, zeroAddress } from "viem";
 import { AddressByChain } from "@/lib/types";
-import { mainnet } from "wagmi";
-import { arbitrum, aurora, avalanche, bsc, fantom, optimism, polygon } from "viem/chains";
-import { xLayer } from "./customChains";
+import { mainnet, arbitrum, aurora, avalanche, bsc, fantom, optimism, polygon, xLayer } from "viem/chains";
 
 export const VCX: Address = "0xcE246eEa10988C495B4A90a905Ee9237a0f91543";
 export const VCX_LP: Address = "0x577A7f7EE659Aa14Dc16FD384B3F8078E23F1920";
@@ -68,6 +66,13 @@ export const OptionTokenByChain: AddressByChain = {
   [optimism.id]: "0xD41d34d6b50785fDC025caD971fE940B8AA1bE45",
   [arbitrum.id]: "0x59a696bF34Eae5AD8Fd472020e3Bed410694a230"
 }
+
+export const WrappedOptionTokenByChain: AddressByChain = {
+  [mainnet.id]: "0x1AaAFe03A8a2E93A399DbCE03F88Bbaff1b08D60",
+  [optimism.id]: "0xAe5CbB42F0Afa59B90769df4b4c6D623896E4573",
+  [arbitrum.id]: "0xaF33642938172011f711bA530acc900Ae17620A7"
+}
+
 
 export const XVCXByChain: AddressByChain = {
   [mainnet.id]: "0x18445923592be303fbd3BC164ee685C7457051b4",

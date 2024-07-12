@@ -1,6 +1,5 @@
 import { ProtocolName } from "vaultcraft-sdk";
-import { Address } from "viem";
-import { PublicClient, WalletClient } from "wagmi";
+import { Address, PublicClient, WalletClient } from "viem";
 
 export type Token = {
   address: Address;
@@ -158,7 +157,8 @@ export type RewardApy = {
 export type TokenReward = {
   address: Address;
   emissions: number;
-  emissionsValue: number
+  emissionsValue: number;
+  apy: number;
 }
 
 export type ClaimableReward = {

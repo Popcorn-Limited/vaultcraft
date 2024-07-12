@@ -1,5 +1,4 @@
-import { Address, createPublicClient, http } from "viem";
-import { erc20ABI } from "wagmi";
+import { Address, createPublicClient, erc20Abi, http } from "viem";
 import { TokenByAddress } from "@/lib/types";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 
@@ -25,7 +24,7 @@ export default async function mutateTokenBalance({
     contracts: tokensToUpdate.map(address => {
       return {
         address,
-        abi: erc20ABI,
+        abi: erc20Abi,
         functionName: "balanceOf",
         args: [account],
       }

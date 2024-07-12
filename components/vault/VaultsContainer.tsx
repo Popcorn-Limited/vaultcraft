@@ -45,13 +45,6 @@ export default function VaultsContainer({
   const [tokens] = useAtom(tokensAtom)
   const [gaugeRewards] = useAtom(gaugeRewardsAtom)
 
-  const { data: oBal } = useBalance({
-    chainId: 1,
-    address: account,
-    token: OptionTokenByChain[1],
-    watch: true,
-  });
-
   const [selectedNetworks, selectNetwork] = useNetworkFilter(
     SUPPORTED_NETWORKS.map((network) => network.id)
   );
@@ -65,136 +58,141 @@ export default function VaultsContainer({
 
   return (
     <NoSSR >
-      <Modal visibility={[showOptionTokenModal, setShowOptionTokenModal]}>
-        <OptionTokenInterface />
-      </Modal>
-      <OptionTokenExerciseModal show={[showExerciseModal, setShowExerciseModal]} />
-      <section className="md:border-b border-customNeutral100 md:flex md:flex-row items-center justify-between py-10 px-4 md:px-8 md:gap-4">
-        <div className="w-full md:w-max">
-          <h1 className="text-5xl font-normal m-0 mb-4 md:mb-2 leading-0 text-white md:text-3xl leading-none">
-            Smart Vaults
-          </h1>
-          <p className="text-customGray100 md:text-white md:opacity-80">
-            Automate your returns in single-asset deposit yield strategies.
-          </p>
-        </div>
-
-        <div className="w-full lg:justify-end lg:w-8/12 md:divide-x md:flex md:flex-row space-y-4 md:space-y-0 mt-4 md:mt-0">
-          <div className="flex flex-row items-center md:pr-10 gap-10 md:w-fit">
-            <div className="w-[120px] md:w-max">
-              <LargeCardStat
-                id="total-tvl"
-                label="TVL"
-                value={`$${NumberFormatter.format(tvl.vault)}`}
-                tooltip="Total value locked (TVL) is the amount of user funds deposited in Smart Vaults."
-              />
+      {Object.keys(tokens).length > 0 ?
+        <>
+          <Modal visibility={[showOptionTokenModal, setShowOptionTokenModal]}>
+            <OptionTokenInterface />
+          </Modal>
+          <OptionTokenExerciseModal show={[showExerciseModal, setShowExerciseModal]} />
+          <section className="md:border-b border-customNeutral100 md:flex md:flex-row items-center justify-between py-10 px-4 md:px-8 md:gap-4">
+            <div className="w-full md:w-max">
+              <h1 className="text-5xl font-normal m-0 mb-4 md:mb-2 leading-0 text-white md:text-3xl leading-none">
+                Smart Vaults
+              </h1>
+              <p className="text-customGray100 md:text-white md:opacity-80">
+                Automate your returns in single-asset deposit yield strategies.
+              </p>
             </div>
 
-            <div className="w-[120px] md:w-max">
-              <LargeCardStat
-                id="total-deposits"
-                label="Deposits"
-                value={`$${NumberFormatter.format(networth.vault)}`}
-                tooltip="Value of your smart vault deposits across all blockchains."
-              />
-            </div>
-          </div>
-
-          <div className="flex flex-row items-center md:gap-6 md:w-fit md:pl-12">
-            <div className="flex gap-10 w-fit">
-              <div className="w-[120px] md:w-max">
-                <LargeCardStat
-                  id="total-my-ovcx"
-                  label="My oVCX"
-                  value={`$${oBal && tokens[1] && tokens[1][VCX]
-                    ? NumberFormatter.format(
-                      (Number(oBal?.value) / 1e18) * (tokens[1][VCX].price * 0.25)
-                    )
-                    : "0"
-                    }`}
-                  tooltip="Value of oVCX held in your wallet across all blockchains."
-                />
-
-              </div>
-
-              <div className="w-[120px] md:w-max">
-                <LargeCardStat
-                  id="total-claimable-ovcx"
-                  label="Claimable oVCX"
-                  value={`$${gaugeRewards && tokens[1] && tokens[1][VCX]
-                    ? NumberFormatter.format(
-                      (Number(gaugeRewards?.[1]?.total + gaugeRewards?.[10]?.total + gaugeRewards?.[42161]?.total || 0) / 1e18) *
-                      (tokens[1][VCX].price * 0.25)
-                    )
-                    : "0"
-                    }`}
-                  tooltip="Cumulative value of claimable oVCX from vaults across all blockchains."
-                />
-              </div>
-            </div>
-
-            <div className="hidden md:flex flex-row items-center w-100 space-x-4">
-              <MainActionButton
-                label="Claim oVCX"
-                handleClick={() => setShowOptionTokenModal(true)}
-              />
-              <SecondaryActionButton
-                label="Exercise oVCX"
-                handleClick={() => setShowExerciseModal(true)}
-              />
-            </div>
-          </div>
-          <div className="md:hidden space-y-4">
-            <MainActionButton
-              label="Claim oVCX"
-              handleClick={() => setShowOptionTokenModal(true)}
-            />
-            <SecondaryActionButton
-              label="Exercise oVCX"
-              handleClick={() => setShowExerciseModal(true)}
-            />
-          </div>
-        </div>
-      </section>
-
-      <section className="my-10 px-4 md:px-8 md:flex flex-row items-center justify-between">
-        <NetworkFilter
-          supportedNetworks={SUPPORTED_NETWORKS.map((chain) => chain.id)}
-          selectNetwork={selectNetwork}
-        />
-        <div className="flex flex-row space-x-4 mt-4">
-          <SearchBar searchTerm={searchTerm} handleSearch={handleSearch} />
-          <VaultsSorting className="" vaultState={[vaults, setVaults]} />
-        </div>
-      </section>
-
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-4 px-4 md:px-8">
-        {vaults.length > 0 ? (
-          <>
-            {vaults
-              .filter((vault) => selectedNetworks.includes(vault.chainId))
-              .filter((vault) =>
-                Object.keys(displayVaults).length > 0
-                  ? displayVaults[vault.chainId].includes(vault.address)
-                  : !hiddenVaults[vault.chainId].includes(vault.address)
-              )
-              .sort((a, b) => b.tvl - a.tvl)
-              .map((vault) => {
-                return (
-                  <SmartVault
-                    key={`sv-${vault.address}-${vault.chainId}`}
-                    vaultData={vault}
-                    searchTerm={searchTerm}
-                    description={showDescription ? vault.metadata.description : undefined}
+            <div className="w-full lg:justify-end lg:w-8/12 md:divide-x md:flex md:flex-row space-y-4 md:space-y-0 mt-4 md:mt-0">
+              <div className="flex flex-row items-center md:pr-10 gap-10 md:w-fit">
+                <div className="w-[120px] md:w-max">
+                  <LargeCardStat
+                    id="total-tvl"
+                    label="TVL"
+                    value={`$${NumberFormatter.format(tvl.vault)}`}
+                    tooltip="Total value locked (TVL) is the amount of user funds deposited in Smart Vaults."
                   />
-                )
-              })
-            }
-          </>
-        ) : (
-          <p className="text-white">Loading Vaults...</p>
-        )}
-      </section>
+                </div>
+
+                <div className="w-[120px] md:w-max">
+                  <LargeCardStat
+                    id="total-deposits"
+                    label="Deposits"
+                    value={`$${NumberFormatter.format(networth.vault)}`}
+                    tooltip="Value of your smart vault deposits across all blockchains."
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-row items-center md:gap-6 md:w-fit md:pl-12">
+                <div className="flex gap-10 w-fit">
+                  <div className="w-[120px] md:w-max">
+                    <LargeCardStat
+                      id="total-my-ovcx"
+                      label="My oVCX"
+                      value={`$${tokens[1][OptionTokenByChain[1]].balance && tokens[1] && tokens[1][VCX]
+                        ? NumberFormatter.format(
+                          (tokens[1][OptionTokenByChain[1]].balance / 1e18) * (tokens[1][VCX].price * 0.25)
+                        )
+                        : "0"
+                        }`}
+                      tooltip="Value of oVCX held in your wallet across all blockchains."
+                    />
+
+                  </div>
+
+                  <div className="w-[120px] md:w-max">
+                    <LargeCardStat
+                      id="total-claimable-ovcx"
+                      label="Claimable oVCX"
+                      value={`$${gaugeRewards && tokens[1] && tokens[1][VCX]
+                        ? NumberFormatter.format(
+                          (Number(gaugeRewards?.[1]?.total + gaugeRewards?.[10]?.total + gaugeRewards?.[42161]?.total || 0) / 1e18) *
+                          (tokens[1][VCX].price * 0.25)
+                        )
+                        : "0"
+                        }`}
+                      tooltip="Cumulative value of claimable oVCX from vaults across all blockchains."
+                    />
+                  </div>
+                </div>
+
+                <div className="hidden md:flex flex-row items-center w-100 space-x-4">
+                  <MainActionButton
+                    label="Claim oVCX"
+                    handleClick={() => setShowOptionTokenModal(true)}
+                  />
+                  <SecondaryActionButton
+                    label="Exercise oVCX"
+                    handleClick={() => setShowExerciseModal(true)}
+                  />
+                </div>
+              </div>
+              <div className="md:hidden space-y-4">
+                <MainActionButton
+                  label="Claim oVCX"
+                  handleClick={() => setShowOptionTokenModal(true)}
+                />
+                <SecondaryActionButton
+                  label="Exercise oVCX"
+                  handleClick={() => setShowExerciseModal(true)}
+                />
+              </div>
+            </div>
+          </section>
+
+          <section className="my-10 px-4 md:px-8 md:flex flex-row items-center justify-between">
+            <NetworkFilter
+              supportedNetworks={SUPPORTED_NETWORKS.map((chain) => chain.id)}
+              selectNetwork={selectNetwork}
+            />
+            <div className="flex flex-row space-x-4 mt-4">
+              <SearchBar searchTerm={searchTerm} handleSearch={handleSearch} />
+              <VaultsSorting className="" vaultState={[vaults, setVaults]} />
+            </div>
+          </section>
+
+          <section className="grid grid-cols-1 md:grid-cols-3 gap-4 px-4 md:px-8">
+            {vaults.length > 0 ? (
+              <>
+                {vaults
+                  .filter((vault) => selectedNetworks.includes(vault.chainId))
+                  .filter((vault) =>
+                    Object.keys(displayVaults).length > 0
+                      ? displayVaults[vault.chainId].includes(vault.address)
+                      : !hiddenVaults[vault.chainId].includes(vault.address)
+                  )
+                  .sort((a, b) => b.tvl - a.tvl)
+                  .map((vault) => {
+                    return (
+                      <SmartVault
+                        key={`sv-${vault.address}-${vault.chainId}`}
+                        vaultData={vault}
+                        searchTerm={searchTerm}
+                        description={showDescription ? vault.metadata.description : undefined}
+                      />
+                    )
+                  })
+                }
+              </>
+            ) : (
+              <p className="text-white">Loading Vaults...</p>
+            )}
+          </section>
+        </>
+        : <p className="text-white">Loading...</p>
+      }
     </NoSSR >
   )
 }

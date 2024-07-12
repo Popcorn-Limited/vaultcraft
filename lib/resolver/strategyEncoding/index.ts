@@ -1,10 +1,9 @@
-import { Address } from "viem";
+import { Address, PublicClient } from "viem";
 import {
   balancerLpCompounder,
   curveCompounder,
   curveStargateCompounder,
 } from "@/lib/resolver/strategyEncoding/resolver";
-import { PublicClient } from "wagmi";
 
 export type StrategyEncodingResolverParams = {
   chainId: number;

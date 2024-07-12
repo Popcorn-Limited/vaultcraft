@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Address, useAccount } from "wagmi";
+import { useAccount } from "wagmi";
 import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
 import AssetWithName from "@/components/vault/AssetWithName";
@@ -11,6 +11,7 @@ import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import { roundToTwoDecimalPlaces } from "@/lib/utils/helpers";
 import { useAtom } from "jotai";
 import { tokensAtom } from "@/lib/atoms";
+import { Address } from "viem";
 
 interface GaugeProps {
   vaultData: VaultData;

@@ -41,13 +41,12 @@ export default function VaultStats({
         value={`$ ${account
           ?
           `${!!gauge ?
-            NumberFormatter.format(((gauge.balance * gauge.price) / 10 ** gauge.decimals) + ((vault?.balance! * vault?.price!) / 10 ** vault?.decimals!))
+            NumberFormatter.format(((gauge.balance * gauge.price) / 10 ** gauge?.decimals!) + ((vault?.balance! * vault?.price!) / 10 ** vault?.decimals!))
             : formatAndRoundNumber(vault?.balance! * vault?.price!, vault?.decimals!)
-          }`
-          : "0"}`}
+          }` : "0"}`}
         secondaryValue={`${!!gauge ?
-          NumberFormatter.format(((gauge.balance) / 10 ** gauge.decimals) + ((vault?.balance!) / 10 ** vault?.decimals!))
-          : formatAndRoundNumber(vault?.balance!, vault?.decimals!)
+          NumberFormatter.format((gauge.balance * vaultData.assetsPerShare / (10 ** asset.decimals)) + (vault?.balance! * vaultData.assetsPerShare / (10 ** asset.decimals)))
+          : formatAndRoundNumber(vault?.balance! * vaultData.assetsPerShare, asset?.decimals!)
           } ${asset.symbol}`}
         tooltip="Value of your vault deposits"
       />
@@ -87,13 +86,12 @@ export default function VaultStats({
           label="Reward APR"
           value={`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData?.gaugeData?.rewardApy.apy))} %`}
           tooltipChild={
-            <div className="w-28">
+            <div className="w-42">
               <p className="font-bold">Annual Rewards</p>
               {vaultData.gaugeData?.rewardApy.rewards
-                .filter(reward => reward.address !== "0x9d2F299715D94d8A7E6F5eaa8E654E8c74a988A7"
-                  && reward.address !== "0x10393c20975cF177a3513071bC110f7962CD67da")
+                .filter(reward => reward.emissions > 0)
                 .map(reward =>
-                  <p key={reward.address}>{NumberFormatter.format(reward.emissions)} {tokens[vaultData.chainId][reward.address].symbol}</p>
+                  <p key={reward.address}>{NumberFormatter.format(reward.emissions)} {tokens[vaultData.chainId][reward.address].symbol} | ${NumberFormatter.format(reward.emissionsValue)} | {NumberFormatter.format(roundToTwoDecimalPlaces(reward.apy))}%</p>
                 )}
             </div>
           }

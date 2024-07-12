@@ -1,7 +1,6 @@
-import { Address } from "viem";
+import { Address, PublicClient } from "viem";
 import axios from "axios";
-import { PublicClient, mainnet } from "wagmi";
-import { arbitrum, optimism } from "viem/chains";
+import { arbitrum, mainnet, optimism } from "viem/chains";
 import { Clients } from "@/lib/types";
 import { showLoadingToast, showSuccessToast } from "@/lib/toasts";
 import { handleCallResult, simulateCall } from "@/lib/utils/helpers";

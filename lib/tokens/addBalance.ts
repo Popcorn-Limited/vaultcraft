@@ -1,6 +1,5 @@
-import { Address, PublicClient } from "viem"
+import { Address, PublicClient, erc20Abi } from "viem"
 import { Token, TokenByAddress } from "@/lib/types"
-import { erc20ABI } from "wagmi"
 
 export async function addBalances(tokens: TokenByAddress, account: Address, client: PublicClient): Promise<TokenByAddress> {
   const balances = await client.multicall({
@@ -9,7 +8,7 @@ export async function addBalances(tokens: TokenByAddress, account: Address, clie
         .map((token: Token) => {
           return {
             address: token.address,
-            abi: erc20ABI,
+            abi: erc20Abi,
             functionName: "balanceOf",
             args: [account]
           }

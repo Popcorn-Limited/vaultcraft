@@ -22,8 +22,8 @@ export async function beefy({
   address,
 }: StrategyDefaultResolverParams): Promise<any[]> {
   const network = transformNetwork(
-    SUPPORTED_NETWORKS.find((chain) => chain.id === chainId)?.network
-  );
+    SUPPORTED_NETWORKS.find((chain) => chain.id === chainId)?.name
+  ).toLowerCase();
 
   const vaults = (await (
     await fetch(`https://api.beefy.finance/vaults/${network}`)
