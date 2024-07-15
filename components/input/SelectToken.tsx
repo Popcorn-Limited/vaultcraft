@@ -29,10 +29,10 @@ export default function SelectToken({
   return (
     <>
       {/* Desktop Token Search */}
-      <div className="hidden md:block">
+      <div className="">
         <Modal
           visibility={[show, setShow]}
-          classNames="hidden md:block md:w-fit md:min-w-fit"
+          classNames="md:w-fit md:min-w-fit"
           title={<h2 className="text-white text-2xl">Select a token</h2>}
         >
           <div className="mt-8">
@@ -101,7 +101,7 @@ export default function SelectToken({
         </span>
       </div>
       {/* Mobile Token Search */}
-      <div className="fixed z-100 left-0 md:hidden">
+      {/* <div className="fixed z-100 left-0 md:hidden">
         <PopUpModal
           visible={show}
           onClosePopUpModal={() => setShow(false)}
@@ -120,7 +120,7 @@ export default function SelectToken({
             selectedToken={selectedToken}
           />
         </PopUpModal>
-      </div>
+      </div> */}
     </>
   );
 }

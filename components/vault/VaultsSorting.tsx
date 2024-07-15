@@ -27,11 +27,6 @@ export default function VaultsSorting({
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const isLessThenMdScreenSize = useMemo(
-    () => window.innerWidth < 1024,
-    [window.innerWidth]
-  );
-
   function sortVaults(sortType: VAULT_SORTING_TYPE) {
     setVaults(sort(sortType, vaults));
     setSortingType(sortType);
@@ -74,7 +69,7 @@ export default function VaultsSorting({
           size={"21px"}
         />
       </button>
-      {openFilter && !isLessThenMdScreenSize && (
+      {openFilter && (
         <div
           ref={dropdownRef}
           className="hidden md:block absolute w-[180px] p-2 border border-customGray500 top-16 bg-customNeutral300 rounded-lg right-0"
@@ -89,11 +84,10 @@ export default function VaultsSorting({
                             transition 
                             ease-in-out 
                             duration-250 
-                            ${
-                              sortingType === VAULT_SORTING_TYPE.mostTvl
-                                ? "bg-customNeutral100"
-                                : "bg-customNeutral300"
-                            }
+                            ${sortingType === VAULT_SORTING_TYPE.mostTvl
+                ? "bg-customNeutral100"
+                : "bg-customNeutral300"
+              }
                         `}
             onClick={() => sortVaults(VAULT_SORTING_TYPE.mostTvl)}
           >
@@ -108,11 +102,10 @@ export default function VaultsSorting({
                             transition 
                             ease-in-out 
                             duration-250
-                            ${
-                              sortingType === VAULT_SORTING_TYPE.lessTvl
-                                ? "bg-customNeutral100"
-                                : "bg-customNeutral300"
-                            }
+                            ${sortingType === VAULT_SORTING_TYPE.lessTvl
+                ? "bg-customNeutral100"
+                : "bg-customNeutral300"
+              }
                         `}
             onClick={() => sortVaults(VAULT_SORTING_TYPE.lessTvl)}
           >
@@ -127,11 +120,10 @@ export default function VaultsSorting({
                             transition 
                             ease-in-out 
                             duration-250
-                            ${
-                              sortingType === VAULT_SORTING_TYPE.mostvAPR
-                                ? "bg-customNeutral100"
-                                : "bg-customNeutral300"
-                            }
+                            ${sortingType === VAULT_SORTING_TYPE.mostvAPR
+                ? "bg-customNeutral100"
+                : "bg-customNeutral300"
+              }
                         `}
             onClick={() => sortVaults(VAULT_SORTING_TYPE.mostvAPR)}
           >
@@ -147,11 +139,10 @@ export default function VaultsSorting({
                             transition 
                             ease-in-out 
                             duration-250
-                            ${
-                              sortingType === VAULT_SORTING_TYPE.lessvAPR
-                                ? "bg-customNeutral100"
-                                : "bg-customNeutral300"
-                            }
+                            ${sortingType === VAULT_SORTING_TYPE.lessvAPR
+                ? "bg-customNeutral100"
+                : "bg-customNeutral300"
+              }
                         `}
             onClick={() => sortVaults(VAULT_SORTING_TYPE.lessvAPR)}
           >
@@ -159,42 +150,40 @@ export default function VaultsSorting({
           </button>
         </div>
       )}
-      {isLessThenMdScreenSize && (
-        <div className="no-select-dot absolute left-0 block md:hidden">
-          <PopUpModal
-            visible={openFilter}
-            onClosePopUpModal={() => setOpenSorting(false)}
-          >
-            <>
-              <p className="text-white mb-3 text-center">
-                Select a sorting type
-              </p>
-              <div className="space-y-4 w-full">
-                <PseudoRadioButton
-                  label="Most TVL"
-                  handleClick={() => sortVaults(VAULT_SORTING_TYPE.mostTvl)}
-                  isActive={sortingType === VAULT_SORTING_TYPE.mostTvl}
-                />
-                <PseudoRadioButton
-                  label="Less TVL"
-                  handleClick={() => sortVaults(VAULT_SORTING_TYPE.lessTvl)}
-                  isActive={sortingType === VAULT_SORTING_TYPE.lessTvl}
-                />
-                <PseudoRadioButton
-                  label="Most vAPR"
-                  handleClick={() => sortVaults(VAULT_SORTING_TYPE.mostvAPR)}
-                  isActive={sortingType === VAULT_SORTING_TYPE.mostvAPR}
-                />
-                <PseudoRadioButton
-                  label="Less vAPR"
-                  handleClick={() => sortVaults(VAULT_SORTING_TYPE.lessvAPR)}
-                  isActive={sortingType === VAULT_SORTING_TYPE.lessvAPR}
-                />
-              </div>
-            </>
-          </PopUpModal>
-        </div>
-      )}
+      <div className="no-select-dot absolute left-0 block md:hidden">
+        <PopUpModal
+          visible={openFilter}
+          onClosePopUpModal={() => setOpenSorting(false)}
+        >
+          <>
+            <p className="text-white mb-3 text-center">
+              Select a sorting type
+            </p>
+            <div className="space-y-4 w-full">
+              <PseudoRadioButton
+                label="Most TVL"
+                handleClick={() => sortVaults(VAULT_SORTING_TYPE.mostTvl)}
+                isActive={sortingType === VAULT_SORTING_TYPE.mostTvl}
+              />
+              <PseudoRadioButton
+                label="Less TVL"
+                handleClick={() => sortVaults(VAULT_SORTING_TYPE.lessTvl)}
+                isActive={sortingType === VAULT_SORTING_TYPE.lessTvl}
+              />
+              <PseudoRadioButton
+                label="Most vAPR"
+                handleClick={() => sortVaults(VAULT_SORTING_TYPE.mostvAPR)}
+                isActive={sortingType === VAULT_SORTING_TYPE.mostvAPR}
+              />
+              <PseudoRadioButton
+                label="Less vAPR"
+                handleClick={() => sortVaults(VAULT_SORTING_TYPE.lessvAPR)}
+                isActive={sortingType === VAULT_SORTING_TYPE.lessvAPR}
+              />
+            </div>
+          </>
+        </PopUpModal>
+      </div>
     </div>
   );
 }
