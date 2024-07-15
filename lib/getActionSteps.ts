@@ -21,6 +21,15 @@ export function getSmartVaultActionSteps(
   action: SmartVaultActionType
 ): ActionStep[] {
   switch (action) {
+    case SmartVaultActionType.Preview: 
+      return [
+        {
+          step: 1,
+          label: "Preview",
+          ...BaseStepInfo,
+          updateBalance: false
+        }
+      ];
     case SmartVaultActionType.Deposit:
       return [
         {

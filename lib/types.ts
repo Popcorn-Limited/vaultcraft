@@ -170,6 +170,7 @@ export type ClaimableReward = {
 }
 
 export enum SmartVaultActionType {
+  Preview,
   Deposit,
   Withdrawal,
   Stake,
