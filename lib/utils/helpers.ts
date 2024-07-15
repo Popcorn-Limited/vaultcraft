@@ -48,11 +48,11 @@ export async function handleCallResult({
       await sendMessageToDiscord({
         chainId: clients.publicClient.chain?.id ?? 0,
         target: simulationResponse.request.address ?? "0x",
-        user: simulationResponse.request.account ?? "0x",
+        user: simulationResponse.request.account.address ?? "0x",
         isSimulation: false,
         method: simulationResponse.request.functionName ?? "",
         reason: error.shortMessage ?? "",
-        args: [...simulationResponse.request.args],
+        args: simulationResponse.request.args ? [...simulationResponse.request.args] : [],
       });
 
       showErrorToast(error.shortMessage);
@@ -211,7 +211,6 @@ export async function simulateCall({
     });
     return { request: request, success: true, error: null };
   } catch (error: any) {
-    console.log({ simError: error });
     await sendMessageToDiscord({
       chainId: publicClient.chain?.id ?? 0,
       target: contract.address,
