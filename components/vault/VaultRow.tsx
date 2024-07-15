@@ -8,20 +8,21 @@ import {
 } from "@/lib/utils/formatBigNumber";
 import type { Token, VaultData } from "@/lib/types";
 import { tokensAtom } from "@/lib/atoms";
-import { cn, roundToTwoDecimalPlaces } from "@/lib/utils/helpers";
+import { cn } from "@/lib/utils/helpers";
 import { useRouter } from "next/router";
 import AssetWithName from "@/components/common/AssetWithName";
 import { useEffect, useState } from "react";
 import { WithTooltip } from "@/components/common/Tooltip";
-import { OptionTokenByChain } from "@/lib/constants";
 
 export default function VaultRow({
   searchTerm,
+  link,
   ...vaultData
 }: VaultData & {
   searchTerm?: string;
+  link: string;
 }) {
-  const { query, ...router } = useRouter();
+  const { ...router } = useRouter();
 
   const {
     asset: assetAddress,
@@ -78,13 +79,7 @@ export default function VaultRow({
   if (!vaultData || !asset || !vault || Object.keys(tokens).length === 0) return <></>;
   return (
     <tr
-      onClick={() => {
-        router.push(
-          !!query?.ref && isAddress(query.ref as string)
-            ? `/vaults/${vaultData.vault}?chainId=${vaultData.chainId}&ref=${query.ref}`
-            : `/vaults/${vaultData.vault}?chainId=${vaultData.chainId}`
-        );
-      }}
+      onClick={() => router.push(link)}
       role="button"
       className={cn(
         "border-b cursor-pointer hover:bg-customNeutral200/80 border-customNeutral100",

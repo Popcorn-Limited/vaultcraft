@@ -170,11 +170,11 @@ export default function Index() {
 
           {vaultData
             ? <VaultHero vaultData={vaultData} asset={asset} vault={vault} gauge={gauge} showClaim={false} />
-            : <section className="md:border-b border-customNeutral100 pt-10 pb-6 px-4 md:px-8 "></section>
+            : <section className="md:border-b border-customNeutral100 pt-10 pb-6 px-4 md:px-0 "></section>
           }
 
           {vaultData.gauge && (
-            <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-8 text-white">
+            <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-0 text-white">
               <h2 className="text-white font-bold text-2xl">
                 Manage Gauge Rewards
               </h2>
@@ -182,8 +182,7 @@ export default function Index() {
             </section>
           )}
 
-
-          <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-8 text-white">
+          <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-0 text-white">
             <div className="grid md:grid-cols-2 mb-12">
               <ApyChart strategy={vaultData.strategies[0]} />
               <NetFlowChart logs={logs} asset={asset} />

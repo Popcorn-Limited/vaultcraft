@@ -12,27 +12,29 @@ import { TiArrowUnsorted } from "react-icons/ti";
 import VaultRow from "./VaultRow";
 import { VAULT_SORTING_TYPE, sort } from "./VaultsSorting";
 import { WithTooltip } from "@/components/common/Tooltip";
+import { useRouter } from "next/router";
+import { isAddress } from "viem";
 
 export default function VaultsTable({
   vaults,
   searchTerm,
+  manage,
   onSearchTermChange,
   onSelectNetwork,
 }: {
   vaults: VaultData[];
   searchTerm: string;
+  manage?: boolean;
   onSearchTermChange: (searchTerm: string) => void;
   onSelectNetwork: (chainId: ChainId) => void;
 }): JSX.Element {
+  const { query } = useRouter();
+
   const [sorting, setSorting] = useState<VAULT_SORTING_TYPE>(
     VAULT_SORTING_TYPE.mostTvl
   );
-
   const [showSearchInput, setShowSearchInput] = useState(false);
-
   const SHOW_INPUT_SEARCH = showSearchInput || searchTerm.length > 0;
-
-  console.log(vaults)
 
   return (
     <section className="text-white mt-12 w-full border rounded-xl overflow-hidden border-customNeutral100">
@@ -149,6 +151,12 @@ export default function VaultsTable({
             <VaultRow
               {...vaultData}
               searchTerm={searchTerm}
+              link={manage ?
+                `/manage/vaults/${vaultData.vault}?chainId=${vaultData.chainId}`
+                : !!query?.ref && isAddress(query.ref as string)
+                  ? `/vaults/${vaultData.vault}?chainId=${vaultData.chainId}&ref=${query.ref}`
+                  : `/vaults/${vaultData.vault}?chainId=${vaultData.chainId}`
+              }
               key={`item-${i}`}
             />
           ))}

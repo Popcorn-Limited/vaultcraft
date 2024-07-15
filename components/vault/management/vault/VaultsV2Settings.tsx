@@ -1,5 +1,5 @@
 import TabSelector from "@/components/common/TabSelector";
-import { AdminProxyByChain, MultiStrategyVaultAbi, VaultAbi, VaultControllerByChain } from "@/lib/constants";
+import { AdminProxyByChain, MultiStrategyVaultAbi, MultiStrategyVaultV2Abi, VaultAbi, VaultControllerByChain } from "@/lib/constants";
 import { VaultData, VaultV1Settings } from "@/lib/types";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 import { useEffect, useState } from "react";
@@ -15,17 +15,16 @@ import VaultTakeFees from "@/components/vault/management/vault/Fees";
 import VaultPausing from "@/components/vault/management/vault/Pausing";
 
 const DEFAULT_TABS = [
+  "Rebalance",
   "Strategy",
   "Deposit Limit",
-  "Pausing",
-  "Fee Configuration",
-  "Fee Recipient",
+  "Pausing"
 ];
 
 function getMulticalls(vault: VaultData) {
   const vaultContract = {
     address: vault.address,
-    abi: vault.strategies.length > 1 ? MultiStrategyVaultAbi : VaultAbi,
+    abi: MultiStrategyVaultV2Abi,
   };
   const result = [
     {
@@ -115,13 +114,13 @@ async function getVaultSettings(vault: VaultData,): Promise<VaultV1Settings> {
   };
 }
 
-export default function VaultsV1Settings({ vaultData }: { vaultData: VaultData, }): JSX.Element {
+export default function VaultsV2Settings({ vaultData }: { vaultData: VaultData, }): JSX.Element {
   const { address: account } = useAccount();
   const [settings, setSettings] = useState<VaultV1Settings>();
   const [callAddress, setCallAddress] = useState<Address>();
 
   const [availableTabs, setAvailableTabs] = useState<string[]>(DEFAULT_TABS);
-  const [tab, setTab] = useState<string>("Strategy");
+  const [tab, setTab] = useState<string>("Rebalance");
 
   useEffect(() => {
     getVaultSettings(vaultData).then(res => {
@@ -132,19 +131,6 @@ export default function VaultsV1Settings({ vaultData }: { vaultData: VaultData, 
       );
       setSettings(res);
     });
-
-    let tabs = DEFAULT_TABS
-    if (vaultData.metadata.type !== "multi-strategy-vault-v1") {
-      tabs.push("Take Fees")
-    }
-
-    if (vaultData.strategies.length > 1) {
-      tabs = ["Rebalance", ...tabs]
-      setAvailableTabs(tabs)
-      setTab("Rebalance");
-    } else {
-      setAvailableTabs(tabs);
-    }
   }, [vaultData]);
 
 

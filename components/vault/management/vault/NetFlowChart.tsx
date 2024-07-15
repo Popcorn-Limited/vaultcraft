@@ -142,7 +142,7 @@ export default function NetFlowChart({ logs, asset }: { logs: any[], asset?: Tok
           : <></>
         }
       </Modal>
-      <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-8">
+      <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-0">
         <h3 className="text-white font-bold text-xl">Vault In- and Outflows</h3>
         <div className="flex flex-row items-end px-12 pt-4 pb-4 space-x-4 text-white">
           <div>

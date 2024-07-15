@@ -30,11 +30,13 @@ import LargeCardStat from "@/components/common/LargeCardStat";
 interface VaultsContainerProps {
   hiddenVaults: AddressesByChain;
   displayVaults: AddressesByChain;
+  manage?: boolean;
 }
 
 export default function VaultsContainer({
   hiddenVaults,
   displayVaults,
+  manage
 }: VaultsContainerProps): JSX.Element {
   const [vaultsData] = useAtom(vaultsAtom);
   const [vaults, setVaults] = useState<VaultData[]>([]);
@@ -194,6 +196,7 @@ export default function VaultsContainer({
                 : !hiddenVaults[vault.chainId].includes(vault.address)
             )}
           searchTerm={searchTerm}
+          manage={manage}
           onSearchTermChange={setSearchTerm}
           onSelectNetwork={selectNetwork}
         />

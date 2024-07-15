@@ -107,7 +107,7 @@ export default function ApyChart({ strategy }: { strategy: Strategy }): JSX.Elem
 
   return (
     <>
-      <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-8">
+      <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-0">
         <h3 className="text-white font-bold text-xl">Vault APY</h3>
         <div className="flex flex-row items-end px-12 pt-4 pb-4 space-x-4 text-white">
           <div>
