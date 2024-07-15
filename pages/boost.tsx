@@ -60,9 +60,6 @@ function VePopContainer() {
 
   const [weeklyEmissions, setWeeklyEmissions] = useState<number>(0)
 
-  const [initalLoad, setInitalLoad] = useState<boolean>(false);
-  const [accountLoad, setAccountLoad] = useState<boolean>(false);
-
   const [vaults, setVaults] = useAtom(vaultsAtom);
   const [gaugeVaults, setGaugeVaults] = useState<VaultData[]>([])
   const [initialVotes, setInitialVotes] = useState<{ [key: Address]: number }>(
@@ -84,19 +81,18 @@ function VePopContainer() {
 
   useEffect(() => {
     async function initialSetup() {
-      setInitalLoad(true);
-      if (account) setAccountLoad(true);
-
       const _hiddenGauges = await getHiddenGauges();
       setHiddenGauges(_hiddenGauges);
 
       const vaultsWithGauges = Object.values(vaults).flat().filter((vault) => vault.gauge !== zeroAddress)
       setGaugeVaults(vaultsWithGauges);
 
-      const rate = await createPublicClient({
+      const client = await createPublicClient({
         chain: mainnet,
         transport: http(RPC_URLS[1]),
-      }).readContract({
+      })
+
+      const rate = await client.readContract({
         address: TOKEN_ADMIN,
         abi: TokenAdminAbi,
         functionName: "rate",
@@ -104,42 +100,34 @@ function VePopContainer() {
       // Emissions per second * seconds per week
       setWeeklyEmissions((Number(rate) / 1e18) * 604800)
 
-      if (
-        vaultsWithGauges.length > 0 &&
-        Object.keys(votes).length === 0 &&
-        chain?.id === 1
-      ) {
+      const initialVotes: { [key: Address]: number } = {};
+      const voteUserSlopesData = await voteUserSlopes({
+        gaugeAddresses: vaultsWithGauges?.map(
+          (vault: VaultData) => vault.gauge as Address
+        ),
+        publicClient: client,
+        account: account as Address,
+      });
+      vaultsWithGauges.forEach((vault, index) => {
+        initialVotes[vault.gauge as Address] = Number(
+          voteUserSlopesData[index].power
+        );
+      });
+      setInitialVotes(initialVotes);
+      setVotes(initialVotes);
 
-        const initialVotes: { [key: Address]: number } = {};
-        const voteUserSlopesData = await voteUserSlopes({
-          gaugeAddresses: vaultsWithGauges?.map(
-            (vault: VaultData) => vault.gauge as Address
-          ),
-          publicClient: publicClient!,
-          account: account as Address,
-        });
-        vaultsWithGauges.forEach((vault, index) => {
-          initialVotes[vault.gauge as Address] = Number(
-            voteUserSlopesData[index].power
-          );
-        });
-        setInitialVotes(initialVotes);
-        setVotes(initialVotes);
-
-        const voteData_ = await hasAlreadyVoted({
-          addresses: vaultsWithGauges?.map(
-            (vault: VaultData) => vault.gauge as Address
-          ),
-          publicClient: publicClient!,
-          account: account as Address,
-        });
-        setVoteData(voteData_);
-        setCanCastVote(!!account && tokens[1][VE_VCX].balance > 0);
-      }
+      const voteData_ = await hasAlreadyVoted({
+        addresses: vaultsWithGauges?.map(
+          (vault: VaultData) => vault.gauge as Address
+        ),
+        publicClient: client,
+        account: account as Address,
+      });
+      setVoteData(voteData_);
+      setCanCastVote(!!account && tokens[1][VE_VCX].balance > 0);
     }
-    if (!account && !initalLoad && Object.keys(tokens).length > 0 && Object.keys(vaults).length > 0) initialSetup();
-    if (account && !accountLoad && Object.keys(tokens).length > 0 && Object.keys(vaults).length > 0) initialSetup();
-  }, [account, initalLoad, accountLoad, vaults]);
+    if (Object.keys(tokens).length > 0 && Object.keys(vaults).length > 0) initialSetup();
+  }, [account, vaults]);
 
   function handleVotes(val: number, index: Address) {
     const updatedVotes = { ...votes };
@@ -280,7 +268,7 @@ function VePopContainer() {
             <p className="mt-1">
               Voting power used:{" "}
               <span className="font-bold">
-                {tokens[1][VE_VCX].balance && Object.keys(votes).length > 0
+                {Object.keys(tokens).length > 0 && Object.keys(votes).length > 0
                   ? (
                     Object.values(votes).reduce((a, b) => a + b, 0) / 100
                   ).toFixed(2)
