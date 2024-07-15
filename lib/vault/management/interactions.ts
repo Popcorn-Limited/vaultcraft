@@ -361,8 +361,8 @@ export async function unpauseVault({
     simulationResponse: await simulateCall({
       account: account as Address,
       contract: getSimulationContract(address, vaultData.chainId),
-      functionName: "unpauseVaults",
-      args: [[vaultData.address]],
+      functionName,
+      args,
       publicClient: clients.publicClient
     }),
     clients

@@ -18,6 +18,7 @@ import NetFlowChart from "@/components/vault/management/vault/NetFlowChart";
 import VaultHero from "@/components/vault/VaultHero";
 import RewardsSection from "@/components/vault/management/vault/RewardsSection";
 import VaultsV1Settings from "@/components/vault/management/vault/VaultsV1Settings";
+import VaultsV2Settings from "@/components/vault/management/vault/VaultsV2Settings";
 
 async function getLogs(vault: VaultData, asset: Token) {
   const client = createPublicClient({
@@ -247,7 +248,7 @@ export default function Index() {
           </section>
 
           {vaultData.metadata.type === "multi-strategy-vault-v2"
-            ? <></>
+            ? <VaultsV2Settings vaultData={vaultData} />
             : <VaultsV1Settings vaultData={vaultData} />
           }
 

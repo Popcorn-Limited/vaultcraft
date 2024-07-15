@@ -28,7 +28,7 @@ export default function VaultStrategyConfiguration({
   return (
     <>
       <div className="flex flex-row justify-center">
-        <div className="w-1/2">
+        <div className="w-full">
           <p className="text-customGray500">
             Change the strategy used by this vault. The new strategy MUST use
             the same asset as the current and it MUST adhere to the ERC-4626 standard.

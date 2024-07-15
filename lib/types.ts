@@ -304,3 +304,14 @@ export type VaultV1Settings = {
   accruedFees: number;
   owner: Address;
 }
+
+export type VaultV2Settings = {
+  proposedStrategies: Address[];
+  proposedStrategyTime: number;
+  withdrawalQueue:number[];
+  proposedWithdrawalQueue:number[];
+  depositIndex: number;
+  proposedDepositIndex: number;
+  paused: boolean;
+  owner: Address;
+}

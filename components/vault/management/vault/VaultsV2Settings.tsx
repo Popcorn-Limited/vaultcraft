@@ -1,22 +1,19 @@
 import TabSelector from "@/components/common/TabSelector";
-import { AdminProxyByChain, MultiStrategyVaultAbi, MultiStrategyVaultV2Abi, VaultAbi, VaultControllerByChain } from "@/lib/constants";
-import { VaultData, VaultV1Settings } from "@/lib/types";
+import { MultiStrategyVaultV2Abi } from "@/lib/constants";
+import { VaultData, VaultV2Settings } from "@/lib/types";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 import { useEffect, useState } from "react";
-import { createPublicClient, http, Address } from "viem";
+import { createPublicClient, http } from "viem";
 import { useAccount } from "wagmi";
 import VaultRebalance from "@/components/vault/management/vault/Rebalance";
-import VaultStrategiesConfiguration from "@/components/vault/management/vault/Strategies";
-import VaultStrategyConfiguration from "@/components/vault/management/vault/Strategy";
-import VaultFeeConfiguration from "@/components/vault/management/vault/FeeConfiguration";
-import VaultFeeRecipient from "@/components/vault/management/vault/FeeRecipient";
 import VaultDepositLimit from "@/components/vault/management/vault/DepositLimit";
-import VaultTakeFees from "@/components/vault/management/vault/Fees";
 import VaultPausing from "@/components/vault/management/vault/Pausing";
 
 const DEFAULT_TABS = [
   "Rebalance",
   "Strategy",
+  "Withdrawal Queue",
+  "Deposit Index",
   "Deposit Limit",
   "Pausing"
 ];
@@ -26,14 +23,30 @@ function getMulticalls(vault: VaultData) {
     address: vault.address,
     abi: MultiStrategyVaultV2Abi,
   };
-  const result = [
+  return [
     {
       ...vaultContract,
-      functionName: "proposedFees",
+      functionName: "getProposedStrategies",
     },
     {
       ...vaultContract,
-      functionName: "proposedFeeTime",
+      functionName: "proposedStrategyTime",
+    },
+    {
+      ...vaultContract,
+      functionName: "getWithdrawalQueue",
+    },
+    {
+      ...vaultContract,
+      functionName: "getProposedWithdrawalQueue",
+    },
+    {
+      ...vaultContract,
+      functionName: "depositIndex",
+    },
+    {
+      ...vaultContract,
+      functionName: "proposedDepositIndex",
     },
     {
       ...vaultContract,
@@ -41,51 +54,12 @@ function getMulticalls(vault: VaultData) {
     },
     {
       ...vaultContract,
-      functionName: "balanceOf",
-      args: [vault.metadata.feeRecipient],
-    },
-    {
-      ...vaultContract,
-      functionName: "accruedManagementFee",
-    },
-    {
-      ...vaultContract,
-      functionName: "accruedPerformanceFee",
-    },
-    {
-      ...vaultContract,
       functionName: "owner",
-    },
+    }
   ];
-
-  if (vault.strategies.length > 1) {
-    return [
-      {
-        ...vaultContract,
-        functionName: "getProposedStrategies",
-      },
-      {
-        ...vaultContract,
-        functionName: "proposedStrategyTime",
-      },
-      ...result,
-    ];
-  } else {
-    return [
-      {
-        ...vaultContract,
-        functionName: "proposedAdapter",
-      },
-      {
-        ...vaultContract,
-        functionName: "proposedAdapterTime",
-      },
-      ...result,
-    ];
-  }
 }
 
-async function getVaultSettings(vault: VaultData,): Promise<VaultV1Settings> {
+async function getVaultSettings(vault: VaultData): Promise<VaultV2Settings> {
   const client = createPublicClient({
     chain: ChainById[vault.chainId],
     transport: http(RPC_URLS[vault.chainId]),
@@ -98,39 +72,25 @@ async function getVaultSettings(vault: VaultData,): Promise<VaultV1Settings> {
   });
 
   return {
-    proposedStrategies: vault.strategies.length > 1 ? res[0] : [res[0]],
+    proposedStrategies: res[0],
     proposedStrategyTime: Number(res[1]),
-    proposedFees: {
-      deposit: Number(res[2][0]),
-      withdrawal: Number(res[2][1]),
-      management: Number(res[2][2]),
-      performance: Number(res[2][3]),
-    },
-    proposedFeeTime: Number(res[3]),
-    paused: res[4],
-    feeBalance: Number(res[5]),
-    accruedFees: Number(res[6]) + Number(res[7]),
-    owner: res[8],
+    withdrawalQueue: res[2],
+    proposedWithdrawalQueue: res[3],
+    depositIndex: Number(res[4]),
+    proposedDepositIndex: Number(res[5]),
+    paused: res[6],
+    owner: res[7],
   };
 }
 
 export default function VaultsV2Settings({ vaultData }: { vaultData: VaultData, }): JSX.Element {
   const { address: account } = useAccount();
-  const [settings, setSettings] = useState<VaultV1Settings>();
-  const [callAddress, setCallAddress] = useState<Address>();
+  const [settings, setSettings] = useState<VaultV2Settings>();
 
-  const [availableTabs, setAvailableTabs] = useState<string[]>(DEFAULT_TABS);
   const [tab, setTab] = useState<string>("Rebalance");
 
   useEffect(() => {
-    getVaultSettings(vaultData).then(res => {
-      setCallAddress(
-        res.owner === AdminProxyByChain[vaultData.chainId]
-          ? VaultControllerByChain[vaultData.chainId]
-          : vaultData.address
-      );
-      setSettings(res);
-    });
+    getVaultSettings(vaultData).then(res => setSettings(res));
   }, [vaultData]);
 
 
@@ -143,11 +103,11 @@ export default function VaultsV2Settings({ vaultData }: { vaultData: VaultData, 
       <h2 className="text-white font-bold text-2xl">Vault Settings</h2>
       <TabSelector
         className="mt-6 mb-12"
-        availableTabs={availableTabs}
+        availableTabs={DEFAULT_TABS}
         activeTab={tab}
         setActiveTab={changeTab}
       />
-      {settings && callAddress ? (
+      {settings ? (
         <div>
           {tab === "Rebalance" && (
             <VaultRebalance
@@ -156,59 +116,31 @@ export default function VaultsV2Settings({ vaultData }: { vaultData: VaultData, 
           )}
           {tab === "Strategy" && (
             <>
-              {vaultData.strategies.length > 1 ? (
-                <VaultStrategiesConfiguration
-                  vaultData={vaultData}
-                  proposedStrategies={settings.proposedStrategies}
-                  proposedStrategyTime={settings.proposedStrategyTime}
-                  callAddress={callAddress}
-                  disabled={account !== vaultData.metadata.creator}
-                />
-              ) : (
-                <VaultStrategyConfiguration
-                  vaultData={vaultData}
-                  proposedStrategies={settings.proposedStrategies}
-                  proposedStrategyTime={settings.proposedStrategyTime}
-                  callAddress={callAddress}
-                  disabled={account !== vaultData.metadata.creator}
-                />
-              )}
+
             </>
           )}
-          {tab === "Fee Configuration" && (
-            <VaultFeeConfiguration
-              vaultData={vaultData}
-              proposedFeeTime={settings.proposedFeeTime}
-              callAddress={callAddress}
-              disabled={account !== vaultData.metadata.creator}
-            />
+          {tab === "Withdrawal Queue" && (
+            <>
+
+            </>
           )}
-          {tab === "Fee Recipient" && (
-            <VaultFeeRecipient
-              vaultData={vaultData}
-              callAddress={callAddress}
-              disabled={account !== vaultData.metadata.creator}
-            />
+          {tab === "Deposit Index" && (
+            <>
+
+            </>
           )}
           {tab === "Deposit Limit" && (
             <VaultDepositLimit
               vaultData={vaultData}
-              callAddress={callAddress}
+              callAddress={vaultData.address}
               disabled={account !== vaultData.metadata.creator}
-            />
-          )}
-          {tab === "Take Fees" && (
-            <VaultTakeFees
-              vaultData={vaultData}
-              accruedFees={settings.accruedFees}
-              callAddress={callAddress}
             />
           )}
           {tab === "Pausing" && (
             <VaultPausing
               vaultData={vaultData}
               paused={settings.paused}
-              callAddress={callAddress}
+              callAddress={vaultData.address}
               disabled={account !== vaultData.metadata.creator}
             />
           )}
