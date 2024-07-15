@@ -8,6 +8,8 @@ import {
 import { useEffect, useState } from "react";
 import {
   Address,
+  createPublicClient,
+  http,
   zeroAddress,
 } from "viem";
 import { VoteData, hasAlreadyVoted } from "@/lib/gauges/hasAlreadyVoted";
@@ -34,6 +36,8 @@ import ResponsiveTooltip from "@/components/common/Tooltip";
 import BoostVaultsTable from "@/components/boost/BoostVaultsTable";
 import BoostVaultCard from "@/components/boost/BoostVaultCard";
 import useWeeklyEmissions from "@/lib/gauges/useWeeklyEmissions";
+import { mainnet } from "viem/chains";
+import { RPC_URLS } from "@/lib/utils/connectors";
 
 export const GAUGE_NETWORKS = [1, 10, 42161];
 
@@ -63,7 +67,7 @@ function VePopContainer() {
 
   const weeklyEmissions = useWeeklyEmissions();
 
-  const [vaults, setVaults] = useAtom(vaultsAtom);
+  const [vaults] = useAtom(vaultsAtom);
   const [gaugeVaults, setGaugeVaults] = useState<VaultData[]>([])
   const [initialVotes, setInitialVotes] = useState<{ [key: Address]: number }>(
     {}
@@ -96,14 +100,6 @@ function VePopContainer() {
         chain: mainnet,
         transport: http(RPC_URLS[1]),
       })
-
-      const rate = await client.readContract({
-        address: TOKEN_ADMIN,
-        abi: TokenAdminAbi,
-        functionName: "rate",
-      });
-      // Emissions per second * seconds per week
-      setWeeklyEmissions((Number(rate) / 1e18) * 604800)
 
       const initialVotes: { [key: Address]: number } = {};
       const voteUserSlopesData = await voteUserSlopes({
