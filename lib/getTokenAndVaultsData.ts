@@ -125,7 +125,7 @@ export default async function getTokenAndVaultsDataByChain({
 
   // add gauge data
   if (Object.keys(gauges).length > 0) {
-    vaultsData = await addGaugeData(vaultsData, tokens, account, chainId)
+    vaultsData = await addGaugeData(vaultsData, assets, gauges, account, chainId)
   }
 
   return { vaultsData: Object.values(vaultsData), tokens };
@@ -407,8 +407,8 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
   return vaults
 }
 
-async function addGaugeData(vaultsData: VaultDataByAddress, tokens: TokenByAddress, account: Address, chainId: number): Promise<VaultDataByAddress> {
-  const gaugesData = await getGaugesData({ vaultsData, tokens, account, chainId });
+async function addGaugeData(vaultsData: VaultDataByAddress, assets: TokenByAddress, gauges: TokenByAddress, account: Address, chainId: number): Promise<VaultDataByAddress> {
+  const gaugesData = await getGaugesData({ vaultsData, assets, account, chainId, veToken: assets[VeTokenByChain[chainId]], gauges, addUserData: true });
 
   gaugesData.forEach(gaugeData => {
     const vault = vaultsData[gaugeData.vault]

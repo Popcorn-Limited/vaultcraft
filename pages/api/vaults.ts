@@ -237,7 +237,7 @@ export default async function handler(
     // Get gaugesData for gauge and reward apy
     const gaugesData = await getGaugesData({
         vaultsData,
-        tokens: tokens,
+        assets: tokens,
         account: zeroAddress,
         chainId: chainId
     })
