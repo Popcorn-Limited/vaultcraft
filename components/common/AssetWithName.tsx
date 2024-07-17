@@ -109,7 +109,7 @@ export default function AssetWithName({
           protocolName={
             vault.strategies.length > 1
               ? "Multistrategy"
-              : vault.strategies[0].metadata.name
+              : vault.strategies[0].metadata.protocol
           }
           tooltip={{
             id: tooltipId,

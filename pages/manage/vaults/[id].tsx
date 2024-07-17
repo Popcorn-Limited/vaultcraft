@@ -150,7 +150,7 @@ export default function Index() {
 
   return (
     <NoSSR>
-      {vaultData ? (
+      {vaultData && asset && vault ? (
         <div className="min-h-screen">
           <button
             className="border border-customGray500 rounded-lg flex flex-row items-center px-4 py-2 ml-4 md:ml-0 mt-10"
@@ -169,10 +169,7 @@ export default function Index() {
             <p className="text-white leading-0 mt-1 ml-2">Back to Vaults</p>
           </button>
 
-          {vaultData
-            ? <VaultHero vaultData={vaultData} asset={asset} vault={vault} gauge={gauge} showClaim={false} />
-            : <section className="md:border-b border-customNeutral100 pt-10 pb-6 px-4 md:px-0 "></section>
-          }
+          <VaultHero vaultData={vaultData} asset={asset} vault={vault} gauge={gauge} showClaim={false} />
 
           {vaultData.gauge && (
             <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-0 text-white">

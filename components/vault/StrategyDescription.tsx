@@ -3,6 +3,9 @@ import CardStat from "@/components/common/CardStat";
 import { NumberFormatter, formatAndRoundNumber } from "@/lib/utils/formatBigNumber";
 import { roundToTwoDecimalPlaces } from "@/lib/utils/helpers";
 import { Strategy, Token } from "@/lib/types";
+import { showSuccessToast } from "@/lib/toasts";
+import CopyToClipboard from "react-copy-to-clipboard";
+import { Square2StackIcon } from "@heroicons/react/24/outline";
 
 export default function StrategyDescription({ strategy, asset, i, stratLen }: { strategy: Strategy, asset: Token, i: number, stratLen: number }) {
   return <div
@@ -10,13 +13,14 @@ export default function StrategyDescription({ strategy, asset, i, stratLen }: { 
   >
     <div className="w-max flex flex-row items-center mb-2">
       <img
-        src={IconByProtocol[strategy.metadata.name] || "/images/tokens/vcx.svg"}
+        src={IconByProtocol[strategy.metadata.protocol] || "/images/tokens/vcx.svg"}
         className={`h-7 w-7 mr-2 mb-1.5 rounded-full border border-white`}
       />
       <h2 className="text-2xl font-bold text-white">
-        {strategy.metadata.name}
+        {strategy.metadata.protocol} - {strategy.metadata.name}
       </h2>
     </div>
+
     <p className='text-white'>
       {strategy.metadata.description && strategy.metadata.description?.split("-LINK- ").length > 1 ?
         <>{strategy.metadata.description?.split("-LINK- ")[0]}{" "}
@@ -29,6 +33,12 @@ export default function StrategyDescription({ strategy, asset, i, stratLen }: { 
         View on <a href={`https://defillama.com/yields/pool/${strategy.apyId}`} target="_blank" className="text-secondaryBlue">Defillama</a>
       </p>
     }
+    <div className='flex flex-row items-center'>
+      <p className="text-white">{strategy.address.slice(0, 6)}...{strategy.address.slice(-4)}</p>
+      <CopyToClipboard text={strategy.address} onCopy={() => showSuccessToast("Strategy address copied!")}>
+        <Square2StackIcon className="w-4 h-4 ml-1 mb-0.5 cursor-pointer text-white hover:text-primaryYellow" />
+      </CopyToClipboard>
+    </div>
     <div className="mt-2 md:flex md:flex-row md:items-center">
       <CardStat
         id={`${strategy.resolver}-${i}-allocation`}

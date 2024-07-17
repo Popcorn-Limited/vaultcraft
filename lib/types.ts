@@ -80,6 +80,7 @@ export type Strategy = {
 
 type StrategyMetadata = {
   name: string;
+  protocol: string;
   description: string;
 }
 
@@ -308,8 +309,8 @@ export type VaultV1Settings = {
 export type VaultV2Settings = {
   proposedStrategies: Address[];
   proposedStrategyTime: number;
-  withdrawalQueue:number[];
-  proposedWithdrawalQueue:number[];
+  withdrawalQueue: number[];
+  proposedWithdrawalQueue: number[];
   depositIndex: number;
   proposedDepositIndex: number;
   paused: boolean;

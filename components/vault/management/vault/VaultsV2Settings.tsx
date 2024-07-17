@@ -8,6 +8,10 @@ import { useAccount } from "wagmi";
 import VaultRebalance from "@/components/vault/management/vault/Rebalance";
 import VaultDepositLimit from "@/components/vault/management/vault/DepositLimit";
 import VaultPausing from "@/components/vault/management/vault/Pausing";
+import VaultDepositIndex from "@/components/vault/management/vault/DepositIndex";
+import { tokensAtom } from "@/lib/atoms";
+import { useAtom } from "jotai";
+import VaultWithdrawalQueue from "./WithdrawalQueue";
 
 const DEFAULT_TABS = [
   "Rebalance",
@@ -85,6 +89,7 @@ async function getVaultSettings(vault: VaultData): Promise<VaultV2Settings> {
 
 export default function VaultsV2Settings({ vaultData }: { vaultData: VaultData, }): JSX.Element {
   const { address: account } = useAccount();
+  const [tokens] = useAtom(tokensAtom)
   const [settings, setSettings] = useState<VaultV2Settings>();
 
   const [tab, setTab] = useState<string>("Rebalance");
@@ -107,7 +112,7 @@ export default function VaultsV2Settings({ vaultData }: { vaultData: VaultData, 
         activeTab={tab}
         setActiveTab={changeTab}
       />
-      {settings ? (
+      {Object.keys(tokens).length > 0 && settings ? (
         <div>
           {tab === "Rebalance" && (
             <VaultRebalance
@@ -120,14 +125,20 @@ export default function VaultsV2Settings({ vaultData }: { vaultData: VaultData, 
             </>
           )}
           {tab === "Withdrawal Queue" && (
-            <>
-
-            </>
+            <VaultWithdrawalQueue
+              vaultData={vaultData}
+              asset={tokens[vaultData.chainId][vaultData.asset]}
+              withdrawalQueue={settings.withdrawalQueue}
+              disabled={account !== vaultData.metadata.creator}
+            />
           )}
           {tab === "Deposit Index" && (
-            <>
-
-            </>
+            <VaultDepositIndex
+              vaultData={vaultData}
+              asset={tokens[vaultData.chainId][vaultData.asset]}
+              depositIndex={settings.depositIndex}
+              disabled={account !== vaultData.metadata.creator}
+            />
           )}
           {tab === "Deposit Limit" && (
             <VaultDepositLimit

@@ -328,14 +328,16 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
         console.log(`ERROR FETCHING APY: ${address} - ${desc.apySource}=${desc.apyId}`)
         console.log(e)
       }
+      const descriptionSplit = desc.description.split("** - ");
 
       strategies[address] = {
         totalAssets,
         totalSupply,
         assetsPerShare,
         asset: desc.asset,
-        name: desc.name,
-        description: desc.description.split("** - ")[1],
+        name: descriptionSplit[0],
+        protocol: desc.name,
+        description: descriptionSplit[1],
         resolver: desc.resolver,
         apy,
         apyHist,
@@ -376,7 +378,8 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
       vaults[address].strategies[i] = {
         address: strategy.address,
         metadata: {
-          name: strategyData.name,
+          name: strategyData.name.replace("**", ""),
+          protocol: strategyData.protocol,
           description: strategyData.description,
         },
         resolver: strategyData.resolver,
