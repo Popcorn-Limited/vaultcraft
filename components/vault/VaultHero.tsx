@@ -19,13 +19,18 @@ export default function VaultHero({
   showClaim = false,
 }: {
   vaultData: VaultData;
-  asset?: Token;
-  vault?: Token;
+  asset: Token;
+  vault: Token;
   gauge?: Token;
   showClaim?: boolean;
 }): JSX.Element {
   const [tokens] = useAtom(tokensAtom);
   const boost = ((vaultData.gaugeData?.workingBalance! / (gauge?.balance || 0)) * 5) || 1
+  const walletValue = ((asset.balance * asset.price) / (10 ** asset.decimals))
+  let depositValue = (vault.balance * vault.price) / (10 ** vault.decimals)
+  if (gauge) {
+    depositValue += (gauge.balance * gauge.price) / (10 ** gauge.decimals)
+  }
 
   return (
     <section className="md:border-b border-customNeutral100 pt-10 pb-6 px-4 md:px-0 ">
@@ -39,20 +44,8 @@ export default function VaultHero({
             <LargeCardStat
               id={"wallet"}
               label="Your Wallet"
-              value={
-                asset
-                  ? `$ ${NumberFormatter.format(
-                    (asset.balance * asset.price) / 10 ** asset.decimals
-                  )}`
-                  : "$ 0"
-              }
-              secondaryValue={
-                asset
-                  ? `$ ${NumberFormatter.format(
-                    asset.balance / 10 ** asset.decimals
-                  )} ${asset.symbol}`
-                  : "0 TKN"
-              }
+              value={walletValue < 1 ? "$ 0" : `$ ${formatTwoDecimals(walletValue)}`}
+              secondaryValue={walletValue < 1 ? `0 ${asset.symbol}` : `$ ${formatTwoDecimals(asset.balance / 10 ** asset.decimals)} ${asset.symbol}`}
               tooltip="Value of deposit assets held in your wallet"
             />
           </div>
@@ -60,15 +53,10 @@ export default function VaultHero({
             <LargeCardStat
               id={"deposits"}
               label="Deposits"
-              value={vaultData ?
-                `$ ${!!gauge ?
-                  NumberFormatter.format(((gauge.balance * gauge.price) / 10 ** gauge?.decimals!) + ((vault?.balance! * vault?.price!) / 10 ** vault?.decimals!))
-                  : formatAndRoundNumber(vault?.balance! * vault?.price!, vault?.decimals!)
-                }` : "0"}
-              secondaryValue={`${!!gauge ?
-                NumberFormatter.format((gauge.balance * vaultData.assetsPerShare / (10 ** asset?.decimals!)) + (vault?.balance! * vaultData.assetsPerShare / (10 ** asset?.decimals!)))
-                : formatAndRoundNumber(vault?.balance! * vaultData.assetsPerShare, asset?.decimals!)
-                } ${asset?.symbol!}`}
+              value={depositValue < 1 ? "$ 0" : `$ ${NumberFormatter.format(depositValue)}`}
+              secondaryValue={depositValue < 1 ? "$ 0" : `${!!gauge ?
+                NumberFormatter.format(((gauge.balance) / 10 ** gauge.decimals) + ((vault?.balance!) / 10 ** vault?.decimals!))
+                : formatAndRoundNumber(vault?.balance!, vault?.decimals!)} ${asset.symbol}`}
               tooltip="Value of your vault deposits"
             />
           </div>

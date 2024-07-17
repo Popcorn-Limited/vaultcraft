@@ -64,7 +64,7 @@ export default function Index() {
 
   return <NoSSR>
     {
-      (vaultData && tokenOptions.length > 0) ? (
+      (vaultData && asset && vault && tokenOptions.length > 0) ? (
         <>
           <ManageLoanInterface visibilityState={[showLoanManagementModal, setShowLoanManagementModal]} vaultData={vaultData} />
           <div className="min-h-screen">
@@ -79,10 +79,7 @@ export default function Index() {
               <p className="text-white leading-0 mt-1 ml-2">Back to Vaults</p>
             </button>
 
-            {vaultData
-              ? <VaultHero vaultData={vaultData} asset={asset} vault={vault} gauge={gauge} showClaim />
-              : <section className="md:border-b border-customNeutral100 pt-10 pb-6 px-4 md:px-0 "></section>
-            }
+            <VaultHero vaultData={vaultData} asset={asset} vault={vault} gauge={gauge} showClaim />
 
             <section className="w-full md:flex md:flex-row md:justify-between md:space-x-8 py-10 px-4 md:px-0">
               <div className="w-full md:w-1/3">
@@ -99,7 +96,7 @@ export default function Index() {
               </div>
 
               <div className="w-full md:w-2/3 mt-8 md:mt-0 space-y-4">
-                {gauge && gauge?.balance > 0 && Object.keys(tokens).length > 0 &&
+                {gauge && gauge?.balance > 0 && Object.keys(tokens).length > 0 && (vaultData.gaugeData?.lowerAPR || 0) > 0 &&
                   <UserBoostSection vaultData={vaultData} gauge={gauge} veToken={tokens[vaultData.chainId][VeTokenByChain[vaultData.chainId]]} />
                 }
 
@@ -180,16 +177,15 @@ export default function Index() {
 
                 <div className="bg-customNeutral200 p-6 rounded-lg">
                   <p className="text-white text-2xl font-bold">Strategies</p>
-                  {asset &&
-                    vaultData.strategies.map((strategy, i) =>
-                      <StrategyDescription
-                        key={`${strategy.resolver}-${i}`}
-                        strategy={strategy}
-                        asset={asset}
-                        i={i}
-                        stratLen={vaultData.strategies.length}
-                      />
-                    )}
+                  {vaultData.strategies.map((strategy, i) =>
+                    <StrategyDescription
+                      key={`${strategy.resolver}-${i}`}
+                      strategy={strategy}
+                      asset={asset}
+                      i={i}
+                      stratLen={vaultData.strategies.length}
+                    />
+                  )}
                 </div>
               </div>
             </section>
