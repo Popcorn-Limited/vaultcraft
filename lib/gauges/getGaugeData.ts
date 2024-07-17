@@ -2,7 +2,7 @@ import { Address, PublicClient, createPublicClient, erc20Abi, http, zeroAddress 
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 import { ChildGaugeAbi, GaugeAbi, VCX, } from "@/lib/constants";
 import { vcx as getVcxPrice } from "@/lib/resolver/price/resolver";
-import { GaugeData, RewardApy, TokenByAddress, VaultDataByAddress } from "@/lib/types";
+import { GaugeData, RewardApy, Token, TokenByAddress, VaultDataByAddress } from "@/lib/types";
 import { thisPeriodTimestamp } from "./utils";
 import { mainnet } from "viem/chains";
 
@@ -21,6 +21,8 @@ const gaugeTypeToChainId: { [id: number]: number } = {
 
 const CHILD_GAUGE_TYPES: number[] = [3, 4];
 
+const TOKENLESS_PRODUCTION = 20
+
 const clientByChainId: { [id: number]: PublicClient } = {
   1: createPublicClient({
     chain: ChainById[1],
@@ -36,36 +38,46 @@ const clientByChainId: { [id: number]: PublicClient } = {
   }),
 };
 
+interface GaugeDataInputs {
+  vaultsData: VaultDataByAddress;
+  assets: TokenByAddress;
+  account: Address;
+  chainId: number;
+  veToken?: Token;
+  gauges?: TokenByAddress;
+  addUserData?: boolean;
+}
+
 export default async function getGaugesData({
   vaultsData,
-  tokens,
+  assets,
   account,
-  chainId
-}: {
-  vaultsData: VaultDataByAddress,
-  tokens: TokenByAddress,
-  account: Address,
-  chainId: number
-}): Promise<GaugeData[]> {
+  chainId,
+  veToken,
+  gauges,
+  addUserData = false,
+}: GaugeDataInputs): Promise<GaugeData[]> {
+  // addUserData requires veToken and gauge
+  if (addUserData && (!veToken || !gauges)) return []
+
   const vcxPriceInUsd = await getVcxPrice({ address: VCX, chainId: mainnet.id, client: undefined });
   const ovcxPrice = vcxPriceInUsd * 0.25;
 
   return chainId === mainnet.id ?
-    getMainnetGaugesData({ vaultsData, tokens, account, ovcxPrice }) :
-    getChildGaugesData({ vaultsData, tokens, account, chainId, ovcxPrice });
+    getMainnetGaugesData({ vaultsData, assets, account, chainId: 1, veToken, gauges, addUserData, ovcxPrice }) :
+    getChildGaugesData({ vaultsData, assets, account, chainId, veToken, gauges, addUserData, ovcxPrice });
 }
 
 async function getMainnetGaugesData({
   vaultsData,
-  tokens,
+  assets,
   account,
+  chainId,
+  veToken,
+  gauges,
+  addUserData,
   ovcxPrice
-}: {
-  vaultsData: VaultDataByAddress,
-  tokens: TokenByAddress,
-  account: Address,
-  ovcxPrice: number
-}): Promise<GaugeData[]> {
+}: GaugeDataInputs & { ovcxPrice: number }): Promise<GaugeData[]> {
   const vaultsWithGauges = Object.values(vaultsData).filter(vault => vault.gauge !== zeroAddress)
 
   // @ts-ignore
@@ -91,13 +103,13 @@ async function getMainnetGaugesData({
       {
         address: vault.gauge!,
         abi: GaugeAbi,
-        functionName: "working_supply"
+        functionName: "working_balances",
+        args: [account]
       },
       {
         address: vault.gauge!,
         abi: GaugeAbi,
-        functionName: "working_balances",
-        args: [account]
+        functionName: "working_supply"
       }
     ]).flat(),
     allowFailure: false,
@@ -106,26 +118,35 @@ async function getMainnetGaugesData({
   return Promise.all(vaultsWithGauges.map(async (vault, i) => {
     if (i > 0) i = i * 5
 
-    const workingSupplyAssets = (vault.assetsPerShare * Number(mainnetData[i])) / (10 ** tokens[vault.asset].decimals);
+    const workingSupplyAssets = (vault.assetsPerShare * Number(mainnetData[i])) / (10 ** assets[vault.asset].decimals);
 
     const { lowerAPR, upperAPR } = calcBaseApy({
       inflationRate: Number(mainnetData[i + 1]) / 1e18,
       cappedRelativeWeight: Number(mainnetData[i + 2]) / 1e18,
       workingSupply: workingSupplyAssets,
-      tokenlessProduction: 20,
-      vaultPrice: tokens[vault.asset].price,
+      tokenlessProduction: TOKENLESS_PRODUCTION,
+      vaultPrice: assets[vault.asset].price,
       ovcxPrice: ovcxPrice
     })
 
     const rewardApy = await getRewardsApy({
       gauge: vault.gauge!,
       workingSupply: workingSupplyAssets,
-      vaultPrice: tokens[vault.asset].price,
-      tokens: tokens,
+      vaultPrice: assets[vault.asset].price,
+      assets: assets,
       chainId: 1
     })
 
     const annualEmissions = ((Number(mainnetData[i + 1]) / 1e18) * (Number(mainnetData[i + 2]) / 1e18)) * 86400 * 365
+
+    let workingBalance = Number(mainnetData[i + 3]);
+    let workingSupply = Number(mainnetData[i + 4]);
+    if (addUserData && veToken && gauges && vault.gauge && vault.gauge !== zeroAddress) {
+      const updatedWorkingBalance = calcWorkingBalance(veToken, gauges[vault.gauge], TOKENLESS_PRODUCTION);
+      workingSupply = workingSupply + updatedWorkingBalance - workingBalance;
+      workingBalance = updatedWorkingBalance;
+    }
+
     return {
       vault: vault.address,
       gauge: vault.gauge!,
@@ -134,26 +155,22 @@ async function getMainnetGaugesData({
       annualEmissions: annualEmissions,
       annualRewardValue: annualEmissions * ovcxPrice,
       rewardApy,
-      workingSupply: Number(mainnetData[i + 3]),
-      workingBalance: Number(mainnetData[i + 4])
+      workingBalance,
+      workingSupply
     }
-  })
-  )
+  }))
 }
 
 async function getChildGaugesData({
   vaultsData,
-  tokens,
+  assets,
   account,
   chainId,
+  veToken,
+  gauges,
+  addUserData,
   ovcxPrice
-}: {
-  vaultsData: VaultDataByAddress,
-  tokens: TokenByAddress,
-  account: Address,
-  chainId: number,
-  ovcxPrice: number
-}): Promise<GaugeData[]> {
+}: GaugeDataInputs & { ovcxPrice: number }): Promise<GaugeData[]> {
   const vaultsWithGauges = Object.values(vaultsData).filter(vault => vault.gauge !== zeroAddress)
 
   const mainnetData = await clientByChainId[1].multicall({
@@ -184,14 +201,14 @@ async function getChildGaugesData({
       {
         address: vault.gauge!,
         abi: GaugeAbi,
-        functionName: "working_supply"
+        functionName: "working_balances",
+        args: [account]
       },
       {
         address: vault.gauge!,
         abi: GaugeAbi,
-        functionName: "working_balances",
-        args: [account]
-      }
+        functionName: "working_supply"
+      },
     ]).flat(),
     allowFailure: false,
   }) as any[];
@@ -203,26 +220,35 @@ async function getChildGaugesData({
       i = i * 2
     }
 
-    const workingSupplyAssets = (vault.assetsPerShare * Number(chainData[n])) / (10 ** tokens[vault.asset].decimals)
+    const workingSupplyAssets = (vault.assetsPerShare * Number(chainData[n])) / (10 ** assets[vault.asset].decimals)
 
     const { lowerAPR, upperAPR } = calcBaseApy({
       inflationRate: Number(mainnetData[i].rate) / 1e18,
       cappedRelativeWeight: Number(mainnetData[i + 1]) / 1e18,
       workingSupply: workingSupplyAssets,
-      tokenlessProduction: 20,
-      vaultPrice: tokens[vault.asset].price,
+      tokenlessProduction: TOKENLESS_PRODUCTION,
+      vaultPrice: assets[vault.asset].price,
       ovcxPrice: ovcxPrice
     })
 
     const rewardApy = await getRewardsApy({
       gauge: vault.gauge!,
       workingSupply: workingSupplyAssets,
-      vaultPrice: tokens[vault.asset].price,
-      tokens: tokens,
+      vaultPrice: assets[vault.asset].price,
+      assets: assets,
       chainId
     })
 
     const annualEmissions = ((Number(mainnetData[i].rate) / 1e18) * (Number(mainnetData[i + 1]) / 1e18)) * 86400 * 365
+
+    let workingBalance = Number(chainData[n + 1]);
+    let workingSupply = Number(chainData[n + 2]);
+    if (addUserData && veToken && gauges && vault.gauge && vault.gauge !== zeroAddress) {
+      const updatedWorkingBalance = calcWorkingBalance(veToken, gauges[vault.gauge], TOKENLESS_PRODUCTION);
+      workingSupply = workingSupply + updatedWorkingBalance - workingBalance;
+      workingBalance = updatedWorkingBalance;
+    }
+
     return {
       vault: vault.address,
       gauge: vault.gauge!,
@@ -231,8 +257,8 @@ async function getChildGaugesData({
       annualEmissions: annualEmissions,
       annualRewardValue: annualEmissions * ovcxPrice,
       rewardApy,
-      workingSupply: Number(chainData[n + 1]),
-      workingBalance: Number(chainData[n + 2])
+      workingBalance,
+      workingSupply,
     }
   })
   )
@@ -281,13 +307,13 @@ async function getRewardsApy({
   gauge,
   workingSupply,
   vaultPrice,
-  tokens,
+  assets,
   chainId
 }: {
   gauge: Address,
   workingSupply: number,
   vaultPrice: number,
-  tokens: TokenByAddress,
+  assets: TokenByAddress,
   chainId: number
 }): Promise<RewardApy> {
   const client = clientByChainId[chainId];
@@ -322,8 +348,8 @@ async function getRewardsApy({
     const rewardData = rewardRes.map((data, i) => {
       const rewardAddress = rewardLogs[i].args.reward_token!;
       const rewardEnded = Date.UTC(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()) >= Number(data.period_finish) * 1000
-      const emissions = rewardEnded ? 0 : ((Number(data.rate) / 1e18) * 86400 * 365) / (10 ** tokens[rewardAddress].decimals)
-      const emissionsValue = emissions * tokens[rewardAddress].price;
+      const emissions = rewardEnded ? 0 : ((Number(data.rate) / 1e18) * 86400 * 365) / (10 ** assets[rewardAddress].decimals)
+      const emissionsValue = emissions * assets[rewardAddress].price;
       return {
         address: rewardAddress,
         emissions: emissions,
@@ -336,4 +362,13 @@ async function getRewardsApy({
     return { rewards: rewardData, annualRewardValue: annualRewardUSD, apy: (annualRewardUSD / workingSupplyUSD) * 100 }
   }
   return { rewards: [], annualRewardValue: 0, apy: 0 }
+}
+
+
+function calcWorkingBalance(veToken: Token, gauge: Token, tokenlessProduction: number) {
+  let workingBalance = (gauge.balance * tokenlessProduction) / 100
+  if (veToken.balance > 0) {
+    workingBalance += ((gauge.totalSupply * veToken.balance) / veToken.totalSupply) * ((100 - tokenlessProduction) / 100)
+  }
+  return Math.min(gauge.balance, workingBalance)
 }

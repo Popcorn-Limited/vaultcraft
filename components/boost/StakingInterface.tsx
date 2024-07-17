@@ -159,11 +159,11 @@ export default function StakingInterface({
             />
           )}
           <SecondaryActionButton
-            label="Get VCX-LP"
+            label="Get VCX-LP Token"
             handleClick={() => setShowLpModal(true)}
           />
           <SecondaryActionButton
-            label="Bridge VCX"
+            label="Bridge your VCX"
             handleClick={() => setShowBridgeModal(true)}
           />
           <SecondaryActionButton

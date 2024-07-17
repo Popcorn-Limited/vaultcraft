@@ -26,6 +26,7 @@ const EMPTY_LLAMA_APY_ENTRY: LlamaApy = {
   apy: 0,
   apyBase: 0,
   apyReward: 0,
+  tvl: 0,
   date: new Date(),
 }
 
@@ -124,7 +125,7 @@ export default async function getTokenAndVaultsDataByChain({
 
   // add gauge data
   if (Object.keys(gauges).length > 0) {
-    vaultsData = await addGaugeData(vaultsData, tokens, account, chainId)
+    vaultsData = await addGaugeData(vaultsData, assets, gauges, account, chainId)
   }
 
   return { vaultsData: Object.values(vaultsData), tokens };
@@ -260,7 +261,7 @@ async function getCustomApy(address: Address, apyId: string, chainId: number): P
 async function getApy(apyId: string): Promise<LlamaApy[]> {
   try {
     const { data } = await axios.get(`https://pro-api.llama.fi/${process.env.DEFILLAMA_API_KEY}/yields/chart/${apyId}`)
-    return data.data.map((entry: any) => { return { apy: entry.apy, apyBase: entry.apyBase, apyReward: entry.apyReward, date: new Date(entry.timestamp) } })
+    return data.data.map((entry: any) => { return { apy: entry.apy, apyBase: entry.apyBase, apyReward: entry.apyReward, tvl: entry.tvlUsd, date: new Date(entry.timestamp) } })
   } catch (e) {
     console.log("ERROR FETCHING APY ", + apyId)
     console.log(e)
@@ -327,14 +328,16 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
         console.log(`ERROR FETCHING APY: ${address} - ${desc.apySource}=${desc.apyId}`)
         console.log(e)
       }
+      const descriptionSplit = desc.description.split("** - ");
 
       strategies[address] = {
         totalAssets,
         totalSupply,
         assetsPerShare,
         asset: desc.asset,
-        name: desc.name,
-        description: desc.description.split("** - ")[1],
+        name: descriptionSplit[0],
+        protocol: desc.name,
+        description: descriptionSplit[1],
         resolver: desc.resolver,
         apy,
         apyHist,
@@ -375,7 +378,8 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
       vaults[address].strategies[i] = {
         address: strategy.address,
         metadata: {
-          name: strategyData.name,
+          name: strategyData.name.replace("**", ""),
+          protocol: strategyData.protocol,
           description: strategyData.description,
         },
         resolver: strategyData.resolver,
@@ -406,8 +410,8 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
   return vaults
 }
 
-async function addGaugeData(vaultsData: VaultDataByAddress, tokens: TokenByAddress, account: Address, chainId: number): Promise<VaultDataByAddress> {
-  const gaugesData = await getGaugesData({ vaultsData, tokens, account, chainId });
+async function addGaugeData(vaultsData: VaultDataByAddress, assets: TokenByAddress, gauges: TokenByAddress, account: Address, chainId: number): Promise<VaultDataByAddress> {
+  const gaugesData = await getGaugesData({ vaultsData, assets, account, chainId, veToken: assets[VeTokenByChain[chainId]], gauges, addUserData: true });
 
   gaugesData.forEach(gaugeData => {
     const vault = vaultsData[gaugeData.vault]

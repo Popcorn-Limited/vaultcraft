@@ -148,7 +148,7 @@ export default function VaultRebalance({
   return (
     <>
       <div className="flex flex-row justify-center">
-        <div className="w-1/2">
+        <div className="w-full">
           <p className="text-customGray500 mb-12">
             To rebalance between strategies you need to free up funds first (Float) before you can allocate those.
             Deallocating and Allocating are two seperate transactions.
@@ -202,7 +202,7 @@ export default function VaultRebalance({
                             ? (strategy.allocation / (10 ** asset.decimals)) - Number(inputValues[i])
                             : (strategy.allocation / (10 ** asset.decimals)) + Number(inputValues[i])
                           }
-                          {asset.symbol}
+                          {" "}{asset.symbol}
                         </td>
                       </tr>
                   )}

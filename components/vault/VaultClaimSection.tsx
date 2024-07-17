@@ -8,7 +8,7 @@ import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import getGaugeRewards from "@/lib/gauges/getGaugeRewards";
 import { claimOPop } from "@/lib/optionToken/interactions";
 import { gaugeRewardsAtom, tokensAtom } from "@/lib/atoms";
-import { MinterByChain, OptionTokenByChain, VCX, } from "@/lib/constants";
+import { MinterByChain, OptionTokenByChain, RewardsClaimerByChain, VCX, WrappedOptionTokenByChain } from "@/lib/constants";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
@@ -17,6 +17,7 @@ import LargeCardStat from "../common/LargeCardStat";
 import MainActionButton from "../button/MainActionButton";
 import { getClaimableRewards } from "@/lib/gauges/useGaugeRewardData";
 import ResponsiveTooltip from "../common/Tooltip";
+import { handleAllowance } from "@/lib/approve";
 
 export default function VaultClaimSection({ vaultData }: { vaultData: VaultData }) {
   const { switchChainAsync } = useSwitchChain();
@@ -24,45 +25,32 @@ export default function VaultClaimSection({ vaultData }: { vaultData: VaultData 
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
 
-  const [tokens, setTokens] = useAtom(tokensAtom)
+  const [tokens, setTokens] = useAtom(tokensAtom);
   const [vaults] = useAtom(vaultsAtom);
 
-  const [claimableRewards, setClaimableRewards] = useState<ClaimableReward[]>([])
-
+  const [claimableRewards, setClaimableRewards] = useState<ClaimableReward[]>(
+    []
+  );
   const [gaugeRewards, setGaugeRewards] = useAtom(gaugeRewardsAtom);
-
-  const [oBal, setOBal] = useState<number>(0)
+  const rewardValue = claimableRewards.reduce((a, b) => a + b.value, 0) || 0;
 
   useEffect(() => {
     async function getOToken() {
-      const client = createPublicClient({
-        chain: ChainById[vaultData?.chainId!],
-        transport: http(RPC_URLS[vaultData?.chainId!]),
-      })
-      const newOBal = client.readContract({
-        address: OptionTokenByChain[vaultData?.chainId!],
-        abi: erc20Abi,
-        functionName: "balanceOf",
-        args: [account!]
-      })
-      setOBal(Number(newOBal) / 1e18)
-
       if (vaultData.gauge && vaultData.gauge !== zeroAddress) {
         const newClaimableReward = await getClaimableRewards({
           gauge: vaultData.gauge,
           account: account!,
           tokens: tokens[vaultData.chainId],
-          chainId: vaultData.chainId
-        })
-        setClaimableRewards(newClaimableReward)
+          chainId: vaultData.chainId,
+        });
+        setClaimableRewards(newClaimableReward);
       }
     }
-    if (account && vaultData) getOToken()
-  }, [account])
-
+    if (account && vaultData) getOToken();
+  }, [account]);
 
   async function handleClaimRewards() {
-    if (!vaultData || !account) return
+    if (!vaultData || !account) return;
 
     if (chain?.id !== vaultData?.chainId) {
       try {
@@ -72,25 +60,43 @@ export default function VaultClaimSection({ vaultData }: { vaultData: VaultData 
       }
     }
 
-    const success = await claimRewards({
+    const clients = {
+      publicClient: publicClient!,
+      walletClient: walletClient!,
+    }
+
+    let success;
+    const wrappedTokenReward = claimableRewards.find(reward => reward.token.address === WrappedOptionTokenByChain[vaultData?.chainId])
+    if (wrappedTokenReward && wrappedTokenReward.amount > 0) {
+      success = await handleAllowance({
+        token: wrappedTokenReward.token.address,
+        amount: wrappedTokenReward.amount,
+        account: account,
+        spender: RewardsClaimerByChain[vaultData?.chainId],
+        clients
+      });
+    }
+
+    success = await claimRewards({
       gauge: vaultData.gauge!,
       account: account,
-      clients: { publicClient: publicClient!, walletClient: walletClient! }
+      clients,
+      chainId: vaultData?.chainId
     })
 
     if (success) {
       await mutateTokenBalance({
-        tokensToUpdate: claimableRewards.map(reward => reward.token.address),
+        tokensToUpdate: claimableRewards.map((reward) => reward.token.address),
         account,
         tokensAtom: [tokens, setTokens],
-        chainId: vaultData?.chainId
-      })
-      setClaimableRewards([])
+        chainId: vaultData?.chainId,
+      });
+      setClaimableRewards([]);
     }
   }
 
   async function handleClaim() {
-    if (!vaultData || !account) return
+    if (!vaultData || !account) return;
 
     if (chain?.id !== vaultData?.chainId) {
       try {
@@ -113,12 +119,14 @@ export default function VaultClaimSection({ vaultData }: { vaultData: VaultData 
         tokensToUpdate: [OptionTokenByChain[vaultData?.chainId]],
         account,
         tokensAtom: [tokens, setTokens],
-        chainId: vaultData?.chainId
-      })
+        chainId: vaultData?.chainId,
+      });
       setGaugeRewards({
         ...gaugeRewards,
         [vaultData?.chainId]: await getGaugeRewards({
-          gauges: vaults[vaultData?.chainId].filter(vault => vault.gauge && vault.gauge !== zeroAddress).map(vault => vault.gauge) as Address[],
+          gauges: vaults[vaultData?.chainId]
+            .filter((vault) => vault.gauge && vault.gauge !== zeroAddress)
+            .map((vault) => vault.gauge) as Address[],
           account: account,
           chainId: vaultData?.chainId,
           publicClient: publicClient!
@@ -133,29 +141,25 @@ export default function VaultClaimSection({ vaultData }: { vaultData: VaultData 
         <div className="w-full flex flex-wrap md:gap-x-4">
           <div className="w-1/2 md:w-max">
             <LargeCardStat
-              id={"my-ovcx"}
-              label="My oVCX"
-              value={`$${oBal && tokens[1][VCX] ? NumberFormatter.format(oBal * (tokens[1][VCX].price * 0.25)) : "0"}`}
-              tooltip="Value of oVCX held in your wallet across all blockchains."
-            />
-          </div>
-
-          <div className="w-1/2 md:w-max">
-            <LargeCardStat
               id={"claimable-ovcx"}
               label="Claimable oVCX"
               value={`$${gaugeRewards && tokens[1][VCX]
-                ? NumberFormatter.format((Number(gaugeRewards?.[vaultData.chainId]?.total || 0) / 1e18) * (tokens[1][VCX].price * 0.25))
-                : "0"}`}
+                ? NumberFormatter.format(
+                  (Number(gaugeRewards?.[vaultData.chainId]?.total || 0) /
+                    1e18) *
+                  (tokens[1][VCX].price * 0.25)
+                )
+                : "0"
+                }`}
               tooltip="Cumulative value of claimable oVCX from vaults across all blockchains."
             />
           </div>
-          {claimableRewards.length > 0 &&
+          {claimableRewards.length > 0 && rewardValue > 0.1 ? (
             <div className="w-1/2 md:w-max">
               <LargeCardStat
                 id={"claimable-rewards"}
                 label="Claimable Rewards"
-                value={`$${NumberFormatter.format(claimableRewards.reduce((a, b) => a + b.value, 0))}`}
+                value={`$${NumberFormatter.format(rewardValue)}`}
                 tooltipChild={
                   <div className="w-42">
                     <p className="font-bold">Claimable Rewards</p>
@@ -168,6 +172,8 @@ export default function VaultClaimSection({ vaultData }: { vaultData: VaultData 
                 }
               />
             </div>
+          )
+            : <></>
           }
         </div>
 
@@ -175,24 +181,28 @@ export default function VaultClaimSection({ vaultData }: { vaultData: VaultData 
           <MainActionButton
             label="Claim oVCX"
             handleClick={handleClaim}
-            disabled={!gaugeRewards || gaugeRewards?.[vaultData.chainId]?.total < 0}
+            disabled={
+              !gaugeRewards || gaugeRewards?.[vaultData.chainId]?.total < 0
+            }
           />
-          {claimableRewards.length > 0 &&
+          {claimableRewards.length > 0 && rewardValue > 0.1 && (
             <SecondaryActionButton
               label="Claim Rewards"
               handleClick={handleClaimRewards}
               disabled={!account}
             />
-          }
+          )}
         </div>
       </div>
-      <div className="md:hidden">
+      <div className="md:hidden pt-8">
         <MainActionButton
           label="Claim oVCX"
           handleClick={handleClaim}
-          disabled={!gaugeRewards || gaugeRewards?.[vaultData.chainId]?.total < 0}
+          disabled={
+            !gaugeRewards || gaugeRewards?.[vaultData.chainId]?.total < 0
+          }
         />
       </div>
     </>
-  )
+  );
 }

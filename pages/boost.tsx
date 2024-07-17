@@ -1,17 +1,21 @@
 import NoSSR from "react-no-ssr";
+import "rc-slider/assets/index.css";
 import {
   useAccount,
-  useBalance,
   usePublicClient,
   useWalletClient,
 } from "wagmi";
-import { Address, WalletClient, createPublicClient, http, zeroAddress } from "viem";
 import { useEffect, useState } from "react";
+import {
+  Address,
+  createPublicClient,
+  http,
+  zeroAddress,
+} from "viem";
 import { VoteData, hasAlreadyVoted } from "@/lib/gauges/hasAlreadyVoted";
 import { AddressesByChain, VaultData } from "@/lib/types";
 import StakingInterface from "@/components/boost/StakingInterface";
 import { sendVotes } from "@/lib/gauges/interactions";
-import Gauge from "@/components/boost/Gauge";
 import LockModal from "@/components/boost/modals/lock/LockModal";
 import ManageLockModal from "@/components/boost/modals/manage/ManageLockModal";
 import OptionTokenExerciseModal from "@/components/optionToken/exercise/OptionTokenExerciseModal";
@@ -21,36 +25,39 @@ import { vaultsAtom } from "@/lib/atoms/vaults";
 import OptionTokenInterface from "@/components/optionToken/OptionTokenInterface";
 import LpModal from "@/components/boost/modals/lp/LpModal";
 import { voteUserSlopes } from "@/lib/gauges/useGaugeWeights";
-import NetworkFilter from "@/components/network/NetworkFilter";
-import SearchBar from "@/components/input/SearchBar";
-import VaultsSorting from "@/components/vault/VaultsSorting";
-import useNetworkFilter from "@/lib/useNetworkFilter";
-import { TOKEN_ADMIN, TokenAdminAbi, VE_VCX, VOTING_ESCROW } from "@/lib/constants";
+import { VE_VCX } from "@/lib/constants";
 import Modal from "@/components/modal/Modal";
 import BridgeModal from "@/components/bridge/BridgeModal";
 import axios from "axios";
 import BroadcastVeBalanceInterface from "@/components/boost/modals/manage/BroadcastVeBalanceInterface";
-import { RPC_URLS } from "@/lib/utils/connectors";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import { tokensAtom } from "@/lib/atoms";
+import ResponsiveTooltip from "@/components/common/Tooltip";
+import BoostVaultsTable from "@/components/boost/BoostVaultsTable";
+import BoostVaultCard from "@/components/boost/BoostVaultCard";
+import useWeeklyEmissions from "@/lib/gauges/useWeeklyEmissions";
 import { mainnet } from "viem/chains";
+import { RPC_URLS } from "@/lib/utils/connectors";
 
-export const GAUGE_NETWORKS = [1, 10, 42161]
+export const GAUGE_NETWORKS = [1, 10, 42161];
 
+let hiddenGauges: AddressesByChain = {};
 async function getHiddenGauges(): Promise<AddressesByChain> {
-  const result: AddressesByChain = {}
+  // If we already have the hidden gauges, return them immediately
+  if (Object.keys(hiddenGauges).length > 0) return hiddenGauges;
+
+  const result: AddressesByChain = {};
   await Promise.all(
     GAUGE_NETWORKS.map(async (chain) => {
       const res = await axios.get(
         `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/gauges/hidden/${chain}.json`
-      )
-      result[chain] = res.data
+      );
+      result[chain] = res.data;
     })
-  )
+  );
+  hiddenGauges = result;
   return result;
 }
-
-
 
 function VePopContainer() {
   const { address: account, chain } = useAccount();
@@ -58,9 +65,9 @@ function VePopContainer() {
   const { data: walletClient } = useWalletClient();
   const [tokens] = useAtom(tokensAtom);
 
-  const [weeklyEmissions, setWeeklyEmissions] = useState<number>(0)
+  const weeklyEmissions = useWeeklyEmissions();
 
-  const [vaults, setVaults] = useAtom(vaultsAtom);
+  const [vaults] = useAtom(vaultsAtom);
   const [gaugeVaults, setGaugeVaults] = useState<VaultData[]>([])
   const [initialVotes, setInitialVotes] = useState<{ [key: Address]: number }>(
     {}
@@ -77,28 +84,22 @@ function VePopContainer() {
   const [showBridgeModal, setShowBridgeModal] = useState(false);
   const [showSyncModal, setShowSyncModal] = useState(false);
 
-  const [hiddenGauges, setHiddenGauges] = useState<AddressesByChain>({})
+  const [hiddenGauges, setHiddenGauges] = useState<AddressesByChain>({});
 
   useEffect(() => {
     async function initialSetup() {
       const _hiddenGauges = await getHiddenGauges();
       setHiddenGauges(_hiddenGauges);
 
-      const vaultsWithGauges = Object.values(vaults).flat().filter((vault) => vault.gauge !== zeroAddress)
+      const vaultsWithGauges = Object.values(vaults)
+        .flat()
+        .filter((vault) => vault.gauge !== zeroAddress);
       setGaugeVaults(vaultsWithGauges);
 
       const client = await createPublicClient({
         chain: mainnet,
         transport: http(RPC_URLS[1]),
       })
-
-      const rate = await client.readContract({
-        address: TOKEN_ADMIN,
-        abi: TokenAdminAbi,
-        functionName: "rate",
-      });
-      // Emissions per second * seconds per week
-      setWeeklyEmissions((Number(rate) / 1e18) * 604800)
 
       const initialVotes: { [key: Address]: number } = {};
       const voteUserSlopesData = await voteUserSlopes({
@@ -141,15 +142,22 @@ function VePopContainer() {
       updatedVotes[index] = val;
     }
 
-    setVotes((prevVotes) => updatedVotes);
+    setVotes(updatedVotes);
   }
 
-  const [selectedNetworks, selectNetwork] = useNetworkFilter(GAUGE_NETWORKS);
-  const [searchTerm, setSearchTerm] = useState("");
+  const selectedNetworks = GAUGE_NETWORKS;
 
-  function handleSearch(value: string) {
-    setSearchTerm(value);
-  }
+  const formattedVaults = gaugeVaults
+    .filter((vault) => selectedNetworks.includes(vault.chainId))
+    .sort((a, b) => b.tvl - a.tvl) // Sort by TVL
+    .map((vault) => ({
+      ...vault,
+      isDeprecated: (hiddenGauges ?? {})[vault.chainId]?.includes(vault.gauge!),
+    }))
+    .sort(({ isDeprecated: a }, { isDeprecated: b }) =>
+      // Sort deprecated vaults to the end
+      a === b ? 0 : a ? 1 : -1
+    );
 
   return Object.keys(tokens).length > 0 ? (
     <>
@@ -175,8 +183,8 @@ function VePopContainer() {
         <BroadcastVeBalanceInterface setShowModal={setShowSyncModal} />
       </Modal>
       <div className="static">
-        <section className="py-10 px-4 md:px-8 border-t md:border-t-0 md:border-b border-customNeutral100 lg:flex lg:flex-row items-center justify-between text-white">
-          <div className="lg:w-[1050px]">
+        <section className="w-full py-10 px-4 md:px-0 border-t md:border-t-0 md:border-b border-customNeutral100 md:flex md:flex-row items-center justify-between text-white">
+          <div className="">
             <h1 className="text-2xl md:text-3xl font-normal">
               Lock your{" "}
               <span className="text-primaryYellow font-bold md:font-normal md:underline md:decoration-solid">
@@ -185,23 +193,48 @@ function VePopContainer() {
               for voting power, XP points, and oVCX multipliers
             </h1>
             <p className="text-base text-white opacity-80 mt-4">
-              Vote on which Smart Vaults will receive more oVCX every epoch with veVCX - your locked VCX LP.
+              Vote on which Smart Vaults will receive more oVCX every epoch with
+              veVCX - your locked VCX LP.
             </p>
             <p className="text-base text-white opacity-80">
-              You can only vote once every 10 days and your vote persists until you change it.
+              You can only vote once every 10 days and your vote persists until
+              you change it.
             </p>
           </div>
-          <div className="bg-customNeutral200 border border-customNeutral100 rounded-lg px-6 py-4">
-            <p className="text-base opacity-80">Emissions per week</p>
-            <div className="flex flex-row items-center justify-between">
-              <img src={"/images/tokens/oVcx.svg"}
-                alt="token icon" className="w-6 h-6 object-contain rounded-full" />
-              <p className="font-bold text-xl">{NumberFormatter.format(weeklyEmissions)} oVCX</p>
+
+          <div>
+            <div
+              id="rewards-tooltip-inner"
+              className="bg-customNeutral200 mt-6 lg:mt-0 cursor-pointer border border-customNeutral100 rounded-lg px-6 py-4"
+            >
+              <p className="text-base opacity-80 whitespace-nowrap">
+                Emissions per week
+              </p>
+              <div className="flex flex-row items-center justify-between">
+                <img
+                  src={"/images/tokens/oVcx.svg"}
+                  alt="token icon"
+                  className="w-6 h-6 object-contain rounded-full"
+                />
+                <p className="font-bold text-xl">
+                  {NumberFormatter.format(weeklyEmissions)} oVCX
+                </p>
+              </div>
             </div>
+            <ResponsiveTooltip
+              id="rewards-tooltip-inner"
+              content={
+                <p className="w-52">
+                  oVCX rewards accrue weekly, not daily. Distributions happen
+                  post-contract funding. Note: You still earn oVCX even without
+                  the boost.
+                </p>
+              }
+            />
           </div>
         </section>
 
-        <section className="pb-12 md:py-10 px-4 md:px-8 md:flex md:flex-row md:justify-between space-y-4 md:space-y-0 md:space-x-8">
+        <section className="pb-12 md:py-10 px-4 md:px-0 md:flex md:flex-row md:justify-between space-y-4 md:space-y-0 md:space-x-8">
           <StakingInterface
             setShowLockModal={setShowLockModal}
             setShowMangementModal={setShowMangementModal}
@@ -210,58 +243,41 @@ function VePopContainer() {
             setShowSyncModal={setShowSyncModal}
           />
           <div className="w-full lg:w-1/2">
-            <OptionTokenInterface setShowOptionTokenModal={setShowExerciseModal} />
+            <OptionTokenInterface
+              setShowOptionTokenModal={setShowExerciseModal}
+            />
           </div>
         </section>
 
-        <section className="my-10 px-4 md:px-8 md:flex flex-row items-center justify-between">
-          <NetworkFilter supportedNetworks={GAUGE_NETWORKS} selectNetwork={selectNetwork} />
-          <div className="flex flex-row space-x-4 mt-4">
-            <SearchBar searchTerm={searchTerm} handleSearch={handleSearch} />
-            <VaultsSorting className="" vaultState={[gaugeVaults, setGaugeVaults]} />
-          </div>
-        </section>
+        <div className="border-b border-customNeutral100 w-full mb-12" />
 
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-4 px-4 md:px-8">
-          {gaugeVaults?.length > 0 ? (
-            <>
-              {gaugeVaults
-                .filter((vault) => selectedNetworks.includes(vault.chainId))
-                .filter((vault) => Object.keys(hiddenGauges).length > 0 ? !hiddenGauges[vault.chainId].includes(vault.gauge!) : true)
-                .sort((a, b) => b.tvl - a.tvl)
-                .map((vault: VaultData, index: number) => (
-                  <Gauge
-                    key={vault.address}
-                    vaultData={vault}
-                    index={vault.gauge!}
-                    votes={votes}
-                    handleVotes={handleVotes}
-                    canVote={voteData.find(v => v.gauge === vault.gauge)?.canVote!}
-                    searchTerm={searchTerm}
-                    deprecated={false}
-                  />
-                ))}
-              {gaugeVaults
-                .filter((vault) => selectedNetworks.includes(vault.chainId))
-                .filter((vault) => Object.keys(hiddenGauges).length > 0 ? hiddenGauges[vault.chainId].includes(vault.gauge!) : true)
-                .sort((a, b) => b.tvl - a.tvl)
-                .map((vault: VaultData, index: number) => (
-                  <Gauge
-                    key={vault.address}
-                    vaultData={vault}
-                    index={vault.gauge!}
-                    votes={votes}
-                    handleVotes={handleVotes}
-                    canVote={voteData.find(v => v.gauge === vault.gauge)?.canVote!}
-                    searchTerm={searchTerm}
-                    deprecated={true}
-                  />
-                ))}
-            </>
-          ) : (
-            <p className="text-white">Loading Gauges...</p>
-          )}
-        </section>
+        {gaugeVaults?.length > 0 ?
+          <>
+            <section className="md:hidden px-4 gap-6 md:gap-10">
+              {formattedVaults.map((vaultData) => (
+                <BoostVaultCard
+                  {...vaultData}
+                  isVotingAvailable={
+                    voteData.find((v) => v.gauge === vaultData.gauge)
+                      ?.canVote!
+                  }
+                  handleVotes={handleVotes}
+                  votes={votes}
+                  key={`sm-mb-${vaultData.address}`}
+                />
+              ))}
+            </section>
+            <div className="hidden md:block">
+              <BoostVaultsTable
+                handleVotes={handleVotes}
+                vaults={formattedVaults}
+                voteData={voteData}
+                votes={votes}
+              />
+            </div>
+          </>
+          : <p className="text-white text-center py-12">Loading Gauges...</p>
+        }
 
         <div className="fixed left-0 bottom-10 w-full">
           <div className="z-10 mx-auto w-60 md:w-104 bg-customNeutral200 px-6 py-4 rounded-lg flex flex-col md:flex-row items-center justify-between text-white border border-customNeutral100">

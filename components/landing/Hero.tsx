@@ -10,7 +10,7 @@ export default function Hero(): JSX.Element {
 
   return (
     <section className="pb-8 pt-8 sm:pb-6 border-b border-customGray300">
-      <div className="w-full px-4 md:px-8 md:flex flex-row items-center">
+      <div className="w-full px-4 md:px-0 md:flex flex-row items-center">
         <div className="w-full xl:w-2/3 md:flex md:flex-row space-y-4 md:space-y-0 mt-4 md:mt-0">
           <div className="flex flex-row items-center md:pr-10 gap-10 md:w-fit">
             <LargeCardStat

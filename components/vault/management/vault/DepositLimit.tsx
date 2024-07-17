@@ -35,7 +35,7 @@ export default function VaultDepositLimit({
 
   return (
     <div className="flex flex-row justify-center">
-      <div className="w-1/2">
+      <div className="w-full">
         <p className="text-customGray500">
           Change the deposit limit for this vault. The deposit limit controls
           the maximum amount of assets that can be deposited across all users.

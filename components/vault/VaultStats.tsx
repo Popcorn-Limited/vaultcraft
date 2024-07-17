@@ -5,6 +5,7 @@ import { Token, VaultData } from "@/lib/types";
 import { roundToTwoDecimalPlaces } from "@/lib/utils/helpers";
 import { useAtom } from "jotai";
 import { tokensAtom } from "@/lib/atoms";
+import { useEffect, useState } from "react";
 
 interface VaultStatProps {
   vaultData: VaultData;
@@ -26,25 +27,33 @@ export default function VaultStats({
   const [tokens] = useAtom(tokensAtom);
   const baseTooltipId = vault.address.slice(1);
 
+  const [walletValue, setWalletValue] = useState<number>(0)
+  const [depositValue, setDepositValue] = useState<number>(0)
+
+  useEffect(() => {
+    let depositValue_ = (vault.balance * vault.price) / (10 ** vault.decimals)
+    if (gauge) depositValue_ += (gauge.balance * gauge.price) / (10 ** gauge.decimals)
+
+    setWalletValue((asset.balance * asset.price) / (10 ** asset.decimals))
+    setDepositValue(depositValue_)
+  }, [vault, gauge, asset])
+
   return (
     <div className="w-full md:flex md:flex-wrap md:justify-between md:gap-4">
       <CardStat
         id={`${baseTooltipId}-wallet`}
         label="Your Wallet"
-        value={`$ ${formatAndRoundNumber(asset.balance * asset.price, asset.decimals)}`}
-        secondaryValue={`${formatAndRoundNumber(asset.balance, asset.decimals)} ${asset.symbol}`}
+        value={`$ ${walletValue < 1 ? "0" : NumberFormatter.format(walletValue)}`}
+        secondaryValue={`${walletValue < 1 ? "0" : formatAndRoundNumber(asset.balance, asset.decimals)} ${asset.symbol}`}
         tooltip="Value of deposit assets held in your wallet"
       />
       <CardStat
         id={`${baseTooltipId}-deposit`}
         label="Your Deposit"
-        value={`$ ${account
-          ?
+        value={`$ ${depositValue}`}
+        secondaryValue={depositValue < 1 ?
+          "0" :
           `${!!gauge ?
-            NumberFormatter.format(((gauge.balance * gauge.price) / 10 ** gauge?.decimals!) + ((vault?.balance! * vault?.price!) / 10 ** vault?.decimals!))
-            : formatAndRoundNumber(vault?.balance! * vault?.price!, vault?.decimals!)
-          }` : "0"}`}
-        secondaryValue={`${!!gauge ?
           NumberFormatter.format((gauge.balance * vaultData.assetsPerShare / (10 ** asset.decimals)) + (vault?.balance! * vaultData.assetsPerShare / (10 ** asset.decimals)))
           : formatAndRoundNumber(vault?.balance! * vaultData.assetsPerShare, asset?.decimals!)
           } ${asset.symbol}`}

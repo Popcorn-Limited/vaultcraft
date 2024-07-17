@@ -22,7 +22,7 @@ export default function VaultTakeFees({
   const [tokens] = useAtom(tokensAtom)
   return (
     <div className="flex flex-row justify-center">
-      <div className="w-1/2">
+      <div className="w-full">
         <p className="text-customGray500">
           Taking fees mints new vault shares for the value of accumulated fees.
           These new shares will be minted to the configured fee recipient and

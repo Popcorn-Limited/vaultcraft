@@ -5,8 +5,6 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import NoSSR from "react-no-ssr";
 import { yieldOptionsAtom } from "@/lib/atoms/sdk";
-import { NumberFormatter, formatNumber } from "@/lib/utils/formatBigNumber";
-import { roundToTwoDecimalPlaces } from "@/lib/utils/helpers";
 import VaultInputs from "@/components/vault/VaultInputs";
 import { showSuccessToast } from "@/lib/toasts";
 import CopyToClipboard from "react-copy-to-clipboard";
@@ -16,11 +14,11 @@ import LeftArrowIcon from "@/components/svg/LeftArrowIcon";
 import ManageLoanInterface from "@/components/lending/ManageLoanInterface";
 import { VeTokenByChain, ZapAssetAddressesByChain } from "@/lib/constants";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
-import CardStat from "@/components/common/CardStat";
 import StrategyDescription from "@/components/vault/StrategyDescription";
 import ApyChart from "@/components/vault/ApyChart";
 import VaultHero from "@/components/vault/VaultHero";
 import { isAddress, zeroAddress } from "viem";
+import UserBoostSection from "@/components/vault/UserBoostSection";
 
 export default function Index() {
   const router = useRouter();
@@ -64,16 +62,14 @@ export default function Index() {
 
   const [showLoanManagementModal, setShowLoanManagementModal] = useState(false)
 
-  console.log({ vaultData })
-
   return <NoSSR>
     {
-      (vaultData && tokenOptions.length > 0) ? (
+      (vaultData && asset && vault && tokenOptions.length > 0) ? (
         <>
           <ManageLoanInterface visibilityState={[showLoanManagementModal, setShowLoanManagementModal]} vaultData={vaultData} />
           <div className="min-h-screen">
             <button
-              className="border border-customGray500 rounded-lg flex flex-row items-center px-4 py-2 ml-4 md:ml-8 mt-10"
+              className="border border-customGray500 rounded-lg flex flex-row items-center px-4 py-2 ml-4 md:ml-0 mt-10"
               type="button"
               onClick={() => router.push((!!query?.ref && isAddress(query.ref as string)) ? `/vaults?ref=${query.ref}` : "/vaults")}
             >
@@ -83,12 +79,9 @@ export default function Index() {
               <p className="text-white leading-0 mt-1 ml-2">Back to Vaults</p>
             </button>
 
-            {vaultData
-              ? <VaultHero vaultData={vaultData} asset={asset} vault={vault} gauge={gauge} showClaim />
-              : <section className="md:border-b border-customNeutral100 pt-10 pb-6 px-4 md:px-8 "></section>
-            }
+            <VaultHero vaultData={vaultData} asset={asset} vault={vault} gauge={gauge} showClaim />
 
-            <section className="w-full md:flex md:flex-row md:justify-between md:space-x-8 py-10 px-4 md:px-8">
+            <section className="w-full md:flex md:flex-row md:justify-between md:space-x-8 py-10 px-4 md:px-0">
               <div className="w-full md:w-1/3">
                 <div className="bg-customNeutral200 p-6 rounded-lg">
                   <div className="bg-customNeutral300 px-6 py-6 rounded-lg">
@@ -103,30 +96,8 @@ export default function Index() {
               </div>
 
               <div className="w-full md:w-2/3 mt-8 md:mt-0 space-y-4">
-                {(gauge && gauge?.balance > 0) &&
-                  <div className="bg-customNeutral200 p-6 rounded-lg">
-                    <p className="text-white text-2xl font-bold mb-4">Your Boost 🚀</p>
-                    <div className="w-full md:flex md:flex-wrap md:justify-between md:gap-4">
-                      <CardStat
-                        id="your-apy"
-                        label="Your Rewards APY"
-                        value={`${formatNumber((vaultData.gaugeData?.workingBalance! / (gauge?.balance || 0)) * vaultData.gaugeData?.upperAPR!)} %`}
-                        tooltip={`Your rewards APY depends on the proportion of locked liquidity, veVCX, you provide relative to the total veVCX held by all gauge holders. For instance, to receive the maximum rewards APY, if you own 10% of the supply of Gauge A you also would need to own 10% of cumulative veVCX supply of all gauge share holders to earn the maximum rewards apy of ${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.gaugeData?.upperAPR!))} %. Liquidity providers are guaranteed a minimum rewards apy of ${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.gaugeData?.lowerAPR!))}`}
-                      />
-                      <CardStat
-                        id="boost"
-                        label="Your Boost"
-                        value={`${formatNumber((vaultData.gaugeData?.workingBalance! / (gauge?.balance || 0)) * 5)} X`}
-                        tooltip="Your Boost depends on the proportion of locked liquidity, veVCX, you provide relative to the total veVCX held by all gauge holders. For instance, to receive the maximum 5x boost, if you own 10% of the supply of Gauge A you also would need to own 10% of cumulative veVCX supply of all gauge share holders to earn the maximum boost of 5x. Liquidity providers are guaranteed a minimum boost of 1x."
-                      />
-                      <CardStat
-                        id="ve-missing"
-                        label="VeVCX Missing for max Boost"
-                        value={`${formatNumber((((gauge?.balance || 0) / vaultData.gaugeData?.workingSupply!) * (tokens[vaultData.chainId][VeTokenByChain[vaultData.chainId]].totalSupply / 1e18)) - (tokens[vaultData.chainId][VeTokenByChain[vaultData.chainId]].balance / 1e18))} VeVCX`}
-                        tooltip="The amount of locked liquidity, veVCX, required to earn the maximum boost in oVCX rewards per epoch."
-                      />
-                    </div>
-                  </div>
+                {gauge && gauge?.balance > 0 && Object.keys(tokens).length > 0 && (vaultData.gaugeData?.lowerAPR || 0) > 0 &&
+                  <UserBoostSection vaultData={vaultData} gauge={gauge} veToken={tokens[vaultData.chainId][VeTokenByChain[vaultData.chainId]]} />
                 }
 
                 <div className="bg-customNeutral200 p-6 rounded-lg">
@@ -206,16 +177,15 @@ export default function Index() {
 
                 <div className="bg-customNeutral200 p-6 rounded-lg">
                   <p className="text-white text-2xl font-bold">Strategies</p>
-                  {asset &&
-                    vaultData.strategies.map((strategy, i) =>
-                      <StrategyDescription
-                        key={`${strategy.resolver}-${i}`}
-                        strategy={strategy}
-                        asset={asset}
-                        i={i}
-                        stratLen={vaultData.strategies.length}
-                      />
-                    )}
+                  {vaultData.strategies.map((strategy, i) =>
+                    <StrategyDescription
+                      key={`${strategy.resolver}-${i}`}
+                      strategy={strategy}
+                      asset={asset}
+                      i={i}
+                      stratLen={vaultData.strategies.length}
+                    />
+                  )}
                 </div>
               </div>
             </section>
@@ -223,7 +193,7 @@ export default function Index() {
         </>
       )
         :
-        <p className="text-white ml-4 md:ml-8">Loading...</p>
+        <p className="text-white ml-4 md:ml-0">Loading...</p>
     }
   </NoSSR >
 }

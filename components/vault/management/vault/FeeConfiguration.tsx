@@ -38,7 +38,7 @@ export default function VaultFeeConfiguration({
 
   return (
     <div className="flex flex-row justify-center">
-      <div className="w-1/2">
+      <div className="w-full">
         <p className="text-customGray500">
           Change the fees for this vault. This process happens in two steps.
           First new fees must be proposed. Users now have three days to withdraw

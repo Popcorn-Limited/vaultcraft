@@ -153,7 +153,7 @@ export default function VaultsV1Settings({ vaultData }: { vaultData: VaultData, 
   }
 
   return (
-    <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-8 text-white">
+    <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-0 text-white">
       <h2 className="text-white font-bold text-2xl">Vault Settings</h2>
       <TabSelector
         className="mt-6 mb-12"

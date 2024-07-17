@@ -62,6 +62,7 @@ export type LlamaApy = {
   apy: number;
   apyBase: number;
   apyReward: number;
+  tvl: number;
   date: Date;
 }
 
@@ -79,6 +80,7 @@ export type Strategy = {
 
 type StrategyMetadata = {
   name: string;
+  protocol: string;
   description: string;
 }
 
@@ -301,5 +303,16 @@ export type VaultV1Settings = {
   paused: boolean;
   feeBalance: number;
   accruedFees: number;
+  owner: Address;
+}
+
+export type VaultV2Settings = {
+  proposedStrategies: Address[];
+  proposedStrategyTime: number;
+  withdrawalQueue: number[];
+  proposedWithdrawalQueue: number[];
+  depositIndex: number;
+  proposedDepositIndex: number;
+  paused: boolean;
   owner: Address;
 }

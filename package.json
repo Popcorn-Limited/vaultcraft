@@ -35,6 +35,8 @@
     "react-icons": "4.7.1",
     "react-no-ssr": "1.1.0",
     "react-tooltip": "5.22.0",
+    "swr": "^2.2.5",
+    "tailwind-merge": "^2.3.0",
     "tailwind-scrollbar-hide": "1.1.7",
     "tailwindcss": "3.4.4",
     "vaultcraft-sdk": "0.2.4",

@@ -11,8 +11,8 @@ import { useRouter } from "next/router";
 import { Address, createPublicClient, http, zeroAddress } from "viem";
 import Modal from "@/components/modal/Modal";
 import MainActionButton from "../button/MainActionButton";
-import { gaugeRewardsAtom, networthAtom, tokensAtom, tvlAtom, vaultronAtom, zapAssetsAtom } from "@/lib/atoms";
-import { ReserveData, TokenByAddress, TokenType, UserAccountData, VaultData, VaultDataByAddress } from "@/lib/types";
+import { gaugeRewardsAtom, networthAtom, tokensAtom, tvlAtom, vaultronAtom } from "@/lib/atoms";
+import { ReserveData, TokenByAddress, TokenType, UserAccountData, VaultData } from "@/lib/types";
 import getTokenAndVaultsDataByChain from "@/lib/getTokenAndVaultsData";
 import { aaveAccountDataAtom, aaveReserveDataAtom } from "@/lib/atoms/lending";
 import { GAUGE_NETWORKS } from "pages/boost";
@@ -48,10 +48,7 @@ function TermsModal({
   function handleAccept() {
     setTermsSigned(true);
     setShowModal(false);
-    localStorage.setItem(
-      "termsAndConditions",
-      String(Number(new Date()))
-    );
+    localStorage.setItem("termsAndConditions", String(Number(new Date())));
   }
 
   return (
@@ -138,7 +135,8 @@ function TermsModal({
           </li>
         </ul>
         <p className="py-6 border-t-2 border-customNeutral100">
-          By accepting you agree that you have read and accept the <a
+          By accepting you agree that you have read and accept the{" "}
+          <a
             className="text-secondaryBlue hover:text-primaryYellow focus:none outline-none"
             href="https://app.vaultcraft.io/disclaimer"
             target="_blank"
@@ -159,7 +157,6 @@ export default function Page({
   children: JSX.Element;
 }): JSX.Element {
   const router = useRouter();
-  const { query, asPath } = router;
   const { address: account } = useAccount();
   const publicClient = usePublicClient();
 
@@ -176,9 +173,9 @@ export default function Page({
   const [, setGaugeRewards] = useAtom(gaugeRewardsAtom);
   const [, setTVL] = useAtom(tvlAtom);
   const [, setNetworth] = useAtom(networthAtom);
-  const [, setAaveReserveData] = useAtom(aaveReserveDataAtom)
-  const [, setAaveAccountData] = useAtom(aaveAccountDataAtom)
-  const [, setVaultronStats] = useAtom(vaultronAtom)
+  const [, setAaveReserveData] = useAtom(aaveReserveDataAtom);
+  const [, setAaveAccountData] = useAtom(aaveAccountDataAtom);
+  const [, setVaultronStats] = useAtom(vaultronAtom);
 
   useEffect(() => {
     async function getData() {
@@ -209,7 +206,7 @@ export default function Page({
           newVaultsData[chain.id] = vaultsData
           newTokens[chain.id] = tokens;
         })
-      )
+      );
 
       console.log(`Completed fetching Token and Vaults Data (${new Date()})`)
       console.log(`Took ${Number(new Date()) - start}ms to load`)
@@ -241,7 +238,7 @@ export default function Page({
             newUserAccountData[chain.id] = res.userAccountData
           }
         })
-      )
+      );
 
       console.log(`Completed fetching AaveData (${new Date()})`)
       console.log(`Took ${Number(new Date()) - start}ms to load`)
@@ -257,7 +254,7 @@ export default function Page({
       try {
         stakingTVL = await axios.get(`https://pro-api.llama.fi/${process.env.DEFILLAMA_API_KEY}/api/protocol/vaultcraft`).then(res => res.data.currentChainTvls["staking"])
       } catch (e) {
-        stakingTVL = 762000
+        stakingTVL = 762000;
       }
 
       console.log(`Completed fetching TVL (${new Date()})`)
@@ -268,12 +265,12 @@ export default function Page({
         vault: vaultTVL,
         lockVault: lockVaultTVL,
         stake: stakingTVL,
-        total: vaultTVL + lockVaultTVL + stakingTVL
+        total: vaultTVL + lockVaultTVL + stakingTVL,
       });
       setVaults(newVaultsData);
       setTokens(newTokens);
-      setAaveReserveData(newReserveData)
-      setAaveAccountData(newUserAccountData)
+      setAaveReserveData(newReserveData);
+      setAaveAccountData(newUserAccountData);
 
       if (account) {
         console.log(`Fetching Networth (${new Date()})`)
@@ -296,8 +293,9 @@ export default function Page({
           args: [account],
         });
 
-        const stakeNetworth = (Number(stake.amount) / 1e18) * newTokens[1][VCX_LP].price;
-        const lockVaultNetworth = 0 // @dev hardcoded since we removed lock vaults
+        const stakeNetworth =
+          (Number(stake.amount) / 1e18) * newTokens[1][VCX_LP].price;
+        const lockVaultNetworth = 0; // @dev hardcoded since we removed lock vaults
 
         console.log(`Completed fetching Networth (${new Date()})`)
         console.log(`Took ${Number(new Date()) - start}ms to load`)
@@ -326,8 +324,9 @@ export default function Page({
           lockVault: lockVaultNetworth,
           wallet: assetNetworth,
           stake: stakeNetworth,
-          total: vaultNetworth + assetNetworth + stakeNetworth + lockVaultNetworth
-        })
+          total:
+            vaultNetworth + assetNetworth + stakeNetworth + lockVaultNetworth,
+        });
         setGaugeRewards(newRewards);
 
         console.log(`Fetching Vaultron (${new Date()})`)
@@ -355,7 +354,7 @@ export default function Page({
   useEffect(() => {
     if (!termsSigned) {
       const expiryDate = localStorage.getItem("termsAndConditions");
-      if (!expiryDate || (Number(expiryDate) + 1209600000 < Number(new Date()))) {
+      if (!expiryDate || Number(expiryDate) + 1209600000 < Number(new Date())) {
         setShowTermsModal(true);
       } else {
         setTermsSigned(true);
@@ -367,7 +366,7 @@ export default function Page({
     <>
       <div className="bg-customNeutral300 w-full min-h-screen h-full mx-auto font-khTeka flex flex-col">
         <Navbar />
-        <div className="flex-1">
+        <div className="flex-1 container p-0">
           <TermsModal
             showModal={showTermsModal}
             setShowModal={setShowTermsModal}

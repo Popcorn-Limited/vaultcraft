@@ -1,3 +1,5 @@
+import { keccak256, toHex } from "viem";
+import { PropsWithChildren } from "react";
 import { Tooltip } from "react-tooltip";
 
 export default function ResponsiveTooltip({
@@ -13,7 +15,11 @@ export default function ResponsiveTooltip({
         <Tooltip
           anchorSelect={`#${id}`}
           place="bottom"
-          style={{ backgroundColor: "#353945", borderRadius: "8px", zIndex: "50" }}
+          style={{
+            backgroundColor: "#353945",
+            borderRadius: "8px",
+            zIndex: "50",
+          }}
           border="1px solid #555555"
           opacity={1}
         >
@@ -25,7 +31,11 @@ export default function ResponsiveTooltip({
           anchorSelect={`#${id}`}
           openOnClick
           place="bottom"
-          style={{ backgroundColor: "#353945", borderRadius: "8px", zIndex: "50" }}
+          style={{
+            backgroundColor: "#353945",
+            borderRadius: "8px",
+            zIndex: "50",
+          }}
           border="1px solid #555555"
           opacity={1}
         >
@@ -35,3 +45,32 @@ export default function ResponsiveTooltip({
     </>
   );
 }
+
+export const WithTooltip = ({
+  children,
+  content,
+  tooltipChild,
+  subId,
+}: PropsWithChildren<{
+  content: string;
+  tooltipChild?: JSX.Element;
+  subId?: string;
+}>) => {
+  const id = `tooltip-${keccak256(toHex(content)).slice(2, 10)}${subId ?? ""}`;
+
+  return (
+    <span role="button" className="cursor-pointer" id={id}>
+      {children}
+      <ResponsiveTooltip
+        id={id}
+        content={
+          tooltipChild
+            ? tooltipChild
+            : <p className="max-w-[20rem] !text-sm whitespace-normal text-left">
+              {content}
+            </p>
+        }
+      />
+    </span>
+  );
+};

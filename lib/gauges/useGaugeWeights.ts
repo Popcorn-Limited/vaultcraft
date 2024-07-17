@@ -17,8 +17,8 @@ export default function useGaugeWeights({
   const contract = {
     address: GAUGE_CONTROLLER,
     chainId: Number(1),
-    abi: GaugeControllerAbi
-  }
+    abi: GaugeControllerAbi,
+  };
 
   return useReadContracts({
     contracts: [
@@ -37,6 +37,10 @@ export default function useGaugeWeights({
         functionName: "vote_user_slopes",
         args: [account || zeroAddress, address],
       },
+      {
+        ...contract,
+        functionName: "get_total_weight",
+      }
     ],
     allowFailure: false,
   });

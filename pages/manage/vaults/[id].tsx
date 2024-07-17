@@ -18,6 +18,7 @@ import NetFlowChart from "@/components/vault/management/vault/NetFlowChart";
 import VaultHero from "@/components/vault/VaultHero";
 import RewardsSection from "@/components/vault/management/vault/RewardsSection";
 import VaultsV1Settings from "@/components/vault/management/vault/VaultsV1Settings";
+import VaultsV2Settings from "@/components/vault/management/vault/VaultsV2Settings";
 
 async function getLogs(vault: VaultData, asset: Token) {
   const client = createPublicClient({
@@ -149,10 +150,10 @@ export default function Index() {
 
   return (
     <NoSSR>
-      {vaultData ? (
+      {vaultData && asset && vault ? (
         <div className="min-h-screen">
           <button
-            className="border border-customGray500 rounded-lg flex flex-row items-center px-4 py-2 ml-4 md:ml-8 mt-10"
+            className="border border-customGray500 rounded-lg flex flex-row items-center px-4 py-2 ml-4 md:ml-0 mt-10"
             type="button"
             onClick={() =>
               router.push(
@@ -168,13 +169,10 @@ export default function Index() {
             <p className="text-white leading-0 mt-1 ml-2">Back to Vaults</p>
           </button>
 
-          {vaultData
-            ? <VaultHero vaultData={vaultData} asset={asset} vault={vault} gauge={gauge} showClaim={false} />
-            : <section className="md:border-b border-customNeutral100 pt-10 pb-6 px-4 md:px-8 "></section>
-          }
+          <VaultHero vaultData={vaultData} asset={asset} vault={vault} gauge={gauge} showClaim={false} />
 
           {vaultData.gauge && (
-            <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-8 text-white">
+            <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-0 text-white">
               <h2 className="text-white font-bold text-2xl">
                 Manage Gauge Rewards
               </h2>
@@ -182,8 +180,7 @@ export default function Index() {
             </section>
           )}
 
-
-          <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-8 text-white">
+          <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-0 text-white">
             <div className="grid md:grid-cols-2 mb-12">
               <ApyChart strategy={vaultData.strategies[0]} />
               <NetFlowChart logs={logs} asset={asset} />
@@ -248,7 +245,7 @@ export default function Index() {
           </section>
 
           {vaultData.metadata.type === "multi-strategy-vault-v2"
-            ? <></>
+            ? <VaultsV2Settings vaultData={vaultData} />
             : <VaultsV1Settings vaultData={vaultData} />
           }
 

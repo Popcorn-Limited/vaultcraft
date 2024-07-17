@@ -2,9 +2,10 @@ import NetworkSticker from "@/components/network/NetworkSticker";
 import TokenIcon from "@/components/common/TokenIcon";
 import { VaultData, VaultLabel } from "@/lib/types";
 import ProtocolIcon from "@/components/common/ProtocolIcon";
-import ResponsiveTooltip from "../common/Tooltip";
+import ResponsiveTooltip from "@/components/common/Tooltip";
 import { useAtom } from "jotai";
 import { tokensAtom } from "@/lib/atoms";
+import { cn } from "@/lib/utils/helpers";
 
 const vaultLabelColor: { [key: string]: string } = {
   Experimental: "text-white bg-orange-500 bg-opacity-90",
@@ -53,8 +54,9 @@ function VaultLabelPill({
         id={tooltipId}
       >
         <div
-          className={`${vaultLabelColor[String(label)]
-            } rounded-lg py-1 px-3 flex flex-row items-center gap-2`}
+          className={`${
+            vaultLabelColor[String(label)]
+          } rounded-lg py-1 px-3 flex flex-row items-center gap-2`}
         >
           <p className={`${textSize[size]}`}>{String(label)}</p>
         </div>
@@ -72,15 +74,22 @@ function VaultLabelPill({
 export default function AssetWithName({
   vault,
   size = 1,
+  className,
 }: {
   vault: VaultData;
+  className?: string;
   size?: number;
 }) {
   const [tokens] = useAtom(tokensAtom);
   const tooltipId = vault.address.slice(1);
 
   return (
-    <div className="flex items-center gap-4 max-w-full flex-wrap md:flex-nowrap flex-1">
+    <div
+      className={cn(
+        "flex items-center gap-4 max-w-full flex-wrap md:flex-nowrap flex-1",
+        className
+      )}
+    >
       <div className="relative">
         <NetworkSticker chainId={vault.chainId} size={size} />
         <TokenIcon
@@ -97,15 +106,18 @@ export default function AssetWithName({
       </h2>
       <div className="flex flex-row flex-wrap w-max space-x-2">
         <ProtocolIcon
-          protocolName={vault.strategies.length > 1 ? "Multistrategy" : vault.strategies[0].metadata.name}
+          protocolName={
+            vault.strategies.length > 1
+              ? "Multistrategy"
+              : vault.strategies[0].metadata.protocol
+          }
           tooltip={{
             id: tooltipId,
             content: (
               <p className="w-60">
-                {vault.strategies.length > 1 ?
-                  "This vault allocates between multiple strategies"
-                  : vault.strategies[0].metadata.description
-                }
+                {vault.strategies.length > 1
+                  ? "This vault allocates between multiple strategies"
+                  : vault.strategies[0].metadata.description}
               </p>
             ),
           }}

@@ -31,7 +31,7 @@ export default function VaultFeeRecipient({
 
   return (
     <div className="flex flex-row justify-center">
-      <div className="w-1/2">
+      <div className="w-full">
         <p className="text-customGray500">
           Change the address receiving fees from this vault. Fee shares that got
           minted already will not be transfered to the new fee recipient.
