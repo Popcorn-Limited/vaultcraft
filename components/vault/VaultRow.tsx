@@ -41,6 +41,8 @@ export default function VaultRow({
   const [gauge, setGauge] = useState<Token>();
   const [walletValue, setWalletValue] = useState<number>(0)
   const [depositValue, setDepositValue] = useState<number>(0)
+  const [boost, setBoost] = useState<number>(1);
+  const [vAPR, setVAPR] = useState<number>(0);
 
   useEffect(() => {
     if (vaultData) {
@@ -54,15 +56,22 @@ export default function VaultRow({
       setWalletValue((asset_.balance * asset_.price) / (10 ** asset_.decimals))
       setDepositValue(depositValue_)
 
+      let vAPR_ = apy;
+      if (gaugeData && gauge) {
+        let boost_ = (gaugeData.workingBalance / (gauge.balance || 0)) * 5;
+        if (boost_ > 1) setBoost(boost_);
+
+        if (gaugeData.rewardApy.apy) vAPR_ += gaugeData.rewardApy.apy
+        if (gaugeData.lowerAPR) vAPR_ += (gaugeData.lowerAPR * boost)
+      }
+      setVAPR(vAPR_)
+
       setAsset(asset_);
       setVault(vault_);
       setGauge(gauge_);
     }
   }, [vaultData])
 
-  const boost = (vaultData.gaugeData?.workingBalance! / (gauge?.balance || 0)) * 5
-  let vAPR = apy + (gaugeData?.rewardApy.apy || 0)
-  if (gaugeData?.lowerAPR) vAPR += gaugeData.lowerAPR * boost
 
   const searchData = [
     vaultData.metadata?.vaultName,
