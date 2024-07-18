@@ -60,7 +60,9 @@ export default function VaultRow({
     }
   }, [vaultData])
 
-  const boost = ((vaultData.gaugeData?.workingBalance! / (gauge?.balance || 0)) * 5) || 1
+  const boost = (vaultData.gaugeData?.workingBalance! / (gauge?.balance || 0)) * 5
+  let vAPR = apy + (gaugeData?.rewardApy.apy || 0)
+  if (gaugeData?.lowerAPR) vAPR += gaugeData.lowerAPR * boost
 
   const searchData = [
     vaultData.metadata?.vaultName,
@@ -140,13 +142,13 @@ export default function VaultRow({
           tooltipChild={
             <div className="w-42">
               <p>Vault APR: {formatTwoDecimals(apy)} %</p>
-              {gaugeData?.lowerAPR && gaugeData?.lowerAPR > 0 ? <p>Your Boost: {formatTwoDecimals(gaugeData?.lowerAPR || 0 * boost)} %</p> : <></>}
+              {gaugeData?.lowerAPR && gaugeData?.lowerAPR > 0 ? <p>Your Boost: {formatTwoDecimals(gaugeData?.lowerAPR * boost)} %</p> : <></>}
               {gaugeData?.rewardApy.apy && gaugeData?.rewardApy.apy > 0 ? <p>Additional Rewards: {formatTwoDecimals(gaugeData?.rewardApy.apy)} %</p> : <></>}
             </div>
           }
         >
           <p className="text-lg">
-            {formatTwoDecimals(apy + (gaugeData?.lowerAPR || 0 * boost) + (gaugeData?.rewardApy.apy || 0))}%
+            {formatTwoDecimals(vAPR)}%
           </p>
         </WithTooltip>
       </td>
