@@ -11,7 +11,7 @@ import { networkMap } from "@/lib/utils/connectors";
 import { VeBeaconAbi } from "@/lib/constants/abi/VeBeacon";
 import { RootGaugeFactoryAbi } from "@/lib/constants/abi/RootGaugeFactory";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
-import {sendMessageToDiscord} from "@/lib/discord/discordBot";
+import { sendMessageToDiscord } from "@/lib/discord/discordBot";
 
 interface SendVotesProps {
   vaults: VaultData[];
@@ -127,6 +127,7 @@ export async function increaseLockAmount({
   clients,
 }: IncreaseLockAmountProps): Promise<boolean> {
   showLoadingToast("Increasing lock amount...");
+  amount = Number(amount) * 1e18
 
   return handleCallResult({
     successMessage: "Lock amount increased successfully!",
@@ -138,11 +139,7 @@ export async function increaseLockAmount({
       },
       functionName: "increase_amount",
       publicClient: clients.publicClient,
-      args: [
-        parseEther(
-          Number(amount).toLocaleString("fullwide", { useGrouping: false })
-        ),
-      ],
+      args: [BigInt(amount.toLocaleString("fullwide", { useGrouping: false }))],
     }),
     clients,
   });
@@ -296,7 +293,7 @@ export async function broadcastVeBalance({ targetChain, account, address, client
         user: account,
         isSimulation: false,
         method: "Switching chains",
-        reason: error?? "",
+        reason: error ?? "",
       });
       return
     }
@@ -341,7 +338,7 @@ export async function transmitRewards({ gauges, account, address, clients }
         user: account,
         isSimulation: false,
         method: "switch chain",
-        reason: error?? "",
+        reason: error ?? "",
       });
       return
     }
