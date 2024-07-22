@@ -242,7 +242,14 @@ async function addApyHist(vaults: VaultDataByAddress): Promise<VaultDataByAddres
   }))
 
   Object.values(vaults).forEach((vault: any, i: number) => {
-    vaults[vault.address].apyHist = apyHistAll[i]
+    let hist = apyHistAll[i]
+
+    // Cut off the first few days to normalise the apy chart (first few days of a new vault with low deposits arent representable)
+    if (hist.length > 10) {
+      hist = hist.slice(10, hist.length - 1)
+    }
+
+    vaults[vault.address].apyHist = hist
   })
 
   return vaults
