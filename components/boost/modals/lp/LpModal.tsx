@@ -12,7 +12,7 @@ import LpInfo from "@/components/boost/modals/lp/LpInfo";
 import LpInterface from "@/components/boost/modals/lp/LpInterface";
 import { handleAllowance } from "@/lib/approve";
 import ActionSteps from "@/components/vault/ActionSteps";
-import { depositIntoPool } from "@/lib/balancer/interactions";
+import { depositIntoPool } from "@/lib/external/balancer/interactions";
 import { ActionStep, POOL_DEPOSIT_STEPS } from "@/lib/getActionSteps";
 import { BALANCER_VAULT, VCX, VCX_LP, WETH } from "@/lib/constants";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
