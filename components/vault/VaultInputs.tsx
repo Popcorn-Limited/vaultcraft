@@ -218,18 +218,21 @@ export default function VaultInputs({
     }
   }
 
+  async function handleSwitchChain() {
+    showLoadingToast("Switching chain..")
+    try {
+      await switchChainAsync?.({ chainId: Number(chainId) });
+      showSuccessToast("Success");
+    } catch (error) {
+      showErrorToast("Failed switching chain")
+      return;
+    }
+  }
+
   async function handleMainAction() {
     let val = Number(inputBalance)
     if (val === 0 || !inputToken || !outputToken || !asset || !vault || !account || !walletClient) return;
     val = val * (10 ** inputToken.decimals)
-
-    if (chain?.id !== Number(chainId)) {
-      try {
-        await switchChainAsync?.({ chainId: Number(chainId) });
-      } catch (error) {
-        return;
-      }
-    }
 
     let newZapProvider = zapProvider
     if (newZapProvider === ZapProvider.none && [SmartVaultActionType.ZapDeposit, SmartVaultActionType.ZapDepositAndStake, SmartVaultActionType.ZapUnstakeAndWithdraw, SmartVaultActionType.ZapWithdrawal].includes(action)) {
@@ -468,7 +471,19 @@ export default function VaultInputs({
       </div>
 
       <div className="">
-        {account ? (
+        {!account &&
+          <MainActionButton
+            label={"Connect Wallet"}
+            handleClick={openConnectModal}
+          />
+        }
+        {(account && chain?.id !== Number(chainId)) &&
+          <MainActionButton
+            label="Switch Chain"
+            handleClick={handleSwitchChain}
+          />
+        }
+        {(account && chain?.id === Number(chainId)) &&
           <>
             {stepCounter === steps.length ||
               steps.some((step) => !step.loading && step.error) ? (
@@ -481,12 +496,7 @@ export default function VaultInputs({
               />
             )}
           </>
-        ) : (
-          <MainActionButton
-            label={"Connect Wallet"}
-            handleClick={openConnectModal}
-          />
-        )}
+        }
       </div>
     </>
   );
