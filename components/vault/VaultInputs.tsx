@@ -471,34 +471,32 @@ export default function VaultInputs({
       </div>
 
       <div className="">
-
-        {(chain?.id !== Number(chainId)) ? (
+        {!account &&
+          <MainActionButton
+            label={"Connect Wallet"}
+            handleClick={openConnectModal}
+          />
+        }
+        {(account && chain?.id !== Number(chainId)) &&
+          <MainActionButton
+            label="Switch Chain"
+            handleClick={handleSwitchChain}
+          />
+        }
+        {(account && chain?.id === Number(chainId)) &&
           <>
-            <MainActionButton
-              label="Switch Chain"
-              handleClick={handleSwitchChain}
-            />
+            {stepCounter === steps.length ||
+              steps.some((step) => !step.loading && step.error) ? (
+              <MainActionButton label={"Finish"} handleClick={hideModal} />
+            ) : (
+              <MainActionButton
+                label={steps[stepCounter].label}
+                handleClick={handleMainAction}
+                disabled={inputBalance === "0" || steps[stepCounter].loading}
+              />
+            )}
           </>
-        )
-          : account ? (
-            <>
-              {stepCounter === steps.length ||
-                steps.some((step) => !step.loading && step.error) ? (
-                <MainActionButton label={"Finish"} handleClick={hideModal} />
-              ) : (
-                <MainActionButton
-                  label={steps[stepCounter].label}
-                  handleClick={handleMainAction}
-                  disabled={inputBalance === "0" || steps[stepCounter].loading}
-                />
-              )}
-            </>
-          ) : (
-            <MainActionButton
-              label={"Connect Wallet"}
-              handleClick={openConnectModal}
-            />
-          )}
+        }
       </div>
     </>
   );
