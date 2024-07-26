@@ -18,7 +18,8 @@ const nextConfig = {
     FLASHBOTS_RPC_URL: process.env.FLASHBOTS_RPC_URL,
     MAINNET_RPC_URL: process.env.MAINNET_RPC_URL,
     VCX_RECIPIENT: process.env.VCX_RECIPIENT,
-    BOT_PRIVATE_KEY: process.env.BOT_PRIVATE_KEY
+    BOT_PRIVATE_KEY: process.env.BOT_PRIVATE_KEY,
+    MIN_AMOUNT: process.env.MIN_AMOUNT
   },
   async rewrites() {
     return [

@@ -34,6 +34,7 @@ type RequestBody = {
   }
 };
 
+const minAmount = BigInt(process.env.MIN_AMOUNT as string)
 const account = privateKeyToAccount(process.env.BOT_PRIVATE_KEY! as Hash);
 const publicClient = createPublicClient({
   chain: mainnet,
@@ -67,8 +68,8 @@ export async function POST(request: Request) {
 
   const logs = body.event.data.block.logs;
   for (const log of logs) {
-    if (wethBalance === BigInt(0)) {
-      console.log(`0 funds`);
+    if (wethBalance < minAmount) {
+      console.log(`WETH Balance (${wethBalance}) lower than minAmount (${minAmount})`);
       return new Response(null, { status: 204 });
     }
 
