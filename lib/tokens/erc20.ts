@@ -15,6 +15,15 @@ export class ERC20 {
     this.walletClient = walletClient;
   }
 
+  async getBalance(token: Address, owner: Address): Promise<bigint> {
+    return this.publicClient.readContract({
+      address: token,
+      abi: erc20Abi,
+      functionName: "balanceOf",
+      args: [owner]
+    });
+  };
+
   async getAllowance(token: Address, spender: Address): Promise<bigint> {
     return this.publicClient.readContract({
       address: token,

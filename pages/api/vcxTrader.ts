@@ -34,7 +34,7 @@ type RequestBody = {
   }
 };
 
-const account = privateKeyToAccount(process.env.PRIVATE_KEY! as Hash);
+const account = privateKeyToAccount(process.env.BOT_PRIVATE_KEY! as Hash);
 const publicClient = createPublicClient({
   chain: mainnet,
   transport: http(process.env.MAINNET_RPC_URL!),
@@ -61,10 +61,17 @@ export async function POST(request: Request) {
     await erc20.approve(WETH, BALANCER_VAULT, maxUint256);
   }
 
+  let wethBalance = await erc20.getBalance(WETH, account.address);
+
   const body: RequestBody = await request.json();
 
   const logs = body.event.data.block.logs;
   for (const log of logs) {
+    if (wethBalance === BigInt(0)) {
+      console.log(`0 funds`);
+      return new Response(null, { status: 204 });
+    }
+
     const tokenIn = getAddress(trim(log.topics[2]));
 
     if (tokenIn !== VCX) {
@@ -102,17 +109,29 @@ export async function POST(request: Request) {
       log.data,
     );
 
+    let wethAmount = amounts[1]
+    if (wethAmount > wethBalance) {
+      wethAmount = wethBalance;
+    }
+
     const swap: SingleSwap = {
       poolId: VCX_POOL_ID,
       kind: SwapKind.GIVEN_IN,
       assetIn: WETH,
       assetOut: VCX,
-      amount: amounts[1],
+      amount: wethAmount,
       userData: zeroHash,
     };
 
     const swapTxHash = await balancer.swap(swap);
-    console.log(`executed swap for log ${log.transaction.hash} with txHash ${swapTxHash}`);
+    const receipt = await publicClient.waitForTransactionReceipt({ hash: swapTxHash });
+    if (receipt) {
+      console.log(`executed swap for log ${log.transaction.hash} with txHash ${swapTxHash}`);
+      wethBalance -= wethAmount;
+    } else {
+      console.log("Swap failed");
+      return new Response(null, { status: 204 });
+    }
   }
 
   return new Response("ok", { status: 200 });
