@@ -19,7 +19,8 @@ const nextConfig = {
     MAINNET_RPC_URL: process.env.MAINNET_RPC_URL,
     VCX_RECIPIENT: process.env.VCX_RECIPIENT,
     BOT_PRIVATE_KEY: process.env.BOT_PRIVATE_KEY,
-    MIN_AMOUNT: process.env.MIN_AMOUNT
+    MIN_AMOUNT: process.env.MIN_AMOUNT,
+    WATCH_LIST: process.env.WATCH_LIST
   },
   async rewrites() {
     return [
