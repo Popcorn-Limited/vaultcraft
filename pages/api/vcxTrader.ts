@@ -110,28 +110,26 @@ export async function POST(request: Request) {
       log.data,
     );
 
-    let wethAmount = amounts[1]
-    if (wethAmount > wethBalance) {
-      wethAmount = wethBalance;
-    }
+    let wethAmount = amounts[1] > wethBalance ? wethBalance : amounts[1]
+    if (wethAmount >= minAmount) {
+      const swap: SingleSwap = {
+        poolId: VCX_POOL_ID,
+        kind: SwapKind.GIVEN_IN,
+        assetIn: WETH,
+        assetOut: VCX,
+        amount: wethAmount,
+        userData: zeroHash,
+      };
 
-    const swap: SingleSwap = {
-      poolId: VCX_POOL_ID,
-      kind: SwapKind.GIVEN_IN,
-      assetIn: WETH,
-      assetOut: VCX,
-      amount: wethAmount,
-      userData: zeroHash,
-    };
-
-    const swapTxHash = await balancer.swap(swap);
-    const receipt = await publicClient.waitForTransactionReceipt({ hash: swapTxHash });
-    if (receipt) {
-      console.log(`executed swap for log ${log.transaction.hash} with txHash ${swapTxHash}`);
-      wethBalance -= wethAmount;
-    } else {
-      console.log("Swap failed");
-      return new Response(null, { status: 204 });
+      const swapTxHash = await balancer.swap(swap);
+      const receipt = await publicClient.waitForTransactionReceipt({ hash: swapTxHash });
+      if (receipt) {
+        console.log(`executed swap for log ${log.transaction.hash} with txHash ${swapTxHash}`);
+        wethBalance -= wethAmount;
+      } else {
+        console.log("Swap failed");
+        return new Response(null, { status: 204 });
+      }
     }
   }
 
