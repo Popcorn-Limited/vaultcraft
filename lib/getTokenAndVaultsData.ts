@@ -73,16 +73,20 @@ export default async function getTokenAndVaultsDataByChain({
   });
 
   // Add aave assets
-  if (chainId !== xLayer.id) {
-    const reserveData = await client.readContract({
-      address: AaveUiPoolProviderByChain[chainId],
-      abi: AavePoolUiAbi,
-      functionName: 'getReservesData',
-      args: [AavePoolAddressProviderByChain[chainId]],
-    })
-    reserveData[0].filter(d => !d.isFrozen && !uniqueAssetAdresses.includes(d.underlyingAsset))
-      .forEach(d => uniqueAssetAdresses.push(d.underlyingAsset))
-  }
+  // if (chainId !== xLayer.id) {
+  //   try {
+  //     const reserveData = await client.readContract({
+  //       address: AaveUiPoolProviderByChain[chainId],
+  //       abi: AavePoolUiAbi,
+  //       functionName: 'getReservesData',
+  //       args: [AavePoolAddressProviderByChain[chainId]],
+  //     })
+  //     reserveData[0].filter(d => !d.isFrozen && !uniqueAssetAdresses.includes(d.underlyingAsset))
+  //       .forEach(d => uniqueAssetAdresses.push(d.underlyingAsset))
+  //   } catch (e) {
+  //     console.log(`Aave (${chainId}) fetching error: `, e)
+  //   }
+  // }
 
   // Add reward token addresses
   if (GAUGE_NETWORKS.includes(client.chain.id)) {

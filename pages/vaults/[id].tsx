@@ -100,7 +100,7 @@ export default function Index() {
                   <UserBoostSection vaultData={vaultData} gauge={gauge} veToken={tokens[vaultData.chainId][VeTokenByChain[vaultData.chainId]]} />
                 }
 
-                <div className="bg-customNeutral200 p-6 rounded-lg">
+                {/* <div className="bg-customNeutral200 p-6 rounded-lg">
                   <p className="text-white text-2xl font-bold mb-4">Leverage Farm 🧑‍🌾</p>
                   <p className='text-white mb-4'>
                     The borrow modal allows liquidity providers to borrow against their collateral and deposit more into Smart Vaults, enhancing capital efficiency and premiums earned.
@@ -113,7 +113,7 @@ export default function Index() {
                       />
                     </div>
                   </div>
-                </div>
+                </div> */}
 
                 {vaultData.apyHist.length > 0 && <ApyChart vault={vaultData} />}
 
