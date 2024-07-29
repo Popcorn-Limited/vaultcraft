@@ -21,6 +21,7 @@ import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
 import { useAtom } from "jotai";
 import { tokensAtom } from "@/lib/atoms";
 import { VCX_LP, VOTING_ESCROW } from "@/lib/constants/addresses";
+import { handleSwitchChain } from "@/lib/utils/helpers";
 
 interface LockModalProps {
   show: [boolean, Dispatch<SetStateAction<boolean>>];
@@ -159,11 +160,19 @@ export default function LockModal({
           {modalStep === 3 && (
             <>
               {stepCounter < 2 ? (
-                <MainActionButton
-                  label={steps[stepCounter].label}
-                  handleClick={handleLock}
-                  disabled={amount === "0" || days === 0}
-                />
+                <>
+                  {chain?.id !== 1
+                    ? <MainActionButton
+                      label="Switch Chain"
+                      handleClick={() => handleSwitchChain(1, switchChainAsync)}
+                    />
+                    : <MainActionButton
+                      label={steps[stepCounter].label}
+                      handleClick={handleLock}
+                      disabled={amount === "0" || days === 0}
+                    />
+                  }
+                </>
               ) : (
                 <MainActionButton
                   label={"Close Modal"}

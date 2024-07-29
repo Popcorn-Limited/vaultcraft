@@ -10,7 +10,7 @@ import {
 } from "wagmi";
 import TabSelector from "@/components/common/TabSelector";
 import { SmartVaultActionType, Token, TokenType, VaultData, ZapProvider } from "@/lib/types";
-import { validateInput } from "@/lib/utils/helpers";
+import { handleSwitchChain, validateInput } from "@/lib/utils/helpers";
 import Modal from "@/components/modal/Modal";
 import InputNumber from "@/components/input/InputNumber";
 import { safeRound } from "@/lib/utils/formatBigNumber";
@@ -215,17 +215,6 @@ export default function VaultInputs({
             // error
             return;
         }
-    }
-  }
-
-  async function handleSwitchChain() {
-    showLoadingToast("Switching chain..")
-    try {
-      await switchChainAsync?.({ chainId: Number(chainId) });
-      showSuccessToast("Success");
-    } catch (error) {
-      showErrorToast("Failed switching chain")
-      return;
     }
   }
 
@@ -480,7 +469,7 @@ export default function VaultInputs({
         {(account && chain?.id !== Number(chainId)) &&
           <MainActionButton
             label="Switch Chain"
-            handleClick={handleSwitchChain}
+            handleClick={() => handleSwitchChain(chainId, switchChainAsync)}
           />
         }
         {(account && chain?.id === Number(chainId)) &&

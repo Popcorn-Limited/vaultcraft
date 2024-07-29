@@ -1,4 +1,4 @@
-import { showErrorToast, showSuccessToast } from "@/lib/toasts";
+import { showErrorToast, showLoadingToast, showSuccessToast } from "@/lib/toasts";
 import { Clients, SimulationResponse, Token } from "@/lib/types";
 import { InitParam, InitParamRequirement } from "@/lib/atoms/adapter";
 import { Abi, Address, PublicClient, isAddress } from "viem";
@@ -234,4 +234,16 @@ export function handleChangeInput(e: any, setter: Function) {
 export function handleMaxClick(token: Token, setter: Function) {
   const formatted = numberToFormattedString(token.balance, token.decimals)
   setter(validateInput(formatted).isValid ? formatted : "0");
+}
+
+
+export async function handleSwitchChain(chainId: number, switchChainAsync: Function) {
+  showLoadingToast("Switching chain..")
+  try {
+    await switchChainAsync?.({ chainId: Number(chainId) });
+    showSuccessToast("Success");
+  } catch (error) {
+    showErrorToast("Failed switching chain")
+    return;
+  }
 }

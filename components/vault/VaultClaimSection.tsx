@@ -16,11 +16,13 @@ import { claimRewards } from "@/lib/gauges/interactions";
 import LargeCardStat from "../common/LargeCardStat";
 import MainActionButton from "../button/MainActionButton";
 import { getClaimableRewards } from "@/lib/gauges/useGaugeRewardData";
-import ResponsiveTooltip from "../common/Tooltip";
 import { handleAllowance } from "@/lib/approve";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { handleSwitchChain } from "@/lib/utils/helpers";
 
 export default function VaultClaimSection({ vaultData }: { vaultData: VaultData }) {
   const { switchChainAsync } = useSwitchChain();
+  const { openConnectModal } = useConnectModal();
   const { address: account, chain } = useAccount();
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
@@ -178,30 +180,67 @@ export default function VaultClaimSection({ vaultData }: { vaultData: VaultData 
         </div>
 
         <div className="hidden md:block md:mt-auto w-52 mb-8 space-y-2">
-          <MainActionButton
-            label="Claim oVCX"
-            handleClick={handleClaim}
-            disabled={
-              !gaugeRewards || gaugeRewards?.[vaultData.chainId]?.total < 0
-            }
-          />
-          {claimableRewards.length > 0 && rewardValue > 0.1 && (
-            <SecondaryActionButton
-              label="Claim Rewards"
-              handleClick={handleClaimRewards}
-              disabled={!account}
+          {!account &&
+            <MainActionButton
+              label={"Connect Wallet"}
+              handleClick={openConnectModal}
             />
-          )}
+          }
+          {(account && chain?.id !== Number(vaultData.chainId)) &&
+            <MainActionButton
+              label="Switch Chain"
+              handleClick={() => handleSwitchChain(vaultData.chainId, switchChainAsync)}
+            />
+          }
+          {(account && chain?.id === Number(vaultData.chainId)) &&
+            <>
+              <MainActionButton
+                label="Claim oVCX"
+                handleClick={handleClaim}
+                disabled={
+                  !gaugeRewards || gaugeRewards?.[vaultData.chainId]?.total < 0
+                }
+              />
+              {claimableRewards.length > 0 && rewardValue > 0.1 && (
+                <SecondaryActionButton
+                  label="Claim Rewards"
+                  handleClick={handleClaimRewards}
+                  disabled={!account}
+                />
+              )}
+            </>}
         </div>
       </div>
       <div className="md:hidden pt-8">
-        <MainActionButton
-          label="Claim oVCX"
-          handleClick={handleClaim}
-          disabled={
-            !gaugeRewards || gaugeRewards?.[vaultData.chainId]?.total < 0
-          }
-        />
+        {!account &&
+          <MainActionButton
+            label={"Connect Wallet"}
+            handleClick={openConnectModal}
+          />
+        }
+        {(account && chain?.id !== Number(vaultData.chainId)) &&
+          <MainActionButton
+            label="Switch Chain"
+            handleClick={() => handleSwitchChain(vaultData.chainId, switchChainAsync)}
+          />
+        }
+        {(account && chain?.id === Number(vaultData.chainId)) &&
+          <>
+            <MainActionButton
+              label="Claim oVCX"
+              handleClick={handleClaim}
+              disabled={
+                !gaugeRewards || gaugeRewards?.[vaultData.chainId]?.total < 0
+              }
+            />
+            {claimableRewards.length > 0 && rewardValue > 0.1 && (
+              <SecondaryActionButton
+                label="Claim Rewards"
+                handleClick={handleClaimRewards}
+                disabled={!account}
+              />
+            )}
+          </>}
       </div>
     </>
   );

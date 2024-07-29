@@ -6,7 +6,7 @@ import MainActionButton from "@/components/button/MainActionButton";
 import ActionSteps from "@/components/vault/ActionSteps";
 import { safeRound } from "@/lib/utils/formatBigNumber";
 import { encodeAbiParameters, formatUnits } from "viem";
-import { validateInput } from "@/lib/utils/helpers";
+import { handleSwitchChain, validateInput } from "@/lib/utils/helpers";
 import { ArrowDownIcon } from "@heroicons/react/24/outline";
 import { LockboxAdapterByChain, VCX, XVCXByChain } from "@/lib/constants/addresses";
 import { SmartVaultActionType, Token } from "@/lib/types";
@@ -201,10 +201,16 @@ export default function BridgeModal({ show }: { show: [boolean, Dispatch<SetStat
             </p>
           </div>
           <div className="mt-6">
-            <MainActionButton
-              label="Bridge"
-              handleClick={handleMainAction}
-            />
+            {chain?.id !== chainId
+              ? <MainActionButton
+                label="Switch Chain"
+                handleClick={() => handleSwitchChain(chainId, switchChainAsync)}
+              />
+              : <MainActionButton
+                label="Bridge"
+                handleClick={handleMainAction}
+              />
+            }
           </div>
           <p className="text-start mt-4">
             If you encounter issues with this interface try using {" "}

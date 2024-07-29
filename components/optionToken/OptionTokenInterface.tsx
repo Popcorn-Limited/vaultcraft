@@ -19,6 +19,7 @@ import getGaugeRewards from "@/lib/gauges/getGaugeRewards";
 import { vaultsAtom } from "@/lib/atoms/vaults";
 import NetworkSticker from "@/components/network/NetworkSticker";
 import TokenIcon from "@/components/common/TokenIcon";
+import { handleSwitchChain } from "@/lib/utils/helpers";
 
 interface OptionTokenInterfaceProps {
   setShowOptionTokenModal?: Dispatch<SetStateAction<boolean>>;
@@ -170,25 +171,43 @@ export default function OptionTokenInterface({ setShowOptionTokenModal }: Option
         {(gaugeRewards && Object.keys(gaugeRewards).length > 0) ?
           <>
             <div className="w-full md:w-60">
-              <MainActionButton
-                label="Claim ETH oVCX"
-                handleClick={() => handleClaim(1)}
-                disabled={!account || (gaugeRewards ? Number(gaugeRewards[1].total) === 0 : true)}
-              />
+              {chain?.id === 1
+                ? <MainActionButton
+                  label="Claim ETH oVCX"
+                  handleClick={() => handleClaim(1)}
+                  disabled={!account || (gaugeRewards ? Number(gaugeRewards[1].total) === 0 : true)}
+                />
+                : <MainActionButton
+                  label="Connect to Ethereum"
+                  handleClick={() => handleSwitchChain(1, switchChainAsync)}
+                />
+              }
             </div>
             <div className="w-full md:w-60">
-              <MainActionButton
-                label="Claim OPT oVCX"
-                handleClick={() => handleClaim(10)}
-                disabled={!account || (gaugeRewards ? Number(gaugeRewards[10].total) === 0 : true)}
-              />
+              {chain?.id === 10
+                ? <MainActionButton
+                  label="Claim OPT oVCX"
+                  handleClick={() => handleClaim(10)}
+                  disabled={!account || (gaugeRewards ? Number(gaugeRewards[10].total) === 0 : true)}
+                />
+                : <MainActionButton
+                  label="Connect to Optimism"
+                  handleClick={() => handleSwitchChain(10, switchChainAsync)}
+                />
+              }
             </div>
             <div className="w-full md:w-60">
-              <MainActionButton
-                label="Claim ARB oVCX"
-                handleClick={() => handleClaim(42161)}
-                disabled={!account || (gaugeRewards ? Number(gaugeRewards[42161].total) === 0 : true)}
-              />
+              {chain?.id === 42161
+                ? <MainActionButton
+                  label="Claim ARB oVCX"
+                  handleClick={() => handleClaim(42161)}
+                  disabled={!account || (gaugeRewards ? Number(gaugeRewards[42161].total) === 0 : true)}
+                />
+                : <MainActionButton
+                  label="Connect to Arbitrum"
+                  handleClick={() => handleSwitchChain(42161, switchChainAsync)}
+                />
+              }
             </div>
           </>
           :
