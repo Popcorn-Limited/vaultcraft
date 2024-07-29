@@ -1,4 +1,4 @@
-import AssetWithName from "@/components/vault/AssetWithName";
+import AssetWithName from "@/components/common/AssetWithName";
 import { vaultsAtom } from "@/lib/atoms/vaults";
 import { ReserveData, Token, UserAccountData, VaultData, ZapProvider } from "@/lib/types";
 import { useAtom } from "jotai";
@@ -69,6 +69,9 @@ export default function PreviewInterface({ visibilityState, vaultData, inAmount,
     setSteps(getSmartVaultActionSteps(action));
   }, [visible, input])
 
+  // print one card for each step with data
+  // highlight current step one
+  // use small cards with no inputs, just recaps
   async function handleMainAction() {
     let val = Number(input)
     let chainId = vaultData.chainId;
@@ -214,35 +217,11 @@ export default function PreviewInterface({ visibilityState, vaultData, inAmount,
           }
 
           <div className="w-full md:flex md:flex-wrap md:justify-between md:gap-5 text-start">
-            {(account && inputToken) &&
-              <>
-                {/* Input */}
-                <InputTokenStatic
-                  captionText={`${activeTab} Amount`}
-                  chainId={vaultData.chainId}
-                  value={input}
-                  selectedToken={inputToken}
-                  errorMessage={""}
-                  {...inputProps}
-                />
-
-                {/* Output */}
-                <InputTokenStatic
-                  captionText={"Output Amount"}
-                  chainId={vaultData.chainId}
-                  value={
-                    (Number(input) * Number(inputToken?.price)) /
-                    Number(outputToken?.price) || 0
-                  }
-                  selectedToken={outputToken}
-                  errorMessage={""}
-                  {...inputProps}
-                />
-              </>
-            }
-
             <div className="w-full flex justify-center my-6">
-              <ActionSteps steps={steps} stepCounter={stepCounter} />
+              <ActionSteps 
+              steps={steps} 
+              stepCounter={stepCounter} inputAmount={input} inputToken={inputToken} outputToken={outputToken}
+              chainId={vaultData.chainId}/>
             </div>
             <div className="">
               {account ? (

@@ -10,7 +10,7 @@ import {
 import axios from "axios";
 import { VaultAbi } from "@/lib/constants/abi/Vault";
 import { LlamaApy, TokenByAddress, VaultData, VaultDataByAddress, VaultLabel } from "@/lib/types";
-import { ChildGaugeAbi, ERC20Abi, GaugeAbi, OptionTokenByChain, VCX, VCX_LP, VE_VCX, VeTokenByChain, XVCXByChain, ZapAssetAddressesByChain } from "@/lib/constants";
+import { ChildGaugeAbi, ERC20Abi, GaugeAbi, OptionTokenByChain, VCX, VCX_LP, VE_VCX, pVCX, pOHM, VeTokenByChain, XVCXByChain, ZapAssetAddressesByChain } from "@/lib/constants";
 import { RPC_URLS } from "@/lib/utils/connectors";
 import { YieldOptions } from "vaultcraft-sdk";
 import { AavePoolUiAbi } from "@/lib/constants/abi/Aave";
@@ -62,7 +62,7 @@ export default async function getTokenAndVaultsDataByChain({
 
   // Create token array
   const uniqueAssetAdresses: Address[] = [...ZapAssetAddressesByChain[chainId]];
-  if (chainId === 1) uniqueAssetAdresses.push(...[VCX, VCX_LP, VE_VCX])
+  if (chainId === 1) uniqueAssetAdresses.push(...[VCX, VCX_LP, VE_VCX, pVCX, pOHM])
   if (GAUGE_NETWORKS.includes(chainId)) uniqueAssetAdresses.push(...[OptionTokenByChain[chainId], VeTokenByChain[chainId], XVCXByChain[chainId]])
 
   // Add vault assets
@@ -73,16 +73,16 @@ export default async function getTokenAndVaultsDataByChain({
   });
 
   // Add aave assets
-  if (chainId !== xLayer.id) {
-    const reserveData = await client.readContract({
-      address: AaveUiPoolProviderByChain[chainId],
-      abi: AavePoolUiAbi,
-      functionName: 'getReservesData',
-      args: [AavePoolAddressProviderByChain[chainId]],
-    })
-    reserveData[0].filter(d => !d.isFrozen && !uniqueAssetAdresses.includes(d.underlyingAsset))
-      .forEach(d => uniqueAssetAdresses.push(d.underlyingAsset))
-  }
+  // if (chainId !== xLayer.id) {
+  //   const reserveData = await client.readContract({
+  //     address: AaveUiPoolProviderByChain[chainId],
+  //     abi: AavePoolUiAbi,
+  //     functionName: 'getReservesData',
+  //     args: [AavePoolAddressProviderByChain[chainId]],
+  //   })
+  //   reserveData[0].filter(d => !d.isFrozen && !uniqueAssetAdresses.includes(d.underlyingAsset))
+  //     .forEach(d => uniqueAssetAdresses.push(d.underlyingAsset))
+  // }
 
   // Add reward token addresses
   if (GAUGE_NETWORKS.includes(client.chain.id)) {

@@ -143,6 +143,10 @@ export default function VaultInputs({
             //   getSmartVaultActionSteps(SmartVaultActionType.DepositAndStake)
             // );
             return;
+          case "0x319121F8F39669599221A883Bb6d7d0Feef0E69c": 
+            setIsDeposit(true);
+            setAction(SmartVaultActionType.PeapodsStake);
+            return;
           default:
             // error
             return;
@@ -232,108 +236,108 @@ export default function VaultInputs({
     }
   }
 
-  async function handleMainAction() {
-    let val = Number(inputBalance)
-    if (val === 0 || !inputToken || !outputToken || !asset || !vault || !account || !walletClient) return;
-    val = val * (10 ** inputToken.decimals)
+  // async function handleMainAction() {
+  //   let val = Number(inputBalance)
+  //   if (val === 0 || !inputToken || !outputToken || !asset || !vault || !account || !walletClient) return;
+  //   val = val * (10 ** inputToken.decimals)
 
-    let newZapProvider = zapProvider
-    if (newZapProvider === ZapProvider.none && [SmartVaultActionType.ZapDeposit, SmartVaultActionType.ZapDepositAndStake, SmartVaultActionType.ZapUnstakeAndWithdraw, SmartVaultActionType.ZapWithdrawal].includes(action)) {
-      showLoadingToast("Searching for the best price...")
-      if ([SmartVaultActionType.ZapDeposit, SmartVaultActionType.ZapDepositAndStake].includes(action)) {
-        newZapProvider = await getZapProvider({ sellToken: inputToken, buyToken: asset, amount: val, chainId, account })
-      } else {
-        newZapProvider = await getZapProvider({ sellToken: asset, buyToken: outputToken, amount: val, chainId, account })
-      }
+  //   let newZapProvider = zapProvider
+  //   if (newZapProvider === ZapProvider.none && [SmartVaultActionType.ZapDeposit, SmartVaultActionType.ZapDepositAndStake, SmartVaultActionType.ZapUnstakeAndWithdraw, SmartVaultActionType.ZapWithdrawal].includes(action)) {
+  //     showLoadingToast("Searching for the best price...")
+  //     if ([SmartVaultActionType.ZapDeposit, SmartVaultActionType.ZapDepositAndStake].includes(action)) {
+  //       newZapProvider = await getZapProvider({ sellToken: inputToken, buyToken: asset, amount: val, chainId, account })
+  //     } else {
+  //       newZapProvider = await getZapProvider({ sellToken: asset, buyToken: outputToken, amount: val, chainId, account })
+  //     }
 
-      setZapProvider(newZapProvider)
+  //     setZapProvider(newZapProvider)
 
-      if (newZapProvider === ZapProvider.notFound) {
-        showErrorToast("Zap not available. Please try a different token.")
-        return
-      } else {
-        showSuccessToast(`Using ${String(ZapProvider[newZapProvider])} for your zap`)
-      }
-    }
+  //     if (newZapProvider === ZapProvider.notFound) {
+  //       showErrorToast("Zap not available. Please try a different token.")
+  //       return
+  //     } else {
+  //       showSuccessToast(`Using ${String(ZapProvider[newZapProvider])} for your zap`)
+  //     }
+  //   }
 
-    const stepsCopy = [...steps]
-    const currentStep = stepsCopy[stepCounter]
-    currentStep.loading = true
-    setSteps(stepsCopy)
+  //   const stepsCopy = [...steps]
+  //   const currentStep = stepsCopy[stepCounter]
+  //   currentStep.loading = true
+  //   setSteps(stepsCopy)
 
-    const vaultInteraction = await handleVaultInteraction({
-      action,
-      stepCounter,
-      chainId,
-      amount: val,
-      inputToken,
-      outputToken,
-      vaultData,
-      asset,
-      vault,
-      gauge,
-      account,
-      zapProvider: newZapProvider,
-      slippage,
-      tradeTimeout,
-      clients: { publicClient: publicClient!, walletClient },
-      referral:
-        !!query?.ref && isAddress(query.ref as string)
-          ? getAddress(query.ref as string)
-          : undefined,
-      tokensAtom: [tokens, setTokens]
-    });
-    const success = await vaultInteraction();
+  //   const vaultInteraction = await handleVaultInteraction({
+  //     action,
+  //     stepCounter,
+  //     chainId,
+  //     amount: val,
+  //     inputToken,
+  //     outputToken,
+  //     vaultData,
+  //     asset,
+  //     vault,
+  //     gauge,
+  //     account,
+  //     zapProvider: newZapProvider,
+  //     slippage,
+  //     tradeTimeout,
+  //     clients: { publicClient: publicClient!, walletClient },
+  //     referral:
+  //       !!query?.ref && isAddress(query.ref as string)
+  //         ? getAddress(query.ref as string)
+  //         : undefined,
+  //     tokensAtom: [tokens, setTokens]
+  //   });
+  //   const success = await vaultInteraction();
 
-    currentStep.loading = false;
-    currentStep.success = success;
-    currentStep.error = !success;
+  //   currentStep.loading = false;
+  //   currentStep.success = success;
+  //   currentStep.error = !success;
 
-    const newStepCounter = stepCounter + 1;
-    setSteps(stepsCopy);
-    setStepCounter(newStepCounter);
+  //   const newStepCounter = stepCounter + 1;
+  //   setSteps(stepsCopy);
+  //   setStepCounter(newStepCounter);
 
-    if (newStepCounter === steps.length && success) {
-      const newSupply = await publicClient?.readContract({
-        address: vaultData.address,
-        abi: erc20Abi,
-        functionName: "totalSupply"
-      })
-      const index = vaults[vaultData.chainId].findIndex(v => v.address === vaultData.address)
-      const newNetworkVaults = [...vaults[vaultData.chainId]]
-      newNetworkVaults[index] = {
-        ...vaultData,
-        totalSupply: Number(newSupply),
-        tvl: (Number(newSupply) * vault.price) / (10 ** vault.decimals)
-      }
-      const newVaults = { ...vaults, [vaultData.chainId]: newNetworkVaults }
+  //   if (newStepCounter === steps.length && success) {
+  //     const newSupply = await publicClient?.readContract({
+  //       address: vaultData.address,
+  //       abi: erc20Abi,
+  //       functionName: "totalSupply"
+  //     })
+  //     const index = vaults[vaultData.chainId].findIndex(v => v.address === vaultData.address)
+  //     const newNetworkVaults = [...vaults[vaultData.chainId]]
+  //     newNetworkVaults[index] = {
+  //       ...vaultData,
+  //       totalSupply: Number(newSupply),
+  //       tvl: (Number(newSupply) * vault.price) / (10 ** vault.decimals)
+  //     }
+  //     const newVaults = { ...vaults, [vaultData.chainId]: newNetworkVaults }
 
-      setVaults(newVaults)
+  //     setVaults(newVaults)
 
-      const vaultTVL = SUPPORTED_NETWORKS.map(chain => newVaults[chain.id]).flat().reduce((a, b) => a + b.tvl, 0)
-      setTVL({
-        vault: vaultTVL,
-        lockVault: tvl.lockVault,
-        stake: tvl.stake,
-        total: vaultTVL + tvl.lockVault + tvl.stake
-      });
+  //     const vaultTVL = SUPPORTED_NETWORKS.map(chain => newVaults[chain.id]).flat().reduce((a, b) => a + b.tvl, 0)
+  //     setTVL({
+  //       vault: vaultTVL,
+  //       lockVault: tvl.lockVault,
+  //       stake: tvl.stake,
+  //       total: vaultTVL + tvl.lockVault + tvl.stake
+  //     });
 
-      const vaultNetworth = SUPPORTED_NETWORKS.map(chain =>
-        Object.values(tokens[chain.id])).flat().filter(t => t.type === TokenType.Vault || t.type === TokenType.Gauge)
-        .reduce((a, b) => a + ((b.balance / (10 ** b.decimals)) * b.price), 0)
-      const assetNetworth = SUPPORTED_NETWORKS.map(chain =>
-        Object.values(tokens[chain.id])).flat().filter(t => t.type === TokenType.Asset)
-        .reduce((a, b) => a + ((b.balance / (10 ** b.decimals)) * b.price), 0)
+  //     const vaultNetworth = SUPPORTED_NETWORKS.map(chain =>
+  //       Object.values(tokens[chain.id])).flat().filter(t => t.type === TokenType.Vault || t.type === TokenType.Gauge)
+  //       .reduce((a, b) => a + ((b.balance / (10 ** b.decimals)) * b.price), 0)
+  //     const assetNetworth = SUPPORTED_NETWORKS.map(chain =>
+  //       Object.values(tokens[chain.id])).flat().filter(t => t.type === TokenType.Asset)
+  //       .reduce((a, b) => a + ((b.balance / (10 ** b.decimals)) * b.price), 0)
 
-      setNetworth({
-        vault: vaultNetworth,
-        lockVault: networth.lockVault,
-        wallet: assetNetworth,
-        stake: networth.stake,
-        total: vaultNetworth + assetNetworth + networth.lockVault + networth.stake
-      })
-    }
-  }
+  //     setNetworth({
+  //       vault: vaultNetworth,
+  //       lockVault: networth.lockVault,
+  //       wallet: assetNetworth,
+  //       stake: networth.stake,
+  //       total: vaultNetworth + assetNetworth + networth.lockVault + networth.stake
+  //     })
+  //   }
+  // }
 
   function handleMaxClick() {
     if (!inputToken) return;
@@ -480,10 +484,6 @@ export default function VaultInputs({
         </div>
       </div>
 
-      <div className="w-full flex justify-center my-6">
-        <ActionSteps steps={steps} stepCounter={stepCounter} />
-      </div>
-
       <div className="">
 
         {(chain?.id !== Number(chainId)) ? (
@@ -502,7 +502,7 @@ export default function VaultInputs({
               ) : (
                 <MainActionButton
                   label={steps[stepCounter].label}
-                  handleClick={handleMainAction}
+                  handleClick={() => setShowPreviewModal(true)}
                   disabled={inputBalance === "0" || steps[stepCounter].loading}
                 />
               )}

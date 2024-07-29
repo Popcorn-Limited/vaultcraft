@@ -215,33 +215,33 @@ export default function Page({
       const newReserveData: { [key: number]: ReserveData[] } = {}
       const newUserAccountData: { [key: number]: UserAccountData } = {}
 
-      console.log(`Fetching AaveData (${new Date()})`)
-      start = Number(new Date())
+      // console.log(`Fetching AaveData (${new Date()})`)
+      // start = Number(new Date())
 
-      await Promise.all(
-        SUPPORTED_NETWORKS.map(async (chain) => {
-          if (chain.id === xLayer.id) {
-            newReserveData[chain.id] = []
-            newUserAccountData[chain.id] = {
-              totalCollateral: 0,
-              totalBorrowed: 0,
-              netValue: 0,
-              totalSupplyRate: 0,
-              totalBorrowRate: 0,
-              netRate: 0,
-              ltv: 0,
-              healthFactor: 0
-            }
-          } else {
-            const res = await fetchAaveData(account || zeroAddress, newTokens[chain.id], chain)
-            newReserveData[chain.id] = res.reserveData
-            newUserAccountData[chain.id] = res.userAccountData
-          }
-        })
-      );
+      // await Promise.all(
+      //   SUPPORTED_NETWORKS.map(async (chain) => {
+      //     if (chain.id === xLayer.id) {
+      //       newReserveData[chain.id] = []
+      //       newUserAccountData[chain.id] = {
+      //         totalCollateral: 0,
+      //         totalBorrowed: 0,
+      //         netValue: 0,
+      //         totalSupplyRate: 0,
+      //         totalBorrowRate: 0,
+      //         netRate: 0,
+      //         ltv: 0,
+      //         healthFactor: 0
+      //       }
+      //     } else {
+      //       const res = await fetchAaveData(account || zeroAddress, newTokens[chain.id], chain)
+      //       newReserveData[chain.id] = res.reserveData
+      //       newUserAccountData[chain.id] = res.userAccountData
+      //     }
+      //   })
+      // );
 
-      console.log(`Completed fetching AaveData (${new Date()})`)
-      console.log(`Took ${Number(new Date()) - start}ms to load`)
+      // console.log(`Completed fetching AaveData (${new Date()})`)
+      // console.log(`Took ${Number(new Date()) - start}ms to load`)
 
 
       console.log(`Fetching TVL (${new Date()})`)

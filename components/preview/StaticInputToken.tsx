@@ -9,6 +9,7 @@ export default function InputTokenStatic({
   errorMessage,
   chainId,
   captionText,
+  actionText,
   inputMoreThanBalance,
   ...props
 }: {
@@ -16,6 +17,7 @@ export default function InputTokenStatic({
   selectedToken?: Token;
   chainId: any;
   captionText?: string;
+  actionText?: string;
   inputMoreThanBalance?: boolean;
 } & HTMLProps<HTMLInputElement>): JSX.Element {
   const balance =
@@ -23,9 +25,10 @@ export default function InputTokenStatic({
 
   return (
     <>
-      {captionText && (
+      <h1>{captionText}</h1><br/>
+      {actionText && (
         <p className="text-white text-start">
-          {captionText}
+          {actionText}
           {inputMoreThanBalance && (
             <span className="text-red-500 ml-2">Input More than Balance</span>
           )}
