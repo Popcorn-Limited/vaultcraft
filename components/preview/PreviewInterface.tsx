@@ -25,12 +25,13 @@ import { useRouter } from "next/router";
 
 const LOAN_TABS = ["Preview"]
 
-export default function PreviewInterface({ visibilityState, vaultData, inAmount, outputToken, inputToken, gauge, vault, actionType }: {
+export default function PreviewInterface({ visibilityState, vaultData, inAmount, outputToken, vaultAsset, inputToken, gauge, vault, actionType }: {
   visibilityState: [boolean, Dispatch<SetStateAction<boolean>>],
   vaultData: VaultData,
   actionType: SmartVaultActionType,
   inAmount: [string, Dispatch<SetStateAction<string>>],
   outputToken: Token,
+  vaultAsset: Token,
   gauge?: Token,
   vault: Token,
   inputToken: Token
@@ -221,6 +222,7 @@ export default function PreviewInterface({ visibilityState, vaultData, inAmount,
               <ActionSteps 
               steps={steps} 
               stepCounter={stepCounter} inputAmount={input} inputToken={inputToken} outputToken={outputToken}
+              vaultAsset={vaultAsset}
               chainId={vaultData.chainId}/>
             </div>
             <div className="">

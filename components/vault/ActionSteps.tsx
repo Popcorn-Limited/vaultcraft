@@ -20,6 +20,7 @@ interface ActionStepsProps {
   inputToken: Token;
   inputAmount: string;
   outputToken: Token;
+  vaultAsset: Token;
   chainId: number;
 }
 
@@ -29,6 +30,7 @@ export default function ActionSteps({
   inputAmount,
   inputToken,
   outputToken,
+  vaultAsset,
   chainId
 }: ActionStepsProps): JSX.Element {
   const inputProps = { readOnly: true }
@@ -36,13 +38,19 @@ export default function ActionSteps({
   return (
     <div className="flex flex-row items-center">
       {steps.map((step, i) => (
-        <div className="w-full md:flex md:flex-row md:space-x-20">
+        <div className="w-full h-full md:space-x-20">
           <div className="w-full">
-          {(step.label === "Handle Allowance" || step.label === "Handle Zap Allowance") && (
-            <HandleAllowanceStep isLast={i===stepCounter} step={step} inputToken={inputToken} inputAmount={inputAmount} chainId={chainId}/>
+          {(step.label === "Handle Allowance") && (
+            <HandleAllowanceStep isLast={i===stepCounter} step={step} inputToken={vaultAsset} inputAmount={inputAmount} chainId={chainId} stepNumber={i + 1}/>
           )}
-          {(step.label !== "Handle Allowance" && step.label !== "Handle Zap Allowance") && (
-            <ActionStepComponent isLast={i===stepCounter} step={step} inputAmount={inputAmount} inputToken={inputToken} outputToken={outputToken} chainId={chainId}/>
+          {(step.label === "Handle Zap Allowance") && (
+            <HandleAllowanceStep isLast={i===stepCounter} step={step} inputToken={inputToken} inputAmount={inputAmount} chainId={chainId}  stepNumber={i + 1}/>
+          )}
+          {(step.label.includes("Zap") && step.label !== "Handle Zap Allowance") && (
+            <ActionStepComponent isLast={i===stepCounter} stepNumber={i + 1} step={step} inputAmount={inputAmount} inputToken={inputToken} outputToken={vaultAsset} chainId={chainId}/>
+          )}
+          {(!step.label.includes("Zap") && !step.label.includes("Allowance")) && (
+            <ActionStepComponent isLast={i===stepCounter}  stepNumber={i + 1} step={step} inputAmount={inputAmount} inputToken={vaultAsset} outputToken={outputToken} chainId={chainId}/>
           )}
           </div>
         </div>

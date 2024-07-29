@@ -358,6 +358,7 @@ export default function VaultInputs({
         inAmount={[inputBalance, setInputBalance]} 
         outputToken={outputToken}
         inputToken={inputToken}
+        vaultAsset={asset}
         vault={vault}
         gauge={gauge}
         actionType={action}

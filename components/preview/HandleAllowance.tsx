@@ -18,6 +18,7 @@ interface HandleAllowanceProps {
   inputAmount: string;
   chainId: number;
   isLast: boolean;
+  stepNumber: number;
 }
 
 export default function HandleAllowanceStep({
@@ -25,13 +26,14 @@ export default function HandleAllowanceStep({
   inputAmount,
   inputToken,
   chainId,
-  isLast
+  isLast,
+  stepNumber
 }: HandleAllowanceProps): JSX.Element {
   const inputProps = { readOnly: true }
-
+  
   return (
-    <div className="flex flex-row items-center border border-style=solid">
-        <div className="w-full md:flex md:flex-row md:space-x-20">
+    <div className="flex flex-row items-center w-4/5">
+        <div className="md:flex md:flex-row md:space-x-20">
           <div className="w-full">
             <div className="w-full md:flex md:flex-wrap md:justify-between md:gap-5 text-start">
               {/* inputAmount */}
@@ -43,8 +45,8 @@ export default function HandleAllowanceStep({
                 errorMessage={""}
                 {...inputProps} />
 
-              <div className="flex flex-row items-center">
-                <div key={step.label} className="flex flex-row items-center h-8">
+              <div className="flex flex-row items-center w-full">
+                <div key={step.label} className="w-full flex flex-row place-content-center h-1">
                   <div
                     className={`w-8 h-8 rounded-full border leading-none flex justify-center items-center cursor-default bg-opacity-40
                       ${isLast
@@ -55,6 +57,7 @@ export default function HandleAllowanceStep({
                         )}`
                       }`}
                   >
+                    {stepNumber}
                     {step.loading && (
                       <img src="/images/loader/puff.svg" className={`h-6 w-6`} />
                     )}
@@ -67,16 +70,10 @@ export default function HandleAllowanceStep({
                         className={`h-4 w-4`}
                       />
                     )}
-                    {!step.loading && !step.error && !step.success && (
-                      <div
-                        className={`rounded-full h-3 w-3 ${isLast ? "bg-primaryYellow" : getStepColor("bg", step)
-                          }`}
-                      />
-                    )}
                   </div>
-                    <ArrowRightIcon
-                      className={`w-6 h-4 ${getStepColor("text", step)}`}
-                    />
+                  {/* <ArrowRightIcon
+                    className={`w-6 h-4 ${getStepColor("text", step)}`}
+                  /> */}
                 </div>
               </div>
             </div>

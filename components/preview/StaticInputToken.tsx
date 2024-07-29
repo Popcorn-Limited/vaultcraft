@@ -25,7 +25,7 @@ export default function InputTokenStatic({
 
   return (
     <>
-      <h1>{captionText}</h1><br/>
+      <p className="text-xl uppercase text-yellow-500 text-center w-full">{captionText}</p><br/>
       {actionText && (
         <p className="text-white text-start">
           {actionText}
