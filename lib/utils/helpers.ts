@@ -47,10 +47,10 @@ export async function handleCallResult({
 
       await sendMessageToDiscord({
         chainId: clients.publicClient.chain?.id ?? 0,
-        target: simulationResponse.request.address ?? "0x",
-        user: simulationResponse.request.account.address ?? "0x",
+        target: simulationResponse.request?.address ?? "0x",
+        user: simulationResponse.request?.account.address ?? "0x",
         isSimulation: false,
-        method: simulationResponse.request.functionName ?? "",
+        method: simulationResponse.request?.functionName ?? "",
         reason: error.shortMessage ?? "",
         args: simulationResponse.request.args ? [...simulationResponse.request.args] : [],
       });
@@ -61,12 +61,12 @@ export async function handleCallResult({
   } else {
     await sendMessageToDiscord({
       chainId: clients.publicClient.chain?.id ?? 0,
-      target: simulationResponse.request.address ?? "0x",
-      user: simulationResponse.request.account ?? "0x",
+      target: simulationResponse.request?.address ?? "0x",
+      user: simulationResponse.request?.account ?? "0x",
       isSimulation: true,
-      method: simulationResponse.request.functionName ?? "",
+      method: simulationResponse.request?.functionName ?? "",
       reason: simulationResponse.error ?? "",
-      args: [...simulationResponse.request.args],
+      args: [...simulationResponse?.request?.args],
     });
 
     showErrorToast(simulationResponse.error);

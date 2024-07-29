@@ -21,6 +21,57 @@ export function getSmartVaultActionSteps(
   action: SmartVaultActionType
 ): ActionStep[] {
   switch (action) {
+    case SmartVaultActionType.PeapodsStake: 
+      return [
+        {
+          step: 0,
+          label: "Handle allowance for pVCX",
+          ...BaseStepInfo,
+          updateBalance: false
+        },
+        {
+          step: 1,
+          label: "Bond into pVCX",
+          ...BaseStepInfo,
+          updateBalance: false
+        },
+        {
+          step: 2,
+          label: "Get pOHM",
+          ...BaseStepInfo,
+          updateBalance: false
+        },
+        {
+          step: 3,
+          label: "Handle pVCX allowance for Peapods",
+          ...BaseStepInfo,
+          updateBalance: false
+        },
+        {
+          step: 4,
+          label: "Handle pOHM allowance for Peapods",
+          ...BaseStepInfo,
+          updateBalance: false
+        },
+        {
+          step: 5,
+          label: "Add liquidity and stake into Peapods",
+          ...BaseStepInfo,
+          updateBalance: false
+        },
+        {
+          step: 6,
+          label: "Handle Vault Asset Allowance",
+          ...BaseStepInfo,
+          updateBalance: false
+        },
+        {
+          step: 7,
+          label: "Deposit into vault",
+          ...BaseStepInfo,
+          updateBalance: false
+        },
+      ];
     case SmartVaultActionType.Preview: 
       return [
         {
