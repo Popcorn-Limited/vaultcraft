@@ -15,7 +15,7 @@ function getStepColor(preFix: string, step: any): string {
 interface HandleAllowanceProps {
   step: ActionStep;
   inputToken: Token;
-  inputAmount: string;
+  inputAmount: number;
   chainId: number;
   isLast: boolean;
   stepNumber: number;

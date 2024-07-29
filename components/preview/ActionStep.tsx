@@ -16,7 +16,8 @@ interface ActionStepProps {
   step: ActionStep;
   isLast: boolean;
   inputToken: Token;
-  inputAmount: string;
+  inputAmount: number;
+  outputAmount: number;
   outputToken: Token;
   chainId: number;
   stepNumber: number;
@@ -27,12 +28,14 @@ export default function ActionStepComponent({
   inputAmount,
   inputToken,
   outputToken,
+  outputAmount,
   chainId,
   stepNumber,
   isLast
 }: ActionStepProps): JSX.Element {
   const inputProps = { readOnly: true }
 
+  console.log(step.label, inputAmount, outputAmount);
   return (
     <div className="w-4/5 md:flex md:flex-wrap md:justify-between md:gap-5 text-start">
       {/* inputAmount */}
@@ -50,10 +53,7 @@ export default function ActionStepComponent({
       <InputTokenStatic
         actionText={"Output Amount"}
         chainId={chainId}
-        value={
-          (Number(inputAmount) * Number(inputToken?.price)) /
-          Number(outputToken?.price) || 0
-        }
+        value={outputAmount}
         selectedToken={outputToken}
         errorMessage={""}
         {...inputProps}
