@@ -80,9 +80,7 @@ export default function VaultRow({
     gauge?.symbol,
     gauge?.name,
     ...(vaultData.metadata?.labels ?? []),
-    ...vaultData.strategies.map(
-      ({ metadata }) => `${metadata?.name}${metadata?.description}`
-    ),
+    ...vaultData.strategies.map(strategy => strategy.metadata.protocol),
   ]
     .join()
     .toLowerCase();

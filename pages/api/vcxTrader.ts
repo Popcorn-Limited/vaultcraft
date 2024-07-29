@@ -54,7 +54,7 @@ const balancer = new Balancer(
 
 const erc20 = new ERC20(account, publicClient, walletClient);
 
-export async function POST(request: Request) {
+export default async function POST(request: Request) {
   const watchList = process.env.WATCH_LIST!.split(',').map(address => getAddress(address));
 
   const allowance = await erc20.getAllowance(WETH, BALANCER_VAULT);
