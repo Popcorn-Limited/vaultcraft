@@ -35,7 +35,6 @@ export default function ActionStepComponent({
 }: ActionStepProps): JSX.Element {
   const inputProps = { readOnly: true }
 
-  console.log(step.label, inputAmount, outputAmount);
   return (
     <div className="w-4/5 md:flex md:flex-wrap md:justify-between md:gap-5 text-start">
       {/* inputAmount */}
