@@ -65,7 +65,7 @@ export default async function POST(request: any) {
     return new Response(null, { status: 204 });
   }
 
-  const watchList = process.env.WATCH_LIST!.split(',').map(address => getAddress(address));
+  // const watchList = process.env.WATCH_LIST!.split(',').map(address => getAddress(address));
 
   const allowance = await erc20.getAllowance(WETH, BALANCER_VAULT);
   if (allowance === BigInt(0)) {
@@ -105,10 +105,10 @@ export default async function POST(request: any) {
       }
     });
 
-    if (!watchList.includes(user)) {
-      console.log(`skipping swap for user ${user} with tx ${log.transaction.hash} because they are on the watch list`);
-      return new Response(null, { status: 204 });
-    }
+    // if (!watchList.includes(user)) {
+    //   console.log(`skipping swap for user ${user} with tx ${log.transaction.hash} because they are on the watch list`);
+    //   return new Response(null, { status: 204 });
+    // }
 
     // [0] is the amount of VCX that's sold
     // [1] is the amount of WETH that's bought
