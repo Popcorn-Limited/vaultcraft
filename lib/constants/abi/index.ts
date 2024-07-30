@@ -1,4 +1,5 @@
 export * from "./BalancerOracle";
+export * from "./BalancerQuery";
 export * from "./BalancerVault";
 export * from "./ERC20";
 export * from "./Gauge";

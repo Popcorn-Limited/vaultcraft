@@ -149,7 +149,7 @@ export default function StakingInterface({
         <div className="lg:flex lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-8 mt-6 lg:max-h-12">
           {Number(lockedBal?.amount) === 0 ? (
             <MainActionButton
-              label="Lock VCX-LP"
+              label="Lock your VCX-LP"
               handleClick={() => setShowLockModal(true)}
             />
           ) : (

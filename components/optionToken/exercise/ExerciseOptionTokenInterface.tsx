@@ -17,7 +17,7 @@ import InputTokenWithError from "@/components/input/InputTokenWithError";
 import { BalancerOracleAbi, ZERO } from "@/lib/constants";
 import { ExerciseByChain, ExerciseOracleByChain, OVCX_ORACLE, OptionTokenByChain, VCX, VcxByChain, WETH, WethByChain } from "@/lib/constants/addresses";
 import { formatNumber, safeRound } from "@/lib/utils/formatBigNumber";
-import { validateInput } from "@/lib/utils/helpers";
+import { handleSwitchChain, validateInput } from "@/lib/utils/helpers";
 import { Token } from "@/lib/types";
 import { Address, createPublicClient, formatEther, http, parseEther } from "viem";
 import { useAtom } from "jotai";
@@ -317,18 +317,26 @@ export default function ExerciseOptionTokenInterface({ chainId, setShowModal }: 
             />
           </div>
           <div className="mb-4">
-            {stepCounter < EXERCISE_OVCX_STEPS.length ? (
-              <MainActionButton
-                label={steps[stepCounter].label}
-                handleClick={handleExerciseOptionToken}
-              //disabled={amount === "0" || maxPaymentAmount === "0"}
+            {chain?.id === chainId
+              ? <>
+                {stepCounter < EXERCISE_OVCX_STEPS.length ? (
+                  <MainActionButton
+                    label={steps[stepCounter].label}
+                    handleClick={handleExerciseOptionToken}
+                  //disabled={amount === "0" || maxPaymentAmount === "0"}
+                  />
+                ) : (
+                  <MainActionButton
+                    label={"Close Modal"}
+                    handleClick={closeModal}
+                  />
+                )}
+              </>
+              : <MainActionButton
+                label="Switch Chain"
+                handleClick={() => handleSwitchChain(chainId, switchChainAsync)}
               />
-            ) : (
-              <MainActionButton
-                label={"Close Modal"}
-                handleClick={closeModal}
-              />
-            )}
+            }
           </div>
           <span className="flex flex-row items-center justify-between pb-6 border-b border-customNeutral100"></span>
         </>)

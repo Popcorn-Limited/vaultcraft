@@ -19,7 +19,7 @@ import ApyChart from "@/components/vault/ApyChart";
 import VaultHero from "@/components/vault/VaultHero";
 import { isAddress, zeroAddress } from "viem";
 import UserBoostSection from "@/components/vault/UserBoostSection";
-import { VCX, pVCX, pOHM} from "@/lib/constants";
+import { VCX, pVCX, pOHM } from "@/lib/constants";
 import VCXStaking from "@/components/vault/VCXStaking";
 
 export default function Index() {
@@ -49,7 +49,7 @@ export default function Index() {
           ...ZapAssetAddressesByChain[chainId].filter(addr => foundVault.asset !== addr).map(addr => tokens[chainId][addr])
         ]
 
-        if(chainId === 1 && foundVault.vault == "0x319121F8F39669599221A883Bb6d7d0Feef0E69c") {
+        if (chainId === 1 && foundVault.vault == "0x319121F8F39669599221A883Bb6d7d0Feef0E69c") {
           newTokenOptions.push(tokens[1][VCX])
           newTokenOptions.push(tokens[1][pVCX])
           newTokenOptions.push(tokens[1][pOHM])
@@ -93,24 +93,24 @@ export default function Index() {
               <div className="w-full md:w-1/3">
                 <div className="bg-customNeutral200 p-6 rounded-lg">
                   <div className="bg-customNeutral300 px-6 py-6 rounded-lg">
-                    { (vaultData.address === "0x319121F8F39669599221A883Bb6d7d0Feef0E69c") ? ( 
-                        <>
+                    {(vaultData.address === "0x319121F8F39669599221A883Bb6d7d0Feef0E69c") ? (
+                      <>
                         <VCXStaking
-                        vaultData={vaultData}
-                        tokenOptions={tokenOptions}
-                        chainId={vaultData.chainId}
-                        hideModal={() => router.reload()}
-                      />
+                          vaultData={vaultData}
+                          tokenOptions={tokenOptions}
+                          chainId={vaultData.chainId}
+                          hideModal={() => router.reload()}
+                        />
                       </>
-                      ) : 
+                    ) :
                       (
                         <>
-                        <VaultInputs
-                        vaultData={vaultData}
-                        tokenOptions={tokenOptions}
-                        chainId={vaultData.chainId}
-                        hideModal={() => router.reload()}
-                        />
+                          <VaultInputs
+                            vaultData={vaultData}
+                            tokenOptions={tokenOptions}
+                            chainId={vaultData.chainId}
+                            hideModal={() => router.reload()}
+                          />
                         </>
                       )
                     }
@@ -136,7 +136,7 @@ export default function Index() {
                       />
                     </div>
                   </div>
-                </div>*/}
+                </div> */}
 
                 {vaultData.apyHist.length > 0 && <ApyChart vault={vaultData} />}
 

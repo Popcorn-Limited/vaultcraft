@@ -269,8 +269,8 @@ export default function Page({
       });
       setVaults(newVaultsData);
       setTokens(newTokens);
-      setAaveReserveData(newReserveData);
-      setAaveAccountData(newUserAccountData);
+      // setAaveReserveData(newReserveData);
+      // setAaveAccountData(newUserAccountData);
 
       if (account) {
         console.log(`Fetching Networth (${new Date()})`)

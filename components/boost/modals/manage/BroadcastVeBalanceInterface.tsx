@@ -5,11 +5,13 @@ import { VeRecipientByChain, VE_BEACON, VOTING_ESCROW, VE_VCX } from "@/lib/cons
 import { broadcastVeBalance } from "@/lib/gauges/interactions";
 import { RPC_URLS } from "@/lib/utils/connectors";
 import { NumberFormatter, formatNumber } from "@/lib/utils/formatBigNumber";
+import { handleSwitchChain } from "@/lib/utils/helpers";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { Address, Chain, createPublicClient, erc20Abi, formatEther, http } from "viem";
 import { arbitrum, optimism } from "viem/chains";
-import { useAccount, useBalance, usePublicClient, useWalletClient } from "wagmi";
+import { chainConfig } from "viem/zksync";
+import { useAccount, useBalance, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
 
 async function getVeBalance(account: Address, chain: Chain): Promise<number> {
   const client = createPublicClient({
@@ -26,9 +28,10 @@ async function getVeBalance(account: Address, chain: Chain): Promise<number> {
 }
 
 export default function BroadcastVeBalanceInterface({ setShowModal }: { setShowModal: Function }): JSX.Element {
-  const { address: account } = useAccount();
+  const { address: account, chain } = useAccount();
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
+  const { switchChainAsync } = useSwitchChain();
 
   const [tokens] = useAtom(tokensAtom);
   const [opVeBal, setOpVeBal] = useState<number>(0)
@@ -74,18 +77,26 @@ export default function BroadcastVeBalanceInterface({ setShowModal }: { setShowM
           </span>
         </div>
         <div className="flex flex-row space-x-4 mt-10">
-          <div className="w-full md:w-60">
-            <MainActionButton
-              label="Broadcast to Optimism"
-              handleClick={() => handleBroadcast(10)}
+          {chain?.id !== 1
+            ? <MainActionButton
+              label="Switch Chain"
+              handleClick={() => handleSwitchChain(1, switchChainAsync)}
             />
-          </div>
-          <div className="w-full md:w-60">
-            <MainActionButton
-              label="Broadcast to Arbitrum"
-              handleClick={() => handleBroadcast(42161)}
-            />
-          </div>
+            : <>
+              <div className="w-full md:w-60">
+                <MainActionButton
+                  label="Broadcast to Optimism"
+                  handleClick={() => handleBroadcast(10)}
+                />
+              </div>
+              <div className="w-full md:w-60">
+                <MainActionButton
+                  label="Broadcast to Arbitrum"
+                  handleClick={() => handleBroadcast(42161)}
+                />
+              </div>
+            </>
+          }
         </div>
       </div>
     </div>

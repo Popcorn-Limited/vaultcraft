@@ -12,12 +12,13 @@ import LpInfo from "@/components/boost/modals/lp/LpInfo";
 import LpInterface from "@/components/boost/modals/lp/LpInterface";
 import { handleAllowance } from "@/lib/approve";
 import ActionSteps from "@/components/vault/ActionSteps";
-import { depositIntoPool } from "@/lib/balancer/interactions";
+import { depositIntoPool } from "@/lib/external/balancer/interactions";
 import { ActionStep, POOL_DEPOSIT_STEPS } from "@/lib/getActionSteps";
 import { BALANCER_VAULT, VCX, VCX_LP, WETH } from "@/lib/constants";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
 import { useAtom } from "jotai";
 import { tokensAtom } from "@/lib/atoms";
+import { handleSwitchChain } from "@/lib/utils/helpers";
 
 export default function LpModal({
   show,
@@ -154,11 +155,19 @@ export default function LpModal({
           {modalStep === 1 && (
             <>
               {stepCounter < 3 ? (
-                <MainActionButton
-                  label={steps[stepCounter].label}
-                  handleClick={handlePoolDeposit}
-                  disabled={vcxAmount === "0" || wethAmount === "0"}
-                />
+                <>
+                  {chain?.id !== 1
+                    ? <MainActionButton
+                      label="Switch Chain"
+                      handleClick={() => handleSwitchChain(1, switchChainAsync)}
+                    />
+                    : <MainActionButton
+                      label={steps[stepCounter].label}
+                      handleClick={handlePoolDeposit}
+                      disabled={vcxAmount === "0" || wethAmount === "0"}
+                    />
+                  }
+                </>
               ) : (
                 <MainActionButton
                   label={"Close Modal"}

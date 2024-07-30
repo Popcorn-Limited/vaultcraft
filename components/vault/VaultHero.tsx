@@ -10,6 +10,7 @@ import { roundToTwoDecimalPlaces } from "@/lib/utils/helpers";
 import VaultClaimSection from "@/components/vault/VaultClaimSection";
 import { useAtom } from "jotai";
 import { tokensAtom } from "@/lib/atoms";
+import { useEffect, useState } from "react";
 
 export default function VaultHero({
   vaultData,
@@ -25,12 +26,30 @@ export default function VaultHero({
   showClaim?: boolean;
 }): JSX.Element {
   const [tokens] = useAtom(tokensAtom);
-  const boost = (vaultData.gaugeData?.workingBalance! / (gauge?.balance || 0)) * 5
-  const walletValue = ((asset.balance * asset.price) / (10 ** asset.decimals))
-  let depositValue = (vault.balance * vault.price) / (10 ** vault.decimals)
-  if (gauge) {
-    depositValue += (gauge.balance * gauge.price) / (10 ** gauge.decimals)
-  }
+  const [walletValue, setWalletValue] = useState<number>(0)
+  const [depositValue, setDepositValue] = useState<number>(0)
+  const [boost, setBoost] = useState<number>(1);
+  const [vAPR, setVAPR] = useState<number>(0);
+
+  useEffect(() => {
+    if (vaultData) {
+      let depositValue_ = (vault.balance * vault.price) / (10 ** vault.decimals)
+      if (gauge) depositValue_ += (gauge.balance * gauge.price) / (10 ** gauge.decimals)
+
+      setWalletValue((asset.balance * asset.price) / (10 ** asset.decimals))
+      setDepositValue(depositValue_)
+
+      let vAPR_ = vaultData.apy;
+      if (vaultData.gaugeData && gauge) {
+        let boost_ = (vaultData.gaugeData.workingBalance / (gauge.balance || 0)) * 5;
+        if (boost_ > 1) setBoost(boost_);
+
+        if (vaultData.gaugeData.rewardApy.apy) vAPR_ += vaultData.gaugeData.rewardApy.apy
+        if (vaultData.gaugeData.lowerAPR) vAPR_ += (vaultData.gaugeData.lowerAPR * boost)
+      }
+      setVAPR(vAPR_)
+    }
+  }, [vaultData])
 
   return (
     <section className="md:border-b border-customNeutral100 pt-10 pb-6 px-4 md:px-0 ">
