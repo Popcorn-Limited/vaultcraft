@@ -27,7 +27,7 @@ import { VaultRouterByChain } from "@/lib/constants";
 import { vaultDepositAndStake } from "@/lib/vault/interactions";
 import { getActionsByType, ActionProps, ActionButton } from "@/lib/getActions";
 
-export default function PreviewInterface({ visibilityState, vaultData, inAmount, outputToken, vaultAsset, inputToken, gauge, vault, actionType }: {
+export default function PreviewInterface({ visibilityState, vaultData, inAmount, outputToken, vaultAsset, inputToken, gauge, vault, actionType, zapProvider }: {
   visibilityState: [boolean, Dispatch<SetStateAction<boolean>>],
   vaultData: VaultData,
   actionType: SmartVaultActionType,
@@ -37,6 +37,7 @@ export default function PreviewInterface({ visibilityState, vaultData, inAmount,
   gauge?: Token,
   vault: Token,
   inputToken: Token,
+  zapProvider: ZapProvider
 }): JSX.Element {
   const [visible, setVisible] = visibilityState
   const [inputAmount, setInputAmount] = inAmount;
@@ -47,8 +48,6 @@ export default function PreviewInterface({ visibilityState, vaultData, inAmount,
   const { data: walletClient } = useWalletClient()
   const { openConnectModal } = useConnectModal();
   const clients = { publicClient: publicClient!, walletClient: walletClient! };
-
-  const [zapProvider, setZapProvider] = useState(ZapProvider.none) // TODO pass from above
 
   const [slippage, setSlippage] = useState<number>(100); // In BPS 0 - 10_000 // pass from above
   const [tradeTimeout, setTradeTimeout] = useState<number>(300); // number of seconds a cow order is valid for // pass from above
@@ -140,7 +139,7 @@ export default function PreviewInterface({ visibilityState, vaultData, inAmount,
             <div className="w-full">
               {actions.map((action, i) => (
                 <div className="p-8">
-                  <p className="text-lg">{action.title}</p>
+                  <p className="text-lg">{`${action.id} - ${action.title}`}</p>
                   <p>{action.description}</p>
                   <MainActionButton
                     label={action.button.label}

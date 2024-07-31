@@ -78,6 +78,33 @@ export default function VaultInputs({
 
   const [showPreviewModal, setShowPreviewModal] = useState(false)
 
+  const useZapProvider = async () : Promise<ZapProvider> => {
+    let newZapProvider = zapProvider
+    if (newZapProvider === ZapProvider.none && [
+      SmartVaultActionType.ZapDeposit, 
+      SmartVaultActionType.ZapDepositAndStake, SmartVaultActionType.ZapUnstakeAndWithdraw, 
+      SmartVaultActionType.ZapWithdrawal].includes(action)) 
+    {
+      showLoadingToast("Searching for the best price...")
+      if ([SmartVaultActionType.ZapDeposit, SmartVaultActionType.ZapDepositAndStake].includes(action)) {
+        newZapProvider = await getZapProvider({ 
+          sellToken: inputToken!, buyToken: asset!, amount: Number(inputBalance), chainId: vaultData.chainId, account: account! })
+      } else {
+        newZapProvider = await getZapProvider(
+          { sellToken: asset!, buyToken: outputToken!, amount: Number(inputBalance), chainId: vaultData.chainId, account: account! }
+        )
+      }
+
+      if (newZapProvider === ZapProvider.notFound) {
+        showErrorToast("Zap not available. Please try a different token.")
+      } else {
+        showSuccessToast(`Using ${String(ZapProvider[newZapProvider])} for your zap`)
+      }
+    }
+
+    return newZapProvider;
+  }
+
   useEffect(() => {
     // set default input/output tokens
     setInputToken(asset);
@@ -89,9 +116,11 @@ export default function VaultInputs({
     setSteps(getSmartVaultActionSteps(SmartVaultActionType.Preview));
   }, []);
 
-  function handleChangeInput(e: any) {
+  async function handleChangeInput(e: any) {
     const value = e.currentTarget.value;
     setInputBalance(validateInput(value).isValid ? value : "0");
+    console.log("SETTING ZAP")
+    setZapProvider(await useZapProvider())
   }
 
   function switchTokens() {
@@ -119,11 +148,14 @@ export default function VaultInputs({
     }
   }
 
-  function handleTokenSelect(input: Token, output: Token): void {
+  async function handleTokenSelect(input: Token, output: Token): Promise<void> {
     setStepCounter(0);
 
     setInputToken(input);
     setOutputToken(output);
+
+    console.log("SETTING ZAP");
+    setZapProvider(await useZapProvider())
 
     switch (input.address) {
       case asset?.address!:
@@ -362,6 +394,7 @@ export default function VaultInputs({
         vault={vault}
         gauge={gauge}
         actionType={action}
+        zapProvider={zapProvider}
       />
       
       <Modal visibility={[showModal, setShowModal]}>
@@ -389,7 +422,7 @@ export default function VaultInputs({
         onMaxClick={handleMaxClick}
         chainId={chainId}
         value={inputBalance}
-        onChange={handleChangeInput}
+        onChange={e => handleChangeInput(e)}
         selectedToken={inputToken}
         errorMessage={""}
         tokenList={tokenOptions.filter((token) =>
