@@ -62,7 +62,7 @@ export default async function POST(request: any) {
   logs = body.event.data.block.logs
   if (!logs || logs.length === 0) {
     console.log("No logs");
-    return new Response(null, { status: 204 });
+    return new Response(null, { status: 200 });
   }
 
   // const watchList = process.env.WATCH_LIST!.split(',').map(address => getAddress(address));
@@ -77,14 +77,15 @@ export default async function POST(request: any) {
   for (const log of logs) {
     if (wethBalance < minAmount) {
       console.log(`WETH Balance (${wethBalance}) lower than minAmount (${minAmount})`);
-      return new Response(null, { status: 204 });
+      return new Response(null, { status: 200 });
     }
 
     const tokenIn = getAddress(trim(log.topics[2]));
 
     if (tokenIn !== VCX) {
       // we only care about VCX sales
-      return new Response(null, { status: 204 });
+      console.log("Not a sell order")
+      return new Response(null, { status: 200 });
     }
 
     // we need to figure out who initiated the swap
@@ -107,7 +108,7 @@ export default async function POST(request: any) {
 
     // if (!watchList.includes(user)) {
     //   console.log(`skipping swap for user ${user} with tx ${log.transaction.hash} because they are on the watch list`);
-    //   return new Response(null, { status: 204 });
+    //   return new Response(null, { status: 200 });
     // }
 
     // [0] is the amount of VCX that's sold
@@ -135,8 +136,10 @@ export default async function POST(request: any) {
         wethBalance -= wethAmount;
       } else {
         console.log("Swap failed");
-        return new Response(null, { status: 204 });
       }
+    } else {
+      console.log("Balance lower than min")
+      return new Response(null, { status: 200 });
     }
   }
 
