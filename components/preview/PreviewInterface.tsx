@@ -25,7 +25,7 @@ import { useRouter } from "next/router";
 import { handleAllowance } from "@/lib/approve";
 import { VaultRouterByChain } from "@/lib/constants";
 import { vaultDepositAndStake } from "@/lib/vault/interactions";
-import { getActionsByType, ActionProps, ActionButton } from "@/lib/getActions";
+import { getActionsByType, ActionProps, getTokenBalanceAndUpdateAction } from "@/lib/getActions";
 
 export default function PreviewInterface({ visibilityState, vaultData, inAmount, outputToken, vaultAsset, inputToken, gauge, vault, actionType, zapProvider }: {
   visibilityState: [boolean, Dispatch<SetStateAction<boolean>>],
@@ -64,10 +64,37 @@ export default function PreviewInterface({ visibilityState, vaultData, inAmount,
   const outputAmount = (Number(inAmount) * Number(inputToken?.price)) /
   Number(outputToken?.price) || 0
 
-  const executeActionAndUpdateState = async (action: () => Promise<boolean>) => {
+  const executeActionAndUpdateState = async (action: ActionProps) => {
     setStepLoading(true);
+
+    // get updated action with right amount
+    if(action.updateInputBalanceBefore) {      
+      action = await getTokenBalanceAndUpdateAction({
+        vaultRouter: VaultRouterByChain[vaultData.chainId],
+        actionType,
+        vaultData,
+        inputAmount: Number(inAmount),
+        inputToken,
+        outputToken,
+        outputAmount,
+        account: account!,
+        zapProvider,
+        slippage,
+        tradeTimeout,
+        vaultAsset,
+        vault,
+        referral: !!query?.ref && isAddress(query.ref as string)
+          ? getAddress(query.ref as string)
+          : undefined,
+        clients,
+        tokensAtom: [tokens, setTokens]
+      }, actions, action.id - 1)
+
+      console.log(action);
+    }
+
     try {
-      const success = await action();
+      const success = await action.button.action();
       setStepLoading(false);
       if (success) {
         setError(false);
@@ -141,7 +168,7 @@ export default function PreviewInterface({ visibilityState, vaultData, inAmount,
                   <p>{action.description}</p>
                   <MainActionButton
                     label={action.button.label}
-                    handleClick={() => executeActionAndUpdateState(action.button.action)}
+                    handleClick={() => executeActionAndUpdateState(action)}
                     disabled={stepLoading || error || currentStep !== action.id} />
                 </div>
               ))}

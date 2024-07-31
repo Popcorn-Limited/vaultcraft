@@ -15,6 +15,8 @@ export interface ActionProps {
     title: string;
     description: string;
     button: ActionButton;
+    updateInputBalanceBefore?: boolean;
+    updateInputValue?: (props:GetActionsProps, actions:ActionProps[], step:number) => Promise<() => Promise<boolean>>
 }
 
 interface GetActionsProps {
@@ -47,41 +49,78 @@ interface GetActionsProps {
       ) => Promise<void>;
 }
 
-const getTokenBalanceAndAction = async (action:string, props:GetActionsProps) : Promise<() => Promise<boolean>> => {
-    let postBal = await props.clients.publicClient.readContract({
+export const getTokenBalanceAndUpdateAction = async (props:GetActionsProps, actions:ActionProps[], step:number) : Promise<ActionProps> => {
+    let postBal = Number(await props.clients.publicClient.readContract({
         address: props.vaultAsset.address,
         abi: erc20Abi,
         functionName: "balanceOf",
         args: [props.account],
-    });
+    }));
 
-    switch(action) {
-        case "handleAllowance": return () =>
-            handleAllowance({
-                token: props.vaultAsset.address,
-                amount: Number(postBal) - props.vaultAsset.balance,
+    var updateAction = actions[step];
+
+    switch(updateAction.title) {
+        case "Approve": {
+            switch(props.actionType) {
+                case SmartVaultActionType.ZapDepositAndStake: {
+                    updateAction.button.action = () => handleAllowance({
+                        token: props.vaultAsset.address,
+                        amount: postBal,
+                        account: props.account,
+                        spender: props.vaultRouter,
+                        clients: props.clients,
+                    });
+                    break;
+                }
+                case SmartVaultActionType.ZapDeposit: {
+                    updateAction.button.action = () => handleAllowance({
+                        token: props.vaultAsset.address,
+                        amount: postBal,
+                        account: props.account,
+                        spender: props.vault.address,
+                        clients: props.clients,
+                    });
+                    break;
+                }
+                default:
+                break;
+            }
+        }
+        case "Deposit": {
+            updateAction.button.action = () => vaultDeposit({
+                chainId: props.vaultData.chainId,
+                vaultData: props.vaultData,
+                asset: props.vaultAsset,
+                vault: props.vault,
                 account: props.account,
-                spender: props.outputToken.address,
-                clients: props.clients
-                })
+                amount: postBal,
+                clients: props.clients,
+                fireEvent: props.fireEvent,
+                referral: props.referral,
+                tokensAtom: props.tokensAtom
+            });
             break;
-        case "depositStake": return () =>
-            vaultDepositAndStake({
+        }
+        case "DepositAndStake": {
+            updateAction.button.action = () => vaultDepositAndStake({
                 chainId: props.vaultData.chainId,
                 router: props.vaultRouter,
                 vaultData: props.vaultData,
                 asset: props.vaultAsset,
                 vault: props.vault,
-                amount: Number(postBal) - props.vaultAsset.balance,
+                amount: postBal,
                 account: props.account!,
                 referral: props.referral,
                 tokensAtom: props.tokensAtom,
                 clients: props.clients
-            })
+            });
+            break;
+        }
         default:
-            return async () => false;
+            return updateAction;
     }
-    
+
+    return updateAction;
 }
 
 export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
@@ -343,11 +382,12 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
             id: 3,
             title: "Approve",
             description: `Approve ${vaultAsset.name} for vault deposit`,
+            updateInputBalanceBefore: true,
             button: {
                 label: "Approve",
                 action: () => handleAllowance({
                     token: vaultData.asset,
-                    amount: decimalInput, //TODO get balance and overwrite amount
+                    amount: decimalInput,
                     account,
                     spender: vault.address,
                     clients
@@ -358,6 +398,7 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
                 id: 4,
                 title: "Deposit",
                 description: `Deposit ${inputAmount} ${vaultAsset.symbol} into the vault, receives vault shares`,
+                updateInputBalanceBefore: true,
                 button: {
                 label: "Deposit",
                 action: () => vaultDeposit({
@@ -417,13 +458,14 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
             id: 3,
             title: "Approve",
             description: `Approve ${vaultAsset.name} for vault deposit`,
+            updateInputBalanceBefore: true,
             button: {
                 label: "Approve",
                 action: () => handleAllowance({
                     token: vaultAsset.address,
-                    amount: vaultAsset.balance, // TODO
+                    amount: vaultAsset.balance,
                     account: account,
-                    spender: outputToken.address,
+                    spender: vaultRouter,
                     clients: clients
                     })
                 },
@@ -432,6 +474,7 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
             id: 4,
             title: "Deposit And Stake",
             description: `Deposit ${outputAmount} ${vaultAsset.symbol} into the vault and stake into gauge`,
+            updateInputBalanceBefore: true,
             button: {
                 label: "Deposit And Stake",
                 action: () => vaultDepositAndStake({
