@@ -128,6 +128,7 @@ export default async function POST(request: any) {
         amount: wethAmount,
         userData: zeroHash,
       };
+      console.log(swap)
 
       const swapTxHash = await balancer.swap(swap);
       const receipt = await publicClient.waitForTransactionReceipt({ hash: swapTxHash });
