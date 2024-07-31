@@ -107,6 +107,8 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
         fireEvent
     } = props;
 
+    const decimalInput = inputAmount * (10 ** inputToken.decimals);
+
     switch(actionType) {
     case SmartVaultActionType.Deposit: {
         actionObj = [{
@@ -117,7 +119,7 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
             label: "Approve",
             action: () => handleAllowance({
                 token: inputToken.address,
-                amount: inputAmount,
+                amount: decimalInput,
                 account: account!,
                 spender: outputToken.address,
                 clients
@@ -136,7 +138,7 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
                 asset: vaultAsset,
                 vault,
                 account,
-                amount: inputAmount,
+                amount: decimalInput,
                 clients,
                 fireEvent,
                 referral,
@@ -160,7 +162,7 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
                     asset: vaultAsset,
                     vault,
                     account,
-                    amount: inputAmount,
+                    amount: decimalInput,
                     clients,
                     fireEvent,
                     referral,
@@ -179,7 +181,7 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
                 label: "Approve",
                 action: () => handleAllowance({
                     token: inputToken.address,
-                    amount: inputAmount,
+                    amount: decimalInput,
                     account,
                     spender: vaultData.gauge!,
                     clients,
@@ -195,7 +197,7 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
                 action: () => gaugeDeposit({
                     vaultData,
                     account,
-                    amount,
+                    amount: decimalInput,
                     clients,
                     tokensAtom
                   })
@@ -214,7 +216,7 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
                 action: () => gaugeWithdraw({
                     vaultData,
                     account,
-                    amount: inputAmount,
+                    amount: decimalInput,
                     clients,
                     tokensAtom
                   })
@@ -232,7 +234,7 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
                 label: "Approve",
                 action: () => handleAllowance({
                     token: inputToken.address,
-                    amount: inputAmount,
+                    amount: decimalInput,
                     account: account!,
                     spender: vaultRouter,
                     clients
@@ -251,7 +253,7 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
                     vaultData,
                     asset: vaultAsset,
                     vault,
-                    amount: inputAmount,
+                    amount: decimalInput,
                     account: account!,
                     referral: referral,
                     tokensAtom,
@@ -271,7 +273,7 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
                 label: "Approve",
                 action: () => handleAllowance({
                     token: inputToken.address,
-                    amount: inputAmount,
+                    amount: decimalInput,
                     account: account!,
                     spender: vaultRouter,
                     clients
@@ -310,7 +312,7 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
                 label: "Approve",
                 action: () => handleZapAllowance({
                     token: inputToken.address,
-                    amount: inputAmount,
+                    amount: decimalInput,
                     account: account!,
                     zapProvider,
                     clients
@@ -327,7 +329,7 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
                     chainId: vaultData.chainId,
                     sellToken: inputToken,
                     buyToken: vaultAsset,
-                    amount: inputAmount,
+                    amount: decimalInput,
                     account,
                     zapProvider,
                     slippage,
@@ -345,7 +347,7 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
                 label: "Approve",
                 action: () => handleAllowance({
                     token: vaultData.asset,
-                    amount: inputAmount, //TODO get balance and overwrite amount
+                    amount: decimalInput, //TODO get balance and overwrite amount
                     account,
                     spender: vault.address,
                     clients
@@ -364,7 +366,7 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
                     asset: vaultAsset,
                     vault,
                     account,
-                    amount: inputAmount,
+                    amount: decimalInput,
                     clients,
                     fireEvent,
                     referral,
@@ -384,7 +386,7 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
                 label: "Approve",
                 action: () => handleZapAllowance({
                     token: inputToken.address,
-                    amount: inputAmount,
+                    amount: decimalInput,
                     account: account!,
                     zapProvider,
                     clients
@@ -401,7 +403,7 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
                     chainId: vaultData.chainId,
                     sellToken: inputToken,
                     buyToken: vaultAsset,
-                    amount: inputAmount,
+                    amount: decimalInput,
                     account,
                     zapProvider,
                     slippage,

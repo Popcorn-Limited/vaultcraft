@@ -31,7 +31,7 @@ export default function PreviewInterface({ visibilityState, vaultData, inAmount,
   visibilityState: [boolean, Dispatch<SetStateAction<boolean>>],
   vaultData: VaultData,
   actionType: SmartVaultActionType,
-  inAmount: [string, Dispatch<SetStateAction<string>>],
+  inAmount: string,
   outputToken: Token,
   vaultAsset: Token,
   gauge?: Token,
@@ -40,8 +40,6 @@ export default function PreviewInterface({ visibilityState, vaultData, inAmount,
   zapProvider: ZapProvider
 }): JSX.Element {
   const [visible, setVisible] = visibilityState
-  const [inputAmount, setInputAmount] = inAmount;
-  const action = actionType;
 
   const { address: account, chain } = useAccount();
   const publicClient = usePublicClient();
@@ -63,7 +61,7 @@ export default function PreviewInterface({ visibilityState, vaultData, inAmount,
 
   const { query } = useRouter();
 
-  const outputAmount = (Number(inputAmount) * Number(inputToken?.price)) /
+  const outputAmount = (Number(inAmount) * Number(inputToken?.price)) /
   Number(outputToken?.price) || 0
 
   const executeActionAndUpdateState = async (action: () => Promise<boolean>) => {
@@ -91,7 +89,7 @@ export default function PreviewInterface({ visibilityState, vaultData, inAmount,
         vaultRouter: VaultRouterByChain[vaultData.chainId],
         actionType,
         vaultData,
-        inputAmount: Number(inputAmount),
+        inputAmount: Number(inAmount),
         inputToken,
         outputToken,
         outputAmount,
@@ -108,7 +106,7 @@ export default function PreviewInterface({ visibilityState, vaultData, inAmount,
         tokensAtom: [tokens, setTokens]
       })
     );
-  }, [visible, inputAmount, action])
+  }, [visible])
 
   return <>
     <Modal

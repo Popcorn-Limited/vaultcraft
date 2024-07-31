@@ -78,9 +78,11 @@ export default function VaultInputs({
 
   const [showPreviewModal, setShowPreviewModal] = useState(false)
 
-  const useZapProvider = async () : Promise<ZapProvider> => {
+  const useZapProvider = async (value: number) : Promise<ZapProvider> => {
+    let inputVal = value * (10 ** inputToken!.decimals);
+
     let newZapProvider = zapProvider
-    if (newZapProvider === ZapProvider.none && [
+    if ([
       SmartVaultActionType.ZapDeposit, 
       SmartVaultActionType.ZapDepositAndStake, SmartVaultActionType.ZapUnstakeAndWithdraw, 
       SmartVaultActionType.ZapWithdrawal].includes(action)) 
@@ -88,10 +90,10 @@ export default function VaultInputs({
       showLoadingToast("Searching for the best price...")
       if ([SmartVaultActionType.ZapDeposit, SmartVaultActionType.ZapDepositAndStake].includes(action)) {
         newZapProvider = await getZapProvider({ 
-          sellToken: inputToken!, buyToken: asset!, amount: Number(inputBalance), chainId: vaultData.chainId, account: account! })
+          sellToken: inputToken!, buyToken: asset!, amount: Number(inputVal), chainId: vaultData.chainId, account: account! })
       } else {
         newZapProvider = await getZapProvider(
-          { sellToken: asset!, buyToken: outputToken!, amount: Number(inputBalance), chainId: vaultData.chainId, account: account! }
+          { sellToken: asset!, buyToken: outputToken!, amount: Number(inputVal), chainId: vaultData.chainId, account: account! }
         )
       }
 
@@ -119,8 +121,8 @@ export default function VaultInputs({
   async function handleChangeInput(e: any) {
     const value = e.currentTarget.value;
     setInputBalance(validateInput(value).isValid ? value : "0");
-    console.log("SETTING ZAP")
-    setZapProvider(await useZapProvider())
+    
+    setZapProvider(await useZapProvider(value))
   }
 
   function switchTokens() {
@@ -153,9 +155,6 @@ export default function VaultInputs({
 
     setInputToken(input);
     setOutputToken(output);
-
-    console.log("SETTING ZAP");
-    setZapProvider(await useZapProvider())
 
     switch (input.address) {
       case asset?.address!:
@@ -201,6 +200,7 @@ export default function VaultInputs({
           default:
             setIsDeposit(false);
             setAction(SmartVaultActionType.ZapWithdrawal);
+            setZapProvider(await useZapProvider(Number(inputBalance)))
             // setSteps(
             //   getSmartVaultActionSteps(SmartVaultActionType.ZapWithdrawal)
             // );
@@ -226,6 +226,7 @@ export default function VaultInputs({
           default:
             setIsDeposit(false);
             setAction(SmartVaultActionType.ZapUnstakeAndWithdraw);
+            setZapProvider(await useZapProvider(Number(inputBalance)))
             // setSteps(
             //   getSmartVaultActionSteps(
             //     SmartVaultActionType.ZapUnstakeAndWithdraw
@@ -241,11 +242,13 @@ export default function VaultInputs({
           case vault?.address!:
             setIsDeposit(true);
             setAction(SmartVaultActionType.ZapDeposit);
+            setZapProvider(await useZapProvider(Number(inputBalance)))
             // setSteps(getSmartVaultActionSteps(SmartVaultActionType.ZapDeposit));
             return;
           case gauge?.address:
             setIsDeposit(true);
             setAction(SmartVaultActionType.ZapDepositAndStake);
+            setZapProvider(await useZapProvider(Number(inputBalance)))
             // setSteps(
             //   getSmartVaultActionSteps(SmartVaultActionType.ZapDepositAndStake)
             // );
@@ -387,7 +390,7 @@ export default function VaultInputs({
       <PreviewInterface 
         visibilityState={[showPreviewModal, setShowPreviewModal]} 
         vaultData={vaultData} 
-        inAmount={[inputBalance, setInputBalance]} 
+        inAmount={inputBalance} 
         outputToken={outputToken}
         inputToken={inputToken}
         vaultAsset={asset}
