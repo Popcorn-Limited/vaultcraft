@@ -28,7 +28,9 @@ export const IconByProtocol: { [key: string]: string } = {
   Stader: "https://icons.llamao.fi/icons/protocols/stader?w=48&h=48",
   KelpDAO: "https://icons.llamao.fi/icons/protocols/kelp-dao?w=48&h=48",
   Ion: "https://www.app.ionprotocol.io/logo.svg",
-  Multistrategy: "/images/tokens/vcx.svg"
+  Multistrategy: "/images/tokens/vcx.svg",
+  VaultCraft: "/images/tokens/vcx.svg",
+  None: "/images/tokens/vcx.svg"
 };
 
 const iconSize: { [key: number]: string } = {

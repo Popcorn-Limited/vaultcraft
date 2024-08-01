@@ -338,6 +338,7 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
       } catch (e) {
         console.log(`ERROR FETCHING APY: ${address} - ${desc.apySource}=${desc.apyId}`)
         console.log(e)
+        apyHist = [EMPTY_LLAMA_APY_ENTRY]
       }
       const descriptionSplit = desc.description.split("** - ");
 
@@ -376,47 +377,67 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
   Object.keys(vaults).forEach((address: any) => {
     let apy = 0;
 
-    vaults[address].strategies.forEach((strategy: any, i: number) => {
-      const strategyData = strategies[strategy.address]
-
-      // calc allocation in assets
-      const allocation = Number(strategyBalances[n]) * strategyData.assetsPerShare
-
-      // calc allocation percentage
-      const allocationPerc = (allocation / vaults[address].totalAssets) || 0
-
-      // add strategy metadata
-      vaults[address].strategies[i] = {
-        address: strategy.address,
+    if (vaults[address].strategies.length === 0) {
+      vaults[address].strategies[0] = {
+        address: zeroAddress,
         metadata: {
-          name: strategyData.name.replace("**", ""),
-          protocol: strategyData.protocol,
-          description: strategyData.description,
+          name: "Stake",
+          protocol: "VaultCraft",
+          description: "This vault holds funds to incentivise via gauges.",
         },
-        resolver: strategyData.resolver,
-        allocation: allocation,
-        allocationPerc: allocationPerc,
-        apy: strategyData.apy,
-        apyHist: strategyData.apyHist,
-        apyId: strategyData.apyId,
-        apySource: strategyData.apySource
+        resolver: "",
+        allocation: vaults[address].totalAssets,
+        allocationPerc: 1,
+        apy: 0,
+        apyHist: [EMPTY_LLAMA_APY_ENTRY],
+        apyId: "",
+        apySource: "custom"
       }
+    } else {
 
-      // calc blended apy of the vault
-      if (vaults[address].totalSupply === 0) {
-        // Assume even allocation if the vault doesnt have allocations yet
-        apy += strategyData.apy * (1 / vaults[address].strategies.length)
-      } else {
-        apy += strategyData.apy * allocationPerc
-      }
+      vaults[address].strategies.forEach((strategy: any, i: number) => {
+        const strategyData = strategies[strategy.address]
 
-      n += 1
-    })
+        // calc allocation in assets
+        const allocation = Number(strategyBalances[n]) * strategyData.assetsPerShare
+
+        // calc allocation percentage
+        const allocationPerc = (allocation / vaults[address].totalAssets) || 0
+
+        // add strategy metadata
+        vaults[address].strategies[i] = {
+          address: strategy.address,
+          metadata: {
+            name: strategyData.name.replace("**", ""),
+            protocol: strategyData.protocol,
+            description: strategyData.description,
+          },
+          resolver: strategyData.resolver,
+          allocation: allocation,
+          allocationPerc: allocationPerc,
+          apy: strategyData.apy,
+          apyHist: strategyData.apyHist,
+          apyId: strategyData.apyId,
+          apySource: strategyData.apySource
+        }
+
+        // calc blended apy of the vault
+        if (vaults[address].totalSupply === 0) {
+          // Assume even allocation if the vault doesnt have allocations yet
+          apy += strategyData.apy * (1 / vaults[address].strategies.length)
+        } else {
+          apy += strategyData.apy * allocationPerc
+        }
+
+        n += 1
+      })
+    }
 
     // assign apy
     vaults[address].apy = apy;
     vaults[address].totalApy = apy;
   })
+
 
   return vaults
 }
