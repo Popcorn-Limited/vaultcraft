@@ -15,14 +15,14 @@ export interface ActionProps {
     title: string;
     description: string;
     button: ActionButton;
-    updateInputBalanceBefore?: boolean;
-    updateInputValue?: (props:GetActionsProps, actions:ActionProps[], step:number) => Promise<() => Promise<boolean>>
+    updateBalanceAfter?: boolean;
 }
 
 interface GetActionsProps {
     vaultRouter: Address; 
     actionType:SmartVaultActionType; 
     vaultData: VaultData;
+    zapAmount?: number;
     inputAmount: number;
     inputToken: Token;
     outputToken: Token;
@@ -49,80 +49,7 @@ interface GetActionsProps {
       ) => Promise<void>;
 }
 
-export const getTokenBalanceAndUpdateAction = async (props:GetActionsProps, actions:ActionProps[], step:number) : Promise<ActionProps> => {
-    let postBal = Number(await props.clients.publicClient.readContract({
-        address: props.vaultAsset.address,
-        abi: erc20Abi,
-        functionName: "balanceOf",
-        args: [props.account],
-    }));
-
-    var updateAction = actions[step];
-
-    switch(updateAction.title) {
-        case "Approve": {
-            switch(props.actionType) {
-                case SmartVaultActionType.ZapDepositAndStake: {
-                    updateAction.button.action = () => handleAllowance({
-                        token: props.vaultAsset.address,
-                        amount: postBal,
-                        account: props.account,
-                        spender: props.vaultRouter,
-                        clients: props.clients,
-                    });
-                    break;
-                }
-                case SmartVaultActionType.ZapDeposit: {
-                    updateAction.button.action = () => handleAllowance({
-                        token: props.vaultAsset.address,
-                        amount: postBal,
-                        account: props.account,
-                        spender: props.vault.address,
-                        clients: props.clients,
-                    });
-                    break;
-                }
-                default:
-                break;
-            }
-        }
-        case "Deposit": {
-            updateAction.button.action = () => vaultDeposit({
-                chainId: props.vaultData.chainId,
-                vaultData: props.vaultData,
-                asset: props.vaultAsset,
-                vault: props.vault,
-                account: props.account,
-                amount: postBal,
-                clients: props.clients,
-                fireEvent: props.fireEvent,
-                referral: props.referral,
-                tokensAtom: props.tokensAtom
-            });
-            break;
-        }
-        case "DepositAndStake": {
-            updateAction.button.action = () => vaultDepositAndStake({
-                chainId: props.vaultData.chainId,
-                router: props.vaultRouter,
-                vaultData: props.vaultData,
-                asset: props.vaultAsset,
-                vault: props.vault,
-                amount: postBal,
-                account: props.account!,
-                referral: props.referral,
-                tokensAtom: props.tokensAtom,
-                clients: props.clients
-            });
-            break;
-        }
-        default:
-            return updateAction;
-    }
-
-    return updateAction;
-}
-
+// TODO zap withdraw
 export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
     var actionObj:ActionProps[];
 
@@ -130,6 +57,7 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
         vaultRouter, 
         actionType, 
         vaultData,
+        zapAmount,
         inputAmount,
         inputToken,
         outputToken,
@@ -147,6 +75,7 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
     } = props;
 
     const decimalInput = inputAmount * (10 ** inputToken.decimals);
+    const decimalZapAmount = zapAmount ? zapAmount / (10 ** vaultAsset.decimals) : 0;
 
     switch(actionType) {
     case SmartVaultActionType.Deposit: {
@@ -362,6 +291,7 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
             id: 2,
             title: "Zap into Vault Asset",
             description: `Zap ${inputAmount} ${inputToken.symbol} for ${outputAmount} ${vaultAsset.symbol}`,
+            updateBalanceAfter: true,
             button: {
                 label: "Zap",
                 action: () => zap({
@@ -381,13 +311,12 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
             {
             id: 3,
             title: "Approve",
-            description: `Approve ${vaultAsset.name} for vault deposit`,
-            updateInputBalanceBefore: true,
+            description: `Approve ${zapAmount ? decimalZapAmount : outputAmount} ${vaultAsset.name} for vault deposit`,
             button: {
                 label: "Approve",
                 action: () => handleAllowance({
                     token: vaultData.asset,
-                    amount: decimalInput,
+                    amount: zapAmount!,
                     account,
                     spender: vault.address,
                     clients
@@ -397,8 +326,7 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
             {
                 id: 4,
                 title: "Deposit",
-                description: `Deposit ${inputAmount} ${vaultAsset.symbol} into the vault, receives vault shares`,
-                updateInputBalanceBefore: true,
+                description: `Deposit ${zapAmount ? decimalZapAmount : outputAmount} ${vaultAsset.symbol} into the vault, receives vault shares`,
                 button: {
                 label: "Deposit",
                 action: () => vaultDeposit({
@@ -407,7 +335,7 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
                     asset: vaultAsset,
                     vault,
                     account,
-                    amount: decimalInput,
+                    amount: zapAmount!,
                     clients,
                     fireEvent,
                     referral,
@@ -438,6 +366,7 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
             id: 2,
             title: "Zap into Vault Asset",
             description: `Zap ${inputAmount} ${inputToken.symbol} for ${outputAmount} ${vaultAsset.symbol}`,
+            updateBalanceAfter: true,
             button: {
                 label: "Zap",
                 action: () => zap({
@@ -457,13 +386,12 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
             {
             id: 3,
             title: "Approve",
-            description: `Approve ${vaultAsset.name} for vault deposit`,
-            updateInputBalanceBefore: true,
+            description: `Approve ${zapAmount ? decimalZapAmount : outputAmount} ${vaultAsset.name} for vault deposit`,
             button: {
                 label: "Approve",
                 action: () => handleAllowance({
                     token: vaultAsset.address,
-                    amount: vaultAsset.balance,
+                    amount: zapAmount!,
                     account: account,
                     spender: vaultRouter,
                     clients: clients
@@ -473,8 +401,7 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
             {
             id: 4,
             title: "Deposit And Stake",
-            description: `Deposit ${outputAmount} ${vaultAsset.symbol} into the vault and stake into gauge`,
-            updateInputBalanceBefore: true,
+            description: `Deposit ${zapAmount ? decimalZapAmount : outputAmount} ${vaultAsset.symbol} into the vault, receives vault shares`,
             button: {
                 label: "Deposit And Stake",
                 action: () => vaultDepositAndStake({
@@ -483,7 +410,7 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
                     vaultData: vaultData,
                     asset: vaultAsset,
                     vault: vault,
-                    amount: vaultAsset.balance,
+                    amount: zapAmount!,
                     account: account!,
                     referral: referral,
                     tokensAtom: tokensAtom,

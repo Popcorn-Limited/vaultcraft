@@ -1,33 +1,21 @@
 import AssetWithName from "@/components/common/AssetWithName";
-import { vaultsAtom } from "@/lib/atoms/vaults";
 import { ReserveData, Token, UserAccountData, VaultData, ZapProvider } from "@/lib/types";
 import { useAtom } from "jotai";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useAccount, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
 import { erc20Abi, formatUnits, zeroAddress, isAddress, getAddress } from "viem";
-import { formatNumber, formatToFixedDecimals, safeRound } from "@/lib/utils/formatBigNumber";
-import { validateInput } from "@/lib/utils/helpers";
 import MainActionButton from "@/components/button/MainActionButton";
-import { DEFAULT_ASSET, tokensAtom } from "@/lib/atoms";
-import TabSelector from "@/components/common/TabSelector";
+import { tokensAtom } from "@/lib/atoms";
 import Modal from "@/components/modal/Modal";
-import InputTokenStatic from "@/components/preview/StaticInputToken";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-
-import { ArrowDownIcon, Cog6ToothIcon } from "@heroicons/react/24/outline";
-import { SmartVaultActionType, TokenType } from "@/lib/types";
-import { ActionStep, getSmartVaultActionSteps } from "@/lib/getActionSteps";
-import ActionSteps from "@/components/vault/ActionSteps";
+import { SmartVaultActionType } from "@/lib/types";
 import { getZapProvider } from "@/lib/vault/zap";
 import { showErrorToast, showLoadingToast, showSuccessToast } from "@/lib/toasts";
-import handleVaultInteraction from "@/lib/vault/handleVaultInteraction";
 import { useRouter } from "next/router";
-import { handleAllowance } from "@/lib/approve";
 import { VaultRouterByChain } from "@/lib/constants";
-import { vaultDepositAndStake } from "@/lib/vault/interactions";
-import { getActionsByType, ActionProps, getTokenBalanceAndUpdateAction } from "@/lib/getActions";
+import { getActionsByType, ActionProps } from "@/lib/getActions";
 
-export default function PreviewInterface({ visibilityState, vaultData, inAmount, outputToken, vaultAsset, inputToken, gauge, vault, actionType, zapProvider }: {
+export default function PreviewInterface({ visibilityState, vaultData, inAmount, outputToken, vaultAsset, inputToken, gauge, vault, actionType }: {
   visibilityState: [boolean, Dispatch<SetStateAction<boolean>>],
   vaultData: VaultData,
   actionType: SmartVaultActionType,
@@ -37,23 +25,24 @@ export default function PreviewInterface({ visibilityState, vaultData, inAmount,
   gauge?: Token,
   vault: Token,
   inputToken: Token,
-  zapProvider: ZapProvider
 }): JSX.Element {
   const [visible, setVisible] = visibilityState
-
   const { address: account, chain } = useAccount();
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient()
   const { openConnectModal } = useConnectModal();
   const clients = { publicClient: publicClient!, walletClient: walletClient! };
 
-  const [slippage, setSlippage] = useState<number>(100); // In BPS 0 - 10_000 // pass from above
-  const [tradeTimeout, setTradeTimeout] = useState<number>(300); // number of seconds a cow order is valid for // pass from above
+  const [slippage, setSlippage] = useState<number>(100); // In BPS 0 - 10_000 // TODO pass from above
+  const [tradeTimeout, setTradeTimeout] = useState<number>(300); // number of seconds a cow order is valid for // TODO pass from above
   const [tokens, setTokens] = useAtom(tokensAtom);
   const [actions, setActions] = useState<ActionProps[]>([]);
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [error, setError] = useState<boolean>(false);
   const [stepLoading, setStepLoading] = useState<boolean>(false);
+  const [zapLoading, setZapLoading] = useState<boolean>(false);
+  const [zapProvider, setZapProvider] = useState(ZapProvider.none)
+  const zapTypes = [SmartVaultActionType.ZapDeposit, SmartVaultActionType.ZapDepositAndStake, SmartVaultActionType.ZapUnstakeAndWithdraw, SmartVaultActionType.ZapWithdrawal];
 
   // const [finish, setFinish] = useState<boolean>(false);
 
@@ -64,36 +53,23 @@ export default function PreviewInterface({ visibilityState, vaultData, inAmount,
   const outputAmount = (Number(inAmount) * Number(inputToken?.price)) /
   Number(outputToken?.price) || 0
 
+
+  // hardcode preview action steps in vault inputs
+  // allow to retry step in error and not only finish
+  // update TVL wallet balance after finish
   const executeActionAndUpdateState = async (action: ActionProps) => {
     setStepLoading(true);
-
-    // get updated action with right amount
-    if(action.updateInputBalanceBefore) {      
-      action = await getTokenBalanceAndUpdateAction({
-        vaultRouter: VaultRouterByChain[vaultData.chainId],
-        actionType,
-        vaultData,
-        inputAmount: Number(inAmount),
-        inputToken,
-        outputToken,
-        outputAmount,
-        account: account!,
-        zapProvider,
-        slippage,
-        tradeTimeout,
-        vaultAsset,
-        vault,
-        referral: !!query?.ref && isAddress(query.ref as string)
-          ? getAddress(query.ref as string)
-          : undefined,
-        clients,
-        tokensAtom: [tokens, setTokens]
-      }, actions, action.id - 1)
-
-      console.log(action);
-    }
+    
+    var assetBalanceBefore = 0;
 
     try {
+      assetBalanceBefore = Number(await clients.publicClient.readContract({
+        address: vaultAsset.address,
+        abi: erc20Abi,
+        functionName: "balanceOf",
+        args: [account!],
+      }));
+
       const success = await action.button.action();
       setStepLoading(false);
       if (success) {
@@ -108,14 +84,22 @@ export default function PreviewInterface({ visibilityState, vaultData, inAmount,
       showErrorToast("Error")
       setError(true);
     }
-  }
 
-  useEffect(() => {
-    setActions(
-      getActionsByType({
+    // reload actions with balanced updated
+    if(action.updateBalanceAfter) {
+      let postBal = Number(await clients.publicClient.readContract({
+          address: vaultAsset.address,
+          abi: erc20Abi,
+          functionName: "balanceOf",
+          args: [account!],
+      }));
+
+      setActions(
+        getActionsByType({
         vaultRouter: VaultRouterByChain[vaultData.chainId],
         actionType,
         vaultData,
+        zapAmount: postBal - assetBalanceBefore,
         inputAmount: Number(inAmount),
         inputToken,
         outputToken,
@@ -131,8 +115,89 @@ export default function PreviewInterface({ visibilityState, vaultData, inAmount,
           : undefined,
         clients,
         tokensAtom: [tokens, setTokens]
-      })
-    );
+      }))
+    }
+  }
+
+  useEffect(() => {
+  if(visible){
+    const useZapProvider = async (value: number, isZapDeposit: boolean) => {
+      setZapLoading(true);
+      showLoadingToast("Searching for the best price...")
+  
+      let inputVal = value * (10 ** inputToken!.decimals);
+  
+      let newZapProvider = zapProvider
+      if (isZapDeposit) {
+        newZapProvider = await getZapProvider({ 
+          sellToken: inputToken!, buyToken: vaultAsset!, amount: Number(inputVal), chainId: vaultData.chainId, account: account! })
+      } else {
+        newZapProvider = await getZapProvider(
+          { sellToken: vaultAsset!, buyToken: outputToken!, amount: Number(inputVal), chainId: vaultData.chainId, account: account! }
+        )
+      }
+  
+      if (newZapProvider === ZapProvider.notFound) {
+        showErrorToast("Zap not available. Please try a different token or amount")
+        setError(true);
+      } else {
+        showSuccessToast(`Using ${String(ZapProvider[newZapProvider])} for your zap`)
+        setZapProvider(newZapProvider);
+      }
+  
+      setZapLoading(false);
+  
+      setActions(
+        getActionsByType({
+          vaultRouter: VaultRouterByChain[vaultData.chainId],
+          actionType,
+          vaultData,
+          inputAmount: Number(inAmount),
+          inputToken,
+          outputToken,
+          outputAmount,
+          account: account!,
+          zapProvider: newZapProvider,
+          slippage,
+          tradeTimeout,
+          vaultAsset,
+          vault,
+          referral: !!query?.ref && isAddress(query.ref as string)
+            ? getAddress(query.ref as string)
+            : undefined,
+          clients,
+          tokensAtom: [tokens, setTokens]
+        })
+      );
+    }
+  
+    if(zapTypes.includes(actionType)) {  
+      useZapProvider(Number(inAmount), zapTypes.slice(0,2).includes(actionType));
+    } else {
+      setActions(
+        getActionsByType({
+          vaultRouter: VaultRouterByChain[vaultData.chainId],
+          actionType,
+          vaultData,
+          inputAmount: Number(inAmount),
+          inputToken,
+          outputToken,
+          outputAmount,
+          account: account!,
+          zapProvider,
+          slippage,
+          tradeTimeout,
+          vaultAsset,
+          vault,
+          referral: !!query?.ref && isAddress(query.ref as string)
+            ? getAddress(query.ref as string)
+            : undefined,
+          clients,
+          tokensAtom: [tokens, setTokens]
+        })
+      );
+    }
+  }
   }, [visible])
 
   return <>
@@ -156,7 +221,11 @@ export default function PreviewInterface({ visibilityState, vaultData, inAmount,
             </div>
           }
           {
-            (account && !inputToken || actions.length === 0) &&
+            (zapLoading) &&
+            <p className="text-white">Loading up the zap provider..</p>
+          }
+          {
+            (account && !inputToken || (actions.length === 0 && !zapLoading)) &&
             <p className="text-white">Nothing to do here</p>
           }
 
@@ -169,12 +238,12 @@ export default function PreviewInterface({ visibilityState, vaultData, inAmount,
                   <MainActionButton
                     label={action.button.label}
                     handleClick={() => executeActionAndUpdateState(action)}
-                    disabled={stepLoading || error || currentStep !== action.id} />
+                    disabled={zapLoading || stepLoading || error || currentStep !== action.id} />
                 </div>
               ))}
             </div>
             {
-              (currentStep === actions.length + 1 ||
+              ((currentStep === actions.length + 1 && !zapLoading) ||
               error) && (
                 <div className="w-full">
                   <MainActionButton label={"Finish"} handleClick={() => {

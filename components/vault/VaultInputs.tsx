@@ -9,7 +9,7 @@ import {
   useWalletClient,
 } from "wagmi";
 import TabSelector from "@/components/common/TabSelector";
-import { SmartVaultActionType, Token, TokenType, VaultData, ZapProvider } from "@/lib/types";
+import { SmartVaultActionType, Token, TokenType, VaultData } from "@/lib/types";
 import { validateInput } from "@/lib/utils/helpers";
 import Modal from "@/components/modal/Modal";
 import InputNumber from "@/components/input/InputNumber";
@@ -23,7 +23,6 @@ import { useRouter } from "next/router";
 import { ActionStep, getSmartVaultActionSteps } from "@/lib/getActionSteps";
 import { vaultsAtom } from "@/lib/atoms/vaults";
 import { networthAtom, tokensAtom, tvlAtom } from "@/lib/atoms";
-import { getZapProvider } from "@/lib/vault/zap";
 import { showErrorToast, showLoadingToast, showSuccessToast } from "@/lib/toasts";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import PreviewInterface from "@/components/preview/PreviewInterface";
@@ -71,41 +70,11 @@ export default function VaultInputs({
   const [isDeposit, setIsDeposit] = useState<boolean>(true);
 
   // Zap Settings
-  const [zapProvider, setZapProvider] = useState(ZapProvider.none)
   const [showModal, setShowModal] = useState<boolean>(false)
   const [tradeTimeout, setTradeTimeout] = useState<number>(300); // number of seconds a cow order is valid for
   const [slippage, setSlippage] = useState<number>(100); // In BPS 0 - 10_000
 
   const [showPreviewModal, setShowPreviewModal] = useState(false)
-
-  const useZapProvider = async (value: number) : Promise<ZapProvider> => {
-    let inputVal = value * (10 ** inputToken!.decimals);
-
-    let newZapProvider = zapProvider
-    if ([
-      SmartVaultActionType.ZapDeposit, 
-      SmartVaultActionType.ZapDepositAndStake, SmartVaultActionType.ZapUnstakeAndWithdraw, 
-      SmartVaultActionType.ZapWithdrawal].includes(action)) 
-    {
-      showLoadingToast("Searching for the best price...")
-      if ([SmartVaultActionType.ZapDeposit, SmartVaultActionType.ZapDepositAndStake].includes(action)) {
-        newZapProvider = await getZapProvider({ 
-          sellToken: inputToken!, buyToken: asset!, amount: Number(inputVal), chainId: vaultData.chainId, account: account! })
-      } else {
-        newZapProvider = await getZapProvider(
-          { sellToken: asset!, buyToken: outputToken!, amount: Number(inputVal), chainId: vaultData.chainId, account: account! }
-        )
-      }
-
-      if (newZapProvider === ZapProvider.notFound) {
-        showErrorToast("Zap not available. Please try a different token.")
-      } else {
-        showSuccessToast(`Using ${String(ZapProvider[newZapProvider])} for your zap`)
-      }
-    }
-
-    return newZapProvider;
-  }
 
   useEffect(() => {
     // set default input/output tokens
@@ -121,8 +90,6 @@ export default function VaultInputs({
   async function handleChangeInput(e: any) {
     const value = e.currentTarget.value;
     setInputBalance(validateInput(value).isValid ? value : "0");
-    
-    setZapProvider(await useZapProvider(value))
   }
 
   function switchTokens() {
@@ -165,14 +132,10 @@ export default function VaultInputs({
           case vault?.address!:
             setIsDeposit(true);
             setAction(SmartVaultActionType.Deposit);
-            // setSteps(getSmartVaultActionSteps(SmartVaultActionType.Deposit));
             return;
           case gauge?.address:
             setIsDeposit(true);
             setAction(SmartVaultActionType.DepositAndStake);
-            // setSteps(
-            //   getSmartVaultActionSteps(SmartVaultActionType.DepositAndStake)
-            // );
             return;
           case "0x319121F8F39669599221A883Bb6d7d0Feef0E69c": 
             setIsDeposit(true);
@@ -187,7 +150,6 @@ export default function VaultInputs({
           case asset?.address!:
             setIsDeposit(false);
             setAction(SmartVaultActionType.Withdrawal);
-            // setSteps(getSmartVaultActionSteps(SmartVaultActionType.Withdrawal));
             return;
           case vault?.address!:
             // error
@@ -195,15 +157,10 @@ export default function VaultInputs({
           case gauge?.address:
             setIsDeposit(true);
             setAction(SmartVaultActionType.Stake);
-            // setSteps(getSmartVaultActionSteps(SmartVaultActionType.Stake));
             return;
           default:
             setIsDeposit(false);
             setAction(SmartVaultActionType.ZapWithdrawal);
-            setZapProvider(await useZapProvider(Number(inputBalance)))
-            // setSteps(
-            //   getSmartVaultActionSteps(SmartVaultActionType.ZapWithdrawal)
-            // );
             return;
         }
       case gauge?.address:
@@ -211,14 +168,10 @@ export default function VaultInputs({
           case asset?.address!:
             setIsDeposit(false);
             setAction(SmartVaultActionType.UnstakeAndWithdraw);
-            // setSteps(
-            //   getSmartVaultActionSteps(SmartVaultActionType.UnstakeAndWithdraw)
-            // );
             return;
           case vault?.address!:
             setIsDeposit(false);
             setAction(SmartVaultActionType.Unstake);
-            // setSteps(getSmartVaultActionSteps(SmartVaultActionType.Unstake));
             return;
           case gauge?.address:
             // error
@@ -226,12 +179,6 @@ export default function VaultInputs({
           default:
             setIsDeposit(false);
             setAction(SmartVaultActionType.ZapUnstakeAndWithdraw);
-            setZapProvider(await useZapProvider(Number(inputBalance)))
-            // setSteps(
-            //   getSmartVaultActionSteps(
-            //     SmartVaultActionType.ZapUnstakeAndWithdraw
-            //   )
-            // );
             return;
         }
       default:
@@ -242,16 +189,10 @@ export default function VaultInputs({
           case vault?.address!:
             setIsDeposit(true);
             setAction(SmartVaultActionType.ZapDeposit);
-            setZapProvider(await useZapProvider(Number(inputBalance)))
-            // setSteps(getSmartVaultActionSteps(SmartVaultActionType.ZapDeposit));
             return;
           case gauge?.address:
             setIsDeposit(true);
             setAction(SmartVaultActionType.ZapDepositAndStake);
-            setZapProvider(await useZapProvider(Number(inputBalance)))
-            // setSteps(
-            //   getSmartVaultActionSteps(SmartVaultActionType.ZapDepositAndStake)
-            // );
             return;
           default:
             // error
@@ -272,34 +213,6 @@ export default function VaultInputs({
   }
 
   // async function handleMainAction() {
-  //   let val = Number(inputBalance)
-  //   if (val === 0 || !inputToken || !outputToken || !asset || !vault || !account || !walletClient) return;
-  //   val = val * (10 ** inputToken.decimals)
-
-  //   let newZapProvider = zapProvider
-  //   if (newZapProvider === ZapProvider.none && [SmartVaultActionType.ZapDeposit, SmartVaultActionType.ZapDepositAndStake, SmartVaultActionType.ZapUnstakeAndWithdraw, SmartVaultActionType.ZapWithdrawal].includes(action)) {
-  //     showLoadingToast("Searching for the best price...")
-  //     if ([SmartVaultActionType.ZapDeposit, SmartVaultActionType.ZapDepositAndStake].includes(action)) {
-  //       newZapProvider = await getZapProvider({ sellToken: inputToken, buyToken: asset, amount: val, chainId, account })
-  //     } else {
-  //       newZapProvider = await getZapProvider({ sellToken: asset, buyToken: outputToken, amount: val, chainId, account })
-  //     }
-
-  //     setZapProvider(newZapProvider)
-
-  //     if (newZapProvider === ZapProvider.notFound) {
-  //       showErrorToast("Zap not available. Please try a different token.")
-  //       return
-  //     } else {
-  //       showSuccessToast(`Using ${String(ZapProvider[newZapProvider])} for your zap`)
-  //     }
-  //   }
-
-  //   const stepsCopy = [...steps]
-  //   const currentStep = stepsCopy[stepCounter]
-  //   currentStep.loading = true
-  //   setSteps(stepsCopy)
-
   //   const vaultInteraction = await handleVaultInteraction({
   //     action,
   //     stepCounter,
@@ -397,7 +310,6 @@ export default function VaultInputs({
         vault={vault}
         gauge={gauge}
         actionType={action}
-        zapProvider={zapProvider}
       />
       
       <Modal visibility={[showModal, setShowModal]}>
