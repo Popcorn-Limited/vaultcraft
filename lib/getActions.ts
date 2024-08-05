@@ -49,7 +49,6 @@ interface GetActionsProps {
       ) => Promise<void>;
 }
 
-// TODO zap withdraw
 export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
     var actionObj:ActionProps[];
 
