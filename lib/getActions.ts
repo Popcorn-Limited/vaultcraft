@@ -8,7 +8,7 @@ import zap, { handleZapAllowance } from "./vault/zap";
 export interface ActionButton {
     label: string;
     action: () => Promise<boolean>
-  }
+}
 
 export interface ActionProps {
     id: number;
@@ -19,8 +19,8 @@ export interface ActionProps {
 }
 
 interface GetActionsProps {
-    vaultRouter: Address; 
-    actionType:SmartVaultActionType; 
+    vaultRouter: Address;
+    actionType: SmartVaultActionType;
     vaultData: VaultData;
     zapAmount?: number;
     inputAmount: number;
@@ -39,22 +39,22 @@ interface GetActionsProps {
     fireEvent?: (
         type: string,
         {
-          user_address,
-          network,
-          contract_address,
-          asset_amount,
-          asset_ticker,
-          additionalEventData,
+            user_address,
+            network,
+            contract_address,
+            asset_amount,
+            asset_ticker,
+            additionalEventData,
         }: any
-      ) => Promise<void>;
+    ) => Promise<void>;
 }
 
-export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
-    var actionObj:ActionProps[];
+export const getActionsByType = (props: GetActionsProps): ActionProps[] => {
+    var actionObj: ActionProps[];
 
     const {
-        vaultRouter, 
-        actionType, 
+        vaultRouter,
+        actionType,
         vaultData,
         zapAmount,
         inputAmount,
@@ -76,45 +76,45 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
     const decimalInput = inputAmount * (10 ** inputToken.decimals);
     const decimalZapAmount = zapAmount ? zapAmount / (10 ** vaultAsset.decimals) : 0;
 
-    switch(actionType) {
-    case SmartVaultActionType.Deposit: {
-        actionObj = [{
-            id: 1,
-            title: "Approve",
-            description: `Approve ${inputAmount} ${inputToken.symbol} for depositing`,
-            button: {
-            label: "Approve",
-            action: () => handleAllowance({
-                token: inputToken.address,
-                amount: decimalInput,
-                account: account!,
-                spender: outputToken.address,
-                clients
-                })
+    switch (actionType) {
+        case SmartVaultActionType.Deposit: {
+            actionObj = [{
+                id: 1,
+                title: "Approve",
+                description: `Approve ${inputAmount} ${inputToken.symbol} for depositing`,
+                button: {
+                    label: "Approve",
+                    action: () => handleAllowance({
+                        token: inputToken.address,
+                        amount: decimalInput,
+                        account: account!,
+                        spender: outputToken.address,
+                        clients
+                    })
+                }
+            },
+            {
+                id: 2,
+                title: "Deposit",
+                description: `Deposit ${inputAmount} ${inputToken.symbol} into the vault, receives vault shares`,
+                button: {
+                    label: "Deposit",
+                    action: () => vaultDeposit({
+                        chainId: vaultData.chainId,
+                        vaultData,
+                        asset: vaultAsset,
+                        vault,
+                        account,
+                        amount: decimalInput,
+                        clients,
+                        fireEvent,
+                        referral,
+                        tokensAtom
+                    })
+                }
             }
-        },
-        {
-            id: 2,
-            title: "Deposit",
-            description: `Deposit ${inputAmount} ${inputToken.symbol} into the vault, receives vault shares`,
-            button: {
-            label: "Deposit",
-            action: () => vaultDeposit({
-                chainId: vaultData.chainId,
-                vaultData,
-                asset: vaultAsset,
-                vault,
-                account,
-                amount: decimalInput,
-                clients,
-                fireEvent,
-                referral,
-                tokensAtom
-                })
-            }
-            }
-        ]
-        break;
+            ]
+            break;
         }
         case SmartVaultActionType.Withdrawal: {
             actionObj = [{
@@ -122,19 +122,19 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
                 title: "Redeem",
                 description: `Redeem ${inputAmount} vaultShares for ${outputAmount} ${outputToken.symbol} for depositing`,
                 button: {
-                label: "Redeem",
-                action: () => vaultRedeem({
-                    chainId: vaultData.chainId,
-                    vaultData,
-                    asset: vaultAsset,
-                    vault,
-                    account,
-                    amount: decimalInput,
-                    clients,
-                    fireEvent,
-                    referral,
-                    tokensAtom
-                  })
+                    label: "Redeem",
+                    action: () => vaultRedeem({
+                        chainId: vaultData.chainId,
+                        vaultData,
+                        asset: vaultAsset,
+                        vault,
+                        account,
+                        amount: decimalInput,
+                        clients,
+                        fireEvent,
+                        referral,
+                        tokensAtom
+                    })
                 }
             }]
             break;
@@ -145,14 +145,14 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
                 title: "Approve",
                 description: `Approve ${inputAmount} vaultShares to stake on gauge`,
                 button: {
-                label: "Approve",
-                action: () => handleAllowance({
-                    token: inputToken.address,
-                    amount: decimalInput,
-                    account,
-                    spender: vaultData.gauge!,
-                    clients,
-                  })
+                    label: "Approve",
+                    action: () => handleAllowance({
+                        token: inputToken.address,
+                        amount: decimalInput,
+                        account,
+                        spender: vaultData.gauge!,
+                        clients,
+                    })
                 }
             },
             {
@@ -160,17 +160,17 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
                 title: "Gauge Stake",
                 description: `Stake ${inputAmount} vaultShares on gauge`,
                 button: {
-                label: "Gauge Stake",
-                action: () => gaugeDeposit({
-                    vaultData,
-                    account,
-                    amount: decimalInput,
-                    clients,
-                    tokensAtom
-                  })
+                    label: "Gauge Stake",
+                    action: () => gaugeDeposit({
+                        vaultData,
+                        account,
+                        amount: decimalInput,
+                        clients,
+                        tokensAtom
+                    })
                 }
             }
-        ]
+            ]
             break;
         }
         case SmartVaultActionType.Unstake: {
@@ -179,147 +179,147 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
                 title: "Unstake",
                 description: `Withdraw ${inputAmount} vaultShares from gauge`,
                 button: {
-                label: "Unstake Gauge",
-                action: () => gaugeWithdraw({
-                    vaultData,
-                    account,
-                    amount: decimalInput,
-                    clients,
-                    tokensAtom
-                  })
+                    label: "Unstake Gauge",
+                    action: () => gaugeWithdraw({
+                        vaultData,
+                        account,
+                        amount: decimalInput,
+                        clients,
+                        tokensAtom
+                    })
                 }
             }
-        ]
+            ]
             break;
         }
         case SmartVaultActionType.DepositAndStake: {
             actionObj = [{
-            id: 1,
-            title: "Approve",
-            description: `Approve ${inputAmount} ${inputToken.symbol} for depositing`,
-            button: {
-                label: "Approve",
-                action: () => handleAllowance({
-                    token: inputToken.address,
-                    amount: decimalInput,
-                    account: account!,
-                    spender: vaultRouter,
-                    clients
-                })
-            }
+                id: 1,
+                title: "Approve",
+                description: `Approve ${inputAmount} ${inputToken.symbol} for depositing`,
+                button: {
+                    label: "Approve",
+                    action: () => handleAllowance({
+                        token: inputToken.address,
+                        amount: decimalInput,
+                        account: account!,
+                        spender: vaultRouter,
+                        clients
+                    })
+                }
             },
             {
-            id: 2,
-            title: "Deposit And Stake",
-            description: `Deposit ${inputAmount} ${inputToken.symbol} into the vault and stake into gauge`,
-            button: {
-                label: "Deposit And Stake",
-                action: () => vaultDepositAndStake({
-                    chainId: vaultData.chainId,
-                    router: vaultRouter,
-                    vaultData,
-                    asset: vaultAsset,
-                    vault,
-                    amount: decimalInput,
-                    account: account!,
-                    referral: referral,
-                    tokensAtom,
-                    clients
-                })
+                id: 2,
+                title: "Deposit And Stake",
+                description: `Deposit ${inputAmount} ${inputToken.symbol} into the vault and stake into gauge`,
+                button: {
+                    label: "Deposit And Stake",
+                    action: () => vaultDepositAndStake({
+                        chainId: vaultData.chainId,
+                        router: vaultRouter,
+                        vaultData,
+                        asset: vaultAsset,
+                        vault,
+                        amount: decimalInput,
+                        account: account!,
+                        referral: referral,
+                        tokensAtom,
+                        clients
+                    })
                 }
             }
             ]
-        break;
+            break;
         }
         case SmartVaultActionType.UnstakeAndWithdraw: {
             actionObj = [
-            {
-            id: 1,
-            title: "Approve",
-            description: `Approve router to pull ${inputAmount} ${inputToken.symbol} for withdrawing`,
-            button: {
-                label: "Approve",
-                action: () => handleAllowance({
-                    token: inputToken.address,
-                    amount: decimalInput,
-                    account: account!,
-                    spender: vaultRouter,
-                    clients
-                })
-            }
-            },
-            {
-            id: 2,
-            title: "Unstake And Withdraw",
-            description: `Unstake ${inputAmount} ${inputToken.symbol} from gauge and withdraw from vault`,
-            button: {
-                label: "Unstake and Withdraw",
-                action: () => vaultUnstakeAndWithdraw({
-                    chainId: vaultData.chainId,
-                    router: vaultRouter,
-                    vaultData,
-                    asset: vaultAsset,
-                    vault,
-                    amount: decimalInput,
-                    account: account!,
-                    referral: referral,
-                    tokensAtom,
-                    clients
-                })
+                {
+                    id: 1,
+                    title: "Approve",
+                    description: `Approve router to pull ${inputAmount} ${inputToken.symbol} for withdrawing`,
+                    button: {
+                        label: "Approve",
+                        action: () => handleAllowance({
+                            token: inputToken.address,
+                            amount: decimalInput,
+                            account: account!,
+                            spender: vaultRouter,
+                            clients
+                        })
+                    }
+                },
+                {
+                    id: 2,
+                    title: "Unstake And Withdraw",
+                    description: `Unstake ${inputAmount} ${inputToken.symbol} from gauge and withdraw from vault`,
+                    button: {
+                        label: "Unstake and Withdraw",
+                        action: () => vaultUnstakeAndWithdraw({
+                            chainId: vaultData.chainId,
+                            router: vaultRouter,
+                            vaultData,
+                            asset: vaultAsset,
+                            vault,
+                            amount: decimalInput,
+                            account: account!,
+                            referral: referral,
+                            tokensAtom,
+                            clients
+                        })
+                    }
                 }
-            }
             ]
-        break;
+            break;
         }
         case SmartVaultActionType.ZapDeposit: {
             actionObj = [{
-            id: 1,
-            title: "Approve",
-            description: `Approve zap provider to pull ${inputAmount} ${inputToken.symbol} for swapping`,
-            button: {
-                label: "Approve",
-                action: () => handleZapAllowance({
-                    token: inputToken.address,
-                    amount: decimalInput,
-                    account: account!,
-                    zapProvider,
-                    clients
-                })
-            }
-            },
-            {
-            id: 2,
-            title: "Zap into Vault Asset",
-            description: `Zap ${inputAmount} ${inputToken.symbol} for ${outputAmount} ${vaultAsset.symbol}`,
-            updateBalanceAfter: true,
-            button: {
-                label: "Zap",
-                action: () => zap({
-                    chainId: vaultData.chainId,
-                    sellToken: inputToken,
-                    buyToken: vaultAsset,
-                    amount: decimalInput,
-                    account,
-                    zapProvider,
-                    slippage,
-                    tradeTimeout,
-                    clients,
-                    tokensAtom
-                  })
+                id: 1,
+                title: "Approve",
+                description: `Approve zap provider to pull ${inputAmount} ${inputToken.symbol} for swapping`,
+                button: {
+                    label: "Approve",
+                    action: () => handleZapAllowance({
+                        token: inputToken.address,
+                        amount: decimalInput,
+                        account: account!,
+                        zapProvider,
+                        clients
+                    })
                 }
             },
             {
-            id: 3,
-            title: "Approve",
-            description: `Approve ${zapAmount ? decimalZapAmount : outputAmount} ${vaultAsset.name} for vault deposit`,
-            button: {
-                label: "Approve",
-                action: () => handleAllowance({
-                    token: vaultData.asset,
-                    amount: zapAmount!,
-                    account,
-                    spender: vault.address,
-                    clients
+                id: 2,
+                title: "Zap into Vault Asset",
+                description: `Zap ${inputAmount} ${inputToken.symbol} for ${outputAmount} ${vaultAsset.symbol}`,
+                updateBalanceAfter: true,
+                button: {
+                    label: "Zap",
+                    action: () => zap({
+                        chainId: vaultData.chainId,
+                        sellToken: inputToken,
+                        buyToken: vaultAsset,
+                        amount: decimalInput,
+                        account,
+                        zapProvider,
+                        slippage,
+                        tradeTimeout,
+                        clients,
+                        tokensAtom
+                    })
+                }
+            },
+            {
+                id: 3,
+                title: "Approve",
+                description: `Approve ${zapAmount ? decimalZapAmount : outputAmount} ${vaultAsset.name} for vault deposit`,
+                button: {
+                    label: "Approve",
+                    action: () => handleAllowance({
+                        token: vaultData.asset,
+                        amount: zapAmount!,
+                        account,
+                        spender: vault.address,
+                        clients
                     })
                 }
             },
@@ -328,98 +328,98 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
                 title: "Deposit",
                 description: `Deposit ${zapAmount ? decimalZapAmount : outputAmount} ${vaultAsset.symbol} into the vault, receives vault shares`,
                 button: {
-                label: "Deposit",
-                action: () => vaultDeposit({
-                    chainId: vaultData.chainId,
-                    vaultData,
-                    asset: vaultAsset,
-                    vault,
-                    account,
-                    amount: zapAmount!,
-                    clients,
-                    fireEvent,
-                    referral,
-                    tokensAtom
+                    label: "Deposit",
+                    action: () => vaultDeposit({
+                        chainId: vaultData.chainId,
+                        vaultData,
+                        asset: vaultAsset,
+                        vault,
+                        account,
+                        amount: zapAmount!,
+                        clients,
+                        fireEvent,
+                        referral,
+                        tokensAtom
                     })
                 }
-                }
+            }
             ]
-        break;
+            break;
         }
         case SmartVaultActionType.ZapDepositAndStake: {
             actionObj = [{
-            id: 1,
-            title: "Approve",
-            description: `Approve zap provider to pull ${inputAmount} ${inputToken.symbol} for swapping`,
-            button: {
-                label: "Approve",
-                action: () => handleZapAllowance({
-                    token: inputToken.address,
-                    amount: decimalInput,
-                    account: account!,
-                    zapProvider,
-                    clients
-                })
-            }
-            },
-            {
-            id: 2,
-            title: "Zap into Vault Asset",
-            description: `Zap ${inputAmount} ${inputToken.symbol} for ${outputAmount} ${vaultAsset.symbol}`,
-            updateBalanceAfter: true,
-            button: {
-                label: "Zap",
-                action: () => zap({
-                    chainId: vaultData.chainId,
-                    sellToken: inputToken,
-                    buyToken: vaultAsset,
-                    amount: decimalInput,
-                    account,
-                    zapProvider,
-                    slippage,
-                    tradeTimeout,
-                    clients,
-                    tokensAtom
-                  })
+                id: 1,
+                title: "Approve",
+                description: `Approve zap provider to pull ${inputAmount} ${inputToken.symbol} for swapping`,
+                button: {
+                    label: "Approve",
+                    action: () => handleZapAllowance({
+                        token: inputToken.address,
+                        amount: decimalInput,
+                        account: account!,
+                        zapProvider,
+                        clients
+                    })
                 }
             },
             {
-            id: 3,
-            title: "Approve",
-            description: `Approve ${zapAmount ? decimalZapAmount : outputAmount} ${vaultAsset.name} for vault deposit`,
-            button: {
-                label: "Approve",
-                action: () => handleAllowance({
-                    token: vaultAsset.address,
-                    amount: zapAmount!,
-                    account: account,
-                    spender: vaultRouter,
-                    clients: clients
+                id: 2,
+                title: "Zap into Vault Asset",
+                description: `Zap ${inputAmount} ${inputToken.symbol} for ${outputAmount} ${vaultAsset.symbol}`,
+                updateBalanceAfter: true,
+                button: {
+                    label: "Zap",
+                    action: () => zap({
+                        chainId: vaultData.chainId,
+                        sellToken: inputToken,
+                        buyToken: vaultAsset,
+                        amount: decimalInput,
+                        account,
+                        zapProvider,
+                        slippage,
+                        tradeTimeout,
+                        clients,
+                        tokensAtom
+                    })
+                }
+            },
+            {
+                id: 3,
+                title: "Approve",
+                description: `Approve ${zapAmount ? decimalZapAmount : outputAmount} ${vaultAsset.name} for vault deposit`,
+                button: {
+                    label: "Approve",
+                    action: () => handleAllowance({
+                        token: vaultAsset.address,
+                        amount: zapAmount!,
+                        account: account,
+                        spender: vaultRouter,
+                        clients: clients
                     })
                 },
             },
             {
-            id: 4,
-            title: "Deposit And Stake",
-            description: `Deposit ${zapAmount ? decimalZapAmount : outputAmount} ${vaultAsset.symbol} into the vault, receives vault shares`,
-            button: {
-                label: "Deposit And Stake",
-                action: () => vaultDepositAndStake({
-                    chainId: vaultData.chainId,
-                    router: vaultRouter,
-                    vaultData: vaultData,
-                    asset: vaultAsset,
-                    vault: vault,
-                    amount: zapAmount!,
-                    account: account!,
-                    referral: referral,
-                    tokensAtom: tokensAtom,
-                    clients: clients
-                })
+                id: 4,
+                title: "Deposit And Stake",
+                description: `Deposit ${zapAmount ? decimalZapAmount : outputAmount} ${vaultAsset.symbol} into the vault, receives vault shares`,
+                button: {
+                    label: "Deposit And Stake",
+                    action: () => vaultDepositAndStake({
+                        chainId: vaultData.chainId,
+                        router: vaultRouter,
+                        vaultData: vaultData,
+                        asset: vaultAsset,
+                        vault: vault,
+                        amount: zapAmount!,
+                        account: account!,
+                        referral: referral,
+                        tokensAtom: tokensAtom,
+                        clients: clients
+                    })
                 }
             }
             ]
-        break;
+            break;
         }
         case SmartVaultActionType.ZapWithdrawal: {
             actionObj = [
@@ -456,7 +456,7 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
                             account,
                             zapProvider,
                             clients
-                          })
+                        })
                     }
                 },
                 {
@@ -479,7 +479,7 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
                         })
                     }
                 },
-                ]
+            ]
             break;
         }
         case SmartVaultActionType.ZapUnstakeAndWithdraw: {
@@ -498,7 +498,7 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
                             clients
                         })
                     }
-                    },
+                },
                 {
                     id: 2,
                     title: "Unstake and Withdraw",
@@ -518,7 +518,7 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
                             fireEvent,
                             referral,
                             tokensAtom
-                          })
+                        })
                     }
                 },
                 {
@@ -533,7 +533,7 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
                             account,
                             zapProvider,
                             clients
-                          })
+                        })
                     }
                 },
                 {
@@ -553,16 +553,107 @@ export const getActionsByType = (props: GetActionsProps) : ActionProps[] => {
                             tradeTimeout,
                             clients,
                             tokensAtom
-                          })
+                        })
                     }
                 },
-                ]
+            ]
             break;
         }
-      default: {
-        actionObj = []
-      }
+        default: {
+            actionObj = []
+        }
     }
 
     return actionObj;
-  }
+}
+
+interface ExecuteProps {
+    actionProps: GetActionsProps;
+    action: ActionButton;
+    isLastStep: boolean;
+    updateBalanceAfter?: boolean;
+    chainTokens: Token[]
+}
+export interface ExecuteRes {
+    success: boolean;
+    newVaultData: VaultData;
+    newActions: ActionProps[];
+    newVaultNetworth: number;
+    newAssetNetworth: number;
+    error?: any;
+}
+export const executeAction = async (props: ExecuteProps): Promise<ExecuteRes> => {
+    var assetBalanceBefore = 0;
+
+    var res: ExecuteRes = {
+        success: false,
+        newVaultData: props.actionProps.vaultData,
+        newActions: [],
+        newVaultNetworth: 0,
+        newAssetNetworth: 0
+    }
+
+    try {
+        if (props.updateBalanceAfter) {
+
+            assetBalanceBefore = Number(await props.actionProps.clients.publicClient.readContract({
+                address: props.actionProps.vaultAsset.address,
+                abi: erc20Abi,
+                functionName: "balanceOf",
+                args: [props.actionProps.account],
+            }));
+        }
+
+        res.success = await props.action.action();
+
+        if (res.success) {
+            if (props.isLastStep) {
+                // update vault supply
+                const newVaultSupply = Number(await props.actionProps.clients.publicClient.readContract({
+                    address: props.actionProps.vault.address,
+                    abi: erc20Abi,
+                    functionName: "totalSupply"
+                }));
+
+                // update vault tvl
+                const newVaultTVL = (newVaultSupply * props.actionProps.vault.price) / (10 ** props.actionProps.vault.decimals);
+
+                // update vaults
+                res.newVaultData = {
+                    ...props.actionProps.vaultData,
+                    totalSupply: newVaultSupply,
+                    tvl: newVaultTVL
+                };
+
+                // update user net worth
+                res.newVaultNetworth = props.chainTokens
+                    .filter(t => t.type === TokenType.Vault || t.type === TokenType.Gauge)
+                    .reduce((a, b) => a + ((b.balance / (10 ** b.decimals)) * b.price), 0);
+
+                res.newAssetNetworth = props.chainTokens
+                    .filter(t => t.type === TokenType.Asset)
+                    .reduce((a, b) => a + ((b.balance / (10 ** b.decimals)) * b.price), 0);
+            } else {
+                // reload actions with balanced updated if zap
+                if (props.updateBalanceAfter) {
+                    let postBal = Number(await props.actionProps.clients.publicClient.readContract({
+                        address: props.actionProps.vaultAsset.address,
+                        abi: erc20Abi,
+                        functionName: "balanceOf",
+                        args: [props.actionProps.account],
+                    }));
+                    
+                    var newProps = props.actionProps;
+                    newProps.zapAmount = postBal - assetBalanceBefore;
+
+                    res.newActions = getActionsByType(newProps);
+                }
+            }
+        }
+    } catch (err) {
+        res.success = false;
+        res.error = err;
+    }
+
+    return res;
+}

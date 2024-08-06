@@ -14,7 +14,7 @@ import { getZapProvider } from "@/lib/vault/zap";
 import { showErrorToast, showLoadingToast, showSuccessToast } from "@/lib/toasts";
 import { useRouter } from "next/router";
 import { VaultRouterByChain } from "@/lib/constants";
-import { getActionsByType, ActionProps } from "@/lib/getActions";
+import { getActionsByType, ActionProps, ExecuteRes, executeAction } from "@/lib/getActions";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 
 export default function PreviewInterface({ visibilityState, vaultData, inAmount, outputToken, vaultAsset, inputToken, gauge, vault, actionType }: {
@@ -57,108 +57,80 @@ export default function PreviewInterface({ visibilityState, vaultData, inAmount,
   const outputAmount = (Number(inAmount) * Number(inputToken?.price)) /
     Number(outputToken?.price) || 0
 
-  // hardcode preview action steps in vault inputs
-  // update TVL wallet balance after finish
   const executeActionAndUpdateState = async (action: ActionProps) => {
     setStepLoading(true);
 
-    var assetBalanceBefore = 0;
+    const isLastStep: boolean = currentStep === actions.length + 1 && !zapLoading;
 
-    try {
-      assetBalanceBefore = Number(await clients.publicClient.readContract({
-        address: vaultAsset.address,
-        abi: erc20Abi,
-        functionName: "balanceOf",
-        args: [account!],
-      }));
+    var executeActionRes: ExecuteRes = await executeAction({
+      actionProps: {
+        vaultRouter: VaultRouterByChain[vaultData.chainId],
+        actionType,
+        vaultData,
+        zapAmount: 0,
+        inputAmount: Number(inAmount),
+        inputToken,
+        outputToken,
+        outputAmount,
+        account: account!,
+        zapProvider,
+        slippage,
+        tradeTimeout,
+        vaultAsset,
+        vault,
+        referral: !!query?.ref && isAddress(query.ref as string)
+          ? getAddress(query.ref as string)
+          : undefined,
+        clients,
+        tokensAtom: [tokens, setTokens]
+      },
+      action: action.button,
+      isLastStep,
+      updateBalanceAfter: action.updateBalanceAfter,
+      chainTokens: SUPPORTED_NETWORKS.map(chain => Object.values(tokens[chain.id])).flat()
+    });
 
-      const success = await action.button.action();
-      setStepLoading(false);
-      if (success) {
-        setError(false);
-        setCurrentStep(currentStep + 1);
-        showSuccessToast("Done");
+    setStepLoading(false);
 
-        // the end
-        if (currentStep === actions.length + 1 && !zapLoading) {
-          const newSupply = await publicClient?.readContract({
-            address: vaultData.address,
-            abi: erc20Abi,
-            functionName: "totalSupply"
-          })
-          const index = vaults[vaultData.chainId].findIndex(v => v.address === vaultData.address)
-          const newNetworkVaults = [...vaults[vaultData.chainId]]
-          newNetworkVaults[index] = {
-            ...vaultData,
-            totalSupply: Number(newSupply),
-            tvl: (Number(newSupply) * vault.price) / (10 ** vault.decimals)
-          }
-          const newVaults = { ...vaults, [vaultData.chainId]: newNetworkVaults }
+    if (executeActionRes.success) {
+      setError(false);
+      setCurrentStep(currentStep + 1);
+      showSuccessToast("Done");
 
-          setVaults(newVaults)
+      // the end
+      if (isLastStep) {
+        // update vaults 
+        const index = vaults[vaultData.chainId].findIndex(v => v.address === vaultData.address)
+        const newNetworkVaults = [...vaults[vaultData.chainId]]
+        newNetworkVaults[index] = executeActionRes.newVaultData;
+        const newVaults = { ...vaults, [vaultData.chainId]: newNetworkVaults }
 
-          const vaultTVL = SUPPORTED_NETWORKS.map(chain => newVaults[chain.id]).flat().reduce((a, b) => a + b.tvl, 0)
-          setTVL({
-            vault: vaultTVL,
-            lockVault: tvl.lockVault,
-            stake: tvl.stake,
-            total: vaultTVL + tvl.lockVault + tvl.stake
-          });
+        setVaults(newVaults)
 
-          const vaultNetworth = SUPPORTED_NETWORKS.map(chain =>
-            Object.values(tokens[chain.id])).flat().filter(t => t.type === TokenType.Vault || t.type === TokenType.Gauge)
-            .reduce((a, b) => a + ((b.balance / (10 ** b.decimals)) * b.price), 0)
-          const assetNetworth = SUPPORTED_NETWORKS.map(chain =>
-            Object.values(tokens[chain.id])).flat().filter(t => t.type === TokenType.Asset)
-            .reduce((a, b) => a + ((b.balance / (10 ** b.decimals)) * b.price), 0)
-
-          setNetworth({
-            vault: vaultNetworth,
-            lockVault: networth.lockVault,
-            wallet: assetNetworth,
-            stake: networth.stake,
-            total: vaultNetworth + assetNetworth + networth.lockVault + networth.stake
-          })
-        } else {
-          // reload actions with balanced updated
-          if (action.updateBalanceAfter) {
-            let postBal = Number(await clients.publicClient.readContract({
-              address: vaultAsset.address,
-              abi: erc20Abi,
-              functionName: "balanceOf",
-              args: [account!],
-            }));
-
-            setActions(
-              getActionsByType({
-                vaultRouter: VaultRouterByChain[vaultData.chainId],
-                actionType,
-                vaultData,
-                zapAmount: postBal - assetBalanceBefore,
-                inputAmount: Number(inAmount),
-                inputToken,
-                outputToken,
-                outputAmount,
-                account: account!,
-                zapProvider,
-                slippage,
-                tradeTimeout,
-                vaultAsset,
-                vault,
-                referral: !!query?.ref && isAddress(query.ref as string)
-                  ? getAddress(query.ref as string)
-                  : undefined,
-                clients,
-                tokensAtom: [tokens, setTokens]
-              }))
-          }
-        }
+        // update tvl
+        setTVL({
+          vault: executeActionRes.newVaultData.tvl,
+          lockVault: tvl.lockVault,
+          stake: tvl.stake,
+          total: executeActionRes.newVaultData.tvl + tvl.lockVault + tvl.stake
+        });
+        
+        // update net worth
+        setNetworth({
+          vault: executeActionRes.newVaultNetworth,
+          lockVault: networth.lockVault,
+          wallet: executeActionRes.newAssetNetworth,
+          stake: networth.stake,
+          total: executeActionRes.newVaultNetworth + executeActionRes.newAssetNetworth + networth.lockVault + networth.stake
+        })
       } else {
-        showErrorToast("Error")
-        setError(true);
+        // new step - reload actions with balanced updated if required
+        if (action.updateBalanceAfter){
+          setActions(executeActionRes.newActions);
+        }
       }
-    } catch (err) {
-      showErrorToast("Error")
+    } else {
+      showErrorToast(`Error ${executeActionRes.error}`);
       setError(true);
     }
   }
@@ -289,7 +261,7 @@ export default function PreviewInterface({ visibilityState, vaultData, inAmount,
             </div>
             {
               ((currentStep === actions.length + 1 && !zapLoading) ||
-              error) && (
+                error) && (
                 <div className="w-full">
                   <MainActionButton label={"Exit"} handleClick={() => {
                     setVisible(false)
