@@ -17,7 +17,9 @@ import { VaultRouterByChain } from "@/lib/constants";
 import { getActionsByType, ActionProps, ExecuteRes, executeAction } from "@/lib/getActions";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 
-export default function PreviewInterface({ visibilityState, vaultData, inAmount, outputToken, vaultAsset, inputToken, gauge, vault, actionType }: {
+export default function PreviewInterface({
+  visibilityState, vaultData, inAmount, outputToken, vaultAsset, inputToken, gauge, vault, actionType, slippage, tradeTimeout
+}: {
   visibilityState: [boolean, Dispatch<SetStateAction<boolean>>],
   vaultData: VaultData,
   actionType: SmartVaultActionType,
@@ -27,6 +29,8 @@ export default function PreviewInterface({ visibilityState, vaultData, inAmount,
   gauge?: Token,
   vault: Token,
   inputToken: Token,
+  slippage: number,
+  tradeTimeout: number,
 }): JSX.Element {
   const [visible, setVisible] = visibilityState
   const { address: account, chain } = useAccount();
@@ -35,8 +39,6 @@ export default function PreviewInterface({ visibilityState, vaultData, inAmount,
   const { openConnectModal } = useConnectModal();
   const clients = { publicClient: publicClient!, walletClient: walletClient! };
 
-  const [slippage, setSlippage] = useState<number>(100); // In BPS 0 - 10_000 // TODO pass from above
-  const [tradeTimeout, setTradeTimeout] = useState<number>(300); // number of seconds a cow order is valid for // TODO pass from above
   const [tokens, setTokens] = useAtom(tokensAtom);
   const [actions, setActions] = useState<ActionProps[]>([]);
   const [currentStep, setCurrentStep] = useState<number>(1);
@@ -50,6 +52,7 @@ export default function PreviewInterface({ visibilityState, vaultData, inAmount,
   const [networth, setNetworth] = useAtom(networthAtom);
 
   const zapTypes = [SmartVaultActionType.ZapDeposit, SmartVaultActionType.ZapDepositAndStake, SmartVaultActionType.ZapUnstakeAndWithdraw, SmartVaultActionType.ZapWithdrawal];
+  const router = useRouter();
 
   const inputProps = { readOnly: true }
 
@@ -95,7 +98,7 @@ export default function PreviewInterface({ visibilityState, vaultData, inAmount,
     if (executeActionRes.success) {
       setError(false);
       setCurrentStep(currentStep + 1);
-      showSuccessToast("Done");
+      showSuccessToast("Success");
 
       // the end
       if (isLastStep) {
@@ -114,7 +117,7 @@ export default function PreviewInterface({ visibilityState, vaultData, inAmount,
           stake: tvl.stake,
           total: executeActionRes.newVaultData.tvl + tvl.lockVault + tvl.stake
         });
-        
+
         // update net worth
         setNetworth({
           vault: executeActionRes.newVaultNetworth,
@@ -125,7 +128,7 @@ export default function PreviewInterface({ visibilityState, vaultData, inAmount,
         })
       } else {
         // new step - reload actions with balanced updated if required
-        if (action.updateBalanceAfter){
+        if (action.updateBalanceAfter) {
           setActions(executeActionRes.newActions);
         }
       }
@@ -245,34 +248,37 @@ export default function PreviewInterface({ visibilityState, vaultData, inAmount,
             (account && !inputToken || (actions.length === 0 && !zapLoading)) &&
             <p className="text-white">Nothing to do here</p>
           }
-
-          <div className="w-full md:flex md:flex-wrap md:justify-between md:gap-5 text-start">
-            <div className="w-full">
-              {actions.map((action, i) => (
-                <div className="p-8">
-                  <p className="text-lg">{`${action.id} - ${action.title}`}</p>
-                  <p>{action.description}</p>
-                  <MainActionButton
-                    label={action.button.label}
-                    handleClick={() => executeActionAndUpdateState(action)}
-                    disabled={zapLoading || stepLoading || currentStep !== action.id} />
-                </div>
-              ))}
+          {
+            (!zapLoading) &&
+            <div className="w-full md:flex md:flex-wrap md:justify-between md:gap-5 text-start">
+              <div className="w-full">
+                {actions.map((action, i) => (
+                  <div className="p-8">
+                    <p className="text-lg">{`${action.id} - ${action.title}`}</p>
+                    <p>{action.description}</p>
+                    <MainActionButton
+                      label={action.button.label}
+                      handleClick={() => executeActionAndUpdateState(action)}
+                      disabled={stepLoading || currentStep !== action.id} />
+                  </div>
+                ))}
+              </div>
+              {
+                ((currentStep === actions.length + 1 && !zapLoading) ||
+                  error) && (
+                  <div className="w-full">
+                    <MainActionButton label={"Exit"} handleClick={() => {
+                      setVisible(false)
+                      setError(false)
+                      setCurrentStep(1)
+                      router.reload();
+                    }}
+                    />
+                  </div>
+                )
+              }
             </div>
-            {
-              ((currentStep === actions.length + 1 && !zapLoading) ||
-                error) && (
-                <div className="w-full">
-                  <MainActionButton label={"Exit"} handleClick={() => {
-                    setVisible(false)
-                    setError(false)
-                    setCurrentStep(1)
-                  }}
-                  />
-                </div>
-              )
-            }
-          </div>
+          }
         </div>
       </div>
     </Modal>

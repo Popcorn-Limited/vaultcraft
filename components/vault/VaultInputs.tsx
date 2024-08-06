@@ -235,6 +235,8 @@ export default function VaultInputs({
         vault={vault}
         gauge={gauge}
         actionType={action}
+        slippage={slippage}
+        tradeTimeout={tradeTimeout}
       />
       
       <Modal visibility={[showModal, setShowModal]}>
