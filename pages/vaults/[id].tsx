@@ -19,6 +19,8 @@ import ApyChart from "@/components/vault/ApyChart";
 import VaultHero from "@/components/vault/VaultHero";
 import { isAddress, zeroAddress } from "viem";
 import UserBoostSection from "@/components/vault/UserBoostSection";
+import { VCX, pVCX, pOHM} from "@/lib/constants";
+import VCXStaking from "@/components/vault/VCXStaking";
 
 export default function Index() {
   const router = useRouter();
@@ -46,6 +48,12 @@ export default function Index() {
           tokens[chainId][foundVault.vault],
           ...ZapAssetAddressesByChain[chainId].filter(addr => foundVault.asset !== addr).map(addr => tokens[chainId][addr])
         ]
+
+        if(chainId === 1 && foundVault.vault == "0x319121F8F39669599221A883Bb6d7d0Feef0E69c") {
+          newTokenOptions.push(tokens[1][VCX])
+          newTokenOptions.push(tokens[1][pVCX])
+          newTokenOptions.push(tokens[1][pOHM])
+        };
 
         setAsset(tokens[chainId][foundVault.asset])
         setVault(tokens[chainId][foundVault.vault])
@@ -85,12 +93,27 @@ export default function Index() {
               <div className="w-full md:w-1/3">
                 <div className="bg-customNeutral200 p-6 rounded-lg">
                   <div className="bg-customNeutral300 px-6 py-6 rounded-lg">
-                    <VaultInputs
-                      vaultData={vaultData}
-                      tokenOptions={tokenOptions}
-                      chainId={vaultData.chainId}
-                      hideModal={() => router.reload()}
-                    />
+                    { (vaultData.address === "0x319121F8F39669599221A883Bb6d7d0Feef0E69c") ? ( 
+                        <>
+                        <VCXStaking
+                        vaultData={vaultData}
+                        tokenOptions={tokenOptions}
+                        chainId={vaultData.chainId}
+                        hideModal={() => router.reload()}
+                      />
+                      </>
+                      ) : 
+                      (
+                        <>
+                        <VaultInputs
+                        vaultData={vaultData}
+                        tokenOptions={tokenOptions}
+                        chainId={vaultData.chainId}
+                        hideModal={() => router.reload()}
+                        />
+                        </>
+                      )
+                    }
                   </div>
                 </div>
               </div>
@@ -100,7 +123,7 @@ export default function Index() {
                   <UserBoostSection vaultData={vaultData} gauge={gauge} veToken={tokens[vaultData.chainId][VeTokenByChain[vaultData.chainId]]} />
                 }
 
-                <div className="bg-customNeutral200 p-6 rounded-lg">
+                {/* <div className="bg-customNeutral200 p-6 rounded-lg">
                   <p className="text-white text-2xl font-bold mb-4">Leverage Farm 🧑‍🌾</p>
                   <p className='text-white mb-4'>
                     The borrow modal allows liquidity providers to borrow against their collateral and deposit more into Smart Vaults, enhancing capital efficiency and premiums earned.
@@ -113,7 +136,7 @@ export default function Index() {
                       />
                     </div>
                   </div>
-                </div>
+                </div>*/}
 
                 {vaultData.apyHist.length > 0 && <ApyChart vault={vaultData} />}
 

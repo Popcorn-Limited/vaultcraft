@@ -9,13 +9,13 @@ import {
   useWalletClient,
 } from "wagmi";
 import TabSelector from "@/components/common/TabSelector";
-import { SmartVaultActionType, Token, TokenType, VaultData } from "@/lib/types";
+import { SmartVaultActionType, Token, TokenType, VaultData, ZapProvider } from "@/lib/types";
 import { validateInput } from "@/lib/utils/helpers";
 import Modal from "@/components/modal/Modal";
 import InputNumber from "@/components/input/InputNumber";
 import { safeRound } from "@/lib/utils/formatBigNumber";
 import { erc20Abi, formatUnits, getAddress, isAddress, maxUint256 } from "viem";
-import handleVaultInteraction from "@/lib/vault/handleVaultInteraction";
+import handleStakingInteraction from "@/lib/vault/handleStakingInteraction";
 import ActionSteps from "@/components/vault/ActionSteps";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { useAtom } from "jotai";
@@ -23,9 +23,11 @@ import { useRouter } from "next/router";
 import { ActionStep, getSmartVaultActionSteps } from "@/lib/getActionSteps";
 import { vaultsAtom } from "@/lib/atoms/vaults";
 import { networthAtom, tokensAtom, tvlAtom } from "@/lib/atoms";
+import { getZapProvider } from "@/lib/vault/zap";
 import { showErrorToast, showLoadingToast, showSuccessToast } from "@/lib/toasts";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
-import PreviewInterface from "@/components/preview/PreviewInterface";
+import PreviewStakingInterface from "../preview/PreviewStakingInterface"; 
+import { VCX, pVCX, pOHM } from "@/lib/constants";
 
 export interface VaultInputsProps {
   vaultData: VaultData;
@@ -34,7 +36,7 @@ export interface VaultInputsProps {
   hideModal: () => void;
 }
 
-export default function VaultInputs({
+export default function VCXStaking({
   vaultData,
   tokenOptions,
   chainId,
@@ -42,7 +44,8 @@ export default function VaultInputs({
 }: VaultInputsProps): JSX.Element {
   const asset = tokenOptions.find(t => t.address === vaultData.asset)
   const vault = tokenOptions.find(t => t.address === vaultData.vault)
-  const gauge = tokenOptions.find(t => t.address === vaultData.gauge)
+  const gauge = undefined;
+  const VCXToken = tokenOptions.find(t => t.address === VCX)
 
   const { query } = useRouter();
   const publicClient = usePublicClient({ chainId });
@@ -57,6 +60,8 @@ export default function VaultInputs({
   const [networth, setNetworth] = useAtom(networthAtom);
 
   const [inputToken, setInputToken] = useState<Token>();
+  const [inputTokenB, setInputTokenB] = useState<Token>();
+
   const [outputToken, setOutputToken] = useState<Token>();
 
   const [stepCounter, setStepCounter] = useState<number>(0);
@@ -66,38 +71,33 @@ export default function VaultInputs({
   );
 
   const [inputBalance, setInputBalance] = useState<string>("0");
-  const [outputAmount, setOutputAmount] = useState<number>(0);
+  const [amountTokenB, setAmountTokenB] = useState<string>("0");
+
   const [isDeposit, setIsDeposit] = useState<boolean>(true);
 
   // Zap Settings
+  const [zapProvider, setZapProvider] = useState(ZapProvider.none)
   const [showModal, setShowModal] = useState<boolean>(false)
   const [tradeTimeout, setTradeTimeout] = useState<number>(300); // number of seconds a cow order is valid for
   const [slippage, setSlippage] = useState<number>(100); // In BPS 0 - 10_000
 
   const [showPreviewModal, setShowPreviewModal] = useState(false)
 
+  // TODO pass down tokenA to preview component to dictate actions - ie if LP token go to vault deposit directly
+  // TODO get pOHM logic - swap from pVCX or bond with ETH? 
+  // which tokens do we want to provide as input other than VCX and ETH
+  // TODO logic where not all steps are necessary - skip button? 
+  // TODO pricing logic 
+  // TODO vault page should show input/output like regular vaults?
   useEffect(() => {
-    // set default input/output tokens
-    setInputToken(asset);
-    setOutputToken(!!gauge ? gauge : vault);
-    const actionType = !!gauge
-      ? SmartVaultActionType.DepositAndStake
-      : SmartVaultActionType.Deposit;
-    setAction(actionType);
+    setInputToken(VCXToken);
+    setOutputToken(vault);
+    setAction(SmartVaultActionType.PeapodsStake);
     setSteps(getSmartVaultActionSteps(SmartVaultActionType.Preview));
   }, []);
 
-  const calcOutput = (input: number, inToken?: Token) => {
-    const tokenIn = inToken ? inToken : inputToken;
-
-    setOutputAmount(((input * Number(tokenIn?.price)) /
-      (Number(outputToken?.price))) || 0
-    );
-  }
-  async function handleChangeInput(e: any) {
+  function handleChangeInput(e: any) {
     const value = e.currentTarget.value;
-
-    calcOutput(value);
     setInputBalance(validateInput(value).isValid ? value : "0");
   }
 
@@ -118,21 +118,15 @@ export default function VaultInputs({
       setInputToken(asset);
       setOutputToken(!!gauge ? gauge : vault);
       setIsDeposit(true);
-      const newAction = !!gauge
-        ? SmartVaultActionType.DepositAndStake
-        : SmartVaultActionType.Deposit;
-      setAction(newAction);
-      // setSteps(getSmartVaultActionSteps(SmartVaultActionType.Preview));
+      setAction(SmartVaultActionType.PeapodsStake);
     }
   }
 
-  async function handleTokenSelect(input: Token, output: Token): Promise<void> {
+  function handleTokenSelect(input: Token, output: Token): void {
     setStepCounter(0);
 
     setInputToken(input);
     setOutputToken(output);
-
-    calcOutput((Number(inputBalance)), input);
 
     switch (input.address) {
       case asset?.address!:
@@ -143,12 +137,16 @@ export default function VaultInputs({
           case vault?.address!:
             setIsDeposit(true);
             setAction(SmartVaultActionType.Deposit);
+            // setSteps(getSmartVaultActionSteps(SmartVaultActionType.Deposit));
             return;
-          case gauge?.address:
-            setIsDeposit(true);
-            setAction(SmartVaultActionType.DepositAndStake);
-            return;
-          case "0x319121F8F39669599221A883Bb6d7d0Feef0E69c":
+          // case gauge?.address:
+          //   setIsDeposit(true);
+          //   setAction(SmartVaultActionType.DepositAndStake);
+          //   // setSteps(
+          //   //   getSmartVaultActionSteps(SmartVaultActionType.DepositAndStake)
+          //   // );
+          //   return;
+          case "0x319121F8F39669599221A883Bb6d7d0Feef0E69c": 
             setIsDeposit(true);
             setAction(SmartVaultActionType.PeapodsStake);
             return;
@@ -161,37 +159,51 @@ export default function VaultInputs({
           case asset?.address!:
             setIsDeposit(false);
             setAction(SmartVaultActionType.Withdrawal);
+            // setSteps(getSmartVaultActionSteps(SmartVaultActionType.Withdrawal));
             return;
           case vault?.address!:
             // error
             return;
-          case gauge?.address:
-            setIsDeposit(true);
-            setAction(SmartVaultActionType.Stake);
-            return;
+          // case gauge?.address:
+          //   setIsDeposit(true);
+          //   setAction(SmartVaultActionType.Stake);
+          //   // setSteps(getSmartVaultActionSteps(SmartVaultActionType.Stake));
+          //   return;
           default:
             setIsDeposit(false);
             setAction(SmartVaultActionType.ZapWithdrawal);
+            // setSteps(
+            //   getSmartVaultActionSteps(SmartVaultActionType.ZapWithdrawal)
+            // );
             return;
         }
-      case gauge?.address:
-        switch (output.address) {
-          case asset?.address!:
-            setIsDeposit(false);
-            setAction(SmartVaultActionType.UnstakeAndWithdraw);
-            return;
-          case vault?.address!:
-            setIsDeposit(false);
-            setAction(SmartVaultActionType.Unstake);
-            return;
-          case gauge?.address:
-            // error
-            return;
-          default:
-            setIsDeposit(false);
-            setAction(SmartVaultActionType.ZapUnstakeAndWithdraw);
-            return;
-        }
+      // case gauge?.address:
+      //   switch (output.address) {
+      //     case asset?.address!:
+      //       setIsDeposit(false);
+      //       setAction(SmartVaultActionType.UnstakeAndWithdraw);
+      //       // setSteps(
+      //       //   getSmartVaultActionSteps(SmartVaultActionType.UnstakeAndWithdraw)
+      //       // );
+      //       return;
+      //     case vault?.address!:
+      //       setIsDeposit(false);
+      //       setAction(SmartVaultActionType.Unstake);
+      //       // setSteps(getSmartVaultActionSteps(SmartVaultActionType.Unstake));
+      //       return;
+      //     case gauge?.address:
+      //       // error
+      //       return;
+      //     default:
+      //       setIsDeposit(false);
+      //       setAction(SmartVaultActionType.ZapUnstakeAndWithdraw);
+      //       // setSteps(
+      //       //   getSmartVaultActionSteps(
+      //       //     SmartVaultActionType.ZapUnstakeAndWithdraw
+      //       //   )
+      //       // );
+      //       return;
+      //   }
       default:
         switch (output.address) {
           case asset?.address!:
@@ -200,11 +212,15 @@ export default function VaultInputs({
           case vault?.address!:
             setIsDeposit(true);
             setAction(SmartVaultActionType.ZapDeposit);
+            // setSteps(getSmartVaultActionSteps(SmartVaultActionType.ZapDeposit));
             return;
-          case gauge?.address:
-            setIsDeposit(true);
-            setAction(SmartVaultActionType.ZapDepositAndStake);
-            return;
+          // case gauge?.address:
+          //   setIsDeposit(true);
+          //   setAction(SmartVaultActionType.ZapDepositAndStake);
+          //   // setSteps(
+          //   //   getSmartVaultActionSteps(SmartVaultActionType.ZapDepositAndStake)
+          //   // );
+          //   return;
           default:
             // error
             return;
@@ -236,21 +252,18 @@ export default function VaultInputs({
   if (!inputToken || !outputToken || !asset || !vault) return <></>;
   return (
     <>
-      <PreviewInterface
-        visibilityState={[showPreviewModal, setShowPreviewModal]}
-        vaultData={vaultData}
-        inAmount={inputBalance}
-        outputAmount={outputAmount}
-        outputToken={outputToken}
+      <PreviewStakingInterface 
         inputToken={inputToken}
-        vaultAsset={asset}
+        inputAmount={+inputBalance}
+        tokenOptions={tokenOptions}
+        visibilityState={[showPreviewModal, setShowPreviewModal]} 
+        vaultData={vaultData}
+        chainId={chainId}
         vault={vault}
         gauge={gauge}
         actionType={action}
-        slippage={slippage}
-        tradeTimeout={tradeTimeout}
       />
-
+      
       <Modal visibility={[showModal, setShowModal]}>
         <div className="text-start">
           <p>Slippage (in BPS)</p>
@@ -276,14 +289,10 @@ export default function VaultInputs({
         onMaxClick={handleMaxClick}
         chainId={chainId}
         value={inputBalance}
-        onChange={e => handleChangeInput(e)}
+        onChange={handleChangeInput}
         selectedToken={inputToken}
         errorMessage={""}
-        tokenList={tokenOptions.filter((token) =>
-          gauge?.address
-            ? token.address !== gauge?.address
-            : token.address !== vault?.address
-        )}
+        tokenList={tokenOptions}
         allowSelection={isDeposit}
         allowInput
       />
@@ -317,15 +326,14 @@ export default function VaultInputs({
         }
         onMaxClick={() => { }}
         chainId={chainId}
-        value={outputAmount}
+        value={
+          (Number(inputBalance) * Number(inputToken?.price)) /
+          Number(outputToken?.price) || 0
+        }
         onChange={() => { }}
         selectedToken={outputToken}
         errorMessage={""}
-        tokenList={tokenOptions.filter((token) =>
-          gauge?.address
-            ? token.address !== gauge?.address
-            : token.address !== vault.address
-        )}
+        tokenList={tokenOptions}
         allowSelection={!isDeposit}
         allowInput={false}
       />
@@ -367,6 +375,10 @@ export default function VaultInputs({
             <p>{vaultData.fees.performance / 1e16} %</p>
           </span>
         </div>
+      </div>
+
+      <div className="w-full flex justify-center my-6">
+        <ActionSteps steps={steps} stepCounter={stepCounter} />
       </div>
 
       <div className="">

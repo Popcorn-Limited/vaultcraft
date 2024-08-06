@@ -1,5 +1,12 @@
 import { ActionStep } from "@/lib/getActionSteps";
 import { ArrowRightIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { Address } from "viem";
+import InputTokenStatic from "@/components/preview/StaticInputToken";
+import MainActionButton from "@/components/button/MainActionButton";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { ReserveData, Token, UserAccountData, VaultData, ZapProvider } from "@/lib/types";
+import HandleAllowanceStep from "../preview/HandleAllowance";
+import ActionStepComponent from "../preview/ActionStep";
 
 function getStepColor(preFix: string, step: any): string {
   if (step.loading || step.success) return `${preFix}-primaryYellow`;
@@ -10,52 +17,43 @@ function getStepColor(preFix: string, step: any): string {
 interface ActionStepsProps {
   steps: ActionStep[];
   stepCounter: number;
+  inputToken: Token;
+  inputAmount: string;
+  outputToken: Token;
+  vaultAsset: Token;
+  chainId: number;
 }
 
 export default function ActionSteps({
   steps,
   stepCounter,
-}: ActionStepsProps): JSX.Element {
+  inputAmount,
+  inputToken,
+  outputToken,
+  vaultAsset,
+  chainId
+}: ActionStepsProps): JSX.Element {  
+  const outputAmount = Number(inputAmount) * Number(inputToken?.price) /
+  Number(outputToken?.price) || 0;
+
   return (
     <div className="flex flex-row items-center">
       {steps.map((step, i) => (
-        <div key={step.label} className="flex flex-row items-center h-8">
-          <div
-            className={`w-8 h-8 rounded-full border leading-none flex justify-center items-center cursor-default bg-opacity-40
-              ${
-                i === stepCounter
-                  ? "border-primaryYellow bg-primaryYellow"
-                  : `${getStepColor("border", step)} ${getStepColor(
-                      "bg",
-                      step
-                    )}`
-              }`}
-          >
-            {step.loading && (
-              <img src="/images/loader/puff.svg" className={`h-6 w-6`} />
-            )}
-            {!step.loading && step.error && (
-              <XMarkIcon className="h-4 w-4 text-red-500" />
-            )}
-            {!step.loading && step.success && (
-              <img
-                src="/images/icons/checkIconYellow.svg"
-                className={`h-4 w-4`}
-              />
-            )}
-            {!step.loading && !step.error && !step.success && (
-              <div
-                className={`rounded-full h-3 w-3 ${
-                  i === stepCounter ? "bg-primaryYellow" : getStepColor("bg", step)
-                }`}
-              />
-            )}
-          </div>
-          {step.step < steps.length && (
-            <ArrowRightIcon
-              className={`w-6 h-4 ${getStepColor("text", step)}`}
-            />
+        <div className="w-full h-full md:space-x-20">
+          <div className="w-full">
+          {(step.label === "Handle Allowance") && (
+            <HandleAllowanceStep isLast={i===stepCounter} step={step} inputToken={vaultAsset} inputAmount={outputAmount} chainId={chainId} stepNumber={i + 1}/>
           )}
+          {(step.label === "Handle Zap Allowance") && (
+            <HandleAllowanceStep isLast={i===stepCounter} step={step} inputToken={inputToken} inputAmount={Number(inputAmount)} chainId={chainId}  stepNumber={i + 1}/>
+          )}
+          {(step.label.includes("Zap") && step.label !== "Handle Zap Allowance") && (
+            <ActionStepComponent isLast={i===stepCounter} stepNumber={i + 1} step={step} inputAmount={Number(inputAmount)} outputAmount={outputAmount} inputToken={inputToken} outputToken={vaultAsset} chainId={chainId}/>
+          )}
+          {(!step.label.includes("Zap") && !step.label.includes("Allowance")) && (
+            <ActionStepComponent isLast={i===stepCounter}  stepNumber={i + 1} step={step} inputAmount={outputAmount} outputAmount={outputAmount} inputToken={vaultAsset} outputToken={outputToken} chainId={chainId}/>
+          )}
+          </div>
         </div>
       ))}
     </div>

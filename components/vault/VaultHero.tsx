@@ -25,7 +25,7 @@ export default function VaultHero({
   showClaim?: boolean;
 }): JSX.Element {
   const [tokens] = useAtom(tokensAtom);
-  const boost = ((vaultData.gaugeData?.workingBalance! / (gauge?.balance || 0)) * 5) || 1
+  const boost = (vaultData.gaugeData?.workingBalance! / (gauge?.balance || 0)) * 5
   const walletValue = ((asset.balance * asset.price) / (10 ** asset.decimals))
   let depositValue = (vault.balance * vault.price) / (10 ** vault.decimals)
   if (gauge) {
@@ -93,9 +93,9 @@ export default function VaultHero({
             (
               <div className="w-1/2 md:w-max">
                 <LargeCardStat
-                  id={"min-boost"}
+                  id={"boost"}
                   label="Boost APR"
-                  value={`${formatTwoDecimals(vaultData.gaugeData?.lowerAPR || 0 * boost)} %`}
+                  value={`${formatTwoDecimals(vaultData.gaugeData?.lowerAPR * boost)} %`}
                   tooltip={`Minimum oVCX boost APR based on most current epoch's distribution. (Based on the current emissions for this gauge of
                      ${formatTwoDecimals((vaultData?.gaugeData.annualEmissions / 5) * boost)} oVCX p. year)`}
                 />
