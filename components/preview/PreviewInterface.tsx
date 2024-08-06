@@ -18,12 +18,13 @@ import { getActionsByType, ActionProps, ExecuteRes, executeAction } from "@/lib/
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 
 export default function PreviewInterface({
-  visibilityState, vaultData, inAmount, outputToken, vaultAsset, inputToken, gauge, vault, actionType, slippage, tradeTimeout
+  visibilityState, vaultData, inAmount, outputAmount, outputToken, vaultAsset, inputToken, gauge, vault, actionType, slippage, tradeTimeout
 }: {
   visibilityState: [boolean, Dispatch<SetStateAction<boolean>>],
   vaultData: VaultData,
   actionType: SmartVaultActionType,
   inAmount: string,
+  outputAmount: number,
   outputToken: Token,
   vaultAsset: Token,
   gauge?: Token,
@@ -57,8 +58,6 @@ export default function PreviewInterface({
   const inputProps = { readOnly: true }
 
   const { query } = useRouter();
-  const outputAmount = (Number(inAmount) * Number(inputToken?.price)) /
-    Number(outputToken?.price) || 0
 
   const executeActionAndUpdateState = async (action: ActionProps) => {
     setStepLoading(true);
@@ -160,7 +159,9 @@ export default function PreviewInterface({
         if (newZapProvider === ZapProvider.notFound) {
           showErrorToast("Zap not available. Please try a different token or amount")
           setError(true);
+          setVisible(false);
         } else {
+          setError(false);
           showSuccessToast(`Using ${String(ZapProvider[newZapProvider])} for your zap`)
           setZapProvider(newZapProvider);
         }
@@ -222,7 +223,7 @@ export default function PreviewInterface({
 
   return <>
     <Modal
-      visibility={visibilityState}
+      visibility={[visible, setVisible]}
       title={vaultData.address ?
         <AssetWithName vault={vaultData} /> :
         <h2 className={`text-2xl font-bold text-white`}>
@@ -230,57 +231,71 @@ export default function PreviewInterface({
         </h2>
       }
     >
-      <div className="w-full md:flex md:flex-row md:space-x-20">
-        <div className="w-full">
-          {!account &&
-            <div>
-              <MainActionButton
-                label="Connect Wallet"
-                handleClick={openConnectModal}
-              />
-            </div>
-          }
-          {
-            (zapLoading) &&
-            <p className="text-white">Loading up the zap provider..</p>
-          }
-          {
-            (account && !inputToken || (actions.length === 0 && !zapLoading)) &&
-            <p className="text-white">Nothing to do here</p>
-          }
-          {
-            (!zapLoading) &&
-            <div className="w-full md:flex md:flex-wrap md:justify-between md:gap-5 text-start">
-              <div className="w-full">
-                {actions.map((action, i) => (
-                  <div className="p-8">
-                    <p className="text-lg">{`${action.id} - ${action.title}`}</p>
-                    <p>{action.description}</p>
-                    <MainActionButton
-                      label={action.button.label}
-                      handleClick={() => executeActionAndUpdateState(action)}
-                      disabled={stepLoading || currentStep !== action.id} />
-                  </div>
-                ))}
-              </div>
+      {visible &&
+        (
+          <div className="w-full md:flex md:flex-row md:space-x-20">
+            <div className="w-full">
+              {!account &&
+                <div>
+                  <MainActionButton
+                    label="Connect Wallet"
+                    handleClick={openConnectModal}
+                  />
+                </div>
+              }
               {
-                ((currentStep === actions.length + 1 && !zapLoading) ||
-                  error) && (
+                (zapLoading) &&
+                <p className="text-white">Loading up the zap provider..</p>
+              }
+              {
+                (account && !inputToken || (actions.length === 0 && !zapLoading)) &&
+                <p className="text-white">Nothing to do here</p>
+              }
+              {
+                (!zapLoading) &&
+                <div className="w-full md:flex md:flex-wrap md:justify-between md:gap-5 text-start">
                   <div className="w-full">
-                    <MainActionButton label={"Exit"} handleClick={() => {
-                      setVisible(false)
-                      setError(false)
-                      setCurrentStep(1)
-                      router.reload();
-                    }}
-                    />
+                    {actions.map((action, i) => (
+                      <div className="p-8">
+                        <p className="text-lg">{`${action.id} - ${action.title}`}</p>
+                        <p>{action.description}</p>
+                        <MainActionButton
+                          label={action.button.label}
+                          handleClick={() => executeActionAndUpdateState(action)}
+                          disabled={stepLoading || currentStep !== action.id} />
+                      </div>
+                    ))}
                   </div>
-                )
+                  {
+                    (error) && (
+                    <div className="w-full">
+                      <MainActionButton label={"Restart"} handleClick={() => {
+                        setVisible(false)
+                        setError(false)
+                        setCurrentStep(1)
+                      }}
+                      />
+                    </div>
+                  )
+                  }
+                  {
+                    ((currentStep === actions.length + 1 && !zapLoading)) && (
+                      <div className="w-full">
+                        <MainActionButton label={"Complete"} handleClick={() => {
+                          setVisible(false)
+                          setError(false)
+                          setCurrentStep(1)
+                          router.reload();
+                        }}
+                        />
+                      </div>
+                    )
+                  }
+                </div>
               }
             </div>
-          }
-        </div>
-      </div>
+          </div>
+        )}
     </Modal>
   </>
 }

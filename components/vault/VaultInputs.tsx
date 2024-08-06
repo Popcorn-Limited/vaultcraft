@@ -66,7 +66,7 @@ export default function VaultInputs({
   );
 
   const [inputBalance, setInputBalance] = useState<string>("0");
-
+  const [outputAmount, setOutputAmount] = useState<number>(0);
   const [isDeposit, setIsDeposit] = useState<boolean>(true);
 
   // Zap Settings
@@ -87,8 +87,17 @@ export default function VaultInputs({
     setSteps(getSmartVaultActionSteps(SmartVaultActionType.Preview));
   }, []);
 
+  const calcOutput = (input: number, inToken?: Token) => {
+    const tokenIn = inToken ? inToken : inputToken;
+
+    setOutputAmount(((input * Number(tokenIn?.price)) /
+      (Number(outputToken?.price))) || 0
+    );
+  }
   async function handleChangeInput(e: any) {
     const value = e.currentTarget.value;
+
+    calcOutput(value);
     setInputBalance(validateInput(value).isValid ? value : "0");
   }
 
@@ -123,6 +132,8 @@ export default function VaultInputs({
     setInputToken(input);
     setOutputToken(output);
 
+    calcOutput((Number(inputBalance)), input);
+
     switch (input.address) {
       case asset?.address!:
         switch (output.address) {
@@ -137,7 +148,7 @@ export default function VaultInputs({
             setIsDeposit(true);
             setAction(SmartVaultActionType.DepositAndStake);
             return;
-          case "0x319121F8F39669599221A883Bb6d7d0Feef0E69c": 
+          case "0x319121F8F39669599221A883Bb6d7d0Feef0E69c":
             setIsDeposit(true);
             setAction(SmartVaultActionType.PeapodsStake);
             return;
@@ -225,10 +236,11 @@ export default function VaultInputs({
   if (!inputToken || !outputToken || !asset || !vault) return <></>;
   return (
     <>
-      <PreviewInterface 
-        visibilityState={[showPreviewModal, setShowPreviewModal]} 
-        vaultData={vaultData} 
-        inAmount={inputBalance} 
+      <PreviewInterface
+        visibilityState={[showPreviewModal, setShowPreviewModal]}
+        vaultData={vaultData}
+        inAmount={inputBalance}
+        outputAmount={outputAmount}
         outputToken={outputToken}
         inputToken={inputToken}
         vaultAsset={asset}
@@ -238,7 +250,7 @@ export default function VaultInputs({
         slippage={slippage}
         tradeTimeout={tradeTimeout}
       />
-      
+
       <Modal visibility={[showModal, setShowModal]}>
         <div className="text-start">
           <p>Slippage (in BPS)</p>
@@ -305,10 +317,7 @@ export default function VaultInputs({
         }
         onMaxClick={() => { }}
         chainId={chainId}
-        value={
-          (Number(inputBalance) * Number(inputToken?.price)) /
-          Number(outputToken?.price) || 0
-        }
+        value={outputAmount}
         onChange={() => { }}
         selectedToken={outputToken}
         errorMessage={""}
