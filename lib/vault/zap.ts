@@ -226,7 +226,7 @@ export async function getZapQuote({ sellToken, buyToken, amount, chainId, accoun
   switch (zapProvider) {
     case ZapProvider.enso:
       try {
-        const ensoRes = (await axios.get(`https://api.enso.finance/api/v1/shortcuts/quote?chainId=${chainId}&routingStrategy=router&tokenIn=${sellToken.address}&tokenOut=${buyToken.address}&fee=1&feeReceiver=${feeRecipient}&amountIn=${amount.toLocaleString("fullwide", { useGrouping: false })}`,
+        const ensoRes = (await axios.get(`https://api.enso.finance/api/v1/shortcuts/quote?chainId=${chainId}&routingStrategy=router&tokenIn=${sellToken.address}&tokenOut=${buyToken.address}&fee=5&feeReceiver=${feeRecipient}&amountIn=${amount.toLocaleString("fullwide", { useGrouping: false })}`,
           { headers: { Authorization: `Bearer ${process.env.ENSO_API_KEY}` } })
         ).data
         return { zapProvider, out: Number(ensoRes.amountOut) }
