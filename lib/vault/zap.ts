@@ -210,13 +210,14 @@ interface GetZapProviderProps {
   amount: number;
   chainId: number;
   account: Address;
+  feeRecipient: Address;
 }
 
 interface GetZapQuoteProps extends GetZapProviderProps {
   zapProvider: ZapProvider
 }
 
-export async function getZapQuote({ sellToken, buyToken, amount, chainId, account, zapProvider }: GetZapQuoteProps): Promise<{ zapProvider: ZapProvider, out: number }> {
+export async function getZapQuote({ sellToken, buyToken, amount, chainId, account, zapProvider, feeRecipient }: GetZapQuoteProps): Promise<{ zapProvider: ZapProvider, out: number }> {
   // Check if ZapProvider is supported on that chain
   const spender = await getZapSpender({ account, chainId, zapProvider })
   if (spender === zeroAddress) return { zapProvider: ZapProvider.notFound, out: 0 }
@@ -225,7 +226,7 @@ export async function getZapQuote({ sellToken, buyToken, amount, chainId, accoun
   switch (zapProvider) {
     case ZapProvider.enso:
       try {
-        const ensoRes = (await axios.get(`https://api.enso.finance/api/v1/shortcuts/quote?chainId=${chainId}&routingStrategy=router&fromAddress=${account}&tokenIn=${sellToken.address}&tokenOut=${buyToken.address}&amountIn=${amount.toLocaleString("fullwide", { useGrouping: false })}`,
+        const ensoRes = (await axios.get(`https://api.enso.finance/api/v1/shortcuts/quote?chainId=${chainId}&routingStrategy=router&tokenIn=${sellToken.address}&tokenOut=${buyToken.address}&fee=5&feeReceiver=${feeRecipient}&amountIn=${amount.toLocaleString("fullwide", { useGrouping: false })}`,
           { headers: { Authorization: `Bearer ${process.env.ENSO_API_KEY}` } })
         ).data
         return { zapProvider, out: Number(ensoRes.amountOut) }
@@ -285,8 +286,8 @@ export async function getZapQuote({ sellToken, buyToken, amount, chainId, accoun
 
 const ZAP_PROVIDER = [ZapProvider.enso, ZapProvider.zeroX, ZapProvider.oneInch, ZapProvider.paraSwap]
 
-export async function getZapProvider({ sellToken, buyToken, amount, chainId, account }: GetZapProviderProps): Promise<ZapProvider> {
-  const quotes = await Promise.all(ZAP_PROVIDER.map(async zapProvider => getZapQuote({ sellToken, buyToken, amount, chainId, account, zapProvider })))
+export async function getZapProvider({ sellToken, buyToken, amount, chainId, account, feeRecipient }: GetZapProviderProps): Promise<ZapProvider> {
+  const quotes = await Promise.all(ZAP_PROVIDER.map(async zapProvider => getZapQuote({ sellToken, buyToken, amount, chainId, account, zapProvider, feeRecipient })))
   const sorted = quotes.sort((a, b) => b.out - a.out)
   return sorted[0].zapProvider
 } 
