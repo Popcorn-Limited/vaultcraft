@@ -2,8 +2,8 @@ import { Address, PublicClient, erc20Abi, getAddress } from "viem";
 import axios from "axios";
 import { TokenByAddress, TokenType } from "@/lib/types";
 import { networkMap } from "@/lib/utils/connectors";
-import { vcx as getVcxPrice } from "@/lib/resolver/price/resolver";
-import { OptionTokenByChain, VCX, WrappedOptionTokenByChain } from "@/lib/constants";
+import { vcx as getVcxPrice, vcxLp as getVcxLpPrice } from "@/lib/resolver/price/resolver";
+import { OptionTokenByChain, VCX, VCX_LP, WrappedOptionTokenByChain } from "@/lib/constants";
 import { mainnet } from "viem/chains";
 
 export async function prepareAssets(addresses: Address[], chainId: number, client: PublicClient): Promise<TokenByAddress> {
@@ -20,6 +20,7 @@ export async function prepareAssets(addresses: Address[], chainId: number, clien
   );
 
   const vcxPrice = await getVcxPrice({ address: VCX, chainId: mainnet.id, client: undefined })
+  const vcxLpPrice = chainId === 1 ? await getVcxLpPrice({ address: VCX_LP, chainId: mainnet.id, client: undefined }) : 0
 
   const ts = await client.multicall({
     contracts: addresses
@@ -39,11 +40,7 @@ export async function prepareAssets(addresses: Address[], chainId: number, clien
   addresses.forEach((address, i) => {
     let tokenPrice = Number(priceData.coins[`${networkMap[chainId].toLowerCase()}:${address}`]?.price) || 0
 
-    if (address === VCX) {
-      tokenPrice = vcxPrice
-    } else if (address === OptionTokenByChain[chainId] || address === WrappedOptionTokenByChain[chainId]) {
-      tokenPrice = vcxPrice * 0.25
-    }
+    tokenPrice = handleTokenPriceExepction(address, tokenPrice, vcxPrice, vcxLpPrice, chainId)
 
     result[getAddress(address)] = {
       ...assets[getAddress(address)],
@@ -57,4 +54,22 @@ export async function prepareAssets(addresses: Address[], chainId: number, clien
   })
 
   return result;
+}
+
+function handleTokenPriceExepction(address: Address, tokenPrice: number, vcxPrice: number, vcxLpPrice: number, chainId: number): number {
+  switch (address) {
+    case VCX:
+      return vcxPrice;
+    case OptionTokenByChain[chainId]:
+    case WrappedOptionTokenByChain[chainId]:
+      return vcxPrice * 0.25
+    case VCX_LP:
+      if (tokenPrice === 0) {
+        return vcxLpPrice
+      } else {
+        return tokenPrice
+      }
+    default:
+      return tokenPrice
+  }
 }

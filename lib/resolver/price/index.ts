@@ -1,5 +1,5 @@
 import { Address, PublicClient } from "viem";
-import { llama, vcx } from "./resolver";
+import { llama, vcx, vcxLp } from "./resolver";
 
 export type PriceResolverParams = {
   address: Address;
