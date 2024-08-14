@@ -53,7 +53,7 @@ export default async function fetchVaultron(account: Address, client: PublicClie
 
   // const totalXp = nftData.map(nft => Number(nft.data.properties.XP?.value || 0) * getMultiplier(nft.data.properties.Level?.value || "1")).reduce((a, b) => a + b, 0)
 
-  const totalXp = 453780;
+  const totalXp = 548325;
 
   try {
     const tokenId = await client.readContract({
