@@ -38,6 +38,7 @@ import BoostVaultCard from "@/components/boost/BoostVaultCard";
 import useWeeklyEmissions from "@/lib/gauges/useWeeklyEmissions";
 import { mainnet } from "viem/chains";
 import { RPC_URLS } from "@/lib/utils/connectors";
+import Carousel from "@/components/common/Carousel";
 
 export const GAUGE_NETWORKS = [1, 10, 42161];
 
@@ -161,7 +162,6 @@ function VePopContainer() {
 
   return Object.keys(tokens).length > 0 ? (
     <>
-
       <LockModal
         show={[showLockModal, setShowLockModal]}
         setShowLpModal={setShowLpModal}
@@ -183,6 +183,7 @@ function VePopContainer() {
         <BroadcastVeBalanceInterface setShowModal={setShowSyncModal} />
       </Modal>
       <div className="static">
+        <Carousel />
         <section className="w-full py-10 px-4 md:px-0 border-t md:border-t-0 md:border-b border-customNeutral100 md:flex md:flex-row items-center justify-between text-white">
           <div className="">
             <h1 className="text-2xl md:text-3xl font-normal">

@@ -4,6 +4,7 @@ import axios from "axios";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { AddressesByChain } from "@/lib/types";
 import { useEffect, useState } from "react";
+import Carousel from "@/components/common/Carousel";
 
 async function getFlagshipVaults(): Promise<AddressesByChain> {
   const result: AddressesByChain = {}
@@ -26,7 +27,10 @@ const Vaults: NextPage = () => {
   }, [])
 
   return Object.keys(flagshipVaults).length > 0 ?
-    <VaultsContainer hiddenVaults={{}} displayVaults={flagshipVaults} />
+    <>
+      <Carousel />
+      <VaultsContainer hiddenVaults={{}} displayVaults={flagshipVaults} />
+    </>
     : <p className="text-white">Loading...</p>;
 };
 

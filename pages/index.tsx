@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import { useRouter } from "next/router";
 import Hero from "@/components/landing/Hero";
 import Products from "@/components/landing/Products";
+import Carousel from "@/components/common/Carousel";
 
 const IndexPage = () => {
   const router = useRouter();
@@ -15,6 +16,7 @@ const IndexPage = () => {
 
   return (
     <NoSSR>
+      <Carousel />
       <Hero />
       <Products />
     </NoSSR>
