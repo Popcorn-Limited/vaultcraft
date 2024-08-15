@@ -350,7 +350,7 @@ export default function Vaults() {
           created: number;
           title: string;
         }>
-      >("https://api.dune.com/api/v1/query/2548926/results", duneOpts),
+      >("https://api.dune.com/api/v1/endpoints/vaultcraft/snapshot/results", duneOpts),
       axios.get<
         DuneQueryResult<{
           totalsupply: number;
@@ -358,7 +358,7 @@ export default function Vaults() {
           cumulativeexercisedvcx: number;
           circulatingsupply: number;
         }>
-      >("https://api.dune.com/api/v1/query/3238349/results", duneOpts),
+      >("https://api.dune.com/api/v1/endpoints/vaultcraft/supply/results", duneOpts),
       publicClient.readContract({
         address: BALANCER_VAULT,
         abi: BalancerVaultAbi,
@@ -404,7 +404,7 @@ export default function Vaults() {
           total_balance: number;
           total_number: number;
         }>
-      >("https://api.dune.com/api/v1/query/3237039/results", duneOpts),
+      >("https://api.dune.com/api/v1/endpoints/vaultcraft/users/results", duneOpts),
       publicClient.readContract({
         address: VOTING_ESCROW,
         abi: VotingEscrowAbi,
@@ -415,12 +415,12 @@ export default function Vaults() {
           "USD Volume": number;
           blockchain: string;
         }>
-      >("https://api.dune.com/api/v1/query/2490697/results", duneOpts),
+      >("https://api.dune.com/api/v1/endpoints/vaultcraft/dexvolume/results", duneOpts),
       axios.get<
         DuneQueryResult<{
           cumulative_eth_redeemed: number;
         }>
-      >("https://api.dune.com/api/v1/query/3237707/results", duneOpts),
+      >("https://api.dune.com/api/v1/endpoints/vaultcraft/redemptions/results", duneOpts),
     ]);
 
     const vcxInUsd = tokens[1][VCX].price

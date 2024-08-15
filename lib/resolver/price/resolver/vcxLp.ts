@@ -35,7 +35,6 @@ export async function vcxLp({
     ],
     allowFailure: false,
   });
-  console.log(res)
   const totalValue = ((Number(res[0][1][0]) / 1e18) * ethPrice) + ((Number(res[0][1][1]) / 1e18) * vcxPrice)
   return (Number(res[1]) / 1e18) * totalValue
 }
