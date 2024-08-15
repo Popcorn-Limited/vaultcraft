@@ -233,14 +233,13 @@ export default function VaultClaimSection({ vaultData }: { vaultData: VaultData 
                 !gaugeRewards || gaugeRewards?.[vaultData.chainId]?.total < 0
               }
             />
-            {claimableRewards.length > 0 && rewardValue > 0.1 && (
-              <SecondaryActionButton
-                label="Claim Rewards"
-                handleClick={handleClaimRewards}
-                disabled={!account}
-              />
-            )}
-          </>}
+            <SecondaryActionButton
+              label="Claim Rewards"
+              handleClick={handleClaimRewards}
+              disabled={!account || claimableRewards.length === 0 || rewardValue <= 0.1}
+            />
+          </>
+        }
       </div>
     </>
   );
