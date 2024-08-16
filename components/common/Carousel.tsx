@@ -7,8 +7,8 @@ const banners = [
   {
     id: 'Banner_D01_02',
     title: 'The VCX Smart Vault',
-    description: 'Compound Aura & BAL rewards into VCX',
-    buttonText: 'Deposit your VCX',
+    description: 'Auto-compound AURA & BAL into VCX for 50%+ APY',
+    buttonText: 'Deposit here',
     buttonLink: 'vaults/0x99a53fAB6fBD1eacb59AE998dA2DbF130BE94C38?chainId=1',
     imageSrc: 'images/banner/banner1.png',
     tokenSrc: 'images/banner/bannerToken1.svg'
@@ -17,7 +17,7 @@ const banners = [
     id: 'Banner_D02_02',
     title: 'Boost your oVCX rewards',
     description: 'Lock your 80VCX 20WETH pool for max boost in oVCX and voting power',
-    buttonText: 'Lock here',
+    buttonText: 'Boost here',
     buttonLink: 'boost',
     imageSrc: 'images/banner/banner2.png',
     tokenSrc: 'images/banner/bannerToken2.svg'
@@ -25,7 +25,7 @@ const banners = [
   {
     id: 'Banner_D03_02',
     title: "It's raining ARB rewards",
-    description: 'The WETH & USDT Compound Smart Vaults are being incentivized with ARB on both OKX and VaultCraft',
+    description: 'Watch out for “additional rewards” in ARB and OP',
     buttonText: 'Check it out',
     buttonLink: 'vaults',
     imageSrc: 'images/banner/banner3.png',
