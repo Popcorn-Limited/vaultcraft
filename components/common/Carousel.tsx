@@ -11,7 +11,7 @@ const banners = [
     buttonText: 'Deposit your VCX',
     buttonLink: 'vaults/0x99a53fAB6fBD1eacb59AE998dA2DbF130BE94C38?chainId=1',
     imageSrc: 'images/banner/banner1.png',
-    tokenSrc: 'images/banner/bannerToken1.png'
+    tokenSrc: 'images/banner/bannerToken1.svg'
   },
   {
     id: 'Banner_D02_02',
@@ -20,7 +20,7 @@ const banners = [
     buttonText: 'Lock here',
     buttonLink: 'boost',
     imageSrc: 'images/banner/banner2.png',
-    tokenSrc: 'images/banner/bannerToken2.png'
+    tokenSrc: 'images/banner/bannerToken2.svg'
   },
   {
     id: 'Banner_D03_02',
@@ -29,7 +29,7 @@ const banners = [
     buttonText: 'Check it out',
     buttonLink: 'vaults',
     imageSrc: 'images/banner/banner3.png',
-    tokenSrc: 'images/banner/bannerToken3.png'
+    tokenSrc: 'images/banner/bannerToken3.svg'
   }
 ]
 
