@@ -162,6 +162,8 @@ const DEFAULT_STATISTICS = {
 export default function Vaults() {
   const publicClient = usePublicClient({ chainId: 1 });
 
+  console.log("!!!! DUNE_ENV: ", process.env.DUNE_API_KEY)
+
   const [tokens] = useAtom(tokensAtom)
 
   const [statistics, setStatistics] = useState<Statistics>(DEFAULT_STATISTICS);
