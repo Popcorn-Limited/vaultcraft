@@ -162,8 +162,6 @@ const DEFAULT_STATISTICS = {
 export default function Vaults() {
   const publicClient = usePublicClient({ chainId: 1 });
 
-  // console.log("!!!! DUNE_ENV: ", process.env.DUNE_API_KEY)
-
   const [tokens] = useAtom(tokensAtom)
 
   const [statistics, setStatistics] = useState<Statistics>(DEFAULT_STATISTICS);
@@ -540,7 +538,7 @@ export default function Vaults() {
 
   return (
     <NoSSR>
-      <div className={`text-white px-4 md:px-8`}>
+      <div className={`text-white px-4 md:px-0`}>
         <h1 className={`font-bold text-[2rem]`}>VaultCraft Statistics</h1>
         <p className={`text-[1.125rem] mb-8`}>
           Total Stats start from 30 November 2023
