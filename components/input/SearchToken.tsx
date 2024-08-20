@@ -4,6 +4,7 @@ import { Token } from "@/lib/types";
 import TokenIcon from "@/components/common/TokenIcon";
 import { ZapAssetAddressesByChain } from "@/lib/constants";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { formatNumber } from "@/lib/utils/formatBigNumber";
 
 interface SearchTokenProps {
   selectToken: (token: Token) => void;
@@ -102,11 +103,10 @@ export default function SearchToken({
               }}
             >
               <span
-                className={`flex items-center py-3 px-3 ${
-                  selectedToken.address === option.address
-                    ? "text-primaryYellow font-semibold"
-                    : "text-white font-normal  cursor-pointer"
-                }`}
+                className={`flex items-center py-3 px-3 ${selectedToken?.address === option.address
+                  ? "text-primaryYellow font-semibold"
+                  : "text-white font-normal  cursor-pointer"
+                  }`}
               >
                 <span className="w-5 h-5 inline-flex mr-3 flex-shrink-0 cursor-pointer">
                   <img
@@ -115,7 +115,10 @@ export default function SearchToken({
                     className="h-full w-full object-contain"
                   />
                 </span>
-                <span className="cursor-pointer">{option.symbol}</span>
+                <span className="cursor-pointer w-full flex flex-row justify-between">
+                  <p>{option.symbol}</p>
+                  <p>{(option.balance / (10 ** option.decimals)) * selectedToken?.price! < 1 ? 0 : formatNumber(option.balance / (10 ** option.decimals))}</p>
+                </span>
               </span>
             </li>
           ))}

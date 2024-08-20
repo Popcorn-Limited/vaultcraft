@@ -1,5 +1,5 @@
 import { ActionStep } from "@/lib/getActionSteps";
-import { ArrowRightIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { ArrowRightIcon, CheckIcon, XMarkIcon } from "@heroicons/react/24/outline";
 
 function getStepColor(preFix: string, step: any): string {
   if (step.loading || step.success) return `${preFix}-primaryYellow`;
@@ -17,47 +17,33 @@ export default function ActionSteps({
   stepCounter,
 }: ActionStepsProps): JSX.Element {
   return (
-    <div className="flex flex-row items-center">
-      {steps.map((step, i) => (
-        <div key={step.label} className="flex flex-row items-center h-8">
-          <div
-            className={`w-8 h-8 rounded-full border leading-none flex justify-center items-center cursor-default bg-opacity-40
-              ${
-                i === stepCounter
-                  ? "border-primaryYellow bg-primaryYellow"
-                  : `${getStepColor("border", step)} ${getStepColor(
-                      "bg",
-                      step
-                    )}`
-              }`}
-          >
-            {step.loading && (
-              <img src="/images/loader/puff.svg" className={`h-6 w-6`} />
+    <nav aria-label="Progress" className="flex flex-col justify-center items-center">
+      <ol role="list" className="flex items-center space-x-5">
+        {steps.map((step) => (
+          <li key={step.label}>
+            {step.success ? (
+              <a className="block h-5 w-5 rounded-full bg-primaryYellow hover:bg-primaryYellow">
+                <span className="sr-only">{step.label}</span>
+              </a>
+            ) : step.loading ? (
+              <a aria-current="step" className="relative flex items-center justify-center">
+                <span aria-hidden="true" className="absolute flex h-10 w-10 p-px">
+                  <span className="h-full w-full rounded-full bg-primaryYellow opacity-50" />
+                </span>
+                <span aria-hidden="true" className="relative block h-5 w-5 rounded-full bg-primaryYellow" />
+                <span className="sr-only">{step.label}</span>
+              </a>
+            ) : (
+              <a className="block h-5 w-5 rounded-full bg-customGray200 hover:bg-customGray200">
+                <span className="sr-only">{step.label}</span>
+              </a>
             )}
-            {!step.loading && step.error && (
-              <XMarkIcon className="h-4 w-4 text-red-500" />
-            )}
-            {!step.loading && step.success && (
-              <img
-                src="/images/icons/checkIconYellow.svg"
-                className={`h-4 w-4`}
-              />
-            )}
-            {!step.loading && !step.error && !step.success && (
-              <div
-                className={`rounded-full h-3 w-3 ${
-                  i === stepCounter ? "bg-primaryYellow" : getStepColor("bg", step)
-                }`}
-              />
-            )}
-          </div>
-          {step.step < steps.length && (
-            <ArrowRightIcon
-              className={`w-6 h-4 ${getStepColor("text", step)}`}
-            />
-          )}
-        </div>
-      ))}
-    </div>
-  );
+          </li>
+        ))}
+      </ol>
+      <p className="text-sm font-medium text-white mt-2">
+        Step {stepCounter + 1} of {steps.length}
+      </p>
+    </nav>
+  )
 }
