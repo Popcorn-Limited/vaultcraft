@@ -198,6 +198,18 @@ export const ManagementMultisigByChain: AddressByChain = {
   [arbitrum.id]: "0x24a1c01a0ca2393e03f292Be1A6EBcFe96956a50"
 }
 
+export const AssetPushOracleByChain: AddressByChain = {
+  [mainnet.id]: zeroAddress,
+  [optimism.id]: zeroAddress,
+  [arbitrum.id]: "0x3a7e41AdA7066109E2ebbb33921dd8a124d54B01"
+}
+
+export const AssetPushOracleOwnerByChain: AddressByChain = {
+  [mainnet.id]: zeroAddress,
+  [optimism.id]: zeroAddress,
+  [arbitrum.id]: "0x86f8d1C5dBd755854C1820592f2D8383FC374695"
+}
+
 export const FeeRecipientByChain: AddressByChain = {
   [mainnet.id]: FEE_RECIPIENT_PROXY,
   [polygon.id]: FEE_RECIPIENT_PROXY,

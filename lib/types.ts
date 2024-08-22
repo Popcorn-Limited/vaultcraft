@@ -66,6 +66,8 @@ export type LlamaApy = {
   date: Date;
 }
 
+export type StrategyType = "AnyToAnyV1" | "Vanilla"
+
 export type Strategy = {
   address: Address;
   metadata: StrategyMetadata;
@@ -75,7 +77,8 @@ export type Strategy = {
   apy: number;
   apyHist: LlamaApy[];
   apyId: string;
-  apySource: "custom" | "defillama"
+  apySource: "custom" | "defillama";
+  type: StrategyType
 }
 
 type StrategyMetadata = {

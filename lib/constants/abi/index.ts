@@ -23,3 +23,5 @@ export * from "./MultiStrategyVaultV2";
 export * from "./TokenAdmin";
 export * from "./ChildGauge";
 export * from "./RewardsClaimer";
+export * from "./AssetPushOracle";
+export * from "./AssetPushOracleOwner";
