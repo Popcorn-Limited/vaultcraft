@@ -37,10 +37,12 @@ async function getLogs(vault: Address, asset: Token, chainId: number) {
     fromBlock: "earliest",
     toBlock: "latest",
   });
-  const creationBlockNumber = initLog[0].blockNumber;
-  const creationBlock = await client.getBlock({
-    blockNumber: creationBlockNumber,
-  });
+  const creationBlockNumber = initLog[0]?.blockNumber || BigInt(0);
+  const creationBlock = creationBlockNumber === BigInt(0)
+    ? await client.getBlock({
+      blockNumber: creationBlockNumber,
+    })
+    : await client.getBlock();
   const creationTime = new Date(Number(creationBlock.timestamp) * 1000);
   const creationDate = Date.UTC(
     creationTime.getFullYear(),
