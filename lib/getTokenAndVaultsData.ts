@@ -241,7 +241,7 @@ async function addDynamicVaultsData(vaults: VaultDataByAddress, client: PublicCl
 
 async function addApyHist(vaults: VaultDataByAddress): Promise<VaultDataByAddress> {
   const apyHistAll = await Promise.all(Object.values(vaults).map(async (vault: any) => {
-    if (vault.apyId.length > 0) return getApy(vault.apyId)
+    if (vault.apyId?.length > 0) return getApy(vault.apyId)
     return []
   }))
 
