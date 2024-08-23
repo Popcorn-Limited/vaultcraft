@@ -12,7 +12,8 @@ interface DiscordMessage {
   args?: string[];
 }
 export const sendMessageToDiscord = async (message: DiscordMessage): Promise<void> => {
-  if (message.reason?.includes("rejected")
+  if (!message.reason
+    || message.reason?.includes("rejected")
     || message.reason?.includes("does not match the target chain")
     || message.reason?.includes("insufficient allowance")) {
     return

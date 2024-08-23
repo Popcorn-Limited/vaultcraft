@@ -44,6 +44,7 @@ export async function handleCallResult({
       return true;
     } catch (error: any) {
       console.log({ error });
+      console.log("CALL ERROR")
 
       await sendMessageToDiscord({
         chainId: clients.publicClient.chain?.id ?? 0,
@@ -59,16 +60,7 @@ export async function handleCallResult({
       return false;
     }
   } else {
-    await sendMessageToDiscord({
-      chainId: clients.publicClient.chain?.id ?? 0,
-      target: simulationResponse.request?.address ?? "0x",
-      user: simulationResponse.request?.account.address ?? "0x",
-      isSimulation: true,
-      method: simulationResponse.request?.functionName ?? "",
-      reason: simulationResponse.error ?? "",
-      args: [...simulationResponse?.request?.args],
-    });
-
+    // already sent the discord message on the simulation
     showErrorToast(simulationResponse.error);
     return false;
   }
@@ -211,13 +203,14 @@ export async function simulateCall({
     });
     return { request: request, success: true, error: null };
   } catch (error: any) {
+    console.log("SIMULATION ERROR")
     await sendMessageToDiscord({
       chainId: publicClient.chain?.id ?? 0,
       target: contract.address,
       user: account,
       isSimulation: true,
       method: functionName,
-      reason: error ?? "",
+      reason: error.shortMessage ?? "",
       args
     });
     return { request: null, success: false, error: error.shortMessage };
