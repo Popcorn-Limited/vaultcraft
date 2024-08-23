@@ -18,6 +18,7 @@ export default function ManagementPage() {
   return <div className="flex flex-row flex-wrap w-full">
     {Cards.map(card =>
       <Link
+        key={card.title}
         href={card.link}
         className="w-1/2 p-5"
       >
