@@ -25,3 +25,5 @@ export * from "./ChildGauge";
 export * from "./RewardsClaimer";
 export * from "./AssetPushOracle";
 export * from "./AssetPushOracleOwner";
+export * from "./AnyToAnyDepositor";
+export * from "./MultiStrategyVaultV2_1";
