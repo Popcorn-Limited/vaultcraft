@@ -4,14 +4,14 @@ import { useAtom } from "jotai";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import NoSSR from "react-no-ssr";
-import { Address, createPublicClient, getAddress, http, isAddress } from "viem";
-import { VaultAbi } from "@/lib/constants";
+import { Address, createPublicClient, erc20Abi, formatUnits, getAddress, http, isAddress, zeroAddress } from "viem";
+import { AnyToAnyDepositorAbi, AssetPushOracleAbi, AssetPushOracleByChain, VaultAbi } from "@/lib/constants";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 import { yieldOptionsAtom } from "@/lib/atoms/sdk";
 import { tokensAtom } from "@/lib/atoms";
 import { showSuccessToast } from "@/lib/toasts";
 import CopyToClipboard from "react-copy-to-clipboard";
-import { Square2StackIcon } from "@heroicons/react/24/outline";
+import { ArrowDownIcon, Square2StackIcon } from "@heroicons/react/24/outline";
 import LeftArrowIcon from "@/components/svg/LeftArrowIcon";
 import ApyChart from "@/components/vault/management/vault/ApyChart";
 import NetFlowChart from "@/components/vault/management/vault/NetFlowChart";
@@ -23,6 +23,16 @@ import AssetWithName from "@/components/common/AssetWithName";
 import ProtocolIcon from "@/components/common/ProtocolIcon";
 import NetworkSticker from "@/components/network/NetworkSticker";
 import TokenIcon from "@/components/common/TokenIcon";
+import TabSelector from "@/components/common/TabSelector";
+import InputNumber from "@/components/input/InputNumber";
+import InputTokenWithError from "@/components/input/InputTokenWithError";
+import SecondaryActionButton from "@/components/button/SecondaryActionButton";
+import MainActionButton from "@/components/button/MainActionButton";
+import { handleAllowance } from "@/lib/approve";
+import { formatNumber, safeRound } from "@/lib/utils/formatBigNumber";
+import { validateInput } from "@/lib/utils/helpers";
+import { useAccount, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
+import { pullFunds, pushFunds } from "@/lib/vault/management/strategyInteractions";
 
 async function getLogs(vault: Address, asset: Token, chainId: number) {
   const client = createPublicClient({
@@ -220,12 +230,12 @@ export default function Index() {
                     {strategy.address.slice(0, 6)}...
                     {strategy.address.slice(-4)}
                   </p>
-                  <div className="w-6 h-6 group/vaultAddress">
+                  <div className="w-6 h-6 group/strategyAddress">
                     <CopyToClipboard
                       text={strategy.address}
                       onCopy={() => showSuccessToast("Vault address copied!")}
                     >
-                      <Square2StackIcon className="text-white group-hover/vaultAddress:text-primaryYellow" />
+                      <Square2StackIcon className="text-white group-hover/strategyAddress:text-primaryYellow" />
                     </CopyToClipboard>
                   </div>
                 </div>
@@ -237,18 +247,43 @@ export default function Index() {
                   <p className="font-bold text-white">
                     {asset.address.slice(0, 6)}...{asset.address.slice(-4)}
                   </p>
-                  <div className="w-6 h-6 group/vaultAddress">
+                  <div className="w-6 h-6 group/assetAddress">
                     <CopyToClipboard
                       text={asset.address}
                       onCopy={() => showSuccessToast("Asset address copied!")}
                     >
-                      <Square2StackIcon className="text-white group-hover/vaultAddress:text-primaryYellow" />
+                      <Square2StackIcon className="text-white group-hover/assetAddress:text-primaryYellow" />
                     </CopyToClipboard>
                   </div>
                 </div>
               </div>
+              {strategy.yieldAsset && strategy.yieldAsset !== zeroAddress &&
+                <div className="w-full md:w-10/12 border border-customNeutral100 rounded-lg p-4">
+                  <p className="text-white font-normal">YieldAsset address:</p>
+                  <div className="flex flex-row items-center justify-between">
+                    <p className="font-bold text-white">
+                      {strategy.yieldAsset.slice(0, 6)}...{strategy.yieldAsset.slice(-4)}
+                    </p>
+                    <div className="w-6 h-6 group/yieldAssetAddress">
+                      <CopyToClipboard
+                        text={strategy.yieldAsset}
+                        onCopy={() => showSuccessToast("YieldAsset address copied!")}
+                      >
+                        <Square2StackIcon className="text-white group-hover/yieldAssetAddress:text-primaryYellow" />
+                      </CopyToClipboard>
+                    </div>
+                  </div>
+                </div>
+              }
             </div>
           </section>
+
+          {
+            strategy && strategy.type === "AnyToAnyV1" &&
+            <div>
+              <AnyToAnyV1DepositorSettings strategy={strategy} asset={asset} yieldAsset={tokens[chainId][strategy.yieldAsset!]} chainId={chainId} />
+            </div>
+          }
 
         </div>
       ) : (
@@ -257,3 +292,334 @@ export default function Index() {
     </NoSSR>
   );
 }
+
+
+async function getAnyToAnyData(address: Address, asset: Token, yieldAsset: Token, chainId: number): Promise<AnyToAnySettings> {
+  const client = createPublicClient({
+    chain: ChainById[chainId],
+    transport: http(RPC_URLS[chainId]),
+  });
+
+  const res1 = await client.multicall({
+    contracts: [
+      {
+        address,
+        abi: AnyToAnyDepositorAbi,
+        functionName: "owner",
+      },
+      {
+        address,
+        abi: AnyToAnyDepositorAbi,
+        functionName: "keeper",
+      },
+      {
+        address,
+        abi: AnyToAnyDepositorAbi,
+        functionName: "floatRatio",
+      },
+      {
+        address,
+        abi: AnyToAnyDepositorAbi,
+        functionName: "proposedFloatRatio",
+      },
+      {
+        address,
+        abi: AnyToAnyDepositorAbi,
+        functionName: "slippage",
+      },
+      {
+        address,
+        abi: AnyToAnyDepositorAbi,
+        functionName: "proposedSlippage",
+      },
+      {
+        address: yieldAsset.address,
+        abi: erc20Abi,
+        functionName: "balanceOf",
+        args: [address]
+      },
+      {
+        address: asset.address,
+        abi: erc20Abi,
+        functionName: "balanceOf",
+        args: [address]
+      },
+      {
+        address,
+        abi: AnyToAnyDepositorAbi,
+        functionName: "totalReservedAssets",
+      },
+      {
+        address,
+        abi: AnyToAnyDepositorAbi,
+        functionName: "totalReservedYieldAssets",
+      },
+      {
+        address: AssetPushOracleByChain[chainId],
+        abi: AssetPushOracleAbi,
+        functionName: "prices",
+        args: [yieldAsset.address, asset.address]
+      },
+      {
+        address: AssetPushOracleByChain[chainId],
+        abi: AssetPushOracleAbi,
+        functionName: "prices",
+        args: [asset.address, yieldAsset.address]
+      }
+    ],
+    allowFailure: false
+  })
+  const assetBal = Number(res1[7] - res1[8]);
+  const yieldAssetBal = Number(res1[6] - res1[9])
+  return {
+    owner: res1[0],
+    keeper: res1[1],
+    assetBal: assetBal,
+    yieldAssetBal: yieldAssetBal,
+    reservedAssets: Number(res1[2]),
+    reservedYieldAssets: Number(res1[3]),
+    float: res1[2],
+    proposedFloat: { value: res1[3][0], time: res1[3][1] },
+    slippage: res1[4],
+    proposedSlippage: { value: res1[5][0], time: res1[5][1] },
+    bqPrice: Number(res1[10]),
+    qbPrice: Number(res1[11]),
+    totalAssets: assetBal + ((yieldAssetBal * Number(res1[10])) / 1e18)
+  }
+}
+
+interface ProposedChange {
+  value: bigint;
+  time: bigint;
+}
+
+interface AnyToAnySettings {
+  owner: Address;
+  keeper: Address;
+  assetBal: number;
+  yieldAssetBal: number;
+  reservedAssets: number;
+  reservedYieldAssets: number;
+  float: bigint;
+  proposedFloat: ProposedChange;
+  slippage: bigint;
+  proposedSlippage: ProposedChange;
+  bqPrice: number;
+  qbPrice: number;
+  totalAssets: number;
+}
+
+const DEFAULT_TABS = ["Convert", "Slippage", "Float"]
+
+function AnyToAnyV1DepositorSettings({ strategy, asset, yieldAsset, chainId }: { strategy: Strategy, asset: Token, yieldAsset: Token, chainId: number }) {
+  const [settings, setSettings] = useState<AnyToAnySettings>()
+  const [tab, setTab] = useState<string>("Convert")
+
+  useEffect(() => {
+    if (strategy.address) getAnyToAnyData(strategy.address, asset, yieldAsset, chainId).then(res => setSettings(res))
+  }, [strategy, asset, chainId])
+
+  return settings ? (
+    <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-0 text-white">
+      <h2 className="text-white font-bold text-2xl">Vault Settings</h2>
+      <TabSelector
+        className="mt-6 mb-12"
+        availableTabs={DEFAULT_TABS}
+        activeTab={tab}
+        setActiveTab={(t: string) => setTab(t)}
+      />
+      {
+        tab === "Convert" && <ConvertSection strategy={strategy} asset={asset} yieldAsset={yieldAsset} settings={settings} chainId={chainId} />
+      }
+    </section>
+  )
+    : <p className="text-white">Loading...</p>
+}
+
+function ConvertSection({ strategy, asset, yieldAsset, settings, chainId }: { strategy: Strategy, asset: Token, yieldAsset: Token, settings: AnyToAnySettings, chainId: number }) {
+  return (
+    <>
+      <p>Assets per YieldAsset: {settings.bqPrice / 1e18}</p>
+      <p>YieldAssets per Asset: {settings.qbPrice / 1e18}</p>
+      <p>Asset Balance: {settings.assetBal / (10 ** asset.decimals)}</p>
+      <p>YieldAsset Balance: {settings.yieldAssetBal / (10 ** yieldAsset.decimals)}</p>
+      <div className="flex flex-row items-center justify-between space-x-8">
+        <div className="w-1/2">
+          <p className="text-white text-2xl">Deposit YieldAsset</p>
+          <p>Deposit yieldAssets to claim assets at an equivalent value after</p>
+          <ConvertToken token={yieldAsset} strategy={strategy} asset={asset} yieldAsset={yieldAsset} settings={settings} chainId={chainId} />
+        </div>
+        <div className="w-1/2">
+          <p className="text-white text-2xl">Deposit Asset</p>
+          <p>Deposit assets to claim yieldAssets at an equivalent value after</p>
+          <ConvertToken token={asset} strategy={strategy} asset={asset} yieldAsset={yieldAsset} settings={settings} chainId={chainId} />
+        </div>
+      </div>
+    </>
+  )
+}
+
+
+function ConvertToken({ token, strategy, asset, yieldAsset, settings, chainId }:
+  { token: Token, strategy: Strategy, asset: Token, yieldAsset: Token, settings: AnyToAnySettings, chainId: number }) {
+  const { owner, keeper, assetBal, yieldAssetBal, bqPrice, qbPrice } = settings;
+  const isAsset = token.address === asset.address
+  const price = isAsset ? qbPrice : bqPrice
+  const float = (settings.assetBal / (10 ** asset.decimals)) / (10_000 / Number(settings.float))
+  const depositLimit = isAsset ? (yieldAssetBal / (10 ** yieldAsset.decimals)) / (bqPrice / 1e18) : ((assetBal / (10 ** asset.decimals)) - float) / (price / 1e18)
+
+  const { address: account, chain } = useAccount();
+  const publicClient = usePublicClient({ chainId });
+  const { data: walletClient } = useWalletClient();
+  const { switchChainAsync } = useSwitchChain();
+  const [tokens, setTokens] = useAtom(tokensAtom);
+
+  const [amount, setAmount] = useState<string>("0");
+
+  function handleChangeInput(e: any) {
+    const value = e.currentTarget.value;
+    setAmount(validateInput(value).isValid ? value : "0");
+  }
+
+  function handleMaxClick() {
+    if (!token) return;
+    const stringBal = token.balance.toLocaleString("fullwide", {
+      useGrouping: false,
+    });
+    const rounded = safeRound(BigInt(stringBal), token.decimals);
+    const formatted = formatUnits(rounded, token.decimals);
+    handleChangeInput({ currentTarget: { value: formatted } });
+  }
+
+  async function handleApprove() {
+    let val = Number(amount)
+    if (val === 0 || !account || !publicClient || !walletClient) return
+    val = val * (10 ** token.decimals)
+
+    if (chain?.id !== Number(chainId)) {
+      try {
+        await switchChainAsync?.({ chainId });
+      } catch (error) {
+        return;
+      }
+    }
+
+    handleAllowance({
+      token: token.address,
+      spender: strategy.address,
+      amount: val,
+      account: account,
+      clients: {
+        publicClient,
+        walletClient
+      }
+    })
+  }
+
+  async function handleDeposit() {
+    let val = Number(amount)
+    if (val === 0 || !account || !publicClient || !walletClient) return
+    val = val * (10 ** token.decimals)
+
+    if (chain?.id !== Number(chainId)) {
+      try {
+        await switchChainAsync?.({ chainId });
+      } catch (error) {
+        return;
+      }
+    }
+
+    if (isAsset) {
+      pullFunds({
+        amount: val,
+        address: strategy.address,
+        account,
+        clients: {
+          publicClient,
+          walletClient
+        }
+      })
+    }
+    else {
+      pushFunds({
+        amount: val,
+        address: strategy.address,
+        account,
+        clients: {
+          publicClient,
+          walletClient
+        }
+      })
+    }
+  }
+
+  return (
+    <div className="">
+      <div className="">
+        <div>
+          <p>Input Amount</p>
+          <InputTokenWithError
+            onSelectToken={() => { }}
+            onMaxClick={handleMaxClick}
+            chainId={chainId}
+            value={amount}
+            onChange={handleChangeInput}
+            selectedToken={token}
+            errorMessage={""}
+            tokenList={[]}
+            allowSelection={false}
+            allowInput={true}
+          />
+          <p>DepositLimit: {isAsset
+            ? formatNumber(depositLimit)
+            : formatNumber(depositLimit)}
+          </p>
+        </div>
+        <div className="relative py-4">
+          <div className="absolute inset-0 flex items-center" aria-hidden="true">
+            <div className="w-full border-t border-customGray500" />
+          </div>
+          <div className="relative flex justify-center">
+            <span className="bg-customNeutral300 px-4">
+              <ArrowDownIcon
+                className="h-10 w-10 p-2 text-customGray500 border border-customGray500 rounded-full cursor-pointer hover:text-white hover:border-white"
+                aria-hidden="true"
+                onClick={() => { }}
+              />
+            </span>
+          </div>
+        </div>
+        <div>
+          <p>Claimable Amount</p>
+          <InputTokenWithError
+            onSelectToken={() => { }}
+            onMaxClick={() => { }}
+            chainId={chainId}
+            value={(Number(amount) * price) / 1e18}
+            onChange={() => { }}
+            selectedToken={isAsset ? yieldAsset : asset}
+            errorMessage={""}
+            tokenList={[]}
+            allowSelection={false}
+            allowInput={false}
+          />
+        </div>
+      </div>
+      <div className="mt-4 space-y-4">
+        <SecondaryActionButton
+          label="Approve"
+          handleClick={handleApprove} disabled={!account || (account !== owner && account !== keeper)}
+        />
+        <MainActionButton
+          label="Deposit"
+          handleClick={handleDeposit}
+          disabled={!account || (account !== owner && account !== keeper) || Number(amount) >= depositLimit}
+        />
+      </div>
+    </div>
+  )
+}
+
+// set slippage
+// set float
+// claim

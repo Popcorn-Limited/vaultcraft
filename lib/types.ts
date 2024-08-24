@@ -78,7 +78,8 @@ export type Strategy = {
   apyHist: LlamaApy[];
   apyId: string;
   apySource: "custom" | "defillama";
-  type: StrategyType
+  type: StrategyType;
+  yieldAsset?: Address;
 }
 
 type StrategyMetadata = {

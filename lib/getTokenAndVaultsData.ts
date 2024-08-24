@@ -67,6 +67,11 @@ export default async function getTokenAndVaultsDataByChain({
 
   // Add vault assets
   Object.values(vaultsData).forEach((vault) => {
+    vault.strategies.forEach((strategy) => {
+      if (strategy.yieldAsset && !uniqueAssetAdresses.includes(strategy.yieldAsset)) {
+        uniqueAssetAdresses.push(strategy.yieldAsset);
+      }
+    })
     if (!uniqueAssetAdresses.includes(vault.asset)) {
       uniqueAssetAdresses.push(vault.asset);
     }
@@ -351,7 +356,8 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
         protocol: desc.name,
         description: descriptionSplit[1],
         resolver: desc.resolver,
-        type: desc.type || "Vanilla",
+        type: desc.type ?? "Vanilla",
+        yieldAsset: desc.yieldAsset || undefined,
         apy,
         apyHist,
         apyId: desc.apyId,
@@ -396,7 +402,6 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
         apySource: "custom"
       }
     } else {
-
       vaults[address].strategies.forEach((strategy: any, i: number) => {
         const strategyData = strategies[strategy.address]
 
@@ -414,7 +419,8 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
             protocol: strategyData.protocol,
             description: strategyData.description,
           },
-          type: strategy.type,
+          type: strategyData.type,
+          yieldAsset: strategyData.yieldAsset,
           resolver: strategyData.resolver,
           allocation: allocation,
           allocationPerc: allocationPerc,

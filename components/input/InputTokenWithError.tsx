@@ -32,7 +32,6 @@ export default function InputTokenWithError({
 } & HTMLProps<HTMLInputElement>): JSX.Element {
   const balance =
     Number(selectedToken?.balance) / 10 ** (selectedToken?.decimals as number);
-  console.log(balance)
   return (
     <>
       {captionText && (
