@@ -4,7 +4,7 @@ import { useAtom } from "jotai";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import NoSSR from "react-no-ssr";
-import { Address, createPublicClient, erc20Abi, formatUnits, getAddress, http, isAddress, zeroAddress } from "viem";
+import { Address, createPublicClient, erc20Abi, formatUnits, getAddress, http, isAddress, PublicClient, zeroAddress } from "viem";
 import { AnyToAnyDepositorAbi, AssetPushOracleAbi, AssetPushOracleByChain, VaultAbi } from "@/lib/constants";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 import { yieldOptionsAtom } from "@/lib/atoms/sdk";
@@ -32,7 +32,7 @@ import { handleAllowance } from "@/lib/approve";
 import { formatNumber, safeRound } from "@/lib/utils/formatBigNumber";
 import { validateInput } from "@/lib/utils/helpers";
 import { useAccount, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
-import { pullFunds, pushFunds } from "@/lib/vault/management/strategyInteractions";
+import { claimReserve, pullFunds, pushFunds } from "@/lib/vault/management/strategyInteractions";
 
 async function getLogs(vault: Address, asset: Token, chainId: number) {
   const client = createPublicClient({
@@ -384,7 +384,7 @@ async function getAnyToAnyData(address: Address, asset: Token, yieldAsset: Token
     proposedSlippage: { value: res1[5][0], time: res1[5][1] },
     bqPrice: Number(res1[10]),
     qbPrice: Number(res1[11]),
-    totalAssets: assetBal + ((yieldAssetBal * Number(res1[10])) / 1e18)
+    totalAssets: assetBal + ((yieldAssetBal * (Number(res1[10]) / 1e18)) / (10 ** (yieldAsset.decimals - asset.decimals)))
   }
 }
 
@@ -407,6 +407,14 @@ interface AnyToAnySettings {
   bqPrice: number;
   qbPrice: number;
   totalAssets: number;
+}
+
+interface PassThroughProps {
+  strategy: Strategy;
+  asset: Token;
+  yieldAsset: Token;
+  settings: AnyToAnySettings;
+  chainId: number;
 }
 
 const DEFAULT_TABS = ["Convert", "Slippage", "Float"]
@@ -436,32 +444,93 @@ function AnyToAnyV1DepositorSettings({ strategy, asset, yieldAsset, chainId }: {
     : <p className="text-white">Loading...</p>
 }
 
-function ConvertSection({ strategy, asset, yieldAsset, settings, chainId }: { strategy: Strategy, asset: Token, yieldAsset: Token, settings: AnyToAnySettings, chainId: number }) {
+async function getReserveLogs(address: Address, account: Address, client: PublicClient) {
+  let addedLogs = await client.getContractEvents({
+    address: address,
+    abi: AnyToAnyDepositorAbi,
+    eventName: "ReserveAdded",
+    fromBlock: "earliest",
+    toBlock: "latest",
+  });
+  const removeLogs = await client.getContractEvents({
+    address: address,
+    abi: AnyToAnyDepositorAbi,
+    eventName: "ReserveClaimed",
+    fromBlock: "earliest",
+    toBlock: "latest",
+  });
+  // Filter out claimed reserves
+  const removedBlocks = removeLogs.map(log => log.args.blockNumber)
+  addedLogs = addedLogs.filter(log => !removedBlocks.includes(log.args.blockNumber))
+
+  // Filter out reserves that are not for account
+  addedLogs = addedLogs.filter(log => log.args.user === account);
+
+  return addedLogs
+}
+
+function ConvertSection({ strategy, asset, yieldAsset, settings, chainId }: PassThroughProps) {
+  const { address: account, chain } = useAccount();
+  const publicClient = usePublicClient({ chainId });
+  const [reserves, setReserves] = useState<any[]>()
+
+  useEffect(() => {
+    if (publicClient && account && !reserves) updateReserves()
+  }, [publicClient, account, strategy])
+
+  async function updateReserves() {
+    const logs = await getReserveLogs(strategy.address, account!, publicClient!)
+    setReserves(logs)
+  }
+
   return (
     <>
-      <p>Assets per YieldAsset: {settings.bqPrice / 1e18}</p>
-      <p>YieldAssets per Asset: {settings.qbPrice / 1e18}</p>
-      <p>Asset Balance: {settings.assetBal / (10 ** asset.decimals)}</p>
-      <p>YieldAsset Balance: {settings.yieldAssetBal / (10 ** yieldAsset.decimals)}</p>
       <div className="flex flex-row items-center justify-between space-x-8">
         <div className="w-1/2">
           <p className="text-white text-2xl">Deposit YieldAsset</p>
           <p>Deposit yieldAssets to claim assets at an equivalent value after</p>
-          <ConvertToken token={yieldAsset} strategy={strategy} asset={asset} yieldAsset={yieldAsset} settings={settings} chainId={chainId} />
+          <ConvertToken token={yieldAsset} strategy={strategy} asset={asset} yieldAsset={yieldAsset} settings={settings} chainId={chainId} updateReserves={updateReserves} />
         </div>
         <div className="w-1/2">
           <p className="text-white text-2xl">Deposit Asset</p>
           <p>Deposit assets to claim yieldAssets at an equivalent value after</p>
-          <ConvertToken token={asset} strategy={strategy} asset={asset} yieldAsset={yieldAsset} settings={settings} chainId={chainId} />
+          <ConvertToken token={asset} strategy={strategy} asset={asset} yieldAsset={yieldAsset} settings={settings} chainId={chainId} updateReserves={updateReserves} />
         </div>
       </div>
+      <div className="w-full border border-customNeutral100 rounded-lg p-4 my-4 flex flex-row justify-between">
+        <div className="w-1/2 px-4">
+          <p className="text-xl">Price</p>
+          <span className="flex space-x-2">
+            <p>Assets p. YieldAsset:</p>
+            <p className="text-customGray300">{settings.bqPrice / 1e18}</p>
+          </span>
+          <span className="flex space-x-2">
+            <p>YieldAssets p. Asset:</p>
+            <p className="text-customGray300">{settings.qbPrice / 1e18}</p>
+          </span>
+        </div>
+        <div className="w-1/2 px-4">
+          <p className="text-xl">Balance</p>
+          <span className="flex space-x-2">
+            <p>Assets:</p>
+            <p className="text-customGray300">{settings.assetBal / (10 ** asset.decimals)}</p>
+          </span>
+          <span className="flex space-x-2">
+            <p>YieldAssets:</p>
+            <p className="text-customGray300">{settings.yieldAssetBal / (10 ** yieldAsset.decimals)}</p>
+          </span>
+          <span className="flex space-x-2">
+            <p>Total Assets:</p>
+            <p className="text-customGray300">{settings.totalAssets / (10 ** asset.decimals)}</p>
+          </span>
+        </div>
+      </div>
+      <ReservesContainer strategy={strategy} asset={asset} yieldAsset={yieldAsset} settings={settings} chainId={chainId} reserves={reserves} updateReserves={updateReserves} />
     </>
   )
 }
 
-
-function ConvertToken({ token, strategy, asset, yieldAsset, settings, chainId }:
-  { token: Token, strategy: Strategy, asset: Token, yieldAsset: Token, settings: AnyToAnySettings, chainId: number }) {
+function ConvertToken({ token, strategy, asset, yieldAsset, settings, chainId, updateReserves }: PassThroughProps & { token: Token, updateReserves: Function }) {
   const { owner, keeper, assetBal, yieldAssetBal, bqPrice, qbPrice } = settings;
   const isAsset = token.address === asset.address
   const price = isAsset ? qbPrice : bqPrice
@@ -529,8 +598,9 @@ function ConvertToken({ token, strategy, asset, yieldAsset, settings, chainId }:
       }
     }
 
+    let success
     if (isAsset) {
-      pullFunds({
+      success = await pullFunds({
         amount: val,
         address: strategy.address,
         account,
@@ -541,7 +611,7 @@ function ConvertToken({ token, strategy, asset, yieldAsset, settings, chainId }:
       })
     }
     else {
-      pushFunds({
+      success = await pushFunds({
         amount: val,
         address: strategy.address,
         account,
@@ -551,6 +621,7 @@ function ConvertToken({ token, strategy, asset, yieldAsset, settings, chainId }:
         }
       })
     }
+    if (success) updateReserves()
   }
 
   return (
@@ -620,6 +691,62 @@ function ConvertToken({ token, strategy, asset, yieldAsset, settings, chainId }:
   )
 }
 
+function ReservesContainer({ strategy, asset, yieldAsset, settings, chainId, reserves, updateReserves }: PassThroughProps & { reserves?: any[], updateReserves: Function }) {
+  const { address: account, chain } = useAccount();
+  const publicClient = usePublicClient({ chainId });
+  const { data: walletClient } = useWalletClient();
+  const { switchChainAsync } = useSwitchChain();
+
+  async function handleMainAction(log: any) {
+    if (!account || !publicClient || !walletClient) return
+
+    if (chain?.id !== Number(chainId)) {
+      try {
+        await switchChainAsync?.({ chainId });
+      } catch (error) {
+        return;
+      }
+    }
+
+    const success = await claimReserve({
+      blockNumber: log.args.blockNumber,
+      isYieldAsset: log.args.asset === asset.address,
+      address: strategy.address,
+      account,
+      clients: {
+        publicClient,
+        walletClient
+      }
+    })
+    if (success) updateReserves()
+  }
+
+  return (
+    <div className="mt-4">
+      <p className="text-white text-2xl">Claim Withdrawable</p>
+      <div className="w-full flex flex-row items-center mt-4">
+        <p className="w-1/3">Deposited</p>
+        <p className="w-1/3">Withdrawable</p>
+        <p className="w-1/3"></p>
+      </div>
+      {
+        reserves?.map(log => {
+          const isAsset = log.args.asset === asset.address
+          return (
+            <div key={log.blockHash} className="w-full flex flex-row items-center">
+              <p className="w-1/3">{Number(log.args.amount) / (10 ** (isAsset ? asset.decimals : yieldAsset.decimals))} {isAsset ? asset.symbol : yieldAsset.symbol}</p>
+              <p className="w-1/3">{Number(log.args.withdrawable) / (10 ** (isAsset ? yieldAsset.decimals : asset.decimals))} {isAsset ? yieldAsset.symbol : asset.symbol}</p>
+              <div className="w-1/3">
+                <MainActionButton label="Claim" handleClick={() => handleMainAction(log)} disabled={!account} />
+              </div>
+            </div>
+          )
+        }
+        )
+      }
+    </div>
+  )
+}
+
 // set slippage
 // set float
-// claim

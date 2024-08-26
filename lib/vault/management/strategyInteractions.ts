@@ -54,3 +54,26 @@ export async function pullFunds({
 
   return success;
 }
+
+export async function claimReserve({
+  blockNumber,
+  isYieldAsset,
+  address,
+  account,
+  clients,
+}: { blockNumber: bigint, isYieldAsset: boolean, address: Address, account: Address, clients: Clients }): Promise<boolean> {
+  showLoadingToast("Claiming Reserve...");
+  const success = await handleCallResult({
+    successMessage: "Claimed reserve!",
+    simulationResponse: await simulateCall({
+      account: account as Address,
+      contract: { address: address, abi: AnyToAnyDepositorAbi },
+      functionName: "claimReserved",
+      args: [blockNumber, isYieldAsset],
+      publicClient: clients.publicClient
+    }),
+    clients
+  });
+
+  return success;
+}
