@@ -1,8 +1,9 @@
 import TabSelector from "@/components/common/TabSelector";
 import { tokensAtom } from "@/lib/atoms";
-import { BalancerOracleAbi, ExerciseByChain, ExerciseOracleByChain, OptionTokenByChain, OVCX_ORACLE, VCX, VcxByChain, WETH, XVCXByChain } from "@/lib/constants";
+import { AssetPushOracleAbi, AssetPushOracleByChain, BalancerOracleAbi, ExerciseByChain, ExerciseOracleByChain, OptionTokenByChain, OVCX_ORACLE, VCX, VcxByChain, WETH, XVCXByChain } from "@/lib/constants";
+import { loadingStyle } from "@/lib/toasts/toastStyles";
 import { TokenByAddress } from "@/lib/types";
-import { ChainById, GAUGE_NETWORKS, RPC_URLS } from "@/lib/utils/connectors";
+import { ChainById, GAUGE_NETWORKS, RPC_URLS, SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { formatNumber } from "@/lib/utils/formatBigNumber";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
@@ -10,7 +11,8 @@ import { createPublicClient, erc20Abi, http, parseAbi, parseAbiItem, PublicClien
 
 async function loadDashboardData(tokens: { [key: number]: TokenByAddress }) {
   const vcxData = await loadVCXData(tokens);
-  return { vcxData }
+  const assetOracleData = await loadAssetOracleData()
+  return { vcxData, assetOracleData }
 }
 
 async function loadVCXData(tokens: { [key: number]: TokenByAddress }) {
@@ -133,6 +135,30 @@ async function loadVCXDataByChain(chainId: number, mainnetClient: PublicClient, 
   return { oVCXInCirculation, exercisableVCX, vcxPrice, strikePrice, minPrice: minPriceInUsd, ovcxPrice, discount, lastUpdate, lastBridge }
 }
 
+async function loadAssetOracleData() {
+  const chains = Object.keys(AssetPushOracleByChain).filter(chain => AssetPushOracleByChain[Number(chain)] !== zeroAddress).map(chain => Number(chain))
+
+  const assetOracleData: { [key: number]: any } = {}
+  await Promise.all(
+    chains.map(async (chain) => {
+      assetOracleData[chain] = await loadAssetOracleDataByChain(chain)
+    })
+  )
+  return assetOracleData
+}
+
+async function loadAssetOracleDataByChain(chainId: number) {
+  const client = createPublicClient({ chain: ChainById[chainId], transport: http(RPC_URLS[chainId]) })
+
+  const logs = await client.getLogs({
+    address: AssetPushOracleByChain[chainId],
+    event: AssetPushOracleAbi[6],
+    fromBlock: "earliest",
+    toBlock: "latest"
+  });
+  return logs
+}
+
 const DEFAULT_TABS = ["Vaults", "VCX", "Oracles", "Automation"]
 
 export default function Dashboard() {
@@ -178,12 +204,13 @@ function AlertSection({ dashboardData }: { dashboardData: any }) {
 function VaultsDashboard({ dashboardData }: { dashboardData: any }) {
   return (
     <>
+      <p className="text-white">Coming Soon. Check out the other Dashboards in the mean time...</p>
     </>
   )
 }
 
 function VCXDashboard({ dashboardData }: { dashboardData: any }) {
-  return Object.keys(dashboardData?.vcxData).length > 0 ? (
+  return dashboardData && Object.keys(dashboardData).length > 0 && Object.keys(dashboardData?.vcxData).length > 0 ? (
     <div className="mt-8 flow-root">
       <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
         <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
@@ -239,15 +266,105 @@ function VCXDashboard({ dashboardData }: { dashboardData: any }) {
 }
 
 function OraclesDashboard({ dashboardData }: { dashboardData: any }) {
-  return (
+  const [chain, setChain] = useState<number>(1)
+
+  function selectTab(val: string) {
+    const selected = SUPPORTED_NETWORKS.find(network => network.name === val)
+    setChain(selected?.id || 1)
+  }
+
+  return dashboardData && Object.keys(dashboardData).length > 0 && Object.keys(dashboardData?.vcxData).length > 0 && Object.keys(dashboardData?.assetOracleData).length > 0 ? (
     <>
+      <TabSelector
+        className="mt-6 mb-12"
+        availableTabs={GAUGE_NETWORKS.map(chain => ChainById[chain].name)}
+        activeTab={ChainById[chain].name}
+        setActiveTab={(t: string) => selectTab(t)}
+      />
+      <div className="mt-8 flow-root">
+        <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+          <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+            <table className="min-w-full divide-y divide-gray-300">
+              <thead>
+                <tr>
+                  <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-white sm:pl-0">
+                    Base
+                  </th>
+                  <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-white">
+                    Quote
+                  </th>
+                  <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-white">
+                    Price
+                  </th>
+                  <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-white">
+                    Update
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                <tr>
+                  <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-white sm:pl-0">
+                    {OptionTokenByChain[chain]}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-4 text-sm text-customGray200">
+                    USD
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-4 text-sm text-customGray200">
+                    {dashboardData?.vcxData[chain].ovcxPrice}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-4 text-sm text-customGray200">
+                    {Number(dashboardData?.vcxData[chain].lastUpdate)}
+                  </td>
+                </tr>
+                {!!dashboardData?.assetOracleData[chain]
+                  ? dashboardData?.assetOracleData[chain].map((log: any) =>
+                    <>
+                      <tr>
+                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-white sm:pl-0">
+                          {log.args.base}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-customGray200">
+                          {log.args.quote}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-customGray200">
+                          {Number(log.args.bqPrice)}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-customGray200">
+                          {Number(log.blockNumber)}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-white sm:pl-0">
+                          {log.args.quote}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-customGray200">
+                          {log.args.base}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-customGray200">
+                          {Number(log.args.qbPrice)}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-customGray200">
+                          {Number(log.blockNumber)}
+                        </td>
+                      </tr>
+                    </>
+                  )
+                  : <p className="text-white">No Asset Oracles</p>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div >
     </>
   )
+    : <p className="text-white">Loading...</p>
 }
 
 function AutomationDashboard({ dashboardData }: { dashboardData: any }) {
   return (
     <>
+      <p className="text-white">Coming Soon. Check out the other Dashboards in the mean time...</p>
     </>
   )
 }
