@@ -198,6 +198,14 @@ export default function Dashboard() {
 }
 
 function AlertSection({ dashboardData }: { dashboardData: any }) {
+  // TODO
+  // - Add alert for stale asset oracle
+  // - Add alert for stale harvest
+  // - Add alert for low 1Balance + eth bal gelato
+  // - Add alert for low balance trade bot
+  // - Add alert for low liquid cash in vaults
+  // - Add alert for large fee amount in vaults
+  
   if (!dashboardData || Object.keys(dashboardData).length === 0) return <></>
   return (
     <div className="flex flex-row flex-wrap">
@@ -284,7 +292,15 @@ function OptionTokenAlert({ chainId, vcxData }: { chainId: number, vcxData: any 
   )
 }
 
+// TODO Add alert for stale asset oracle
+
 function VaultsDashboard({ dashboardData }: { dashboardData: any }) {
+  // TODO
+  // - liquid cash of vaults and strategies
+  // - add strategy into its own atom
+  // - add withdrawal limits on vaults to [id]-page
+  // - fees
+  // - last harvested
   return (
     <>
       <p className="text-white">Coming Soon. Check out the other Dashboards in the mean time...</p>
@@ -355,6 +371,10 @@ function OraclesDashboard({ dashboardData }: { dashboardData: any }) {
     const selected = SUPPORTED_NETWORKS.find(network => network.name === val)
     setChain(selected?.id || 1)
   }
+
+  // TODO
+  // - Sort the values by active strategies
+  // - Add token metadata
 
   return dashboardData && Object.keys(dashboardData).length > 0 && Object.keys(dashboardData?.vcxData).length > 0 && Object.keys(dashboardData?.assetOracleData).length > 0 ? (
     <>
@@ -445,6 +465,12 @@ function OraclesDashboard({ dashboardData }: { dashboardData: any }) {
 }
 
 function AutomationDashboard({ dashboardData }: { dashboardData: any }) {
+  // TODO
+  // - show last update asset oracles per active pair
+  // - show last update ovcx oracle
+  // - show trade bot balances + last trade
+  // - show gelato 1balance + eth balance
+  // - (show last harvests?)
   return (
     <>
       <p className="text-white">Coming Soon. Check out the other Dashboards in the mean time...</p>
