@@ -6,7 +6,7 @@ import { ChainById, GAUGE_NETWORKS, RPC_URLS } from "@/lib/utils/connectors";
 import { formatNumber } from "@/lib/utils/formatBigNumber";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
-import { createPublicClient, erc20Abi, http, parseAbi, parseAbiItem, zeroAddress } from "viem";
+import { createPublicClient, erc20Abi, http, parseAbi, parseAbiItem, PublicClient, zeroAddress } from "viem";
 
 async function loadDashboardData(tokens: { [key: number]: TokenByAddress }) {
   const vcxData = await loadVCXData(tokens);
@@ -24,13 +24,13 @@ async function loadVCXData(tokens: { [key: number]: TokenByAddress }) {
   const vcxDataByChain: { [key: number]: any } = {}
   await Promise.all(
     GAUGE_NETWORKS.map(async (chain) => {
-      vcxDataByChain[chain] = await loadVCXDataByChain(chain, tokens, minPrice)
+      vcxDataByChain[chain] = await loadVCXDataByChain(chain, mainnetClient, tokens, minPrice)
     })
   )
   return vcxDataByChain
 }
 
-async function loadVCXDataByChain(chainId: number, tokens: { [key: number]: TokenByAddress }, minPrice: bigint) {
+async function loadVCXDataByChain(chainId: number, mainnetClient: PublicClient, tokens: { [key: number]: TokenByAddress }, minPrice: bigint) {
   const client = createPublicClient({ chain: ChainById[chainId], transport: http(RPC_URLS[chainId]) })
 
   const strikePriceRes = await client.readContract({
@@ -47,6 +47,7 @@ async function loadVCXDataByChain(chainId: number, tokens: { [key: number]: Toke
   let oVCXInCirculation;
   let exercisableVCX;
   let lastUpdate;
+  let lastBridge;
   if (chainId === 1) {
     const balanceRes = await client.multicall({
       contracts: [
@@ -71,6 +72,7 @@ async function loadVCXDataByChain(chainId: number, tokens: { [key: number]: Toke
 
     const block = await client.getBlock()
     lastUpdate = block.timestamp
+    lastBridge = 0
   } else {
     const balanceRes = await client.multicall({
       contracts: [
@@ -101,9 +103,34 @@ async function loadVCXDataByChain(chainId: number, tokens: { [key: number]: Toke
     });
     const block = await client.getBlock({ blockNumber: updateLogs[updateLogs.length - 1].blockNumber })
     lastUpdate = block.timestamp
+
+    let bridgeLogs: any[] = []
+    if (chainId === 10) {
+      bridgeLogs = await mainnetClient.getLogs({
+        address: "0x99C9fc46f92E8a1c0deC1b1747d010903E884bE1",
+        event: parseAbiItem("event ERC20BridgeInitiated(address indexed localToken, address indexed remoteToken, address indexed from, address to, uint256 amount, bytes extraData)"),
+        fromBlock: "earliest",
+        toBlock: "latest",
+        args: {
+          localToken: OptionTokenByChain[1]
+        }
+      });
+    } else if (chainId === 42161) {
+      bridgeLogs = await mainnetClient.getLogs({
+        address: "0x72Ce9c846789fdB6fC1f34aC4AD25Dd9ef7031ef",
+        event: parseAbiItem("event TransferRouted(address indexed token, address indexed _userFrom, address indexed _userTo, address gateway)"),
+        fromBlock: "earliest",
+        toBlock: "latest",
+        args: {
+          token: OptionTokenByChain[1]
+        }
+      });
+    }
+    const bridgeBlock = await client.getBlock({ blockNumber: bridgeLogs[bridgeLogs.length - 1].blockNumber })
+    lastBridge = bridgeBlock.timestamp
   }
 
-  return { oVCXInCirculation, exercisableVCX, vcxPrice, strikePrice, minPrice: minPriceInUsd, ovcxPrice, discount, lastUpdate }
+  return { oVCXInCirculation, exercisableVCX, vcxPrice, strikePrice, minPrice: minPriceInUsd, ovcxPrice, discount, lastUpdate, lastBridge }
 }
 
 const DEFAULT_TABS = ["Vaults", "VCX", "Oracles", "Automation"]
@@ -182,9 +209,19 @@ function VCXDashboard({ dashboardData }: { dashboardData: any }) {
                   {GAUGE_NETWORKS.map(chain =>
                     <td key={chain + key} className="whitespace-nowrap px-3 py-4 text-sm text-customGray200">
                       {key.includes("Price") && "$ "}
-                      {key === "lastUpdate"
-                        ? `${new Date(Number(dashboardData.vcxData[chain][key]) * 1000).toLocaleTimeString()} ${new Date(Number(dashboardData.vcxData[chain][key]) * 1000).toLocaleDateString()}`
-                        : formatNumber(Number(dashboardData.vcxData[chain][key]) / (["oVCXInCirculation", "exercisableVCX"].includes(key) ? 1e18 : 1))}
+                      {key === "lastUpdate" &&
+                        `${new Date(Number(dashboardData.vcxData[chain][key]) * 1000).toLocaleTimeString()} ${new Date(Number(dashboardData.vcxData[chain][key]) * 1000).toLocaleDateString()}`
+                      }
+                      {key === "lastBridge" &&
+                        <>
+                          {
+                            Number(dashboardData.vcxData[chain][key]) > 0
+                              ? `${new Date(Number(dashboardData.vcxData[chain][key]) * 1000).toLocaleTimeString()} ${new Date(Number(dashboardData.vcxData[chain][key]) * 1000).toLocaleDateString()}`
+                              : 0
+                          }
+                        </>
+                      }
+                      {!key.includes("last") && formatNumber(Number(dashboardData.vcxData[chain][key]) / (["oVCXInCirculation", "exercisableVCX"].includes(key) ? 1e18 : 1))}
                       {key === "discount" && " %"}
                       {key === "oVCXInCirculation" && " oVCX"}
                       {key === "exercisableVCX" && " VCX"}
@@ -200,16 +237,6 @@ function VCXDashboard({ dashboardData }: { dashboardData: any }) {
   )
     : <p className="text-white">Loading...</p>
 }
-
-// Optimism Gateway (0x99C9fc46f92E8a1c0deC1b1747d010903E884bE1)
-// Event: ERC20BridgeInitiated (index_topic_1 address localToken, index_topic_2 address remoteToken, index_topic_3 address from, address to, uint256 amount, bytes extraData)
-// filter by localToken + to (gauge)
-// show time, gauge
-
-// Arbitrum Gateway (0x72Ce9c846789fdB6fC1f34aC4AD25Dd9ef7031ef)
-// Event: TransferRouted (index_topic_1 address token, index_topic_2 address _userFrom, index_topic_3 address _userTo, address gateway)
-// filter by token + userTo (gauge)
-// show time, gauge
 
 function OraclesDashboard({ dashboardData }: { dashboardData: any }) {
   return (
