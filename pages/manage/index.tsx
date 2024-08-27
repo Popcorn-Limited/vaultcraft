@@ -12,6 +12,11 @@ const Cards = [
     description: "Adjust VCX Oracle, Bridge and other settings...",
     link: "/manage/misc"
   },
+  {
+    title: "Dashboard",
+    description: "See all protocol stats in one page...",
+    link: "/manage/dashboard"
+  },
 ]
 
 export default function ManagementPage() {
