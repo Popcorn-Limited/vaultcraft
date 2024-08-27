@@ -1,10 +1,13 @@
 import TabSelector from "@/components/common/TabSelector";
 import { tokensAtom } from "@/lib/atoms";
 import { AssetPushOracleAbi, AssetPushOracleByChain, BalancerOracleAbi, ExerciseByChain, ExerciseOracleByChain, OptionTokenByChain, OVCX_ORACLE, VCX, VcxByChain, WETH, XVCXByChain } from "@/lib/constants";
+import { thisPeriodTimestamp } from "@/lib/gauges/utils";
+import { vcx } from "@/lib/resolver/price/resolver";
 import { loadingStyle } from "@/lib/toasts/toastStyles";
 import { TokenByAddress } from "@/lib/types";
 import { ChainById, GAUGE_NETWORKS, RPC_URLS, SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { formatNumber } from "@/lib/utils/formatBigNumber";
+import { previousFriday, previousThursday } from "date-fns";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { createPublicClient, erc20Abi, http, parseAbi, parseAbiItem, PublicClient, zeroAddress } from "viem";
@@ -128,7 +131,7 @@ async function loadVCXDataByChain(chainId: number, mainnetClient: PublicClient, 
         }
       });
     }
-    const bridgeBlock = await client.getBlock({ blockNumber: bridgeLogs[bridgeLogs.length - 1].blockNumber })
+    const bridgeBlock = await mainnetClient.getBlock({ blockNumber: bridgeLogs[bridgeLogs.length - 1].blockNumber })
     lastBridge = bridgeBlock.timestamp
   }
 
@@ -195,8 +198,88 @@ export default function Dashboard() {
 }
 
 function AlertSection({ dashboardData }: { dashboardData: any }) {
+  if (!dashboardData || Object.keys(dashboardData).length === 0) return <></>
+  return (
+    <div className="flex flex-row flex-wrap">
+      {GAUGE_NETWORKS.map(chainId => <OptionTokenOracleAlert key={"ovcxOracleAlert-" + chainId} chainId={chainId} vcxData={dashboardData.vcxData[chainId]} />)}
+      {GAUGE_NETWORKS.map(chainId => <OptionTokenAlert key={"ovcxAlert-" + chainId} chainId={chainId} vcxData={dashboardData.vcxData[chainId]} />)}
+    </div>
+  )
+}
+
+function OptionTokenOracleAlert({ chainId, vcxData }: { chainId: number, vcxData: any }) {
+  const lastUpdate = Number(vcxData.lastUpdate) * 1000
+  const updateFrequency = 900000 // 15 minutes
   return (
     <>
+      {/* Check that the price isnt lower/equal minPrice */}
+      {vcxData.strikePrice <= vcxData.minPrice &&
+        <div className="w-1/3 p-4">
+          <div className="border border-red-500 bg-red-500 bg-opacity-30 rounded-lg p-4">
+            <p className="text-red-500 text-lg">MinPrice: {ChainById[chainId].name}</p>
+            <p className="text-red-500 text-sm">
+              {`Adjust the minPrice of the OVCX Oracle. The current strike price is lower or equal to the min price. (${vcxData.strikePrice} <= ${vcxData.minPrice})`}
+            </p>
+          </div>
+        </div>
+      }
+
+      {/* Check that the update isnt longer than 15min ago */}
+      {(lastUpdate + updateFrequency) < Number(new Date()) &&
+        <div className="w-1/3 p-4">
+          <div className="border border-secondaryYellow bg-secondaryYellow bg-opacity-30 rounded-lg p-4">
+            <p className="text-secondaryYellow text-lg">Stale Oracle: {ChainById[chainId].name}</p>
+            <p className="text-secondaryYellow text-sm">
+              Oracle has been stale. Last update occured {new Date(lastUpdate).toLocaleString()}
+            </p>
+          </div>
+        </div>
+      }
+    </>
+  )
+}
+
+function OptionTokenAlert({ chainId, vcxData }: { chainId: number, vcxData: any }) {
+  const lastBridge = Number(vcxData.lastBridge) * 1000
+  const lastEpochEnd = (thisPeriodTimestamp() * 1000) - (604800 * 1000)
+  const minExercisableVCX = 100_000e18
+  return (
+    <>
+      {/* Check that oVCX have been bridged after epoch end */}
+      {chainId !== 1 && lastBridge <= lastEpochEnd &&
+        <div className="w-1/3 p-4">
+          <div className="border border-secondaryYellow bg-secondaryYellow bg-opacity-30 rounded-lg p-4">
+            <p className="text-secondaryYellow text-lg">OVCX Bridge: {ChainById[chainId].name}</p>
+            <p className="text-secondaryYellow text-sm">
+              OVCX havent been bridged recently. Last bridge occured {new Date(lastBridge).toLocaleString()} | {new Date(lastEpochEnd).toLocaleString()}
+            </p>
+          </div>
+        </div>
+      }
+
+      {/* Check that Exercise contract is funded */}
+      {vcxData.exercisableVCX < 1000e18 ?
+        <div className="w-1/3 p-4">
+          <div className="border border-red-500 bg-red-500 bg-opacity-30 rounded-lg p-4">
+            <p className="text-red-500 text-lg">Exercisable oVCX: {ChainById[chainId].name}</p>
+            <p className="text-red-500 text-sm">
+              {`Fund the exercise contract. VCX balance of the exercise contract is runnign low (${formatNumber(vcxData.exercisableVCX / 1e18)} VCX < 1000 VCX)`}
+            </p>
+          </div>
+        </div>
+        : <>
+          {vcxData.exercisableVCX < minExercisableVCX &&
+            <div className="w-1/3 p-4">
+              <div className="border border-secondaryYellow bg-secondaryYellow bg-opacity-30 rounded-lg p-4">
+                <p className="text-secondaryYellow text-lg">Exercisable oVCX: {ChainById[chainId].name}</p>
+                <p className="text-secondaryYellow text-sm">
+                  {`Fund the exercise contract. VCX balance of the exercise contract is runnign low (${formatNumber(vcxData.exercisableVCX / 1e18)} VCX < ${formatNumber(minExercisableVCX / 1e18)} VCX)`}
+                </p>
+              </div>
+            </div>
+          }
+        </>
+      }
     </>
   )
 }
@@ -237,13 +320,13 @@ function VCXDashboard({ dashboardData }: { dashboardData: any }) {
                     <td key={chain + key} className="whitespace-nowrap px-3 py-4 text-sm text-customGray200">
                       {key.includes("Price") && "$ "}
                       {key === "lastUpdate" &&
-                        `${new Date(Number(dashboardData.vcxData[chain][key]) * 1000).toLocaleTimeString()} ${new Date(Number(dashboardData.vcxData[chain][key]) * 1000).toLocaleDateString()}`
+                        `${new Date(Number(dashboardData.vcxData[chain][key]) * 1000).toLocaleString()}`
                       }
                       {key === "lastBridge" &&
                         <>
                           {
                             Number(dashboardData.vcxData[chain][key]) > 0
-                              ? `${new Date(Number(dashboardData.vcxData[chain][key]) * 1000).toLocaleTimeString()} ${new Date(Number(dashboardData.vcxData[chain][key]) * 1000).toLocaleDateString()}`
+                              ? `${new Date(Number(dashboardData.vcxData[chain][key]) * 1000).toLocaleString()}`
                               : 0
                           }
                         </>
@@ -260,7 +343,7 @@ function VCXDashboard({ dashboardData }: { dashboardData: any }) {
           </table>
         </div>
       </div>
-    </div>
+    </div >
   )
     : <p className="text-white">Loading...</p>
 }
