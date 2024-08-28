@@ -205,7 +205,7 @@ function AlertSection({ dashboardData }: { dashboardData: any }) {
   // - Add alert for low balance trade bot
   // - Add alert for low liquid cash in vaults
   // - Add alert for large fee amount in vaults
-  
+
   if (!dashboardData || Object.keys(dashboardData).length === 0) return <></>
   return (
     <div className="flex flex-row flex-wrap">
@@ -217,7 +217,7 @@ function AlertSection({ dashboardData }: { dashboardData: any }) {
 
 function OptionTokenOracleAlert({ chainId, vcxData }: { chainId: number, vcxData: any }) {
   const lastUpdate = Number(vcxData.lastUpdate) * 1000
-  const updateFrequency = 900000 // 15 minutes
+  const updateFrequency = 1800000 // 30 minutes
   return (
     <>
       {/* Check that the price isnt lower/equal minPrice */}
