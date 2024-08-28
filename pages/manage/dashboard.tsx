@@ -217,7 +217,7 @@ function AlertSection({ dashboardData }: { dashboardData: any }) {
 
 function OptionTokenOracleAlert({ chainId, vcxData }: { chainId: number, vcxData: any }) {
   const lastUpdate = Number(vcxData.lastUpdate) * 1000
-  const updateFrequency = 1800000 // 30 minutes
+  const updateFrequency = 3600000 // 60 minutes
   return (
     <>
       {/* Check that the price isnt lower/equal minPrice */}
