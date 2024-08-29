@@ -10,7 +10,7 @@ import {
 import axios from "axios";
 import { VaultAbi } from "@/lib/constants/abi/Vault";
 import { LlamaApy, TokenByAddress, VaultData, VaultDataByAddress, VaultLabel } from "@/lib/types";
-import { ChildGaugeAbi, ERC20Abi, GaugeAbi, OptionTokenByChain, VCX, VCX_LP, VE_VCX, VeTokenByChain, XVCXByChain, ZapAssetAddressesByChain } from "@/lib/constants";
+import { ChildGaugeAbi, ERC20Abi, GaugeAbi, OptionTokenByChain, ST_VCX, VCX, VCX_LP, VE_VCX, VeTokenByChain, XVCXByChain, ZapAssetAddressesByChain } from "@/lib/constants";
 import { GAUGE_NETWORKS, RPC_URLS } from "@/lib/utils/connectors";
 import { YieldOptions } from "vaultcraft-sdk";
 import getFraxlendApy from "@/lib/external/fraxlend/getFraxlendApy";
@@ -59,7 +59,7 @@ export default async function getTokenAndVaultsDataByChain({
 
   // Create token array
   const uniqueAssetAdresses: Address[] = [...ZapAssetAddressesByChain[chainId]];
-  if (chainId === 1) uniqueAssetAdresses.push(...[VCX, VCX_LP, VE_VCX])
+  if (chainId === 1) uniqueAssetAdresses.push(...[VCX, VCX_LP, VE_VCX, ST_VCX])
   if (GAUGE_NETWORKS.includes(chainId)) uniqueAssetAdresses.push(...[OptionTokenByChain[chainId], VeTokenByChain[chainId], XVCXByChain[chainId]])
 
   // Add vault assets

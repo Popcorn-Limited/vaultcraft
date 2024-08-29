@@ -66,7 +66,7 @@ export default function Index() {
     {
       (vaultData && asset && vault && tokenOptions.length > 0) ? (
         <>
-          <ManageLoanInterface visibilityState={[showLoanManagementModal, setShowLoanManagementModal]} vaultData={vaultData} />
+          {/* <ManageLoanInterface visibilityState={[showLoanManagementModal, setShowLoanManagementModal]} vaultData={vaultData} /> */}
           <div className="min-h-screen">
             <button
               className="border border-customGray500 rounded-lg flex flex-row items-center px-4 py-2 ml-4 md:ml-0 mt-10"

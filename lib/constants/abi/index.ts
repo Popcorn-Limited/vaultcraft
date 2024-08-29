@@ -27,3 +27,4 @@ export * from "./AssetPushOracle";
 export * from "./AssetPushOracleOwner";
 export * from "./AnyToAnyDepositor";
 export * from "./MultiStrategyVaultV2_1";
+export * from "./LockVault";

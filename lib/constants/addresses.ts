@@ -5,6 +5,7 @@ import { mainnet, arbitrum, aurora, avalanche, bsc, fantom, optimism, polygon, x
 export const VCX: Address = "0xcE246eEa10988C495B4A90a905Ee9237a0f91543";
 export const VCX_LP: Address = "0x577A7f7EE659Aa14Dc16FD384B3F8078E23F1920";
 export const VE_VCX: Address = "0x0aB4bC35Ef33089B9082Ca7BB8657D7c4E819a1A";
+export const ST_VCX: Address = "0xE5d383FC43F6c370DdD3975cf9e363Ad42367697";
 export const POP: Address = "0xD0Cd466b34A24fcB2f87676278AF2005Ca8A78c4";
 export const WETH: Address = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2";
 export const VCX_POOL: Address = "0x577A7f7EE659Aa14Dc16FD384B3F8078E23F1920"; // Same as VCX_LP
