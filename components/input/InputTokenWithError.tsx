@@ -89,11 +89,8 @@ export default function InputTokenWithError({
                   />
                 </svg>
               </div>
-              <p className="text-customGray100 group-hover/max:text-white mt-1">
-                {balance * (selectedToken?.price || 0) < 1
-                  ? "0"
-                  : `${balance}`
-                }
+              <p className="text-customGray100 group-hover/max:text-white">
+                {balance || "0"}
               </p>
             </>
           )}

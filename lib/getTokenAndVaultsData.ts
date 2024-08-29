@@ -11,11 +11,8 @@ import axios from "axios";
 import { VaultAbi } from "@/lib/constants/abi/Vault";
 import { LlamaApy, TokenByAddress, VaultData, VaultDataByAddress, VaultLabel } from "@/lib/types";
 import { ChildGaugeAbi, ERC20Abi, GaugeAbi, OptionTokenByChain, VCX, VCX_LP, VE_VCX, VeTokenByChain, XVCXByChain, ZapAssetAddressesByChain } from "@/lib/constants";
-import { RPC_URLS } from "@/lib/utils/connectors";
+import { GAUGE_NETWORKS, RPC_URLS } from "@/lib/utils/connectors";
 import { YieldOptions } from "vaultcraft-sdk";
-import { AavePoolUiAbi } from "@/lib/constants/abi/Aave";
-import { GAUGE_NETWORKS } from "pages/boost";
-import { AavePoolAddressProviderByChain, AaveUiPoolProviderByChain } from "@/lib/external/aave";
 import getFraxlendApy from "@/lib/external/fraxlend/getFraxlendApy";
 import { prepareAssets, prepareVaults, addBalances, prepareGauges } from "@/lib/tokens";
 import getGaugesData from "@/lib/gauges/getGaugeData";
@@ -67,6 +64,11 @@ export default async function getTokenAndVaultsDataByChain({
 
   // Add vault assets
   Object.values(vaultsData).forEach((vault) => {
+    vault.strategies.forEach((strategy) => {
+      if (strategy.yieldAsset && !uniqueAssetAdresses.includes(strategy.yieldAsset)) {
+        uniqueAssetAdresses.push(strategy.yieldAsset);
+      }
+    })
     if (!uniqueAssetAdresses.includes(vault.asset)) {
       uniqueAssetAdresses.push(vault.asset);
     }
@@ -241,7 +243,7 @@ async function addDynamicVaultsData(vaults: VaultDataByAddress, client: PublicCl
 
 async function addApyHist(vaults: VaultDataByAddress): Promise<VaultDataByAddress> {
   const apyHistAll = await Promise.all(Object.values(vaults).map(async (vault: any) => {
-    if (vault.apyId.length > 0) return getApy(vault.apyId)
+    if (vault.apyId?.length > 0) return getApy(vault.apyId)
     return []
   }))
 
@@ -351,6 +353,8 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
         protocol: desc.name,
         description: descriptionSplit[1],
         resolver: desc.resolver,
+        type: desc.type ?? "Vanilla",
+        yieldAsset: desc.yieldAsset || undefined,
         apy,
         apyHist,
         apyId: desc.apyId,
@@ -386,6 +390,7 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
           description: "This vault holds funds to incentivise via gauges.",
         },
         resolver: "",
+        type: "Vanilla",
         allocation: vaults[address].totalAssets,
         allocationPerc: 1,
         apy: 0,
@@ -394,7 +399,6 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
         apySource: "custom"
       }
     } else {
-
       vaults[address].strategies.forEach((strategy: any, i: number) => {
         const strategyData = strategies[strategy.address]
 
@@ -412,6 +416,8 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
             protocol: strategyData.protocol,
             description: strategyData.description,
           },
+          type: strategyData.type,
+          yieldAsset: strategyData.yieldAsset,
           resolver: strategyData.resolver,
           allocation: allocation,
           allocationPerc: allocationPerc,

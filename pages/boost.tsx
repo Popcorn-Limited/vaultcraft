@@ -37,10 +37,8 @@ import BoostVaultsTable from "@/components/boost/BoostVaultsTable";
 import BoostVaultCard from "@/components/boost/BoostVaultCard";
 import useWeeklyEmissions from "@/lib/gauges/useWeeklyEmissions";
 import { mainnet } from "viem/chains";
-import { RPC_URLS } from "@/lib/utils/connectors";
+import { GAUGE_NETWORKS, RPC_URLS } from "@/lib/utils/connectors";
 import Carousel from "@/components/common/Carousel";
-
-export const GAUGE_NETWORKS = [1, 10, 42161];
 
 let hiddenGauges: AddressesByChain = {};
 async function getHiddenGauges(): Promise<AddressesByChain> {

@@ -19,6 +19,8 @@ import VaultHero from "@/components/vault/VaultHero";
 import RewardsSection from "@/components/vault/management/vault/RewardsSection";
 import VaultsV1Settings from "@/components/vault/management/vault/VaultsV1Settings";
 import VaultsV2Settings from "@/components/vault/management/vault/VaultsV2Settings";
+import StrategyDescription from "@/components/vault/StrategyDescription";
+import Link from "next/link";
 
 async function getLogs(vault: VaultData, asset: Token) {
   const client = createPublicClient({
@@ -242,6 +244,25 @@ export default function Index() {
                 </div>
               )}
             </div>
+
+            <div className="border border-customNeutral100 rounded-lg p-4 mt-4">
+              <p className="text-white text-2xl font-bold">Strategies</p>
+              {vaultData.strategies.map((strategy, i) =>
+                <Link
+                  key={`${strategy.resolver}-${i}`}
+                  href={`/manage/strategies/${strategy.address}?chainId=${vaultData.chainId}`}
+                  passHref
+                >
+                  <StrategyDescription
+                    strategy={strategy}
+                    asset={asset}
+                    i={i}
+                    stratLen={vaultData.strategies.length}
+                  />
+                </Link>
+              )}
+            </div>
+
           </section>
 
           {vaultData.metadata.type === "multi-strategy-vault-v2"

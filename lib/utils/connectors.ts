@@ -81,6 +81,8 @@ export const SUPPORTED_NETWORKS: Chain[] = [
     }
   }]
 
+export const GAUGE_NETWORKS = [1, 10, 42161];
+
 export const ChainById: { [key: number]: Chain } = {
   1: mainnet,
   137: polygon,

@@ -41,7 +41,7 @@ export async function allocateToStrategies({
       account: account as Address,
       contract: { address: vaultData.address, abi: MultiStrategyVaultAbi },
       functionName: "pushFunds",
-      args: allocations,
+      args: [allocations],
       publicClient: clients.publicClient
     }),
     clients
@@ -58,14 +58,13 @@ export async function deallocateFromStrategies({
   clients,
 }: BaseWriteProps & { allocations: VaultAllocation[] }): Promise<boolean> {
   showLoadingToast("Deallocating from strategies...");
-
   const success = await handleCallResult({
     successMessage: "Deallocated from strategies!",
     simulationResponse: await simulateCall({
       account: account as Address,
       contract: { address: vaultData.address, abi: MultiStrategyVaultAbi },
       functionName: "pullFunds",
-      args: allocations,
+      args: [allocations],
       publicClient: clients.publicClient
     }),
     clients

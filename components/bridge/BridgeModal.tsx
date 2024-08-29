@@ -151,7 +151,7 @@ export default function BridgeModal({ show }: { show: [boolean, Dispatch<SetStat
         setActiveTab={switchTab}
       />
       {
-        Object.keys(tokens).length > 0 &&
+        Object.keys(tokens).length > 0 && xVCX?.address &&
         <>
           <InputTokenWithError
             captionText={"Bridge Amount"}

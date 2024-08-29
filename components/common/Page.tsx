@@ -1,7 +1,7 @@
 import Navbar from "@/components/navbar/Navbar";
 import { yieldOptionsAtom } from "@/lib/atoms/sdk";
 import { vaultsAtom } from "@/lib/atoms/vaults";
-import { RPC_URLS, SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
+import { GAUGE_NETWORKS, RPC_URLS, SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { useAtom } from "jotai";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { CachedProvider, YieldOptions } from "vaultcraft-sdk";
@@ -15,10 +15,8 @@ import { gaugeRewardsAtom, networthAtom, tokensAtom, tvlAtom, vaultronAtom } fro
 import { ReserveData, TokenByAddress, TokenType, UserAccountData, VaultData } from "@/lib/types";
 import getTokenAndVaultsDataByChain from "@/lib/getTokenAndVaultsData";
 import { aaveAccountDataAtom, aaveReserveDataAtom } from "@/lib/atoms/lending";
-import { GAUGE_NETWORKS } from "pages/boost";
 import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
 import axios from "axios";
-import { fetchAaveData } from "@/lib/external/aave";
 import { VotingEscrowAbi } from "@/lib/constants";
 import fetchVaultron from "@/lib/vaultron";
 import { mainnet, polygon, xLayer } from "viem/chains";
