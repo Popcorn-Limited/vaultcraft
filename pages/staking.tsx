@@ -12,7 +12,7 @@ import { ArrowDownIcon, Square2StackIcon } from "@heroicons/react/24/outline";
 import { Networth, networthAtom, tokensAtom, TVL, tvlAtom } from "@/lib/atoms";
 import LeftArrowIcon from "@/components/svg/LeftArrowIcon";
 import ManageLoanInterface from "@/components/lending/ManageLoanInterface";
-import { FEE_RECIPIENT_PROXY, ST_VCX, VCX, VeTokenByChain, ZapAssetAddressesByChain } from "@/lib/constants";
+import { FEE_RECIPIENT_PROXY, OptionTokenByChain, ST_VCX, VCX, VeTokenByChain, ZapAssetAddressesByChain } from "@/lib/constants";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import StrategyDescription from "@/components/vault/StrategyDescription";
 import ApyChart from "@/components/vault/ApyChart";
@@ -29,14 +29,15 @@ import { formatAndRoundNumber, formatNumber, formatTwoDecimals, safeRound } from
 import NetworkSticker from "@/components/network/NetworkSticker";
 import TokenIcon from "@/components/common/TokenIcon";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
-import { validateInput } from "@/lib/utils/helpers";
+import { handleSwitchChain, validateInput } from "@/lib/utils/helpers";
 import zap, { getZapProvider, handleZapAllowance } from "@/lib/vault/zap";
 import MainActionButton from "@/components/button/MainActionButton";
 import ActionSteps from "@/components/vault/ActionSteps";
 import { handleAllowance } from "@/lib/approve";
-import { deposit, increaseDeposit, withdraw } from "@/lib/vault/lockVault/interactions";
+import { claim, deposit, increaseDeposit, withdraw } from "@/lib/vault/lockVault/interactions";
 import PseudoRadioButton from "@/components/button/PseudoRadioButton";
 import LockTimeButton from "@/components/button/LockTimeButton";
+import { loadingStyle } from "@/lib/toasts/toastStyles";
 
 async function getUserLockVaultData(user: Address, vault: Address) {
   const client = createPublicClient({
@@ -98,6 +99,20 @@ async function getUserLockVaultData(user: Address, vault: Address) {
   }
 }
 
+async function getLockVaultData(vault: Address) {
+  const client = createPublicClient({
+    chain: mainnet,
+    transport: http(RPC_URLS[mainnet.id]),
+  })
+
+  return client.getLogs({
+    address: vault,
+    event: LockVaultAbi[14],
+    fromBlock: "earliest",
+    toBlock: "latest"
+  })
+}
+
 export default function Staking() {
   const publicClient = usePublicClient({ chainId: 1 });
   const { data: walletClient } = useWalletClient();
@@ -105,7 +120,7 @@ export default function Staking() {
   const { switchChainAsync } = useSwitchChain();
   const { openConnectModal } = useConnectModal();
 
-  const [tokens] = useAtom(tokensAtom)
+  const [tokens, setTokens] = useAtom(tokensAtom)
 
   const [tokenOptions, setTokenOptions] = useState<Token[]>([]);
   const [asset, setAsset] = useState<Token>();
@@ -124,8 +139,6 @@ export default function Staking() {
   const [actionType, setActionType] = useState<StakeActionType>()
   const [showModal, setShowModal] = useState<boolean>(false)
   const [zapProvider, setZapProvider] = useState(ZapProvider.none);
-  const [zapAmount, setZapAmount] = useState<number>(0);
-  const [step, setStep] = useState<number>(0);
 
   useEffect(() => {
     if (Object.keys(tokens).length > 0) {
@@ -135,6 +148,8 @@ export default function Staking() {
       ])
       const _asset = tokens[mainnet.id][VCX]
       const _vault = tokens[mainnet.id][ST_VCX]
+
+      getLockVaultData(ST_VCX).then(res => setLockVaultData(res));
 
       if (account) {
         refreshUserData()
@@ -251,60 +266,92 @@ export default function Staking() {
                 </div>
               </div>
 
-              <div className="w-full md:flex md:flex-row md:justify-between space-y-4 md:space-y-0 mt-4 md:mt-0">
-                <div className="grid grid-cols-2 sm:grid-cols-6 md:pr-10  gap-4 md:gap-10">
-                  <div>
-                    <LargeCardStat
-                      id={"wallet"}
-                      label="Your Wallet"
-                      value={walletValue < 1 ? "$ 0" : `$ ${formatTwoDecimals(walletValue)}`}
-                      secondaryValue={walletValue < 1 ? `0 ${asset.symbol}` : `${formatTwoDecimals(asset.balance / 10 ** asset.decimals)} ${asset.symbol}`}
-                      tooltip="Value of deposit assets held in your wallet"
-                    />
-                  </div>
-                  <div>
-                    <LargeCardStat
-                      id={"deposits"}
-                      label="Deposits"
-                      value={depositValue < 1 ? "$ 0" : `$ ${formatTwoDecimals(depositValue)}`}
-                      secondaryValue={depositValue < 1 ? "$ 0" : `${formatAndRoundNumber(vault?.balance!, vault?.decimals!)} ${asset.symbol}`}
-                      tooltip="Value of your vault deposits"
-                    />
-                  </div>
-                  <div>
-                    <LargeCardStat
-                      id={"tvl"}
-                      label="TVL"
-                      value={`$ ${tvl < 1 ? "0" : formatTwoDecimals(tvl)
-                        }`}
-                      secondaryValue={
-                        asset
-                          ? `${formatTwoDecimals(vault.totalSupply / 1e18)} ${asset?.symbol!}`
-                          : "0 TKN"
-                      }
-                      tooltip={``}
-                    />
-                  </div>
-                  <div>
-                    <LargeCardStat
-                      id={"vapy"}
-                      label="vAPY"
-                      value={`40 %`}
-                      tooltip="Current variable APY of the vault"
-                    />
-                  </div>
-                  {userLockVaultData && userLockVaultData.unlockTime > 0 &&
-                    <>
-                      <div>
-                        <LargeCardStat
-                          id={"unlockDate"}
-                          label="Unlock Date"
-                          value={new Date(userLockVaultData.unlockTime).toLocaleDateString()}
-                          tooltip="Current variable APY of the vault"
+              <div className="w-full md:flex md:flex-row space-x-8 space-y-4 md:space-y-0 mt-4 md:mt-0">
+                <div>
+                  <LargeCardStat
+                    id={"wallet"}
+                    label="Your Wallet"
+                    value={walletValue < 1 ? "$ 0" : `$ ${formatTwoDecimals(walletValue)}`}
+                    secondaryValue={walletValue < 1 ? `0 ${asset.symbol}` : `${formatTwoDecimals(asset.balance / 10 ** asset.decimals)} ${asset.symbol}`}
+                    tooltip="Value of deposit assets held in your wallet"
+                  />
+                </div>
+                <div>
+                  <LargeCardStat
+                    id={"deposits"}
+                    label="Deposits"
+                    value={depositValue < 1 ? "$ 0" : `$ ${formatTwoDecimals(depositValue)}`}
+                    secondaryValue={depositValue < 1 ? "$ 0" : `${formatAndRoundNumber(vault?.balance!, vault?.decimals!)} ${asset.symbol}`}
+                    tooltip="Value of your vault deposits"
+                  />
+                </div>
+                <div>
+                  <LargeCardStat
+                    id={"tvl"}
+                    label="TVL"
+                    value={`$ ${tvl < 1 ? "0" : formatTwoDecimals(tvl)
+                      }`}
+                    secondaryValue={
+                      asset
+                        ? `${formatTwoDecimals(vault.totalSupply / 1e18)} ${asset?.symbol!}`
+                        : "0 TKN"
+                    }
+                    tooltip={``}
+                  />
+                </div>
+                <div>
+                  <LargeCardStat
+                    id={"vapy"}
+                    label="vAPY"
+                    value={"40 %"}
+                    secondaryValue={"10 %"}
+                    tooltip="Current variable APY of the vault"
+                  />
+                </div>
+                {userLockVaultData && userLockVaultData.unlockTime > 0 &&
+                  <>
+                    <div>
+                      <LargeCardStat
+                        id={"yourApy"}
+                        label="Your APY"
+                        value={`${formatTwoDecimals(userLockVaultData.multiplier * 40)} %`}
+                        tooltip="Current variable APY of the vault"
+                      />
+                    </div>
+                    <div>
+                      <LargeCardStat
+                        id={"unlockDate"}
+                        label="Unlock Date"
+                        value={new Date(userLockVaultData.unlockTime).toLocaleDateString()}
+                        tooltip="Current variable APY of the vault"
+                      />
+                    </div>
+                    <div className="flex flex-row space-x-4">
+                      <LargeCardStat
+                        id={"rewards"}
+                        label="Claimable"
+                        value={`$ ${formatNumber(((userLockVaultData.accruedVCX / 1e18) * asset.price) + ((userLockVaultData.accruedOVCX / 1e18) * tokens[1][OptionTokenByChain[1]].price))}`}
+                        tooltip={`${formatNumber(userLockVaultData.accruedVCX / 1e18)} VCX + ${formatNumber(userLockVaultData.accruedOVCX / 1e18)} oVCX`}
+                      />
+                      <div className="h-14">
+                        <MainActionButton
+                          label="Claim"
+                          handleClick={() => claim({
+                            address: ST_VCX,
+                            account: account!,
+                            chainId: 1,
+                            tokensToUpdate: [VCX, OptionTokenByChain[1]],
+                            tokensAtom: [tokens, setTokens],
+                            clients: {
+                              publicClient: publicClient!,
+                              walletClient: walletClient!
+                            },
+                          })}
                         />
                       </div>
-                    </>}
-                </div>
+                    </div>
+                  </>
+                }
               </div>
             </section>
 
@@ -328,7 +375,7 @@ export default function Staking() {
                     />
                     {!userLockVaultData?.isExit &&
                       <div className="flex flex-row items-center w-full space-x-4 mt-4">
-                        <LockTimeButton label="60" handleClick={() => setLockTime(60)} isActive={lockTime === 60} />
+                        <LockTimeButton label="180" handleClick={() => setLockTime(180)} isActive={lockTime === 180} />
                         <LockTimeButton label="1M" handleClick={() => setLockTime(2629800)} isActive={lockTime === 2629800} />
                         <LockTimeButton label="3M" handleClick={() => setLockTime(7889400)} isActive={lockTime === 7889400} />
                         <LockTimeButton label="6M" handleClick={() => setLockTime(15778800)} isActive={lockTime === 15778800} />
@@ -381,15 +428,30 @@ export default function Staking() {
                           allowSelection={false}
                           allowInput={false}
                         />
+                        <p className="text-white">Expected APY: ~{(lockTime / 31557600) * 40} %</p>
                       </>
                     }
                   </div>
                   <div className="mt-4">
-                    <MainActionButton
-                      label={"Preview"}
-                      handleClick={handlePreview}
-                      disabled={showModal}
-                    />
+                    {!account &&
+                      <MainActionButton
+                        label={"Connect Wallet"}
+                        handleClick={openConnectModal}
+                      />
+                    }
+                    {(account && chain?.id !== 1) &&
+                      <MainActionButton
+                        label="Switch Chain"
+                        handleClick={() => handleSwitchChain(1, switchChainAsync)}
+                      />
+                    }
+                    {(account && chain?.id === 1) &&
+                      <MainActionButton
+                        label={"Preview"}
+                        handleClick={handlePreview}
+                        disabled={showModal}
+                      />
+                    }
                   </div>
                   {showModal &&
                     <InteractionContainer
@@ -449,7 +511,49 @@ export default function Staking() {
                 </div>
 
                 <div className="bg-customNeutral200 p-6 rounded-lg">
-                  <p className="text-white text-2xl font-bold">Strategies</p>
+                  <p className="text-white text-2xl font-bold">Reward Payouts</p>
+                  {lockVaultData ?
+                    <div className="mt-8 flow-root">
+                      <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                        <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+                          <table className="min-w-full divide-y divide-gray-300">
+                            <thead>
+                              <tr>
+                                <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-white sm:pl-0">
+                                  Amount
+                                </th>
+                                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-white">
+                                  Block
+                                </th>
+                                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-white">
+                                  Transaction
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-200">
+                              {lockVaultData.length > 0 ?
+                                lockVaultData.map((log: any) =>
+                                  <tr key={`${Number(log.args.amount)}-${log.args.rewardToken}`}>
+                                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-white sm:pl-0">
+                                      {Number(log.args.amount) / 1e18} {log.args.rewardToken === VCX ? "VCX" : "oVCX"}
+                                    </td>
+                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-customGray200">
+                                      {Number(log.blockNumber)}
+                                    </td>
+                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-customGray200">
+                                      {log.transactionHash}
+                                    </td>
+                                  </tr>
+                                )
+                                : <p className="text-white">No reward payouts so far</p>
+                              }
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div >
+                    : <p className="text-white">Loading...</p>
+                  }
                 </div>
               </div>
             </section>

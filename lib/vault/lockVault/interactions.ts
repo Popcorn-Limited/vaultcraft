@@ -175,6 +175,8 @@ export async function fundReward({
 }: SharedProps & { amounts: number[] }): Promise<boolean> {
   showLoadingToast("Funding rewards...");
 
+  console.log(amounts.map(amount => BigInt(amount.toLocaleString("fullwide", { useGrouping: false }))))
+
   const success = await handleCallResult({
     successMessage: "Funded rewards successfully!",
     simulationResponse: await simulateCall({
