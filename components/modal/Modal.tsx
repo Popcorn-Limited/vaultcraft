@@ -47,7 +47,7 @@ export default function Modal({
                 className={`md:min-w-[700px] md:w-2/3 relative transform overflow-hidden rounded-lg bg-customNeutral200 border border-customNeutral100 px-8 py-9 transition-all text-white ${classNames}`}
               >
                 <div className="flex flex-row justify-between font-medium md:items-center mb-8">
-                  <>{title}</>
+                  <>{title || <div></div>}</>
                   <XMarkIcon
                     className="w-10 h-10 text-white"
                     onClick={() => setShowModal(false)}

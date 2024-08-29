@@ -16,6 +16,7 @@ export default function InputTokenWithError({
   getToken,
   allowInput,
   inputMoreThanBalance,
+  disabled = false,
   ...props
 }: {
   errorMessage?: string;
@@ -29,11 +30,12 @@ export default function InputTokenWithError({
   getToken?: Function;
   allowInput?: boolean;
   inputMoreThanBalance?: boolean;
+  disabled?: boolean
 } & HTMLProps<HTMLInputElement>): JSX.Element {
   const balance =
-    Number(selectedToken?.balance) / 10 ** (selectedToken?.decimals as number);
+    Number(selectedToken?.balance || 0) / 10 ** (selectedToken?.decimals || 0);
   return (
-    <>
+    <div className={disabled ? "opacity-50 cursor-default" : ""}>
       {captionText && (
         <p className="text-white text-start">
           {captionText}
@@ -48,7 +50,7 @@ export default function InputTokenWithError({
             }`}
         >
           <div className="xs:w-full xs:border-r xs:border-customGray500 xs:pr-4 smmd:p-0 smmd:border-none smmd:w-1/2">
-            <InputNumber {...props} />
+            <InputNumber {...props} disabled={disabled} />
           </div>
           <div className="xs:w-fit xs:pl-4 smmd:p-0 smmd:w-1/2">
             <SelectToken
@@ -116,6 +118,6 @@ export default function InputTokenWithError({
           </button>
         )}
       </div>
-    </>
+    </div>
   );
 }

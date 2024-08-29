@@ -69,7 +69,7 @@ export default function SelectToken({
             id={selectTokenId}
             className="font-medium text-lg leading-none hidden md:block text-white group-hover:text-white truncate cursor-pointer"
           >
-            {selectedToken?.symbol}
+            {selectedToken?.symbol || "Select Token"}
           </p>
           <div className="hidden md:block">
             <Tooltip
