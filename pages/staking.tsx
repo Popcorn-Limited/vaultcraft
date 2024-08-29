@@ -1,35 +1,42 @@
 import { vaultsAtom } from "@/lib/atoms/vaults";
-import { Token, VaultData } from "@/lib/types";
+import { Clients, Token, TokenByAddress, TokenType, VaultData, ZapProvider } from "@/lib/types";
 import { useAtom } from "jotai";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import NoSSR from "react-no-ssr";
 import { yieldOptionsAtom } from "@/lib/atoms/sdk";
 import VaultInputs from "@/components/vault/VaultInputs";
-import { showSuccessToast } from "@/lib/toasts";
+import { showErrorToast, showLoadingToast, showSuccessToast } from "@/lib/toasts";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { ArrowDownIcon, Square2StackIcon } from "@heroicons/react/24/outline";
-import { tokensAtom } from "@/lib/atoms";
+import { Networth, networthAtom, tokensAtom, TVL, tvlAtom } from "@/lib/atoms";
 import LeftArrowIcon from "@/components/svg/LeftArrowIcon";
 import ManageLoanInterface from "@/components/lending/ManageLoanInterface";
-import { ST_VCX, VCX, VeTokenByChain, ZapAssetAddressesByChain } from "@/lib/constants";
+import { FEE_RECIPIENT_PROXY, ST_VCX, VCX, VeTokenByChain, ZapAssetAddressesByChain } from "@/lib/constants";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import StrategyDescription from "@/components/vault/StrategyDescription";
 import ApyChart from "@/components/vault/ApyChart";
 import VaultHero from "@/components/vault/VaultHero";
-import { Address, createPublicClient, formatUnits, http, isAddress, zeroAddress } from "viem";
+import { Address, createPublicClient, erc20Abi, formatUnits, http, isAddress, PublicClient, zeroAddress } from "viem";
 import { mainnet } from "viem/chains";
 import CardStat from "@/components/common/CardStat";
-import { RPC_URLS } from "@/lib/utils/connectors";
+import { RPC_URLS, SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { LockVaultAbi } from "@/lib/constants/abi/LockVault";
 import { useAccount, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import LargeCardStat from "@/components/common/LargeCardStat";
-import { formatAndRoundNumber, formatTwoDecimals, safeRound } from "@/lib/utils/formatBigNumber";
+import { formatAndRoundNumber, formatNumber, formatTwoDecimals, safeRound } from "@/lib/utils/formatBigNumber";
 import NetworkSticker from "@/components/network/NetworkSticker";
 import TokenIcon from "@/components/common/TokenIcon";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import { validateInput } from "@/lib/utils/helpers";
+import zap, { getZapProvider, handleZapAllowance } from "@/lib/vault/zap";
+import MainActionButton from "@/components/button/MainActionButton";
+import ActionSteps from "@/components/vault/ActionSteps";
+import { handleAllowance } from "@/lib/approve";
+import { deposit, increaseDeposit, withdraw } from "@/lib/vault/lockVault/interactions";
+import PseudoRadioButton from "@/components/button/PseudoRadioButton";
+import LockTimeButton from "@/components/button/LockTimeButton";
 
 async function getUserLockVaultData(user: Address, vault: Address) {
   const client = createPublicClient({
@@ -112,7 +119,13 @@ export default function Staking() {
   const [inputToken, setInputToken] = useState<Token>();
   const [outputToken, setOutputToken] = useState<Token>();
   const [inputBalance, setInputBalance] = useState<string>("0");
-  const [lockTime, setLockTime] = useState<number>(0);
+  const [lockTime, setLockTime] = useState<number>(31557600);
+
+  const [actionType, setActionType] = useState<StakeActionType>()
+  const [showModal, setShowModal] = useState<boolean>(false)
+  const [zapProvider, setZapProvider] = useState(ZapProvider.none);
+  const [zapAmount, setZapAmount] = useState<number>(0);
+  const [step, setStep] = useState<number>(0);
 
   useEffect(() => {
     if (Object.keys(tokens).length > 0) {
@@ -120,30 +133,45 @@ export default function Staking() {
         tokens[mainnet.id][VCX],
         ...ZapAssetAddressesByChain[mainnet.id].filter(addr => VCX !== addr).map(addr => tokens[mainnet.id][addr])
       ])
-
-      setAsset(tokens[mainnet.id][VCX])
-      setVault(tokens[mainnet.id][ST_VCX])
-      setWalletValue((tokens[mainnet.id][VCX].balance * tokens[mainnet.id][VCX].price) / 1e18)
-      setDepositValue((tokens[mainnet.id][ST_VCX].balance * tokens[mainnet.id][VCX].price) / 1e18)
-      setTvl((tokens[mainnet.id][ST_VCX].totalSupply * tokens[mainnet.id][VCX].price) / 1e18)
-
+      const _asset = tokens[mainnet.id][VCX]
+      const _vault = tokens[mainnet.id][ST_VCX]
 
       if (account) {
-        getUserLockVaultData(account, ST_VCX).then(res => {
-          setUserLockVaultData(res)
-          setInputToken(res.isExit ? vault : asset)
-          setOutputToken(res.isExit ? asset : vault)
-        })
+        refreshUserData()
       } else {
-        setInputToken(asset)
-        setOutputToken(vault)
+        setInputToken(_asset)
+        setOutputToken(_vault)
+        setActionType(StakeActionType.Deposit)
       }
+
+      setAsset(_asset)
+      setVault(_vault)
+      setWalletValue((_asset.balance * _asset.price) / 1e18)
+      setDepositValue((_vault.balance * _asset.price) / 1e18)
+      setTvl((_vault.totalSupply * _asset.price) / 1e18)
+
     }
   }, [tokens, account]);
+
+  async function refreshUserData() {
+    const _asset = tokens[mainnet.id][VCX];
+    const _vault = tokens[mainnet.id][ST_VCX]
+    const _userLockVaultData = await getUserLockVaultData(account!, ST_VCX)
+    setUserLockVaultData(_userLockVaultData)
+    setInputToken(_userLockVaultData.isExit ? _vault : _asset)
+    setOutputToken(_userLockVaultData.isExit ? _asset : _vault)
+    setActionType(_userLockVaultData.isExit ? StakeActionType.Withdraw : _userLockVaultData.hasLock ? StakeActionType.IncreaseAmount : StakeActionType.Deposit)
+    if (_userLockVaultData.isExit) {
+      setInputBalance(String(_vault.balance / 1e18))
+    }
+  }
 
   function handleChangeInput(e: any) {
     const value = e.currentTarget.value;
     setInputBalance(validateInput(value).isValid ? value : "0");
+
+    setShowModal(false)
+    setZapProvider(ZapProvider.none)
   }
 
   function handleMaxClick() {
@@ -157,23 +185,43 @@ export default function Staking() {
   }
 
   function handleTokenSelect(option: Token) {
+    if (option.address === asset!.address) {
+      setActionType(userLockVaultData.hasLock ? StakeActionType.IncreaseAmount : StakeActionType.Deposit)
+    } else {
+      setActionType(userLockVaultData.hasLock ? StakeActionType.ZapIncreaseAmount : StakeActionType.ZapDeposit)
+    }
     setInputToken(option)
+    setInputBalance("0")
+    setShowModal(false)
+    setZapProvider(ZapProvider.none)
   }
 
-  async function handleMainAction() {
-    let val = Number(inputBalance)
-    if (val === 0 || !inputToken || !outputToken || !asset || !vault || !account || !walletClient) return;
-    val = val * (10 ** inputToken.decimals)
+  async function findZapProvider(): Promise<boolean> {
+    if (!inputToken || !outputToken || !asset || !account) return false
+    const val = Number(inputBalance) * (10 ** inputToken.decimals)
 
-    if (userLockVaultData.isExit) {
-      // exit
+    let newZapProvider = zapProvider
+    showLoadingToast("Searching for the best price...")
+    newZapProvider = await getZapProvider({ sellToken: inputToken, buyToken: asset, amount: val, chainId: 1, account, feeRecipient: FEE_RECIPIENT_PROXY })
+
+
+    setZapProvider(newZapProvider)
+
+    if (newZapProvider === ZapProvider.notFound) {
+      showErrorToast("Zap not available. Please try a different token.")
+      return false
     } else {
-      if (userLockVaultData.hasLock) {
-        // increase
-      } else {
-        // lock
-      }
+      showSuccessToast(`Using ${String(ZapProvider[newZapProvider])} for your zap`)
+      return true
     }
+  }
+
+  async function handlePreview() {
+    let success = true;
+    if ([StakeActionType.ZapDeposit, StakeActionType.ZapIncreaseAmount].includes(actionType!)) {
+      success = await findZapProvider();
+    }
+    if (success) setShowModal(true)
   }
 
   return <NoSSR>
@@ -245,42 +293,17 @@ export default function Staking() {
                       tooltip="Current variable APY of the vault"
                     />
                   </div>
-                  {/* {vaultData.gaugeData?.lowerAPR ?
-                    (
-                      <div className="w-1/2 md:w-max">
+                  {userLockVaultData && userLockVaultData.unlockTime > 0 &&
+                    <>
+                      <div>
                         <LargeCardStat
-                          id={"boost"}
-                          label="Boost APR"
-                          value={`${formatTwoDecimals(vaultData.gaugeData?.lowerAPR * boost)} %`}
-                          tooltip={`Minimum oVCX boost APR based on most current epoch's distribution. (Based on the current emissions for this gauge of
-                     ${formatTwoDecimals((vaultData?.gaugeData.annualEmissions / 5) * boost)} oVCX p. year)`}
+                          id={"unlockDate"}
+                          label="Unlock Date"
+                          value={new Date(userLockVaultData.unlockTime).toLocaleDateString()}
+                          tooltip="Current variable APY of the vault"
                         />
                       </div>
-                    )
-                    : <></>
-                  }
-                  {vaultData.gaugeData?.rewardApy.apy ?
-                    (
-                      <div className="w-1/2 md:w-max">
-                        <LargeCardStat
-                          id={"add-rewards"}
-                          label="Add. Rewards"
-                          value={`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.gaugeData?.rewardApy.apy))} %`}
-                          tooltipChild={
-                            <div className="w-42">
-                              <p className="font-bold">Annual Rewards</p>
-                              {vaultData.gaugeData?.rewardApy.rewards
-                                .filter(reward => reward.emissions > 0)
-                                .map(reward =>
-                                  <p key={reward.address}>{NumberFormatter.format(reward.emissions)} {tokens[vaultData.chainId][reward.address].symbol} | ${NumberFormatter.format(reward.emissionsValue)} | {NumberFormatter.format(roundToTwoDecimalPlaces(reward.apy))}%</p>
-                                )}
-                            </div>
-                          }
-                        />
-                      </div>
-                    )
-                    : <></>
-                  } */}
+                    </>}
                 </div>
               </div>
             </section>
@@ -290,11 +313,6 @@ export default function Staking() {
                 <div className="bg-customNeutral200 p-6 rounded-lg">
                   <p className="text-white text-2xl font-bold">{userLockVaultData?.isExit ? "Withdraw" : "Deposit"}</p>
                   <div className="bg-customNeutral300 px-6 py-6 rounded-lg">
-                    {/*
-                     1. if no lock -> deposit
-                     2. If lock and not expired -> increase
-                     3. If lock and expired -> exit
-                    */}
                     <InputTokenWithError
                       captionText={"Input Amount"}
                       onSelectToken={(option) => handleTokenSelect(option)}
@@ -308,6 +326,16 @@ export default function Staking() {
                       allowSelection={!userLockVaultData?.isExit}
                       allowInput
                     />
+                    {!userLockVaultData?.isExit &&
+                      <div className="flex flex-row items-center w-full space-x-4 mt-4">
+                        <LockTimeButton label="60" handleClick={() => setLockTime(60)} isActive={lockTime === 60} />
+                        <LockTimeButton label="1M" handleClick={() => setLockTime(2629800)} isActive={lockTime === 2629800} />
+                        <LockTimeButton label="3M" handleClick={() => setLockTime(7889400)} isActive={lockTime === 7889400} />
+                        <LockTimeButton label="6M" handleClick={() => setLockTime(15778800)} isActive={lockTime === 15778800} />
+                        <LockTimeButton label="9M" handleClick={() => setLockTime(23668200)} isActive={lockTime === 23668200} />
+                        <LockTimeButton label="12M" handleClick={() => setLockTime(31557600)} isActive={lockTime === 31557600} />
+                      </div>
+                    }
                     <div className="relative py-4">
                       <div className="absolute inset-0 flex items-center" aria-hidden="true">
                         <div className="w-full border-t border-customGray500" />
@@ -329,38 +357,59 @@ export default function Staking() {
                       value={(Number(inputBalance) * Number(inputToken?.price)) /
                         Number(outputToken?.price) || 0}
                       onChange={() => { }}
-                      selectedToken={vault}
+                      selectedToken={outputToken}
                       errorMessage={""}
                       tokenList={[]}
                       allowSelection={false}
                       allowInput={false}
                     />
+                    {!userLockVaultData?.isExit &&
+                      <>
+                        <InputTokenWithError
+                          captionText={"Reward Shares"}
+                          onSelectToken={() => { }}
+                          onMaxClick={() => { }}
+                          chainId={1}
+                          value={((Number(inputBalance) * Number(inputToken?.price))
+                            / Number(outputToken?.price) || 0)
+                            / (31557600 / lockTime)
+                          }
+                          onChange={() => { }}
+                          selectedToken={vault}
+                          errorMessage={""}
+                          tokenList={[]}
+                          allowSelection={false}
+                          allowInput={false}
+                        />
+                      </>
+                    }
                   </div>
+                  <div className="mt-4">
+                    <MainActionButton
+                      label={"Preview"}
+                      handleClick={handlePreview}
+                      disabled={showModal}
+                    />
+                  </div>
+                  {showModal &&
+                    <InteractionContainer
+                      inputToken={inputToken!}
+                      outputToken={outputToken!}
+                      asset={asset}
+                      vault={vault}
+                      amount={Number(inputBalance)}
+                      time={lockTime}
+                      zapProvider={zapProvider}
+                      action={selectActions(actionType!)[0]}
+                      actions={selectActions(actionType!)}
+                      setShowModal={setShowModal}
+                      refreshUserData={refreshUserData}
+                    />
+                  }
                 </div>
               </div>
 
               <div className="w-full md:w-2/3 mt-8 md:mt-0 space-y-4">
-                <div>
-                  <CardStat
-                    id={`${vault.address.slice(1)}-deposit`}
-                    label="Your Deposit"
-                    value={`${formatAndRoundNumber(vault.balance, vault.decimals)}`}
-                    tooltip="Vault Shares held in your wallet"
-                  />
-                  <CardStat
-                    id={`${vault.address.slice(1)}-unlockDate`}
-                    label="Unlock Date"
-                    value={userLockVaultData ? new Date(userLockVaultData.unlockTime).toLocaleDateString() : "?"}
-                    tooltip="The date when you are able to withdraw your funds"
-                  />
-                  <CardStat
-                    id={`${vault.address.slice(1)}-tvl`}
-                    label="Unlockable"
-                    value={userLockVaultData ? String(userLockVaultData.unlocked) : "?"}
-                    tooltip="Can you withdraw your funds"
-                  />
-                </div>
-
                 <div className="bg-customNeutral200 p-6 rounded-lg">
                   <p className="text-white text-2xl font-bold">Information</p>
                   <p className="text-white">
@@ -411,4 +460,301 @@ export default function Staking() {
         <p className="text-white ml-4 md:ml-0">Loading...</p>
     }
   </NoSSR >
+}
+
+interface PassThroughProps {
+  inputToken: Token,
+  outputToken: Token,
+  asset: Token,
+  vault: Token,
+  amount: number,
+  time: number,
+  zapProvider: ZapProvider,
+  action: Action,
+  setShowModal: Function,
+}
+
+function InteractionContainer({ inputToken, outputToken, asset, vault, zapProvider, amount, time, action, actions, setShowModal, refreshUserData }: PassThroughProps & {
+  actions: Action[], refreshUserData: Function
+}): JSX.Element {
+  const [inputAmount, setInputAmount] = useState<number>(amount)
+  const [valueStorage, setValueStorage] = useState<number>(amount)
+  const [currentAction, setCurrentAction] = useState<Action>(action)
+  const [step, setStep] = useState<number>(0);
+
+  const [tvl, setTVL] = useAtom(tvlAtom);
+  const [networth, setNetworth] = useAtom(networthAtom);
+
+  async function interactionPreHook() {
+    if (action === Action.zap) {
+      setValueStorage(asset.balance)
+    }
+  }
+
+  async function interactionPostHook(success: boolean) {
+    if (success) {
+      if (action === Action.deposit) {
+        const val = (amount * vault.price) / 1e18
+        setTVL({ ...tvl, stake: tvl.stake + val, total: tvl.total + val })
+        setNetworth({ ...networth, stake: networth.stake + val, total: networth.total + val })
+        refreshUserData();
+      } else if (action === Action.withdraw) {
+        const val = (amount * vault.price) / 1e18
+        setTVL({ ...tvl, stake: tvl.stake - val, total: tvl.total - val })
+        setNetworth({ ...networth, stake: networth.stake - val, total: networth.total - val })
+        refreshUserData();
+      } else if (action === Action.zap) {
+        setInputAmount(asset.balance - valueStorage)
+      }
+      const nextStep = step + 1
+      setCurrentAction(actions[nextStep])
+      setStep(nextStep)
+    } else {
+      setCurrentAction(Action.done)
+    }
+  }
+
+  return <div className="w-full flex flex-col mt-5">
+    <Interaction
+      inputToken={inputToken}
+      outputToken={outputToken}
+      asset={asset}
+      vault={vault}
+      zapProvider={zapProvider}
+      action={currentAction}
+      amount={inputAmount}
+      time={time}
+      interactionHooks={[interactionPreHook, interactionPostHook]}
+      setShowModal={setShowModal}
+    />
+    <div className="mt-6">
+      <ActionSteps
+        steps={actions.slice(0, -1).map((a, i) => {
+          const isError = action === Action.done && step < actions.length
+          return {
+            step: i + 1,
+            label: getLabel(a),
+            success: i < step,
+            error: isError,
+            loading: !isError && i === step,
+            updateBalance: false
+          }
+        })}
+        stepCounter={step}
+      />
+    </div>
+  </div>
+}
+
+function Interaction({ inputToken, outputToken, asset, vault, zapProvider, amount, time, action, setShowModal, interactionHooks }: PassThroughProps & { interactionHooks: [Function, Function] }): JSX.Element {
+  const [preHook, postHook] = interactionHooks
+  const publicClient = usePublicClient({ chainId: 1 });
+  const { data: walletClient } = useWalletClient();
+  const { address: account, chain } = useAccount();
+  const [tokens, setTokens] = useAtom(tokensAtom);
+
+  async function handleMainAction() {
+    if (!account) return
+    if (action === Action.done) setShowModal(false)
+    const val = amount * (10 ** inputToken.decimals)
+
+    preHook()
+
+    const clients = { publicClient: publicClient!, walletClient: walletClient! }
+    const success = await handleInteraction(
+      inputToken,
+      outputToken,
+      val,
+      time,
+      action,
+      asset,
+      vault,
+      account,
+      zapProvider,
+      clients,
+      [tokens, setTokens]
+    )()
+    postHook(success)
+  }
+
+  return (
+    <>
+      <p className="text-white text-start text-2xl font-bold leading-none mb-1">{getLabel(action)}</p>
+      <p className="text-white text-start mb-2">{getDescription(inputToken, outputToken, amount, action)}</p>
+      <MainActionButton label={getLabel(action)} handleClick={handleMainAction} />
+    </>
+  )
+}
+
+function getDescription(inputToken: Token, outputToken: Token, amount: number, action: Action) {
+  switch (action) {
+    case Action.depositApprove:
+      return `Approving ${amount} ${inputToken.symbol} for Vault deposit.`
+    case Action.zapApprove:
+      return `Approving ${amount} ${inputToken.symbol} for zapping.`
+    case Action.deposit:
+    case Action.increaseAmount:
+      return `Depositing ${amount} ${inputToken.symbol} into the Vault.`
+    case Action.withdraw:
+      return `Withdrawing ${amount} ${inputToken.symbol}.`
+    case Action.zap:
+      return `Selling ${amount} ${inputToken.symbol} for ${outputToken.symbol}.`
+    case Action.done:
+      return ""
+  }
+}
+
+function getLabel(action: Action) {
+  switch (action) {
+    case Action.depositApprove:
+    case Action.zapApprove:
+      return "Approve"
+    case Action.deposit:
+    case Action.increaseAmount:
+      return "Deposit"
+    case Action.withdraw:
+      return "Withdraw"
+    case Action.zap:
+      return "Zap"
+    case Action.done:
+      return "Done"
+  }
+}
+
+
+function selectActions(action: StakeActionType) {
+  switch (action) {
+    case StakeActionType.Deposit:
+      return [
+        Action.depositApprove,
+        Action.deposit,
+        Action.done
+      ]
+    case StakeActionType.ZapDeposit:
+      return [
+        Action.zapApprove,
+        Action.zap,
+        Action.depositApprove,
+        Action.deposit,
+        Action.done
+      ]
+    case StakeActionType.IncreaseAmount:
+      return [
+        Action.depositApprove,
+        Action.increaseAmount,
+        Action.done
+      ]
+    case StakeActionType.ZapIncreaseAmount:
+      return [
+        Action.zapApprove,
+        Action.zap,
+        Action.depositApprove,
+        Action.increaseAmount,
+        Action.done
+      ]
+    case StakeActionType.Withdraw:
+      return [
+        Action.withdraw,
+        Action.done
+      ]
+  }
+}
+
+function handleInteraction(
+  inputToken: Token,
+  outputToken: Token,
+  amount: number,
+  time: number,
+  action: Action,
+  asset: Token,
+  vault: Token,
+  account: Address,
+  zapProvider: ZapProvider,
+  clients: Clients,
+  tokensAtom: [{ [key: number]: TokenByAddress }, Function]
+) {
+  switch (action) {
+    case Action.depositApprove:
+      return () =>
+        handleAllowance({
+          token: inputToken.address,
+          amount,
+          account,
+          spender: vault.address,
+          clients,
+        });
+    case Action.zapApprove:
+      return () => handleZapAllowance({
+        token: inputToken.address,
+        amount,
+        account,
+        zapProvider,
+        clients
+      })
+    case Action.deposit:
+      return () =>
+        deposit({
+          amount,
+          time,
+          account,
+          address: vault.address,
+          chainId: 1,
+          tokensToUpdate: [VCX, ST_VCX],
+          tokensAtom,
+          clients
+        });
+    case Action.increaseAmount:
+      return () => increaseDeposit({
+        amount,
+        account,
+        address: vault.address,
+        chainId: 1,
+        tokensToUpdate: [VCX, ST_VCX],
+        tokensAtom,
+        clients
+      })
+    case Action.withdraw:
+      return () =>
+        withdraw({
+          account,
+          address: vault.address,
+          chainId: 1,
+          tokensToUpdate: [VCX, ST_VCX],
+          tokensAtom,
+          clients
+        })
+    case Action.zap:
+      return () => zap({
+        chainId: 1,
+        sellToken: inputToken,
+        buyToken: outputToken,
+        amount,
+        account,
+        zapProvider,
+        slippage: 100,
+        tradeTimeout: 300,
+        clients,
+        tokensAtom
+      })
+    case Action.done:
+      return () => { }
+  }
+}
+
+enum Action {
+  depositApprove,
+  zapApprove,
+  deposit,
+  increaseAmount,
+  withdraw,
+  zap,
+  done
+}
+
+enum StakeActionType {
+  Deposit,
+  ZapDeposit,
+  IncreaseAmount,
+  ZapIncreaseAmount,
+  Withdraw
 }

@@ -6,26 +6,7 @@ import { handleMaxClick, validateInput } from "@/lib/utils/helpers";
 import { VCX_LP } from "@/lib/constants/addresses";
 import { useAtom } from "jotai";
 import { tokensAtom } from "@/lib/atoms";
-
-function LockTimeButton({
-  label,
-  isActive,
-  handleClick,
-}: {
-  label: string;
-  isActive: boolean;
-  handleClick: Function;
-}): JSX.Element {
-  return (
-    <button
-      className={`w-10 h-10 border border-customGray200 hover:bg-customNeutral200 rounded-lg ${isActive ? "bg-white text-black" : "text-white"
-        }`}
-      onClick={() => handleClick()}
-    >
-      {label}
-    </button>
-  );
-}
+import LockTimeButton from "@/components/button/LockTimeButton";
 
 interface LockVcxInterfaceProps {
   amountState: [string, Dispatch<SetStateAction<string>>];
