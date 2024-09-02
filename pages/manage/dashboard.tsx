@@ -8,7 +8,7 @@ import { AssetPushOracleAbi, AssetPushOracleByChain, BalancerOracleAbi, Exercise
 import { thisPeriodTimestamp } from "@/lib/gauges/utils";
 import { vcx } from "@/lib/resolver/price/resolver";
 import { loadingStyle } from "@/lib/toasts/toastStyles";
-import { TokenByAddress, VaultData } from "@/lib/types";
+import { TokenByAddress, VaultData, VaultLabel } from "@/lib/types";
 import { ChainById, GAUGE_NETWORKS, RPC_URLS, SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { formatNumber, formatTwoDecimals } from "@/lib/utils/formatBigNumber";
 import { previousFriday, previousThursday } from "date-fns";
@@ -311,41 +311,47 @@ function VaultsAlert() {
 
   return vaults.length > 0 && Object.keys(tokens).length > 0 ? (
     <>
-      {vaults.map(vault =>
-        <>
-          {/* Check that Vaults have enough liquid cash */}
-          {(vault.liquid * tokens[vault.chainId][vault.asset].price / (10 ** tokens[vault.chainId][vault.asset].decimals)) < 100_000 ?
-            <div className="w-1/3 p-4">
-              <div className="border border-red-500 bg-red-500 bg-opacity-30 rounded-lg p-4">
-                <p className="text-red-500 text-lg">
-                  Low Cash: {ChainById[vault.chainId].name} {tokens[vault.chainId][vault.asset].symbol}-{vault.strategies.length > 1
-                    ? "Multistrategy"
-                    : vault.strategies[0].metadata.protocol}
-                </p>
-                <p className="text-red-500 text-sm">
-                  {`Free up cash for withdrawals! Either deallocate funds from strategies or convert YieldTokens in strategies. ( $${formatNumber(vault.liquid * tokens[vault.chainId][vault.asset].price / (10 ** tokens[vault.chainId][vault.asset].decimals))} < $100k )`}
-                </p>
-              </div>
-            </div>
-            : <>
-              {((vault.liquid / vault.totalAssets) * 100) < 20 &&
-                <div className="w-1/3 p-4">
-                  <div className="border border-secondaryYellow bg-secondaryYellow bg-opacity-30 rounded-lg p-4">
-                    <p className="text-secondaryYellow text-lg">
-                      Low Cash: {ChainById[vault.chainId].name} {tokens[vault.chainId][vault.asset].symbol}-{vault.strategies.length > 1
-                        ? "Multistrategy"
-                        : vault.strategies[0].metadata.protocol}
-                    </p>
-                    <p className="text-secondaryYellow text-sm">
-                      {`Free up cash for withdrawals. Either deallocate funds from strategies or convert YieldTokens in strategies. (${formatTwoDecimals(vault.liquid / vault.totalAssets * 100)}% < 20% )`}
-                    </p>
-                  </div>
+      {vaults
+        .filter(
+          vault => vault.metadata.labels
+            ? vault.metadata.labels?.filter(label => [VaultLabel.experimental, VaultLabel.deprecated].includes(label)).length === 0
+            : true
+        )
+        .map(vault =>
+          <>
+            {/* Check that Vaults have enough liquid cash */}
+            {(vault.liquid * tokens[vault.chainId][vault.asset].price / (10 ** tokens[vault.chainId][vault.asset].decimals)) < 100_000 ?
+              <div className="w-1/3 p-4">
+                <div className="border border-red-500 bg-red-500 bg-opacity-30 rounded-lg p-4">
+                  <p className="text-red-500 text-lg">
+                    Low Cash: {ChainById[vault.chainId].name} {tokens[vault.chainId][vault.asset].symbol}-{vault.strategies.length > 1
+                      ? "Multistrategy"
+                      : vault.strategies[0].metadata.protocol}
+                  </p>
+                  <p className="text-red-500 text-sm">
+                    {`Free up cash for withdrawals! Either deallocate funds from strategies or convert YieldTokens in strategies. ( $${formatNumber(vault.liquid * tokens[vault.chainId][vault.asset].price / (10 ** tokens[vault.chainId][vault.asset].decimals))} < $100k )`}
+                  </p>
                 </div>
-              }
-            </>
-          }
-        </>
-      )}
+              </div>
+              : <>
+                {((vault.liquid / vault.totalAssets) * 100) < 20 &&
+                  <div className="w-1/3 p-4">
+                    <div className="border border-secondaryYellow bg-secondaryYellow bg-opacity-30 rounded-lg p-4">
+                      <p className="text-secondaryYellow text-lg">
+                        Low Cash: {ChainById[vault.chainId].name} {tokens[vault.chainId][vault.asset].symbol}-{vault.strategies.length > 1
+                          ? "Multistrategy"
+                          : vault.strategies[0].metadata.protocol}
+                      </p>
+                      <p className="text-secondaryYellow text-sm">
+                        {`Free up cash for withdrawals. Either deallocate funds from strategies or convert YieldTokens in strategies. (${formatTwoDecimals(vault.liquid / vault.totalAssets * 100)}% < 20% )`}
+                      </p>
+                    </div>
+                  </div>
+                }
+              </>
+            }
+          </>
+        )}
     </>
   )
     : <></>
@@ -368,64 +374,148 @@ function VaultsDashboard({ dashboardData }: { dashboardData: any }) {
   // - last harvested
   return vaults.length > 0 && Object.keys(tokens).length > 0 ?
     (
-      <div className="flex flex-row flex-wrap w-full">
-        {vaults.sort((a, b) => (b.totalAssets - b.liquid) - (a.totalAssets - a.liquid)).map(vault =>
-          <div key={vault.address} className="w-1/2 p-2">
-            <div className="group border rounded-lg w-full px-8 py-4 bg-customNeutral300 border-customNeutral100 border-opacity-75">
-              <div className="w-full flex flex-row items-center justify-center">
-                <AssetWithName vault={vault} />
-              </div>
-              <div className="text-white flex flex-row py-2 border-b border-customGray500">
-                <CardStat
-                  id={`wallet`}
-                  label="TotalAssets"
-                  value={`${formatNumber(vault.totalAssets / (10 ** tokens[vault.chainId][vault.asset].decimals))}`}
-                />
-                <CardStat
-                  id={`Liquid`}
-                  label="Liquid"
-                  value={`${formatNumber(vault.liquid / (10 ** tokens[vault.chainId][vault.asset].decimals))}`}
-                  secondaryValue={`${formatTwoDecimals((vault.liquid / vault.totalAssets) * 100)} %`}
-                />
-                <CardStat
-                  id={`wallet`}
-                  label="Idle"
-                  value={`${formatNumber(vault.idle / (10 ** tokens[vault.chainId][vault.asset].decimals))}`}
-                />
-              </div>
-              <div className="mt-4 space-y-4">
-                {vault.strategies.map(strategy =>
-                  <div className="text-white" key={strategy.address}>
-                    <div className="w-max flex flex-row items-center">
-                      <img
-                        src={IconByProtocol[strategy.metadata.protocol] || "/images/tokens/vcx.svg"}
-                        className={`h-4 w-4 mr-2 mb-1.5 rounded-full border border-white`}
-                      />
-                      <h2 className="text-lg text-white">
-                        {strategy.metadata.protocol} - {strategy.metadata.name}
-                      </h2>
-                    </div>
-                    <div className="flex flex-row items-center">
-                      <CardStat
-                        id={`wallet`}
-                        label="Allocation"
-                        value={formatNumber(strategy.allocation / (10 ** tokens[vault.chainId][vault.asset].decimals))}
-                        secondaryValue={`${formatTwoDecimals(strategy.allocationPerc * 100)} %`}
-                      />
-                      <CardStat
-                        id={`wallet`}
-                        label="Liquid"
-                        value={formatNumber(strategy.allocation / (10 ** tokens[vault.chainId][vault.asset].decimals))}
-                        secondaryValue={`${formatTwoDecimals((strategy.idle / strategy.allocation) * 100)} %`}
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
+      <div className="mt-8 flow-root">
+        <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+          <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+            <table className="min-w-full">
+              <thead className="">
+                <tr>
+                  <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-white sm:pl-3">
+                    Name
+                  </th>
+                  <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-white">
+                    Assets
+                  </th>
+                  <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-white">
+                    Liquid
+                  </th>
+                  <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-white">
+                    Liquid %
+                  </th>
+                  <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-white">
+                    Idle
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="">
+                {vaults
+                  .map(vault =>
+                    <>
+                      <tr className="border-t border-gray-200">
+                        <th
+                          scope="colgroup"
+                          colSpan={5}
+                          className="bg-customGray600 py-2 pl-4 pr-3 text-left text-sm font-semibold text-white sm:pl-3"
+                        >
+                          <AssetWithName vault={vault} />
+                        </th>
+                      </tr>
+                      <tr
+                        className="border-gray-300 border-t"
+                      >
+                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-white sm:pl-3">
+                          Vault
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          {formatNumber(vault.totalAssets / (10 ** tokens[vault.chainId][vault.asset].decimals))}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          {formatNumber(vault.liquid / (10 ** tokens[vault.chainId][vault.asset].decimals))}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          {formatTwoDecimals(vault.liquid / vault.totalAssets)} %
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          {formatNumber(vault.idle / (10 ** tokens[vault.chainId][vault.asset].decimals))}
+                        </td>
+                      </tr>
+                      {vault.strategies.map(strategy => (
+                        <tr
+                          key={vault.address + strategy.address}
+                          className="border-gray-200 border-t"
+                        >
+                          <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-white sm:pl-3">
+                            {strategy.metadata.protocol} - {strategy.metadata.name}
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                            {formatNumber(strategy.allocation / (10 ** tokens[vault.chainId][vault.asset].decimals))}
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                            {formatNumber(strategy.idle / (10 ** tokens[vault.chainId][vault.asset].decimals))}
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                            {formatTwoDecimals((strategy.idle / strategy.allocation) * 100)} %
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                            0
+                          </td>
+                        </tr>
+                      ))}
+                    </>
+                  )}
+              </tbody>
+            </table>
           </div>
-        )}
-      </div >
+        </div>
+      </div>
+      // <div className="flex flex-row flex-wrap w-full">
+      //   {vaults.sort((a, b) => (b.totalAssets - b.liquid) - (a.totalAssets - a.liquid)).map(vault =>
+      //     <div key={vault.address} className="w-1/2 p-2">
+      //       <div className="group border rounded-lg w-full px-8 py-4 bg-customNeutral300 border-customNeutral100 border-opacity-75">
+      //         <div className="w-full flex flex-row items-center justify-center">
+      //           <AssetWithName vault={vault} />
+      //         </div>
+      //         <div className="text-white flex flex-row py-2 border-b border-customGray500">
+      //           <CardStat
+      //             id={`wallet`}
+      //             label="TotalAssets"
+      //             value={`${formatNumber(vault.totalAssets / (10 ** tokens[vault.chainId][vault.asset].decimals))}`}
+      //           />
+      //           <CardStat
+      //             id={`Liquid`}
+      //             label="Liquid"
+      //             value={`${formatNumber(vault.liquid / (10 ** tokens[vault.chainId][vault.asset].decimals))}`}
+      //             secondaryValue={`${formatTwoDecimals((vault.liquid / vault.totalAssets) * 100)} %`}
+      //           />
+      //           <CardStat
+      //             id={`wallet`}
+      //             label="Idle"
+      //             value={`${formatNumber(vault.idle / (10 ** tokens[vault.chainId][vault.asset].decimals))}`}
+      //           />
+      //         </div>
+      //         <div className="mt-4 space-y-4">
+      //           {vault.strategies.map(strategy =>
+      //             <div className="text-white" key={strategy.address}>
+      //               <div className="w-max flex flex-row items-center">
+      //                 <img
+      //                   src={IconByProtocol[strategy.metadata.protocol] || "/images/tokens/vcx.svg"}
+      //                   className={`h-4 w-4 mr-2 mb-1.5 rounded-full border border-white`}
+      //                 />
+      //                 <h2 className="text-lg text-white">
+      //                   {strategy.metadata.protocol} - {strategy.metadata.name}
+      //                 </h2>
+      //               </div>
+      //               <div className="flex flex-row items-center">
+      //                 <CardStat
+      //                   id={`wallet`}
+      //                   label="Allocation"
+      //                   value={formatNumber(strategy.allocation / (10 ** tokens[vault.chainId][vault.asset].decimals))}
+      //                   secondaryValue={`${formatTwoDecimals(strategy.allocationPerc * 100)} %`}
+      //                 />
+      //                 <CardStat
+      //                   id={`wallet`}
+      //                   label="Liquid"
+      //                   value={formatNumber(strategy.allocation / (10 ** tokens[vault.chainId][vault.asset].decimals))}
+      //                   secondaryValue={`${formatTwoDecimals((strategy.idle / strategy.allocation) * 100)} %`}
+      //                 />
+      //               </div>
+      //             </div>
+      //           )}
+      //         </div>
+      //       </div>
+      //     </div>
+      //   )}
+      // </div >
     )
     : <p className="text-white">Loading...</p>
 }
