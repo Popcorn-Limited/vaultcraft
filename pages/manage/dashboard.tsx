@@ -1,12 +1,16 @@
+import AssetWithName from "@/components/common/AssetWithName";
+import CardStat from "@/components/common/CardStat";
+import { IconByProtocol } from "@/components/common/ProtocolIcon";
 import TabSelector from "@/components/common/TabSelector";
 import { tokensAtom } from "@/lib/atoms";
+import { vaultsAtom } from "@/lib/atoms/vaults";
 import { AssetPushOracleAbi, AssetPushOracleByChain, BalancerOracleAbi, ExerciseByChain, ExerciseOracleByChain, OptionTokenByChain, OVCX_ORACLE, VCX, VcxByChain, WETH, XVCXByChain } from "@/lib/constants";
 import { thisPeriodTimestamp } from "@/lib/gauges/utils";
 import { vcx } from "@/lib/resolver/price/resolver";
 import { loadingStyle } from "@/lib/toasts/toastStyles";
-import { TokenByAddress } from "@/lib/types";
+import { TokenByAddress, VaultData } from "@/lib/types";
 import { ChainById, GAUGE_NETWORKS, RPC_URLS, SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
-import { formatNumber } from "@/lib/utils/formatBigNumber";
+import { formatNumber, formatTwoDecimals } from "@/lib/utils/formatBigNumber";
 import { previousFriday, previousThursday } from "date-fns";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
@@ -198,6 +202,8 @@ export default function Dashboard() {
 }
 
 function AlertSection({ dashboardData }: { dashboardData: any }) {
+  const [vaults] = useAtom(vaultsAtom)
+
   // TODO
   // - Add alert for stale asset oracle
   // - Add alert for stale harvest
@@ -295,17 +301,82 @@ function OptionTokenAlert({ chainId, vcxData }: { chainId: number, vcxData: any 
 // TODO Add alert for stale asset oracle
 
 function VaultsDashboard({ dashboardData }: { dashboardData: any }) {
+  const [vaultsData] = useAtom(vaultsAtom)
+  const [tokens] = useAtom(tokensAtom)
+  const [vaults, setVaults] = useState<VaultData[]>([]);
+
+  useEffect(() => {
+    if (Object.keys(vaultsData).length > 0 && vaults.length === 0) {
+      setVaults(SUPPORTED_NETWORKS.map((chain) => vaultsData[chain.id]).flat());
+    }
+  }, [vaultsData, vaults]);
+
   // TODO
-  // - liquid cash of vaults and strategies
   // - add strategy into its own atom
-  // - add withdrawal limits on vaults to [id]-page
   // - fees
   // - last harvested
-  return (
-    <>
-      <p className="text-white">Coming Soon. Check out the other Dashboards in the mean time...</p>
-    </>
-  )
+  return vaults.length > 0 && Object.keys(tokens).length > 0 ?
+    (
+      <div className="flex flex-row flex-wrap w-full">
+        {vaults.sort((a, b) => (b.totalAssets - b.liquid) - (a.totalAssets - a.liquid)).map(vault =>
+          <div key={vault.address} className="w-1/2 p-2">
+            <div className="group border rounded-lg w-full px-8 py-4 bg-customNeutral300 border-customNeutral100 border-opacity-75">
+              <div className="w-full flex flex-row items-center justify-center">
+                <AssetWithName vault={vault} />
+              </div>
+              <div className="text-white flex flex-row py-2 border-b border-customGray500">
+                <CardStat
+                  id={`wallet`}
+                  label="TotalAssets"
+                  value={`${formatNumber(vault.totalAssets / (10 ** tokens[vault.chainId][vault.asset].decimals))}`}
+                />
+                <CardStat
+                  id={`Liquid`}
+                  label="Liquid"
+                  value={`${formatNumber(vault.liquid / (10 ** tokens[vault.chainId][vault.asset].decimals))}`}
+                  secondaryValue={`${formatTwoDecimals((vault.liquid / vault.totalAssets) * 100)} %`}
+                />
+                <CardStat
+                  id={`wallet`}
+                  label="Idle"
+                  value={`${formatNumber(vault.idle / (10 ** tokens[vault.chainId][vault.asset].decimals))}`}
+                />
+              </div>
+              <div className="mt-4 space-y-4">
+                {vault.strategies.map(strategy =>
+                  <div className="text-white" key={strategy.address}>
+                    <div className="w-max flex flex-row items-center">
+                      <img
+                        src={IconByProtocol[strategy.metadata.protocol] || "/images/tokens/vcx.svg"}
+                        className={`h-4 w-4 mr-2 mb-1.5 rounded-full border border-white`}
+                      />
+                      <h2 className="text-lg text-white">
+                        {strategy.metadata.protocol} - {strategy.metadata.name}
+                      </h2>
+                    </div>
+                    <div className="flex flex-row items-center">
+                      <CardStat
+                        id={`wallet`}
+                        label="Allocation"
+                        value={formatNumber(strategy.allocation / (10 ** tokens[vault.chainId][vault.asset].decimals))}
+                        secondaryValue={`${formatTwoDecimals(strategy.allocationPerc * 100)} %`}
+                      />
+                      <CardStat
+                        id={`wallet`}
+                        label="Liquid"
+                        value={formatNumber(strategy.allocation / (10 ** tokens[vault.chainId][vault.asset].decimals))}
+                        secondaryValue={`${formatTwoDecimals((strategy.idle / strategy.allocation) * 100)} %`}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </div >
+    )
+    : <p className="text-white">Loading...</p>
 }
 
 function VCXDashboard({ dashboardData }: { dashboardData: any }) {
