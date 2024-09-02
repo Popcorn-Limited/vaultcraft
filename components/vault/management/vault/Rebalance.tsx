@@ -2,8 +2,7 @@ import MainActionButton from "@/components/button/MainActionButton";
 import { IconByProtocol } from "@/components/common/ProtocolIcon";
 import TabSelector from "@/components/common/TabSelector";
 import InputNumber from "@/components/input/InputNumber";
-import { tokensAtom } from "@/lib/atoms";
-import { yieldOptionsAtom } from "@/lib/atoms/sdk";
+import { strategiesAtom, tokensAtom } from "@/lib/atoms";
 import { addStrategyData } from "@/lib/getTokenAndVaultsData";
 import { Token, VaultAllocation, VaultData } from "@/lib/types";
 import { validateInput } from "@/lib/utils/helpers";
@@ -22,8 +21,8 @@ export default function VaultRebalance({
   const { data: walletClient } = useWalletClient();
   const { switchChainAsync } = useSwitchChain();
 
-  const [yieldOptions] = useAtom(yieldOptionsAtom)
   const [tokens] = useAtom(tokensAtom)
+  const [strategies] = useAtom(strategiesAtom)
   const [asset, setAsset] = useState<Token>()
 
   const { data: blockNumber } = useBlockNumber({ watch: true })
@@ -75,7 +74,7 @@ export default function VaultRebalance({
   }
 
   async function handleMainAction() {
-    if (inputValues.reduce((a, b) => Number(a) + Number(b), 0) === 0 || !asset || !vaultData || !account || !walletClient || !yieldOptions) return;
+    if (inputValues.reduce((a, b) => Number(a) + Number(b), 0) === 0 || !asset || !vaultData || !account || !walletClient || !strategies) return;
 
     if (chain?.id !== vaultData.chainId) {
       try {
@@ -111,7 +110,7 @@ export default function VaultRebalance({
       })
 
       if (success) {
-        const updatedVault = await addStrategyData({ [vaultData.address]: vaultData }, vaultData.chainId, publicClient!)
+        const updatedVault = await addStrategyData({ [vaultData.address]: vaultData }, strategies[vaultData.chainId], publicClient!)
         vaultData = updatedVault[vaultData.address]
       }
       return
@@ -137,7 +136,7 @@ export default function VaultRebalance({
       })
 
       if (success) {
-        const updatedVault = await addStrategyData({ [vaultData.address]: vaultData }, vaultData.chainId, publicClient!)
+        const updatedVault = await addStrategyData({ [vaultData.address]: vaultData }, strategies[vaultData.chainId], publicClient!)
         vaultData = updatedVault[vaultData.address]
       }
       return

@@ -10,25 +10,15 @@ import {
 } from "viem";
 import axios from "axios";
 import { VaultAbi } from "@/lib/constants/abi/Vault";
-import { LlamaApy, TokenByAddress, VaultData, VaultDataByAddress, VaultLabel } from "@/lib/types";
+import { Strategy, StrategyByAddress, TokenByAddress, VaultData, VaultDataByAddress, VaultLabel } from "@/lib/types";
 import { ChildGaugeAbi, ERC20Abi, GaugeAbi, OptionTokenByChain, VCX, VCX_LP, VE_VCX, VeTokenByChain, XVCXByChain, ZapAssetAddressesByChain } from "@/lib/constants";
 import { GAUGE_NETWORKS, RPC_URLS } from "@/lib/utils/connectors";
 import { YieldOptions } from "vaultcraft-sdk";
-import getFraxlendApy from "@/lib/external/fraxlend/getFraxlendApy";
 import { prepareAssets, prepareVaults, addBalances, prepareGauges } from "@/lib/tokens";
 import getGaugesData from "@/lib/gauges/getGaugeData";
-import { mainnet, xLayer } from "viem/chains";
-import { numberFormat } from "highcharts";
-
-
-const EMPTY_LLAMA_APY_ENTRY: LlamaApy = {
-  apy: 0,
-  apyBase: 0,
-  apyReward: 0,
-  tvl: 0,
-  date: new Date(),
-}
-
+import { mainnet } from "viem/chains";
+import prepareStrategies from "@/lib/prepareStrategies";
+import { EMPTY_LLAMA_APY_ENTRY, getApy } from "@/lib/resolver/apy";
 
 interface GetVaultsByChainProps {
   chain: Chain;
@@ -40,7 +30,7 @@ export default async function getTokenAndVaultsDataByChain({
   chain,
   account = zeroAddress,
   yieldOptions,
-}: GetVaultsByChainProps): Promise<{ vaultsData: VaultData[], tokens: TokenByAddress }> {
+}: GetVaultsByChainProps): Promise<{ vaultsData: VaultData[], tokens: TokenByAddress, strategies: StrategyByAddress }> {
   const client = createPublicClient({
     chain,
     transport: http(RPC_URLS[chain.id]),
@@ -56,8 +46,10 @@ export default async function getTokenAndVaultsDataByChain({
   // Add apyHist
   vaultsData = await addApyHist(vaultsData)
 
+  const strategies = await prepareStrategies(vaultsData, chainId, client)
+
   // Add strategy data
-  vaultsData = await addStrategyData(vaultsData, chainId, client)
+  vaultsData = await addStrategyData(vaultsData, strategies, client)
 
   // Create token array
   const uniqueAssetAdresses: Address[] = [...ZapAssetAddressesByChain[chainId]];
@@ -136,7 +128,7 @@ export default async function getTokenAndVaultsDataByChain({
     vaultsData = await addGaugeData(vaultsData, assets, gauges, account, chainId)
   }
 
-  return { vaultsData: Object.values(vaultsData), tokens };
+  return { vaultsData: Object.values(vaultsData), tokens, strategies };
 }
 
 async function getInitialVaultsData(chainId: number, client: PublicClient): Promise<VaultDataByAddress> {
@@ -273,115 +265,7 @@ async function addApyHist(vaults: VaultDataByAddress): Promise<VaultDataByAddres
   return vaults
 }
 
-
-async function getCustomApy(address: Address, apyId: string, chainId: number): Promise<LlamaApy[]> {
-  switch (apyId) {
-    case "fraxlend":
-      return getFraxlendApy(address, chainId);
-    default:
-      return [EMPTY_LLAMA_APY_ENTRY]
-  }
-}
-
-async function getApy(apyId: string): Promise<LlamaApy[]> {
-  try {
-    const { data } = await axios.get(`https://pro-api.llama.fi/${process.env.DEFILLAMA_API_KEY}/yields/chart/${apyId}`)
-    return data.data.map((entry: any) => { return { apy: entry.apy, apyBase: entry.apyBase, apyReward: entry.apyReward, tvl: entry.tvlUsd, date: new Date(entry.timestamp) } })
-  } catch (e) {
-    console.log("ERROR FETCHING APY ", + apyId)
-    console.log(e)
-    return [EMPTY_LLAMA_APY_ENTRY]
-  }
-}
-
-export async function addStrategyData(vaults: VaultDataByAddress, chainId: number, client: PublicClient): Promise<VaultDataByAddress> {
-  const uniqueStrategyAdresses: Address[] = [];
-  Object.values(vaults).forEach((vault) => {
-    vault.strategies.forEach((strategy: any) => {
-      if (!uniqueStrategyAdresses.includes(strategy.address)) {
-        uniqueStrategyAdresses.push(strategy.address);
-      }
-    })
-  });
-
-  const { data: strategyDescriptions } = await axios.get(
-    `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/descriptions/strategies/${chainId}.json`
-  );
-
-  // Get TotalAssets and TotalSupply
-  // @ts-ignore
-  const taAndTs = await client.multicall({
-    contracts: uniqueStrategyAdresses
-      .map((address: Address) => {
-        return [
-          {
-            address: address,
-            abi: VaultAbi,
-            functionName: "totalAssets"
-          },
-          {
-            address: address,
-            abi: VaultAbi,
-            functionName: "totalSupply"
-          },
-          {
-            address: strategyDescriptions[address].asset,
-            abi: erc20Abi,
-            functionName: "balanceOf",
-            args: [address]
-          }
-        ]
-      })
-      .flat(),
-    allowFailure: false,
-  });
-
-  let strategies: { [key: Address]: any } = {}
-
-  await Promise.all(
-    // We use map here since Promise.all doesnt work on a forEach
-    uniqueStrategyAdresses.map(async (address, i) => {
-      if (i > 0) i = i * 3;
-
-      const totalAssets = Number(taAndTs[i]);
-      const totalSupply = Number(taAndTs[i + 1]);
-      const assetsPerShare =
-        totalSupply > 0 ? totalAssets / totalSupply : Number(1);
-
-      const desc = strategyDescriptions[address]
-      let apy = 0;
-      let apyHist: LlamaApy[] = []
-
-      try {
-        const strategyApy = desc.apySource === "custom" ? await getCustomApy(address, desc.apyId, chainId) : await getApy(desc.apyId)
-        apy = strategyApy[strategyApy.length - 1].apy;
-        apyHist = strategyApy;
-      } catch (e) {
-        console.log(`ERROR FETCHING APY: ${address} - ${desc.apySource}=${desc.apyId}`)
-        console.log(e)
-        apyHist = [EMPTY_LLAMA_APY_ENTRY]
-      }
-      const descriptionSplit = desc.description.split("** - ");
-
-      strategies[address] = {
-        totalAssets,
-        totalSupply,
-        assetsPerShare,
-        asset: desc.asset,
-        name: descriptionSplit[0],
-        protocol: desc.name,
-        description: descriptionSplit[1],
-        resolver: desc.resolver,
-        type: desc.type ?? "Vanilla",
-        yieldAsset: desc.yieldAsset || undefined,
-        apy,
-        apyHist,
-        apyId: desc.apyId,
-        apySource: desc.apySource,
-        idle: desc.type === "AnyToAnyV1" ? Number(taAndTs[i + 2]) : totalAssets
-      }
-    }))
-
+export async function addStrategyData(vaults: VaultDataByAddress, strategies: { [key: Address]: Strategy }, client: PublicClient): Promise<VaultDataByAddress> {
   const strategyBalances = await client.multicall({
     contracts:
       Object.values(vaults)
@@ -405,19 +289,24 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
     if (vaults[address].strategies.length === 0) {
       vaults[address].strategies[0] = {
         address: zeroAddress,
+        asset: vaults[address].asset,
+        yieldAsset: undefined,
         metadata: {
           name: "Stake",
           protocol: "VaultCraft",
           description: "This vault holds funds to incentivise via gauges.",
+          type: "Vanilla"
         },
         resolver: "",
-        type: "Vanilla",
         allocation: vaults[address].totalAssets,
         allocationPerc: 1,
         apy: 0,
         apyHist: [EMPTY_LLAMA_APY_ENTRY],
         apyId: "",
         apySource: "custom",
+        totalAssets: vaults[address].totalAssets,
+        totalSupply: vaults[address].totalSupply,
+        assetsPerShare: vaults[address].assetsPerShare,
         idle: vaults[address].totalAssets
       }
       liquid = vaults[address].totalAssets
@@ -430,28 +319,16 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
 
         // calc allocation percentage
         const allocationPerc = (allocation / vaults[address].totalAssets) || 0
-        
+
         // Idle assets in the strategy accessiable by the vault
-        const idle = strategyData.type === "AnyToAnyV1" ? strategyData.idle : allocation
+        const idle = strategyData.metadata.type === "AnyToAnyV1" ? strategyData.idle : allocation
 
         // add strategy metadata
         vaults[address].strategies[i] = {
-          address: strategy.address,
-          metadata: {
-            name: strategyData.name.replace("**", ""),
-            protocol: strategyData.protocol,
-            description: strategyData.description,
-          },
-          type: strategyData.type,
-          yieldAsset: strategyData.yieldAsset,
-          resolver: strategyData.resolver,
-          allocation: allocation,
-          allocationPerc: allocationPerc,
-          apy: strategyData.apy,
-          apyHist: strategyData.apyHist,
-          apyId: strategyData.apyId,
-          apySource: strategyData.apySource,
-          idle: idle
+          ...strategyData,
+          allocation,
+          allocationPerc,
+          idle
         }
 
         // calc blended apy of the vault

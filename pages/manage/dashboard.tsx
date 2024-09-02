@@ -1,20 +1,15 @@
 import AssetWithName from "@/components/common/AssetWithName";
-import CardStat from "@/components/common/CardStat";
-import { IconByProtocol } from "@/components/common/ProtocolIcon";
 import TabSelector from "@/components/common/TabSelector";
-import { tokensAtom } from "@/lib/atoms";
+import { strategiesAtom, tokensAtom } from "@/lib/atoms";
 import { vaultsAtom } from "@/lib/atoms/vaults";
-import { AssetPushOracleAbi, AssetPushOracleByChain, BalancerOracleAbi, ExerciseByChain, ExerciseOracleByChain, OptionTokenByChain, OVCX_ORACLE, VCX, VcxByChain, WETH, XVCXByChain } from "@/lib/constants";
+import { AssetPushOracleAbi, AssetPushOracleByChain, BalancerOracleAbi, ExerciseByChain, ExerciseOracleByChain, OptionTokenByChain, OVCX_ORACLE, VCX, VcxByChain, WETH } from "@/lib/constants";
 import { thisPeriodTimestamp } from "@/lib/gauges/utils";
-import { vcx } from "@/lib/resolver/price/resolver";
-import { loadingStyle } from "@/lib/toasts/toastStyles";
 import { TokenByAddress, VaultData, VaultLabel } from "@/lib/types";
 import { ChainById, GAUGE_NETWORKS, RPC_URLS, SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { formatNumber, formatTwoDecimals } from "@/lib/utils/formatBigNumber";
-import { previousFriday, previousThursday } from "date-fns";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
-import { createPublicClient, erc20Abi, http, parseAbi, parseAbiItem, PublicClient, zeroAddress } from "viem";
+import { createPublicClient, erc20Abi, http, parseAbiItem, PublicClient, zeroAddress } from "viem";
 
 async function loadDashboardData(tokens: { [key: number]: TokenByAddress }) {
   const vcxData = await loadVCXData(tokens);
@@ -163,7 +158,26 @@ async function loadAssetOracleDataByChain(chainId: number) {
     fromBlock: "earliest",
     toBlock: "latest"
   });
-  return logs
+
+  // Get unique base-quote pairs
+  let uniqueKeys: string[] = []
+  logs.forEach(log => {
+    if (!uniqueKeys.includes(String(log.args.base! + log.args.quote!))) {
+      uniqueKeys.push(String(log.args.base! + log.args.quote!));
+    }
+  })
+
+  // Find the latest event of each base-quote pair
+  const latestLogs = uniqueKeys.map(key => logs.findLast(log => String(log.args.base! + log.args.quote!) === key))
+
+  let result: any[] = []
+  await Promise.all(
+    latestLogs.map(async (log: any) => {
+      const block = await client.getBlock({ blockNumber: log.blockNumber! })
+      result.push({ lastUpdate: block.timestamp, log })
+    })
+  )
+  return result
 }
 
 const DEFAULT_TABS = ["Vaults", "VCX", "Oracles", "Automation"]
@@ -203,7 +217,6 @@ export default function Dashboard() {
 
 function AlertSection({ dashboardData }: { dashboardData: any }) {
   // TODO
-  // - Add alert for stale asset oracle
   // - Add alert for stale harvest
   // - Add alert for low 1Balance + eth bal gelato
   // - Add alert for low balance trade bot
@@ -212,9 +225,10 @@ function AlertSection({ dashboardData }: { dashboardData: any }) {
   if (!dashboardData || Object.keys(dashboardData).length === 0) return <></>
   return (
     <div className="flex flex-row flex-wrap">
+      <VaultsAlert />
+      {GAUGE_NETWORKS.map(chainId => <AssetTokenOracleAlert key={"assetOracleAlert-" + chainId} chainId={chainId} assetOracleData={dashboardData.assetOracleData[chainId]} />)}
       {GAUGE_NETWORKS.map(chainId => <OptionTokenOracleAlert key={"ovcxOracleAlert-" + chainId} chainId={chainId} vcxData={dashboardData.vcxData[chainId]} />)}
       {GAUGE_NETWORKS.map(chainId => <OptionTokenAlert key={"ovcxAlert-" + chainId} chainId={chainId} vcxData={dashboardData.vcxData[chainId]} />)}
-      <VaultsAlert />
     </div>
   )
 }
@@ -236,11 +250,11 @@ function OptionTokenOracleAlert({ chainId, vcxData }: { chainId: number, vcxData
         </div>
       }
 
-      {/* Check that the update isnt longer than 15min ago */}
+      {/* Check that the update isnt longer than 60min ago */}
       {(lastUpdate + updateFrequency) < Number(new Date()) &&
         <div className="w-1/3 p-4">
           <div className="border border-secondaryYellow bg-secondaryYellow bg-opacity-30 rounded-lg p-4">
-            <p className="text-secondaryYellow text-lg">Stale Oracle: {ChainById[chainId].name}</p>
+            <p className="text-secondaryYellow text-lg">Stale oVCX Oracle: {ChainById[chainId].name}</p>
             <p className="text-secondaryYellow text-sm">
               Oracle has been stale. Last update occured {new Date(lastUpdate).toLocaleString()}
             </p>
@@ -296,7 +310,44 @@ function OptionTokenAlert({ chainId, vcxData }: { chainId: number, vcxData: any 
   )
 }
 
-// TODO Add alert for stale asset oracle
+function AssetTokenOracleAlert({ chainId, assetOracleData }: { chainId: number, assetOracleData: any }) {
+  const [strategies] = useAtom(strategiesAtom)
+  const [tokens] = useAtom(tokensAtom)
+
+  const updateFrequency = 3600000 // 60 minutes
+
+  if (
+    Object.keys(strategies).length === 0 ||
+    Object.keys(strategies).length === 0 ||
+    !assetOracleData ||
+    assetOracleData?.length === 0
+  ) return <></>
+  return assetOracleData
+    .filter((log: any) =>
+      !!Object.values(strategies[chainId])
+        .filter(strategy => strategy.yieldAsset)
+        .find(strategy =>
+          (strategy.yieldAsset === log.log.args.quote && strategy.asset === log.log.args.base)
+          || (strategy.asset === log.log.args.quote && strategy.yieldAsset === log.log.args.base))
+    )
+    .map((log: any) =>
+      <>
+        {/* Check that the update isnt longer than 60min ago */}
+        {((Number(log.lastUpdate) * 1000) + updateFrequency) < Number(new Date()) &&
+          <div className="w-1/3 p-4">
+            <div className="border border-secondaryYellow bg-secondaryYellow bg-opacity-30 rounded-lg p-4">
+              <p className="text-secondaryYellow text-lg">
+                Stale Asset Oracle: {ChainById[chainId].name} {tokens[chainId][log.log.args.base].symbol}-{tokens[chainId][log.log.args.quote].symbol}
+              </p>
+              <p className="text-secondaryYellow text-sm">
+                Oracle has been stale. Last update occured {new Date(Number(log.lastUpdate) * 1000).toLocaleString()}
+              </p>
+            </div>
+          </div>
+        }
+      </>
+    )
+}
 
 function VaultsAlert() {
   const [vaultsData] = useAtom(vaultsAtom)
@@ -369,7 +420,6 @@ function VaultsDashboard({ dashboardData }: { dashboardData: any }) {
   }, [vaultsData, vaults]);
 
   // TODO
-  // - add strategy into its own atom
   // - fees
   // - last harvested
   return vaults.length > 0 && Object.keys(tokens).length > 0 ?
@@ -458,64 +508,6 @@ function VaultsDashboard({ dashboardData }: { dashboardData: any }) {
           </div>
         </div>
       </div>
-      // <div className="flex flex-row flex-wrap w-full">
-      //   {vaults.sort((a, b) => (b.totalAssets - b.liquid) - (a.totalAssets - a.liquid)).map(vault =>
-      //     <div key={vault.address} className="w-1/2 p-2">
-      //       <div className="group border rounded-lg w-full px-8 py-4 bg-customNeutral300 border-customNeutral100 border-opacity-75">
-      //         <div className="w-full flex flex-row items-center justify-center">
-      //           <AssetWithName vault={vault} />
-      //         </div>
-      //         <div className="text-white flex flex-row py-2 border-b border-customGray500">
-      //           <CardStat
-      //             id={`wallet`}
-      //             label="TotalAssets"
-      //             value={`${formatNumber(vault.totalAssets / (10 ** tokens[vault.chainId][vault.asset].decimals))}`}
-      //           />
-      //           <CardStat
-      //             id={`Liquid`}
-      //             label="Liquid"
-      //             value={`${formatNumber(vault.liquid / (10 ** tokens[vault.chainId][vault.asset].decimals))}`}
-      //             secondaryValue={`${formatTwoDecimals((vault.liquid / vault.totalAssets) * 100)} %`}
-      //           />
-      //           <CardStat
-      //             id={`wallet`}
-      //             label="Idle"
-      //             value={`${formatNumber(vault.idle / (10 ** tokens[vault.chainId][vault.asset].decimals))}`}
-      //           />
-      //         </div>
-      //         <div className="mt-4 space-y-4">
-      //           {vault.strategies.map(strategy =>
-      //             <div className="text-white" key={strategy.address}>
-      //               <div className="w-max flex flex-row items-center">
-      //                 <img
-      //                   src={IconByProtocol[strategy.metadata.protocol] || "/images/tokens/vcx.svg"}
-      //                   className={`h-4 w-4 mr-2 mb-1.5 rounded-full border border-white`}
-      //                 />
-      //                 <h2 className="text-lg text-white">
-      //                   {strategy.metadata.protocol} - {strategy.metadata.name}
-      //                 </h2>
-      //               </div>
-      //               <div className="flex flex-row items-center">
-      //                 <CardStat
-      //                   id={`wallet`}
-      //                   label="Allocation"
-      //                   value={formatNumber(strategy.allocation / (10 ** tokens[vault.chainId][vault.asset].decimals))}
-      //                   secondaryValue={`${formatTwoDecimals(strategy.allocationPerc * 100)} %`}
-      //                 />
-      //                 <CardStat
-      //                   id={`wallet`}
-      //                   label="Liquid"
-      //                   value={formatNumber(strategy.allocation / (10 ** tokens[vault.chainId][vault.asset].decimals))}
-      //                   secondaryValue={`${formatTwoDecimals((strategy.idle / strategy.allocation) * 100)} %`}
-      //                 />
-      //               </div>
-      //             </div>
-      //           )}
-      //         </div>
-      //       </div>
-      //     </div>
-      //   )}
-      // </div >
     )
     : <p className="text-white">Loading...</p>
 }
@@ -578,17 +570,24 @@ function VCXDashboard({ dashboardData }: { dashboardData: any }) {
 
 function OraclesDashboard({ dashboardData }: { dashboardData: any }) {
   const [chain, setChain] = useState<number>(1)
+  const [vaultsData] = useAtom(vaultsAtom)
+  const [tokens] = useAtom(tokensAtom)
+  const [strategies] = useAtom(strategiesAtom)
 
   function selectTab(val: string) {
     const selected = SUPPORTED_NETWORKS.find(network => network.name === val)
     setChain(selected?.id || 1)
   }
 
-  // TODO
-  // - Sort the values by active strategies
-  // - Add token metadata
-
-  return dashboardData && Object.keys(dashboardData).length > 0 && Object.keys(dashboardData?.vcxData).length > 0 && Object.keys(dashboardData?.assetOracleData).length > 0 ? (
+  if (!dashboardData
+    || Object.keys(dashboardData).length === 0
+    || Object.keys(dashboardData?.vcxData).length === 0
+    || Object.keys(dashboardData?.assetOracleData).length === 0
+    || Object.keys(vaultsData).length === 0
+    || Object.keys(tokens).length === 0
+    || Object.keys(strategies).length === 0
+  ) return <p className="text-white">Loading...</p>
+  return (
     <>
       <TabSelector
         className="mt-6 mb-12"
@@ -606,10 +605,7 @@ function OraclesDashboard({ dashboardData }: { dashboardData: any }) {
                     Base
                   </th>
                   <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-white">
-                    Quote
-                  </th>
-                  <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-white">
-                    Price
+                    Price in Quote
                   </th>
                   <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-white">
                     Update
@@ -619,51 +615,50 @@ function OraclesDashboard({ dashboardData }: { dashboardData: any }) {
               <tbody className="divide-y divide-gray-200">
                 <tr>
                   <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-white sm:pl-0">
-                    {OptionTokenByChain[chain]}
+                    oVCX
                   </td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm text-customGray200">
-                    USD
+                    $ {formatNumber(dashboardData?.vcxData[chain].ovcxPrice)}
                   </td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm text-customGray200">
-                    {dashboardData?.vcxData[chain].ovcxPrice}
-                  </td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-customGray200">
-                    {Number(dashboardData?.vcxData[chain].lastUpdate)}
+                    {new Date(Number(dashboardData?.vcxData[chain].lastUpdate) * 1000).toLocaleString()}
                   </td>
                 </tr>
                 {!!dashboardData?.assetOracleData[chain]
-                  ? dashboardData?.assetOracleData[chain].map((log: any) =>
-                    <>
-                      <tr>
-                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-white sm:pl-0">
-                          {log.args.base}
-                        </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-customGray200">
-                          {log.args.quote}
-                        </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-customGray200">
-                          {Number(log.args.bqPrice)}
-                        </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-customGray200">
-                          {Number(log.blockNumber)}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-white sm:pl-0">
-                          {log.args.quote}
-                        </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-customGray200">
-                          {log.args.base}
-                        </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-customGray200">
-                          {Number(log.args.qbPrice)}
-                        </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-customGray200">
-                          {Number(log.blockNumber)}
-                        </td>
-                      </tr>
-                    </>
-                  )
+                  ? dashboardData?.assetOracleData[chain]
+                    .filter((log: any) =>
+                      !!Object.values(strategies[chain])
+                        .filter(strategy => strategy.yieldAsset)
+                        .find(strategy =>
+                          (strategy.yieldAsset === log.log.args.quote && strategy.asset === log.log.args.base)
+                          || (strategy.asset === log.log.args.quote && strategy.yieldAsset === log.log.args.base))
+                    )
+                    .map((log: any) =>
+                      <>
+                        <tr>
+                          <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-white sm:pl-0">
+                            {tokens[chain][log.log.args.base].symbol}
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm text-customGray200">
+                            {formatNumber(Number(log.log.args.bqPrice) / 1e18)} {tokens[chain][log.log.args.quote].symbol}
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm text-customGray200">
+                            {new Date(Number(log.lastUpdate) * 1000).toLocaleString()}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-white sm:pl-0">
+                            {tokens[chain][log.log.args.quote].symbol}
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm text-customGray200">
+                            {formatNumber(Number(log.log.args.qbPrice) / 1e18)} {tokens[chain][log.log.args.base].symbol}
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm text-customGray200">
+                            {new Date(Number(log.lastUpdate) * 1000).toLocaleString()}
+                          </td>
+                        </tr>
+                      </>
+                    )
                   : <p className="text-white">No Asset Oracles</p>
                 }
               </tbody>
@@ -673,7 +668,6 @@ function OraclesDashboard({ dashboardData }: { dashboardData: any }) {
       </div >
     </>
   )
-    : <p className="text-white">Loading...</p>
 }
 
 function AutomationDashboard({ dashboardData }: { dashboardData: any }) {

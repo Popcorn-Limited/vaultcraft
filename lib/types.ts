@@ -57,7 +57,7 @@ export type VaultData = {
   metadata: VaultMetadata;
   strategies: Strategy[];
   idle: number;
-  liquid:number;
+  liquid: number;
 };
 
 export type LlamaApy = {
@@ -72,6 +72,8 @@ export type StrategyType = "AnyToAnyV1" | "Vanilla"
 
 export type Strategy = {
   address: Address;
+  asset: Address;
+  yieldAsset?: Address;
   metadata: StrategyMetadata;
   resolver: string;
   allocation: number;
@@ -80,8 +82,9 @@ export type Strategy = {
   apyHist: LlamaApy[];
   apyId: string;
   apySource: "custom" | "defillama";
-  type: StrategyType;
-  yieldAsset?: Address;
+  totalAssets: number;
+  totalSupply: number;
+  assetsPerShare: number;
   idle: number;
 }
 
@@ -89,6 +92,7 @@ type StrategyMetadata = {
   name: string;
   protocol: string;
   description: string;
+  type: StrategyType;
 }
 
 export enum VaultLabel {
@@ -282,6 +286,14 @@ export type VaultDataByAddress = {
 
 export type AddressByChain = {
   [key: number]: Address
+}
+
+export type StrategyByAddress = {
+  [key: Address]: Strategy
+}
+
+export type StrategiesByChain = {
+  [key: number]: StrategyByAddress
 }
 
 export type AddressesByChain = {

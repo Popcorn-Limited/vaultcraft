@@ -279,7 +279,7 @@ export default function Index() {
           </section>
 
           {
-            strategy && strategy.type === "AnyToAnyV1" &&
+            strategy && strategy.metadata.type === "AnyToAnyV1" &&
             <div>
               <AnyToAnyV1DepositorSettings strategy={strategy} asset={asset} yieldAsset={tokens[chainId][strategy.yieldAsset!]} chainId={chainId} />
             </div>
