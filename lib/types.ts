@@ -56,6 +56,8 @@ export type VaultData = {
   gaugeData?: GaugeData;
   metadata: VaultMetadata;
   strategies: Strategy[];
+  idle: number;
+  liquid:number;
 };
 
 export type LlamaApy = {
@@ -80,6 +82,7 @@ export type Strategy = {
   apySource: "custom" | "defillama";
   type: StrategyType;
   yieldAsset?: Address;
+  idle: number;
 }
 
 type StrategyMetadata = {

@@ -220,6 +220,8 @@ export default async function handler(
                 feeRecipient: vault.feeRecipeint
             },
             strategies: [],
+            idle: 0,
+            liquid: 0
         }
 
         tokens[vault.address] = {

@@ -3,6 +3,7 @@ import {
   Chain,
   PublicClient,
   createPublicClient,
+  erc20Abi,
   getAddress,
   http,
   zeroAddress,
@@ -17,6 +18,7 @@ import getFraxlendApy from "@/lib/external/fraxlend/getFraxlendApy";
 import { prepareAssets, prepareVaults, addBalances, prepareGauges } from "@/lib/tokens";
 import getGaugesData from "@/lib/gauges/getGaugeData";
 import { mainnet, xLayer } from "viem/chains";
+import { numberFormat } from "highcharts";
 
 
 const EMPTY_LLAMA_APY_ENTRY: LlamaApy = {
@@ -191,7 +193,9 @@ async function getInitialVaultsData(chainId: number, client: PublicClient): Prom
           allocationPerc: 0,
           apy: 0
         }
-      })
+      }),
+      idle: 0,
+      liquid: 0
     }
   })
 
@@ -220,6 +224,12 @@ async function addDynamicVaultsData(vaults: VaultDataByAddress, client: PublicCl
             abi: VaultAbi,
             functionName: "depositLimit"
           },
+          {
+            address: vault.asset,
+            abi: erc20Abi,
+            functionName: "balanceOf",
+            args: [vault.address]
+          },
         ]
       })
       .flat(),
@@ -227,14 +237,16 @@ async function addDynamicVaultsData(vaults: VaultDataByAddress, client: PublicCl
   });
 
   Object.values(vaults).forEach((vault: any, i: number) => {
-    if (i > 0) i = i * 3;
+    if (i > 0) i = i * 4;
     const totalAssets = Number(dynamicValues[i]);
     const totalSupply = Number(dynamicValues[i + 1]);
 
-    vaults[vault.address].totalAssets = totalAssets
-    vaults[vault.address].totalSupply = totalSupply
-    vaults[vault.address].depositLimit = Number(dynamicValues[i + 2])
-    vaults[vault.address].assetsPerShare = totalSupply > 0 ? totalAssets / totalSupply : Number(1)
+    vaults[vault.address].totalAssets = totalAssets;
+    vaults[vault.address].totalSupply = totalSupply;
+    vaults[vault.address].depositLimit = Number(dynamicValues[i + 2]);
+    vaults[vault.address].assetsPerShare = totalSupply > 0 ? totalAssets / totalSupply : Number(1);
+    vaults[vault.address].idle = Number(dynamicValues[i + 3]);
+
   })
 
   return vaults;
@@ -292,6 +304,10 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
     })
   });
 
+  const { data: strategyDescriptions } = await axios.get(
+    `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/descriptions/strategies/${chainId}.json`
+  );
+
   // Get TotalAssets and TotalSupply
   // @ts-ignore
   const taAndTs = await client.multicall({
@@ -307,22 +323,25 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
             address: address,
             abi: VaultAbi,
             functionName: "totalSupply"
-          }]
+          },
+          {
+            address: strategyDescriptions[address].asset,
+            abi: erc20Abi,
+            functionName: "balanceOf",
+            args: [address]
+          }
+        ]
       })
       .flat(),
     allowFailure: false,
   });
-
-  const { data: strategyDescriptions } = await axios.get(
-    `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/descriptions/strategies/${chainId}.json`
-  );
 
   let strategies: { [key: Address]: any } = {}
 
   await Promise.all(
     // We use map here since Promise.all doesnt work on a forEach
     uniqueStrategyAdresses.map(async (address, i) => {
-      if (i > 0) i = i * 2;
+      if (i > 0) i = i * 3;
 
       const totalAssets = Number(taAndTs[i]);
       const totalSupply = Number(taAndTs[i + 1]);
@@ -358,7 +377,8 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
         apy,
         apyHist,
         apyId: desc.apyId,
-        apySource: desc.apySource
+        apySource: desc.apySource,
+        idle: desc.type === "AnyToAnyV1" ? Number(taAndTs[i + 2]) : totalAssets
       }
     }))
 
@@ -380,6 +400,7 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
   let n = 0
   Object.keys(vaults).forEach((address: any) => {
     let apy = 0;
+    let liquid = 0;
 
     if (vaults[address].strategies.length === 0) {
       vaults[address].strategies[0] = {
@@ -396,8 +417,10 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
         apy: 0,
         apyHist: [EMPTY_LLAMA_APY_ENTRY],
         apyId: "",
-        apySource: "custom"
+        apySource: "custom",
+        idle: vaults[address].totalAssets
       }
+      liquid = vaults[address].totalAssets
     } else {
       vaults[address].strategies.forEach((strategy: any, i: number) => {
         const strategyData = strategies[strategy.address]
@@ -407,6 +430,9 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
 
         // calc allocation percentage
         const allocationPerc = (allocation / vaults[address].totalAssets) || 0
+        
+        // Idle assets in the strategy accessiable by the vault
+        const idle = strategyData.type === "AnyToAnyV1" ? strategyData.idle : allocation
 
         // add strategy metadata
         vaults[address].strategies[i] = {
@@ -424,7 +450,8 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
           apy: strategyData.apy,
           apyHist: strategyData.apyHist,
           apyId: strategyData.apyId,
-          apySource: strategyData.apySource
+          apySource: strategyData.apySource,
+          idle: idle
         }
 
         // calc blended apy of the vault
@@ -433,6 +460,7 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
           apy += strategyData.apy * (1 / vaults[address].strategies.length)
         } else {
           apy += strategyData.apy * allocationPerc
+          liquid += idle
         }
 
         n += 1
@@ -442,6 +470,7 @@ export async function addStrategyData(vaults: VaultDataByAddress, chainId: numbe
     // assign apy
     vaults[address].apy = apy;
     vaults[address].totalApy = apy;
+    vaults[address].liquid = liquid + vaults[address].idle;
   })
 
 
