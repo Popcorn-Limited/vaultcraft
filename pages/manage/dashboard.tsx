@@ -202,14 +202,11 @@ export default function Dashboard() {
 }
 
 function AlertSection({ dashboardData }: { dashboardData: any }) {
-  const [vaults] = useAtom(vaultsAtom)
-
   // TODO
   // - Add alert for stale asset oracle
   // - Add alert for stale harvest
   // - Add alert for low 1Balance + eth bal gelato
   // - Add alert for low balance trade bot
-  // - Add alert for low liquid cash in vaults
   // - Add alert for large fee amount in vaults
 
   if (!dashboardData || Object.keys(dashboardData).length === 0) return <></>
@@ -217,6 +214,7 @@ function AlertSection({ dashboardData }: { dashboardData: any }) {
     <div className="flex flex-row flex-wrap">
       {GAUGE_NETWORKS.map(chainId => <OptionTokenOracleAlert key={"ovcxOracleAlert-" + chainId} chainId={chainId} vcxData={dashboardData.vcxData[chainId]} />)}
       {GAUGE_NETWORKS.map(chainId => <OptionTokenAlert key={"ovcxAlert-" + chainId} chainId={chainId} vcxData={dashboardData.vcxData[chainId]} />)}
+      <VaultsAlert />
     </div>
   )
 }
@@ -299,6 +297,59 @@ function OptionTokenAlert({ chainId, vcxData }: { chainId: number, vcxData: any 
 }
 
 // TODO Add alert for stale asset oracle
+
+function VaultsAlert() {
+  const [vaultsData] = useAtom(vaultsAtom)
+  const [tokens] = useAtom(tokensAtom)
+  const [vaults, setVaults] = useState<VaultData[]>([]);
+
+  useEffect(() => {
+    if (Object.keys(vaultsData).length > 0 && vaults.length === 0) {
+      setVaults(SUPPORTED_NETWORKS.map((chain) => vaultsData[chain.id]).flat());
+    }
+  }, [vaultsData, vaults]);
+
+  return vaults.length > 0 && Object.keys(tokens).length > 0 ? (
+    <>
+      {vaults.map(vault =>
+        <>
+          {/* Check that Vaults have enough liquid cash */}
+          {(vault.liquid * tokens[vault.chainId][vault.asset].price / (10 ** tokens[vault.chainId][vault.asset].decimals)) < 100_000 ?
+            <div className="w-1/3 p-4">
+              <div className="border border-red-500 bg-red-500 bg-opacity-30 rounded-lg p-4">
+                <p className="text-red-500 text-lg">
+                  Low Cash: {ChainById[vault.chainId].name} {tokens[vault.chainId][vault.asset].symbol}-{vault.strategies.length > 1
+                    ? "Multistrategy"
+                    : vault.strategies[0].metadata.protocol}
+                </p>
+                <p className="text-red-500 text-sm">
+                  {`Free up cash for withdrawals! Either deallocate funds from strategies or convert YieldTokens in strategies. ( $${formatNumber(vault.liquid * tokens[vault.chainId][vault.asset].price / (10 ** tokens[vault.chainId][vault.asset].decimals))} < $100k )`}
+                </p>
+              </div>
+            </div>
+            : <>
+              {((vault.liquid / vault.totalAssets) * 100) < 20 &&
+                <div className="w-1/3 p-4">
+                  <div className="border border-secondaryYellow bg-secondaryYellow bg-opacity-30 rounded-lg p-4">
+                    <p className="text-secondaryYellow text-lg">
+                      Low Cash: {ChainById[vault.chainId].name} {tokens[vault.chainId][vault.asset].symbol}-{vault.strategies.length > 1
+                        ? "Multistrategy"
+                        : vault.strategies[0].metadata.protocol}
+                    </p>
+                    <p className="text-secondaryYellow text-sm">
+                      {`Free up cash for withdrawals. Either deallocate funds from strategies or convert YieldTokens in strategies. (${formatTwoDecimals(vault.liquid / vault.totalAssets * 100)}% < 20% )`}
+                    </p>
+                  </div>
+                </div>
+              }
+            </>
+          }
+        </>
+      )}
+    </>
+  )
+    : <></>
+}
 
 function VaultsDashboard({ dashboardData }: { dashboardData: any }) {
   const [vaultsData] = useAtom(vaultsAtom)
