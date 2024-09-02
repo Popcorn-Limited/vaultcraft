@@ -78,7 +78,7 @@ export default async function prepareStrategies(vaults: VaultDataByAddress, chai
         asset: desc.asset,
         yieldAsset: desc.yieldAsset || undefined,
         metadata: {
-          name: descriptionSplit[0],
+          name: descriptionSplit[0].slice(2),
           protocol: desc.name,
           description: descriptionSplit[1],
           type: desc.type ?? "Vanilla",
