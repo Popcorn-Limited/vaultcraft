@@ -99,19 +99,19 @@ async function getUserLockVaultData(user: Address, vault: Address) {
   }
 }
 
-async function getLockVaultData(vault: Address) {
-  const client = createPublicClient({
-    chain: mainnet,
-    transport: http(RPC_URLS[mainnet.id]),
-  })
+// async function getLockVaultData(vault: Address) {
+//   const client = createPublicClient({
+//     chain: mainnet,
+//     transport: http(RPC_URLS[mainnet.id]),
+//   })
 
-  return client.getLogs({
-    address: vault,
-    event: LockVaultAbi[14],
-    fromBlock: "earliest",
-    toBlock: "latest"
-  })
-}
+//   return client.getLogs({
+//     address: vault,
+//     event: LockVaultAbi[14],
+//     fromBlock: "earliest",
+//     toBlock: "latest"
+//   })
+// }
 
 export default function Staking() {
   const publicClient = usePublicClient({ chainId: 1 });
@@ -149,7 +149,7 @@ export default function Staking() {
       const _asset = tokens[mainnet.id][VCX]
       const _vault = tokens[mainnet.id][ST_VCX]
 
-      getLockVaultData(ST_VCX).then(res => setLockVaultData(res));
+      // getLockVaultData(ST_VCX).then(res => setLockVaultData(res));
 
       if (account) {
         refreshUserData()
@@ -375,8 +375,6 @@ export default function Staking() {
                     />
                     {!userLockVaultData?.isExit &&
                       <div className="flex flex-row items-center w-full space-x-4 mt-4">
-                        <LockTimeButton label="180" handleClick={() => setLockTime(180)} isActive={lockTime === 180} />
-                        <LockTimeButton label="1M" handleClick={() => setLockTime(2629800)} isActive={lockTime === 2629800} />
                         <LockTimeButton label="3M" handleClick={() => setLockTime(7889400)} isActive={lockTime === 7889400} />
                         <LockTimeButton label="6M" handleClick={() => setLockTime(15778800)} isActive={lockTime === 15778800} />
                         <LockTimeButton label="9M" handleClick={() => setLockTime(23668200)} isActive={lockTime === 23668200} />
@@ -411,25 +409,7 @@ export default function Staking() {
                       allowInput={false}
                     />
                     {!userLockVaultData?.isExit &&
-                      <>
-                        <InputTokenWithError
-                          captionText={"Reward Shares"}
-                          onSelectToken={() => { }}
-                          onMaxClick={() => { }}
-                          chainId={1}
-                          value={((Number(inputBalance) * Number(inputToken?.price))
-                            / Number(outputToken?.price) || 0)
-                            / (31557600 / lockTime)
-                          }
-                          onChange={() => { }}
-                          selectedToken={vault}
-                          errorMessage={""}
-                          tokenList={[]}
-                          allowSelection={false}
-                          allowInput={false}
-                        />
-                        <p className="text-white">Expected APY: ~{(lockTime / 31557600) * 40} %</p>
-                      </>
+                      <p className="text-white">Expected APY: ~{(lockTime / 31557600) * 40} %</p>
                     }
                   </div>
                   <div className="mt-4">
@@ -510,7 +490,7 @@ export default function Staking() {
                   </div>
                 </div>
 
-                <div className="bg-customNeutral200 p-6 rounded-lg">
+                {/* <div className="bg-customNeutral200 p-6 rounded-lg">
                   <p className="text-white text-2xl font-bold">Reward Payouts</p>
                   {lockVaultData ?
                     <div className="mt-8 flow-root">
@@ -554,7 +534,7 @@ export default function Staking() {
                     </div >
                     : <p className="text-white">Loading...</p>
                   }
-                </div>
+                </div> */}
               </div>
             </section>
           </div>
