@@ -20,6 +20,10 @@ const ProductLinks = [
     label: "Create Vaults",
     href: "/create-vault",
   },
+  {
+    label: "Manage",
+    href: "/manage",
+  },
 ];
 
 const GeneralLinks = [
