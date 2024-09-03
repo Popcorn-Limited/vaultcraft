@@ -1,7 +1,7 @@
 import { formatNumber } from "@/lib/utils/formatBigNumber"
 
 export default function AutomationDashboard({ dashboardData }: { dashboardData: any }) {
-  // TODO
+  // running
   // - show last update asset oracles per active pair
   // - show last update ovcx oracle
   // - (show last harvests?)

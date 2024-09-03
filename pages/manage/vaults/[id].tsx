@@ -21,6 +21,7 @@ import VaultsV1Settings from "@/components/vault/management/vault/VaultsV1Settin
 import VaultsV2Settings from "@/components/vault/management/vault/VaultsV2Settings";
 import StrategyDescription from "@/components/vault/StrategyDescription";
 import Link from "next/link";
+import CopyAddress from "@/components/common/CopyAddress";
 
 async function getLogs(vault: VaultData, asset: Token) {
   const client = createPublicClient({
@@ -173,73 +174,27 @@ export default function Index() {
 
           <VaultHero vaultData={vaultData} asset={asset} vault={vault} gauge={gauge} showClaim={false} />
 
-          {vaultData.gauge && (
-            <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-0 text-white">
-              <h2 className="text-white font-bold text-2xl">
-                Manage Gauge Rewards
-              </h2>
-              <RewardsSection gauge={vaultData.gauge} chainId={vaultData.chainId} />
-            </section>
-          )}
-
-          <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-0 text-white">
-            <div className="grid md:grid-cols-2 mb-12">
-              <ApyChart strategy={vaultData.strategies[0]} />
-              <NetFlowChart logs={logs} asset={asset} />
-            </div>
-
+          <section className="px-4 md:px-0 text-white">
             <div className="md:flex mt-12 md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4">
               <div className="w-full md:w-10/12 border border-customNeutral100 rounded-lg p-4 px-6">
                 <p className="text-white font-normal">Vault address:</p>
-                <div className="flex flex-row items-center justify-between">
-                  <p className="font-bold text-white">
-                    {vaultData.address.slice(0, 6)}...
-                    {vaultData.address.slice(-4)}
-                  </p>
-                  <div className="w-6 h-6 group/vaultAddress">
-                    <CopyToClipboard
-                      text={vaultData.address}
-                      onCopy={() => showSuccessToast("Vault address copied!")}
-                    >
-                      <Square2StackIcon className="text-white group-hover/vaultAddress:text-primaryYellow" />
-                    </CopyToClipboard>
-                  </div>
+                <div className="text-white w-full">
+                  <CopyAddress address={vaultData.address} label="Vault" />
                 </div>
               </div>
 
               <div className="w-full md:w-10/12 border border-customNeutral100 rounded-lg p-4">
                 <p className="text-white font-normal">Asset address:</p>
-                <div className="flex flex-row items-center justify-between">
-                  <p className="font-bold text-white">
-                    {vaultData.asset.slice(0, 6)}...{vaultData.asset.slice(-4)}
-                  </p>
-                  <div className="w-6 h-6 group/vaultAddress">
-                    <CopyToClipboard
-                      text={vaultData.asset}
-                      onCopy={() => showSuccessToast("Asset address copied!")}
-                    >
-                      <Square2StackIcon className="text-white group-hover/vaultAddress:text-primaryYellow" />
-                    </CopyToClipboard>
-                  </div>
+                <div className="text-white w-full">
+                  <CopyAddress address={vaultData.asset} label="Asset" />
                 </div>
               </div>
 
               {vaultData.gauge && (
                 <div className="w-full md:w-10/12 border border-customNeutral100 rounded-lg p-4">
                   <p className="text-white font-normal">Gauge address:</p>
-                  <div className="flex flex-row items-center justify-between">
-                    <p className="font-bold text-white">
-                      {vaultData.gauge.slice(0, 6)}...
-                      {vaultData.gauge.slice(-4)}
-                    </p>
-                    <div className="w-6 h-6 group/gaugeAddress">
-                      <CopyToClipboard
-                        text={vaultData.gauge}
-                        onCopy={() => showSuccessToast("Gauge address copied!")}
-                      >
-                        <Square2StackIcon className="text-white group-hover/gaugeAddress:text-primaryYellow" />
-                      </CopyToClipboard>
-                    </div>
+                  <div className="text-white w-full">
+                    <CopyAddress address={vaultData.gauge} label="Gauge" />
                   </div>
                 </div>
               )}
@@ -264,17 +219,34 @@ export default function Index() {
               )}
             </div>
 
+            <div className="grid md:grid-cols-2 mb-12">
+              <ApyChart strategy={vaultData.strategies[0]} />
+              <NetFlowChart logs={logs} asset={asset} />
+            </div>
           </section>
 
-          {vaultData.metadata.type === "multi-strategy-vault-v2"
-            ? <VaultsV2Settings vaultData={vaultData} />
-            : <VaultsV1Settings vaultData={vaultData} />
+          {
+            vaultData.gauge && (
+              <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-0 text-white">
+                <h2 className="text-white font-bold text-2xl">
+                  Manage Gauge Rewards
+                </h2>
+                <RewardsSection gauge={vaultData.gauge} chainId={vaultData.chainId} />
+              </section>
+            )
           }
 
-        </div>
+          {
+            ["multi-strategy-vault-v2", "multi-strategy-vault-v2.5"].includes(vaultData.metadata.type)
+              ? <VaultsV2Settings vaultData={vaultData} />
+              : <VaultsV1Settings vaultData={vaultData} />
+          }
+
+        </div >
       ) : (
         <p className="text-white">Loading...</p>
-      )}
-    </NoSSR>
+      )
+      }
+    </NoSSR >
   );
 }

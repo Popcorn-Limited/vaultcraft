@@ -1,4 +1,4 @@
-import { MultiStrategyVaultAbi, VaultAbi, VaultControllerAbi, VaultControllerByChain } from "@/lib/constants";
+import { MultiStrategyVaultAbi, MultiStrategyVaultV2Abi, VaultAbi, VaultControllerAbi, VaultControllerByChain } from "@/lib/constants";
 import { showLoadingToast } from "@/lib/toasts"
 import { AddressByChain, Clients, SimulationResponse, VaultAllocation, VaultData } from "@/lib/types"
 import { SimulationContract, handleCallResult, simulateCall } from "@/lib/utils/helpers"
@@ -387,6 +387,57 @@ export async function takeFees({
       },
       account: account as Address,
       functionName: "takeManagementAndPerformanceFees",
+      publicClient: clients.publicClient
+    }),
+    clients
+  });
+}
+
+
+export async function setDepositIndex({
+  depositIndex,
+  vaultData,
+  address,
+  account,
+  clients,
+}: BaseWriteProps & { depositIndex: bigint }): Promise<boolean> {
+  showLoadingToast("Setting new deposit index...");
+
+  return handleCallResult({
+    successMessage: "New deposit index set!",
+    simulationResponse: await simulateCall({
+      contract: {
+        address,
+        abi: MultiStrategyVaultV2Abi
+      },
+      account: account as Address,
+      functionName: "setDepositIndex",
+      args: [depositIndex],
+      publicClient: clients.publicClient
+    }),
+    clients
+  });
+}
+
+export async function proposeWithdrawalQueue({
+  withdrawalQueue,
+  vaultData,
+  address,
+  account,
+  clients,
+}: BaseWriteProps & { withdrawalQueue: number[] }): Promise<boolean> {
+  showLoadingToast("Proposing new withdrawal queue...");
+
+  return handleCallResult({
+    successMessage: "New withdrawal queue proposed!",
+    simulationResponse: await simulateCall({
+      contract: {
+        address,
+        abi: MultiStrategyVaultV2Abi
+      },
+      account: account as Address,
+      functionName: "proposeWithdrawalQueue",
+      args: [withdrawalQueue.map(e => BigInt(e))],
       publicClient: clients.publicClient
     }),
     clients

@@ -1,5 +1,7 @@
 import MainActionButton from "@/components/button/MainActionButton";
+import CopyAddress from "@/components/common/CopyAddress";
 import { IconByProtocol } from "@/components/common/ProtocolIcon";
+import StrategyName from "@/components/common/StrategyName";
 import TabSelector from "@/components/common/TabSelector";
 import InputNumber from "@/components/input/InputNumber";
 import { strategiesAtom, tokensAtom } from "@/lib/atoms";
@@ -170,15 +172,11 @@ export default function VaultRebalance({
                     (strategy, i) =>
                       <tr key={strategy.address}>
                         <td className="whitespace-nowrap py-4 pl-4 pr-3 font-medium sm:pl-0">
-                          <div className="w-max flex flex-row items-center mb-2">
-                            <img
-                              src={IconByProtocol[strategy.metadata.protocol] || "/images/tokens/vcx.svg"}
-                              className={`h-5 w-5 mr-2 mb-1.5 rounded-full border border-white`}
-                            />
-                            <h2 className="text-xl font-bold text-white">
-                              {strategy.metadata.protocol} - {strategy.metadata.name} ({tokens[vaultData.chainId][strategy.yieldAsset ? strategy.yieldAsset : strategy.asset].symbol})
-                            </h2>
-                          </div>
+                          <StrategyName
+                            strategy={strategy}
+                            asset={tokens[vaultData.chainId][strategy.asset]}
+                            yieldAsset={strategy.yieldAsset ? tokens[vaultData.chainId][strategy.yieldAsset] : undefined}
+                          />
                         </td>
 
                         <td className="whitespace-nowrap px-3 py-4 text-gray-500">

@@ -21,6 +21,7 @@ export default function VaultsDashboard({ dashboardData }: { dashboardData: any 
   // TODO
   // - fees
   // - last harvested
+  
   return vaults.length > 0 && Object.keys(tokens).length > 0 ?
     (
       <div className="mt-8 flow-root">

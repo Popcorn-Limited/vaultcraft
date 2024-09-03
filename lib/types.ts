@@ -72,7 +72,7 @@ export type StrategyType = "AnyToAnyV1" | "Vanilla"
 
 export type Strategy = {
   address: Address;
-  asset:Address;
+  asset: Address;
   yieldAsset?: Address;
   metadata: StrategyMetadata;
   resolver: string;
@@ -109,7 +109,8 @@ export type VaultMetadata = {
   | "single-asset-vault-v1"
   | "single-asset-lock-vault-v1"
   | "multi-strategy-vault-v1"
-  | "multi-strategy-vault-v2";
+  | "multi-strategy-vault-v2"
+  | "multi-strategy-vault-v2.5";
   creator: Address;
   feeRecipient: Address;
 };
@@ -334,4 +335,15 @@ export type VaultV2Settings = {
   proposedDepositIndex: number;
   paused: boolean;
   owner: Address;
+  fees: {
+    performance: {
+      value: number,
+      exists: boolean
+    },
+    management: {
+      value: number,
+      exists: boolean
+    },
+  },
+  accruedFees: number
 }

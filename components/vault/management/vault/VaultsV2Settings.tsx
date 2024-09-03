@@ -1,5 +1,5 @@
 import TabSelector from "@/components/common/TabSelector";
-import { MultiStrategyVaultV2Abi } from "@/lib/constants";
+import { MultiStrategyVaultV2_1Abi, MultiStrategyVaultV2Abi } from "@/lib/constants";
 import { VaultData, VaultV2Settings } from "@/lib/types";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 import { useEffect, useState } from "react";
@@ -8,24 +8,26 @@ import { useAccount } from "wagmi";
 import VaultRebalance from "@/components/vault/management/vault/Rebalance";
 import VaultDepositLimit from "@/components/vault/management/vault/DepositLimit";
 import VaultPausing from "@/components/vault/management/vault/Pausing";
-import VaultDepositIndex from "@/components/vault/management/vault/DepositIndex";
+import VaultAutoDeposit from "@/components/vault/management/vault/AutoDeposit";
 import { tokensAtom } from "@/lib/atoms";
 import { useAtom } from "jotai";
 import VaultWithdrawalQueue from "./WithdrawalQueue";
+import VaultTakeFees from "./Fees";
 
 const DEFAULT_TABS = [
   "Rebalance",
-  "Strategy",
+  "Strategies",
   "Withdrawal Queue",
-  "Deposit Index",
+  "Auto Deposit",
   "Deposit Limit",
-  "Pausing"
+  "Pausing",
+  "Fees"
 ];
 
 function getMulticalls(vault: VaultData) {
   const vaultContract = {
     address: vault.address,
-    abi: MultiStrategyVaultV2Abi,
+    abi: MultiStrategyVaultV2_1Abi,
   };
   return [
     {
@@ -59,6 +61,22 @@ function getMulticalls(vault: VaultData) {
     {
       ...vaultContract,
       functionName: "owner",
+    },
+    {
+      ...vaultContract,
+      functionName: "accruedPerformanceFee"
+    },
+    {
+      ...vaultContract,
+      functionName: "accruedManagementFee"
+    },
+    {
+      ...vaultContract,
+      functionName: "performanceFee"
+    },
+    {
+      ...vaultContract,
+      functionName: "managementFee"
     }
   ];
 }
@@ -72,18 +90,31 @@ async function getVaultSettings(vault: VaultData): Promise<VaultV2Settings> {
   // @ts-ignore
   const res: any[] = await client.multicall({
     contracts: getMulticalls(vault),
-    allowFailure: false,
+    allowFailure: true,
   });
 
+  const hasManagementFee = res[11].status === "success"
+
   return {
-    proposedStrategies: res[0],
-    proposedStrategyTime: Number(res[1]),
-    withdrawalQueue: res[2],
-    proposedWithdrawalQueue: res[3],
-    depositIndex: Number(res[4]),
-    proposedDepositIndex: Number(res[5]),
-    paused: res[6],
-    owner: res[7],
+    proposedStrategies: res[0].result,
+    proposedStrategyTime: Number(res[1].result),
+    withdrawalQueue: res[2].result.map((e: bigint) => Number(e)),
+    proposedWithdrawalQueue: res[3].result,
+    depositIndex: Number(res[4].result),
+    proposedDepositIndex: Number(res[5].result),
+    paused: res[6].result,
+    owner: res[7].result,
+    fees: {
+      performance: {
+        value: Number(res[10].result),
+        exists: true
+      },
+      management: {
+        value: hasManagementFee ? Number(res[11].result) : 0,
+        exists: hasManagementFee
+      }
+    },
+    accruedFees: Number(res[8].result) + Number(hasManagementFee ? res[9].result : 0)
   };
 }
 
@@ -104,14 +135,10 @@ export default function VaultsV2Settings({ vaultData }: { vaultData: VaultData, 
   }
 
   // TODO
-  // - pause/unpause
-  // - deposit Index
-  // - withdrawal queue
+  // - withdrawal queue (add change withdrawal queue)
   // - propose strategy (with depositIndex,withdrawalQueue)
-  // - set fees (differentiage between per fee only or both)
-  // - take fees
-  // - set deposit limit
-
+  // - set fees (differentiate between per fee only or both)
+  
   return (
     <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-0 text-white">
       <h2 className="text-white font-bold text-2xl">Vault Settings</h2>
@@ -128,7 +155,7 @@ export default function VaultsV2Settings({ vaultData }: { vaultData: VaultData, 
               vaultData={vaultData}
             />
           )}
-          {tab === "Strategy" && (
+          {tab === "Strategies" && (
             <>
 
             </>
@@ -141,8 +168,8 @@ export default function VaultsV2Settings({ vaultData }: { vaultData: VaultData, 
               disabled={account !== vaultData.metadata.creator}
             />
           )}
-          {tab === "Deposit Index" && (
-            <VaultDepositIndex
+          {tab === "Auto Deposit" && (
+            <VaultAutoDeposit
               vaultData={vaultData}
               asset={tokens[vaultData.chainId][vaultData.asset]}
               depositIndex={settings.depositIndex}
@@ -163,6 +190,15 @@ export default function VaultsV2Settings({ vaultData }: { vaultData: VaultData, 
               callAddress={vaultData.address}
               disabled={account !== vaultData.metadata.creator}
             />
+          )}
+          {tab === "Fees" && (
+            <>
+              <VaultTakeFees
+                vaultData={vaultData}
+                accruedFees={settings.accruedFees / (10 ** tokens[vaultData.chainId][vaultData.asset].decimals)}
+                callAddress={vaultData.address}
+              />
+            </>
           )}
         </div>
       ) : (

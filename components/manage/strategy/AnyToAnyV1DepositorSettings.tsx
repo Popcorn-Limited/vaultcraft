@@ -139,6 +139,10 @@ export default function AnyToAnyV1DepositorSettings({ strategy, asset, yieldAsse
     if (strategy.address) getAnyToAnyData(strategy.address, asset, yieldAsset, chainId).then(res => setSettings(res))
   }, [strategy, asset, chainId])
 
+  // TODO
+  // set slippage
+  // set float
+
   return settings ? (
     <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-0 text-white">
       <h2 className="text-white font-bold text-2xl">Vault Settings</h2>
@@ -155,8 +159,3 @@ export default function AnyToAnyV1DepositorSettings({ strategy, asset, yieldAsse
   )
     : <p className="text-white">Loading...</p>
 }
-
-
-
-// set slippage
-// set float
