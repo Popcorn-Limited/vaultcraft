@@ -3,11 +3,11 @@ import { tokensAtom } from "@/lib/atoms";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import loadDashboardData from "@/lib/dashboard";
-import AlertSection from "@/components/dashboard/alerts/AlertSection";
-import VaultsDashboard from "@/components/dashboard/boards/VaultsDashboard";
-import VCXDashboard from "@/components/dashboard/boards/VCXDashboard";
-import OraclesDashboard from "@/components/dashboard/boards/OraclesDashboard";
-import AutomationDashboard from "@/components/dashboard/boards/AutomationsDashboard";
+import AlertSection from "@/components/manage/dashboard/alerts/AlertSection";
+import VaultsDashboard from "@/components/manage/dashboard/boards/VaultsDashboard";
+import VCXDashboard from "@/components/manage/dashboard/boards/VCXDashboard";
+import OraclesDashboard from "@/components/manage/dashboard/boards/OraclesDashboard";
+import AutomationDashboard from "@/components/manage/dashboard/boards/AutomationsDashboard";
 
 const DEFAULT_TABS = ["Vaults", "VCX", "Oracles", "Automation"]
 

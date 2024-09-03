@@ -103,6 +103,15 @@ export default function VaultsV2Settings({ vaultData }: { vaultData: VaultData, 
     setTab(tab);
   }
 
+  // TODO
+  // - pause/unpause
+  // - deposit Index
+  // - withdrawal queue
+  // - propose strategy (with depositIndex,withdrawalQueue)
+  // - set fees (differentiage between per fee only or both)
+  // - take fees
+  // - set deposit limit
+
   return (
     <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-0 text-white">
       <h2 className="text-white font-bold text-2xl">Vault Settings</h2>

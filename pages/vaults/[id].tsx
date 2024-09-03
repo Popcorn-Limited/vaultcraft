@@ -182,6 +182,7 @@ export default function Index() {
                       key={`${strategy.resolver}-${i}`}
                       strategy={strategy}
                       asset={asset}
+                      chainId={vaultData.chainId}
                       i={i}
                       stratLen={vaultData.strategies.length}
                     />

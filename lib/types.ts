@@ -72,7 +72,7 @@ export type StrategyType = "AnyToAnyV1" | "Vanilla"
 
 export type Strategy = {
   address: Address;
-  asset: Address;
+  asset:Address;
   yieldAsset?: Address;
   metadata: StrategyMetadata;
   resolver: string;

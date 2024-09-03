@@ -170,13 +170,13 @@ export default function VaultRebalance({
                     (strategy, i) =>
                       <tr key={strategy.address}>
                         <td className="whitespace-nowrap py-4 pl-4 pr-3 font-medium sm:pl-0">
-                          <div className="w-max flex flex-row items-center">
+                          <div className="w-max flex flex-row items-center mb-2">
                             <img
-                              src={IconByProtocol[strategy.metadata.name] || "/images/tokens/vcx.svg"}
-                              className={`h-5 w-5 mr-2  rounded-full border border-white`}
+                              src={IconByProtocol[strategy.metadata.protocol] || "/images/tokens/vcx.svg"}
+                              className={`h-5 w-5 mr-2 mb-1.5 rounded-full border border-white`}
                             />
-                            <h2 className="text-lg text-white">
-                              {strategy.metadata.name}
+                            <h2 className="text-xl font-bold text-white">
+                              {strategy.metadata.protocol} - {strategy.metadata.name} ({tokens[vaultData.chainId][strategy.yieldAsset ? strategy.yieldAsset : strategy.asset].symbol})
                             </h2>
                           </div>
                         </td>

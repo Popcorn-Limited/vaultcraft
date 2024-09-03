@@ -35,6 +35,7 @@ export default function VaultWithdrawalQueue({
                 key={vaultData.strategies[index].address}
                 strategy={vaultData.strategies[index]}
                 asset={asset}
+                chainId={vaultData.chainId}
                 i={i}
                 stratLen={vaultData.strategies.length}
               />
@@ -50,6 +51,7 @@ export default function VaultWithdrawalQueue({
                 key={`${strategy.resolver}-${i}`}
                 strategy={strategy}
                 asset={asset}
+                chainId={vaultData.chainId}
                 i={i}
                 stratLen={vaultData.strategies.length}
               />

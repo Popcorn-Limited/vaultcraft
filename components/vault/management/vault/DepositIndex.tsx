@@ -38,6 +38,7 @@ export default function VaultDepositIndex({
               : <StrategyDescription
                 strategy={vaultData.strategies[depositIndex]}
                 asset={asset}
+                chainId={vaultData.chainId}
                 i={0}
                 stratLen={vaultData.strategies.length}
               />
@@ -52,6 +53,7 @@ export default function VaultDepositIndex({
                 key={`${strategy.resolver}-${i}`}
                 strategy={strategy}
                 asset={asset}
+                chainId={vaultData.chainId}
                 i={i}
                 stratLen={vaultData.strategies.length}
               />

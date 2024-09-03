@@ -256,6 +256,7 @@ export default function Index() {
                   <StrategyDescription
                     strategy={strategy}
                     asset={asset}
+                    chainId={vaultData.chainId}
                     i={i}
                     stratLen={vaultData.strategies.length}
                   />
