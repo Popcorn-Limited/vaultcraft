@@ -9,7 +9,6 @@ import TradeBothBalanceAlert from "./TradeBothBalanceAlert"
 export default function AlertSection({ dashboardData }: { dashboardData: any }) {
   // TODO
   // - Add alert for stale harvest
-  // - Add alert for low balance trade bot
   // - Add alert for large fee amount in vaults
 
   if (!dashboardData || Object.keys(dashboardData).length === 0) return <></>
