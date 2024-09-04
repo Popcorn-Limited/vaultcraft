@@ -7,6 +7,7 @@ import InputNumber from "@/components/input/InputNumber";
 import { strategiesAtom, tokensAtom } from "@/lib/atoms";
 import { addStrategyData } from "@/lib/getTokenAndVaultsData";
 import { Token, VaultAllocation, VaultData } from "@/lib/types";
+import { formatNumber } from "@/lib/utils/formatBigNumber";
 import { validateInput } from "@/lib/utils/helpers";
 import { allocateToStrategies, deallocateFromStrategies } from "@/lib/vault/management/interactions";
 import { useAtom } from "jotai";
@@ -150,11 +151,16 @@ export default function VaultRebalance({
     <>
       <div className="flex flex-row justify-center">
         <div className="w-full">
-          <p className="text-customGray500 mb-12">
+          <p className="text-customGray500 mb-2">
             To rebalance between strategies you need to free up funds first (Float) before you can allocate those.
             Deallocating and Allocating are two seperate transactions.
             Keep in mind that by dellocating or allocating funds you might be charged fees or slippage from the underlying protocols.
           </p>
+          <div className="mb-4">
+            <p>Total Assets: {formatNumber(vaultData.totalAssets / (10 ** (asset?.decimals || 0)))} {asset?.symbol}</p>
+            <p>Liquid Assets: {formatNumber(vaultData.liquid / (10 ** (asset?.decimals || 0)))} {asset?.symbol}</p>
+            <p>Idle Assets: {formatNumber(vaultData.idle / (10 ** (asset?.decimals || 0)))} {asset?.symbol}</p>
+          </div>
           <TabSelector activeTab={activeTab} availableTabs={["Deallocate", "Allocate"]} setActiveTab={switchTab} />
           {(asset && float) ?
             <div className="mt-4">

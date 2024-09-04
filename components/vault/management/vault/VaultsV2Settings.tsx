@@ -139,6 +139,7 @@ export default function VaultsV2Settings({ vaultData }: { vaultData: VaultData, 
   return (
     <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-0 text-white">
       <h2 className="text-white font-bold text-2xl">Vault Settings</h2>
+      <p className="text-customGray500">Owner: {settings?.owner}</p>
       <TabSelector
         className="mt-6 mb-12"
         availableTabs={DEFAULT_TABS}
