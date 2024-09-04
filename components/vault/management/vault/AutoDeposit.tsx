@@ -1,11 +1,9 @@
 import MainActionButton from "@/components/button/MainActionButton";
-import Input from "@/components/input/Input";
 import { tokensAtom } from "@/lib/atoms";
 import { Token, VaultData } from "@/lib/types";
 import { useAtom } from "jotai";
-import { FormEventHandler, useState } from "react";
-import { Address, maxUint256 } from "viem";
-import { IconByProtocol } from "@/components/common/ProtocolIcon";
+import { useState } from "react";
+import { maxUint256 } from "viem";
 import { setDepositIndex } from "@/lib/vault/management/interactions";
 import { useAccount, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
@@ -100,10 +98,10 @@ export default function VaultAutoDeposit({
             />
           }
           {(account && chain?.id === Number(vaultData.chainId)) &&
-            <MainActionButton label="Change Deposit Limit"
+            <MainActionButton label="Change Auto Deposit"
               handleClick={() =>
                 setDepositIndex({
-                  depositIndex: BigInt(newDepositIndex),
+                  depositIndex: newDepositIndex,
                   vaultData,
                   address: vaultData.address,
                   account,

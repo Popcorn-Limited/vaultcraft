@@ -335,15 +335,16 @@ export type VaultV2Settings = {
   proposedDepositIndex: number;
   paused: boolean;
   owner: Address;
-  fees: {
-    performance: {
-      value: number,
-      exists: boolean
-    },
-    management: {
-      value: number,
-      exists: boolean
-    },
-  },
-  accruedFees: number
+  fees: VaultsV2FeeConfig;
+  accruedFees: number;
+}
+
+export type VaultsV2Fee = {
+  value: number | string;
+  exists: boolean;
+}
+
+export type VaultsV2FeeConfig = {
+  performance: VaultsV2Fee;
+  management: VaultsV2Fee;
 }

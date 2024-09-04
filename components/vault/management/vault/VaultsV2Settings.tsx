@@ -13,6 +13,8 @@ import { tokensAtom } from "@/lib/atoms";
 import { useAtom } from "jotai";
 import VaultWithdrawalQueue from "./WithdrawalQueue";
 import VaultTakeFees from "./Fees";
+import VaultV2FeeConfiguration from "./VaultV2FeeConfiguration";
+import VaultV2Strategies from "./VaultV2Strategies";
 
 const DEFAULT_TABS = [
   "Rebalance",
@@ -134,11 +136,6 @@ export default function VaultsV2Settings({ vaultData }: { vaultData: VaultData, 
     setTab(tab);
   }
 
-  // TODO
-  // - withdrawal queue (add change withdrawal queue)
-  // - propose strategy (with depositIndex,withdrawalQueue)
-  // - set fees (differentiate between per fee only or both)
-  
   return (
     <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-0 text-white">
       <h2 className="text-white font-bold text-2xl">Vault Settings</h2>
@@ -157,7 +154,11 @@ export default function VaultsV2Settings({ vaultData }: { vaultData: VaultData, 
           )}
           {tab === "Strategies" && (
             <>
-
+              <VaultV2Strategies
+                vaultData={vaultData}
+                settings={settings}
+                disabled={account !== vaultData.metadata.creator}
+              />
             </>
           )}
           {tab === "Withdrawal Queue" && (
@@ -197,6 +198,12 @@ export default function VaultsV2Settings({ vaultData }: { vaultData: VaultData, 
                 vaultData={vaultData}
                 accruedFees={settings.accruedFees / (10 ** tokens[vaultData.chainId][vaultData.asset].decimals)}
                 callAddress={vaultData.address}
+              />
+              <VaultV2FeeConfiguration
+                vaultData={vaultData}
+                fees={settings.fees}
+                callAddress={vaultData.address}
+                disabled={account !== vaultData.metadata.creator}
               />
             </>
           )}

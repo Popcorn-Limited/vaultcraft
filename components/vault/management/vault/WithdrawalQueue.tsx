@@ -1,18 +1,15 @@
 import MainActionButton from "@/components/button/MainActionButton";
-import Input from "@/components/input/Input";
 import { tokensAtom } from "@/lib/atoms";
 import { Token, VaultData } from "@/lib/types";
 import { useAtom } from "jotai";
-import { FormEventHandler, useState } from "react";
-import { Address, maxUint256 } from "viem";
+import { useState } from "react";
 import { useAccount, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
-import StrategyDescription from "../../StrategyDescription";
-import { IconByProtocol } from "@/components/common/ProtocolIcon";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { ArrowDownIcon, ArrowUpIcon } from "@heroicons/react/24/outline";
 import { handleSwitchChain } from "@/lib/utils/helpers";
-import { proposeWithdrawalQueue } from "@/lib/vault/management/interactions";
+import { setWithdrawalQueue } from "@/lib/vault/management/interactions";
 import StrategyName from "@/components/common/StrategyName";
+import MainButtonGroup from "@/components/common/MainButtonGroup";
 
 export default function VaultWithdrawalQueue({
   vaultData,
@@ -90,35 +87,22 @@ export default function VaultWithdrawalQueue({
               </div>
             )}
           <div className="w-60 py-6">
-            {!account &&
-              <MainActionButton
-                label={"Connect Wallet"}
-                handleClick={openConnectModal}
-              />
-            }
-            {(account && chain?.id !== Number(vaultData.chainId)) &&
-              <MainActionButton
-                label="Switch Chain"
-                handleClick={() => handleSwitchChain(vaultData.chainId, switchChainAsync)}
-              />
-            }
-            {(account && chain?.id === Number(vaultData.chainId)) &&
-              <MainActionButton label="Propose Withdrawal Queue"
-                handleClick={() =>
-                  proposeWithdrawalQueue({
-                    withdrawalQueue: newWithdrawalQueue,
-                    vaultData,
-                    address: vaultData.address,
-                    account,
-                    clients: {
-                      publicClient: publicClient!,
-                      walletClient: walletClient!,
-                    },
-                  })
-                }
-                disabled={disabled}
-              />
-            }
+            <MainButtonGroup
+              label="Set Withdrawal Queue"
+              mainAction={() =>
+                setWithdrawalQueue({
+                  withdrawalQueue: newWithdrawalQueue,
+                  vaultData,
+                  address: vaultData.address,
+                  account,
+                  clients: {
+                    publicClient: publicClient!,
+                    walletClient: walletClient!,
+                  },
+                })}
+              chainId={vaultData.chainId}
+              disabled={disabled}
+            />
           </div>
         </div>
       </div>
