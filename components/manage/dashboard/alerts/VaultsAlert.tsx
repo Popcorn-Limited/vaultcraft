@@ -25,6 +25,7 @@ export default function VaultsAlert() {
             ? vault.metadata.labels?.filter(label => [VaultLabel.experimental, VaultLabel.deprecated].includes(label)).length === 0
             : true
         )
+        .filter(vault => vault.totalAssets - vault.liquid > 0)
         .map(vault =>
           <>
             {/* Check that Vaults have enough liquid cash */}
