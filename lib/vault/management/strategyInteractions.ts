@@ -63,6 +63,7 @@ export async function claimReserve({
   clients,
 }: { blockNumber: bigint, isYieldAsset: boolean, address: Address, account: Address, clients: Clients }): Promise<boolean> {
   showLoadingToast("Claiming Reserve...");
+
   const success = await handleCallResult({
     successMessage: "Claimed reserve!",
     simulationResponse: await simulateCall({
@@ -70,6 +71,94 @@ export async function claimReserve({
       contract: { address: address, abi: AnyToAnyDepositorAbi },
       functionName: "claimReserved",
       args: [blockNumber, isYieldAsset],
+      publicClient: clients.publicClient
+    }),
+    clients
+  });
+
+  return success;
+}
+
+export async function proposeSlippage({
+  slippage,
+  address,
+  account,
+  clients,
+}: { slippage: number, address: Address, account: Address, clients: Clients }): Promise<boolean> {
+  showLoadingToast("Proposing slippage...");
+
+  const success = await handleCallResult({
+    successMessage: "Proposed slippage!",
+    simulationResponse: await simulateCall({
+      account: account as Address,
+      contract: { address: address, abi: AnyToAnyDepositorAbi },
+      functionName: "proposeSlippage",
+      args: [BigInt(slippage)],
+      publicClient: clients.publicClient
+    }),
+    clients
+  });
+
+  return success;
+}
+
+export async function changeSlippage({
+  address,
+  account,
+  clients,
+}: { address: Address, account: Address, clients: Clients }): Promise<boolean> {
+  showLoadingToast("Change slippage...");
+
+  const success = await handleCallResult({
+    successMessage: "Changed slippage!",
+    simulationResponse: await simulateCall({
+      account: account as Address,
+      contract: { address: address, abi: AnyToAnyDepositorAbi },
+      functionName: "changeSlippage",
+      publicClient: clients.publicClient
+    }),
+    clients
+  });
+
+  return success;
+}
+
+export async function proposeFloat({
+  float,
+  address,
+  account,
+  clients,
+}: { float: number, address: Address, account: Address, clients: Clients }): Promise<boolean> {
+  showLoadingToast("Proposing float...");
+
+  const success = await handleCallResult({
+    successMessage: "Proposed float!",
+    simulationResponse: await simulateCall({
+      account: account as Address,
+      contract: { address: address, abi: AnyToAnyDepositorAbi },
+      functionName: "proposeFloatRatio",
+      args: [BigInt(float)],
+      publicClient: clients.publicClient
+    }),
+    clients
+  });
+
+  return success;
+}
+
+export async function changeFloat({
+  address,
+  account,
+  clients,
+}: { address: Address, account: Address, clients: Clients }): Promise<boolean> {
+  showLoadingToast("Change float...");
+
+  const success = await handleCallResult({
+    successMessage: "Changed float!",
+    simulationResponse: await simulateCall({
+      account: account as Address,
+      contract: { address: address, abi: AnyToAnyDepositorAbi },
+      functionName: "changeFloatRatio",
       publicClient: clients.publicClient
     }),
     clients

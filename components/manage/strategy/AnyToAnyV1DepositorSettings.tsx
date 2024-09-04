@@ -5,6 +5,7 @@ import { AnyToAnyDepositorAbi, AssetPushOracleAbi, AssetPushOracleByChain } from
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 import TabSelector from "@/components/common/TabSelector";
 import ConvertTokenSection from "./ConvertTokenSection";
+import ChangeSettingSection from "./ChangeSettingSetion";
 
 export interface ProposedChange {
   value: bigint;
@@ -25,6 +26,7 @@ export interface AnyToAnySettings {
   bqPrice: number;
   qbPrice: number;
   totalAssets: number;
+  block: any;
 }
 
 export interface PassThroughProps {
@@ -110,6 +112,8 @@ async function getAnyToAnyData(address: Address, asset: Token, yieldAsset: Token
     ],
     allowFailure: false
   })
+  const block = await client.getBlock()
+
   const assetBal = Number(res1[7] - res1[8]);
   const yieldAssetBal = Number(res1[6] - res1[9])
   return {
@@ -125,7 +129,8 @@ async function getAnyToAnyData(address: Address, asset: Token, yieldAsset: Token
     proposedSlippage: { value: res1[5][0], time: res1[5][1] },
     bqPrice: Number(res1[10]),
     qbPrice: Number(res1[11]),
-    totalAssets: assetBal + ((yieldAssetBal * (Number(res1[10]) / 1e18)) / (10 ** (yieldAsset.decimals - asset.decimals)))
+    totalAssets: assetBal + ((yieldAssetBal * (Number(res1[10]) / 1e18)) / (10 ** (yieldAsset.decimals - asset.decimals))),
+    block
   }
 }
 
@@ -139,10 +144,6 @@ export default function AnyToAnyV1DepositorSettings({ strategy, asset, yieldAsse
     if (strategy.address) getAnyToAnyData(strategy.address, asset, yieldAsset, chainId).then(res => setSettings(res))
   }, [strategy, asset, chainId])
 
-  // TODO
-  // set slippage
-  // set float
-
   return settings ? (
     <section className="md:border-b border-customNeutral100 py-10 px-4 md:px-0 text-white">
       <h2 className="text-white font-bold text-2xl">Vault Settings</h2>
@@ -154,6 +155,12 @@ export default function AnyToAnyV1DepositorSettings({ strategy, asset, yieldAsse
       />
       {
         tab === "Convert" && <ConvertTokenSection strategy={strategy} asset={asset} yieldAsset={yieldAsset} settings={settings} chainId={chainId} />
+      }
+      {
+        tab === "Slippage" && <ChangeSettingSection strategy={strategy} asset={asset} yieldAsset={yieldAsset} settings={settings} chainId={chainId} id={"slippage"} />
+      }
+      {
+        tab === "Float" && <ChangeSettingSection strategy={strategy} asset={asset} yieldAsset={yieldAsset} settings={settings} chainId={chainId} id={"float"} />
       }
     </section>
   )
