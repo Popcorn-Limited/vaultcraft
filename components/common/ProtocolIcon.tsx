@@ -21,6 +21,7 @@ export const IconByProtocol: { [key: string]: string } = {
   Yearn: "https://icons.llamao.fi/icons/protocols/yearn-finance?w=48&h=48",
   Pendle: "https://icons.llamao.fi/icons/protocols/pendle?w=48&h=48",
   Pirex: "https://icons.llamao.fi/icons/protocols/pirex?w=48&h=48",
+  Peapods: "https://icons.llamao.fi/icons/protocols/peapods-finance?w=48&h=48",
   Sommelier: "https://icons.llamao.fi/icons/protocols/sommelier?w=48&h=48",
   Frax: "https://icons.llamao.fi/icons/protocols/frax?w=48&h=48",
   FraxLend: "https://icons.llamao.fi/icons/protocols/frax?w=48&h=48",
@@ -28,6 +29,7 @@ export const IconByProtocol: { [key: string]: string } = {
   Stader: "https://icons.llamao.fi/icons/protocols/stader?w=48&h=48",
   KelpDAO: "https://icons.llamao.fi/icons/protocols/kelp-dao?w=48&h=48",
   Ion: "https://www.app.ionprotocol.io/logo.svg",
+  Ipor: "https://icons.llamao.fi/icons/protocols/ipor?w=48&h=48",
   Multistrategy: "/images/tokens/vcx.svg",
   VaultCraft: "/images/tokens/vcx.svg",
   None: "/images/tokens/vcx.svg"
