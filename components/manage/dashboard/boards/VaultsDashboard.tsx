@@ -21,7 +21,7 @@ export default function VaultsDashboard({ dashboardData }: { dashboardData: any 
   // TODO
   // - fees
   // - last harvested
-  
+
   return vaults.length > 0 && Object.keys(tokens).length > 0 ?
     (
       <div className="mt-8 flow-root">
@@ -73,7 +73,7 @@ export default function VaultsDashboard({ dashboardData }: { dashboardData: any 
                           {formatNumber(vault.liquid / (10 ** tokens[vault.chainId][vault.asset].decimals))}
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                          {formatTwoDecimals(vault.liquid / vault.totalAssets)} %
+                          {formatTwoDecimals((vault.liquid / vault.totalAssets) * 100)} %
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                           {formatNumber(vault.idle / (10 ** tokens[vault.chainId][vault.asset].decimals))}
