@@ -1,6 +1,6 @@
 import { Address, erc20Abi, PublicClient } from "viem";
 import { LlamaApy, Strategy, VaultDataByAddress, StrategyByAddress } from "@/lib/types";
-import { VaultAbi } from "@/lib/constants";
+import { AnyToAnyDepositorAbi, VaultAbi } from "@/lib/constants";
 import axios from "axios";
 import { EMPTY_LLAMA_APY_ENTRY, getApy, getCustomApy } from "@/lib/resolver/apy";
 
@@ -18,9 +18,8 @@ export default async function prepareStrategies(vaults: VaultDataByAddress, chai
     `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/descriptions/strategies/${chainId}.json`
   );
 
-  // Get TotalAssets and TotalSupply and idle cash
   // @ts-ignore
-  const taAndTs = await client.multicall({
+  const strategyRes = await client.multicall({
     contracts: uniqueStrategyAdresses
       .map((address: Address) => {
         return [
@@ -39,11 +38,16 @@ export default async function prepareStrategies(vaults: VaultDataByAddress, chai
             abi: erc20Abi,
             functionName: "balanceOf",
             args: [address]
-          }
+          },
+          {
+            address,
+            abi: AnyToAnyDepositorAbi,
+            functionName: "totalReservedAssets",
+          },
         ]
       })
       .flat(),
-    allowFailure: false,
+    allowFailure: true,
   });
 
   let strategies: StrategyByAddress = {}
@@ -51,10 +55,10 @@ export default async function prepareStrategies(vaults: VaultDataByAddress, chai
   await Promise.all(
     // We use map here since Promise.all doesnt work on a forEach
     uniqueStrategyAdresses.map(async (address, i) => {
-      if (i > 0) i = i * 3;
+      if (i > 0) i = i * 4;
 
-      const totalAssets = Number(taAndTs[i]);
-      const totalSupply = Number(taAndTs[i + 1]);
+      const totalAssets = Number(strategyRes[i].result!);
+      const totalSupply = Number(strategyRes[i + 1].result!);
       const assetsPerShare =
         totalSupply > 0 ? totalAssets / totalSupply : Number(1);
 
@@ -93,7 +97,7 @@ export default async function prepareStrategies(vaults: VaultDataByAddress, chai
         totalAssets,
         totalSupply,
         assetsPerShare,
-        idle: desc.type === "AnyToAnyV1" ? Number(taAndTs[i + 2]) : totalAssets
+        idle: desc.type === "AnyToAnyV1" ? Number(strategyRes[i + 2].result!) - Number(strategyRes[i + 3].result!) : totalAssets
       }
     })
   )

@@ -43,7 +43,7 @@ async function getAnyToAnyData(address: Address, asset: Token, yieldAsset: Token
     transport: http(RPC_URLS[chainId]),
   });
 
-  const res1 = await client.multicall({
+  const vaultRes = await client.multicall({
     contracts: [
       {
         address,
@@ -98,6 +98,16 @@ async function getAnyToAnyData(address: Address, asset: Token, yieldAsset: Token
         functionName: "totalReservedYieldAssets",
       },
       {
+        address,
+        abi: AnyToAnyDepositorAbi,
+        functionName: "totalReservedyieldTokens",
+      },
+      {
+        address,
+        abi: AnyToAnyDepositorAbi,
+        functionName: "totalReservedYieldTokens",
+      },
+      {
         address: AssetPushOracleByChain[chainId],
         abi: AssetPushOracleAbi,
         functionName: "prices",
@@ -110,26 +120,27 @@ async function getAnyToAnyData(address: Address, asset: Token, yieldAsset: Token
         args: [asset.address, yieldAsset.address]
       }
     ],
-    allowFailure: false
+    allowFailure: true
   })
   const block = await client.getBlock()
 
-  const assetBal = Number(res1[7] - res1[8]);
-  const yieldAssetBal = Number(res1[6] - res1[9])
+  const reservedYieldAssets = Number(vaultRes[9].status === "success" ? vaultRes[9].result : vaultRes[10].status === "success" ? vaultRes[10].result : vaultRes[11].result);
+  const assetBal = Number(vaultRes[7].result! - vaultRes[8].result!);
+  const yieldAssetBal = Number(vaultRes[6].result!) - reservedYieldAssets
   return {
-    owner: res1[0],
-    keeper: res1[1],
+    owner: vaultRes[0].result!,
+    keeper: vaultRes[1].result!,
     assetBal: assetBal,
     yieldAssetBal: yieldAssetBal,
-    reservedAssets: Number(res1[2]),
-    reservedYieldAssets: Number(res1[3]),
-    float: res1[2],
-    proposedFloat: { value: res1[3][0], time: res1[3][1] },
-    slippage: res1[4],
-    proposedSlippage: { value: res1[5][0], time: res1[5][1] },
-    bqPrice: Number(res1[10]),
-    qbPrice: Number(res1[11]),
-    totalAssets: assetBal + ((yieldAssetBal * (Number(res1[10]) / 1e18)) / (10 ** (yieldAsset.decimals - asset.decimals))),
+    reservedAssets: Number(vaultRes[2].result!),
+    reservedYieldAssets: reservedYieldAssets,
+    float: vaultRes[2].result!,
+    proposedFloat: { value: vaultRes[3].result![0], time: vaultRes[3].result![1] },
+    slippage: vaultRes[4].result!,
+    proposedSlippage: { value: vaultRes[5].result![0], time: vaultRes[5].result![1] },
+    bqPrice: Number(vaultRes[12].result!),
+    qbPrice: Number(vaultRes[13].result!),
+    totalAssets: assetBal + ((yieldAssetBal * (Number(vaultRes[12].result) / 1e18)) / (10 ** (yieldAsset.decimals - asset.decimals))),
     block
   }
 }
