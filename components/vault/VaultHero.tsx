@@ -99,7 +99,7 @@ export default function VaultHero({
                       TVL of underlying protocols`}
             />
           </div>
-          {vaultData.liquid / vaultData.totalAssets < 1 &&
+          {vaultData.strategies.filter(strategy => strategy.metadata.type === "AnyToAnyV1").length > 0 &&
             <div>
               <LargeCardStat
                 id={"utilization"}
