@@ -4,6 +4,7 @@ import AssetWithName from "@/components/common/AssetWithName";
 import {
   NumberFormatter,
   formatAndRoundNumber,
+  formatNumber,
   formatTwoDecimals,
 } from "@/lib/utils/formatBigNumber";
 import { roundToTwoDecimalPlaces } from "@/lib/utils/helpers";
@@ -98,6 +99,17 @@ export default function VaultHero({
                       TVL of underlying protocols`}
             />
           </div>
+          {vaultData.strategies.filter(strategy => strategy.metadata.type === "AnyToAnyV1").length > 0 &&
+            <div>
+              <LargeCardStat
+                id={"utilization"}
+                label="Utilization"
+                value={`${formatTwoDecimals(100 - (vaultData.liquid / vaultData.totalAssets) * 100)} %`}
+                secondaryValue={`${formatNumber(vaultData.liquid / (10 ** asset?.decimals))} ${asset?.symbol}`}
+                tooltip={`This Vault has deployed ${formatTwoDecimals(100 - (vaultData.liquid / vaultData.totalAssets) * 100)} % of assets in managed strategies. ${formatNumber(vaultData.liquid / (10 ** asset?.decimals))} ${asset?.symbol} are instantly available for withdrawal. Additional funds need to be freed up by the vault manager.`}
+              />
+            </div>
+          }
           <div>
             <LargeCardStat
               id={"vapy"}

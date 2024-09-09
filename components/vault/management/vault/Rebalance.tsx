@@ -1,11 +1,13 @@
 import MainActionButton from "@/components/button/MainActionButton";
+import CopyAddress from "@/components/common/CopyAddress";
 import { IconByProtocol } from "@/components/common/ProtocolIcon";
+import StrategyName from "@/components/common/StrategyName";
 import TabSelector from "@/components/common/TabSelector";
 import InputNumber from "@/components/input/InputNumber";
-import { tokensAtom } from "@/lib/atoms";
-import { yieldOptionsAtom } from "@/lib/atoms/sdk";
+import { strategiesAtom, tokensAtom } from "@/lib/atoms";
 import { addStrategyData } from "@/lib/getTokenAndVaultsData";
 import { Token, VaultAllocation, VaultData } from "@/lib/types";
+import { formatNumber } from "@/lib/utils/formatBigNumber";
 import { validateInput } from "@/lib/utils/helpers";
 import { allocateToStrategies, deallocateFromStrategies } from "@/lib/vault/management/interactions";
 import { useAtom } from "jotai";
@@ -22,8 +24,8 @@ export default function VaultRebalance({
   const { data: walletClient } = useWalletClient();
   const { switchChainAsync } = useSwitchChain();
 
-  const [yieldOptions] = useAtom(yieldOptionsAtom)
   const [tokens] = useAtom(tokensAtom)
+  const [strategies] = useAtom(strategiesAtom)
   const [asset, setAsset] = useState<Token>()
 
   const { data: blockNumber } = useBlockNumber({ watch: true })
@@ -75,7 +77,7 @@ export default function VaultRebalance({
   }
 
   async function handleMainAction() {
-    if (inputValues.reduce((a, b) => Number(a) + Number(b), 0) === 0 || !asset || !vaultData || !account || !walletClient || !yieldOptions) return;
+    if (inputValues.reduce((a, b) => Number(a) + Number(b), 0) === 0 || !asset || !vaultData || !account || !walletClient || !strategies) return;
 
     if (chain?.id !== vaultData.chainId) {
       try {
@@ -111,7 +113,7 @@ export default function VaultRebalance({
       })
 
       if (success) {
-        const updatedVault = await addStrategyData({ [vaultData.address]: vaultData }, vaultData.chainId, publicClient!)
+        const updatedVault = await addStrategyData({ [vaultData.address]: vaultData }, strategies[vaultData.chainId], publicClient!)
         vaultData = updatedVault[vaultData.address]
       }
       return
@@ -137,7 +139,7 @@ export default function VaultRebalance({
       })
 
       if (success) {
-        const updatedVault = await addStrategyData({ [vaultData.address]: vaultData }, vaultData.chainId, publicClient!)
+        const updatedVault = await addStrategyData({ [vaultData.address]: vaultData }, strategies[vaultData.chainId], publicClient!)
         vaultData = updatedVault[vaultData.address]
       }
       return
@@ -149,11 +151,16 @@ export default function VaultRebalance({
     <>
       <div className="flex flex-row justify-center">
         <div className="w-full">
-          <p className="text-customGray500 mb-12">
+          <p className="text-customGray500 mb-2">
             To rebalance between strategies you need to free up funds first (Float) before you can allocate those.
             Deallocating and Allocating are two seperate transactions.
             Keep in mind that by dellocating or allocating funds you might be charged fees or slippage from the underlying protocols.
           </p>
+          <div className="mb-4">
+            <p>Total Assets: {formatNumber(vaultData.totalAssets / (10 ** (asset?.decimals || 0)))} {asset?.symbol}</p>
+            <p>Liquid Assets: {formatNumber(vaultData.liquid / (10 ** (asset?.decimals || 0)))} {asset?.symbol}</p>
+            <p>Idle Assets: {formatNumber(vaultData.idle / (10 ** (asset?.decimals || 0)))} {asset?.symbol}</p>
+          </div>
           <TabSelector activeTab={activeTab} availableTabs={["Deallocate", "Allocate"]} setActiveTab={switchTab} />
           {(asset && float) ?
             <div className="mt-4">
@@ -171,15 +178,11 @@ export default function VaultRebalance({
                     (strategy, i) =>
                       <tr key={strategy.address}>
                         <td className="whitespace-nowrap py-4 pl-4 pr-3 font-medium sm:pl-0">
-                          <div className="w-max flex flex-row items-center">
-                            <img
-                              src={IconByProtocol[strategy.metadata.name] || "/images/tokens/vcx.svg"}
-                              className={`h-5 w-5 mr-2  rounded-full border border-white`}
-                            />
-                            <h2 className="text-lg text-white">
-                              {strategy.metadata.name}
-                            </h2>
-                          </div>
+                          <StrategyName
+                            strategy={strategy}
+                            asset={tokens[vaultData.chainId][strategy.asset]}
+                            yieldAsset={strategy.yieldAsset ? tokens[vaultData.chainId][strategy.yieldAsset] : undefined}
+                          />
                         </td>
 
                         <td className="whitespace-nowrap px-3 py-4 text-gray-500">

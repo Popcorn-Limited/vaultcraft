@@ -11,8 +11,8 @@ import { useRouter } from "next/router";
 import { Address, createPublicClient, http, zeroAddress } from "viem";
 import Modal from "@/components/modal/Modal";
 import MainActionButton from "../button/MainActionButton";
-import { gaugeRewardsAtom, networthAtom, tokensAtom, tvlAtom, vaultronAtom } from "@/lib/atoms";
-import { ReserveData, TokenByAddress, TokenType, UserAccountData, VaultData } from "@/lib/types";
+import { gaugeRewardsAtom, networthAtom, strategiesAtom, tokensAtom, tvlAtom, vaultronAtom } from "@/lib/atoms";
+import { ReserveData, StrategiesByChain, TokenByAddress, TokenType, UserAccountData, VaultData } from "@/lib/types";
 import getTokenAndVaultsDataByChain from "@/lib/getTokenAndVaultsData";
 import { aaveAccountDataAtom, aaveReserveDataAtom } from "@/lib/atoms/lending";
 import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
@@ -168,6 +168,7 @@ export default function Page({
 
   const [, setVaults] = useAtom(vaultsAtom);
   const [, setTokens] = useAtom(tokensAtom);
+  const [, setStrategies] = useAtom(strategiesAtom);
   const [, setGaugeRewards] = useAtom(gaugeRewardsAtom);
   const [, setTVL] = useAtom(tvlAtom);
   const [, setNetworth] = useAtom(networthAtom);
@@ -183,6 +184,7 @@ export default function Page({
       // get vaultsData and tokens
       const newVaultsData: { [key: number]: VaultData[] } = {}
       const newTokens: { [key: number]: TokenByAddress } = {}
+      const newStrategies: StrategiesByChain = {}
 
       console.log(`Fetching Token and Vaults Data (${new Date()})`)
       let start = Number(new Date())
@@ -192,7 +194,7 @@ export default function Page({
           console.log(`Fetching Data for chain ${chain.id} (${new Date()})`)
           let chainStart = Number(new Date())
 
-          const { vaultsData, tokens } = await getTokenAndVaultsDataByChain({
+          const { vaultsData, tokens, strategies } = await getTokenAndVaultsDataByChain({
             chain,
             account: account || zeroAddress,
             yieldOptions: yieldOptions as YieldOptions,
@@ -203,6 +205,7 @@ export default function Page({
 
           newVaultsData[chain.id] = vaultsData
           newTokens[chain.id] = tokens;
+          newStrategies[chain.id] = strategies
         })
       );
 
@@ -268,6 +271,8 @@ export default function Page({
       });
       setVaults(newVaultsData);
       setTokens(newTokens);
+      setStrategies(newStrategies);
+
       // setAaveReserveData(newReserveData);
       // setAaveAccountData(newUserAccountData);
 

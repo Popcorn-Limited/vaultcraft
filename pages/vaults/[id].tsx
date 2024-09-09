@@ -13,12 +13,12 @@ import { tokensAtom } from "@/lib/atoms";
 import LeftArrowIcon from "@/components/svg/LeftArrowIcon";
 import ManageLoanInterface from "@/components/lending/ManageLoanInterface";
 import { VeTokenByChain, ZapAssetAddressesByChain } from "@/lib/constants";
-import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import StrategyDescription from "@/components/vault/StrategyDescription";
 import ApyChart from "@/components/vault/ApyChart";
 import VaultHero from "@/components/vault/VaultHero";
 import { isAddress, zeroAddress } from "viem";
 import UserBoostSection from "@/components/vault/UserBoostSection";
+import HtmlRenderer from "@/components/common/HtmlRenderer";
 
 export default function Index() {
   const router = useRouter();
@@ -119,13 +119,9 @@ export default function Index() {
 
                 <div className="bg-customNeutral200 p-6 rounded-lg">
                   <p className="text-white text-2xl font-bold">Information</p>
-                  <p className="text-white">
-                    {vaultData.metadata.description && vaultData.metadata.description?.split("-LINK- ").length > 1 ?
-                      <>{vaultData.metadata.description?.split("-LINK- ")[0]}{" "}
-                        <a href={vaultData.metadata.description?.split("-LINK- ")[1]} target="_blank" className="text-secondaryBlue">here</a></>
-                      : <>{vaultData.metadata.description}</>
-                    }
-                  </p>
+                  <div className="text-white">
+                    {vaultData.metadata.description && vaultData.metadata.description.length > 0 && <HtmlRenderer htmlContent={vaultData.metadata.description} />}
+                  </div>
                   <div className="md:flex md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4 mt-4">
 
                     <div className="w-full md:w-10/12 border border-customNeutral100 rounded-lg p-4">
@@ -182,6 +178,7 @@ export default function Index() {
                       key={`${strategy.resolver}-${i}`}
                       strategy={strategy}
                       asset={asset}
+                      chainId={vaultData.chainId}
                       i={i}
                       stratLen={vaultData.strategies.length}
                     />

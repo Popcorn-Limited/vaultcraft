@@ -56,6 +56,8 @@ export type VaultData = {
   gaugeData?: GaugeData;
   metadata: VaultMetadata;
   strategies: Strategy[];
+  idle: number;
+  liquid: number;
 };
 
 export type LlamaApy = {
@@ -70,6 +72,8 @@ export type StrategyType = "AnyToAnyV1" | "Vanilla"
 
 export type Strategy = {
   address: Address;
+  asset: Address;
+  yieldAsset?: Address;
   metadata: StrategyMetadata;
   resolver: string;
   allocation: number;
@@ -78,14 +82,17 @@ export type Strategy = {
   apyHist: LlamaApy[];
   apyId: string;
   apySource: "custom" | "defillama";
-  type: StrategyType;
-  yieldAsset?: Address;
+  totalAssets: number;
+  totalSupply: number;
+  assetsPerShare: number;
+  idle: number;
 }
 
 type StrategyMetadata = {
   name: string;
   protocol: string;
   description: string;
+  type: StrategyType;
 }
 
 export enum VaultLabel {
@@ -102,7 +109,8 @@ export type VaultMetadata = {
   | "single-asset-vault-v1"
   | "single-asset-lock-vault-v1"
   | "multi-strategy-vault-v1"
-  | "multi-strategy-vault-v2";
+  | "multi-strategy-vault-v2"
+  | "multi-strategy-vault-v2.5";
   creator: Address;
   feeRecipient: Address;
 };
@@ -281,6 +289,14 @@ export type AddressByChain = {
   [key: number]: Address
 }
 
+export type StrategyByAddress = {
+  [key: Address]: Strategy
+}
+
+export type StrategiesByChain = {
+  [key: number]: StrategyByAddress
+}
+
 export type AddressesByChain = {
   [key: number]: Address[]
 }
@@ -319,4 +335,16 @@ export type VaultV2Settings = {
   proposedDepositIndex: number;
   paused: boolean;
   owner: Address;
+  fees: VaultsV2FeeConfig;
+  accruedFees: number;
+}
+
+export type VaultsV2Fee = {
+  value: number | string;
+  exists: boolean;
+}
+
+export type VaultsV2FeeConfig = {
+  performance: VaultsV2Fee;
+  management: VaultsV2Fee;
 }

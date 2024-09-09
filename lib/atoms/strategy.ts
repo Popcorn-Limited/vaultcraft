@@ -2,7 +2,12 @@ import { AdapterConfig, InitParam } from "./adapter";
 import strategies from "@/lib/constants/strategies.json";
 import { atom } from "jotai";
 import { stringToHex } from "viem";
+import { StrategiesByChain } from "@/lib/types";
 
+// Used in most of the app
+export const strategiesAtom = atom<StrategiesByChain>({});
+
+// Following is used in the creation tool
 export type Strategy = {
   name: string;
   key: string;

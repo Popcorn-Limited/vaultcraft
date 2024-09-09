@@ -1,9 +1,10 @@
-import { MultiStrategyVaultAbi, VaultAbi, VaultControllerAbi, VaultControllerByChain } from "@/lib/constants";
+import { MultiStrategyVaultAbi, MultiStrategyVaultV2_1Abi, MultiStrategyVaultV2Abi, VaultAbi, VaultControllerAbi, VaultControllerByChain } from "@/lib/constants";
 import { showLoadingToast } from "@/lib/toasts"
-import { AddressByChain, Clients, SimulationResponse, VaultAllocation, VaultData } from "@/lib/types"
+import { AddressByChain, Clients, SimulationResponse, VaultAllocation, VaultData, VaultsV2FeeConfig } from "@/lib/types"
 import { SimulationContract, handleCallResult, simulateCall } from "@/lib/utils/helpers"
+import { MdPanoramaWideAngleSelect } from "react-icons/md";
 import { VaultController } from "vaultcraft-sdk";
-import { Address } from "viem"
+import { Address, maxUint256 } from "viem"
 
 interface BaseWriteProps {
   vaultData: VaultData;
@@ -387,6 +388,147 @@ export async function takeFees({
       },
       account: account as Address,
       functionName: "takeManagementAndPerformanceFees",
+      publicClient: clients.publicClient
+    }),
+    clients
+  });
+}
+
+
+export async function setDepositIndex({
+  depositIndex,
+  vaultData,
+  address,
+  account,
+  clients,
+}: BaseWriteProps & { depositIndex: number }): Promise<boolean> {
+  showLoadingToast("Setting new deposit index...");
+
+  return handleCallResult({
+    successMessage: "New deposit index set!",
+    simulationResponse: await simulateCall({
+      contract: {
+        address,
+        abi: MultiStrategyVaultV2Abi
+      },
+      account: account as Address,
+      functionName: "setDepositIndex",
+      args: [depositIndex === Number(maxUint256) ? maxUint256 : BigInt(depositIndex)],
+      publicClient: clients.publicClient
+    }),
+    clients
+  });
+}
+
+export async function setWithdrawalQueue({
+  withdrawalQueue,
+  vaultData,
+  address,
+  account,
+  clients,
+}: BaseWriteProps & { withdrawalQueue: number[] }): Promise<boolean> {
+  showLoadingToast("Setting new withdrawal queue...");
+
+  return handleCallResult({
+    successMessage: "New withdrawal queue set!",
+    simulationResponse: await simulateCall({
+      contract: {
+        address,
+        abi: MultiStrategyVaultV2Abi
+      },
+      account: account as Address,
+      functionName: "setWithdrawalQueue",
+      args: [withdrawalQueue.map(e => BigInt(e))],
+      publicClient: clients.publicClient
+    }),
+    clients
+  });
+}
+
+export async function setV2Fees({
+  fees,
+  vaultData,
+  address,
+  account,
+  clients,
+}: BaseWriteProps & { fees: VaultsV2FeeConfig }): Promise<boolean> {
+  showLoadingToast("Setting new fees...");
+
+  let params: any = {}
+  if (fees.management.exists) {
+    params = {
+      abi: MultiStrategyVaultV2_1Abi,
+      functionName: "setFees",
+      args: [BigInt(fees.performance.value), BigInt(fees.management.value)]
+    }
+  } else {
+    params = {
+      abi: MultiStrategyVaultV2Abi,
+      functionName: "setPerformanceFee",
+      args: [BigInt(fees.performance.value)]
+    }
+  }
+
+  return handleCallResult({
+    successMessage: "New fees set!",
+    simulationResponse: await simulateCall({
+      contract: {
+        address,
+        abi: params.abi
+      },
+      account: account as Address,
+      functionName: params.functionName,
+      args: params.args,
+      publicClient: clients.publicClient
+    }),
+    clients
+  });
+}
+
+export async function proposeVaultV2NewStrategies({
+  strategies,
+  withdrawalQueue,
+  depositIndex,
+  vaultData,
+  address,
+  account,
+  clients,
+}: BaseWriteProps & { strategies: Address[], withdrawalQueue: number[], depositIndex: number }): Promise<boolean> {
+  showLoadingToast("Proposing new strategies...");
+
+  return handleCallResult({
+    successMessage: "New strategies proposed!",
+    simulationResponse: await simulateCall({
+      contract: {
+        address,
+        abi: MultiStrategyVaultV2Abi
+      },
+      account: account as Address,
+      functionName: "proposeStrategies",
+      args: [strategies, withdrawalQueue.map(e => BigInt(e)), depositIndex === Number(maxUint256) ? maxUint256 : BigInt(depositIndex)],
+      publicClient: clients.publicClient
+    }),
+    clients
+  });
+}
+
+export async function changeVaultV2NewStrategies({
+  vaultData,
+  address,
+  account,
+  clients,
+}: BaseWriteProps): Promise<boolean> {
+  showLoadingToast("Accepting new strategies...");
+
+  return handleCallResult({
+    successMessage: "Accepted new strategies!",
+    simulationResponse: await simulateCall({
+      contract: {
+        address,
+        abi: MultiStrategyVaultV2_1Abi
+      },
+      account: account as Address,
+      functionName: "changeStrategies",
       publicClient: clients.publicClient
     }),
     clients

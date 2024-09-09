@@ -264,11 +264,25 @@ export default function VaultInputs({
       disabled={!isDeposit && !outputToken}
       allowInput
     />
-    {vaultData.depositLimit < maxUint256 &&
-      <span className="flex flex-row items-center justify-between text-[#D7D7D7]">
-        <p>Deposit Limit:</p>
-        <p>{vaultData.depositLimit / (10 ** (asset?.decimals || 0))} {asset?.symbol}</p>
-      </span>
+    {
+      isDeposit ?
+        <>
+          {vaultData.depositLimit < maxUint256 &&
+            <span className="flex flex-row items-center justify-between text-[#D7D7D7]">
+              <p>Deposit Limit:</p>
+              <p>{formatNumber(vaultData.depositLimit / (10 ** (asset?.decimals || 0)))} {asset?.symbol}</p>
+            </span>
+          }
+        </>
+        :
+        <>
+          {vaultData.liquid < vaultData.totalAssets &&
+            <span className="flex flex-row items-center justify-between text-[#D7D7D7]">
+              <p>Withdraw Limit:</p>
+              <p>{formatNumber(vaultData.liquid / (10 ** (asset?.decimals || 0)))} {asset?.symbol}</p>
+            </span>
+          }
+        </>
     }
 
     <div className="relative py-4">
