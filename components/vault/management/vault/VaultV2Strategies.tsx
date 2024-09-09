@@ -6,7 +6,6 @@ import { useState } from "react";
 import { useAccount, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { ArrowDownIcon, ArrowUpIcon, Square2StackIcon } from "@heroicons/react/24/outline";
-import { handleSwitchChain } from "@/lib/utils/helpers";
 import { changeVaultV2NewStrategies, proposeVaultV2NewStrategies, setWithdrawalQueue } from "@/lib/vault/management/interactions";
 import StrategyName from "@/components/common/StrategyName";
 import MainButtonGroup from "@/components/common/MainButtonGroup";
@@ -14,7 +13,6 @@ import { Address, getAddress, isAddress, maxUint256 } from "viem";
 import InputNumber from "@/components/input/InputNumber";
 import { showErrorToast, showSuccessToast } from "@/lib/toasts";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
-import CopyAddress from "@/components/common/CopyAddress";
 import CopyToClipboard from "react-copy-to-clipboard";
 
 export default function VaultV2Strategies({
@@ -82,7 +80,7 @@ export default function VaultV2Strategies({
                 <StrategyName
                   strategy={strategy}
                   asset={tokens[vaultData.chainId][strategy.asset]}
-                  yieldAsset={strategy.yieldAsset ? tokens[vaultData.chainId][strategy.yieldAsset!] : undefined}
+                  yieldToken={strategy.yieldToken ? tokens[vaultData.chainId][strategy.yieldToken!] : undefined}
                 />
               </div>
             </div>

@@ -40,7 +40,7 @@ async function getReserveLogs(address: Address, account: Address, client: Public
   return addedLogs
 }
 
-export default function ConvertTokenSection({ strategy, asset, yieldAsset, settings, chainId }: PassThroughProps) {
+export default function ConvertTokenSection({ strategy, asset, yieldToken, settings, chainId }: PassThroughProps) {
   const { address: account, chain } = useAccount();
   const publicClient = usePublicClient({ chainId });
   const [reserves, setReserves] = useState<any[]>()
@@ -58,25 +58,25 @@ export default function ConvertTokenSection({ strategy, asset, yieldAsset, setti
     <>
       <div className="flex flex-row items-center justify-between space-x-8">
         <div className="w-1/2">
-          <p className="text-white text-2xl">Deposit YieldAsset</p>
-          <p>Deposit yieldAssets to claim assets at an equivalent value after</p>
-          <ConvertToken token={yieldAsset} strategy={strategy} asset={asset} yieldAsset={yieldAsset} settings={settings} chainId={chainId} updateReserves={updateReserves} />
+          <p className="text-white text-2xl">Deposit YieldToken</p>
+          <p>Deposit yieldTokens to claim assets at an equivalent value after</p>
+          <ConvertToken token={yieldToken} strategy={strategy} asset={asset} yieldToken={yieldToken} settings={settings} chainId={chainId} updateReserves={updateReserves} />
         </div>
         <div className="w-1/2">
           <p className="text-white text-2xl">Deposit Asset</p>
-          <p>Deposit assets to claim yieldAssets at an equivalent value after</p>
-          <ConvertToken token={asset} strategy={strategy} asset={asset} yieldAsset={yieldAsset} settings={settings} chainId={chainId} updateReserves={updateReserves} />
+          <p>Deposit assets to claim yieldTokens at an equivalent value after</p>
+          <ConvertToken token={asset} strategy={strategy} asset={asset} yieldToken={yieldToken} settings={settings} chainId={chainId} updateReserves={updateReserves} />
         </div>
       </div>
       <div className="w-full border border-customNeutral100 rounded-lg p-4 my-4 flex flex-row justify-between">
         <div className="w-1/2 px-4">
           <p className="text-xl">Price</p>
           <span className="flex space-x-2">
-            <p>Assets p. YieldAsset:</p>
+            <p>Assets p. YieldToken:</p>
             <p className="text-customGray300">{settings.bqPrice / 1e18}</p>
           </span>
           <span className="flex space-x-2">
-            <p>YieldAssets p. Asset:</p>
+            <p>YieldTokens p. Asset:</p>
             <p className="text-customGray300">{settings.qbPrice / 1e18}</p>
           </span>
         </div>
@@ -87,8 +87,8 @@ export default function ConvertTokenSection({ strategy, asset, yieldAsset, setti
             <p className="text-customGray300">{settings.assetBal / (10 ** asset.decimals)}</p>
           </span>
           <span className="flex space-x-2">
-            <p>YieldAssets:</p>
-            <p className="text-customGray300">{settings.yieldAssetBal / (10 ** yieldAsset.decimals)}</p>
+            <p>YieldTokens:</p>
+            <p className="text-customGray300">{settings.yieldTokenBal / (10 ** yieldToken.decimals)}</p>
           </span>
           <span className="flex space-x-2">
             <p>Total Assets:</p>
@@ -96,17 +96,17 @@ export default function ConvertTokenSection({ strategy, asset, yieldAsset, setti
           </span>
         </div>
       </div>
-      <ReservesContainer strategy={strategy} asset={asset} yieldAsset={yieldAsset} settings={settings} chainId={chainId} reserves={reserves} updateReserves={updateReserves} />
+      <ReservesContainer strategy={strategy} asset={asset} yieldToken={yieldToken} settings={settings} chainId={chainId} reserves={reserves} updateReserves={updateReserves} />
     </>
   )
 }
 
-function ConvertToken({ token, strategy, asset, yieldAsset, settings, chainId, updateReserves }: PassThroughProps & { token: Token, updateReserves: Function }) {
-  const { owner, keeper, assetBal, yieldAssetBal, bqPrice, qbPrice } = settings;
+function ConvertToken({ token, strategy, asset, yieldToken, settings, chainId, updateReserves }: PassThroughProps & { token: Token, updateReserves: Function }) {
+  const { owner, keeper, assetBal, yieldTokenBal, bqPrice, qbPrice } = settings;
   const isAsset = token.address === asset.address
   const price = isAsset ? qbPrice : bqPrice
   const float = (settings.assetBal / (10 ** asset.decimals)) / (10_000 / Number(settings.float))
-  const depositLimit = isAsset ? (yieldAssetBal / (10 ** yieldAsset.decimals)) / (bqPrice / 1e18) : ((assetBal / (10 ** asset.decimals)) - float) / (price / 1e18)
+  const depositLimit = isAsset ? (yieldTokenBal / (10 ** yieldToken.decimals)) / (bqPrice / 1e18) : ((assetBal / (10 ** asset.decimals)) - float) / (price / 1e18)
 
   const { address: account, chain } = useAccount();
   const publicClient = usePublicClient({ chainId });
@@ -239,7 +239,7 @@ function ConvertToken({ token, strategy, asset, yieldAsset, settings, chainId, u
             chainId={chainId}
             value={(Number(amount) * price) / 1e18}
             onChange={() => { }}
-            selectedToken={isAsset ? yieldAsset : asset}
+            selectedToken={isAsset ? yieldToken : asset}
             errorMessage={""}
             tokenList={[]}
             allowSelection={false}
@@ -262,7 +262,7 @@ function ConvertToken({ token, strategy, asset, yieldAsset, settings, chainId, u
   )
 }
 
-function ReservesContainer({ strategy, asset, yieldAsset, settings, chainId, reserves, updateReserves }: PassThroughProps & { reserves?: any[], updateReserves: Function }) {
+function ReservesContainer({ strategy, asset, yieldToken, settings, chainId, reserves, updateReserves }: PassThroughProps & { reserves?: any[], updateReserves: Function }) {
   const { address: account, chain } = useAccount();
   const publicClient = usePublicClient({ chainId });
   const { data: walletClient } = useWalletClient();
@@ -281,7 +281,7 @@ function ReservesContainer({ strategy, asset, yieldAsset, settings, chainId, res
 
     const success = await claimReserve({
       blockNumber: log.args.blockNumber,
-      isYieldAsset: log.args.asset === asset.address,
+      isYieldToken: log.args.asset === asset.address,
       address: strategy.address,
       account,
       clients: {
@@ -305,8 +305,8 @@ function ReservesContainer({ strategy, asset, yieldAsset, settings, chainId, res
           const isAsset = log.args.asset === asset.address
           return (
             <div key={log.blockHash} className="w-full flex flex-row items-center">
-              <p className="w-1/3">{Number(log.args.amount) / (10 ** (isAsset ? asset.decimals : yieldAsset.decimals))} {isAsset ? asset.symbol : yieldAsset.symbol}</p>
-              <p className="w-1/3">{Number(log.args.withdrawable) / (10 ** (isAsset ? yieldAsset.decimals : asset.decimals))} {isAsset ? yieldAsset.symbol : asset.symbol}</p>
+              <p className="w-1/3">{Number(log.args.amount) / (10 ** (isAsset ? asset.decimals : yieldToken.decimals))} {isAsset ? asset.symbol : yieldToken.symbol}</p>
+              <p className="w-1/3">{Number(log.args.withdrawable) / (10 ** (isAsset ? yieldToken.decimals : asset.decimals))} {isAsset ? yieldToken.symbol : asset.symbol}</p>
               <div className="w-1/3">
                 <MainActionButton label="Claim" handleClick={() => handleMainAction(log)} disabled={!account} />
               </div>

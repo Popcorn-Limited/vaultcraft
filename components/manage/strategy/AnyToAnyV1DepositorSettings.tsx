@@ -16,9 +16,9 @@ export interface AnyToAnySettings {
   owner: Address;
   keeper: Address;
   assetBal: number;
-  yieldAssetBal: number;
+  yieldTokenBal: number;
   reservedAssets: number;
-  reservedYieldAssets: number;
+  reservedYieldTokens: number;
   float: bigint;
   proposedFloat: ProposedChange;
   slippage: bigint;
@@ -32,12 +32,12 @@ export interface AnyToAnySettings {
 export interface PassThroughProps {
   strategy: Strategy;
   asset: Token;
-  yieldAsset: Token;
+  yieldToken: Token;
   settings: AnyToAnySettings;
   chainId: number;
 }
 
-async function getAnyToAnyData(address: Address, asset: Token, yieldAsset: Token, chainId: number): Promise<AnyToAnySettings> {
+async function getAnyToAnyData(address: Address, asset: Token, yieldToken: Token, chainId: number): Promise<AnyToAnySettings> {
   const client = createPublicClient({
     chain: ChainById[chainId],
     transport: http(RPC_URLS[chainId]),
@@ -76,7 +76,7 @@ async function getAnyToAnyData(address: Address, asset: Token, yieldAsset: Token
         functionName: "proposedSlippage",
       },
       {
-        address: yieldAsset.address,
+        address: yieldToken.address,
         abi: erc20Abi,
         functionName: "balanceOf",
         args: [address]
@@ -111,48 +111,48 @@ async function getAnyToAnyData(address: Address, asset: Token, yieldAsset: Token
         address: AssetPushOracleByChain[chainId],
         abi: AssetPushOracleAbi,
         functionName: "prices",
-        args: [yieldAsset.address, asset.address]
+        args: [yieldToken.address, asset.address]
       },
       {
         address: AssetPushOracleByChain[chainId],
         abi: AssetPushOracleAbi,
         functionName: "prices",
-        args: [asset.address, yieldAsset.address]
+        args: [asset.address, yieldToken.address]
       }
     ],
     allowFailure: true
   })
   const block = await client.getBlock()
 
-  const reservedYieldAssets = Number(vaultRes[9].status === "success" ? vaultRes[9].result : vaultRes[10].status === "success" ? vaultRes[10].result : vaultRes[11].result);
+  const reservedYieldTokens = Number(vaultRes[9].status === "success" ? vaultRes[9].result : vaultRes[10].status === "success" ? vaultRes[10].result : vaultRes[11].result);
   const assetBal = Number(vaultRes[7].result! - vaultRes[8].result!);
-  const yieldAssetBal = Number(vaultRes[6].result!) - reservedYieldAssets
+  const yieldTokenBal = Number(vaultRes[6].result!) - reservedYieldTokens
   return {
     owner: vaultRes[0].result!,
     keeper: vaultRes[1].result!,
     assetBal: assetBal,
-    yieldAssetBal: yieldAssetBal,
+    yieldTokenBal: yieldTokenBal,
     reservedAssets: Number(vaultRes[2].result!),
-    reservedYieldAssets: reservedYieldAssets,
+    reservedYieldTokens: reservedYieldTokens,
     float: vaultRes[2].result!,
     proposedFloat: { value: vaultRes[3].result![0], time: vaultRes[3].result![1] },
     slippage: vaultRes[4].result!,
     proposedSlippage: { value: vaultRes[5].result![0], time: vaultRes[5].result![1] },
     bqPrice: Number(vaultRes[12].result!),
     qbPrice: Number(vaultRes[13].result!),
-    totalAssets: assetBal + ((yieldAssetBal * (Number(vaultRes[12].result) / 1e18)) / (10 ** (yieldAsset.decimals - asset.decimals))),
+    totalAssets: assetBal + ((yieldTokenBal * (Number(vaultRes[12].result) / 1e18)) / (10 ** (yieldToken.decimals - asset.decimals))),
     block
   }
 }
 
 const DEFAULT_TABS = ["Convert", "Slippage", "Float"]
 
-export default function AnyToAnyV1DepositorSettings({ strategy, asset, yieldAsset, chainId }: { strategy: Strategy, asset: Token, yieldAsset: Token, chainId: number }) {
+export default function AnyToAnyV1DepositorSettings({ strategy, asset, yieldToken, chainId }: { strategy: Strategy, asset: Token, yieldToken: Token, chainId: number }) {
   const [settings, setSettings] = useState<AnyToAnySettings>()
   const [tab, setTab] = useState<string>("Convert")
 
   useEffect(() => {
-    if (strategy.address) getAnyToAnyData(strategy.address, asset, yieldAsset, chainId).then(res => setSettings(res))
+    if (strategy.address) getAnyToAnyData(strategy.address, asset, yieldToken, chainId).then(res => setSettings(res))
   }, [strategy, asset, chainId])
 
   return settings ? (
@@ -165,13 +165,13 @@ export default function AnyToAnyV1DepositorSettings({ strategy, asset, yieldAsse
         setActiveTab={(t: string) => setTab(t)}
       />
       {
-        tab === "Convert" && <ConvertTokenSection strategy={strategy} asset={asset} yieldAsset={yieldAsset} settings={settings} chainId={chainId} />
+        tab === "Convert" && <ConvertTokenSection strategy={strategy} asset={asset} yieldToken={yieldToken} settings={settings} chainId={chainId} />
       }
       {
-        tab === "Slippage" && <ChangeSettingSection strategy={strategy} asset={asset} yieldAsset={yieldAsset} settings={settings} chainId={chainId} id={"slippage"} />
+        tab === "Slippage" && <ChangeSettingSection strategy={strategy} asset={asset} yieldToken={yieldToken} settings={settings} chainId={chainId} id={"slippage"} />
       }
       {
-        tab === "Float" && <ChangeSettingSection strategy={strategy} asset={asset} yieldAsset={yieldAsset} settings={settings} chainId={chainId} id={"float"} />
+        tab === "Float" && <ChangeSettingSection strategy={strategy} asset={asset} yieldToken={yieldToken} settings={settings} chainId={chainId} id={"float"} />
       }
     </section>
   )

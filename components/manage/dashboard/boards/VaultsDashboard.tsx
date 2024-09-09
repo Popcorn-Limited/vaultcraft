@@ -85,7 +85,7 @@ export default function VaultsDashboard({ dashboardData }: { dashboardData: any 
                           className="border-gray-200 border-t"
                         >
                           <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-white sm:pl-3">
-                            {strategy.metadata.protocol} - {strategy.metadata.name} - ({strategy.yieldAsset ? tokens[vault.chainId][strategy.yieldAsset].symbol : tokens[vault.chainId][vault.asset].symbol})
+                            {strategy.metadata.protocol} - {strategy.metadata.name} - ({strategy.yieldToken ? tokens[vault.chainId][strategy.yieldToken].symbol : tokens[vault.chainId][vault.asset].symbol})
                           </td>
                           <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                             {formatNumber(strategy.allocation / (10 ** tokens[vault.chainId][vault.asset].decimals))}

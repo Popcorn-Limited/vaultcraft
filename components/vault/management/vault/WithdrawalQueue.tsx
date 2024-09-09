@@ -55,7 +55,7 @@ export default function VaultWithdrawalQueue({
                 <StrategyName
                   strategy={vaultData.strategies[index]}
                   asset={tokens[vaultData.chainId][vaultData.strategies[index].asset]}
-                  yieldAsset={vaultData.strategies[index].yieldAsset ? tokens[vaultData.chainId][vaultData.strategies[index].yieldAsset!] : undefined}
+                  yieldToken={vaultData.strategies[index].yieldToken ? tokens[vaultData.chainId][vaultData.strategies[index].yieldToken!] : undefined}
                 />
               </div>
             </div>
@@ -81,7 +81,7 @@ export default function VaultWithdrawalQueue({
                   <StrategyName
                     strategy={vaultData.strategies[index]}
                     asset={tokens[vaultData.chainId][vaultData.strategies[index].asset]}
-                    yieldAsset={vaultData.strategies[index].yieldAsset ? tokens[vaultData.chainId][vaultData.strategies[index].yieldAsset!] : undefined}
+                    yieldToken={vaultData.strategies[index].yieldToken ? tokens[vaultData.chainId][vaultData.strategies[index].yieldToken!] : undefined}
                   />
                 </div>
               </div>

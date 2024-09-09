@@ -181,7 +181,7 @@ export default function Index() {
               <h2
                 className={`text-4xl font-bold text-white mr-1 text-ellipsis overflow-hidden whitespace-nowrap smmd:flex-1 smmd:flex-nowrap xs:max-w-[80%] smmd:max-w-fit smmd:block`}
               >
-                {strategy.metadata.name} ({tokens[chainId][strategy.yieldAsset ? strategy.yieldAsset : strategy.asset].symbol})
+                {strategy.metadata.name} ({tokens[chainId][strategy.yieldToken ? strategy.yieldToken : strategy.asset].symbol})
               </h2>
               <div className="flex flex-row flex-wrap w-max space-x-2">
                 <ProtocolIcon
@@ -242,19 +242,19 @@ export default function Index() {
                   </div>
                 </div>
               </div>
-              {strategy.yieldAsset && strategy.yieldAsset !== zeroAddress &&
+              {strategy.yieldToken && strategy.yieldToken !== zeroAddress &&
                 <div className="w-full md:w-10/12 border border-customNeutral100 rounded-lg p-4">
-                  <p className="text-white font-normal">YieldAsset address:</p>
+                  <p className="text-white font-normal">YieldToken address:</p>
                   <div className="flex flex-row items-center justify-between">
                     <p className="font-bold text-white">
-                      {strategy.yieldAsset.slice(0, 6)}...{strategy.yieldAsset.slice(-4)}
+                      {strategy.yieldToken.slice(0, 6)}...{strategy.yieldToken.slice(-4)}
                     </p>
-                    <div className="w-6 h-6 group/yieldAssetAddress">
+                    <div className="w-6 h-6 group/yieldTokenAddress">
                       <CopyToClipboard
-                        text={strategy.yieldAsset}
-                        onCopy={() => showSuccessToast("YieldAsset address copied!")}
+                        text={strategy.yieldToken}
+                        onCopy={() => showSuccessToast("YieldToken address copied!")}
                       >
-                        <Square2StackIcon className="text-white group-hover/yieldAssetAddress:text-primaryYellow" />
+                        <Square2StackIcon className="text-white group-hover/yieldTokenAddress:text-primaryYellow" />
                       </CopyToClipboard>
                     </div>
                   </div>
@@ -266,7 +266,7 @@ export default function Index() {
           {
             strategy && strategy.metadata.type === "AnyToAnyV1" &&
             <div>
-              <AnyToAnyV1DepositorSettings strategy={strategy} asset={asset} yieldAsset={tokens[chainId][strategy.yieldAsset!]} chainId={chainId} />
+              <AnyToAnyV1DepositorSettings strategy={strategy} asset={asset} yieldToken={tokens[chainId][strategy.yieldToken!]} chainId={chainId} />
             </div>
           }
 

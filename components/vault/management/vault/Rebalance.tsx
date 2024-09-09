@@ -181,7 +181,7 @@ export default function VaultRebalance({
                           <StrategyName
                             strategy={strategy}
                             asset={tokens[vaultData.chainId][strategy.asset]}
-                            yieldAsset={strategy.yieldAsset ? tokens[vaultData.chainId][strategy.yieldAsset] : undefined}
+                            yieldToken={strategy.yieldToken ? tokens[vaultData.chainId][strategy.yieldToken] : undefined}
                           />
                         </td>
 

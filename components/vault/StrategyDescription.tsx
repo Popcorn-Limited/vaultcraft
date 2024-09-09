@@ -30,7 +30,7 @@ export default function StrategyDescription({ strategy, asset, chainId, i, strat
           className={`h-7 w-7 mr-2 mb-1.5 rounded-full border border-white`}
         />
         <h2 className="text-2xl font-bold text-white">
-          {strategy.metadata.protocol} - {strategy.metadata.name} ({tokens[chainId][strategy.yieldAsset ? strategy.yieldAsset : strategy.asset].symbol})
+          {strategy.metadata.protocol} - {strategy.metadata.name} ({tokens[chainId][strategy.yieldToken ? strategy.yieldToken : strategy.asset].symbol})
         </h2>
       </div>
 

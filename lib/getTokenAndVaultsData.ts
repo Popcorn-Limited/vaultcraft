@@ -59,8 +59,8 @@ export default async function getTokenAndVaultsDataByChain({
   // Add vault assets
   Object.values(vaultsData).forEach((vault) => {
     vault.strategies.forEach((strategy) => {
-      if (strategy.yieldAsset && !uniqueAssetAdresses.includes(strategy.yieldAsset)) {
-        uniqueAssetAdresses.push(strategy.yieldAsset);
+      if (strategy.yieldToken && !uniqueAssetAdresses.includes(strategy.yieldToken)) {
+        uniqueAssetAdresses.push(strategy.yieldToken);
       }
     })
     if (!uniqueAssetAdresses.includes(vault.asset)) {
@@ -290,7 +290,7 @@ export async function addStrategyData(vaults: VaultDataByAddress, strategies: { 
       vaults[address].strategies[0] = {
         address: zeroAddress,
         asset: vaults[address].asset,
-        yieldAsset: undefined,
+        yieldToken: undefined,
         metadata: {
           name: "Stake",
           protocol: "VaultCraft",

@@ -66,10 +66,10 @@ export default function OraclesDashboard({ dashboardData }: { dashboardData: any
                   ? dashboardData?.assetOracleData[chain]
                     .filter((log: any) =>
                       !!Object.values(strategies[chain])
-                        .filter(strategy => strategy.yieldAsset)
+                        .filter(strategy => strategy.yieldToken)
                         .find(strategy =>
-                          (strategy.yieldAsset === log.log.args.quote && strategy.asset === log.log.args.base)
-                          || (strategy.asset === log.log.args.quote && strategy.yieldAsset === log.log.args.base))
+                          (strategy.yieldToken === log.log.args.quote && strategy.asset === log.log.args.base)
+                          || (strategy.asset === log.log.args.quote && strategy.yieldToken === log.log.args.base))
                     )
                     .map((log: any) =>
                       <>

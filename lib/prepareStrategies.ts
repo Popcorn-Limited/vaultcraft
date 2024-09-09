@@ -1,5 +1,5 @@
 import { Address, erc20Abi, PublicClient } from "viem";
-import { LlamaApy, Strategy, VaultDataByAddress, StrategyByAddress } from "@/lib/types";
+import { LlamaApy, VaultDataByAddress, StrategyByAddress } from "@/lib/types";
 import { AnyToAnyDepositorAbi, VaultAbi } from "@/lib/constants";
 import axios from "axios";
 import { EMPTY_LLAMA_APY_ENTRY, getApy, getCustomApy } from "@/lib/resolver/apy";
@@ -80,7 +80,7 @@ export default async function prepareStrategies(vaults: VaultDataByAddress, chai
       strategies[address] = {
         address,
         asset: desc.asset,
-        yieldAsset: desc.yieldAsset || undefined,
+        yieldToken: desc.yieldToken || undefined,
         metadata: {
           name: descriptionSplit[0].slice(2),
           protocol: desc.name,

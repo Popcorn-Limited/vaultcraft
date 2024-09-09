@@ -17,10 +17,10 @@ export default function AssetTokenOracleAlert({ chainId, assetOracleData }: { ch
   return assetOracleData
     .filter((log: any) =>
       !!Object.values(strategies[chainId])
-        .filter(strategy => strategy.yieldAsset)
+        .filter(strategy => strategy.yieldToken)
         .find(strategy =>
-          (strategy.yieldAsset === log.log.args.quote && strategy.asset === log.log.args.base)
-          || (strategy.asset === log.log.args.quote && strategy.yieldAsset === log.log.args.base))
+          (strategy.yieldToken === log.log.args.quote && strategy.asset === log.log.args.base)
+          || (strategy.asset === log.log.args.quote && strategy.yieldToken === log.log.args.base))
     )
     .map((log: any) =>
       <>

@@ -46,7 +46,7 @@ export default function VaultAutoDeposit({
               : <StrategyName
                 strategy={vaultData.strategies[depositIndex]}
                 asset={tokens[vaultData.chainId][vaultData.strategies[depositIndex].asset]}
-                yieldAsset={vaultData.strategies[depositIndex].yieldAsset ? tokens[vaultData.chainId][vaultData.strategies[depositIndex].yieldAsset!] : undefined}
+                yieldToken={vaultData.strategies[depositIndex].yieldToken ? tokens[vaultData.chainId][vaultData.strategies[depositIndex].yieldToken!] : undefined}
               />
             }
           </div>
@@ -77,7 +77,7 @@ export default function VaultAutoDeposit({
                     <StrategyName
                       strategy={strategy}
                       asset={tokens[vaultData.chainId][strategy.asset]}
-                      yieldAsset={strategy.yieldAsset ? tokens[vaultData.chainId][strategy.yieldAsset] : undefined}
+                      yieldToken={strategy.yieldToken ? tokens[vaultData.chainId][strategy.yieldToken] : undefined}
                     />
                   </div>
                 )}

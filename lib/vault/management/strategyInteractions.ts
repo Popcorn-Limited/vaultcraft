@@ -10,10 +10,10 @@ export async function pushFunds({
   account,
   clients,
 }: { amount: number, address: Address, account: Address, clients: Clients }): Promise<boolean> {
-  showLoadingToast("Depositing yieldAssets...");
+  showLoadingToast("Depositing yield tokens...");
 
   const success = await handleCallResult({
-    successMessage: "Deposited yieldAssets!",
+    successMessage: "Deposited yield tokens!",
     simulationResponse: await simulateCall({
       account: account as Address,
       contract: { address: address, abi: AnyToAnyDepositorAbi },
@@ -57,11 +57,11 @@ export async function pullFunds({
 
 export async function claimReserve({
   blockNumber,
-  isYieldAsset,
+  isYieldToken,
   address,
   account,
   clients,
-}: { blockNumber: bigint, isYieldAsset: boolean, address: Address, account: Address, clients: Clients }): Promise<boolean> {
+}: { blockNumber: bigint, isYieldToken: boolean, address: Address, account: Address, clients: Clients }): Promise<boolean> {
   showLoadingToast("Claiming Reserve...");
 
   const success = await handleCallResult({
@@ -70,7 +70,7 @@ export async function claimReserve({
       account: account as Address,
       contract: { address: address, abi: AnyToAnyDepositorAbi },
       functionName: "claimReserved",
-      args: [blockNumber, isYieldAsset],
+      args: [blockNumber, isYieldToken],
       publicClient: clients.publicClient
     }),
     clients

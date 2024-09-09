@@ -5,7 +5,7 @@ import { useState } from "react";
 import { changeFloat, changeSlippage, proposeFloat, proposeSlippage } from "@/lib/vault/management/strategyInteractions";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 
-export default function ChangeSettingSection({ strategy, asset, yieldAsset, settings, chainId, id }: PassThroughProps & { id: "slippage" | "float" }) {
+export default function ChangeSettingSection({ strategy, asset, yieldToken, settings, chainId, id }: PassThroughProps & { id: "slippage" | "float" }) {
   const proposedKey = id === "slippage" ? "proposedSlippage" : "proposedFloat"
   const [value, setValue] = useState<number>(Number(settings[id]))
 
