@@ -14,6 +14,7 @@ import { validateInput } from "@/lib/utils/helpers";
 import { useAccount, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
 import { claimReserve, pullFunds, pushFunds } from "@/lib/vault/management/strategyInteractions";
 import { PassThroughProps } from "./AnyToAnyV1DepositorSettings";
+import TabSelector from "@/components/common/TabSelector";
 
 async function getReserveLogs(address: Address, account: Address, client: PublicClient) {
   let addedLogs = await client.getContractEvents({
@@ -40,10 +41,13 @@ async function getReserveLogs(address: Address, account: Address, client: Public
   return addedLogs
 }
 
+const DEFAULT_TABS = ["Deposit", "Withdraw"]
+
 export default function ConvertTokenSection({ strategy, asset, yieldToken, settings, chainId }: PassThroughProps) {
   const { address: account, chain } = useAccount();
   const publicClient = usePublicClient({ chainId });
   const [reserves, setReserves] = useState<any[]>()
+  const [tab, setTab] = useState<string>("Deposit")
 
   useEffect(() => {
     if (publicClient && account && !reserves) updateReserves()
@@ -56,43 +60,51 @@ export default function ConvertTokenSection({ strategy, asset, yieldToken, setti
 
   return (
     <>
-      <div className="flex flex-row items-center justify-between space-x-8">
-        <div className="w-1/2">
-          <p className="text-white text-2xl">Deposit YieldToken</p>
-          <p>Deposit yieldTokens to claim assets at an equivalent value after</p>
-          <ConvertToken token={yieldToken} strategy={strategy} asset={asset} yieldToken={yieldToken} settings={settings} chainId={chainId} updateReserves={updateReserves} />
-        </div>
-        <div className="w-1/2">
-          <p className="text-white text-2xl">Deposit Asset</p>
-          <p>Deposit assets to claim yieldTokens at an equivalent value after</p>
-          <ConvertToken token={asset} strategy={strategy} asset={asset} yieldToken={yieldToken} settings={settings} chainId={chainId} updateReserves={updateReserves} />
-        </div>
+      <div className="">
+        <TabSelector
+          className="mt-6 mb-12"
+          availableTabs={DEFAULT_TABS}
+          activeTab={tab}
+          setActiveTab={(t: string) => setTab(t)}
+        />
+        {tab === "Deposit"
+          ? <div className="">
+            <p className="text-white text-2xl">Deposit into Strategy</p>
+            <p>Convert idle assets into productive yield token by depositing yield token and claiming a refund in assets of an equivalent value</p>
+            <ConvertToken token={yieldToken} strategy={strategy} asset={asset} yieldToken={yieldToken} settings={settings} chainId={chainId} updateReserves={updateReserves} />
+          </div>
+          : <div className="">
+            <p className="text-white text-2xl">Withdraw From Strategy</p>
+            <p>Convert yield token to withdrawable assets by depositing assets and claiming a refund in yield token of an equivalent value</p>
+            <ConvertToken token={asset} strategy={strategy} asset={asset} yieldToken={yieldToken} settings={settings} chainId={chainId} updateReserves={updateReserves} />
+          </div>
+        }
       </div>
       <div className="w-full border border-customNeutral100 rounded-lg p-4 my-4 flex flex-row justify-between">
         <div className="w-1/2 px-4">
           <p className="text-xl">Price</p>
           <span className="flex space-x-2">
-            <p>Assets p. YieldToken:</p>
-            <p className="text-customGray300">{settings.bqPrice / 1e18}</p>
+            <p>Assets per. YieldToken:</p>
+            <p className="text-customGray300">1 {yieldToken.symbol} = {formatNumber(settings.bqPrice / 1e18)} {asset.symbol}</p>
           </span>
           <span className="flex space-x-2">
-            <p>YieldTokens p. Asset:</p>
-            <p className="text-customGray300">{settings.qbPrice / 1e18}</p>
+            <p>YieldTokens per. Asset:</p>
+            <p className="text-customGray300">1 {asset.symbol} = {formatNumber(settings.qbPrice / 1e18)} {yieldToken.symbol}</p>
           </span>
         </div>
         <div className="w-1/2 px-4">
           <p className="text-xl">Balance</p>
           <span className="flex space-x-2">
             <p>Assets:</p>
-            <p className="text-customGray300">{settings.assetBal / (10 ** asset.decimals)}</p>
+            <p className="text-customGray300">{formatNumber(settings.assetBal / (10 ** asset.decimals))} {asset.symbol}</p>
           </span>
           <span className="flex space-x-2">
             <p>YieldTokens:</p>
-            <p className="text-customGray300">{settings.yieldTokenBal / (10 ** yieldToken.decimals)}</p>
+            <p className="text-customGray300">{formatNumber(settings.yieldTokenBal / (10 ** yieldToken.decimals))} {yieldToken.symbol}</p>
           </span>
           <span className="flex space-x-2">
             <p>Total Assets:</p>
-            <p className="text-customGray300">{settings.totalAssets / (10 ** asset.decimals)}</p>
+            <p className="text-customGray300">{formatNumber(settings.totalAssets / (10 ** asset.decimals))} {asset.symbol}</p>
           </span>
         </div>
       </div>
@@ -196,10 +208,10 @@ function ConvertToken({ token, strategy, asset, yieldToken, settings, chainId, u
   }
 
   return (
-    <div className="">
+    <div className="mt-4">
       <div className="">
         <div>
-          <p>Input Amount</p>
+          <p>Convert Amount</p>
           <InputTokenWithError
             onSelectToken={() => { }}
             onMaxClick={handleMaxClick}
@@ -212,9 +224,7 @@ function ConvertToken({ token, strategy, asset, yieldToken, settings, chainId, u
             allowSelection={false}
             allowInput={true}
           />
-          <p>DepositLimit: {isAsset
-            ? formatNumber(depositLimit)
-            : formatNumber(depositLimit)}
+          <p>{isAsset ? "Withdraw" : "Deposit"} Limit: {formatNumber(depositLimit)}
           </p>
         </div>
         <div className="relative py-4">
@@ -232,7 +242,7 @@ function ConvertToken({ token, strategy, asset, yieldToken, settings, chainId, u
           </div>
         </div>
         <div>
-          <p>Claimable Amount</p>
+          <p>Refund Amount</p>
           <InputTokenWithError
             onSelectToken={() => { }}
             onMaxClick={() => { }}
@@ -253,7 +263,7 @@ function ConvertToken({ token, strategy, asset, yieldToken, settings, chainId, u
           handleClick={handleApprove} disabled={!account || (account !== owner && account !== keeper)}
         />
         <MainActionButton
-          label="Deposit"
+          label="Convert"
           handleClick={handleDeposit}
           disabled={!account || (account !== owner && account !== keeper) || Number(amount) >= depositLimit}
         />
@@ -294,7 +304,7 @@ function ReservesContainer({ strategy, asset, yieldToken, settings, chainId, res
 
   return (
     <div className="mt-4">
-      <p className="text-white text-2xl">Claim Withdrawable</p>
+      <p className="text-white text-2xl">Claim Refund</p>
       <div className="w-full flex flex-row items-center mt-4">
         <p className="w-1/3">Deposited</p>
         <p className="w-1/3">Withdrawable</p>

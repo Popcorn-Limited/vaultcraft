@@ -68,7 +68,7 @@ export type LlamaApy = {
   date: Date;
 }
 
-export type StrategyType = "AnyToAnyV1" | "Vanilla"
+export type StrategyType = "AnyToAnyV1" | "Vanilla" | "LeverageV1"
 
 export type Strategy = {
   address: Address;
