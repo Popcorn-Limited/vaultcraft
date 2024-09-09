@@ -11,12 +11,14 @@ const vaultLabelColor: { [key: string]: string } = {
   Experimental: "text-white bg-orange-500 bg-opacity-90",
   Deprecated: "text-white bg-red-500 bg-opacity-80",
   New: "text-primaryYellow bg-primaryYellow bg-opacity-30",
+  Leverage: "text-secondaryBlue bg-secondaryBlue bg-opacity-30 text-white",
 };
 
 const vaultLabelTooltip: { [key: string]: string } = {
   Experimental: "Unaudited strategy in testing stage",
   Deprecated: "This strategy got deprecated. Only withdrawals are open",
   New: "Newly deployed! ✨",
+  Leverage: "This vault uses leverage"
 };
 
 const iconSize: { [key: number]: string } = {
@@ -54,9 +56,8 @@ function VaultLabelPill({
         id={tooltipId}
       >
         <div
-          className={`${
-            vaultLabelColor[String(label)]
-          } rounded-lg py-1 px-3 flex flex-row items-center gap-2`}
+          className={`${vaultLabelColor[String(label)]
+            } rounded-lg py-1 px-3 flex flex-row items-center gap-2`}
         >
           <p className={`${textSize[size]}`}>{String(label)}</p>
         </div>

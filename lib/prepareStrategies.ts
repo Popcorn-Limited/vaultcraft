@@ -3,6 +3,7 @@ import { LlamaApy, VaultDataByAddress, StrategyByAddress } from "@/lib/types";
 import { AnyToAnyDepositorAbi, VaultAbi } from "@/lib/constants";
 import axios from "axios";
 import { EMPTY_LLAMA_APY_ENTRY, getApy, getCustomApy } from "@/lib/resolver/apy";
+import { LeverageLooperAbi } from "./constants/abi/LeverageLooper";
 
 export default async function prepareStrategies(vaults: VaultDataByAddress, chainId: number, client: PublicClient): Promise<StrategyByAddress> {
   const uniqueStrategyAdresses: Address[] = [];
@@ -44,6 +45,11 @@ export default async function prepareStrategies(vaults: VaultDataByAddress, chai
             abi: AnyToAnyDepositorAbi,
             functionName: "totalReservedAssets",
           },
+          {
+            address,
+            abi: LeverageLooperAbi,
+            functionName: "getLTV"
+          }
         ]
       })
       .flat(),
@@ -55,7 +61,7 @@ export default async function prepareStrategies(vaults: VaultDataByAddress, chai
   await Promise.all(
     // We use map here since Promise.all doesnt work on a forEach
     uniqueStrategyAdresses.map(async (address, i) => {
-      if (i > 0) i = i * 4;
+      if (i > 0) i = i * 5;
 
       const totalAssets = Number(strategyRes[i].result!);
       const totalSupply = Number(strategyRes[i + 1].result!);
@@ -77,6 +83,8 @@ export default async function prepareStrategies(vaults: VaultDataByAddress, chai
       }
       const descriptionSplit = desc.description.split("** - ");
 
+      if (chainId === 137) console.log(desc)
+
       strategies[address] = {
         address,
         asset: desc.asset,
@@ -97,7 +105,8 @@ export default async function prepareStrategies(vaults: VaultDataByAddress, chai
         totalAssets,
         totalSupply,
         assetsPerShare,
-        idle: desc.type === "AnyToAnyV1" ? Number(strategyRes[i + 2].result!) - Number(strategyRes[i + 3].result!) : totalAssets
+        idle: desc.type === "AnyToAnyV1" ? Number(strategyRes[i + 2].result!) - Number(strategyRes[i + 3].result!) : totalAssets,
+        leverage: desc.type === "LeverageV1" ? 1e18 / (1e18 - Number(strategyRes[i + 4].result)) : undefined
       }
     })
   )

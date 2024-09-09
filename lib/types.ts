@@ -86,6 +86,7 @@ export type Strategy = {
   totalSupply: number;
   assetsPerShare: number;
   idle: number;
+  leverage?: number;
 }
 
 type StrategyMetadata = {
@@ -99,6 +100,7 @@ export enum VaultLabel {
   experimental = "Experimental",
   deprecated = "Deprecated",
   new = "New",
+  leverage = "Leverage"
 }
 
 export type VaultMetadata = {

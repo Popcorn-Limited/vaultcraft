@@ -52,6 +52,8 @@ export default function VaultHero({
     }
   }, [vaultData])
 
+  console.log(vaultData)
+
   return (
     <section className="md:border-b border-customNeutral100 pt-10 pb-6 px-4 md:px-0 ">
       <div className="w-full mb-8">
@@ -107,6 +109,16 @@ export default function VaultHero({
                 value={`${formatTwoDecimals(100 - (vaultData.liquid / vaultData.totalAssets) * 100)} %`}
                 secondaryValue={`${formatNumber(vaultData.liquid / (10 ** asset?.decimals))} ${asset?.symbol}`}
                 tooltip={`This Vault has deployed ${formatTwoDecimals(100 - (vaultData.liquid / vaultData.totalAssets) * 100)} % of assets in managed strategies. ${formatNumber(vaultData.liquid / (10 ** asset?.decimals))} ${asset?.symbol} are instantly available for withdrawal. Additional funds need to be freed up by the vault manager.`}
+              />
+            </div>
+          }
+          {vaultData.strategies.filter(strategy => strategy.metadata.type === "LeverageV1").length > 0 &&
+            <div>
+              <LargeCardStat
+                id={"leverage"}
+                label="Leverage"
+                value={`${formatTwoDecimals(vaultData.strategies.find(strategy => strategy.metadata.type === "LeverageV1")?.leverage || 0)}X`}
+                tooltip={`This strategy levers its assets ${formatTwoDecimals(vaultData.strategies.find(strategy => strategy.metadata.type === "LeverageV1")?.leverage || 0)}X to earn additional yield.`}
               />
             </div>
           }
