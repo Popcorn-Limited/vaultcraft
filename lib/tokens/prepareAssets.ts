@@ -3,7 +3,7 @@ import axios from "axios";
 import { TokenByAddress, TokenType } from "@/lib/types";
 import { networkMap } from "@/lib/utils/connectors";
 import { vcx as getVcxPrice, vcxLp as getVcxLpPrice } from "@/lib/resolver/price/resolver";
-import { OptionTokenByChain, VCX, VCX_LP, WrappedOptionTokenByChain } from "@/lib/constants";
+import { OptionTokenByChain, ST_VCX, VCX, VCX_LP, WrappedOptionTokenByChain } from "@/lib/constants";
 import { mainnet } from "viem/chains";
 
 export async function prepareAssets(addresses: Address[], chainId: number, client: PublicClient): Promise<TokenByAddress> {
@@ -59,6 +59,7 @@ export async function prepareAssets(addresses: Address[], chainId: number, clien
 function handleTokenPriceExepction(address: Address, tokenPrice: number, vcxPrice: number, vcxLpPrice: number, chainId: number): number {
   switch (address) {
     case VCX:
+    case ST_VCX:
       return vcxPrice;
     case OptionTokenByChain[chainId]:
     case WrappedOptionTokenByChain[chainId]:

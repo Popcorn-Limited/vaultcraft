@@ -7,13 +7,14 @@ import ActionSteps from "@/components/vault/ActionSteps";
 import { handleAllowance } from "@/lib/approve";
 import { tokensAtom } from "@/lib/atoms";
 import bridgeToken, { DestinationIdByChain } from "@/lib/bridging/bridgeToken";
-import { BalancerOracleAbi, LockboxAdapterByChain, OVCX_ORACLE, ROOT_GAUGE_FACTORY, VCX, XVCXByChain } from "@/lib/constants";
+import { BalancerOracleAbi, LockboxAdapterByChain, OptionTokenAbi, OptionTokenByChain, OVCX_ORACLE, ROOT_GAUGE_FACTORY, ST_VCX, VCX, XVCXByChain } from "@/lib/constants";
 import { transmitRewards } from "@/lib/gauges/interactions";
 import { ActionStep, getSmartVaultActionSteps } from "@/lib/getActionSteps";
 import { showLoadingToast } from "@/lib/toasts";
 import { SimulationResponse, SmartVaultActionType, Token } from "@/lib/types";
 import { safeRound } from "@/lib/utils/formatBigNumber";
-import { handleCallResult, validateInput } from "@/lib/utils/helpers";
+import { handleCallResult, handleSwitchChain, validateInput } from "@/lib/utils/helpers";
+import { fundReward } from "@/lib/vault/lockVault/interactions";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
 import { ArrowDownIcon } from "@heroicons/react/24/outline";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
@@ -211,6 +212,7 @@ export default function Misc(): JSX.Element {
             <SetOptionTokenOracleParams />
             <RewardBridger />
             <BridgeVCX />
+            <StakingRewardFunding />
           </div>
         </>
         : <MainActionButton label="Connect Wallet" handleClick={openConnectModal} />
@@ -475,4 +477,135 @@ function BridgeVCX() {
       }
     </div>
   </div>
+}
+
+function StakingRewardFunding() {
+  const publicClient = usePublicClient({ chainId: 1 });
+  const { data: walletClient } = useWalletClient();
+  const { address: account, chain } = useAccount();
+  const { switchChainAsync } = useSwitchChain();
+  const { openConnectModal } = useConnectModal();
+
+  const [tokens, setTokens] = useAtom(tokensAtom)
+
+  const [vcxAmount, setVcxAmount] = useState<string>("0")
+  const [ovcxAmount, setOvcxAmount] = useState<string>("0")
+
+  function handleChangeInput(e: any, isVCX: boolean) {
+    let value = e.currentTarget.value;
+    value = validateInput(value).isValid ? value : "0"
+    isVCX ? setVcxAmount(value) : setOvcxAmount(value);
+  }
+
+  function handleMaxClick(isVCX: boolean) {
+    if (!tokens) return
+    const inputToken = isVCX ? tokens[1][VCX] : tokens[1][OptionTokenByChain[1]]
+
+    const stringBal = inputToken.balance.toLocaleString("fullwide", {
+      useGrouping: false,
+    });
+    const rounded = safeRound(BigInt(stringBal), inputToken.decimals);
+    const formatted = formatUnits(rounded, inputToken.decimals);
+    handleChangeInput({ currentTarget: { value: formatted } }, isVCX);
+  }
+
+  async function handleMainAction() {
+    const vcxVal = Number(vcxAmount) * 1e18;
+    const ovcxVal = Number(ovcxAmount) * 1e18;
+
+    fundReward({
+      amounts: [vcxVal, ovcxVal],
+      account: account!,
+      address: ST_VCX,
+      chainId: 1,
+      tokensToUpdate: [VCX, OptionTokenByChain[1]],
+      tokensAtom: [tokens, setTokens],
+      clients: {
+        publicClient: publicClient!,
+        walletClient: walletClient!
+      },
+    })
+  }
+
+  return Object.keys(tokens).length > 0 ?
+    <div className="border-b border-white pb-4 py-10 px-4 md:px-8">
+      <h2 className="text-white text-xl mb-2">Bridge VCX</h2>
+      <div>
+        <InputTokenWithError
+          captionText={"VCX Amount"}
+          onSelectToken={() => { }}
+          onMaxClick={() => handleMaxClick(true)}
+          chainId={1}
+          value={vcxAmount}
+          onChange={(e) => handleChangeInput(e, true)}
+          selectedToken={tokens[1][VCX]}
+          errorMessage={""}
+          tokenList={[]}
+          allowSelection={false}
+          allowInput
+        />
+        <InputTokenWithError
+          captionText={"OVCX Amount"}
+          onSelectToken={() => { }}
+          onMaxClick={() => handleMaxClick(false)}
+          chainId={1}
+          value={ovcxAmount}
+          onChange={(e) => handleChangeInput(e, false)}
+          selectedToken={tokens[1][OptionTokenByChain[1]]}
+          errorMessage={""}
+          tokenList={[]}
+          allowSelection={false}
+          allowInput
+        />
+      </div>
+      <div>
+        {!account &&
+          <MainActionButton
+            label={"Connect Wallet"}
+            handleClick={openConnectModal}
+          />
+        }
+        {(account && chain?.id !== 1) &&
+          <MainActionButton
+            label="Switch Chain"
+            handleClick={() => handleSwitchChain(1, switchChainAsync)}
+          />
+        }
+        {(account && chain?.id === 1) &&
+          <div className="space-y-4">
+            <SecondaryActionButton
+              label="Approve VCX"
+              handleClick={() => handleAllowance({
+                token: VCX,
+                amount: Number(vcxAmount) * 1e18,
+                account,
+                spender: ST_VCX,
+                clients: {
+                  publicClient: publicClient!,
+                  walletClient: walletClient!
+                },
+              })}
+            />
+            <SecondaryActionButton
+              label="Approve oVCX"
+              handleClick={() => handleAllowance({
+                token: OptionTokenByChain[1],
+                amount: Number(ovcxAmount) * 1e18,
+                account,
+                spender: ST_VCX,
+                clients: {
+                  publicClient: publicClient!,
+                  walletClient: walletClient!
+                },
+              })}
+            />
+            <MainActionButton
+              label="Fund rewards"
+              handleClick={handleMainAction}
+            />
+          </div>
+        }
+      </div>
+    </div>
+    : <p>Loading...</p>
 }

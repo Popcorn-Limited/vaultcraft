@@ -20,7 +20,7 @@ import axios from "axios";
 import { VotingEscrowAbi } from "@/lib/constants";
 import fetchVaultron from "@/lib/vaultron";
 import { mainnet, polygon, xLayer } from "viem/chains";
-import { VCX_LP, VE_VCX } from "@/lib/constants/addresses";
+import { ST_VCX, VCX_LP, VE_VCX } from "@/lib/constants/addresses";
 
 async function setUpYieldOptions() {
   const ttl = 360_000;
@@ -257,6 +257,7 @@ export default function Page({
       } catch (e) {
         stakingTVL = 762000;
       }
+      stakingTVL += (newTokens[1][ST_VCX].totalSupply * newTokens[1][ST_VCX].price) / 1e18
 
       console.log(`Completed fetching TVL (${new Date()})`)
       console.log(`Took ${Number(new Date()) - start}ms to load`)
@@ -296,8 +297,7 @@ export default function Page({
           args: [account],
         });
 
-        const stakeNetworth =
-          (Number(stake.amount) / 1e18) * newTokens[1][VCX_LP].price;
+        const stakeNetworth = ((Number(stake.amount) / 1e18) * newTokens[1][VCX_LP].price) + ((newTokens[1][ST_VCX].balance * newTokens[1][ST_VCX].price) / 1e18);
         const lockVaultNetworth = 0; // @dev hardcoded since we removed lock vaults
 
         console.log(`Completed fetching Networth (${new Date()})`)
