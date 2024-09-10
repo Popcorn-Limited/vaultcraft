@@ -200,13 +200,13 @@ export const ManagementMultisigByChain: AddressByChain = {
 }
 
 export const AssetPushOracleByChain: AddressByChain = {
-  [mainnet.id]: zeroAddress,
+  [mainnet.id]: "0xb3404F101F11A14988c4111E30006972EdbB99aB",
   [optimism.id]: zeroAddress,
   [arbitrum.id]: "0x3a7e41AdA7066109E2ebbb33921dd8a124d54B01"
 }
 
 export const AssetPushOracleOwnerByChain: AddressByChain = {
-  [mainnet.id]: zeroAddress,
+  [mainnet.id]: "0x8A8A73B111e5fc0048a179a5d7DbC3BcA08D1EF4",
   [optimism.id]: zeroAddress,
   [arbitrum.id]: "0x86f8d1C5dBd755854C1820592f2D8383FC374695"
 }

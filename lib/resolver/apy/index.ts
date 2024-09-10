@@ -15,7 +15,9 @@ export const EMPTY_LLAMA_APY_ENTRY: LlamaApy = {
 }
 
 export async function getCustomApy(address: Address, apyId: string, chainId: number): Promise<LlamaApy[]> {
-  if (address === "0xB0CDFb59D54b4f5EeAa180dFb9cE3786Cc7D9835") return getLooperApy(address, "67cb77ab-9d9c-4002-9eaf-4388bc892ba5", chainId)
+  if (address === "0xB0CDFb59D54b4f5EeAa180dFb9cE3786Cc7D9835" || address === "0xb75F5eB5b802A450e301a83165A58aA17e03eD3A") {
+    return getLooperApy(address, apyId, chainId)
+  }
   switch (apyId) {
     case "fraxlend":
       return getFraxlendApy(address, chainId);
@@ -63,7 +65,7 @@ export async function getLooperApy(address: Address, apyId: string, chainId: num
   const leveragRatio = 1e18 / (1e18 - Number(looperRes[0].result))
   const borrowRate = Number(looperRes[1].result?.currentVariableBorrowRate) / 1e25 // 1e27 * 100
   const leverageApy = baseApy.map(entry => {
-    const apyBase = entry.apy + ((entry.apy - borrowRate) * (leveragRatio-1));
+    const apyBase = entry.apy + ((entry.apy - borrowRate) * (leveragRatio - 1));
     const apyReward = entry.apyReward * leveragRatio;
     return {
       ...entry,

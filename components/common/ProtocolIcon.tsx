@@ -14,6 +14,7 @@ export const IconByProtocol: { [key: string]: string } = {
   Convex: "https://icons.llamao.fi/icons/protocols/convex-finance?w=48&h=48",
   Curve: "https://icons.llamao.fi/icons/protocols/curve?w=48&h=48",
   CurveGauge: "https://icons.llamao.fi/icons/protocols/curve?w=48&h=48",
+  Etherfi: "https://icons.llamao.fi/icons/protocols/ether.fi?w=48&h=48",
   Flux: "https://icons.llamao.fi/icons/protocols/flux-finance?w=48&h=48",
   Idle: "https://icons.llamao.fi/icons/protocols/idle?w=48&h=48",
   Origin: "https://icons.llamao.fi/icons/protocols/origin-defi?w=48&h=48",
