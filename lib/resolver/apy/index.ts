@@ -63,7 +63,7 @@ export async function getLooperApy(address: Address, apyId: string, chainId: num
   const leveragRatio = 1e18 / (1e18 - Number(looperRes[0].result))
   const borrowRate = Number(looperRes[1].result?.currentVariableBorrowRate) / 1e25 // 1e27 * 100
   const leverageApy = baseApy.map(entry => {
-    const apyBase = (entry.apy - borrowRate) * leveragRatio;
+    const apyBase = entry.apy + ((entry.apy - borrowRate) * (leveragRatio-1));
     const apyReward = entry.apyReward * leveragRatio;
     return {
       ...entry,
