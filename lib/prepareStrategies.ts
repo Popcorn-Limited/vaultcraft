@@ -83,8 +83,6 @@ export default async function prepareStrategies(vaults: VaultDataByAddress, chai
       }
       const descriptionSplit = desc.description.split("** - ");
 
-      if (chainId === 137) console.log(desc)
-
       strategies[address] = {
         address,
         asset: desc.asset,
@@ -105,7 +103,7 @@ export default async function prepareStrategies(vaults: VaultDataByAddress, chai
         totalAssets,
         totalSupply,
         assetsPerShare,
-        idle: desc.type === "AnyToAnyV1" ? Number(strategyRes[i + 2].result!) - Number(strategyRes[i + 3].result!) : totalAssets,
+        idle: ["AnyToAnyV1", "AnyToAnyCompounderV1"].includes(desc.type) ? Number(strategyRes[i + 2].result!) - Number(strategyRes[i + 3].result!) : totalAssets,
         leverage: desc.type === "LeverageV1" ? 1e18 / (1e18 - Number(strategyRes[i + 4].result)) : undefined
       }
     })

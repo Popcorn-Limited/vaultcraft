@@ -101,7 +101,7 @@ export default function VaultHero({
                       TVL of underlying protocols`}
             />
           </div>
-          {vaultData.strategies.filter(strategy => strategy.metadata.type === "AnyToAnyV1").length > 0 &&
+          {vaultData.strategies.filter(strategy => ["AnyToAnyV1", "AnyToAnyCompounderV1"].includes(strategy.metadata.type)).length > 0 &&
             <div>
               <LargeCardStat
                 id={"utilization"}

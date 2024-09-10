@@ -321,7 +321,7 @@ export async function addStrategyData(vaults: VaultDataByAddress, strategies: { 
         const allocationPerc = (allocation / vaults[address].totalAssets) || 0
 
         // Idle assets in the strategy accessiable by the vault
-        const idle = strategyData.metadata.type === "AnyToAnyV1" ? strategyData.idle : allocation
+        const idle = ["AnyToAnyV1", "AnyToAnyCompounderV1"].includes(strategyData.metadata.type) ? strategyData.idle : allocation
 
         // add strategy metadata
         vaults[address].strategies[i] = {

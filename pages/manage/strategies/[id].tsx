@@ -264,7 +264,7 @@ export default function Index() {
           </section>
 
           {
-            strategy && strategy.metadata.type === "AnyToAnyV1" &&
+            strategy && ["AnyToAnyV1", "AnyToAnyCompounderV1"].includes(strategy.metadata.type) &&
             <div>
               <AnyToAnyV1DepositorSettings strategy={strategy} asset={asset} yieldToken={tokens[chainId][strategy.yieldToken!]} chainId={chainId} />
             </div>
