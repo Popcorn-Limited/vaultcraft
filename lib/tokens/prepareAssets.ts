@@ -1,9 +1,9 @@
-import { Address, PublicClient, erc20Abi, getAddress } from "viem";
+import { Address, PublicClient, erc20Abi, getAddress, maxUint256 } from "viem";
 import axios from "axios";
 import { TokenByAddress, TokenType } from "@/lib/types";
 import { networkMap } from "@/lib/utils/connectors";
 import { vcx as getVcxPrice, vcxLp as getVcxLpPrice } from "@/lib/resolver/price/resolver";
-import { OptionTokenByChain, ST_VCX, VCX, VCX_LP, WrappedOptionTokenByChain } from "@/lib/constants";
+import { ALT_NATIVE_ADDRESS, OptionTokenByChain, ST_VCX, VCX, VCX_LP, WrappedOptionTokenByChain } from "@/lib/constants";
 import { mainnet } from "viem/chains";
 
 export async function prepareAssets(addresses: Address[], chainId: number, client: PublicClient): Promise<TokenByAddress> {
@@ -32,7 +32,7 @@ export async function prepareAssets(addresses: Address[], chainId: number, clien
         }
       })
       .flat(),
-    allowFailure: false,
+    allowFailure: true,
   });
 
 
@@ -40,14 +40,14 @@ export async function prepareAssets(addresses: Address[], chainId: number, clien
   addresses.forEach((address, i) => {
     let tokenPrice = Number(priceData.coins[`${networkMap[chainId].toLowerCase()}:${address}`]?.price) || 0
 
-    tokenPrice = handleTokenPriceExepction(address, tokenPrice, vcxPrice, vcxLpPrice, chainId)
+    tokenPrice = handleTokenPriceExpection(address, tokenPrice, vcxPrice, vcxLpPrice, chainId)
 
     result[getAddress(address)] = {
       ...assets[getAddress(address)],
       address: getAddress(address),
       price: tokenPrice,
       balance: 0,
-      totalSupply: Number(ts[i]),
+      totalSupply: address === ALT_NATIVE_ADDRESS ? Number(maxUint256) : Number(ts[i].result),
       chainId: chainId,
       type: TokenType.Asset
     }
@@ -56,7 +56,7 @@ export async function prepareAssets(addresses: Address[], chainId: number, clien
   return result;
 }
 
-function handleTokenPriceExepction(address: Address, tokenPrice: number, vcxPrice: number, vcxLpPrice: number, chainId: number): number {
+function handleTokenPriceExpection(address: Address, tokenPrice: number, vcxPrice: number, vcxLpPrice: number, chainId: number): number {
   switch (address) {
     case VCX:
     case ST_VCX:

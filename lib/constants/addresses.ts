@@ -1,6 +1,7 @@
 import { Address, zeroAddress } from "viem";
 import { AddressByChain } from "@/lib/types";
 import { mainnet, arbitrum, aurora, avalanche, bsc, fantom, optimism, polygon, xLayer } from "viem/chains";
+import { ALT_NATIVE_ADDRESS } from ".";
 
 export const VCX: Address = "0xcE246eEa10988C495B4A90a905Ee9237a0f91543";
 export const VCX_LP: Address = "0x577A7f7EE659Aa14Dc16FD384B3F8078E23F1920";
@@ -124,6 +125,7 @@ export const ZapAssetAddressesByChain: { [key: number]: Address[] } = {
     "0x5f98805A4E8be255a32880FDeC7F6728C6568bA0", // LUSD
     "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", // WETH
     "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599", // WBTC
+    "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE", // ETH
   ],
   [polygon.id]: [
     "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063", // DAI
@@ -131,6 +133,7 @@ export const ZapAssetAddressesByChain: { [key: number]: Address[] } = {
     "0xc2132D05D31c914a87C6611C10748AEb04B58e8F", // USDT
     "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270", // WMATIC
     "0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6", // WBTC
+    "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE" // MATIC
   ],
   [optimism.id]: [
     "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1", // DAI

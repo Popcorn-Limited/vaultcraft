@@ -1,5 +1,5 @@
 import { Address, PublicClient, WalletClient } from "viem";
-import { ERC20Abi, POP, ZERO } from "@/lib/constants";
+import { ALT_NATIVE_ADDRESS, ERC20Abi, POP, ZERO } from "@/lib/constants";
 import {
   showErrorToast,
   showLoadingToast,
@@ -7,7 +7,7 @@ import {
 } from "@/lib/toasts";
 import { Clients, SimulationResponse } from "@/lib/types";
 import { UsdtAbi } from "@/lib/constants/abi/USDT";
-import {sendMessageToDiscord} from "@/lib/discord/discordBot";
+import { sendMessageToDiscord } from "@/lib/discord/discordBot";
 
 interface HandleAllowanceProps {
   token: Address;
@@ -40,6 +40,11 @@ export async function handleAllowance({
   spender,
   clients,
 }: HandleAllowanceProps): Promise<boolean> {
+  // Native Token cant be approved
+  if (token === ALT_NATIVE_ADDRESS) {
+    return true
+  }
+
   const fetchAllowance = async () => {
     return await clients.publicClient.readContract({
       address: token,
@@ -60,6 +65,7 @@ export async function handleAllowance({
       walletClient: clients.walletClient,
     });
   } else if (Number(allowance) < amount) {
+    // We need to zero the allowance first with POP
     if (token === POP) {
       await approve({
         amount: ZERO,
@@ -121,7 +127,7 @@ export default async function approve({
         user: account,
         isSimulation: false,
         method: "approve",
-        reason: error.shortMessage?? "",
+        reason: error.shortMessage ?? "",
         args: [...request.args]
       });
 
@@ -135,7 +141,7 @@ export default async function approve({
       user: account,
       isSimulation: true,
       method: "approve",
-      reason: simulationError?? "",
+      reason: simulationError ?? "",
     });
 
     showErrorToast(simulationError);
