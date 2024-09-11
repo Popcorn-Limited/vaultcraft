@@ -9,7 +9,7 @@ import TabSelector from "@/components/common/TabSelector"
 import InputTokenWithError from "@/components/input/InputTokenWithError"
 import ActionSteps from "@/components/vault/ActionSteps"
 import { handleAllowance } from "@/lib/approve"
-import { Networth, networthAtom, tokensAtom, TVL, tvlAtom } from "@/lib/atoms"
+import { assetAddressesAtom, Networth, networthAtom, tokensAtom, TVL, tvlAtom, valueStorageAtom } from "@/lib/atoms"
 import { vaultsAtom } from "@/lib/atoms/vaults"
 import { VaultRouterByChain } from "@/lib/constants"
 import { gaugeDeposit, gaugeWithdraw } from "@/lib/gauges/interactions"
@@ -366,9 +366,10 @@ export default function VaultInputs({
       <InteractionContainer
         _inputToken={inputToken}
         _outputToken={outputToken}
-        zapProvider={ZapProvider.none}
+        zapProvider={zapProvider}
         _amount={Number(inputBalance) * (10 ** inputToken.decimals)}
         _action={steps[0]}
+        actionSeries={action}
         actions={steps}
         vaultData={vaultData}
         setShowModal={setShowModal}
@@ -377,14 +378,14 @@ export default function VaultInputs({
   </>
 }
 
-function InteractionContainer({ _inputToken, _outputToken, zapProvider, _amount, _action, actions, vaultData, setShowModal }:
-  { _inputToken: Token, _outputToken: Token, _amount: number, zapProvider: ZapProvider, _action: Action, vaultData: VaultData, actions: Action[], setShowModal: Function }): JSX.Element {
+function InteractionContainer({ _inputToken, _outputToken, zapProvider, _amount, _action, actionSeries, actions, vaultData, setShowModal }:
+  { _inputToken: Token, _outputToken: Token, _amount: number, zapProvider: ZapProvider, _action: Action, actionSeries: SmartVaultActionType, actions: Action[], vaultData: VaultData, setShowModal: Function }): JSX.Element {
   const publicClient = usePublicClient({ chainId: vaultData.chainId });
 
   const [inputToken, setInputToken] = useState<Token>(_inputToken)
   const [outputToken, setOutputToken] = useState<Token>(_outputToken)
   const [amount, setAmount] = useState<number>(_amount)
-  const [valueStorage, setValueStorage] = useState<number>(_amount)
+  const [valueStorage, setValueStorage] = useAtom(valueStorageAtom)
   const [action, setAction] = useState<Action>(_action)
   const [step, setStep] = useState<number>(0);
 
@@ -394,25 +395,47 @@ function InteractionContainer({ _inputToken, _outputToken, zapProvider, _amount,
   const [networth, setNetworth] = useAtom(networthAtom);
 
   async function interactionPreHook() {
-    if (action === Action.zap) {
-      setValueStorage(tokens[vaultData.chainId][vaultData.asset].balance)
-    }
+    // if (action === Action.zap) {
+    //   setValueStorage(tokens[vaultData.chainId][vaultData.asset].balance)
+    // }
+    return
   }
 
   async function interactionPostHook(success: boolean) {
     if (success) {
       if ([Action.deposit, Action.stake, Action.depositAndStake, Action.withdraw, Action.unstake, Action.unstakeAndWithdraw].includes(action)) {
         updateStats(publicClient!, tokens[vaultData.chainId][vaultData.address], vaultData, vaults, setVaults, tvl, setTVL, tokens, networth, setNetworth)
+
+        // Set asset as inputToken before zapApproving for zapOut
+        if ([Action.withdraw, Action.unstakeAndWithdraw].includes(action) &&
+          [SmartVaultActionType.ZapWithdrawal, SmartVaultActionType.ZapUnstakeAndWithdraw].includes(actionSeries)
+        ) {
+          setInputToken(tokens[vaultData.chainId][vaultData.asset])
+        }
       }
       if (action === Action.zap) {
+        // Set the `amount` as the output amount from zap
+        console.log({ balance: tokens[vaultData.chainId][vaultData.asset].balance, valueStorage })
         setAmount(tokens[vaultData.chainId][vaultData.asset].balance - valueStorage)
+        // Reset outputToken in case its deposit (reset doesnt matter on withdrawal since its the last action)
+        setOutputToken(_outputToken)
+        // Set to asset in case its deposit (reset doesnt matter on withdrawal since its the last action)
+        setInputToken(tokens[vaultData.chainId][vaultData.asset])
       }
+
+      // Set asset as outputToken before zapping in
+      if (action === Action.zapApprove && [SmartVaultActionType.ZapDeposit, SmartVaultActionType.ZapDepositAndStake].includes(actionSeries)) {
+        setOutputToken(tokens[vaultData.chainId][vaultData.asset])
+        setValueStorage(tokens[vaultData.chainId][vaultData.asset].balance)
+      }
+
       const nextStep = step + 1
       setAction(actions[nextStep])
       setStep(nextStep)
     } else {
       setAction(Action.done)
     }
+    return
   }
 
   return <div className="w-full flex flex-col mt-5">
@@ -446,7 +469,7 @@ function InteractionContainer({ _inputToken, _outputToken, zapProvider, _amount,
 }
 
 function Interaction({ inputToken, outputToken, amount, zapProvider, action, vaultData, interactionHooks, setShowModal }:
-  { inputToken: Token, outputToken: Token, amount: number, zapProvider: ZapProvider, action: Action, vaultData: VaultData, interactionHooks: [Function, Function], setShowModal: Function }): JSX.Element {
+  { inputToken: Token, outputToken: Token, amount: number, zapProvider: ZapProvider, action: Action, vaultData: VaultData, interactionHooks: [(e?: any) => Promise<any>, (e?: any) => Promise<any>], setShowModal: Function }): JSX.Element {
   const [preHook, postHook] = interactionHooks
   const publicClient = usePublicClient({ chainId: vaultData.chainId });
   const { data: walletClient } = useWalletClient();
@@ -457,7 +480,7 @@ function Interaction({ inputToken, outputToken, amount, zapProvider, action, vau
     if (!account) return
     if (action === Action.done) setShowModal(false)
 
-    preHook()
+    await preHook()
 
     const clients = { publicClient: publicClient!, walletClient: walletClient! }
     const success = await handleInteraction(
@@ -473,7 +496,7 @@ function Interaction({ inputToken, outputToken, amount, zapProvider, action, vau
       clients,
       [tokens, setTokens]
     )()
-    postHook(success)
+    await postHook(success)
   }
 
   return (

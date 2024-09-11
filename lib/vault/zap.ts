@@ -1,11 +1,13 @@
 import axios from "axios"
 import { Address, getAddress, zeroAddress } from "viem";
-import { showErrorToast, showSuccessToast } from "@/lib/toasts";
+import { showErrorToast, showLoadingToast, showSuccessToast } from "@/lib/toasts";
 import { AddressByChain, Clients, Token, TokenByAddress, ZapProvider } from "@/lib/types";
 import { handleAllowance } from "@/lib/approve";
 import mutateTokenBalance from "./mutateTokenBalance";
 import { mainnet, arbitrum, optimism, polygon, xLayer } from "viem/chains";
 import { networkMap } from "@/lib/utils/connectors";
+import { ALT_NATIVE_ADDRESS } from "../constants";
+import { formatNumber } from "../utils/formatBigNumber";
 
 interface BaseProps {
   chainId: number;
@@ -30,15 +32,17 @@ const ZeroXBaseUrlByChain: { [key: number]: string } = {
 async function getZapTransaction({ chainId, sellToken, buyToken, amount, account, zapProvider, slippage = 100, tradeTimeout = 60 }: BaseProps): Promise<any> {
   switch (zapProvider) {
     case ZapProvider.enso:
+      const sellTokenAddress = sellToken.address === ALT_NATIVE_ADDRESS ? "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" : sellToken.address
+      const buyTokenAddress = buyToken.address === ALT_NATIVE_ADDRESS ? "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" : buyToken.address
       const ensoRes = (await axios.get(
-        `https://api.enso.finance/api/v1/shortcuts/route?chainId=${chainId}&fromAddress=${account}&spender=${account}&receiver=${account}&amountIn=${amount.toLocaleString("fullwide", { useGrouping: false })}&slippage=${slippage}&tokenIn=${sellToken.address}&tokenOut=${buyToken.address}&routingStrategy=router`,
+        `https://api.enso.finance/api/v1/shortcuts/route?chainId=${chainId}&fromAddress=${account}&spender=${account}&receiver=${account}&amountIn=${amount.toLocaleString("fullwide", { useGrouping: false })}&slippage=${slippage}&tokenIn=${sellTokenAddress}&tokenOut=${buyTokenAddress}&routingStrategy=router`,
         { headers: { Authorization: `Bearer ${process.env.ENSO_API_KEY}` } }
       )).data
       return ensoRes.tx
     case ZapProvider.zeroX:
       return (await axios.get(
         `${ZeroXBaseUrlByChain[chainId]}swap/v1/quote?buyToken=${buyToken}&sellAmount=${amount.toLocaleString("fullwide", { useGrouping: false })}&slippagePercentage=${slippage / 10_000}&tokenIn=${sellToken.address}&tokenOut=${buyToken.address}`,
-        { headers: { Authorization: `Bearer ${process.env.ENSO_API_KEY}` } }
+        { headers: { "Authorization": "Bearer e303b59f-c26a-4071-8575-79ae6c3a8fd1" } }
       )).data
     case ZapProvider.oneInch:
       const txRes = (await axios.get("https://api.1inch.dev/swap/v5.2/1/swap", {
@@ -57,9 +61,9 @@ async function getZapTransaction({ chainId, sellToken, buyToken, amount, account
     case ZapProvider.paraSwap:
       const {
         data: { priceRoute }
-      } = await axios.get(`https://apiv5.paraswap.io/prices/?srcToken=${sellToken.address}&destToken=${buyToken.address}&amount=${amount.toLocaleString("fullwide", { useGrouping: false })}&srcDecimals=${sellToken.decimals}&destDecimals=${buyToken.decimals}&side=SELL&network=${chainId}`);
+      } = await axios.get(`https://api.paraswap.io/prices?srcToken=${sellToken.address}&destToken=${buyToken.address}&amount=${amount.toLocaleString("fullwide", { useGrouping: false })}&srcDecimals=${sellToken.decimals}&destDecimals=${buyToken.decimals}&side=SELL&network=${chainId}&version=6.2`);
 
-      const { data: paraSwapData } = await axios.post(`https://apiv5.paraswap.io/transactions/${chainId}`, {
+      const { data: paraSwapData } = await axios.post(`https://api.paraswap.io/transactions/${chainId}`, {
         srcToken: sellToken.address,
         destToken: buyToken.address,
         srcAmount: amount.toLocaleString("fullwide", { useGrouping: false }),
@@ -71,6 +75,7 @@ async function getZapTransaction({ chainId, sellToken, buyToken, amount, account
         destDecimals: buyToken.decimals,
         ignoreChecks: true
       });
+
       return { from: paraSwapData.from, to: paraSwapData.to, data: paraSwapData.data, value: paraSwapData.value }
     case ZapProvider.kyberSwap:
       const targetPathConfig = {
@@ -114,16 +119,17 @@ export default async function zap({
   tradeTimeout = 60,
   clients,
   tokensAtom }: ZapProps): Promise<boolean> {
+  showLoadingToast(`Selling ${formatNumber(amount / (10 ** sellToken.decimals))} ${sellToken.symbol} for ${buyToken.symbol} using ${String(ZapProvider[zapProvider])}...`)
+
   const transaction = await getZapTransaction({ chainId, sellToken, buyToken, amount, account, zapProvider, slippage, tradeTimeout })
-  console.log({ transaction })
 
   try {
     const hash = await clients.walletClient.sendTransaction(transaction)
     const receipt = await clients.publicClient.waitForTransactionReceipt({ hash })
 
-    showSuccessToast("Zapped successfully")
+    showSuccessToast(`Sold ${formatNumber(amount / (10 ** sellToken.decimals))} ${sellToken.symbol} for ${buyToken.symbol} using ${String(ZapProvider[zapProvider])}!`)
 
-    mutateTokenBalance({
+    await mutateTokenBalance({
       tokensToUpdate: [sellToken.address, buyToken.address],
       account,
       tokensAtom,
@@ -200,7 +206,6 @@ export async function handleZapAllowance({ token, amount, account, zapProvider, 
     return false
   }
   const spender = await getZapSpender({ account, chainId: clients.walletClient.chain?.id, zapProvider })
-  console.log({ spender })
   return handleAllowance({ token, amount, account, spender, clients })
 }
 
@@ -226,8 +231,10 @@ export async function getZapQuote({ sellToken, buyToken, amount, chainId, accoun
   switch (zapProvider) {
     case ZapProvider.enso:
       try {
-        const ensoRes = (await axios.get(`https://api.enso.finance/api/v1/shortcuts/quote?chainId=${chainId}&routingStrategy=router&tokenIn=${sellToken.address}&tokenOut=${buyToken.address}&fee=5&feeReceiver=${feeRecipient}&amountIn=${amount.toLocaleString("fullwide", { useGrouping: false })}`,
-          { headers: { Authorization: `Bearer ${process.env.ENSO_API_KEY}` } })
+        const sellTokenAddress = sellToken.address === ALT_NATIVE_ADDRESS ? "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" : sellToken.address
+        const buyTokenAddress = buyToken.address === ALT_NATIVE_ADDRESS ? "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" : buyToken.address
+        const ensoRes = (await axios.get(`https://api.enso.finance/api/v1/shortcuts/quote?chainId=${chainId}&fromAddress=${account}&routingStrategy=router&tokenIn=${sellTokenAddress}&tokenOut=${buyTokenAddress}&fee=5&feeReceiver=${feeRecipient}&amountIn=${amount.toLocaleString("fullwide", { useGrouping: false })}`,
+          { headers: { "Authorization": "Bearer e303b59f-c26a-4071-8575-79ae6c3a8fd1" } })
         ).data
         return { zapProvider, out: Number(ensoRes.amountOut) }
       } catch {
@@ -255,7 +262,8 @@ export async function getZapQuote({ sellToken, buyToken, amount, chainId, accoun
       try {
         const {
           data: { priceRoute }
-        } = await axios.get(`https://apiv5.paraswap.io/prices/?srcToken=${sellToken.address}&destToken=${buyToken.address}&amount=${amount.toLocaleString("fullwide", { useGrouping: false })}&srcDecimals=${sellToken.decimals}&destDecimals=${buyToken.decimals}&side=SELL&network=${chainId}`);
+        } = await axios.get(`https://api.paraswap.io/prices?srcToken=${sellToken.address}&destToken=${buyToken.address}&amount=${amount.toLocaleString("fullwide", { useGrouping: false })}&srcDecimals=${sellToken.decimals}&destDecimals=${buyToken.decimals}&side=SELL&network=${chainId}&version=6.2`);
+        
         return { zapProvider, out: Number(priceRoute.destAmount) }
       } catch {
         return { zapProvider: ZapProvider.notFound, out: 0 }

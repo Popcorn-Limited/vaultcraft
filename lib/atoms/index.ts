@@ -10,3 +10,8 @@ export * from "./gauges";
 export * from "./tokens";
 export * from "./networth";
 export * from "./vaultron";
+
+
+import { atom } from "jotai";
+
+export const valueStorageAtom = atom<number>(0);

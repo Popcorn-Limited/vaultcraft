@@ -20,7 +20,7 @@ export default function ActionSteps({
     <nav aria-label="Progress" className="flex flex-col justify-center items-center">
       <ol role="list" className="flex items-center space-x-5">
         {steps.map((step) => (
-          <li key={step.label}>
+          <li key={`${step.label}-${step.step}`}>
             {step.success ? (
               <a className="block h-5 w-5 rounded-full bg-primaryYellow hover:bg-primaryYellow">
                 <span className="sr-only">{step.label}</span>

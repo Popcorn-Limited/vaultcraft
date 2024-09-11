@@ -1,6 +1,7 @@
 import { Address, createPublicClient, erc20Abi, http } from "viem";
 import { TokenByAddress } from "@/lib/types";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
+import { ALT_NATIVE_ADDRESS } from "../constants";
 
 export interface MutateTokenBalanceProps {
   tokensToUpdate: Address[],
@@ -20,7 +21,7 @@ export default async function mutateTokenBalance({
     chain: ChainById[chainId],
     transport: http(RPC_URLS[chainId]),
   })
-  const data = await client.multicall({
+  const balances = await client.multicall({
     contracts: tokensToUpdate.map(address => {
       return {
         address,
@@ -29,11 +30,19 @@ export default async function mutateTokenBalance({
         args: [account],
       }
     }),
-    allowFailure: false,
+    allowFailure: true,
   });
 
+  const nativeBalance = await client.getBalance({
+    address: account,
+  })
+
   tokensToUpdate.forEach((address, i) => {
-    tokens[chainId][address].balance = Number(data[i])
+    if (address === ALT_NATIVE_ADDRESS) {
+      tokens[chainId][address].balance = Number(nativeBalance)
+    } else {
+      tokens[chainId][address].balance = Number(balances[i].result)
+    }
   })
 
   setTokens(tokens)
