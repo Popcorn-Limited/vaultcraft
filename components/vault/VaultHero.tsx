@@ -66,8 +66,8 @@ export default function VaultHero({
             <LargeCardStat
               id={"wallet"}
               label="Your Wallet"
-              value={walletValue < 1 ? "$ 0" : `$ ${formatTwoDecimals(walletValue)}`}
-              secondaryValue={walletValue < 1 ? `0 ${asset.symbol}` : `$ ${formatTwoDecimals(asset.balance / 10 ** asset.decimals)} ${asset.symbol}`}
+              value={walletValue < 0.1 ? "$ 0" : `$ ${formatTwoDecimals(walletValue)}`}
+              secondaryValue={walletValue < 0.1 ? `0 ${asset.symbol}` : `$ ${formatTwoDecimals(asset.balance / 10 ** asset.decimals)} ${asset.symbol}`}
               tooltip="Value of deposit assets held in your wallet"
             />
           </div>
@@ -75,8 +75,8 @@ export default function VaultHero({
             <LargeCardStat
               id={"deposits"}
               label="Deposits"
-              value={depositValue < 1 ? "$ 0" : `$ ${NumberFormatter.format(depositValue)}`}
-              secondaryValue={depositValue < 1 ? "$ 0" : `${!!gauge ?
+              value={depositValue < 0.1 ? "$ 0" : `$ ${NumberFormatter.format(depositValue)}`}
+              secondaryValue={depositValue < 0.1 ? "$ 0" : `${!!gauge ?
                 NumberFormatter.format(((gauge.balance) / 10 ** gauge.decimals) + ((vault?.balance!) / 10 ** vault?.decimals!))
                 : formatAndRoundNumber(vault?.balance!, vault?.decimals!)} ${asset.symbol}`}
               tooltip="Value of your vault deposits"

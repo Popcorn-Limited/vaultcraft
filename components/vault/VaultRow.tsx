@@ -117,10 +117,10 @@ export default function VaultRow({
 
       <td className="text-right">
         <p className="text-lg">
-          $ {depositValue < 1 ? "0" : NumberFormatter.format(depositValue)}
+          $ {depositValue < 0.1 ? "0" : NumberFormatter.format(depositValue)}
         </p>
         <p className="text-sm -mt-0.5 text-customGray200">
-          {depositValue < 1 ? "0" :
+          {depositValue < 0.1 ? "0" :
             (
               !!gauge ?
                 NumberFormatter.format(((gauge.balance) / 10 ** gauge.decimals) + ((vault?.balance!) / 10 ** vault?.decimals!))
