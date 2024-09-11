@@ -1,4 +1,4 @@
-import { AnyToAnyDepositorAbi } from "@/lib/constants";
+import { AnyToAnyDepositorAbi, LeverageLooperAbi } from "@/lib/constants";
 import { showLoadingToast } from "@/lib/toasts";
 import { Clients } from "@/lib/types";
 import { handleCallResult, simulateCall } from "@/lib/utils/helpers";
@@ -159,6 +159,27 @@ export async function changeFloat({
       account: account as Address,
       contract: { address: address, abi: AnyToAnyDepositorAbi },
       functionName: "changeFloatRatio",
+      publicClient: clients.publicClient
+    }),
+    clients
+  });
+
+  return success;
+}
+
+export async function adjustLeverage({
+  address,
+  account,
+  clients,
+}: { address: Address, account: Address, clients: Clients }): Promise<boolean> {
+  showLoadingToast("Adjusting Leverage...");
+
+  const success = await handleCallResult({
+    successMessage: "Adjusted leverage!",
+    simulationResponse: await simulateCall({
+      account: account as Address,
+      contract: { address: address, abi: LeverageLooperAbi },
+      functionName: "adjustLeverage",
       publicClient: clients.publicClient
     }),
     clients
