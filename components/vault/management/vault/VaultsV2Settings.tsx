@@ -158,7 +158,7 @@ export default function VaultsV2Settings({ vaultData }: { vaultData: VaultData, 
               <VaultV2Strategies
                 vaultData={vaultData}
                 settings={settings}
-                disabled={account !== vaultData.metadata.creator}
+                disabled={account !== settings.owner}
               />
             </>
           )}
@@ -167,7 +167,7 @@ export default function VaultsV2Settings({ vaultData }: { vaultData: VaultData, 
               vaultData={vaultData}
               asset={tokens[vaultData.chainId][vaultData.asset]}
               withdrawalQueue={settings.withdrawalQueue}
-              disabled={account !== vaultData.metadata.creator}
+              disabled={account !== settings.owner}
             />
           )}
           {tab === "Auto Deposit" && (
@@ -175,14 +175,14 @@ export default function VaultsV2Settings({ vaultData }: { vaultData: VaultData, 
               vaultData={vaultData}
               asset={tokens[vaultData.chainId][vaultData.asset]}
               depositIndex={settings.depositIndex}
-              disabled={account !== vaultData.metadata.creator}
+              disabled={account !== settings.owner}
             />
           )}
           {tab === "Deposit Limit" && (
             <VaultDepositLimit
               vaultData={vaultData}
               callAddress={vaultData.address}
-              disabled={account !== vaultData.metadata.creator}
+              disabled={account !== settings.owner}
             />
           )}
           {tab === "Pausing" && (
@@ -190,7 +190,7 @@ export default function VaultsV2Settings({ vaultData }: { vaultData: VaultData, 
               vaultData={vaultData}
               paused={settings.paused}
               callAddress={vaultData.address}
-              disabled={account !== vaultData.metadata.creator}
+              disabled={account !== settings.owner}
             />
           )}
           {tab === "Fees" && (
@@ -204,7 +204,7 @@ export default function VaultsV2Settings({ vaultData }: { vaultData: VaultData, 
                 vaultData={vaultData}
                 fees={settings.fees}
                 callAddress={vaultData.address}
-                disabled={account !== vaultData.metadata.creator}
+                disabled={account !== settings.owner}
               />
             </>
           )}

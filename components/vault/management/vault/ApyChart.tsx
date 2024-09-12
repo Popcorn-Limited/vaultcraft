@@ -5,6 +5,8 @@ import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import Highcharts, { chart } from "highcharts";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
+import { zeroAddress } from "viem";
+import { EMPTY_LLAMA_APY_ENTRY } from "@/lib/resolver/apy";
 
 function initMultiLineChart(elem: null | HTMLElement, data: any[]) {
   if (!elem) return;
@@ -84,8 +86,12 @@ function initMultiLineChart(elem: null | HTMLElement, data: any[]) {
 }
 
 async function getApy(strategy: Strategy) {
-  const { data } = await axios.get(`https://pro-api.llama.fi/${process.env.DEFILLAMA_API_KEY}/yields/chart/${strategy.apyId}`)
-  return data.data.map((entry: any) => { return { apy: entry.apy, apyBase: entry.apyBase, apyReward: entry.apyReward, date: new Date(entry.timestamp) } })
+  if (strategy.address === zeroAddress) {
+    return [EMPTY_LLAMA_APY_ENTRY]
+  } else {
+    const { data } = await axios.get(`https://pro-api.llama.fi/${process.env.DEFILLAMA_API_KEY}/yields/chart/${strategy.apyId}`)
+    return data.data.map((entry: any) => { return { apy: entry.apy, apyBase: entry.apyBase, apyReward: entry.apyReward, date: new Date(entry.timestamp) } })
+  }
 }
 
 export default function ApyChart({ strategy }: { strategy: Strategy }): JSX.Element {

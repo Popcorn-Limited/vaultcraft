@@ -14,8 +14,14 @@ export const EMPTY_LLAMA_APY_ENTRY: LlamaApy = {
   date: new Date(),
 }
 
+const LEVERAGE_STRATEGIES: Address[] = [
+  "0xB0CDFb59D54b4f5EeAa180dFb9cE3786Cc7D9835", "0xb75F5eB5b802A450e301a83165A58aA17e03eD3A",
+  "0xDafC709d84f5FE09546fD054220EA59b47517379",
+  "0xcdc20718Cc869c6DBD541B7302C97758fF17250b"
+]
+
 export async function getCustomApy(address: Address, apyId: string, chainId: number): Promise<LlamaApy[]> {
-  if (address === "0xB0CDFb59D54b4f5EeAa180dFb9cE3786Cc7D9835" || address === "0xb75F5eB5b802A450e301a83165A58aA17e03eD3A") {
+  if (LEVERAGE_STRATEGIES.includes(address)) {
     return getLooperApy(address, apyId, chainId)
   }
   switch (apyId) {

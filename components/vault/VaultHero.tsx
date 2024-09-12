@@ -117,8 +117,9 @@ export default function VaultHero({
               <LargeCardStat
                 id={"leverage"}
                 label="Leverage"
-                value={`${formatTwoDecimals(vaultData.strategies.find(strategy => strategy.metadata.type === "LeverageV1")?.leverage || 0)}X`}
-                tooltip={`This strategy levers its assets ${formatTwoDecimals(vaultData.strategies.find(strategy => strategy.metadata.type === "LeverageV1")?.leverage || 0)}X to earn additional yield.`}
+                value={vaultData.metadata.vaultName?.includes("10X") ? "10X" : "5X"}
+                secondaryValue={`${formatTwoDecimals(vaultData.strategies.find(strategy => strategy.metadata.type === "LeverageV1")?.leverage || 0)}X`}
+                tooltip={`This strategy levers its assets to earn additional yield. It targets a leverage ratio of ${vaultData.metadata.vaultName?.includes("10X") ? "10X" : "5X"}. The actual rate currently is ${formatTwoDecimals(vaultData.strategies.find(strategy => strategy.metadata.type === "LeverageV1")?.leverage || 0)}X. Leverage is adjusted every 30min but can be adjusted manually.`}
               />
             </div>
           }
