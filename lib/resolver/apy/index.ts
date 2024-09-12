@@ -15,7 +15,8 @@ export const EMPTY_LLAMA_APY_ENTRY: LlamaApy = {
 }
 
 const LEVERAGE_STRATEGIES: Address[] = [
-  "0xB0CDFb59D54b4f5EeAa180dFb9cE3786Cc7D9835", "0xb75F5eB5b802A450e301a83165A58aA17e03eD3A",
+  "0xB0CDFb59D54b4f5EeAa180dFb9cE3786Cc7D9835",
+  "0xb75F5eB5b802A450e301a83165A58aA17e03eD3A",
   "0xDafC709d84f5FE09546fD054220EA59b47517379",
   "0xcdc20718Cc869c6DBD541B7302C97758fF17250b"
 ]
@@ -45,6 +46,7 @@ export async function getApy(apyId: string): Promise<LlamaApy[]> {
 
 export async function getLooperApy(address: Address, apyId: string, chainId: number): Promise<LlamaApy[]> {
   const baseApy = await getApy(apyId)
+  console.log({ chainId, address, apyId, baseApy })
 
   const client = createPublicClient({
     chain: ChainById[chainId],
@@ -59,10 +61,10 @@ export async function getLooperApy(address: Address, apyId: string, chainId: num
         functionName: "getLTV",
       },
       {
-        address: "0x794a61358D6845594F94dc1DB02A252b5b4814aD",
+        address: chainId === 137 ? "0x794a61358D6845594F94dc1DB02A252b5b4814aD" : "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
         abi: AavePoolAbi,
         functionName: "getReserveData",
-        args: ["0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270"]
+        args: [chainId === 137 ? "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270" : "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"]
       },
     ],
     allowFailure: true
