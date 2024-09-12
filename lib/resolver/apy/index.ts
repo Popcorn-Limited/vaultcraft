@@ -5,6 +5,7 @@ import axios from "axios";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 import { LeverageLooperAbi } from "@/lib/constants";
 import { AavePoolAbi } from "@/lib/constants/abi/Aave";
+import { chiliz } from "viem/chains";
 
 export const EMPTY_LLAMA_APY_ENTRY: LlamaApy = {
   apy: 0,
@@ -72,9 +73,11 @@ export async function getLooperApy(address: Address, apyId: string, chainId: num
 
   const leveragRatio = 1e18 / (1e18 - Number(looperRes[0].result))
   const borrowRate = Number(looperRes[1].result?.currentVariableBorrowRate) / 1e25 // 1e27 * 100
+  const rewardApy = chainId === 1 ? 1.5 : 0
+
   const leverageApy = baseApy.map(entry => {
     const apyBase = entry.apy + ((entry.apy - borrowRate) * (leveragRatio - 1));
-    const apyReward = entry.apyReward * leveragRatio;
+    const apyReward = (entry.apyReward + rewardApy) * leveragRatio;
     return {
       ...entry,
       apyBase,
