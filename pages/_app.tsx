@@ -25,8 +25,16 @@ import { Analytics } from "@vercel/analytics/react"
 import { WagmiProvider, http } from "wagmi";
 import { arbitrum, mainnet, optimism, polygon, xLayer } from "viem/chains";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { createWallet } from "@passkeys/core";
+import { WalletProvider, WalletWidget } from "@passkeys/react";
 
 const PROJECT_ID = "9b83e8f348c7515d3f94d83f95a05749"
+
+const exodus = createWallet({
+  providers: {
+    ethereum: true,
+  }
+});
 
 const connectors = connectorsForWallets([
   {
@@ -157,6 +165,8 @@ export default function App({ Component, pageProps }: AppProps) {
         <WagmiProvider config={config}>
           <QueryClientProvider client={queryClient}>
             <RainbowKitProvider modalSize="compact">
+              <WalletProvider wallet={exodus}>
+                <WalletWidget />
               <NoSSR>
                 <Provider>
                   <Page>
@@ -165,6 +175,7 @@ export default function App({ Component, pageProps }: AppProps) {
                   </Page>
                 </Provider>
               </NoSSR>
+              </WalletProvider>
             </RainbowKitProvider>
           </QueryClientProvider>
         </WagmiProvider>
