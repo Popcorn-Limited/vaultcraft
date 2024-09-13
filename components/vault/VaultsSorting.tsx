@@ -183,9 +183,9 @@ export function sort(sortType: VAULT_SORTING_TYPE, vaults: VaultData[]) {
     case VAULT_SORTING_TYPE.lessTvl:
       return vaults.sort((a, b) => a.tvl - b.tvl);
     case VAULT_SORTING_TYPE.mostvAPR:
-      return vaults.sort((a, b) => b.totalApy - a.totalApy);
+      return vaults.sort((a, b) => b.apyData.totalApy - a.apyData.totalApy);
     case VAULT_SORTING_TYPE.lessvAPR:
-      return vaults.sort((a, b) => a.totalApy - b.totalApy);
+      return vaults.sort((a, b) => a.apyData.totalApy - b.apyData.totalApy);
     default:
       return vaults;
   }

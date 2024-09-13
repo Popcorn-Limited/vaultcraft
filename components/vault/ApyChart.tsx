@@ -11,9 +11,9 @@ export default function ApyChart({ vault }: { vault: VaultData }): JSX.Element {
 
   useEffect(() => {
     async function setUp() {
-      setApyData(vault.apyHist);
-      setTo(vault.apyHist.length - 1)
-      initMultiLineChart(chartElem.current, vault.apyHist);
+      setApyData(vault.apyData.apyHist);
+      setTo(vault.apyData.apyHist.length - 1)
+      initMultiLineChart(chartElem.current, vault.apyData.apyHist);
     }
     setUp()
   }, [])

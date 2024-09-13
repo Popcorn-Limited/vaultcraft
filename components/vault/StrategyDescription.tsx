@@ -50,9 +50,9 @@ export default function StrategyDescription({ strategy, asset, chainId, i, strat
           : <>{strategy.metadata.description}</>
         } { }
       </p>
-      {strategy.apySource === "defillama" &&
+      {strategy.apyData.apySource === "defillama" &&
         <p className='text-white'>
-          View on <a href={`https://defillama.com/yields/pool/${strategy.apyId}`} target="_blank" className="text-secondaryBlue">Defillama</a>
+          View on <a href={`https://defillama.com/yields/pool/${strategy.apyData.apyId}`} target="_blank" className="text-secondaryBlue">Defillama</a>
         </p>
       }
       <div className='flex flex-row items-center'>
@@ -80,7 +80,7 @@ export default function StrategyDescription({ strategy, asset, chainId, i, strat
         <CardStat
           id={`${strategy.resolver}-${i}-apy`}
           label="APY"
-          value={`${NumberFormatter.format(roundToTwoDecimalPlaces(strategy.apy))} %`}
+          value={`${NumberFormatter.format(roundToTwoDecimalPlaces(strategy.apyData.totalApy))} %`}
           tooltip="Current variable apy of the strategy"
         />
         {["AnyToAnyV1", "AnyToAnyCompounderV1"].includes(strategy.metadata.type) &&

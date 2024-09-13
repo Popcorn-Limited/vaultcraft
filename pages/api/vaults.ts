@@ -85,7 +85,7 @@ export default async function handler(
 
     const strategies = (await axios.get(
         `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/descriptions/strategies/${chainId}.json`
-    )).data as Strategies;
+    )).data as { [key: Address]: any };
 
     let uniqueStrategies: Address[] = []
     Object.values(vaults).forEach(vault => {
@@ -210,10 +210,13 @@ export default async function handler(
             assetsPerShare: assetsPerShare,
             depositLimit: 0,
             tvl: 0,
-            apy: 0,
-            totalApy: 0,
-            apyHist: [],
-            apyId: "",
+            apyData: {
+                baseApy: 0,
+                rewardApy: 0,
+                totalApy: 0,
+                apyHist: [],
+                apyId: "",
+            },
             metadata: {
                 type: "single-asset-vault-v1",
                 creator: vault.creator,

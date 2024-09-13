@@ -27,8 +27,6 @@ export default function VaultCard({
     asset: assetAddress,
     gaugeData,
     gauge: gaugeAddress,
-    tvl,
-    apy,
     vault: vaultAddress,
     chainId,
   } = vaultData;
@@ -132,7 +130,7 @@ export default function VaultCard({
         <CardStat
           id={`${baseTooltipId}-vApy`}
           label="vAPY"
-          value={`${formatTwoDecimals(vaultData.apy)} %`}
+          value={`${formatTwoDecimals(vaultData.apyData.totalApy)} %`}
           tooltip="Current variable APY of the vault"
         />
         {vaultData?.gaugeData?.upperAPR && vaultData?.gaugeData?.upperAPR > 0

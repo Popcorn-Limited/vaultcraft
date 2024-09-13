@@ -69,16 +69,17 @@ export default async function prepareStrategies(vaults: VaultDataByAddress, chai
         totalSupply > 0 ? totalAssets / totalSupply : Number(1);
 
       const desc = strategyDescriptions[address]
-      let apy = 0;
+      let apy: LlamaApy;
       let apyHist: LlamaApy[] = []
 
       try {
         const strategyApy = desc.apySource === "custom" ? await getCustomApy(address, desc.apyId, chainId) : await getApy(desc.apyId)
-        apy = strategyApy[strategyApy.length - 1].apy;
+        apy = strategyApy[strategyApy.length - 1];
         apyHist = strategyApy;
       } catch (e) {
         console.log(`ERROR FETCHING APY: ${address} - ${desc.apySource}=${desc.apyId}`)
         console.log(e)
+        apy = EMPTY_LLAMA_APY_ENTRY
         apyHist = [EMPTY_LLAMA_APY_ENTRY]
       }
       const descriptionSplit = desc.description.split("** - ");
@@ -93,13 +94,17 @@ export default async function prepareStrategies(vaults: VaultDataByAddress, chai
           description: descriptionSplit[1],
           type: desc.type ?? "Vanilla",
         },
+        apyData: {
+          baseApy: apy.apyBase,
+          rewardApy: apy.apyReward,
+          totalApy: apy.apy,
+          apyHist: apyHist,
+          apyId: desc.apyId,
+          apySource: desc.apySource
+        },
         resolver: desc.resolver,
         allocation: 0,
         allocationPerc: 0,
-        apy,
-        apyHist,
-        apyId: desc.apyId,
-        apySource: desc.apySource,
         totalAssets,
         totalSupply,
         assetsPerShare,

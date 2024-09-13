@@ -115,7 +115,7 @@ export default function Index() {
                   </div>
                 </div> */}
 
-                {vaultData.apyHist.length > 0 && <ApyChart vault={vaultData} />}
+                {vaultData.apyData.apyHist.length > 0 && <ApyChart vault={vaultData} />}
 
                 <div className="bg-customNeutral200 p-6 rounded-lg">
                   <p className="text-white text-2xl font-bold">Information</p>

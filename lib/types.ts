@@ -49,16 +49,22 @@ export type VaultData = {
   assetsPerShare: number;
   depositLimit: number;
   tvl: number;
-  apy: number;
-  totalApy: number;
-  apyHist: LlamaApy[];
-  apyId: string;
+  apyData: ApyData;
   gaugeData?: GaugeData;
   metadata: VaultMetadata;
   strategies: Strategy[];
   idle: number;
   liquid: number;
 };
+
+export type ApyData = {
+  baseApy: number;
+  rewardApy: number;
+  totalApy: number;
+  apyHist: LlamaApy[];
+  apyId: string;
+  apySource?: "custom" | "defillama";
+}
 
 export type LlamaApy = {
   apy: number;
@@ -78,10 +84,7 @@ export type Strategy = {
   resolver: string;
   allocation: number;
   allocationPerc: number;
-  apy: number;
-  apyHist: LlamaApy[];
-  apyId: string;
-  apySource: "custom" | "defillama";
+  apyData: ApyData;
   totalAssets: number;
   totalSupply: number;
   assetsPerShare: number;

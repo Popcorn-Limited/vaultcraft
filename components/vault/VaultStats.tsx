@@ -54,8 +54,8 @@ export default function VaultStats({
         secondaryValue={depositValue < 1 ?
           "0" :
           `${!!gauge ?
-          NumberFormatter.format((gauge.balance * vaultData.assetsPerShare / (10 ** asset.decimals)) + (vault?.balance! * vaultData.assetsPerShare / (10 ** asset.decimals)))
-          : formatAndRoundNumber(vault?.balance! * vaultData.assetsPerShare, asset?.decimals!)
+            NumberFormatter.format((gauge.balance * vaultData.assetsPerShare / (10 ** asset.decimals)) + (vault?.balance! * vaultData.assetsPerShare / (10 ** asset.decimals)))
+            : formatAndRoundNumber(vault?.balance! * vaultData.assetsPerShare, asset?.decimals!)
           } ${asset.symbol}`}
         tooltip="Value of your vault deposits"
       />
@@ -69,7 +69,7 @@ export default function VaultStats({
       <CardStat
         id={`${baseTooltipId}-vApy`}
         label="vAPY"
-        value={`${vaultData.apy ? `${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.apy))}` : "0"} %`}
+        value={`${vaultData.apyData.totalApy ? `${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.apyData.totalApy))}` : "0"} %`}
         tooltip="Current variable APY of the vault"
       />
       {vaultData?.gaugeData?.upperAPR && vaultData?.gaugeData?.upperAPR > 0

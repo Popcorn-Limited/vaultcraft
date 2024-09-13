@@ -40,7 +40,7 @@ export default function VaultHero({
       setWalletValue((asset.balance * asset.price) / (10 ** asset.decimals))
       setDepositValue(depositValue_)
 
-      let vAPR_ = vaultData.apy;
+      let vAPR_ = vaultData.apyData.totalApy;
       if (vaultData.gaugeData && gauge) {
         let boost_ = (vaultData.gaugeData.workingBalance / (gauge.balance || 0)) * 5;
         if (boost_ > 1) setBoost(boost_);
@@ -51,8 +51,6 @@ export default function VaultHero({
       setVAPR(vAPR_)
     }
   }, [vaultData])
-
-  console.log(vaultData)
 
   return (
     <section className="md:border-b border-customNeutral100 pt-10 pb-6 px-4 md:px-0 ">
@@ -97,7 +95,7 @@ export default function VaultHero({
               }
               tooltip={`This Vault deploys its TVL $ ${vaultData.tvl < 1 ? "0" : formatTwoDecimals(vaultData.tvl)}
                       (${formatAndRoundNumber(vaultData.totalAssets, asset?.decimals || 0)} ${asset?.symbol || "TKN"}) 
-                      in $ ${formatTwoDecimals(vaultData.strategies.reduce((a, b) => a + b.apyHist[b.apyHist.length - 1].tvl, 0))} 
+                      in $ ${formatTwoDecimals(vaultData.strategies.reduce((a, b) => a + b.apyData.apyHist[b.apyData.apyHist.length - 1].tvl, 0))} 
                       TVL of underlying protocols`}
             />
           </div>
@@ -127,10 +125,8 @@ export default function VaultHero({
             <LargeCardStat
               id={"vapy"}
               label="vAPY"
-              value={`${NumberFormatter.format(
-                roundToTwoDecimalPlaces(vaultData.apy)
-              )} %`}
-              tooltip="Current variable APY of the vault"
+              value={`${formatTwoDecimals(vaultData.apyData.baseApy + vaultData.apyData.rewardApy)} %`}
+              tooltip={`Base yield from this vault is ${formatTwoDecimals(vaultData.apyData.baseApy)} % + ${formatTwoDecimals(vaultData.apyData.rewardApy)} % in compounded rewards`}
             />
           </div>
           {vaultData.gaugeData?.lowerAPR ?

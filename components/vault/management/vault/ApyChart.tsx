@@ -89,7 +89,7 @@ async function getApy(strategy: Strategy) {
   if (strategy.address === zeroAddress) {
     return [EMPTY_LLAMA_APY_ENTRY]
   } else {
-    const { data } = await axios.get(`https://pro-api.llama.fi/${process.env.DEFILLAMA_API_KEY}/yields/chart/${strategy.apyId}`)
+    const { data } = await axios.get(`https://pro-api.llama.fi/${process.env.DEFILLAMA_API_KEY}/yields/chart/${strategy.apyData.apyId}`)
     return data.data.map((entry: any) => { return { apy: entry.apy, apyBase: entry.apyBase, apyReward: entry.apyReward, date: new Date(entry.timestamp) } })
   }
 }

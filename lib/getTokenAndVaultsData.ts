@@ -158,10 +158,14 @@ async function getInitialVaultsData(chainId: number, client: PublicClient): Prom
       assetsPerShare: 0,
       depositLimit: 0,
       tvl: 0,
-      apy: 0,
-      totalApy: 0,
-      apyHist: [],
-      apyId: vault.apyId,
+      apyData: {
+        baseApy: 0,
+        rewardApy: 0,
+        totalApy: 0,
+        apyHist: [],
+        apyId: vault.apyId,
+        apySource: vault.apyId ? "defillama" : undefined
+      },
       gaugeData: undefined,
       metadata: {
         vaultName: vault.name ? vault.name : undefined,
@@ -246,8 +250,8 @@ async function addDynamicVaultsData(vaults: VaultDataByAddress, client: PublicCl
 
 
 async function addApyHist(vaults: VaultDataByAddress): Promise<VaultDataByAddress> {
-  const apyHistAll = await Promise.all(Object.values(vaults).map(async (vault: any) => {
-    if (vault.apyId?.length > 0) return getApy(vault.apyId)
+  const apyHistAll = await Promise.all(Object.values(vaults).map(async (vault: VaultData) => {
+    if (vault.apyData.apyId?.length > 0) return getApy(vault.apyData.apyId)
     return []
   }))
 
@@ -259,7 +263,7 @@ async function addApyHist(vaults: VaultDataByAddress): Promise<VaultDataByAddres
       hist = hist.slice(10, hist.length - 1)
     }
 
-    vaults[vault.address].apyHist = hist
+    vaults[vault.address].apyData.apyHist = hist
   })
 
   return vaults
@@ -283,7 +287,8 @@ export async function addStrategyData(vaults: VaultDataByAddress, strategies: { 
 
   let n = 0
   Object.keys(vaults).forEach((address: any) => {
-    let apy = 0;
+    let apyBase = 0;
+    let apyRewards = 0;
     let liquid = 0;
 
     if (vaults[address].strategies.length === 0) {
@@ -300,10 +305,14 @@ export async function addStrategyData(vaults: VaultDataByAddress, strategies: { 
         resolver: "",
         allocation: vaults[address].totalAssets,
         allocationPerc: 1,
-        apy: 0,
-        apyHist: [EMPTY_LLAMA_APY_ENTRY],
-        apyId: "",
-        apySource: "custom",
+        apyData: {
+          baseApy: 0,
+          rewardApy: 0,
+          totalApy: 0,
+          apyHist: [EMPTY_LLAMA_APY_ENTRY],
+          apyId: "",
+          apySource: "custom"
+        },
         totalAssets: vaults[address].totalAssets,
         totalSupply: vaults[address].totalSupply,
         assetsPerShare: vaults[address].assetsPerShare,
@@ -334,9 +343,11 @@ export async function addStrategyData(vaults: VaultDataByAddress, strategies: { 
         // calc blended apy of the vault
         if (vaults[address].totalSupply === 0) {
           // Assume even allocation if the vault doesnt have allocations yet
-          apy += strategyData.apy * (1 / vaults[address].strategies.length)
+          apyBase += strategyData.apyData.baseApy * (1 / vaults[address].strategies.length)
+          apyRewards += strategyData.apyData.rewardApy * (1 / vaults[address].strategies.length)
         } else {
-          apy += strategyData.apy * allocationPerc
+          apyBase += strategyData.apyData.baseApy * allocationPerc
+          apyRewards += strategyData.apyData.rewardApy * allocationPerc
           liquid += idle
         }
 
@@ -345,8 +356,9 @@ export async function addStrategyData(vaults: VaultDataByAddress, strategies: { 
     }
 
     // assign apy
-    vaults[address].apy = apy;
-    vaults[address].totalApy = apy;
+    vaults[address].apyData.baseApy = apyBase;
+    vaults[address].apyData.rewardApy = apyRewards;
+    vaults[address].apyData.totalApy = apyBase + apyRewards;
     vaults[address].liquid = liquid + vaults[address].idle;
   })
 
@@ -361,7 +373,7 @@ async function addGaugeData(vaultsData: VaultDataByAddress, assets: TokenByAddre
     const vault = vaultsData[gaugeData.vault]
 
     if (vault) {
-      vault.totalApy += gaugeData.upperAPR + gaugeData.rewardApy.apy || 0;
+      vault.apyData.totalApy += gaugeData.upperAPR + gaugeData.rewardApy.apy || 0;
       vault.gaugeData = gaugeData;
 
       vaultsData[vault.address] = vault;
