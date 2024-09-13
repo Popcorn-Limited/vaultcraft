@@ -126,7 +126,25 @@ export default function VaultHero({
               id={"vapy"}
               label="vAPY"
               value={`${formatTwoDecimals(vaultData.apyData.baseApy + vaultData.apyData.rewardApy)} %`}
-              tooltip={`Base yield from this vault is ${formatTwoDecimals(vaultData.apyData.baseApy)} % + ${formatTwoDecimals(vaultData.apyData.rewardApy)} % in compounded rewards`}
+              tooltipChild={
+                <div className="w-40">
+                  <span className="w-full flex justify-between">
+                    <p className="font-bold text-lg">Total vAPY:</p>
+                    <p className="font-bold text-lg">{formatTwoDecimals(vaultData.apyData.baseApy + vaultData.apyData.rewardApy)} %</p>
+                  </span>
+                  <span className="w-full flex justify-between">
+                    <p className="">Base vAPY:</p>
+                    <p className="">{formatTwoDecimals(vaultData.apyData.baseApy)} %</p>
+                  </span>
+                  {vaultData.apyData.rewardApy && vaultData.apyData.rewardApy > 0
+                    ? <span className="w-full flex justify-between">
+                      <p className="">Reward vAPY:</p>
+                      <p className="">{formatTwoDecimals(vaultData.apyData.rewardApy)} %</p>
+                    </span>
+                    : <></>
+                  }
+                </div>
+              }
             />
           </div>
           {vaultData.gaugeData?.lowerAPR ?
