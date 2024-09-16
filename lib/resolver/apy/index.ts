@@ -47,7 +47,6 @@ export async function getApy(apyId: string): Promise<LlamaApy[]> {
 
 export async function getLooperApy(address: Address, apyId: string, chainId: number): Promise<LlamaApy[]> {
   const baseApy = await getApy(apyId)
-  console.log({ chainId, address, apyId, baseApy })
 
   const client = createPublicClient({
     chain: ChainById[chainId],
@@ -76,6 +75,7 @@ export async function getLooperApy(address: Address, apyId: string, chainId: num
   const rewardApy = chainId === 1 ? 1.5 : 0
 
   const leverageApy = baseApy.map(entry => {
+    entry.apy = chainId === 137 ? 5.17 : entry.apy;
     const apyBase = entry.apy + ((entry.apy - borrowRate) * (leveragRatio - 1));
     const apyReward = (entry.apyReward + rewardApy) * leveragRatio;
     return {
