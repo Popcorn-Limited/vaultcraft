@@ -31,6 +31,7 @@ export const IconByProtocol: { [key: string]: string } = {
   KelpDAO: "https://icons.llamao.fi/icons/protocols/kelp-dao?w=48&h=48",
   Ion: "https://www.app.ionprotocol.io/logo.svg",
   Ipor: "https://icons.llamao.fi/icons/protocols/ipor?w=48&h=48",
+  ZeroLend: "https://icons.llamao.fi/icons/protocols/zerolend?w=48&h=48",
   Multistrategy: "/images/tokens/vcx.svg",
   VaultCraft: "/images/tokens/vcx.svg",
   None: "/images/tokens/vcx.svg"
