@@ -529,7 +529,7 @@ function StakingRewardFunding() {
 
   return Object.keys(tokens).length > 0 ?
     <div className="border-b border-white pb-4 py-10 px-4 md:px-8">
-      <h2 className="text-white text-xl mb-2">Bridge VCX</h2>
+      <h2 className="text-white text-xl mb-2">Fund Staking Rewards</h2>
       <div>
         <InputTokenWithError
           captionText={"VCX Amount"}
