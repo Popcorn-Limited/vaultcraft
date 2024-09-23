@@ -303,8 +303,8 @@ export default function Staking() {
                   <LargeCardStat
                     id={"vapy"}
                     label="vAPY"
-                    value={"40 %"}
-                    secondaryValue={"10 %"}
+                    value={"25 %"}
+                    secondaryValue={"5 %"}
                     tooltip="Current variable APY of the vault"
                   />
                 </div>
@@ -314,7 +314,7 @@ export default function Staking() {
                       <LargeCardStat
                         id={"yourApy"}
                         label="Your APY"
-                        value={`${formatTwoDecimals(userLockVaultData.multiplier * 40)} %`}
+                        value={`${formatTwoDecimals(userLockVaultData.multiplier * 25)} %`}
                         tooltip="Current variable APY of the vault"
                       />
                     </div>
@@ -409,7 +409,7 @@ export default function Staking() {
                       allowInput={false}
                     />
                     {!userLockVaultData?.isExit &&
-                      <p className="text-white">Expected APY: ~{(lockTime / 31557600) * 40} %</p>
+                      <p className="text-white">Expected APY: ~{(lockTime / 31557600) * 25} %</p>
                     }
                   </div>
                   <div className="mt-4">
@@ -452,11 +452,29 @@ export default function Staking() {
               </div>
 
               <div className="w-full md:w-2/3 mt-8 md:mt-0 space-y-4">
-                <div className="bg-customNeutral200 p-6 rounded-lg">
+                <div className="bg-customNeutral200 p-6 rounded-lg text-white">
                   <p className="text-white text-2xl font-bold">Information</p>
                   <p className="text-white">
-                    .....
+                    Lock stake your VCX up to 12 months for 4X voting power on
+                    <a className="text-secondaryBlue hover:text-primaryYellow focus:none outline-none"
+                      href="https://docs.vaultcraft.io/welcome-to-vaultcraft/introduction"
+                      target="_blank"
+                    >https://snapshot.org/#/vaultcraft-snapshot.eth
+                    </a> and earn additional VCX rewards:
                   </p>
+                  <ul className="list-disc list-inside">
+                    <li>3 months: 5% APY</li>
+                    <li>6 months: 10% APY</li>
+                    <li>9 months: 15% APY</li>
+                    <li>12 months: 25% APY</li>
+                  </ul>
+                  <p className="mt-4">Value Proposition:</p>
+                  <ul className="list-disc list-inside">
+                    <li>Incentivize long-term holding and staking of VCX tokens</li>
+                    <li>Enhance governance participation by giving more voting power to committed stakeholders</li>
+                    <li>Align voting power with the level of commitment and risk taken by token holders.</li>
+                    <li>Encourage a more engaged and informed community of governance participants</li>
+                  </ul>
                   <div className="md:flex md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4 mt-4">
 
                     <div className="w-full md:w-10/12 border border-customNeutral100 rounded-lg p-4">
