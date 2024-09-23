@@ -18,6 +18,7 @@ export async function vcxLp({
   const vcxPrice = await getVcxPrice({ address: VCX, chainId: mainnet.id, client: undefined })
   const ethPrice = await llama({ address: WETH, chainId: mainnet.id, client: undefined })
 
+
   // @ts-ignore
   const res: any[] = await client.multicall({
     contracts: [
@@ -36,5 +37,6 @@ export async function vcxLp({
     allowFailure: false,
   });
   const totalValue = ((Number(res[0][1][0]) / 1e18) * ethPrice) + ((Number(res[0][1][1]) / 1e18) * vcxPrice)
-  return (Number(res[1]) / 1e18) * totalValue
+
+  return totalValue / (Number(res[1]) / 1e18)
 }

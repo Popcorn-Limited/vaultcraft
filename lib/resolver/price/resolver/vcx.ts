@@ -1,7 +1,7 @@
 import axios from "axios";
 import { PriceResolverParams } from "..";
 
-const FALLBACK_PRICE = 0.09412
+const FALLBACK_PRICE = 0.03017
 
 export async function vcx({
   address,
