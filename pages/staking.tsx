@@ -463,9 +463,9 @@ export default function Staking() {
                     </a> and earn additional VCX rewards:
                   </p>
                   <ul className="list-disc list-inside">
-                    <li>3 months: 5% APY</li>
-                    <li>6 months: 10% APY</li>
-                    <li>9 months: 15% APY</li>
+                    <li>3 months: 6.25% APY</li>
+                    <li>6 months: 12.5% APY</li>
+                    <li>9 months: 18.75% APY</li>
                     <li>12 months: 25% APY</li>
                   </ul>
                   <p className="mt-4">Value Proposition:</p>
