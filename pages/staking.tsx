@@ -1,25 +1,14 @@
-import { vaultsAtom } from "@/lib/atoms/vaults";
 import { Clients, Token, TokenByAddress, TokenType, VaultData, ZapProvider } from "@/lib/types";
 import { useAtom } from "jotai";
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import NoSSR from "react-no-ssr";
-import { yieldOptionsAtom } from "@/lib/atoms/sdk";
-import VaultInputs from "@/components/vault/VaultInputs";
 import { showErrorToast, showLoadingToast, showSuccessToast } from "@/lib/toasts";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { ArrowDownIcon, Square2StackIcon } from "@heroicons/react/24/outline";
 import { Networth, networthAtom, tokensAtom, TVL, tvlAtom } from "@/lib/atoms";
-import LeftArrowIcon from "@/components/svg/LeftArrowIcon";
-import ManageLoanInterface from "@/components/lending/ManageLoanInterface";
 import { FEE_RECIPIENT_PROXY, OptionTokenByChain, ST_VCX, VCX, VeTokenByChain, ZapAssetAddressesByChain } from "@/lib/constants";
-import SecondaryActionButton from "@/components/button/SecondaryActionButton";
-import StrategyDescription from "@/components/vault/StrategyDescription";
-import ApyChart from "@/components/vault/ApyChart";
-import VaultHero from "@/components/vault/VaultHero";
 import { Address, createPublicClient, erc20Abi, formatUnits, http, isAddress, PublicClient, zeroAddress } from "viem";
 import { mainnet } from "viem/chains";
-import CardStat from "@/components/common/CardStat";
 import { RPC_URLS, SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { LockVaultAbi } from "@/lib/constants/abi/LockVault";
 import { useAccount, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
@@ -35,9 +24,7 @@ import MainActionButton from "@/components/button/MainActionButton";
 import ActionSteps from "@/components/vault/ActionSteps";
 import { handleAllowance } from "@/lib/approve";
 import { claim, deposit, increaseDeposit, withdraw } from "@/lib/vault/lockVault/interactions";
-import PseudoRadioButton from "@/components/button/PseudoRadioButton";
 import LockTimeButton from "@/components/button/LockTimeButton";
-import { loadingStyle } from "@/lib/toasts/toastStyles";
 
 async function getUserLockVaultData(user: Address, vault: Address) {
   const client = createPublicClient({
@@ -464,19 +451,20 @@ export default function Staking() {
                     >https://snapshot.org/#/vaultcraft-snapshot.eth
                     </a> and earn additional VCX rewards. Once an address stakes for X months, it can only increase its stake within the chosen timeframe.
                   </p>
-                  <ul className="list-disc list-inside">
-                    <li>3 months: 5% APY</li>
-                    <li>6 months: 10% APY</li>
-                    <li>9 months: 15% APY</li>
-                    <li>12 months: 25% APY</li>
-                  </ul>
-                  <p>Starting on October 1st, 2024, rewards will be distributed over 13 months. Lock periods will be gradually removed as we progress into the future.</p>
-                  <p className="mt-4">Value Proposition:</p>
+                  <p className="mt-2">Starting on October 1st, 2024, rewards will be distributed over 13 months. Lock periods will be gradually removed as we progress into the future.</p>
+                  <p className="mt-4 font-bold">Value Proposition:</p>
                   <ul className="list-disc list-inside">
                     <li>Incentivize long-term holding and staking of VCX tokens</li>
                     <li>Enhance governance participation by giving more voting power to committed stakeholders</li>
                     <li>Align voting power with the level of commitment and risk taken by token holders.</li>
                     <li>Encourage a more engaged and informed community of governance participants</li>
+                  </ul>
+                  <p className="mt-4 font-bold">Expected Rewards:</p>
+                  <ul className="list-disc list-inside">
+                    <li>3 months: 5% APY</li>
+                    <li>6 months: 10% APY</li>
+                    <li>9 months: 15% APY</li>
+                    <li>12 months: 25% APY</li>
                   </ul>
                   <div className="md:flex md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4 mt-4">
 
