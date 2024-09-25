@@ -12,6 +12,7 @@ import VaultClaimSection from "@/components/vault/VaultClaimSection";
 import { useAtom } from "jotai";
 import { tokensAtom } from "@/lib/atoms";
 import { useEffect, useState } from "react";
+import ProtocolIcon, { IconByProtocol } from "../common/ProtocolIcon";
 
 export default function VaultHero({
   vaultData,
@@ -54,9 +55,25 @@ export default function VaultHero({
 
   return (
     <section className="md:border-b border-customNeutral100 pt-10 pb-6 px-4 md:px-0 ">
-      <div className="w-full mb-8">
+      <div className="w-full mb-12 flex flex-row items-center">
         <AssetWithName vault={vaultData} size={3} />
+        <div className="flex flex-row items-center space-x-4">
+          {vaultData.points.map(point =>
+            <div className="flex flex-col justify-center items-center">
+              <img
+                src={
+                  point.provider
+                    ? IconByProtocol[point.provider]
+                    : "/images/tokens/vcx.svg"
+                }
+                className={`w-8 h-8 rounded-full border border-gray-400`}
+              />
+              <p className="text-white text-lg mt-2" >{point.multiplier}x</p>
+            </div>
+          )}
+        </div>
       </div>
+
 
       <div className="w-full md:flex md:flex-row md:justify-between space-y-4 md:space-y-0 mt-4 md:mt-0">
         <div className="grid grid-cols-2 sm:grid-cols-6 md:pr-10  gap-4 md:gap-10">
@@ -187,6 +204,7 @@ export default function VaultHero({
 
         {showClaim && <VaultClaimSection vaultData={vaultData} />}
       </div>
+
     </section>
   );
 }

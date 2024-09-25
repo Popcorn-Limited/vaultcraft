@@ -12,13 +12,15 @@ const vaultLabelColor: { [key: string]: string } = {
   Deprecated: "text-white bg-red-500 bg-opacity-80",
   New: "text-primaryYellow bg-primaryYellow bg-opacity-30",
   Leverage: "text-secondaryBlue bg-secondaryBlue bg-opacity-30 text-white",
+  Points: "text-secondaryBlue bg-secondaryBlue bg-opacity-30 text-white"
 };
 
 const vaultLabelTooltip: { [key: string]: string } = {
   Experimental: "Unaudited strategy in testing stage",
   Deprecated: "This strategy got deprecated. Only withdrawals are open",
   New: "Newly deployed! ✨",
-  Leverage: "This vault uses leverage"
+  Leverage: "This vault uses leverage",
+  Points: "This vault earns points! 🔥"
 };
 
 const iconSize: { [key: number]: string } = {

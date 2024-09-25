@@ -189,7 +189,8 @@ async function getInitialVaultsData(chainId: number, client: PublicClient): Prom
         }
       }),
       idle: 0,
-      liquid: 0
+      liquid: 0,
+      points: vault.points ? vault.points : []
     }
   })
 

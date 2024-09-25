@@ -55,7 +55,13 @@ export type VaultData = {
   strategies: Strategy[];
   idle: number;
   liquid: number;
+  points: Point[]
 };
+
+export type Point = {
+  provider: string;
+  multiplier: number;
+}
 
 export type ApyData = {
   baseApy: number;
@@ -103,7 +109,8 @@ export enum VaultLabel {
   experimental = "Experimental",
   deprecated = "Deprecated",
   new = "New",
-  leverage = "Leverage"
+  leverage = "Leverage",
+  points = "Points"
 }
 
 export type VaultMetadata = {
