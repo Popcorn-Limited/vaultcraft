@@ -409,7 +409,9 @@ export default function Staking() {
                       allowInput={false}
                     />
                     {!userLockVaultData?.isExit &&
-                      <p className="text-white">Expected APY: ~{(lockTime / 31557600) * 25} %</p>
+                      <p className="text-white">
+                        Expected APY: ~{lockTime === 7889400 ? "5" : lockTime === 15778800 ? "10" : lockTime === 7889400 ? "15" : "25"} %
+                      </p>
                     }
                   </div>
                   <div className="mt-4">
@@ -455,19 +457,20 @@ export default function Staking() {
                 <div className="bg-customNeutral200 p-6 rounded-lg text-white">
                   <p className="text-white text-2xl font-bold">Information</p>
                   <p className="text-white">
-                    Lock stake your VCX up to 12 months for 4X voting power on
+                    Lock stake your VCX up to 12 months for 4X voting power on {" "}
                     <a className="text-secondaryBlue hover:text-primaryYellow focus:none outline-none"
                       href="https://docs.vaultcraft.io/welcome-to-vaultcraft/introduction"
                       target="_blank"
                     >https://snapshot.org/#/vaultcraft-snapshot.eth
-                    </a> and earn additional VCX rewards:
+                    </a> and earn additional VCX rewards. Once an address stakes for X months, it can only increase its stake within the chosen timeframe.
                   </p>
                   <ul className="list-disc list-inside">
-                    <li>3 months: 6.25% APY</li>
-                    <li>6 months: 12.5% APY</li>
-                    <li>9 months: 18.75% APY</li>
+                    <li>3 months: 5% APY</li>
+                    <li>6 months: 10% APY</li>
+                    <li>9 months: 15% APY</li>
                     <li>12 months: 25% APY</li>
                   </ul>
+                  <p>Starting on October 1st, 2024, rewards will be distributed over 13 months. Lock periods will be gradually removed as we progress into the future.</p>
                   <p className="mt-4">Value Proposition:</p>
                   <ul className="list-disc list-inside">
                     <li>Incentivize long-term holding and staking of VCX tokens</li>

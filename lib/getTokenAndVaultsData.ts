@@ -23,13 +23,11 @@ import { EMPTY_LLAMA_APY_ENTRY, getApy } from "@/lib/resolver/apy";
 interface GetVaultsByChainProps {
   chain: Chain;
   account?: Address;
-  yieldOptions: YieldOptions;
 }
 
 export default async function getTokenAndVaultsDataByChain({
   chain,
   account = zeroAddress,
-  yieldOptions,
 }: GetVaultsByChainProps): Promise<{ vaultsData: VaultData[], tokens: TokenByAddress, strategies: StrategyByAddress }> {
   const client = createPublicClient({
     chain,

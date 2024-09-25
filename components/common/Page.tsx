@@ -196,8 +196,7 @@ export default function Page({
 
           const { vaultsData, tokens, strategies } = await getTokenAndVaultsDataByChain({
             chain,
-            account: account || zeroAddress,
-            yieldOptions: yieldOptions as YieldOptions,
+            account: account || zeroAddress
           })
 
           console.log(`Completed fetching Data for chain ${chain.id} (${new Date()})`)
@@ -348,8 +347,8 @@ export default function Page({
       console.log(`COMPLETED FETCHING APP DATA (${new Date()})`)
       console.log(`Took ${Number(new Date()) - getDataStart}ms to load`)
     }
-    if (yieldOptions) getData();
-  }, [yieldOptions, account]);
+    getData();
+  }, [account]);
 
   const [showTermsModal, setShowTermsModal] = useState<boolean>(false);
   const [termsSigned, setTermsSigned] = useState<boolean>(false);
