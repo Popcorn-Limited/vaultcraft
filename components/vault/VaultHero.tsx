@@ -59,7 +59,10 @@ export default function VaultHero({
         <AssetWithName vault={vaultData} size={3} />
         <div className="flex flex-row items-center space-x-4">
           {vaultData.points.map(point =>
-            <div className="flex flex-col justify-center items-center">
+            <div
+              key={point.provider}
+              className="flex flex-col justify-center items-center"
+            >
               <img
                 src={
                   point.provider
