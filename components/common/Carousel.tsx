@@ -5,16 +5,16 @@ import MainActionButton from '@/components/button/MainActionButton'
 
 const banners = [
   {
-    id: 'Banner_D01_02',
-    title: 'The VCX Smart Vault',
-    description: 'Auto-compound AURA & BAL into VCX for 50%+ APY',
-    buttonText: 'Deposit here',
-    buttonLink: 'vaults/0x99a53fAB6fBD1eacb59AE998dA2DbF130BE94C38?chainId=1',
+    id: 'bannerStake',
+    title: 'Stake VCX',
+    description: 'Up to 25% APY and 4x voting power',
+    buttonText: 'Stake now',
+    buttonLink: 'staking',
     imageSrc: 'images/banner/banner1.png',
     tokenSrc: 'images/banner/bannerToken1.svg'
   },
   {
-    id: 'Banner_D02_02',
+    id: 'bannerBoost',
     title: 'Boost your oVCX rewards',
     description: 'Lock your 80VCX 20WETH pool for max boost in oVCX and voting power',
     buttonText: 'Boost here',
@@ -23,14 +23,23 @@ const banners = [
     tokenSrc: 'images/banner/bannerToken2.svg'
   },
   {
-    id: 'Banner_D03_02',
+    id: 'bannerARB',
     title: "It's raining ARB rewards",
     description: 'Watch out for “additional rewards” in ARB and OP',
     buttonText: 'Check it out',
     buttonLink: 'vaults',
     imageSrc: 'images/banner/banner3.png',
     tokenSrc: 'images/banner/bannerToken3.svg'
-  }
+  },
+  {
+    id: 'bannerVault',
+    title: 'The VCX Smart Vault',
+    description: 'Auto-compound AURA & BAL into VCX for 50%+ APY',
+    buttonText: 'Deposit here',
+    buttonLink: 'vaults/0x99a53fAB6fBD1eacb59AE998dA2DbF130BE94C38?chainId=1',
+    imageSrc: 'images/banner/banner2.png',
+    tokenSrc: 'images/banner/bannerToken1.svg'
+  },
 ]
 
 export default function Carousel() {
