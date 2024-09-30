@@ -25,6 +25,7 @@ import { useConnectModal } from "@rainbow-me/rainbowkit"
 import { useAtom } from "jotai"
 import { useState } from "react"
 import { Address, erc20Abi, formatUnits, maxUint256, PublicClient } from "viem"
+import getVaultErrorMessage from "@/lib/vault/errorMessage";
 
 export interface VaultInputsProps {
   vaultData: VaultData;
@@ -57,6 +58,7 @@ export default function VaultInputs({
 
   const [inputBalance, setInputBalance] = useState<string>("0");
   const [isDeposit, setIsDeposit] = useState<boolean>(true);
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   // Zap Settings
   const [zapProvider, setZapProvider] = useState(ZapProvider.none)
@@ -191,8 +193,11 @@ export default function VaultInputs({
   }
 
   function handleChangeInput(e: any) {
-    const value = e.currentTarget.value;
-    setInputBalance(validateInput(value).isValid ? value : "0");
+    if (!inputToken || !outputToken) return
+    let value = e.currentTarget.value;
+    value = validateInput(value).isValid ? value : "0"
+    setInputBalance(value);
+    setErrorMessage(getVaultErrorMessage(value, vaultData, inputToken, outputToken, isDeposit, action))
     setShowModal(false)
   }
 
@@ -254,7 +259,7 @@ export default function VaultInputs({
       value={inputBalance}
       onChange={handleChangeInput}
       selectedToken={inputToken}
-      errorMessage={""}
+      errorMessage={errorMessage}
       tokenList={tokenOptions.filter((token) =>
         gauge?.address
           ? token.address !== gauge?.address
