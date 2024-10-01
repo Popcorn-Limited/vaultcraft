@@ -46,8 +46,7 @@ export default function InputTokenWithError({
       )}
       <div className="relative flex items-center w-full">
         <div
-          className={`h-14 w-full flex px-5 py-4 items-center justify-between rounded-lg border ${errorMessage ? "border-red-500" : "border-customGray100"
-            }`}
+          className={`h-14 w-full flex px-5 py-4 items-center justify-between rounded-lg border ${errorMessage ? "border-red-500" : "border-customGray100"}`}
         >
           <div className="xs:w-full xs:border-r xs:border-customGray500 xs:pr-4 smmd:p-0 smmd:border-none smmd:w-1/2">
             <InputNumber {...props} disabled={disabled} />

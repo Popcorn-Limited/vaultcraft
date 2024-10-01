@@ -48,6 +48,7 @@ export default function VaultInputs({
   const { switchChainAsync } = useSwitchChain();
   const { openConnectModal } = useConnectModal();
 
+  const [tokens] = useAtom(tokensAtom)
   const [inputToken, setInputToken] = useState<Token>();
   const [outputToken, setOutputToken] = useState<Token>();
 
@@ -197,7 +198,7 @@ export default function VaultInputs({
     let value = e.currentTarget.value;
     value = validateInput(value).isValid ? value : "0"
     setInputBalance(value);
-    setErrorMessage(getVaultErrorMessage(value, vaultData, inputToken, outputToken, isDeposit, action))
+    setErrorMessage(getVaultErrorMessage(value, vaultData, inputToken, outputToken, isDeposit, action, tokens))
     setShowModal(false)
   }
 
