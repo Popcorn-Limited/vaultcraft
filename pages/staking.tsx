@@ -397,7 +397,7 @@ export default function Staking() {
                     />
                     {!userLockVaultData?.isExit &&
                       <p className="text-white">
-                        Expected APY: ~{lockTime === 7889400 ? "5" : lockTime === 15778800 ? "10" : lockTime === 7889400 ? "15" : "25"} %
+                        Expected APY: ~{lockTime === 7889400 ? "5" : lockTime === 15778800 ? "10" : lockTime === 23668200 ? "15" : "25"} %
                       </p>
                     }
                   </div>
