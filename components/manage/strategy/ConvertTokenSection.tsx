@@ -2,6 +2,7 @@ import { Token } from "@/lib/types";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { Address, formatUnits, PublicClient } from "viem";
+import axios from "axios";
 import { AnyToAnyDepositorAbi } from "@/lib/constants";
 import { tokensAtom } from "@/lib/atoms";
 import { ArrowDownIcon } from "@heroicons/react/24/outline";
@@ -15,6 +16,8 @@ import { useAccount, usePublicClient, useSwitchChain, useWalletClient } from "wa
 import { claimReserve, pullFunds, pushFunds } from "@/lib/vault/management/strategyInteractions";
 import { PassThroughProps } from "./AnyToAnyV1DepositorSettings";
 import TabSelector from "@/components/common/TabSelector";
+import {ZapAssetAddressesByChain } from "@/lib/constants";
+import { showErrorToast } from "@/lib/toasts";
 
 async function getReserveLogs(address: Address, account: Address, client: PublicClient) {
   let addedLogs = await client.getContractEvents({
@@ -116,17 +119,23 @@ export default function ConvertTokenSection({ strategy, asset, yieldToken, setti
 function ConvertToken({ token, strategy, asset, yieldToken, settings, chainId, updateReserves }: PassThroughProps & { token: Token, updateReserves: Function }) {
   const { owner, keeper, assetBal, yieldTokenBal, bqPrice, qbPrice } = settings;
   const isAsset = token.address === asset.address
-  const price = isAsset ? qbPrice : bqPrice
+  const [price, setPrice] = useState<number>(isAsset ? qbPrice : bqPrice);
   const float = (settings.assetBal / (10 ** asset.decimals)) / (10_000 / Number(settings.float))
-  const depositLimit = isAsset ? (yieldTokenBal / (10 ** yieldToken.decimals)) / (bqPrice / 1e18) : ((assetBal / (10 ** asset.decimals)) - float) / (price / 1e18)
-
+  const [depositLimit, setDepositLimit] = useState<number>(isAsset ? (yieldTokenBal / (10 ** yieldToken.decimals)) / (bqPrice / 1e18) : ((assetBal / (10 ** asset.decimals)) - float) / (price / 1e18))
+  
   const { address: account, chain } = useAccount();
   const publicClient = usePublicClient({ chainId });
   const { data: walletClient } = useWalletClient();
   const { switchChainAsync } = useSwitchChain();
   const [tokens, setTokens] = useAtom(tokensAtom);
+  const [inputToken, setInputToken] = useState<Token>(yieldToken);
+  const [isZap, setIsZap] = useState<boolean>(false);
+
+  const zapList = [asset, yieldToken, ...ZapAssetAddressesByChain[chainId].filter(addr => strategy.asset !== addr).map(addr => tokens[chainId][addr])];
 
   const [amount, setAmount] = useState<string>("0");
+
+  const pendleZapRouter: Address = "0x888888888889758f76e7103c6cbf23abbf58f946";
 
   function handleChangeInput(e: any) {
     const value = e.currentTarget.value;
@@ -157,8 +166,8 @@ function ConvertToken({ token, strategy, asset, yieldToken, settings, chainId, u
     }
 
     handleAllowance({
-      token: token.address,
-      spender: strategy.address,
+      token: inputToken.address,
+      spender: isZap ? pendleZapRouter : strategy.address,
       amount: val,
       account: account,
       clients: {
@@ -207,21 +216,57 @@ function ConvertToken({ token, strategy, asset, yieldToken, settings, chainId, u
     if (success) updateReserves()
   }
 
+  async function handleZap() {
+    let val = Number(amount)
+    if (val === 0 || !account || !publicClient || !walletClient) return
+    val = val * (10 ** inputToken.decimals)
+
+    try {
+      const {data} = await axios.get(`https://api-v2.pendle.finance/core/v1/sdk/1/markets/0xcae62858db831272a03768f5844cbe1b40bb381f/add-liquidity?receiver=${account}&slippage=0.05&enableAggregator=true&tokenIn=${inputToken.address}&amountIn=${val}`)
+      console.log(data)
+      const hash = await walletClient!.sendTransaction({
+        account: account,
+        to: data.tx.to,
+        data: data.tx.data,
+      })
+    } catch (err) {
+      showErrorToast("Error getting zap calldata");
+    }
+  }
+
+  function handleTokenSelect(input: Token): void {
+    setInputToken(input);
+
+    if(![token, asset, yieldToken].includes(input)) {
+      setIsZap(true);
+      const newPrice = input.price * 10 ** 18 / asset.price;
+      console.log("PRICE", newPrice, token, asset, yieldToken);
+
+      setPrice(newPrice); 
+      setDepositLimit(((input.balance / (10 ** asset.decimals)) - float) / (newPrice / 1e18));
+    }
+    else {
+      setIsZap(false);
+      const newPrice = isAsset ? qbPrice : bqPrice;
+      setPrice(newPrice);
+      setDepositLimit(isAsset ? (yieldTokenBal / (10 ** yieldToken.decimals)) / (bqPrice / 1e18) : ((assetBal / (10 ** asset.decimals)) - float) / (newPrice / 1e18));
+    }
+  }
   return (
     <div className="mt-4">
       <div className="">
         <div>
           <p>Convert Amount</p>
           <InputTokenWithError
-            onSelectToken={() => { }}
+            onSelectToken={(option) => handleTokenSelect(option)}
             onMaxClick={handleMaxClick}
             chainId={chainId}
             value={amount}
             onChange={handleChangeInput}
-            selectedToken={token}
+            selectedToken={inputToken}
             errorMessage={""}
-            tokenList={[]}
-            allowSelection={false}
+            tokenList={zapList}
+            allowSelection={true}
             allowInput={true}
           />
           <p>{isAsset ? "Withdraw" : "Deposit"} Limit: {formatNumber(depositLimit)}
@@ -261,11 +306,13 @@ function ConvertToken({ token, strategy, asset, yieldToken, settings, chainId, u
         <SecondaryActionButton
           label="Approve"
           handleClick={handleApprove} disabled={!account || (account !== owner && account !== keeper)}
+          // handleClick={handleApprove} disabled={false} // TODO
         />
         <MainActionButton
-          label="Convert"
-          handleClick={handleDeposit}
+          label={isZap ? "Zap to Yield Asset" : "Convert"}
+          handleClick={isZap ? handleZap : handleDeposit}
           disabled={!account || (account !== owner && account !== keeper) || Number(amount) >= depositLimit}
+          // disabled={false} // TODO
         />
       </div>
     </div>
