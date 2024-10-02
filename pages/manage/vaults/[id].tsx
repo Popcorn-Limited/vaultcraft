@@ -172,7 +172,7 @@ export default function Index() {
             <p className="text-white leading-0 mt-1 ml-2">Back to Vaults</p>
           </button>
 
-          <VaultHero vaultData={vaultData} asset={asset} vault={vault} gauge={gauge} showClaim={false} />
+          <VaultHero vaultData={vaultData} asset={asset} vault={vault} gauge={gauge} isManaged />
 
           <section className="px-4 md:px-0 text-white">
             <div className="md:flex mt-12 md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4">
@@ -214,6 +214,7 @@ export default function Index() {
                     chainId={vaultData.chainId}
                     i={i}
                     stratLen={vaultData.strategies.length}
+                    isManaged
                   />
                 </Link>
               )}

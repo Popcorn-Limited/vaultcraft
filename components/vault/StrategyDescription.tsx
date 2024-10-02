@@ -21,9 +21,10 @@ interface StrategyDescriptionProps {
   chainId: number;
   i: number;
   stratLen: number;
+  isManaged?: boolean
 }
 
-export default function StrategyDescription({ strategy, asset, chainId, i, stratLen }: StrategyDescriptionProps) {
+export default function StrategyDescription({ strategy, asset, chainId, i, stratLen, isManaged = false }: StrategyDescriptionProps) {
   const { address: account, chain } = useAccount();
   const publicClient = usePublicClient({ chainId });
   const { data: walletClient } = useWalletClient();
@@ -83,7 +84,7 @@ export default function StrategyDescription({ strategy, asset, chainId, i, strat
           value={`${NumberFormatter.format(roundToTwoDecimalPlaces(strategy.apyData.totalApy))} %`}
           tooltip="Current variable apy of the strategy"
         />
-        {["AnyToAnyV1", "AnyToAnyCompounderV1"].includes(strategy.metadata.type) &&
+        {isManaged && ["AnyToAnyV1", "AnyToAnyCompounderV1"].includes(strategy.metadata.type) &&
           <CardStat
             id={`${strategy.resolver}-${i}-utilization`}
             label="Utilization"

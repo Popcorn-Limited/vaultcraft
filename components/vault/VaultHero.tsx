@@ -20,12 +20,14 @@ export default function VaultHero({
   vault,
   gauge,
   showClaim = false,
+  isManaged = false
 }: {
   vaultData: VaultData;
   asset: Token;
   vault: Token;
   gauge?: Token;
   showClaim?: boolean;
+  isManaged?: boolean
 }): JSX.Element {
   const [tokens] = useAtom(tokensAtom);
   const [walletValue, setWalletValue] = useState<number>(0)
@@ -119,7 +121,7 @@ export default function VaultHero({
                       TVL of underlying protocols`}
             />
           </div>
-          {vaultData.strategies.filter(strategy => ["AnyToAnyV1", "AnyToAnyCompounderV1"].includes(strategy.metadata.type)).length > 0 &&
+          {isManaged && vaultData.strategies.filter(strategy => ["AnyToAnyV1", "AnyToAnyCompounderV1"].includes(strategy.metadata.type)).length > 0 &&
             <div>
               <LargeCardStat
                 id={"utilization"}
