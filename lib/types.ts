@@ -196,10 +196,12 @@ export type ClaimableReward = {
 export enum SmartVaultActionType {
   Deposit,
   Withdrawal,
+  RequestWithdrawal,
   Stake,
   Unstake,
   DepositAndStake,
   UnstakeAndWithdraw,
+  UnstakeAndRequestWithdrawal,
   ZapDeposit,
   ZapWithdrawal,
   ZapDepositAndStake,

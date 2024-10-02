@@ -50,7 +50,7 @@ export const VaultControllerByChain: AddressByChain = {
 export const VaultRouterByChain: AddressByChain = {
   [mainnet.id]: "0x4995F3bb85E1381D02699e2164bC1C6c6Fa243cd",
   [optimism.id]: "0x3828845F4d7212b6a0Dc3D67482AFf4544002919",
-  [arbitrum.id]: "0x48943F145686bF5c4580D545CDA405844D1f777b"
+  [arbitrum.id]: "0x44874B65503bC48b950a5251C31D8C8e1e74b467"
 }
 
 export const VeRecipientByChain: AddressByChain = {

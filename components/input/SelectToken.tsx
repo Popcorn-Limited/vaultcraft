@@ -11,7 +11,7 @@ import { Tooltip } from "react-tooltip";
 export interface SelectTokenProps {
   allowSelection: boolean;
   options: Token[];
-  selectedToken: Token;
+  selectedToken?: Token;
   selectToken: (token: Token) => void;
   chainId: ChainId;
 }
@@ -57,9 +57,9 @@ export default function SelectToken({
             allowSelection && setShow(true);
           }}
         >
-          <div className="md:mr-2 relative flex-none w-5 h-5">
+          <div className="mb-1 md:mr-2 relative flex-none w-5 h-5">
             <TokenIcon
-              token={selectedToken}
+              token={selectedToken!}
               icon={selectedToken?.logoURI}
               imageSize="w-5 h-5"
               chainId={chainId}

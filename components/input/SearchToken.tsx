@@ -8,7 +8,7 @@ import { formatNumber } from "@/lib/utils/formatBigNumber";
 
 interface SearchTokenProps {
   selectToken: (token: Token) => void;
-  selectedToken: Token;
+  selectedToken?: Token;
   options: Token[];
   chainId: ChainId;
 }

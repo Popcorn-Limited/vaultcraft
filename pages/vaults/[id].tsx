@@ -8,17 +8,24 @@ import { yieldOptionsAtom } from "@/lib/atoms/sdk";
 import VaultInputs from "@/components/vault/VaultInputs";
 import { showSuccessToast } from "@/lib/toasts";
 import CopyToClipboard from "react-copy-to-clipboard";
-import { Square2StackIcon } from "@heroicons/react/24/outline";
+import { ArrowDownIcon, Square2StackIcon } from "@heroicons/react/24/outline";
 import { tokensAtom } from "@/lib/atoms";
 import LeftArrowIcon from "@/components/svg/LeftArrowIcon";
 import ManageLoanInterface from "@/components/lending/ManageLoanInterface";
-import { VeTokenByChain, ZapAssetAddressesByChain } from "@/lib/constants";
+import { ST_VCX, VeTokenByChain, ZapAssetAddressesByChain } from "@/lib/constants";
 import StrategyDescription from "@/components/vault/StrategyDescription";
 import ApyChart from "@/components/vault/ApyChart";
 import VaultHero from "@/components/vault/VaultHero";
 import { isAddress, zeroAddress } from "viem";
 import UserBoostSection from "@/components/vault/UserBoostSection";
 import HtmlRenderer from "@/components/common/HtmlRenderer";
+import TokenIcon from "@/components/common/TokenIcon";
+import SecondaryButtonGroup from "@/components/common/SecondaryButtonGroup";
+import { ChainId } from "@/lib/utils/connectors";
+import MainButtonGroup from "@/components/common/MainButtonGroup";
+import SelectToken from "@/components/input/SelectToken";
+import InputTokenWithError from "@/components/input/InputTokenWithError";
+import ClaimableWithdrawal from "@/components/vault/ClaimableWithdrawal";
 
 export default function Index() {
   const router = useRouter();
@@ -83,8 +90,9 @@ export default function Index() {
 
             <section className="w-full md:flex md:flex-row md:justify-between md:space-x-8 py-10 px-4 md:px-0">
               <div className="w-full md:w-1/3">
+
                 <div className="bg-customNeutral200 p-6 rounded-lg">
-                  <div className="bg-customNeutral300 px-6 py-6 rounded-lg">
+                  <div className="bg-customNeutral300 p-6 rounded-lg">
                     <VaultInputs
                       vaultData={vaultData}
                       tokenOptions={tokenOptions}
@@ -93,6 +101,12 @@ export default function Index() {
                     />
                   </div>
                 </div>
+
+                <ClaimableWithdrawal
+                  vault={vault}
+                  asset={asset}
+                  tokenOptions={tokenOptions.filter(token => token.address !== vault.address && token.address !== gauge?.address && token.address !== ST_VCX)}
+                />
               </div>
 
               <div className="w-full md:w-2/3 mt-8 md:mt-0 space-y-4">
