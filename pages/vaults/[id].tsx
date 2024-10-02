@@ -36,7 +36,7 @@ export default function Index() {
 
 
   useEffect(() => {
-    if (!vaultData && yieldOptions && Object.keys(query).length > 0 && Object.keys(vaults).length > 0) {
+    if (Object.keys(query).length > 0 && Object.keys(vaults).length > 0) {
       const chainIdQuery = query?.chainId! as string
       const chainId = Number(chainIdQuery.replace("?", "").replace("&", ""))
       const foundVault = vaults[chainId].find(vault => vault.address === query?.id)
@@ -58,7 +58,7 @@ export default function Index() {
         setVaultData(foundVault)
       }
     }
-  }, [vaults, query, vaultData]);
+  }, [vaults, query, vaultData, tokens]);
 
   const [showLoanManagementModal, setShowLoanManagementModal] = useState(false)
 
@@ -79,7 +79,13 @@ export default function Index() {
               <p className="text-white leading-0 mt-1 ml-2">Back to Vaults</p>
             </button>
 
-            <VaultHero vaultData={vaultData} asset={asset} vault={vault} gauge={gauge} showClaim />
+            <VaultHero
+              vaultData={vaultData}
+              asset={asset}
+              vault={vault}
+              gauge={gauge}
+              showClaim
+            />
 
             <section className="w-full md:flex md:flex-row md:justify-between md:space-x-8 py-10 px-4 md:px-0">
               <div className="w-full md:w-1/3">

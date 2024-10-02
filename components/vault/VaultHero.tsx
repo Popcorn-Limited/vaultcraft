@@ -36,24 +36,23 @@ export default function VaultHero({
   const [vAPR, setVAPR] = useState<number>(0);
 
   useEffect(() => {
-    if (vaultData) {
-      let depositValue_ = (vault.balance * vault.price) / (10 ** vault.decimals)
-      if (gauge) depositValue_ += (gauge.balance * gauge.price) / (10 ** gauge.decimals)
+    const [asset_, vault_, gauge_] = [asset, vault, gauge]
+    let depositValue_ = (vault_.balance * vault_.price) / (10 ** vault_.decimals)
+    if (gauge_) depositValue_ += (gauge_.balance * gauge_.price) / (10 ** gauge_.decimals)
 
-      setWalletValue((asset.balance * asset.price) / (10 ** asset.decimals))
-      setDepositValue(depositValue_)
+    setWalletValue((asset_.balance * asset_.price) / (10 ** asset_.decimals))
+    setDepositValue(depositValue_)
 
-      let vAPR_ = vaultData.apyData.totalApy;
-      if (vaultData.gaugeData && gauge) {
-        let boost_ = (vaultData.gaugeData.workingBalance / (gauge.balance || 0)) * 5;
-        if (boost_ > 1) setBoost(boost_);
+    let vAPR_ = vaultData.apyData.totalApy;
+    if (vaultData.gaugeData && gauge_) {
+      let boost_ = (vaultData.gaugeData.workingBalance / (gauge_.balance || 0)) * 5;
+      if (boost_ > 1) setBoost(boost_);
 
-        if (vaultData.gaugeData.rewardApy.apy) vAPR_ += vaultData.gaugeData.rewardApy.apy
-        if (vaultData.gaugeData.lowerAPR) vAPR_ += (vaultData.gaugeData.lowerAPR * boost)
-      }
-      setVAPR(vAPR_)
+      if (vaultData.gaugeData.rewardApy.apy) vAPR_ += vaultData.gaugeData.rewardApy.apy
+      if (vaultData.gaugeData.lowerAPR) vAPR_ += (vaultData.gaugeData.lowerAPR * boost)
     }
-  }, [vaultData])
+    setVAPR(vAPR_)
+  }, [vaultData, asset, vault, gauge])
 
   return (
     <section className="md:border-b border-customNeutral100 pt-10 pb-6 px-4 md:px-0 ">

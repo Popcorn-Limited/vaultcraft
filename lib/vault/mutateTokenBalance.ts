@@ -21,6 +21,7 @@ export default async function mutateTokenBalance({
     chain: ChainById[chainId],
     transport: http(RPC_URLS[chainId]),
   })
+
   const balances = await client.multicall({
     contracts: tokensToUpdate.map(address => {
       return {
@@ -45,6 +46,6 @@ export default async function mutateTokenBalance({
     }
   })
 
-  setTokens(tokens)
+  setTokens((prev: any) => ({ ...tokens }))
   return true
 }

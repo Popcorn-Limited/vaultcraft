@@ -262,15 +262,15 @@ export default function Page({
       console.log(`Took ${Number(new Date()) - start}ms to load`)
 
 
-      setTVL({
+      setTVL(prev => ({
         vault: vaultTVL,
         lockVault: lockVaultTVL,
         stake: stakingTVL,
         total: vaultTVL + lockVaultTVL + stakingTVL,
-      });
-      setVaults(newVaultsData);
-      setTokens(newTokens);
-      setStrategies(newStrategies);
+      }));
+      setVaults(prev => ({ ...newVaultsData }));
+      setTokens(prev => ({ ...newTokens }));
+      setStrategies(prev => ({ ...newStrategies }));
 
       // setAaveReserveData(newReserveData);
       // setAaveAccountData(newUserAccountData);
@@ -321,15 +321,15 @@ export default function Page({
         console.log(`Took ${Number(new Date()) - start}ms to load`)
 
 
-        setNetworth({
+        setNetworth(prev => ({
           vault: vaultNetworth,
           lockVault: lockVaultNetworth,
           wallet: assetNetworth,
           stake: stakeNetworth,
           total:
             vaultNetworth + assetNetworth + stakeNetworth + lockVaultNetworth,
-        });
-        setGaugeRewards(newRewards);
+        }));
+        setGaugeRewards(pre => ({ ...newRewards }));
 
         console.log(`Fetching Vaultron (${new Date()})`)
         start = Number(new Date())
@@ -342,7 +342,7 @@ export default function Page({
         console.log(`Completed fetching Vaultron (${new Date()})`)
         console.log(`Took ${Number(new Date()) - start}ms to load`)
 
-        setVaultronStats(newVaultronStats)
+        setVaultronStats(prev => ({ ...newVaultronStats }))
       }
       console.log(`COMPLETED FETCHING APP DATA (${new Date()})`)
       console.log(`Took ${Number(new Date()) - getDataStart}ms to load`)
