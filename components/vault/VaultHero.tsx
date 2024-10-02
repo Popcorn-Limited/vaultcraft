@@ -12,7 +12,7 @@ import VaultClaimSection from "@/components/vault/VaultClaimSection";
 import { useAtom } from "jotai";
 import { tokensAtom } from "@/lib/atoms";
 import { useEffect, useState } from "react";
-import ProtocolIcon, { IconByProtocol } from "../common/ProtocolIcon";
+import { IconByProtocol } from "../common/ProtocolIcon";
 
 export default function VaultHero({
   vaultData,
@@ -37,6 +37,7 @@ export default function VaultHero({
 
   useEffect(() => {
     if (vaultData) {
+      console.log(vault, asset, gauge)
       let depositValue_ = (vault.balance * vault.price) / (10 ** vault.decimals)
       if (gauge) depositValue_ += (gauge.balance * gauge.price) / (10 ** gauge.decimals)
 
@@ -53,7 +54,7 @@ export default function VaultHero({
       }
       setVAPR(vAPR_)
     }
-  }, [vaultData])
+  }, [vaultData, asset, vault, gauge])
 
   return (
     <section className="md:border-b border-customNeutral100 pt-10 pb-6 px-4 md:px-0 ">
