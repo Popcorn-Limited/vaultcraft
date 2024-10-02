@@ -86,7 +86,7 @@ export default function VaultHero({
               id={"wallet"}
               label="Your Wallet"
               value={walletValue < 0.1 ? "$ 0" : `$ ${formatTwoDecimals(walletValue)}`}
-              secondaryValue={walletValue < 0.1 ? `0 ${asset.symbol}` : `$ ${formatTwoDecimals(asset.balance / 10 ** asset.decimals)} ${asset.symbol}`}
+              secondaryValue={walletValue < 0.1 ? `0 ${asset.symbol}` : `${formatTwoDecimals(asset.balance / 10 ** asset.decimals)} ${asset.symbol}`}
               tooltip="Value of deposit assets held in your wallet"
             />
           </div>
