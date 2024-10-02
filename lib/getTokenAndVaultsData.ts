@@ -155,6 +155,7 @@ async function getInitialVaultsData(chainId: number, client: PublicClient): Prom
       totalSupply: 0,
       assetsPerShare: 0,
       depositLimit: 0,
+      withdrawalLimit: 0,
       tvl: 0,
       apyData: {
         baseApy: 0,
@@ -239,9 +240,9 @@ async function addDynamicVaultsData(vaults: VaultDataByAddress, client: PublicCl
     vaults[vault.address].totalAssets = totalAssets;
     vaults[vault.address].totalSupply = totalSupply;
     vaults[vault.address].depositLimit = Number(dynamicValues[i + 2]);
+    vaults[vault.address].withdrawalLimit = totalSupply;
     vaults[vault.address].assetsPerShare = totalSupply > 0 ? totalAssets / totalSupply : Number(1);
     vaults[vault.address].idle = Number(dynamicValues[i + 3]);
-
   })
 
   return vaults;
@@ -359,6 +360,7 @@ export async function addStrategyData(vaults: VaultDataByAddress, strategies: { 
     vaults[address].apyData.rewardApy = apyRewards;
     vaults[address].apyData.totalApy = apyBase + apyRewards;
     vaults[address].liquid = liquid + vaults[address].idle;
+    vaults[address].withdrawalLimit = (liquid + vaults[address].idle) / vaults[address].assetsPerShare
   })
 
 

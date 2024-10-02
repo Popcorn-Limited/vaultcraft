@@ -16,7 +16,7 @@ import { gaugeDeposit, gaugeWithdraw } from "@/lib/gauges/interactions"
 import { showErrorToast, showLoadingToast, showSuccessToast } from "@/lib/toasts"
 import { Clients, SmartVaultActionType, Token, TokenByAddress, TokenType, VaultData, ZapProvider } from "@/lib/types"
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors"
-import { formatNumber, safeRound } from "@/lib/utils/formatBigNumber"
+import { formatNumber, formatTwoDecimals, safeRound } from "@/lib/utils/formatBigNumber"
 import { handleSwitchChain, validateInput } from "@/lib/utils/helpers"
 import { vaultDeposit, vaultDepositAndStake, vaultRedeem, vaultUnstakeAndWithdraw } from "@/lib/vault/interactions"
 import zap, { getZapProvider, handleZapAllowance } from "@/lib/vault/zap"
@@ -26,6 +26,8 @@ import { useAtom } from "jotai"
 import { useState } from "react"
 import { Address, erc20Abi, formatUnits, maxUint256, PublicClient } from "viem"
 import getVaultErrorMessage from "@/lib/vault/errorMessage";
+import AssetTokenOracleAlert from "../manage/dashboard/alerts/AssetOracleAlert";
+import MainButtonGroup from "../common/MainButtonGroup";
 
 export interface VaultInputsProps {
   vaultData: VaultData;
@@ -282,10 +284,10 @@ export default function VaultInputs({
         </>
         :
         <>
-          {vaultData.liquid < vaultData.totalAssets &&
+          {vaultData.withdrawalLimit < vaultData.totalSupply &&
             <span className="flex flex-row items-center justify-between text-[#D7D7D7]">
               <p>Withdraw Limit:</p>
-              <p>{formatNumber(vaultData.liquid / (10 ** (asset?.decimals || 0)))} {asset?.symbol}</p>
+              <p>{vault ? formatNumber(vaultData.withdrawalLimit / (10 ** vault.decimals)) : "0"} {vault?.symbol}</p>
             </span>
           }
         </>
@@ -350,22 +352,32 @@ export default function VaultInputs({
         </span>
       </div>
     </div>
+
     <div className="py-6">
-      {!account &&
-        <MainActionButton
-          label={"Connect Wallet"}
-          handleClick={openConnectModal}
-        />
+      {
+        Number(inputBalance) > (vaultData.withdrawalLimit / (10 ** (vault?.decimals || 0))) && // Input > withdrawalLimit
+        <div className="w-full bg-secondaryYellow bg-opacity-20 border border-secondaryYellow rounded-lg p-4 mb-4">
+          <p className="text-secondaryYellow">
+            At this time, {formatTwoDecimals(100 - (vaultData.liquid / vaultData.totalAssets) * 100)} % of the funds are being utilized in the LBTC Smart Vault&apos;s strategies. You cannot withdraw more than the specified withdrawal limit of {formatNumber(vaultData.withdrawalLimit / (10 ** (vault?.decimals || 0)))} {vault?.symbol}. Funds available for withdrawal will be released once a day at 18:00 CET. Please check back later. In the near future, withdrawals will be automated with withdrawal queues. Please log a ticket on Discord if you need more help:{" "}
+            <a
+              href="https://discord.com/channels/810280562626658334/1178741499605815448"
+              target="_blank"
+              className="text-secondaryBlue">
+              VaultCraft Discord Support
+            </a>
+          </p>
+        </div>
       }
-      {(account && chain?.id !== Number(chainId)) &&
-        <MainActionButton
-          label="Switch Chain"
-          handleClick={() => handleSwitchChain(chainId, switchChainAsync)}
-        />
-      }
-      {(account && chain?.id === Number(chainId)) &&
-        <MainActionButton label="Preview" handleClick={handlePreview} disabled={!account || !inputToken || inputBalance === "0" || showModal} />
-      }
+      <MainButtonGroup
+        label="Preview"
+        mainAction={handlePreview}
+        chainId={vaultData.chainId}
+        disabled={
+          Number(inputBalance) > (vaultData.withdrawalLimit / (10 ** (vault?.decimals || 0))) || // Input > withdrawalLimit
+          !account || !inputToken || inputBalance === "0" ||  // Not connected / selected properly
+          showModal // Already in transactions
+        }
+      />
     </div>
 
     {inputToken && outputToken && showModal &&

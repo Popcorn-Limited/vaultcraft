@@ -48,6 +48,7 @@ export type VaultData = {
   totalSupply: number;
   assetsPerShare: number;
   depositLimit: number;
+  withdrawalLimit: number;
   tvl: number;
   apyData: ApyData;
   gaugeData?: GaugeData;
