@@ -355,6 +355,8 @@ export default function VaultInputs({
 
     <div className="py-6">
       {
+        vaultData.address === "0xCe3Ac66020555EdcE9b54dAD5EC1c35E0478B887" &&
+        isDeposit &&
         Number(inputBalance) > (vaultData.withdrawalLimit / (10 ** (vault?.decimals || 0))) && // Input > withdrawalLimit
         <div className="w-full bg-secondaryYellow bg-opacity-20 border border-secondaryYellow rounded-lg p-4 mb-4">
           <p className="text-secondaryYellow">
