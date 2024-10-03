@@ -81,7 +81,7 @@ export default function StrategyDescription({ strategy, asset, chainId, i, strat
         <CardStat
           id={`${strategy.resolver}-${i}-apy`}
           label="APY"
-          value={strategy.apyData.totalApy === 0 ? "TBD" ? `${NumberFormatter.format(roundToTwoDecimalPlaces(strategy.apyData.totalApy))} %`}
+          value={strategy.apyData.totalApy === 0 ? "TBD" : `${NumberFormatter.format(roundToTwoDecimalPlaces(strategy.apyData.totalApy))} %`}
           tooltip="Current variable apy of the strategy"
         />
         {isManaged && ["AnyToAnyV1", "AnyToAnyCompounderV1"].includes(strategy.metadata.type) &&
