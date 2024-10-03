@@ -8,11 +8,8 @@ export const VCX_LP: Address = "0x577A7f7EE659Aa14Dc16FD384B3F8078E23F1920";
 export const VE_VCX: Address = "0x0aB4bC35Ef33089B9082Ca7BB8657D7c4E819a1A";
 export const ST_VCX: Address = "0xE5d383FC43F6c370DdD3975cf9e363Ad42367697";
 export const POP: Address = "0xD0Cd466b34A24fcB2f87676278AF2005Ca8A78c4";
-export const WETH: Address = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2";
 export const VCX_POOL: Address = "0x577A7f7EE659Aa14Dc16FD384B3F8078E23F1920"; // Same as VCX_LP
 export const OVCX_ORACLE: Address = "0xe2871224b413F55c5a2Fd21E49bD63A52e339b03";
-export const BALANCER_VAULT: Address = "0xBA12222222228d8Ba445958a75a0704d566BF2C8";
-export const BALANCER_QUERIES: Address = "0xE39B5e3B6D74016b2F6A9673D7d7493B6DF549d5";
 export const VE_BOOST: Address = "0xa2E88993a0f0dc6e6020431477f3A70c86109bBf";
 export const VE_DELEGATION: Address = "0xafE32869CAf311585647ADcD79050B83DbCF94C8";
 export const MINTER: Address = "0x49f095B38eE6d8541758af51c509332e7793D4b0";
@@ -28,8 +25,6 @@ export const ROOT_GAUGE_FACTORY: Address = "0x6aa03ebAb1e9CB8d44Fd79153d3a258FFd
 export const VAULTRON: Address = "0x590e3A9260ffb7887ffD54A57d1FACf7db59c751"
 
 export const FEE_RECIPIENT_PROXY = "0x47fd36ABcEeb9954ae9eA1581295Ce9A8308655E" // Is the same on all deployed chains
-
-export const ENSO_ROUTER: Address = "0x80EbA3855878739F4710233A8a19d89Bdd2ffB8E"
 
 export const VaultRegistryByChain: AddressByChain = {
   [mainnet.id]: "0x007318Dc89B314b47609C684260CfbfbcD412864",
@@ -94,12 +89,6 @@ export const VcxByChain: AddressByChain = {
   [arbitrum.id]: XVCXByChain[arbitrum.id]
 }
 
-export const WethByChain: AddressByChain = {
-  [mainnet.id]: WETH,
-  [optimism.id]: "0x4200000000000000000000000000000000000006",
-  [arbitrum.id]: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"
-}
-
 export const GaugeFactoryByChain: AddressByChain = {
   [mainnet.id]: "0x8133cA3AB91B3FE3792992eA69720Ca6d3A92163",
   [optimism.id]: "0x6aa03ebAb1e9CB8d44Fd79153d3a258FFd48169A", // Same as Minter
@@ -116,46 +105,6 @@ export const BridgerByDestination: AddressByChain = {
   [optimism.id]: "0xae167C59FB601260A317A803b5879D47621b1379",
   [arbitrum.id]: "0x44E6FD99a6df3E3D1792a71C1575519293894Ee2"
 }
-
-export const ZapAssetAddressesByChain: { [key: number]: Address[] } = {
-  [mainnet.id]: [
-    "0x6B175474E89094C44Da98b954EedeAC495271d0F", // DAI
-    "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // USDC
-    "0xdAC17F958D2ee523a2206206994597C13D831ec7", // USDT
-    "0x5f98805A4E8be255a32880FDeC7F6728C6568bA0", // LUSD
-    "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", // WETH
-    "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599", // WBTC
-    "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE", // ETH
-  ],
-  [polygon.id]: [
-    "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063", // DAI
-    "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174", // USDC
-    "0xc2132D05D31c914a87C6611C10748AEb04B58e8F", // USDT
-    "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270", // WMATIC
-    "0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6", // WBTC
-    "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE" // MATIC
-  ],
-  [optimism.id]: [
-    "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1", // DAI
-    "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85", // USDC
-    "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58", // USDT
-    "0xc40F949F8a4e094D1b49a23ea9241D289B7b2819", // LUSD
-    "0x4200000000000000000000000000000000000006", // WETH
-    "0x68f180fcCe6836688e9084f035309E29Bf0A2095", // WBTC
-  ],
-  [arbitrum.id]: [
-    "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1", // DAI
-    "0xaf88d065e77c8cC2239327C5EDb3A432268e5831", // USDC
-    "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8", // USDC.e
-    "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9", // USDT
-    "0x93b346b6BC2548dA6A1E7d98E9a421B42541425b", // LUSD
-    "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1", // WETH
-    "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f", // WBTC
-  ],
-  [bsc.id]: [],
-  [xLayer.id]: []
-}
-
 
 export const LockboxAdapterByChain: AddressByChain = {
   [mainnet.id]: "0x45bf3c737e57b059a5855280ca1adb8e9606ac68",
@@ -224,4 +173,62 @@ export const FeeRecipientByChain: AddressByChain = {
   [optimism.id]: FEE_RECIPIENT_PROXY,
   [arbitrum.id]: FEE_RECIPIENT_PROXY,
   [xLayer.id]: "0xA9c5E4484d0f204E758637f7Bf5A08A0AA09A39C"
+}
+
+
+// EXTERNAL
+export const ENSO_ROUTER: Address = "0x80EbA3855878739F4710233A8a19d89Bdd2ffB8E"
+export const BALANCER_VAULT: Address = "0xBA12222222228d8Ba445958a75a0704d566BF2C8";
+export const BALANCER_QUERIES: Address = "0xE39B5e3B6D74016b2F6A9673D7d7493B6DF549d5";
+export const WETH: Address = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2";
+
+export const WethByChain: AddressByChain = {
+  [mainnet.id]: WETH,
+  [optimism.id]: "0x4200000000000000000000000000000000000006",
+  [arbitrum.id]: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"
+}
+
+export const PendleRouterByChain: AddressByChain = {
+  [mainnet.id]: "0x888888888889758f76e7103c6cbf23abbf58f946",
+  [optimism.id]: zeroAddress,
+  [arbitrum.id]: zeroAddress
+}
+
+export const ZapAssetAddressesByChain: { [key: number]: Address[] } = {
+  [mainnet.id]: [
+    "0x6B175474E89094C44Da98b954EedeAC495271d0F", // DAI
+    "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // USDC
+    "0xdAC17F958D2ee523a2206206994597C13D831ec7", // USDT
+    "0x5f98805A4E8be255a32880FDeC7F6728C6568bA0", // LUSD
+    "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", // WETH
+    "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599", // WBTC
+    "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE", // ETH
+  ],
+  [polygon.id]: [
+    "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063", // DAI
+    "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174", // USDC
+    "0xc2132D05D31c914a87C6611C10748AEb04B58e8F", // USDT
+    "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270", // WMATIC
+    "0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6", // WBTC
+    "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE" // MATIC
+  ],
+  [optimism.id]: [
+    "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1", // DAI
+    "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85", // USDC
+    "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58", // USDT
+    "0xc40F949F8a4e094D1b49a23ea9241D289B7b2819", // LUSD
+    "0x4200000000000000000000000000000000000006", // WETH
+    "0x68f180fcCe6836688e9084f035309E29Bf0A2095", // WBTC
+  ],
+  [arbitrum.id]: [
+    "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1", // DAI
+    "0xaf88d065e77c8cC2239327C5EDb3A432268e5831", // USDC
+    "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8", // USDC.e
+    "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9", // USDT
+    "0x93b346b6BC2548dA6A1E7d98E9a421B42541425b", // LUSD
+    "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1", // WETH
+    "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f", // WBTC
+  ],
+  [bsc.id]: [],
+  [xLayer.id]: []
 }
