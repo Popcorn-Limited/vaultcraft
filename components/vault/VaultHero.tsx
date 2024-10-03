@@ -11,8 +11,24 @@ import { roundToTwoDecimalPlaces } from "@/lib/utils/helpers";
 import VaultClaimSection from "@/components/vault/VaultClaimSection";
 import { useAtom } from "jotai";
 import { tokensAtom } from "@/lib/atoms";
-import { useEffect, useState } from "react";
-import ProtocolIcon, { IconByProtocol } from "../common/ProtocolIcon";
+import { IconByProtocol } from "../common/ProtocolIcon";
+
+
+function walletValue(asset: Token): number {
+  return (asset.balance * asset.price) / (10 ** asset.decimals)
+}
+
+function depositValue(vault: Token, gauge?: Token): number {
+  let result = (vault.balance * vault.price) / (10 ** vault.decimals)
+  if (gauge) result += (gauge.balance * gauge.price) / (10 ** gauge.decimals)
+  return result
+}
+
+function boostValue(vaultData: VaultData, gauge?: Token): number {
+  if (!vaultData || !gauge) return 1
+  let boost = (vaultData.gaugeData!.workingBalance / (gauge.balance || 0)) * 5;
+  return boost > 1 ? boost : 1
+}
 
 export default function VaultHero({
   vaultData,
@@ -30,29 +46,6 @@ export default function VaultHero({
   isManaged?: boolean
 }): JSX.Element {
   const [tokens] = useAtom(tokensAtom);
-  const [walletValue, setWalletValue] = useState<number>(0)
-  const [depositValue, setDepositValue] = useState<number>(0)
-  const [boost, setBoost] = useState<number>(1);
-  const [vAPR, setVAPR] = useState<number>(0);
-
-  useEffect(() => {
-    const [asset_, vault_, gauge_] = [asset, vault, gauge]
-    let depositValue_ = (vault_.balance * vault_.price) / (10 ** vault_.decimals)
-    if (gauge_) depositValue_ += (gauge_.balance * gauge_.price) / (10 ** gauge_.decimals)
-
-    setWalletValue((asset_.balance * asset_.price) / (10 ** asset_.decimals))
-    setDepositValue(depositValue_)
-
-    let vAPR_ = vaultData.apyData.totalApy;
-    if (vaultData.gaugeData && gauge_) {
-      let boost_ = (vaultData.gaugeData.workingBalance / (gauge_.balance || 0)) * 5;
-      if (boost_ > 1) setBoost(boost_);
-
-      if (vaultData.gaugeData.rewardApy.apy) vAPR_ += vaultData.gaugeData.rewardApy.apy
-      if (vaultData.gaugeData.lowerAPR) vAPR_ += (vaultData.gaugeData.lowerAPR * boost)
-    }
-    setVAPR(vAPR_)
-  }, [vaultData, asset, vault, gauge])
 
   return (
     <section className="md:border-b border-customNeutral100 pt-10 pb-6 px-4 md:px-0 ">
@@ -85,8 +78,8 @@ export default function VaultHero({
             <LargeCardStat
               id={"wallet"}
               label="Your Wallet"
-              value={walletValue < 0.1 ? "$ 0" : `$ ${formatTwoDecimals(walletValue)}`}
-              secondaryValue={walletValue < 0.1 ? `0 ${asset.symbol}` : `${formatTwoDecimals(asset.balance / 10 ** asset.decimals)} ${asset.symbol}`}
+              value={walletValue(asset) < 0.1 ? "$ 0" : `$ ${formatTwoDecimals(walletValue(asset))}`}
+              secondaryValue={walletValue(asset) < 0.1 ? `0 ${asset.symbol}` : `${formatTwoDecimals(asset.balance / 10 ** asset.decimals)} ${asset.symbol}`}
               tooltip="Value of deposit assets held in your wallet"
             />
           </div>
@@ -94,8 +87,8 @@ export default function VaultHero({
             <LargeCardStat
               id={"deposits"}
               label="Deposits"
-              value={depositValue < 0.1 ? "$ 0" : `$ ${NumberFormatter.format(depositValue)}`}
-              secondaryValue={depositValue < 0.1 ? "$ 0" : `${!!gauge ?
+              value={depositValue(vault, gauge) < 0.1 ? "$ 0" : `$ ${NumberFormatter.format(depositValue(vault, gauge))}`}
+              secondaryValue={depositValue(vault, gauge) < 0.1 ? "$ 0" : `${!!gauge ?
                 NumberFormatter.format(((gauge.balance) / 10 ** gauge.decimals) + ((vault?.balance!) / 10 ** vault?.decimals!))
                 : formatAndRoundNumber(vault?.balance!, vault?.decimals!)} ${asset.symbol}`}
               tooltip="Value of your vault deposits"
@@ -174,9 +167,9 @@ export default function VaultHero({
                 <LargeCardStat
                   id={"boost"}
                   label="Boost APR"
-                  value={`${formatTwoDecimals(vaultData.gaugeData?.lowerAPR * boost)} %`}
+                  value={`${formatTwoDecimals(vaultData.gaugeData?.lowerAPR * boostValue(vaultData, gauge))} %`}
                   tooltip={`Minimum oVCX boost APR based on most current epoch's distribution. (Based on the current emissions for this gauge of
-                     ${formatTwoDecimals((vaultData?.gaugeData.annualEmissions / 5) * boost)} oVCX p. year)`}
+                     ${formatTwoDecimals((vaultData?.gaugeData.annualEmissions / 5) * boostValue(vaultData, gauge))} oVCX p. year)`}
                 />
               </div>
             )
