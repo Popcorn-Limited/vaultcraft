@@ -118,11 +118,11 @@ export default function ConvertTokenSection({ strategy, asset, yieldToken, setti
 
 function ConvertToken({ token, strategy, asset, yieldToken, settings, chainId, updateReserves }: PassThroughProps & { token: Token, updateReserves: Function }) {
   const { owner, keeper, assetBal, yieldTokenBal, bqPrice, qbPrice } = settings;
-  const isAsset = token.address === asset.address
+  const [isAsset, setIsAsset] = useState<boolean>(token.address === asset.address);
   const [price, setPrice] = useState<number>(isAsset ? qbPrice : bqPrice);
   const float = (settings.assetBal / (10 ** asset.decimals)) / (10_000 / Number(settings.float))
-  const [depositLimit, setDepositLimit] = useState<number>(isAsset ? (yieldTokenBal / (10 ** yieldToken.decimals)) / (bqPrice / 1e18) : ((assetBal / (10 ** asset.decimals)) - float) / (price / 1e18))
-  
+  const [depositLimit, setDepositLimit] = useState<number>(isAsset ? (yieldTokenBal / (10 ** yieldToken.decimals)) / (price / 1e18) : ((assetBal / (10 ** asset.decimals)) - float) / (price / 1e18))
+
   const { address: account, chain } = useAccount();
   const publicClient = usePublicClient({ chainId });
   const { data: walletClient } = useWalletClient();
@@ -143,12 +143,12 @@ function ConvertToken({ token, strategy, asset, yieldToken, settings, chainId, u
   }
 
   function handleMaxClick() {
-    if (!token) return;
-    const stringBal = token.balance.toLocaleString("fullwide", {
+    if (!inputToken) return;
+    const stringBal = inputToken.balance.toLocaleString("fullwide", {
       useGrouping: false,
     });
-    const rounded = safeRound(BigInt(stringBal), token.decimals);
-    const formatted = formatUnits(rounded, token.decimals);
+    const rounded = safeRound(BigInt(stringBal), inputToken.decimals);
+    const formatted = formatUnits(rounded, inputToken.decimals);
     handleChangeInput({ currentTarget: { value: formatted } });
   }
 
@@ -223,7 +223,6 @@ function ConvertToken({ token, strategy, asset, yieldToken, settings, chainId, u
 
     try {
       const {data} = await axios.get(`https://api-v2.pendle.finance/core/v1/sdk/1/markets/0xcae62858db831272a03768f5844cbe1b40bb381f/add-liquidity?receiver=${account}&slippage=0.05&enableAggregator=true&tokenIn=${inputToken.address}&amountIn=${val}`)
-      console.log(data)
       const hash = await walletClient!.sendTransaction({
         account: account,
         to: data.tx.to,
@@ -236,20 +235,22 @@ function ConvertToken({ token, strategy, asset, yieldToken, settings, chainId, u
 
   function handleTokenSelect(input: Token): void {
     setInputToken(input);
+    setAmount("0");
+    const isNowAsset = input.address === asset.address;
+    setIsAsset(isNowAsset);
 
     if(![token, asset, yieldToken].includes(input)) {
       setIsZap(true);
       const newPrice = input.price * 10 ** 18 / asset.price;
-      console.log("PRICE", newPrice, token, asset, yieldToken);
 
       setPrice(newPrice); 
       setDepositLimit(((input.balance / (10 ** asset.decimals)) - float) / (newPrice / 1e18));
     }
     else {
       setIsZap(false);
-      const newPrice = isAsset ? qbPrice : bqPrice;
+      const newPrice = isNowAsset ? qbPrice : bqPrice;
       setPrice(newPrice);
-      setDepositLimit(isAsset ? (yieldTokenBal / (10 ** yieldToken.decimals)) / (bqPrice / 1e18) : ((assetBal / (10 ** asset.decimals)) - float) / (newPrice / 1e18));
+      setDepositLimit(isNowAsset ? (yieldTokenBal / (10 ** yieldToken.decimals)) / (bqPrice / 1e18) : ((assetBal / (10 ** asset.decimals)) - float) / (newPrice / 1e18));
     }
   }
   return (
@@ -305,14 +306,14 @@ function ConvertToken({ token, strategy, asset, yieldToken, settings, chainId, u
       <div className="mt-4 space-y-4">
         <SecondaryActionButton
           label="Approve"
-          handleClick={handleApprove} disabled={!account || (account !== owner && account !== keeper)}
-          // handleClick={handleApprove} disabled={false} // TODO
+          // handleClick={handleApprove} disabled={!account || (account !== owner && account !== keeper)}
+          handleClick={handleApprove} disabled={false} // TODO
         />
         <MainActionButton
           label={isZap ? "Zap to Yield Asset" : "Convert"}
           handleClick={isZap ? handleZap : handleDeposit}
-          disabled={!account || (account !== owner && account !== keeper) || Number(amount) >= depositLimit}
-          // disabled={false} // TODO
+          // disabled={!account || (account !== owner && account !== keeper) || Number(amount) >= depositLimit}
+          disabled={false} // TODO
         />
       </div>
     </div>
