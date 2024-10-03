@@ -304,14 +304,12 @@ function ConvertToken({ token, strategy, asset, yieldToken, settings, chainId, u
       <div className="mt-4 space-y-4">
         <SecondaryActionButton
           label="Approve"
-          // handleClick={handleApprove} disabled={!account || (account !== owner && account !== keeper)}
-          handleClick={handleApprove} disabled={false} // TODO
+          handleClick={handleApprove} disabled={!account || (account !== owner && account !== keeper)}
         />
         <MainActionButton
           label={isZap ? "Zap to Yield Asset" : "Convert"}
           handleClick={isZap ? handleZap : handleDeposit}
-          // disabled={!account || (account !== owner && account !== keeper) || Number(amount) >= depositLimit}
-          disabled={false} // TODO
+          disabled={!account || (account !== owner && account !== keeper) || Number(amount) >= depositLimit}
         />
       </div>
     </div>
