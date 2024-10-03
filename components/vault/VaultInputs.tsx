@@ -375,7 +375,7 @@ export default function VaultInputs({
         mainAction={handlePreview}
         chainId={vaultData.chainId}
         disabled={
-          Number(inputBalance) > (vaultData.withdrawalLimit / (10 ** (vault?.decimals || 0))) || // Input > withdrawalLimit
+          (vaultData.address === "0xCe3Ac66020555EdcE9b54dAD5EC1c35E0478B887" && Number(inputBalance) > (vaultData.withdrawalLimit / (10 ** (vault?.decimals || 0)))) || // Input > withdrawalLimit
           !account || !inputToken || inputBalance === "0" ||  // Not connected / selected properly
           showModal // Already in transactions
         }
