@@ -3,7 +3,7 @@ import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { Address, formatUnits, PublicClient } from "viem";
 import axios from "axios";
-import { AnyToAnyDepositorAbi } from "@/lib/constants";
+import { AnyToAnyDepositorAbi, PendleRouterByChain } from "@/lib/constants";
 import { tokensAtom } from "@/lib/atoms";
 import { ArrowDownIcon } from "@heroicons/react/24/outline";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
@@ -135,8 +135,6 @@ function ConvertToken({ token, strategy, asset, yieldToken, settings, chainId, u
 
   const [amount, setAmount] = useState<string>("0");
 
-  const pendleZapRouter: Address = "0x888888888889758f76e7103c6cbf23abbf58f946";
-
   function handleChangeInput(e: any) {
     const value = e.currentTarget.value;
     setAmount(validateInput(value).isValid ? value : "0");
@@ -167,7 +165,7 @@ function ConvertToken({ token, strategy, asset, yieldToken, settings, chainId, u
 
     handleAllowance({
       token: inputToken.address,
-      spender: isZap ? pendleZapRouter : strategy.address,
+      spender: isZap ? PendleRouterByChain[1] : strategy.address,
       amount: val,
       account: account,
       clients: {
