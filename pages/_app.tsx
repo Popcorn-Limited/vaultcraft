@@ -31,6 +31,7 @@ import { WalletProvider, WalletWidget } from "@passkeys/react";
 const PROJECT_ID = "9b83e8f348c7515d3f94d83f95a05749"
 
 const exodus = createWallet({
+  appId: "0beffe6c-8be8-4ec0-9a48-8e80c961045f",
   providers: {
     ethereum: true,
   }
@@ -167,14 +168,14 @@ export default function App({ Component, pageProps }: AppProps) {
             <RainbowKitProvider modalSize="compact">
               <WalletProvider wallet={exodus}>
                 <WalletWidget />
-              <NoSSR>
-                <Provider>
-                  <Page>
-                    { /* @ts-ignore */}
-                    <Component {...pageProps} />
-                  </Page>
-                </Provider>
-              </NoSSR>
+                <NoSSR>
+                  <Provider>
+                    <Page>
+                      { /* @ts-ignore */}
+                      <Component {...pageProps} />
+                    </Page>
+                  </Provider>
+                </NoSSR>
               </WalletProvider>
             </RainbowKitProvider>
           </QueryClientProvider>
