@@ -197,6 +197,7 @@ export default function VaultInputs({
 
   function handleChangeInput(e: any) {
     if (!inputToken || !outputToken) return
+    console.log(e)
     let value = e.currentTarget.value;
     value = validateInput(value).isValid ? value : "0"
     setInputBalance(value);
@@ -276,7 +277,10 @@ export default function VaultInputs({
       isDeposit ?
         <>
           {vaultData.depositLimit < maxUint256 &&
-            <span className="flex flex-row items-center justify-between text-[#D7D7D7]">
+            <span
+              className="flex flex-row items-center justify-between text-customGray100 hover:text-customGray200 cursor-pointer"
+              onClick={() => handleChangeInput({ currentTarget: { value: formatNumber(vaultData.depositLimit / (10 ** (asset?.decimals || 0))).replace(",", ".") } })}
+            >
               <p>Deposit Limit:</p>
               <p>{formatNumber(vaultData.depositLimit / (10 ** (asset?.decimals || 0)))} {asset?.symbol}</p>
             </span>
@@ -285,7 +289,10 @@ export default function VaultInputs({
         :
         <>
           {vaultData.withdrawalLimit < vaultData.totalSupply &&
-            <span className="flex flex-row items-center justify-between text-[#D7D7D7]">
+            <span
+              className="flex flex-row items-center justify-between text-customGray100 hover:text-customGray200 cursor-pointer"
+              onClick={() => handleChangeInput({ currentTarget: { value: formatNumber(vaultData.withdrawalLimit / (10 ** (vault?.decimals || 0))).replace(",", ".") } })}
+            >
               <p>Withdraw Limit:</p>
               <p>{vault ? formatNumber(vaultData.withdrawalLimit / (10 ** vault.decimals)) : "0"} {vault?.symbol}</p>
             </span>

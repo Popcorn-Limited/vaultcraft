@@ -16,7 +16,7 @@ import { useAccount, usePublicClient, useSwitchChain, useWalletClient } from "wa
 import { claimReserve, pullFunds, pushFunds } from "@/lib/vault/management/strategyInteractions";
 import { PassThroughProps } from "./AnyToAnyV1DepositorSettings";
 import TabSelector from "@/components/common/TabSelector";
-import {ZapAssetAddressesByChain } from "@/lib/constants";
+import { ZapAssetAddressesByChain } from "@/lib/constants";
 import { showErrorToast } from "@/lib/toasts";
 
 async function getReserveLogs(address: Address, account: Address, client: PublicClient) {
@@ -220,7 +220,7 @@ function ConvertToken({ token, strategy, asset, yieldToken, settings, chainId, u
     val = val * (10 ** inputToken.decimals)
 
     try {
-      const {data} = await axios.get(`https://api-v2.pendle.finance/core/v1/sdk/1/markets/0xcae62858db831272a03768f5844cbe1b40bb381f/add-liquidity?receiver=${account}&slippage=0.05&enableAggregator=true&tokenIn=${inputToken.address}&amountIn=${val}`)
+      const { data } = await axios.get(`https://api-v2.pendle.finance/core/v1/sdk/1/markets/0xcae62858db831272a03768f5844cbe1b40bb381f/add-liquidity?receiver=${account}&slippage=0.05&enableAggregator=true&tokenIn=${inputToken.address}&amountIn=${val}`)
       const hash = await walletClient!.sendTransaction({
         account: account,
         to: data.tx.to,
@@ -237,11 +237,11 @@ function ConvertToken({ token, strategy, asset, yieldToken, settings, chainId, u
     const isNowAsset = input.address === asset.address;
     setIsAsset(isNowAsset);
 
-    if(![token, asset, yieldToken].includes(input)) {
+    if (![token, asset, yieldToken].includes(input)) {
       setIsZap(true);
       const newPrice = input.price * 10 ** 18 / asset.price;
 
-      setPrice(newPrice); 
+      setPrice(newPrice);
       setDepositLimit(((input.balance / (10 ** asset.decimals)) - float) / (newPrice / 1e18));
     }
     else {
@@ -268,7 +268,10 @@ function ConvertToken({ token, strategy, asset, yieldToken, settings, chainId, u
             allowSelection={true}
             allowInput={true}
           />
-          <p>{isAsset ? "Withdraw" : "Deposit"} Limit: {formatNumber(depositLimit)}
+          <p
+            onClick={() => handleChangeInput({ currentTarget: { value: formatNumber(depositLimit).replace(",", ".") } })}
+          >
+            {isAsset ? "Withdraw" : "Deposit"} Limit: {formatNumber(depositLimit)}
           </p>
         </div>
         <div className="relative py-4">
