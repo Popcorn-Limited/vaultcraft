@@ -56,7 +56,7 @@ export default function VaultRow({
       setWalletValue((asset_.balance * asset_.price) / (10 ** asset_.decimals))
       setDepositValue(depositValue_)
 
-      let vAPR_ = apyData.baseApy + apyData.rewardApy;
+      let vAPR_ = apyData.targetApy;
       if (gaugeData && gauge) {
         let boost_ = (gaugeData.workingBalance / (gauge.balance || 0)) * 5;
         if (boost_ > 1) setBoost(boost_);
@@ -148,7 +148,8 @@ export default function VaultRow({
           content={`vAPR-${vaultAddress}`}
           tooltipChild={
             <div className="w-42">
-              <p>Vault APR: {formatTwoDecimals(apyData.baseApy + apyData.rewardApy)} %</p>
+              {apyData.targetApy !== apyData.totalApy && <p>Target APR: {formatTwoDecimals(apyData.targetApy)} %</p>}
+              <p>Vault APR: {formatTwoDecimals(apyData.totalApy)} %</p>
               {gaugeData?.lowerAPR && gaugeData?.lowerAPR > 0 ? <p>Your Boost: {formatTwoDecimals(gaugeData?.lowerAPR * boost)} %</p> : <></>}
               {gaugeData?.rewardApy.apy && gaugeData?.rewardApy.apy > 0 ? <p>Additional Rewards: {formatTwoDecimals(gaugeData?.rewardApy.apy)} %</p> : <></>}
             </div>

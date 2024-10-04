@@ -95,6 +95,7 @@ export default async function prepareStrategies(vaults: VaultDataByAddress, chai
           type: desc.type ?? "Vanilla",
         },
         apyData: {
+          targetApy: apy.apy,
           baseApy: apy.apyBase,
           rewardApy: apy.apyReward,
           totalApy: apy.apy,

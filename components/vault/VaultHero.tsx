@@ -139,12 +139,19 @@ export default function VaultHero({
             <LargeCardStat
               id={"vapy"}
               label="vAPY"
-              value={`${formatTwoDecimals(vaultData.apyData.baseApy + vaultData.apyData.rewardApy)} %`}
+              value={`${formatTwoDecimals(vaultData.apyData.targetApy)} %`}
+              secondaryValue={`${formatTwoDecimals(vaultData.apyData.totalApy)} %`}
               tooltipChild={
                 <div className="w-40">
+                  {vaultData.apyData.targetApy !== vaultData.apyData.totalApy &&
+                    <span className="w-full flex justify-between">
+                      <p className="font-bold text-lg">Target vAPY:</p>
+                      <p className="font-bold text-lg">{formatTwoDecimals(vaultData.apyData.targetApy)} %</p>
+                    </span>
+                  }
                   <span className="w-full flex justify-between">
                     <p className="font-bold text-lg">Total vAPY:</p>
-                    <p className="font-bold text-lg">{formatTwoDecimals(vaultData.apyData.baseApy + vaultData.apyData.rewardApy)} %</p>
+                    <p className="font-bold text-lg">{formatTwoDecimals(vaultData.apyData.totalApy)} %</p>
                   </span>
                   <span className="w-full flex justify-between">
                     <p className="">Base vAPY:</p>

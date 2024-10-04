@@ -126,6 +126,12 @@ export default async function getTokenAndVaultsDataByChain({
     vaultsData = await addGaugeData(vaultsData, assets, gauges, account, chainId)
   }
 
+  // Exceptions and specific overrides
+  if (chainId === 1) {
+    // Set Target rate for LBTC vault
+    vaultsData["0xCe3Ac66020555EdcE9b54dAD5EC1c35E0478B887"].apyData.targetApy = 6;
+  }
+
   return { vaultsData: Object.values(vaultsData), tokens, strategies };
 }
 
@@ -158,6 +164,7 @@ async function getInitialVaultsData(chainId: number, client: PublicClient): Prom
       withdrawalLimit: 0,
       tvl: 0,
       apyData: {
+        targetApy: 0,
         baseApy: 0,
         rewardApy: 0,
         totalApy: 0,
@@ -306,6 +313,7 @@ export async function addStrategyData(vaults: VaultDataByAddress, strategies: { 
         allocation: vaults[address].totalAssets,
         allocationPerc: 1,
         apyData: {
+          targetApy: 0,
           baseApy: 0,
           rewardApy: 0,
           totalApy: 0,
@@ -359,6 +367,7 @@ export async function addStrategyData(vaults: VaultDataByAddress, strategies: { 
     vaults[address].apyData.baseApy = apyBase;
     vaults[address].apyData.rewardApy = apyRewards;
     vaults[address].apyData.totalApy = apyBase + apyRewards;
+    vaults[address].apyData.targetApy = apyBase + apyRewards;
     vaults[address].liquid = liquid + vaults[address].idle;
     vaults[address].withdrawalLimit = (liquid + vaults[address].idle) / vaults[address].assetsPerShare
   })

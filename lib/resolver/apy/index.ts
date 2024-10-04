@@ -5,7 +5,6 @@ import axios from "axios";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 import { LeverageLooperAbi } from "@/lib/constants";
 import { AavePoolAbi } from "@/lib/constants/abi/Aave";
-import { chiliz } from "viem/chains";
 
 export const EMPTY_LLAMA_APY_ENTRY: LlamaApy = {
   apy: 0,

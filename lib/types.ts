@@ -65,6 +65,7 @@ export type Point = {
 }
 
 export type ApyData = {
+  targetApy:number;
   baseApy: number;
   rewardApy: number;
   totalApy: number;
