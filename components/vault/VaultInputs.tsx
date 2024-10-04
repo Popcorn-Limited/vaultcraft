@@ -197,7 +197,6 @@ export default function VaultInputs({
 
   function handleChangeInput(e: any) {
     if (!inputToken || !outputToken) return
-    console.log(e)
     let value = e.currentTarget.value;
     value = validateInput(value).isValid ? value : "0"
     setInputBalance(value);
