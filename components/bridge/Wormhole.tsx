@@ -15,35 +15,35 @@ import WormholeConnect, {
   customized.button.actionText = "#000000";
 
   const wormholeConfig: WormholeConnectConfig = {
-      env: 'testnet', // from deployment.json of the NTT deployment directory
-      networks: ['arbitrum_sepolia', 'base_sepolia'], // from https://github.com/wormhole-foundation/wormhole-connect/blob/development/wormhole-connect/src/config/testnet/chains.ts#L170
-      // tokens: ['ArbitrumSepoliaToken', 'BaseSepoliaToken'],  // this will limit the available tokens that can be transferred to the other chain
+      env: 'mainnet', // from deployment.json of the NTT deployment directory
+      networks: ['ethereum', 'arbitrum'], // from https://github.com/wormhole-foundation/wormhole-connect/blob/development/wormhole-connect/src/config/testnet/chains.ts#L170
+      tokens: ['VCX', 'arbwVCX'],  // this will limit the available tokens that can be transferred to the other chain
       routes: ['nttManual'], // this will limit the available routes - from https://github.com/wormhole-foundation/wormhole-connect/blob/d7a6b67b18db2c8eb4a249d19ef77d0174deffbe/wormhole-connect/src/config/types.ts#L70
       bridgeDefaults: {
-        fromNetwork: 'arbitrum_sepolia',
-        toNetwork: 'base_sepolia'
+        fromNetwork: 'ethereum',
+        toNetwork: 'arbitrum'
       },
       nttGroups: {
         FTT_NTT: { // arbitrary name for the ntt group
           nttManagers: [
             {
-              chainName: 'arbitrum_sepolia',
-              address: '0x40B74aC60F4133b31F297767B455B4328d917809', // nttManagers Address from deployment.json
-              tokenKey: 'ArbitrumSepoliaToken', 
+              chainName: 'ethereum',
+              address: '0x84926f0957AB2C466Ed6Ce01D5c7458BACa4bFAd', // nttManagers Address from deployment.json
+              tokenKey: 'VCX', 
               transceivers: [
                 {
-                  address: '0xB4A9615DFB7F03Ed89f010E6a326B97407E9fdD8', // transceivers address from deployment.json
+                  address: '0x609Cb6E34dFD476b748b943E5c2b6aA40529Fc2d', // transceivers address from deployment.json
                   type: 'wormhole'
                 }
               ]
             },
             {
-              chainName: 'base_sepolia',
-              address: '0x67eB307120D219d84d1a66a62016D396045F352b', // nttManagers Address from deployment.json
-              tokenKey: 'BaseSepoliaToken',
+              chainName: 'arbitrum',
+              address: '0x0fa98307C08a4A832291767600ABaDb02209DF3f', // nttManagers Address from deployment.json
+              tokenKey: 'arbwVCX',
               transceivers: [
                 {
-                  address: '0xdc45bC110380759F6609564295247aBC9e91Ebf1', // transceivers address from deployment.json
+                  address: '0x8052D5245341F67a8033798987d5d4b323a0913A', // transceivers address from deployment.json
                   type: 'wormhole'
                 }
               ]
@@ -56,14 +56,14 @@ import WormholeConnect, {
       //   base_sepolia: 'https://base-sepolia.g.alchemy.com/v2/a0pLcKaYZsGYU68s567eeouqyMJQI3yJ'
       // },
       tokensConfig: {
-        ArbitrumSepoliaToken: {
-          key: 'ArbitrumSepoliaToken',
-          symbol: 'FTT',
-          nativeChain: 'arbitrum_sepolia', // will be shown as native only on this chain, otherwise as "Wormhole wrapped"
-          displayName: 'FTT (ArbitrumSepolia)', // name that is displayed in the Route
+        VCX: {
+          key: 'VCX',
+          symbol: 'VCX',
+          nativeChain: 'ethereum', // will be shown as native only on this chain, otherwise as "Wormhole wrapped"
+          displayName: 'Vaultcraft VCX', // name that is displayed in the Route
           tokenId: {
-            chain: 'arbitrum_sepolia',
-            address: '0x04661C1d878E36EFa44721B59911a3b8373efBCd' // token address
+            chain: 'mainnet',
+            address: '0xce246eea10988c495b4a90a905ee9237a0f91543' // token address
           },
           coinGeckoId: 'test',
           icon: 'https://wormhole.com/token.png',
@@ -72,14 +72,14 @@ import WormholeConnect, {
             default: 18
           }
         },
-        BaseSepoliaToken: {
-          key: 'BaseSepoliaToken',
-          symbol: 'FTT',
-          nativeChain: 'base_sepolia', // will be shown as native only on this chain, otherwise as "Wormhole wrapped"
-          displayName: 'FTT (BaseSepolia)', // name that is displayed in the Route
+        arbwVCX: {
+          key: 'arbwVCX',
+          symbol: 'wVCX',
+          nativeChain: 'arbitrum', // will be shown as native only on this chain, otherwise as "Wormhole wrapped"
+          displayName: 'Wormhole Arbitrum VCX', // name that is displayed in the Route
           tokenId: {
-            chain: 'base_sepolia',
-            address: '0x4BA04db16799d4Dfbc658d3E4cCC509F564a7eF5' // token address
+            chain: 'arbitrum',
+            address: '0xFeae6470A79b7779888f4a64af315Ca997D6cF33' // token address
           },
           coinGeckoId: 'test',
           icon: 'https://wormhole.com/token.png',
