@@ -312,7 +312,7 @@ function ConvertToken({ token, strategy, asset, yieldToken, settings, chainId, u
         <MainActionButton
           label={isZap ? "Zap to Yield Asset" : "Convert"}
           handleClick={isZap ? handleZap : handleDeposit}
-          disabled={!account || (account !== owner && account !== keeper) || Number(amount) >= depositLimit}
+          disabled={!account || (account !== owner && account !== keeper)}
         />
       </div>
     </div>
