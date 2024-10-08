@@ -129,7 +129,7 @@ export default async function getTokenAndVaultsDataByChain({
   // Exceptions and specific overrides
   if (chainId === 1) {
     // Set Target rate for LBTC vault
-    if (vaultsData["0xCe3Ac66020555EdcE9b54dAD5EC1c35E0478B887"].apyData.targetApy > 6) vaultsData["0xCe3Ac66020555EdcE9b54dAD5EC1c35E0478B887"].apyData.targetApy = 6;
+    if (vaultsData["0xCe3Ac66020555EdcE9b54dAD5EC1c35E0478B887"].apyData.targetApy < 6) vaultsData["0xCe3Ac66020555EdcE9b54dAD5EC1c35E0478B887"].apyData.targetApy = 6;
   }
 
 
