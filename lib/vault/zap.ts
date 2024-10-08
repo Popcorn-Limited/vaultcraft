@@ -1,11 +1,11 @@
 import axios from "axios"
-import { Address, getAddress, zeroAddress } from "viem";
+import { Address, createPublicClient, getAddress, http, zeroAddress } from "viem";
 import { showErrorToast, showLoadingToast, showSuccessToast } from "@/lib/toasts";
 import { AddressByChain, Clients, Token, TokenByAddress, ZapProvider } from "@/lib/types";
 import { handleAllowance } from "@/lib/approve";
 import mutateTokenBalance from "./mutateTokenBalance";
 import { mainnet, arbitrum, optimism, polygon, xLayer } from "viem/chains";
-import { networkMap } from "@/lib/utils/connectors";
+import { ChainById, networkMap, RPC_URLS } from "@/lib/utils/connectors";
 import { ALT_NATIVE_ADDRESS } from "../constants";
 import { formatNumber } from "../utils/formatBigNumber";
 
@@ -25,11 +25,34 @@ interface ZapProps extends BaseProps {
   tokensAtom: [{ [key: number]: TokenByAddress }, Function]
 }
 
+const OpenOceanChainName: { [key: number]: string } = {
+  1: "eth",
+  42161: "arbitrum",
+  137: "polygon",
+  8453: "base",
+  43114: "avax",
+  10: "optimism",
+  56: "bsc",
+}
+
+const OpenOceanNativeToken: { [key: number]: string } = {
+  1: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+  42161: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+  137: "0x0000000000000000000000000000000000001010",
+  8453: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+  43114: "0x0000000000000000000000000000000000000000",
+  10: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+  56: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+}
+
 const ZeroXBaseUrlByChain: { [key: number]: string } = {
   [mainnet.id]: "https://api.0x.org/",
 }
 
 async function getZapTransaction({ chainId, sellToken, buyToken, amount, account, zapProvider, slippage = 100, tradeTimeout = 60 }: BaseProps): Promise<any> {
+  const publicClient = createPublicClient({ chain: ChainById[chainId], transport: http(RPC_URLS[chainId]) })
+  const gasPrice = await publicClient.getGasPrice()
+
   switch (zapProvider) {
     case ZapProvider.enso:
       const sellTokenAddress = sellToken.address === ALT_NATIVE_ADDRESS ? "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" : sellToken.address
@@ -105,6 +128,13 @@ async function getZapTransaction({ chainId, sellToken, buyToken, amount, account
       )
 
       return { from: account, to: kyberSwapData.data.routerAddress, data: kyberSwapData.data.data, value: "0" }
+
+    case ZapProvider.openOcean:
+      const tokenIn = sellToken.address === ALT_NATIVE_ADDRESS ? OpenOceanNativeToken[chainId] : sellToken.address
+      const tokenOut = buyToken.address === ALT_NATIVE_ADDRESS ? OpenOceanNativeToken[chainId] : buyToken.address
+
+      const { data } = await axios.get(`https://open-api.openocean.finance/v4/${OpenOceanChainName[chainId]}/swap?inTokenAddress=${tokenIn}&outTokenAddress=${tokenOut}&amount=${amount / (10 ** sellToken.decimals)}&gasPrice=${gasPrice}&slippage=${slippage / 10_000}&account=${account}`)
+      return { from: account, to: data.data.to, data: data.data.data, value: data.data.value }
   }
 }
 
@@ -183,6 +213,14 @@ const KyberswapRouterByChain: AddressByChain = {
   [xLayer.id]: "0x6131B5fae19EA4f9D964eAc0408E4408b66337b5"
 }
 
+const OpenOceanRouterByChain: AddressByChain = {
+  [mainnet.id]: "0x6352a56caadC4F1E25CD6c75970Fa768A3304e64",
+  [polygon.id]: "0x6352a56caadC4F1E25CD6c75970Fa768A3304e64",
+  [optimism.id]: "0x6352a56caadC4F1E25CD6c75970Fa768A3304e64",
+  [arbitrum.id]: "0x6352a56caadC4F1E25CD6c75970Fa768A3304e64",
+  [xLayer.id]: zeroAddress
+}
+
 async function getZapSpender({ account, chainId, zapProvider }: { account: Address, chainId: number, zapProvider: ZapProvider }): Promise<Address> {
   switch (zapProvider) {
     case ZapProvider.enso:
@@ -195,6 +233,8 @@ async function getZapSpender({ account, chainId, zapProvider }: { account: Addre
       return getAddress(ParaSwapRouterByChain[chainId]);
     case ZapProvider.kyberSwap:
       return getAddress(KyberswapRouterByChain[chainId])
+    case ZapProvider.openOcean:
+      return getAddress(OpenOceanRouterByChain[chainId])
     default:
       return zeroAddress
   }
@@ -223,6 +263,9 @@ interface GetZapQuoteProps extends GetZapProviderProps {
 }
 
 export async function getZapQuote({ sellToken, buyToken, amount, chainId, account, zapProvider, feeRecipient }: GetZapQuoteProps): Promise<{ zapProvider: ZapProvider, out: number }> {
+  const publicClient = createPublicClient({ chain: ChainById[chainId], transport: http(RPC_URLS[chainId]) })
+  const gasPrice = await publicClient.getGasPrice()
+
   // Check if ZapProvider is supported on that chain
   const spender = await getZapSpender({ account, chainId, zapProvider })
   if (spender === zeroAddress) return { zapProvider: ZapProvider.notFound, out: 0 }
@@ -263,7 +306,7 @@ export async function getZapQuote({ sellToken, buyToken, amount, chainId, accoun
         const {
           data: { priceRoute }
         } = await axios.get(`https://api.paraswap.io/prices?srcToken=${sellToken.address}&destToken=${buyToken.address}&amount=${amount.toLocaleString("fullwide", { useGrouping: false })}&srcDecimals=${sellToken.decimals}&destDecimals=${buyToken.decimals}&side=SELL&network=${chainId}&version=6.2`);
-        
+
         return { zapProvider, out: Number(priceRoute.destAmount) }
       } catch {
         return { zapProvider: ZapProvider.notFound, out: 0 }
@@ -287,12 +330,22 @@ export async function getZapQuote({ sellToken, buyToken, amount, chainId, accoun
       } catch {
         return { zapProvider: ZapProvider.notFound, out: 0 }
       }
+    case ZapProvider.openOcean:
+      try {
+        const tokenIn = sellToken.address === ALT_NATIVE_ADDRESS ? OpenOceanNativeToken[chainId] : sellToken.address
+        const tokenOut = buyToken.address === ALT_NATIVE_ADDRESS ? OpenOceanNativeToken[chainId] : buyToken.address
+
+        const { data: openOceanData } = (await axios.get(`https://open-api.openocean.finance/v4/${OpenOceanChainName[chainId]}/quote?inTokenAddress=${tokenIn}&outTokenAddress=${tokenOut}&amount=${amount / (10 ** sellToken.decimals)}&gasPrice=${gasPrice}`))
+        return { zapProvider, out: Number(openOceanData.data.outAmount) }
+      } catch {
+        return { zapProvider: ZapProvider.notFound, out: 0 }
+      }
     default:
       return { zapProvider: ZapProvider.notFound, out: 0 }
   }
 }
 
-const ZAP_PROVIDER = [ZapProvider.enso, ZapProvider.zeroX, ZapProvider.oneInch, ZapProvider.paraSwap]
+const ZAP_PROVIDER = [ZapProvider.enso, ZapProvider.zeroX, ZapProvider.oneInch, ZapProvider.paraSwap, ZapProvider.openOcean]
 
 export async function getZapProvider({ sellToken, buyToken, amount, chainId, account, feeRecipient }: GetZapProviderProps): Promise<ZapProvider> {
   const quotes = await Promise.all(ZAP_PROVIDER.map(async zapProvider => getZapQuote({ sellToken, buyToken, amount, chainId, account, zapProvider, feeRecipient })))
