@@ -31,7 +31,11 @@ export const VaultRegistryByChain: AddressByChain = {
   [polygon.id]: "0x2246c4c469735bCE95C120939b0C078EC37A08D0",
   [optimism.id]: "0xdD0d135b5b52B7EDd90a83d4A4112C55a1A6D23A",
   [arbitrum.id]: "0xB205e94D402742B919E851892f7d515592a7A6cC",
-  [bsc.id]: "0x25172C73958064f9ABc757ffc63EB859D7dc2219"
+  [bsc.id]: "0x25172C73958064f9ABc757ffc63EB859D7dc2219",
+  [xLayer.id]: zeroAddress,
+  [base.id]: zeroAddress,
+  [fraxtal.id]: zeroAddress,
+  [avalanche.id]: zeroAddress,
 };
 
 export const VaultControllerByChain: AddressByChain = {
@@ -40,93 +44,187 @@ export const VaultControllerByChain: AddressByChain = {
   [optimism.id]: "0x757D953c53aD28748aCf94AD2d59C13955E09c08",
   [bsc.id]: "0x815B4A955169Ba1D66944A4d8F18B69bc9553a62",
   [polygon.id]: "0xCe22Ff6d00c5414E64b9253Dd49a35e0B9Ea8b60",
+  [xLayer.id]: zeroAddress,
+  [base.id]: zeroAddress,
+  [fraxtal.id]: zeroAddress,
+  [avalanche.id]: zeroAddress,
 };
 
 export const VaultRouterByChain: AddressByChain = {
   [mainnet.id]: "0x4995F3bb85E1381D02699e2164bC1C6c6Fa243cd",
   [optimism.id]: "0x3828845F4d7212b6a0Dc3D67482AFf4544002919",
-  [arbitrum.id]: "0x48943F145686bF5c4580D545CDA405844D1f777b"
+  [arbitrum.id]: "0x48943F145686bF5c4580D545CDA405844D1f777b",
+  [xLayer.id]: zeroAddress,
+  [base.id]: "0x44874B65503bC48b950a5251C31D8C8e1e74b467",
+  [fraxtal.id]: "0x44874B65503bC48b950a5251C31D8C8e1e74b467",
+  [avalanche.id]: zeroAddress,
+  [polygon.id]: zeroAddress,
+  [bsc.id]: zeroAddress,
 }
 
 export const VeRecipientByChain: AddressByChain = {
   [optimism.id]: "0xC1A6Db6793967Ff7fb7f211E044A4c285A0eB7FB",
-  [arbitrum.id]: "0xC1A6Db6793967Ff7fb7f211E044A4c285A0eB7FB"
+  [arbitrum.id]: "0xC1A6Db6793967Ff7fb7f211E044A4c285A0eB7FB",
+  [xLayer.id]: zeroAddress,
+  [base.id]: zeroAddress,
+  [fraxtal.id]: zeroAddress,
+  [avalanche.id]: zeroAddress,
+  [polygon.id]: zeroAddress,
+  [bsc.id]: zeroAddress,
 }
 
 export const VeTokenByChain: AddressByChain = {
   [mainnet.id]: VE_VCX,
   [optimism.id]: VeRecipientByChain[10],
   [arbitrum.id]: VeRecipientByChain[42161],
+  [xLayer.id]: zeroAddress,
+  [base.id]: zeroAddress,
+  [fraxtal.id]: zeroAddress,
+  [avalanche.id]: zeroAddress,
+  [polygon.id]: zeroAddress,
+  [bsc.id]: zeroAddress,
 }
 
 export const OptionTokenByChain: AddressByChain = {
   [mainnet.id]: "0xaFa52E3860b4371ab9d8F08E801E9EA1027C0CA2",
   [optimism.id]: "0xD41d34d6b50785fDC025caD971fE940B8AA1bE45",
-  [arbitrum.id]: "0x59a696bF34Eae5AD8Fd472020e3Bed410694a230"
+  [arbitrum.id]: "0x59a696bF34Eae5AD8Fd472020e3Bed410694a230",
+  [xLayer.id]: zeroAddress,
+  [base.id]: zeroAddress,
+  [fraxtal.id]: zeroAddress,
+  [avalanche.id]: zeroAddress,
+  [polygon.id]: zeroAddress,
+  [bsc.id]: zeroAddress,
 }
 
 export const WrappedOptionTokenByChain: AddressByChain = {
   [mainnet.id]: "0x1AaAFe03A8a2E93A399DbCE03F88Bbaff1b08D60",
   [optimism.id]: "0xAe5CbB42F0Afa59B90769df4b4c6D623896E4573",
-  [arbitrum.id]: "0xaF33642938172011f711bA530acc900Ae17620A7"
+  [arbitrum.id]: "0xaF33642938172011f711bA530acc900Ae17620A7",
+  [xLayer.id]: zeroAddress,
+  [base.id]: zeroAddress,
+  [fraxtal.id]: zeroAddress,
+  [avalanche.id]: zeroAddress,
+  [polygon.id]: zeroAddress,
+  [bsc.id]: zeroAddress,
 }
 
 export const RewardsClaimerByChain: AddressByChain = {
   [mainnet.id]: "0xa5F5e90304758250764Ad26CbdD04b68D6Ce5d2a",
   [optimism.id]: "0x268823d2D666643721A15462De02987F77DE7bbf",
-  [arbitrum.id]: "0x925Efe4B78a823d6AB22Ac5894516b898293a9E5"
+  [arbitrum.id]: "0x925Efe4B78a823d6AB22Ac5894516b898293a9E5",
+  [xLayer.id]: zeroAddress,
+  [base.id]: zeroAddress,
+  [fraxtal.id]: zeroAddress,
+  [avalanche.id]: zeroAddress,
+  [polygon.id]: zeroAddress,
+  [bsc.id]: zeroAddress,
 }
 
 export const XVCXByChain: AddressByChain = {
   [mainnet.id]: "0x18445923592be303fbd3BC164ee685C7457051b4",
   [optimism.id]: "0xfe7950eC9AfE82538CEAC95735f1daf31829d066",
-  [arbitrum.id]: "0x18445923592be303fbd3BC164ee685C7457051b4"
+  [arbitrum.id]: "0x18445923592be303fbd3BC164ee685C7457051b4",
+  [xLayer.id]: zeroAddress,
+  [base.id]: zeroAddress,
+  [fraxtal.id]: zeroAddress,
+  [avalanche.id]: zeroAddress,
+  [polygon.id]: zeroAddress,
+  [bsc.id]: zeroAddress,
 }
 
 export const VcxByChain: AddressByChain = {
   [mainnet.id]: VCX,
   [optimism.id]: XVCXByChain[optimism.id],
-  [arbitrum.id]: XVCXByChain[arbitrum.id]
+  [arbitrum.id]: XVCXByChain[arbitrum.id],
+  [xLayer.id]: zeroAddress,
+  [base.id]: zeroAddress,
+  [fraxtal.id]: zeroAddress,
+  [avalanche.id]: zeroAddress,
+  [polygon.id]: zeroAddress,
+  [bsc.id]: zeroAddress,
 }
 
 export const GaugeFactoryByChain: AddressByChain = {
   [mainnet.id]: "0x8133cA3AB91B3FE3792992eA69720Ca6d3A92163",
   [optimism.id]: "0x6aa03ebAb1e9CB8d44Fd79153d3a258FFd48169A", // Same as Minter
-  [arbitrum.id]: "0x6aa03ebAb1e9CB8d44Fd79153d3a258FFd48169A" // Same as Minter
+  [arbitrum.id]: "0x6aa03ebAb1e9CB8d44Fd79153d3a258FFd48169A", // Same as Minter
+  [xLayer.id]: zeroAddress,
+  [base.id]: zeroAddress,
+  [fraxtal.id]: zeroAddress,
+  [avalanche.id]: zeroAddress,
+  [polygon.id]: zeroAddress,
+  [bsc.id]: zeroAddress,
 }
 
 export const MinterByChain: AddressByChain = {
   [mainnet.id]: "0x49f095B38eE6d8541758af51c509332e7793D4b0",
   [optimism.id]: "0x6aa03ebAb1e9CB8d44Fd79153d3a258FFd48169A", // Same as GaugeFactory
-  [arbitrum.id]: "0x6aa03ebAb1e9CB8d44Fd79153d3a258FFd48169A" // Same as GaugeFactory
+  [arbitrum.id]: "0x6aa03ebAb1e9CB8d44Fd79153d3a258FFd48169A", // Same as GaugeFactory
+  [xLayer.id]: zeroAddress,
+  [base.id]: zeroAddress,
+  [fraxtal.id]: zeroAddress,
+  [avalanche.id]: zeroAddress,
+  [polygon.id]: zeroAddress,
+  [bsc.id]: zeroAddress,
 }
 
 export const BridgerByDestination: AddressByChain = {
   [optimism.id]: "0xae167C59FB601260A317A803b5879D47621b1379",
-  [arbitrum.id]: "0x44E6FD99a6df3E3D1792a71C1575519293894Ee2"
+  [arbitrum.id]: "0x44E6FD99a6df3E3D1792a71C1575519293894Ee2",
+  [xLayer.id]: zeroAddress,
+  [base.id]: zeroAddress,
+  [fraxtal.id]: zeroAddress,
+  [avalanche.id]: zeroAddress,
+  [polygon.id]: zeroAddress,
+  [bsc.id]: zeroAddress,
 }
 
 export const LockboxAdapterByChain: AddressByChain = {
   [mainnet.id]: "0x45bf3c737e57b059a5855280ca1adb8e9606ac68",
   [optimism.id]: "0x8f7492DE823025b4CfaAB1D34c58963F2af5DEDA",
   [arbitrum.id]: "0xEE9deC2712cCE65174B561151701Bf54b99C24C8",
+  [xLayer.id]: zeroAddress,
+  [base.id]: zeroAddress,
+  [fraxtal.id]: zeroAddress,
+  [avalanche.id]: zeroAddress,
+  [polygon.id]: zeroAddress,
+  [bsc.id]: zeroAddress,
 }
 
 export const ExerciseByChain: AddressByChain = {
   [mainnet.id]: OptionTokenByChain[mainnet.id],
   [optimism.id]: "0x63421beE7a26966156403FF1c8ACBE79c2EaFB1f",
   [arbitrum.id]: "0x63421beE7a26966156403FF1c8ACBE79c2EaFB1f",
+  [xLayer.id]: zeroAddress,
+  [base.id]: zeroAddress,
+  [fraxtal.id]: zeroAddress,
+  [avalanche.id]: zeroAddress,
+  [polygon.id]: zeroAddress,
+  [bsc.id]: zeroAddress,
 }
 
 export const ExerciseOracleByChain: AddressByChain = {
   [mainnet.id]: OVCX_ORACLE,
   [optimism.id]: "0x8Ee82Ad9919b7D272A732479305133B205dA297F",
   [arbitrum.id]: "0x8Ee82Ad9919b7D272A732479305133B205dA297F",
+  [xLayer.id]: zeroAddress,
+  [base.id]: zeroAddress,
+  [fraxtal.id]: zeroAddress,
+  [avalanche.id]: zeroAddress,
+  [polygon.id]: zeroAddress,
+  [bsc.id]: zeroAddress,
 }
 
 export const PushOracleOwnerByChain: AddressByChain = {
   [optimism.id]: "0xa03fc60b0EdC2b1F99Df84193BD392d1CD84a7dA",
-  [arbitrum.id]: "0xe14b718e95699B40dc0E17b2061d8ee11d75709A"
+  [arbitrum.id]: "0xe14b718e95699B40dc0E17b2061d8ee11d75709A",
+  [xLayer.id]: zeroAddress,
+  [base.id]: zeroAddress,
+  [fraxtal.id]: zeroAddress,
+  [avalanche.id]: zeroAddress,
+  [polygon.id]: zeroAddress,
+  [bsc.id]: zeroAddress,
 }
 
 export const PermissionRegistryByChain: AddressByChain = {
@@ -134,7 +232,11 @@ export const PermissionRegistryByChain: AddressByChain = {
   [bsc.id]: "0x8c76AA6B65D0619042EAd6DF748f782c89a06357",
   [polygon.id]: "0x1F381429943AFBb6870b3b9B0aB4707a6BdC2356",
   [optimism.id]: "0xf5862457AA842605f8b675Af13026d3Fd03bFfF0",
-  [arbitrum.id]: "0xB67C4c9C3CebCeC2FD3fDE436340D728D990A8d9"
+  [arbitrum.id]: "0xB67C4c9C3CebCeC2FD3fDE436340D728D990A8d9",
+  [xLayer.id]: zeroAddress,
+  [base.id]: zeroAddress,
+  [fraxtal.id]: zeroAddress,
+  [avalanche.id]: zeroAddress,
 }
 
 export const AdminProxyByChain: AddressByChain = {
@@ -142,25 +244,47 @@ export const AdminProxyByChain: AddressByChain = {
   [bsc.id]: "0x0CfE90Bc6156360E003d5367fcC054Bd1656d1B1",
   [polygon.id]: "0x7Edd61A58B5920dF39208E9888D8be713f639A60",
   [optimism.id]: "0x7D224F9Eaf3855CE3109b205e6fA853d25Bb457f",
-  [arbitrum.id]: "0xcC09F5bd7582D02Bb31825d09589F4773B65eCc9"
+  [arbitrum.id]: "0xcC09F5bd7582D02Bb31825d09589F4773B65eCc9",
+  [xLayer.id]: zeroAddress,
+  [base.id]: zeroAddress,
+  [fraxtal.id]: zeroAddress,
+  [avalanche.id]: zeroAddress,
 }
 
 export const ManagementMultisigByChain: AddressByChain = {
   [mainnet.id]: "0xB85e0d4ad9078676Ca86C6bAa51228aB3E21F5da",
   [optimism.id]: "0xE8021873695943499168052AF6983aE674285aF1",
-  [arbitrum.id]: "0x24a1c01a0ca2393e03f292Be1A6EBcFe96956a50"
+  [arbitrum.id]: "0x24a1c01a0ca2393e03f292Be1A6EBcFe96956a50",
+  [xLayer.id]: zeroAddress,
+  [base.id]: zeroAddress,
+  [fraxtal.id]: zeroAddress,
+  [avalanche.id]: zeroAddress,
+  [polygon.id]: zeroAddress,
+  [bsc.id]: zeroAddress,
 }
 
 export const AssetPushOracleByChain: AddressByChain = {
   [mainnet.id]: "0xb3404F101F11A14988c4111E30006972EdbB99aB",
   [optimism.id]: zeroAddress,
-  [arbitrum.id]: "0x3a7e41AdA7066109E2ebbb33921dd8a124d54B01"
+  [arbitrum.id]: "0x3a7e41AdA7066109E2ebbb33921dd8a124d54B01",
+  [xLayer.id]: zeroAddress,
+  [base.id]: zeroAddress,
+  [fraxtal.id]: zeroAddress,
+  [avalanche.id]: zeroAddress,
+  [polygon.id]: zeroAddress,
+  [bsc.id]: zeroAddress,
 }
 
 export const AssetPushOracleOwnerByChain: AddressByChain = {
   [mainnet.id]: "0x8A8A73B111e5fc0048a179a5d7DbC3BcA08D1EF4",
   [optimism.id]: zeroAddress,
-  [arbitrum.id]: "0x86f8d1C5dBd755854C1820592f2D8383FC374695"
+  [arbitrum.id]: "0x86f8d1C5dBd755854C1820592f2D8383FC374695",
+  [xLayer.id]: zeroAddress,
+  [base.id]: zeroAddress,
+  [fraxtal.id]: zeroAddress,
+  [avalanche.id]: zeroAddress,
+  [polygon.id]: zeroAddress,
+  [bsc.id]: zeroAddress,
 }
 
 export const FeeRecipientByChain: AddressByChain = {
@@ -172,7 +296,9 @@ export const FeeRecipientByChain: AddressByChain = {
   [fantom.id]: FEE_RECIPIENT_PROXY,
   [optimism.id]: FEE_RECIPIENT_PROXY,
   [arbitrum.id]: FEE_RECIPIENT_PROXY,
-  [xLayer.id]: "0xA9c5E4484d0f204E758637f7Bf5A08A0AA09A39C"
+  [xLayer.id]: "0xA9c5E4484d0f204E758637f7Bf5A08A0AA09A39C",
+  [base.id]: "0xe3Bf0045C12C1CF31D7DAc40D0Fc0a49a410bBA2",
+  [fraxtal.id]: "0xe3Bf0045C12C1CF31D7DAc40D0Fc0a49a410bBA2",
 }
 
 
@@ -185,13 +311,25 @@ export const WETH: Address = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2";
 export const WethByChain: AddressByChain = {
   [mainnet.id]: WETH,
   [optimism.id]: "0x4200000000000000000000000000000000000006",
-  [arbitrum.id]: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"
+  [arbitrum.id]: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+  [xLayer.id]: zeroAddress,
+  [base.id]: zeroAddress,
+  [fraxtal.id]: zeroAddress,
+  [avalanche.id]: zeroAddress,
+  [polygon.id]: zeroAddress,
+  [bsc.id]: zeroAddress,
 }
 
 export const PendleRouterByChain: AddressByChain = {
   [mainnet.id]: "0x888888888889758f76e7103c6cbf23abbf58f946",
   [optimism.id]: zeroAddress,
-  [arbitrum.id]: zeroAddress
+  [arbitrum.id]: zeroAddress,
+  [xLayer.id]: zeroAddress,
+  [base.id]: zeroAddress,
+  [fraxtal.id]: zeroAddress,
+  [avalanche.id]: zeroAddress,
+  [polygon.id]: zeroAddress,
+  [bsc.id]: zeroAddress,
 }
 
 export const ZapAssetAddressesByChain: { [key: number]: Address[] } = {
