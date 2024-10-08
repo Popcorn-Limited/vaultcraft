@@ -3,6 +3,7 @@ import {
   arbitrum,
   avalanche,
   base,
+  bsc,
   fraxtal,
   mainnet,
   optimism,
@@ -63,12 +64,10 @@ export const RPC_URLS: { [key: number]: string } = {
 
 export const SUPPORTED_NETWORKS: Chain[] = [
   mainnet,
-  polygon,
   optimism,
   arbitrum,
-  base,
-  fraxtal,
-  avalanche,
+  polygon,
+  bsc,
   {
     ...xLayer,
     contracts: {
@@ -77,15 +76,20 @@ export const SUPPORTED_NETWORKS: Chain[] = [
         blockCreated: 47416
       }
     }
-  }]
+  },
+  base,
+  fraxtal,
+  avalanche,
+]
 
 export const GAUGE_NETWORKS = [1, 10, 42161];
 
 export const ChainById: { [key: number]: Chain } = {
   1: mainnet,
-  137: polygon,
   10: optimism,
   42161: arbitrum,
+  137: polygon,
+  56: bsc,
   196: xLayer,
   8453: base,
   252: fraxtal,
