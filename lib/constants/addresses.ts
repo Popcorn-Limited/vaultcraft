@@ -1,6 +1,6 @@
 import { Address, zeroAddress } from "viem";
 import { AddressByChain } from "@/lib/types";
-import { mainnet, arbitrum, aurora, avalanche, bsc, fantom, optimism, polygon, xLayer } from "viem/chains";
+import { mainnet, arbitrum, aurora, avalanche, bsc, fantom, optimism, polygon, xLayer, fraxtal, base } from "viem/chains";
 import { ALT_NATIVE_ADDRESS } from ".";
 
 export const VCX: Address = "0xcE246eEa10988C495B4A90a905Ee9237a0f91543";
@@ -230,5 +230,8 @@ export const ZapAssetAddressesByChain: { [key: number]: Address[] } = {
     "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f", // WBTC
   ],
   [bsc.id]: [],
-  [xLayer.id]: []
+  [xLayer.id]: [],
+  [base.id]: [],
+  [fraxtal.id]: [],
+  [avalanche.id]: []
 }

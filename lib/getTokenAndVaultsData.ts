@@ -38,6 +38,10 @@ export default async function getTokenAndVaultsDataByChain({
   // Fetch vaults and strategy data from database
   let vaultsData = await getInitialVaultsData(chainId, client)
 
+  if (Object.keys(vaultsData).length === 0) {
+    return { vaultsData: [], tokens: {}, strategies: {} }
+  }
+
   // Add totalAssets, totalSupply, assetsPerShare and depositLimit
   vaultsData = await addDynamicVaultsData(vaultsData, client)
 

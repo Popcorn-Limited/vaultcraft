@@ -23,7 +23,7 @@ import {
 } from "@rainbow-me/rainbowkit/wallets";
 import { Analytics } from "@vercel/analytics/react"
 import { WagmiProvider, http } from "wagmi";
-import { arbitrum, mainnet, optimism, polygon, xLayer } from "viem/chains";
+import { arbitrum, fraxtal, base, mainnet, optimism, polygon, xLayer, avalanche } from "viem/chains";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createWallet } from "@passkeys/core";
 import { WalletProvider, WalletWidget } from "@passkeys/react";
@@ -75,6 +75,9 @@ const config = getDefaultConfig({
     [optimism.id]: http(RPC_URLS[optimism.id]),
     [arbitrum.id]: http(RPC_URLS[arbitrum.id]),
     [xLayer.id]: http(RPC_URLS[xLayer.id]),
+    [base.id]: http(RPC_URLS[base.id]),
+    [fraxtal.id]: http(RPC_URLS[fraxtal.id]),
+    [avalanche.id]: http(RPC_URLS[avalanche.id]),
   },
   connectors
 })
