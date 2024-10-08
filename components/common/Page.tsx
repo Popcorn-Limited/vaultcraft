@@ -247,8 +247,8 @@ export default function Page({
       console.log(`Fetching TVL (${new Date()})`)
       start = Number(new Date())
 
-
-      const vaultTVL = SUPPORTED_NETWORKS.map(chain => newVaultsData[chain.id]).flat().reduce((a, b) => a + b.tvl, 0)
+      console.log(newVaultsData)
+      const vaultTVL = SUPPORTED_NETWORKS.map(chain => newVaultsData[chain.id]).flat().reduce((a, b) => a + (b?.tvl || 0), 0)
       const lockVaultTVL = 520000 // @dev hardcoded since we removed lock vaults
       let stakingTVL = 0
       try {

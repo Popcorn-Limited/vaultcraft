@@ -58,7 +58,7 @@ export const RPC_URLS: { [key: number]: string } = {
   [ChainId.BNB]: `https://bnb-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`,
   [ChainId.XLayer]: "https://rpc.xlayer.tech",
   [ChainId.Base]: `https://base-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`,
-  [ChainId.Fraxtal]: `https://frax-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`,
+  [ChainId.Fraxtal]: `https://rpc.frax.com`,
   [ChainId.Avalanche]: `https://avax-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`
 };
 
