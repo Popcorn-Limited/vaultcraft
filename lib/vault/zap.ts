@@ -6,7 +6,7 @@ import { handleAllowance } from "@/lib/approve";
 import mutateTokenBalance from "./mutateTokenBalance";
 import { mainnet, arbitrum, optimism, polygon, xLayer } from "viem/chains";
 import { ChainById, networkMap, RPC_URLS } from "@/lib/utils/connectors";
-import { ALT_NATIVE_ADDRESS } from "../constants";
+import { ALT_NATIVE_ADDRESS, FeeRecipientByChain } from "../constants";
 import { formatNumber } from "../utils/formatBigNumber";
 
 interface BaseProps {
@@ -133,7 +133,7 @@ async function getZapTransaction({ chainId, sellToken, buyToken, amount, account
       const tokenIn = sellToken.address === ALT_NATIVE_ADDRESS ? OpenOceanNativeToken[chainId] : sellToken.address
       const tokenOut = buyToken.address === ALT_NATIVE_ADDRESS ? OpenOceanNativeToken[chainId] : buyToken.address
 
-      const { data } = await axios.get(`https://open-api.openocean.finance/v4/${OpenOceanChainName[chainId]}/swap?inTokenAddress=${tokenIn}&outTokenAddress=${tokenOut}&amount=${amount / (10 ** sellToken.decimals)}&gasPrice=${gasPrice}&slippage=${slippage / 10_000}&account=${account}`)
+      const { data } = await axios.get(`https://open-api.openocean.finance/v4/${OpenOceanChainName[chainId]}/swap?inTokenAddress=${tokenIn}&outTokenAddress=${tokenOut}&amount=${amount / (10 ** sellToken.decimals)}&gasPrice=${gasPrice}&slippage=${slippage / 10_000}&account=${account}&referrer=${FeeRecipientByChain[chainId]}`)
       return { from: account, to: data.data.to, data: data.data.data, value: data.data.value }
   }
 }
