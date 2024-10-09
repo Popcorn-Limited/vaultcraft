@@ -265,25 +265,25 @@ export const ManagementMultisigByChain: AddressByChain = {
 
 export const AssetPushOracleByChain: AddressByChain = {
   [mainnet.id]: "0xb3404F101F11A14988c4111E30006972EdbB99aB",
-  [optimism.id]: zeroAddress,
+  [optimism.id]: "0xBe793893475073E7E403F4E206c304402Ca26d84",
   [arbitrum.id]: "0x3a7e41AdA7066109E2ebbb33921dd8a124d54B01",
   [xLayer.id]: zeroAddress,
-  [base.id]: zeroAddress,
-  [fraxtal.id]: zeroAddress,
-  [avalanche.id]: zeroAddress,
-  [polygon.id]: zeroAddress,
+  [base.id]: "0xe8f047DC264D62288BF16a0aD7Ff158ddfd14913",
+  [fraxtal.id]: "0xe8f047DC264D62288BF16a0aD7Ff158ddfd14913",
+  [avalanche.id]: "0x9bb694F1205d69BEF07367d77Fd07e2c30a5d8fc",
+  [polygon.id]: "0x4d36fB416fd3287ECFCE367c64057F4ba6EFC20d",
   [bsc.id]: zeroAddress,
 }
 
 export const AssetPushOracleOwnerByChain: AddressByChain = {
   [mainnet.id]: "0x8A8A73B111e5fc0048a179a5d7DbC3BcA08D1EF4",
-  [optimism.id]: zeroAddress,
+  [optimism.id]: "0x0f16B4F10Bc3C31169b5d5B6AEb69835E710c6Bd", 
   [arbitrum.id]: "0x86f8d1C5dBd755854C1820592f2D8383FC374695",
   [xLayer.id]: zeroAddress,
-  [base.id]: zeroAddress,
-  [fraxtal.id]: zeroAddress,
-  [avalanche.id]: zeroAddress,
-  [polygon.id]: zeroAddress,
+  [base.id]: "0xD0Bc541E7c558cA50c33C4166a63ED2b899d2C70",
+  [fraxtal.id]: "0xD0Bc541E7c558cA50c33C4166a63ED2b899d2C70",
+  [avalanche.id]: "0x50206eD4578C325E3308ed6ff51B0DA920448777",
+  [polygon.id]: "0x067e4c15B052C73998689D7A0e19D0B2910819dc",
   [bsc.id]: zeroAddress,
 }
 
@@ -291,7 +291,7 @@ export const FeeRecipientByChain: AddressByChain = {
   [mainnet.id]: FEE_RECIPIENT_PROXY,
   [polygon.id]: FEE_RECIPIENT_PROXY,
   [bsc.id]: FEE_RECIPIENT_PROXY,
-  [avalanche.id]: FEE_RECIPIENT_PROXY,
+  [avalanche.id]: "0xe3Bf0045C12C1CF31D7DAc40D0Fc0a49a410bBA2",
   [aurora.id]: FEE_RECIPIENT_PROXY,
   [fantom.id]: FEE_RECIPIENT_PROXY,
   [optimism.id]: FEE_RECIPIENT_PROXY,
