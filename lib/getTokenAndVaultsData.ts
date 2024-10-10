@@ -389,7 +389,6 @@ async function addGaugeData(vaultsData: VaultDataByAddress, assets: TokenByAddre
 
     if (vault) {
       vault.apyData.totalApy += gaugeData.upperAPR + gaugeData.rewardApy.apy || 0;
-      vault.apyData.targetApy += gaugeData.upperAPR + gaugeData.rewardApy.apy || 0;
       vault.gaugeData = gaugeData;
 
       vaultsData[vault.address] = vault;
