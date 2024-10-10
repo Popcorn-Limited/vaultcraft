@@ -40,6 +40,15 @@ const banners = [
     imageSrc: 'images/banner/banner2.png',
     tokenSrc: 'images/banner/bannerToken1.svg'
   },
+  {
+    id: 'bridge',
+    title: 'Bridge with Wormhole',
+    description: 'Bridge',
+    buttonText: 'Bridge',
+    buttonLink: 'wormhole',
+    imageSrc: 'images/banner/banner2.png',
+    tokenSrc: 'images/banner/bannerToken1.svg'
+  }
 ]
 
 export default function Carousel() {
