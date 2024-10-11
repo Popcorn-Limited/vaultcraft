@@ -15,10 +15,8 @@ export const EMPTY_LLAMA_APY_ENTRY: LlamaApy = {
 }
 
 const LEVERAGE_STRATEGIES: Address[] = [
-  "0xB0CDFb59D54b4f5EeAa180dFb9cE3786Cc7D9835",
-  "0xb75F5eB5b802A450e301a83165A58aA17e03eD3A",
-  "0xDafC709d84f5FE09546fD054220EA59b47517379",
-  "0xcdc20718Cc869c6DBD541B7302C97758fF17250b"
+  "0x8D63e0B19753FFc1C2339689526B7c4AAD6e3758",
+  "0x40B74aC60F4133b31F297767B455B4328d917809",
 ]
 
 export async function getCustomApy(address: Address, apyId: string, chainId: number): Promise<LlamaApy[]> {
@@ -71,7 +69,7 @@ export async function getLooperApy(address: Address, apyId: string, chainId: num
 
   const leveragRatio = 1e18 / (1e18 - Number(looperRes[0].result))
   const borrowRate = Number(looperRes[1].result?.currentVariableBorrowRate) / 1e25 // 1e27 * 100
-  const rewardApy = chainId === 1 ? 1.5 : 0
+  const rewardApy = chainId === 1 ? 0.94 : 0
 
   const leverageApy = baseApy.map(entry => {
     entry.apy = chainId === 137 ? 5 : entry.apy;
