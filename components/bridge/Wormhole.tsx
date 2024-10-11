@@ -1,7 +1,10 @@
-import WormholeConnect, {
-  WormholeConnectConfig, WormholeConnectTheme, dark
-} from '@wormhole-foundation/wormhole-connect';
-import NoSSR from "react-no-ssr";
+import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
+
+const WormholeConnect = dynamic(
+  () => import('@wormhole-foundation/wormhole-connect'),
+  { ssr: false }
+);
 
 // const theme: WormholeConnectPartialTheme = {
 //   background: {
@@ -9,9 +12,9 @@ import NoSSR from "react-no-ssr";
 //   }
 // }
 
-const customized: WormholeConnectTheme = dark;
+// const customized= dark;
 
-const wormholeConfig: WormholeConnectConfig = {
+const wormholeConfig = {
   env: 'mainnet', // from deployment.json of the NTT deployment directory
   networks: ['ethereum', 'arbitrum', 'optimism', 'base', 'avalanche'], // from https://github.com/wormhole-foundation/wormhole-connect/blob/development/wormhole-connect/src/config/testnet/chains.ts#L170
   tokens: ['VCX', 'arbVCX', 'opVCX', 'baseVCX', 'avaxVCX'],  // this will limit the available tokens that can be transferred to the other chain
@@ -162,6 +165,14 @@ const wormholeConfig: WormholeConnectConfig = {
 }
 
 export default function WormholeBridge() {
-  return (
-    <NoSSR><WormholeConnect config={wormholeConfig} theme={customized} /></NoSSR>)
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) return null;
+
+  // @ts-ignore
+  return <WormholeConnect config={wormholeConfig} />
 }
