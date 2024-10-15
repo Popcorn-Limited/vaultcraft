@@ -17,10 +17,6 @@ const ProductLinks = [
     href: "/boost",
   },
   {
-    label: "Create Vaults",
-    href: "/create-vault",
-  },
-  {
     label: "Manage",
     href: "/manage",
   },

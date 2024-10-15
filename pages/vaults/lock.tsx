@@ -7,15 +7,13 @@ import { StakingVaultAbi } from "@/lib/constants";
 import { showLoadingToast } from "@/lib/toasts";
 import { Clients, Token } from "@/lib/types";
 import { RPC_URLS } from "@/lib/utils/connectors";
-import { NumberFormatter, formatAndRoundNumber } from "@/lib/utils/formatBigNumber";
+import { formatAndRoundNumber } from "@/lib/utils/formatBigNumber";
 import { handleCallResult, simulateCall } from "@/lib/utils/helpers";
-import { tokenPocketWallet } from "@rainbow-me/rainbowkit/dist/wallets/walletConnectors";
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { Address, createPublicClient, http } from "viem";
 import { arbitrum } from "viem/chains";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
-
+import axios from "axios";
 async function exitLockVault({ account, vault, clients }: { account: Address, vault: Address, clients: Clients }) {
   showLoadingToast("Exiting Lock Vault...");
 

@@ -67,13 +67,7 @@ export default function BridgeModal({ show }: { show: [boolean, Dispatch<SetStat
 
   function handleMaxClick() {
     if (!xVCX) return
-
-    const stringBal = xVCX.balance.toLocaleString("fullwide", {
-      useGrouping: false,
-    });
-    const rounded = safeRound(BigInt(stringBal), xVCX.decimals);
-    const formatted = formatUnits(rounded, xVCX.decimals);
-    handleChangeInput({ currentTarget: { value: formatted } });
+    handleChangeInput({ currentTarget: { value: xVCX.balance.formatted } });
   }
 
   async function handleMainAction() {

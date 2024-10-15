@@ -331,13 +331,7 @@ function BridgeVCX() {
 
   function handleMaxClick() {
     if (!inputToken) return
-
-    const stringBal = inputToken.balance.toLocaleString("fullwide", {
-      useGrouping: false,
-    });
-    const rounded = safeRound(BigInt(stringBal), inputToken.decimals);
-    const formatted = formatUnits(rounded, inputToken.decimals);
-    handleChangeInput({ currentTarget: { value: formatted } });
+    handleChangeInput({ currentTarget: { value: inputToken.balance.formatted } });
   }
 
   async function handleMainAction() {
@@ -500,13 +494,7 @@ function StakingRewardFunding() {
   function handleMaxClick(isVCX: boolean) {
     if (!tokens) return
     const inputToken = isVCX ? tokens[1][VCX] : tokens[1][OptionTokenByChain[1]]
-
-    const stringBal = inputToken.balance.toLocaleString("fullwide", {
-      useGrouping: false,
-    });
-    const rounded = safeRound(BigInt(stringBal), inputToken.decimals);
-    const formatted = formatUnits(rounded, inputToken.decimals);
-    handleChangeInput({ currentTarget: { value: formatted } }, isVCX);
+    handleChangeInput({ currentTarget: { value: inputToken.balance.formatted } }, isVCX);
   }
 
   async function handleMainAction() {

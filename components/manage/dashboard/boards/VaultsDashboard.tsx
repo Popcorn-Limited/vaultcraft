@@ -4,6 +4,7 @@ import { vaultsAtom } from "@/lib/atoms/vaults";
 import { VaultData } from "@/lib/types";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { formatNumber, formatTwoDecimals } from "@/lib/utils/formatBigNumber";
+import { formatBalance } from "@/lib/utils/helpers";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 
@@ -67,16 +68,16 @@ export default function VaultsDashboard({ dashboardData }: { dashboardData: any 
                           Vault
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                          {formatNumber(vault.totalAssets / (10 ** tokens[vault.chainId][vault.asset].decimals))}
+                          {formatBalance(vault.totalAssets, tokens[vault.chainId][vault.asset].decimals)}
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                          {formatNumber(vault.liquid / (10 ** tokens[vault.chainId][vault.asset].decimals))}
+                          {formatBalance(vault.liquid, tokens[vault.chainId][vault.asset].decimals)}
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                          {formatTwoDecimals((vault.liquid / vault.totalAssets) * 100)} %
+                          {formatTwoDecimals(Number((vault.liquid / vault.totalAssets) * BigInt(100)))} %
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                          {formatNumber(vault.idle / (10 ** tokens[vault.chainId][vault.asset].decimals))}
+                          {formatBalance(vault.idle, tokens[vault.chainId][vault.asset].decimals)}
                         </td>
                       </tr>
                       {vault.strategies.map(strategy => (
@@ -88,13 +89,13 @@ export default function VaultsDashboard({ dashboardData }: { dashboardData: any 
                             {strategy.metadata.protocol} - {strategy.metadata.name} - ({strategy.yieldToken ? tokens[vault.chainId][strategy.yieldToken].symbol : tokens[vault.chainId][vault.asset].symbol})
                           </td>
                           <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            {formatNumber(strategy.allocation / (10 ** tokens[vault.chainId][vault.asset].decimals))}
+                            {formatBalance(strategy.allocation, tokens[vault.chainId][vault.asset].decimals)}
                           </td>
                           <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            {formatNumber(strategy.idle / (10 ** tokens[vault.chainId][vault.asset].decimals))}
+                            {formatBalance(strategy.idle, tokens[vault.chainId][vault.asset].decimals)}
                           </td>
                           <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            {formatTwoDecimals((strategy.idle / strategy.allocation) * 100)} %
+                            {formatTwoDecimals(Number((strategy.idle / strategy.allocation) * BigInt(100)))} %
                           </td>
                           <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                             0

@@ -91,18 +91,14 @@ export default function ExerciseOptionTokenInterface({ chainId, setShowModal }: 
 
   function handleMaxWeth() {
     if (!weth) return
-    const maxEth = formatEther(safeRound(BigInt(weth.balance), 18));
-
-    setMaxPaymentAmount(maxEth);
-    setAmount(getOPopAmount(Number(maxEth)));
+    setMaxPaymentAmount(weth.balance.formatted);
+    setAmount(getOPopAmount(Number(weth.balance.formatted)));
   }
 
   function handleMaxOPop() {
     if (!ovcx) return
-    const maxOPop = formatEther(safeRound(BigInt(ovcx.balance), 18));
-
-    setMaxPaymentAmount(getMaxPaymentAmount(Number(maxOPop)));
-    setAmount(maxOPop);
+    setMaxPaymentAmount(getMaxPaymentAmount(Number(ovcx.balance.formatted)));
+    setAmount(ovcx.balance.formatted);
   }
 
   function getMaxPaymentAmount(oVcxAmount: number) {
@@ -234,7 +230,7 @@ export default function ExerciseOptionTokenInterface({ chainId, setShowModal }: 
               allowInput={true}
               selectedToken={ovcx}
               errorMessage={
-                Number(amount) > (ovcx.balance / 1e18)
+                Number(amount) > Number(ovcx.balance.formatted)
                   ? "Insufficient Balance"
                   : ""
               }
@@ -255,7 +251,7 @@ export default function ExerciseOptionTokenInterface({ chainId, setShowModal }: 
               selectedToken={weth}
               tokenList={[]}
               errorMessage={
-                Number(maxPaymentAmount) > (weth.balance / 1e18)
+                Number(maxPaymentAmount) > Number(weth.balance.formatted)
                   ? "Insufficient Balance"
                   : ""
               }

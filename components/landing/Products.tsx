@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import Product from "@/components/landing/Product";
-import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import PopSmileyIcon from "@/components/svg/popcorn/PopSmileyIcon";
 import SmileyIcon from "@/components/svg/popcorn/SmileyIcon";
 import PopIcon from "@/components/svg/popcorn/PopIcon";
@@ -10,8 +9,7 @@ import { tvlAtom } from "@/lib/atoms";
 import Modal from "@/components/modal/Modal";
 import {
   ChevronLeftIcon,
-  ChevronRightIcon,
-  InformationCircleIcon,
+  ChevronRightIcon
 } from "@heroicons/react/24/outline";
 import InfoIconWithTooltip from "@/components/common/InfoIconWithTooltip";
 import TokenIcon from "@/components/common/TokenIcon";
@@ -27,7 +25,6 @@ export default function Products(): JSX.Element {
   const { query } = router;
   const { address: account } = useAccount();
 
-  const [tvl] = useAtom(tvlAtom);
   const [showModal, setShowModal] = useState<boolean>(false);
 
   return (
@@ -251,25 +248,6 @@ export default function Products(): JSX.Element {
                 <h2 className="text-white text-2xl leading-none mb-2 py-6 px-8">
                   Vaultron
                 </h2>
-              </div>
-            </Link>
-            <Link
-              href={
-                !!query?.ref && isAddress(query.ref as string)
-                  ? `create-vault?ref=${query.ref}`
-                  : `create-vault`
-              }
-              className="rounded w-full min-h-[9rem] relative flex flex-col bg-customNeutral300 border border-customNeutral100 border-opacity-75 smmd:items-center py-6 px-6  hover:shadow-lg ease-in-out duration-250 hover:bg-customNeutral200"
-            >
-              <div className="col-span-12 md:col-span-4 xs:self-start">
-                <div className="relative flex flex-row">
-                  <h2 className="text-white text-3xl leading-none mb-2">
-                    Create Vaults
-                  </h2>
-                </div>
-                <p className="mt-2 text-white">
-                  Customize and deploy your own Smart Vault
-                </p>
               </div>
             </Link>
             <Link

@@ -1,5 +1,10 @@
-import { ProtocolName } from "vaultcraft-sdk";
 import { Address, PublicClient, WalletClient } from "viem";
+
+export type Balance = {
+  value: bigint;
+  formatted: string;
+  formattedUSD: string;
+}
 
 export type Token = {
   address: Address;
@@ -7,9 +12,9 @@ export type Token = {
   symbol: string;
   decimals: number;
   logoURI: string;
-  balance: number;
+  balance: Balance;
   price: number;
-  totalSupply: number;
+  totalSupply: bigint;
   chainId?: number;
   type?: TokenType;
 };
@@ -20,21 +25,11 @@ export enum TokenType {
   Asset,
 }
 
-export type Asset = {
-  chains: number[];
-  address: { [key: string]: Address };
-  name: string;
-  symbol: string;
-  decimals: number;
-  logoURI: string;
-  apy?: number;
-};
-
 export type VaultFees = {
-  deposit: number;
-  withdrawal: number;
-  management: number;
-  performance: number;
+  deposit: bigint;
+  withdrawal: bigint;
+  management: bigint;
+  performance: bigint;
 };
 
 export type VaultData = {
@@ -44,18 +39,18 @@ export type VaultData = {
   gauge?: Address;
   chainId: number;
   fees: VaultFees;
-  totalAssets: number;
-  totalSupply: number;
+  totalAssets: bigint;
+  totalSupply: bigint;
   assetsPerShare: number;
-  depositLimit: number;
-  withdrawalLimit: number;
+  depositLimit: bigint;
+  withdrawalLimit: bigint;
   tvl: number;
   apyData: ApyData;
   gaugeData?: GaugeData;
   metadata: VaultMetadata;
   strategies: Strategy[];
-  idle: number;
-  liquid: number;
+  idle: bigint;
+  liquid: bigint;
   points: Point[]
 };
 
@@ -90,17 +85,17 @@ export type Strategy = {
   yieldToken?: Address;
   metadata: StrategyMetadata;
   resolver: string;
-  allocation: number;
+  allocation: bigint;
   allocationPerc: number;
   apyData: ApyData;
-  totalAssets: number;
-  totalSupply: number;
+  totalAssets: bigint;
+  totalSupply: bigint;
   assetsPerShare: number;
-  idle: number;
+  idle: bigint;
   leverage?: number;
 }
 
-type StrategyMetadata = {
+export type StrategyMetadata = {
   name: string;
   protocol: string;
   description: string;
@@ -127,23 +122,6 @@ export type VaultMetadata = {
   | "multi-strategy-vault-v2.5";
   creator: Address;
   feeRecipient: Address;
-};
-
-export type OptionalMetadata = {
-  token: {
-    name: string;
-    description: string;
-  };
-  protocol: {
-    name: string;
-    description: string;
-  };
-  strategy: {
-    name: string;
-    description: string;
-  };
-  getTokenUrl?: string;
-  resolver?: ProtocolName;
 };
 
 export type SimulationResponse = {
@@ -275,7 +253,7 @@ export type ReserveData = {
   borrowAmount: number;
   supplyValue: number;
   borrowValue: number;
-  balance: number;
+  balance: Balance;
   supplyBalance: number;
   balanceValue: number;
 }

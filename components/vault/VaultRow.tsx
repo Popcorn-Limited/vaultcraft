@@ -8,11 +8,24 @@ import {
 } from "@/lib/utils/formatBigNumber";
 import type { Token, VaultData } from "@/lib/types";
 import { tokensAtom } from "@/lib/atoms";
-import { cn } from "@/lib/utils/helpers";
+import { cn, formatBalance, roundToTwoDecimalPlaces } from "@/lib/utils/helpers";
 import { useRouter } from "next/router";
 import AssetWithName from "@/components/common/AssetWithName";
 import { useEffect, useState } from "react";
 import { WithTooltip } from "@/components/common/Tooltip";
+import LargeCardStat from "../common/LargeCardStat";
+
+function depositValue(vault: Token, gauge?: Token): number {
+  let result = Number(vault.balance.formattedUSD)
+  if (gauge) result += Number(gauge.balance.formattedUSD)
+  return result
+}
+
+function boostValue(vaultData: VaultData, gauge?: Token): number {
+  if (!vaultData || !gauge) return 1
+  let boost = (vaultData.gaugeData!.workingBalance / Number(gauge.balance.value || 0)) * 5;
+  return boost > 1 ? boost : 1
+}
 
 export default function VaultRow({
   searchTerm,
@@ -39,32 +52,12 @@ export default function VaultRow({
   const [asset, setAsset] = useState<Token>();
   const [vault, setVault] = useState<Token>();
   const [gauge, setGauge] = useState<Token>();
-  const [walletValue, setWalletValue] = useState<number>(0)
-  const [depositValue, setDepositValue] = useState<number>(0)
-  const [boost, setBoost] = useState<number>(1);
-  const [vAPR, setVAPR] = useState<number>(0);
 
   useEffect(() => {
     if (vaultData) {
       const asset_ = tokens[chainId][assetAddress];
       const vault_ = tokens[chainId][vaultAddress];
       const gauge_ = gaugeAddress && gaugeAddress !== zeroAddress ? tokens[chainId][gaugeAddress] : undefined
-
-      let depositValue_ = (vault_.balance * vault_.price) / (10 ** vault_.decimals)
-      if (gauge_) depositValue_ += (gauge_.balance * gauge_.price) / (10 ** gauge_.decimals)
-
-      setWalletValue((asset_.balance * asset_.price) / (10 ** asset_.decimals))
-      setDepositValue(depositValue_)
-
-      let vAPR_ = apyData.targetApy;
-      if (gaugeData && gauge) {
-        let boost_ = (gaugeData.workingBalance / (gauge.balance || 0)) * 5;
-        if (boost_ > 1) setBoost(boost_);
-
-        if (gaugeData.rewardApy.apy) vAPR_ += gaugeData.rewardApy.apy
-        if (gaugeData.lowerAPR) vAPR_ += (gaugeData.lowerAPR * boost)
-      }
-      setVAPR(vAPR_)
 
       setAsset(asset_);
       setVault(vault_);
@@ -106,71 +99,114 @@ export default function VaultRow({
         />
       </td>
 
-      <td className="text-right">
-        <p className="text-lg">
-          $ {walletValue < 1 ? "0" : NumberFormatter.format(walletValue)}
-        </p>
-        <p className="text-sm -mt-0.5 text-customGray200">
-          {walletValue < 1 ? "0" : formatAndRoundNumber(asset.balance, asset.decimals)} {asset.symbol}
-        </p>
+      <td>
+        <LargeCardStat
+          id={"wallet"}
+          label="Your Wallet"
+          value={Number(asset.balance.formattedUSD) < 1 ? "$ 0" : `$ ${asset.balance.formattedUSD}`}
+          secondaryValue={Number(asset.balance.formattedUSD) < 1 ? `0 ${asset.symbol}` : `${asset.balance.formatted} ${asset.symbol}`}
+          tooltip="Value of deposit assets held in your wallet"
+        />
       </td>
-
-      <td className="text-right">
-        <p className="text-lg">
-          $ {depositValue < 0.1 ? "0" : NumberFormatter.format(depositValue)}
-        </p>
-        <p className="text-sm -mt-0.5 text-customGray200">
-          {depositValue < 0.1 ? "0" :
-            (
+      <td>
+        <LargeCardStat
+          id={"deposits"}
+          label="Deposits"
+          value={depositValue(vault, gauge) < 1 ? "$ 0" : `$ ${NumberFormatter.format(depositValue(vault, gauge))}`}
+          secondaryValue={depositValue(vault, gauge) < 1 ? "0" :
+            `${(
               !!gauge ?
-                NumberFormatter.format(((gauge.balance) / 10 ** gauge.decimals) + ((vault?.balance!) / 10 ** vault?.decimals!))
-                : formatAndRoundNumber(vault?.balance!, vault?.decimals!)
-            )
-          } {asset.symbol}
-        </p>
+                Number(gauge.balance.formatted) + Number(vault!.balance.formatted)
+                : vault!.balance.formatted
+            )} ${asset.symbol}`}
+          tooltip="Value of your vault deposits"
+        />
       </td>
-
-      <td className="text-right whitespace-nowrap">
-        <WithTooltip content={`This Vault deploys its TVL $ ${tvl < 1 ? "0" : NumberFormatter.format(tvl)}
-        (${formatAndRoundNumber(vaultData.totalAssets, asset.decimals)} ${asset.symbol}) 
-        in $ ${formatTwoDecimals(vaultData.strategies.reduce((a, b) => a + b.apyData.apyHist[b.apyData.apyHist.length - 1].tvl, 0))} TVL of underlying protocols`}>
-          <p className="text-lg">
-            $ {tvl < 1 ? "0" : NumberFormatter.format(tvl)}
-          </p>
-          <p className="text-sm -mt-0.5 text-customGray200">
-            {formatAndRoundNumber(vaultData.totalAssets, asset.decimals)} {asset.symbol}
-          </p>
-        </WithTooltip>
+      <td>
+        <LargeCardStat
+          id={"tvl"}
+          label="TVL"
+          value={`$ ${vaultData.tvl < 1 ? "0" : vaultData.tvl}`}
+          secondaryValue={
+            asset
+              ? `${formatBalance(vaultData.totalAssets, asset.decimals)} ${asset.symbol}`
+              : "0 TKN"
+          }
+          tooltip={`This Vault deploys its TVL $ ${vaultData.tvl < 1 ? "0" : formatTwoDecimals(vaultData.tvl)}
+                      (${formatBalance(vaultData.totalAssets, asset?.decimals || 0)} ${asset?.symbol || "TKN"}) 
+                      in $ ${formatTwoDecimals(vaultData.strategies.reduce((a, b) => a + b.apyData.apyHist[b.apyData.apyHist.length - 1].tvl, 0))} 
+                      TVL of underlying protocols`}
+        />
       </td>
-
-      <td className="text-right text-lg">
-        <WithTooltip
-          content={`vAPR-${vaultAddress}`}
+      <td>
+        <LargeCardStat
+          id={"vapy"}
+          label="vAPY"
+          value={`${formatTwoDecimals(vaultData.apyData.targetApy)} %`}
+          secondaryValue={`${formatTwoDecimals(vaultData.apyData.baseApy + vaultData.apyData.rewardApy)} %`}
           tooltipChild={
-            <div className="w-42">
-              {apyData.targetApy !== (apyData.baseApy + apyData.rewardApy) && <p>Target APR: {formatTwoDecimals(apyData.targetApy)} %</p>}
-              <p>Vault APR: {formatTwoDecimals(apyData.baseApy + apyData.rewardApy)} %</p>
-              {gaugeData?.lowerAPR && gaugeData?.lowerAPR > 0 ? <p>Your Boost: {formatTwoDecimals(gaugeData?.lowerAPR * boost)} %</p> : <></>}
-              {gaugeData?.rewardApy.apy && gaugeData?.rewardApy.apy > 0 ? <p>Additional Rewards: {formatTwoDecimals(gaugeData?.rewardApy.apy)} %</p> : <></>}
+            <div className="w-40">
+              {vaultData.apyData.targetApy !== (vaultData.apyData.baseApy + vaultData.apyData.rewardApy) &&
+                <span className="w-full flex justify-between">
+                  <p className="font-bold text-lg">Target vAPY:</p>
+                  <p className="font-bold text-lg">{formatTwoDecimals(vaultData.apyData.targetApy)} %</p>
+                </span>
+              }
+              <span className="w-full flex justify-between">
+                <p className="font-bold text-lg">Total vAPY:</p>
+                <p className="font-bold text-lg">{formatTwoDecimals(vaultData.apyData.baseApy + vaultData.apyData.rewardApy)} %</p>
+              </span>
+              <span className="w-full flex justify-between">
+                <p className="">Base vAPY:</p>
+                <p className="">{formatTwoDecimals(vaultData.apyData.baseApy)} %</p>
+              </span>
+              {vaultData.apyData.rewardApy && vaultData.apyData.rewardApy > 0
+                ? <span className="w-full flex justify-between">
+                  <p className="">Reward vAPY:</p>
+                  <p className="">{formatTwoDecimals(vaultData.apyData.rewardApy)} %</p>
+                </span>
+                : <></>
+              }
             </div>
           }
-        >
-          <p className="text-lg">
-            {formatTwoDecimals(vAPR)}%
-          </p>
-        </WithTooltip>
+        />
       </td>
-
-      <td className="text-right text-lg">
-        <WithTooltip content={`Earn between ${formatTwoDecimals(gaugeData?.lowerAPR || 0)}-${formatTwoDecimals(gaugeData?.upperAPR || 0)} % oVCX boost APR depending your balance of veVCX. (Based on the current emissions of ${formatTwoDecimals((gaugeData?.annualEmissions || 0) / 5)}-${formatTwoDecimals(gaugeData?.annualEmissions || 0)} oVCX p.Year)`}>
-          <p className="text-lg">
-            {formatTwoDecimals(gaugeData?.upperAPR || 0)}%
-          </p>
-          <p className="text-sm -mt-0.5 text-customGray200">
-            {formatTwoDecimals(gaugeData?.lowerAPR || 0)}%
-          </p>
-        </WithTooltip>
-      </td>
-    </tr>
+      {vaultData.gaugeData?.lowerAPR ?
+        (
+          <td className="w-1/2 md:w-max">
+            <LargeCardStat
+              id={"boost"}
+              label="Boost APR"
+              value={`${formatTwoDecimals(vaultData.gaugeData?.lowerAPR * boostValue(vaultData, gauge))} %`}
+              tooltip={`Minimum oVCX boost APR based on most current epoch's distribution. (Based on the current emissions for this gauge of
+                     ${formatTwoDecimals((vaultData?.gaugeData.annualEmissions / 5) * boostValue(vaultData, gauge))} oVCX p. year)`}
+            />
+          </td>
+        )
+        : <></>
+      }
+      {vaultData.gaugeData?.rewardApy.apy ?
+        (
+          <td className="w-1/2 md:w-max">
+            <LargeCardStat
+              id={"add-rewards"}
+              label="Add. Rewards"
+              value={`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.gaugeData?.rewardApy.apy))} %`}
+              tooltipChild={
+                <div className="w-42">
+                  <p className="font-bold">Annual Rewards</p>
+                  {vaultData.gaugeData?.rewardApy.rewards
+                    .filter(reward => reward.emissions > 0)
+                    .map(reward =>
+                      <p key={reward.address}>{NumberFormatter.format(reward.emissions)} {tokens[vaultData.chainId][reward.address].symbol} | ${NumberFormatter.format(reward.emissionsValue)} | {NumberFormatter.format(roundToTwoDecimalPlaces(reward.apy))}%</p>
+                    )}
+                </div>
+              }
+            />
+          </td>
+        )
+        : <></>
+      }
+    </tr >
   );
 }

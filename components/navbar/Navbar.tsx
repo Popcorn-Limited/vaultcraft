@@ -15,7 +15,6 @@ import { vaultsAtom } from "@/lib/atoms/vaults";
 import { useRouter } from "next/router";
 import ResponsiveTooltip from "@/components/common/Tooltip";
 import { VaultData } from "@/lib/types";
-import ManageLoanInterface from "@/components/lending/ManageLoanInterface";
 import { getHealthFactorColor } from "@/lib/external/aave";
 import { isAddress } from "viem";
 
@@ -67,12 +66,12 @@ export default function Navbar(): JSX.Element {
 
   return (
     <>
-      {chain && Object.keys(vaultData).length > 0 && (
+      {/* {chain && Object.keys(vaultData).length > 0 && (
         <ManageLoanInterface
           visibilityState={[showLendModal, setShowLendModal]}
           vaultData={vaultData}
         />
-      )}
+      )} */}
       <div className="flex container flex-row items-center justify-between w-full py-8 px-4 md:px-0 z-10">
         <div className="flex flex-row items-center gap-6">
           <div>

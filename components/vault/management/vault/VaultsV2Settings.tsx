@@ -1,5 +1,5 @@
 import TabSelector from "@/components/common/TabSelector";
-import { MultiStrategyVaultV2_1Abi, MultiStrategyVaultV2Abi } from "@/lib/constants";
+import { MultiStrategyVaultV2_1Abi } from "@/lib/constants";
 import { VaultData, VaultV2Settings } from "@/lib/types";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 import { useEffect, useState } from "react";

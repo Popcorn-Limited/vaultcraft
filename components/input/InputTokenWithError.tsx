@@ -1,8 +1,8 @@
 import type { HTMLProps } from "react";
-import { formatNumber } from "@/lib/utils/formatBigNumber";
 import { Token } from "@/lib/types";
 import SelectToken from "@/components/input/SelectToken";
 import InputNumber from "@/components/input/InputNumber";
+import { formatBalance } from "@/lib/utils/helpers";
 
 export default function InputTokenWithError({
   tokenList,
@@ -32,8 +32,6 @@ export default function InputTokenWithError({
   inputMoreThanBalance?: boolean;
   disabled?: boolean
 } & HTMLProps<HTMLInputElement>): JSX.Element {
-  const balance =
-    Number(selectedToken?.balance || 0) / 10 ** (selectedToken?.decimals || 0);
   return (
     <div className={disabled ? "opacity-50 cursor-default" : ""}>
       {captionText && (
@@ -46,33 +44,33 @@ export default function InputTokenWithError({
       )}
       <div className="relative flex items-center w-full">
         <div
-          className={`h-14 w-full flex px-5 py-4 items-center justify-between rounded-lg border ${errorMessage ? "border-red-500" : "border-customGray100"}`}
+          className={`w-full px-5 pt-4 pb-2 rounded-lg border ${errorMessage ? "border-red-500" : "border-customGray100"}`}
         >
-          <div className="xs:w-full xs:border-r xs:border-customGray500 xs:pr-4 smmd:p-0 smmd:border-none smmd:w-1/2">
-            <InputNumber {...props} disabled={disabled} />
+          <div className="flex items-center justify-between ">
+            <div className="xs:w-full xs:border-r xs:border-customGray500 xs:pr-4 smmd:p-0 smmd:border-none smmd:w-1/2">
+              <InputNumber {...props} disabled={disabled} />
+            </div>
+            <div className="xs:w-fit xs:pl-4 smmd:p-0 smmd:w-1/2">
+              <SelectToken
+                chainId={chainId}
+                allowSelection={allowSelection!}
+                selectedToken={selectedToken!}
+                options={tokenList}
+                selectToken={onSelectToken}
+              />
+            </div>
           </div>
-          <div className="xs:w-fit xs:pl-4 smmd:p-0 smmd:w-1/2">
-            <SelectToken
-              chainId={chainId}
-              allowSelection={allowSelection!}
-              selectedToken={selectedToken!}
-              options={tokenList}
-              selectToken={onSelectToken}
-            />
-          </div>
-        </div>
-      </div>
-      {errorMessage && (
-        <p className="text-red-500 pt-2 leading-6">{errorMessage}</p>
-      )}
-      <div className="flex justify-between items-center mt-1 w-full">
-        <div
-          className="flex items-center ml-1 gap-2 cursor-pointer group/max"
-          onClick={onMaxClick}
-        >
-          {allowInput && (
-            <>
-              <div className="text-customGray100 group-hover/max:text-white">
+
+          <div className="flex justify-between items-center mt-4 w-full text-customGray500">
+            <p className="group-hover/max:text-white">
+              $ {Number(props.value) * (selectedToken?.price || 0)}
+            </p>
+
+            <div
+              className={`flex items-center ml-1 gap-2 group/max ${allowInput ? "group-hover/max:text-white cursor-pointer " : ""}`}
+              onClick={allowInput ? onMaxClick : () => { }}
+            >
+              <div className={`mb-1 ${allowInput ? "group-hover/max:text-white" : ""}`}>
                 <svg
                   width="16"
                   height="16"
@@ -88,35 +86,16 @@ export default function InputTokenWithError({
                   />
                 </svg>
               </div>
-              <p className="text-customGray100 group-hover/max:text-white">
-                {balance || "0"}
+              <p className={`${allowInput ? "group-hover/max:text-white" : ""}`}>
+                {selectedToken?.balance.formatted || "0"}
               </p>
-            </>
-          )}
+            </div>
+          </div>
         </div>
-        {getToken && (
-          <button
-            className="w-40 h-9 flex items-center justify-center py-2 px-6 text-base text-white font-medium border border-customGray300 rounded-lg cursor-pointer hover:bg-white hover:text-black transition-all leading-none"
-            onClick={() => getToken()}
-          >
-            <p className="mb-0.5">Get Token </p>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              stroke="currentColor"
-              className="w-4 h-4 ml-2"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
-              />
-            </svg>
-          </button>
-        )}
       </div>
+      {errorMessage && (
+        <p className="text-red-500 pt-2 leading-6">{errorMessage}</p>
+      )}
     </div>
   );
 }

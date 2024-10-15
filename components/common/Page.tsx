@@ -1,10 +1,8 @@
 import Navbar from "@/components/navbar/Navbar";
-import { yieldOptionsAtom } from "@/lib/atoms/sdk";
 import { vaultsAtom } from "@/lib/atoms/vaults";
 import { GAUGE_NETWORKS, RPC_URLS, SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { useAtom } from "jotai";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { CachedProvider, YieldOptions } from "vaultcraft-sdk";
 import { useAccount, usePublicClient } from "wagmi";
 import Footer from "@/components/common/Footer";
 import { useRouter } from "next/router";
@@ -19,18 +17,9 @@ import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
 import axios from "axios";
 import { VotingEscrowAbi } from "@/lib/constants";
 import fetchVaultron from "@/lib/vaultron";
-import { mainnet, polygon, xLayer } from "viem/chains";
+import { mainnet, polygon } from "viem/chains";
 import { ST_VCX, VCX_LP, VE_VCX } from "@/lib/constants/addresses";
-
-async function setUpYieldOptions() {
-  const ttl = 360_000;
-  const provider = new CachedProvider();
-  await provider.initialize(
-    "https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/apy-data.json"
-  );
-
-  return new YieldOptions({ provider, ttl });
-}
+import { formatBalanceUSD } from "@/lib/utils/helpers";
 
 interface TermsModalProps {
   showModal: boolean;
@@ -158,14 +147,6 @@ export default function Page({
   const { address: account } = useAccount();
   const publicClient = usePublicClient();
 
-  const [yieldOptions, setYieldOptions] = useAtom(yieldOptionsAtom);
-
-  useEffect(() => {
-    if (!yieldOptions) {
-      setUpYieldOptions().then((res: any) => setYieldOptions(res));
-    }
-  }, []);
-
   const [, setVaults] = useAtom(vaultsAtom);
   const [, setTokens] = useAtom(tokensAtom);
   const [, setStrategies] = useAtom(strategiesAtom);
@@ -256,7 +237,7 @@ export default function Page({
       } catch (e) {
         stakingTVL = 762000;
       }
-      stakingTVL += (newTokens[1][ST_VCX].totalSupply * newTokens[1][ST_VCX].price) / 1e18
+      stakingTVL += Number(formatBalanceUSD(newTokens[1][ST_VCX].totalSupply, newTokens[1][ST_VCX].decimals, newTokens[1][ST_VCX].price))
 
       console.log(`Completed fetching TVL (${new Date()})`)
       console.log(`Took ${Number(new Date()) - start}ms to load`)
@@ -281,10 +262,10 @@ export default function Page({
 
         const vaultNetworth = SUPPORTED_NETWORKS.map(chain =>
           Object.values(newTokens[chain.id])).flat().filter(t => t.type === TokenType.Vault || t.type === TokenType.Gauge)
-          .reduce((a, b) => a + ((b.balance / (10 ** b.decimals)) * b.price), 0)
+          .reduce((a, b) => a + Number(b.balance.formattedUSD), 0)
         const assetNetworth = SUPPORTED_NETWORKS.map(chain =>
           Object.values(newTokens[chain.id])).flat().filter(t => t.type === TokenType.Asset)
-          .reduce((a, b) => a + ((b.balance / (10 ** b.decimals)) * b.price), 0)
+          .reduce((a, b) => a + Number(b.balance.formattedUSD), 0)
 
         const stake = await createPublicClient({
           chain: mainnet,
@@ -296,7 +277,7 @@ export default function Page({
           args: [account],
         });
 
-        const stakeNetworth = ((Number(stake.amount) / 1e18) * newTokens[1][VCX_LP].price) + ((newTokens[1][ST_VCX].balance * newTokens[1][ST_VCX].price) / 1e18);
+        const stakeNetworth = Number(formatBalanceUSD(stake.amount, 18, newTokens[1][VCX_LP].price)) + Number(newTokens[1][ST_VCX].balance.formattedUSD);
         const lockVaultNetworth = 0; // @dev hardcoded since we removed lock vaults
 
         console.log(`Completed fetching Networth (${new Date()})`)

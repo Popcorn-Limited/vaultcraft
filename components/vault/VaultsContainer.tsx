@@ -107,9 +107,7 @@ export default function VaultsContainer({
                   id="total-my-ovcx"
                   label="My oVCX"
                   value={`$${tokens[1][OptionTokenByChain[1]].balance && tokens[1] && tokens[1][VCX]
-                    ? NumberFormatter.format(
-                      (tokens[1][OptionTokenByChain[1]].balance / 1e18) * (tokens[1][VCX].price * 0.25)
-                    )
+                    ? tokens[1][OptionTokenByChain[1]].balance.formattedUSD
                     : "0"
                     }`}
                   tooltip="Value of oVCX held in your wallet across all blockchains."

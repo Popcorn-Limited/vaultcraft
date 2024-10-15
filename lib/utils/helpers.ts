@@ -1,11 +1,8 @@
 import { showErrorToast, showLoadingToast, showSuccessToast } from "@/lib/toasts";
-import { Clients, SimulationResponse, Token } from "@/lib/types";
-import { InitParam, InitParamRequirement } from "@/lib/atoms/adapter";
+import { Balance, Clients, SimulationResponse, Token } from "@/lib/types";
 import { Abi, Address, PublicClient, isAddress } from "viem";
 import { ADDRESS_ZERO } from "@/lib/constants";
 import { sendMessageToDiscord } from "@/lib/discord/discordBot";
-import { numberToFormattedString } from "./formatBigNumber";
-
 import clsx, { type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -111,36 +108,6 @@ export function noOp() { }
 export const beautifyAddress = (addr: string) =>
   `${addr.slice(0, 4)}...${addr.slice(-5, 5)}`;
 
-export function verifyInitParamValidity(
-  value: string,
-  inputParam: InitParam
-): string[] {
-  const errors: string[] = [];
-
-  if (value === "") errors.push("Value is required");
-  if (!inputParam.requirements) {
-    switch (inputParam.type) {
-      case "address":
-        if (!isAddress(value)) errors.push("Must be a valid address");
-    }
-  }
-  if (inputParam.requirements && inputParam.requirements.length > 0) {
-    if (
-      inputParam.requirements.includes(InitParamRequirement.NotAddressZero) &&
-      value !== ADDRESS_ZERO
-    )
-      errors.push("Must not be zero address");
-
-    if (
-      inputParam.requirements.includes(InitParamRequirement.NotZero) &&
-      Number(value) === 0
-    )
-      errors.push("Must not be zero");
-  }
-
-  return errors;
-}
-
 export function transformNetwork(network: string | undefined): string {
   switch (network) {
     case "homestead":
@@ -225,8 +192,7 @@ export function handleChangeInput(e: any, setter: Function) {
 }
 
 export function handleMaxClick(token: Token, setter: Function) {
-  const formatted = numberToFormattedString(token.balance, token.decimals)
-  setter(validateInput(formatted).isValid ? formatted : "0");
+  setter(validateInput(token.balance.formatted).isValid ? token.balance.formatted : "0");
 }
 
 
@@ -239,4 +205,43 @@ export async function handleSwitchChain(chainId: number, switchChainAsync: Funct
     showErrorToast("Failed switching chain")
     return;
   }
+}
+
+export const formatBalance = (value: bigint | number, decimals: number, fixed?: number): string => {
+  const bigValue = typeof value === 'bigint' ? value : BigInt(Math.floor(Number(value)));
+  const divisor = BigInt(10 ** decimals);
+  const displayValue = bigValue / divisor;
+  const fraction = bigValue % divisor;
+
+  if (fraction === BigInt(0) && fixed === undefined) {
+    return `${displayValue}`;
+  }
+
+  let fractionStr = fraction.toString().padStart(decimals, '0');
+  if (fixed === undefined) {
+    return `${displayValue}.${fractionStr.replace(/0+$/, '')}`;
+  }
+  fractionStr = fractionStr.substring(0, fixed).padEnd(fixed, '0');
+  return `${displayValue}.${fractionStr}`;
+};
+
+export function formatBalanceUSD(balance: bigint, decimals: number, price: number, fixed?: number): string {
+  const formatted = formatBalance(balance, decimals, fixed)
+  return String(Number(formatted) * price)
+}
+
+export function calcBalance(balance: bigint, decimals: number, price: number, fixed?: number): Balance {
+  const formatted = formatBalance(balance, decimals, fixed)
+  const formattedUSD = String(Number(formatted) * price)
+  return {
+    value: balance,
+    formatted,
+    formattedUSD
+  }
+}
+
+export const EMPTY_BALANCE: Balance = {
+  value: BigInt(0),
+  formatted: "0",
+  formattedUSD: "0"
 }

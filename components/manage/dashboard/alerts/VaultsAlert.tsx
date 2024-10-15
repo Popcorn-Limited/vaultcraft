@@ -3,6 +3,7 @@ import { vaultsAtom } from "@/lib/atoms/vaults";
 import { VaultData, VaultLabel } from "@/lib/types";
 import { ChainById, SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { formatNumber, formatTwoDecimals } from "@/lib/utils/formatBigNumber";
+import { formatBalanceUSD } from "@/lib/utils/helpers";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 
@@ -29,7 +30,7 @@ export default function VaultsAlert() {
         .map(vault =>
           <>
             {/* Check that Vaults have enough liquid cash */}
-            {(vault.liquid * tokens[vault.chainId][vault.asset].price / (10 ** tokens[vault.chainId][vault.asset].decimals)) < 100_000 ?
+            {Number(formatBalanceUSD(vault.liquid, tokens[vault.chainId][vault.asset].decimals, tokens[vault.chainId][vault.asset].price)) < 100_000 ?
               <div className="w-1/3 p-4">
                 <div className="border border-red-500 bg-red-500 bg-opacity-30 rounded-lg p-4">
                   <p className="text-red-500 text-lg">
@@ -38,12 +39,12 @@ export default function VaultsAlert() {
                       : vault.strategies[0].metadata.protocol}
                   </p>
                   <p className="text-red-500 text-sm">
-                    {`Free up cash for withdrawals! Either deallocate funds from strategies or convert YieldTokens in strategies. ( $${formatNumber(vault.liquid * tokens[vault.chainId][vault.asset].price / (10 ** tokens[vault.chainId][vault.asset].decimals))} < $100k )`}
+                    {`Free up cash for withdrawals! Either deallocate funds from strategies or convert YieldTokens in strategies. ( $${formatBalanceUSD(vault.liquid, tokens[vault.chainId][vault.asset].decimals, tokens[vault.chainId][vault.asset].price)} < $100k )`}
                   </p>
                 </div>
               </div>
               : <>
-                {((vault.liquid / vault.totalAssets) * 100) < 20 &&
+                {((vault.liquid / vault.totalAssets) * BigInt(100)) < BigInt(20) &&
                   <div className="w-1/3 p-4">
                     <div className="border border-secondaryYellow bg-secondaryYellow bg-opacity-30 rounded-lg p-4">
                       <p className="text-secondaryYellow text-lg">
@@ -52,7 +53,7 @@ export default function VaultsAlert() {
                           : vault.strategies[0].metadata.protocol}
                       </p>
                       <p className="text-secondaryYellow text-sm">
-                        {`Free up cash for withdrawals. Either deallocate funds from strategies or convert YieldTokens in strategies. (${formatTwoDecimals(vault.liquid / vault.totalAssets * 100)}% < 20% )`}
+                        {`Free up cash for withdrawals. Either deallocate funds from strategies or convert YieldTokens in strategies. (${formatTwoDecimals(Number(vault.liquid / vault.totalAssets * BigInt(100)))}% < 20% )`}
                       </p>
                     </div>
                   </div>

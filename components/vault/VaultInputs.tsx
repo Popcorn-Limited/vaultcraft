@@ -9,7 +9,7 @@ import TabSelector from "@/components/common/TabSelector"
 import InputTokenWithError from "@/components/input/InputTokenWithError"
 import ActionSteps from "@/components/vault/ActionSteps"
 import { handleAllowance } from "@/lib/approve"
-import { assetAddressesAtom, Networth, networthAtom, tokensAtom, TVL, tvlAtom, valueStorageAtom } from "@/lib/atoms"
+import { Networth, networthAtom, tokensAtom, TVL, tvlAtom, valueStorageAtom } from "@/lib/atoms"
 import { vaultsAtom } from "@/lib/atoms/vaults"
 import { VaultRouterByChain } from "@/lib/constants"
 import { gaugeDeposit, gaugeWithdraw } from "@/lib/gauges/interactions"
@@ -17,7 +17,7 @@ import { showErrorToast, showLoadingToast, showSuccessToast } from "@/lib/toasts
 import { Clients, SmartVaultActionType, Token, TokenByAddress, TokenType, VaultData, ZapProvider } from "@/lib/types"
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors"
 import { formatNumber, formatTwoDecimals, safeRound } from "@/lib/utils/formatBigNumber"
-import { handleSwitchChain, validateInput } from "@/lib/utils/helpers"
+import { formatBalance, formatBalanceUSD, validateInput } from "@/lib/utils/helpers"
 import { vaultDeposit, vaultDepositAndStake, vaultRedeem, vaultUnstakeAndWithdraw } from "@/lib/vault/interactions"
 import zap, { getZapProvider, handleZapAllowance } from "@/lib/vault/zap"
 import { ArrowDownIcon } from "@heroicons/react/24/outline"
@@ -26,7 +26,6 @@ import { useAtom } from "jotai"
 import { useState } from "react"
 import { Address, erc20Abi, formatUnits, maxUint256, PublicClient } from "viem"
 import getVaultErrorMessage from "@/lib/vault/errorMessage";
-import AssetTokenOracleAlert from "../manage/dashboard/alerts/AssetOracleAlert";
 import MainButtonGroup from "../common/MainButtonGroup";
 
 export interface VaultInputsProps {
@@ -206,12 +205,7 @@ export default function VaultInputs({
 
   function handleMaxClick() {
     if (!inputToken) return;
-    const stringBal = inputToken.balance.toLocaleString("fullwide", {
-      useGrouping: false,
-    });
-    const rounded = safeRound(BigInt(stringBal), inputToken.decimals);
-    const formatted = formatUnits(rounded, inputToken.decimals);
-    handleChangeInput({ currentTarget: { value: formatted } });
+    handleChangeInput({ currentTarget: { value: inputToken.balance.formatted } });
   }
 
   async function findZapProvider(): Promise<boolean> {
@@ -278,10 +272,10 @@ export default function VaultInputs({
           {vaultData.depositLimit < maxUint256 &&
             <span
               className="flex flex-row items-center justify-between text-customGray100 hover:text-customGray200 cursor-pointer"
-              onClick={() => handleChangeInput({ currentTarget: { value: formatNumber(vaultData.depositLimit / (10 ** (asset?.decimals || 0))).replace(",", ".") } })}
+              onClick={() => handleChangeInput({ currentTarget: { value: formatBalance(vaultData.depositLimit, asset?.decimals || 0) } })}
             >
               <p>Deposit Limit:</p>
-              <p>{formatNumber(vaultData.depositLimit / (10 ** (asset?.decimals || 0)))} {asset?.symbol}</p>
+              <p>{formatBalance(vaultData.depositLimit, asset?.decimals || 0)} {asset?.symbol}</p>
             </span>
           }
         </>
@@ -290,16 +284,16 @@ export default function VaultInputs({
           {vaultData.withdrawalLimit < vaultData.totalSupply &&
             <span
               className="flex flex-row items-center justify-between text-customGray100 hover:text-customGray200 cursor-pointer"
-              onClick={() => handleChangeInput({ currentTarget: { value: formatNumber(vaultData.withdrawalLimit / (10 ** (vault?.decimals || 0))).replace(",", ".") } })}
+              onClick={() => handleChangeInput({ currentTarget: { value: formatBalance(vaultData.withdrawalLimit, vault?.decimals || 0) } })}
             >
               <p>Withdraw Limit:</p>
-              <p>{vault ? formatNumber(vaultData.withdrawalLimit / (10 ** vault.decimals)) : "0"} {vault?.symbol}</p>
+              <p>{vault ? formatBalance(vaultData.withdrawalLimit, vault.decimals) : "0"} {vault?.symbol}</p>
             </span>
           }
         </>
     }
 
-    <div className="relative py-4">
+    <div className="relative mt-4">
       <div className="absolute inset-0 flex items-center" aria-hidden="true">
         <div className="w-full border-t border-customGray500" />
       </div>
@@ -342,19 +336,19 @@ export default function VaultInputs({
       <div className="bg-customNeutral200 py-2 px-4 rounded-lg space-y-2">
         <span className="flex flex-row items-center justify-between text-white">
           <p>Deposit Fee</p>
-          <p>{vaultData.fees.deposit / 1e16} %</p>
+          <p>{formatUnits(vaultData.fees.deposit, 16)} %</p>
         </span>
         <span className="flex flex-row items-center justify-between text-white">
           <p>Withdrawal Fee</p>
-          <p>{vaultData.fees.withdrawal / 1e16} %</p>
+          <p>{formatUnits(vaultData.fees.withdrawal, 16)} %</p>
         </span>
         <span className="flex flex-row items-center justify-between text-white">
           <p>Management Fee</p>
-          <p>{vaultData.fees.management / 1e16} %</p>
+          <p>{formatUnits(vaultData.fees.management, 16)} %</p>
         </span>
         <span className="flex flex-row items-center justify-between text-white">
           <p>Performance Fee</p>
-          <p>{vaultData.fees.performance / 1e16} %</p>
+          <p>{formatUnits(vaultData.fees.performance, 16)} %</p>
         </span>
       </div>
     </div>
@@ -363,10 +357,10 @@ export default function VaultInputs({
       {
         vaultData.address === "0xCe3Ac66020555EdcE9b54dAD5EC1c35E0478B887" &&
         !isDeposit &&
-        Number(inputBalance) > (vaultData.withdrawalLimit / (10 ** (vault?.decimals || 0))) && // Input > withdrawalLimit
+        Number(inputBalance) > Number(formatBalance(vaultData.withdrawalLimit, vault?.decimals || 0)) && // Input > withdrawalLimit
         <div className="w-full bg-secondaryYellow bg-opacity-20 border border-secondaryYellow rounded-lg p-4 mb-4">
           <p className="text-secondaryYellow">
-            At this time, {formatTwoDecimals(100 - (vaultData.liquid / vaultData.totalAssets) * 100)} % of the funds are being utilized in the LBTC Smart Vault&apos;s strategies. You cannot withdraw more than the specified withdrawal limit of {formatNumber(vaultData.withdrawalLimit / (10 ** (vault?.decimals || 0)))} {vault?.symbol}. Funds available for withdrawal will be released once a day at 18:00 CET. Please check back later. In the near future, withdrawals will be automated with withdrawal queues. Please log a ticket on Discord if you need more help:{" "}
+            At this time, {formatTwoDecimals(100 - (Number(vaultData.liquid) / Number(vaultData.totalAssets) * 100))} % of the funds are being utilized in the LBTC Smart Vault&apos;s strategies. You cannot withdraw more than the specified withdrawal limit of {formatBalance(vaultData.withdrawalLimit, vault?.decimals || 0)} {vault?.symbol}. Funds available for withdrawal will be released once a day at 18:00 CET. Please check back later. In the near future, withdrawals will be automated with withdrawal queues. Please log a ticket on Discord if you need more help:{" "}
             <a
               href="https://discord.com/channels/810280562626658334/1178741499605815448"
               target="_blank"
@@ -381,7 +375,10 @@ export default function VaultInputs({
         mainAction={handlePreview}
         chainId={vaultData.chainId}
         disabled={
-          (!isDeposit && vaultData.address === "0xCe3Ac66020555EdcE9b54dAD5EC1c35E0478B887" && Number(inputBalance) > (vaultData.withdrawalLimit / (10 ** (vault?.decimals || 0)))) || // Input > withdrawalLimit
+          (!isDeposit
+            && vaultData.address === "0xCe3Ac66020555EdcE9b54dAD5EC1c35E0478B887"
+            && Number(inputBalance) > Number(formatBalance(vaultData.withdrawalLimit, vault?.decimals || 0)) // Input > withdrawalLimit
+          ) ||
           !account || !inputToken || inputBalance === "0" ||  // Not connected / selected properly
           showModal // Already in transactions
         }
@@ -442,7 +439,11 @@ function InteractionContainer({ _inputToken, _outputToken, zapProvider, _amount,
       if (action === Action.zap) {
         // Set the `amount` as the output amount from zap
         console.log({ balance: tokens[vaultData.chainId][vaultData.asset].balance, valueStorage })
-        setAmount(tokens[vaultData.chainId][vaultData.asset].balance - valueStorage)
+        setAmount(Number(
+          formatBalance(
+            tokens[vaultData.chainId][vaultData.asset].balance.value - valueStorage,
+            tokens[vaultData.chainId][vaultData.asset].decimals
+          )))
         // Reset outputToken in case its deposit (reset doesnt matter on withdrawal since its the last action)
         setOutputToken(_outputToken)
         // Set to asset in case its deposit (reset doesnt matter on withdrawal since its the last action)
@@ -452,7 +453,7 @@ function InteractionContainer({ _inputToken, _outputToken, zapProvider, _amount,
       // Set asset as outputToken before zapping in
       if (action === Action.zapApprove && [SmartVaultActionType.ZapDeposit, SmartVaultActionType.ZapDepositAndStake].includes(actionSeries)) {
         setOutputToken(tokens[vaultData.chainId][vaultData.asset])
-        setValueStorage(tokens[vaultData.chainId][vaultData.asset].balance)
+        setValueStorage(tokens[vaultData.chainId][vaultData.asset].balance.value)
       }
 
       const nextStep = step + 1
@@ -827,8 +828,8 @@ async function updateStats(
   const newNetworkVaults = [...vaults[vaultData.chainId]]
   newNetworkVaults[index] = {
     ...vaultData,
-    totalSupply: Number(newSupply),
-    tvl: (Number(newSupply) * vault.price) / (10 ** vault.decimals)
+    totalSupply: newSupply,
+    tvl: Number(formatBalanceUSD(newSupply, vault.decimals, vault.price))
   }
   const newVaults = { ...vaults, [vaultData.chainId]: newNetworkVaults }
 
@@ -844,10 +845,10 @@ async function updateStats(
 
   const vaultNetworth = SUPPORTED_NETWORKS.map(chain =>
     Object.values(tokens[chain.id])).flat().filter(t => t.type === TokenType.Vault || t.type === TokenType.Gauge)
-    .reduce((a, b) => a + ((b.balance / (10 ** b.decimals)) * b.price), 0)
+    .reduce((a, b) => a + Number(b.balance.formattedUSD), 0)
   const assetNetworth = SUPPORTED_NETWORKS.map(chain =>
     Object.values(tokens[chain.id])).flat().filter(t => t.type === TokenType.Asset)
-    .reduce((a, b) => a + ((b.balance / (10 ** b.decimals)) * b.price), 0)
+    .reduce((a, b) => a + Number(b.balance.formattedUSD), 0)
 
   setNetworth({
     vault: vaultNetworth,

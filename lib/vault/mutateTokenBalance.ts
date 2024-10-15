@@ -1,7 +1,8 @@
 import { Address, createPublicClient, erc20Abi, http } from "viem";
 import { TokenByAddress } from "@/lib/types";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
-import { ALT_NATIVE_ADDRESS } from "../constants";
+import { ALT_NATIVE_ADDRESS } from "@/lib/constants";
+import { calcBalance } from "@/lib/utils/helpers";
 
 export interface MutateTokenBalanceProps {
   tokensToUpdate: Address[],
@@ -40,9 +41,9 @@ export default async function mutateTokenBalance({
 
   tokensToUpdate.forEach((address, i) => {
     if (address === ALT_NATIVE_ADDRESS) {
-      tokens[chainId][address].balance = Number(nativeBalance)
+      tokens[chainId][address].balance = calcBalance(nativeBalance, tokens[chainId][address].decimals, tokens[chainId][address].price)
     } else {
-      tokens[chainId][address].balance = Number(balances[i].result)
+      tokens[chainId][address].balance = calcBalance(balances[i].result as bigint || BigInt(0), tokens[chainId][address].decimals, tokens[chainId][address].price)
     }
   })
 

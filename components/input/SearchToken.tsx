@@ -117,7 +117,7 @@ export default function SearchToken({
                 </span>
                 <span className="cursor-pointer w-full flex flex-row justify-between">
                   <p>{option.symbol}</p>
-                  <p>{(option.balance / (10 ** option.decimals)) * selectedToken?.price! < 1 ? 0 : formatNumber(option.balance / (10 ** option.decimals))}</p>
+                  <p>{Number(option.balance.formattedUSD) > 1 ? option.balance.formatted : "0"}</p>
                 </span>
               </span>
             </li>

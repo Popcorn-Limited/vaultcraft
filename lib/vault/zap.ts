@@ -3,11 +3,11 @@ import { Address, createPublicClient, getAddress, http, zeroAddress } from "viem
 import { showErrorToast, showLoadingToast, showSuccessToast } from "@/lib/toasts";
 import { AddressByChain, Clients, Token, TokenByAddress, ZapProvider } from "@/lib/types";
 import { handleAllowance } from "@/lib/approve";
-import mutateTokenBalance from "./mutateTokenBalance";
+import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
 import { mainnet, arbitrum, optimism, polygon, xLayer } from "viem/chains";
 import { ChainById, networkMap, RPC_URLS } from "@/lib/utils/connectors";
-import { ALT_NATIVE_ADDRESS, FeeRecipientByChain } from "../constants";
-import { formatNumber } from "../utils/formatBigNumber";
+import { ALT_NATIVE_ADDRESS, FeeRecipientByChain } from "@/lib/constants";
+import { formatNumber } from "@/lib/utils/formatBigNumber";
 
 interface BaseProps {
   chainId: number;

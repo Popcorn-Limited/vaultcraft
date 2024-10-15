@@ -1,7 +1,7 @@
 import { IconByProtocol } from "@/components/common/ProtocolIcon";
 import CardStat from "@/components/common/CardStat";
 import { NumberFormatter, formatAndRoundNumber, formatNumber, formatTwoDecimals } from "@/lib/utils/formatBigNumber";
-import { roundToTwoDecimalPlaces } from "@/lib/utils/helpers";
+import { formatBalance, formatBalanceUSD, roundToTwoDecimalPlaces } from "@/lib/utils/helpers";
 import { Strategy, Token } from "@/lib/types";
 import { showSuccessToast } from "@/lib/toasts";
 import CopyToClipboard from "react-copy-to-clipboard";
@@ -70,7 +70,7 @@ export default function StrategyDescription({ strategy, asset, chainId, i, strat
         >
           <span className="md:flex md:flex-row md:items-center w-full md:space-x-2">
             <p className="text-white text-xl leading-6 md:leading-8 text-end md:text-start">
-              $ {formatAndRoundNumber(strategy.allocation * asset?.price!, asset?.decimals!)}
+              $ {formatBalanceUSD(strategy.allocation, asset?.decimals!, asset?.price!)}
             </p>
             <p className="hidden md:block text-white">|</p>
             <p className="text-white text-xl leading-6 md:leading-8 text-end md:text-start">
@@ -88,9 +88,9 @@ export default function StrategyDescription({ strategy, asset, chainId, i, strat
           <CardStat
             id={`${strategy.resolver}-${i}-utilization`}
             label="Utilization"
-            value={`${formatTwoDecimals(100 - (strategy.idle / strategy.totalAssets) * 100)} %`}
-            secondaryValue={`${formatNumber(strategy.idle / (10 ** asset?.decimals))} ${asset?.symbol}`}
-            tooltip={`This Vault has deployed ${formatTwoDecimals(100 - (strategy.idle / strategy.totalAssets) * 100)} % of assets in managed strategies. ${formatNumber(strategy.idle / (10 ** asset?.decimals))} ${asset?.symbol} are instantly available for withdrawal. Additional funds need to be freed up by the vault manager.`}
+            value={`${formatTwoDecimals(100 - (Number(strategy.idle) / Number(strategy.totalAssets)) * 100)} %`}
+            secondaryValue={`${formatBalance(strategy.idle, asset?.decimals!)} ${asset?.symbol}`}
+            tooltip={`This Vault has deployed ${formatTwoDecimals(100 - (Number(strategy.idle) / Number(strategy.totalAssets)) * 100)} % of assets in managed strategies. ${formatBalance(strategy.idle, asset?.decimals!)} ${asset?.symbol} are instantly available for withdrawal. Additional funds need to be freed up by the vault manager.`}
           />
         }
         {strategy.metadata.type === "LeverageV1" &&

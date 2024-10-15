@@ -1,19 +1,17 @@
 import MainActionButton from "@/components/button/MainActionButton";
 import { tokensAtom } from "@/lib/atoms";
-import { ZERO } from "@/lib/constants";
-import { VeRecipientByChain, VE_BEACON, VOTING_ESCROW, VE_VCX } from "@/lib/constants/addresses";
+import { VeRecipientByChain, VE_BEACON, VE_VCX } from "@/lib/constants/addresses";
 import { broadcastVeBalance } from "@/lib/gauges/interactions";
 import { RPC_URLS } from "@/lib/utils/connectors";
-import { NumberFormatter, formatNumber } from "@/lib/utils/formatBigNumber";
-import { handleSwitchChain } from "@/lib/utils/helpers";
+import { formatNumber } from "@/lib/utils/formatBigNumber";
+import { formatBalance, handleSwitchChain } from "@/lib/utils/helpers";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
-import { Address, Chain, createPublicClient, erc20Abi, formatEther, http } from "viem";
+import { Address, Chain, createPublicClient, erc20Abi, http } from "viem";
 import { arbitrum, optimism } from "viem/chains";
-import { chainConfig } from "viem/zksync";
-import { useAccount, useBalance, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
+import { useAccount, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
 
-async function getVeBalance(account: Address, chain: Chain): Promise<number> {
+async function getVeBalance(account: Address, chain: Chain): Promise<string> {
   const client = createPublicClient({
     chain: chain,
     transport: http(RPC_URLS[chain.id]),
@@ -24,7 +22,7 @@ async function getVeBalance(account: Address, chain: Chain): Promise<number> {
     functionName: "balanceOf",
     args: [account]
   });
-  return Number(veBal) / 1e18
+  return formatBalance(veBal, 18)
 }
 
 export default function BroadcastVeBalanceInterface({ setShowModal }: { setShowModal: Function }): JSX.Element {
@@ -34,8 +32,8 @@ export default function BroadcastVeBalanceInterface({ setShowModal }: { setShowM
   const { switchChainAsync } = useSwitchChain();
 
   const [tokens] = useAtom(tokensAtom);
-  const [opVeBal, setOpVeBal] = useState<number>(0)
-  const [arbVeBal, setArbVeBal] = useState<number>(0)
+  const [opVeBal, setOpVeBal] = useState<string>("0")
+  const [arbVeBal, setArbVeBal] = useState<string>("0")
 
   useEffect(() => {
     if (account) {
@@ -65,15 +63,15 @@ export default function BroadcastVeBalanceInterface({ setShowModal }: { setShowM
         <div className="mt-10">
           <span className="flex flex-row items-center justify-between">
             <p className="text-white font-semibold mb-1">Mainnet veBalance:</p>
-            <p className="w-32 text-customGray300">{NumberFormatter.format(tokens[1][VE_VCX].balance / 1e18) || "0"}</p>
+            <p className="w-32 text-customGray300">{tokens[1][VE_VCX].balance.formatted || "0"}</p>
           </span>
           <span className="flex flex-row items-center justify-between">
             <p className="text-white font-semibold mb-1">Optimism veBalance:</p>
-            <p className="w-32 text-customGray300">{formatNumber(opVeBal || 0)}</p>
+            <p className="w-32 text-customGray300">{opVeBal || "0"}</p>
           </span>
           <span className="flex flex-row items-center justify-between">
             <p className="text-white font-semibold mb-1">Arbitrum veBalance:</p>
-            <p className="w-32 text-customGray300">{formatNumber(arbVeBal || 0)}</p>
+            <p className="w-32 text-customGray300">{arbVeBal || "0"}</p>
           </span>
         </div>
         <div className="flex flex-row space-x-4 mt-10">

@@ -1,11 +1,14 @@
 import { formatTwoDecimals } from "@/lib/utils/formatBigNumber";
 import CardStat from "@/components/common/CardStat";
 import { Token, VaultData } from "@/lib/types";
+import { formatBalance } from "@/lib/utils/helpers";
 
 export default function UserBoostSection({ vaultData, gauge, veToken }: { vaultData: VaultData, gauge: Token, veToken: Token }): JSX.Element {
-  const boostApy = (vaultData.gaugeData?.workingBalance! / (gauge?.balance || 0)) * 5 * vaultData.gaugeData?.lowerAPR!
-  const boost = (vaultData.gaugeData?.workingBalance! / (gauge?.balance || 0)) * 5
-  const missingVeBalance = (((gauge?.balance || 0) / vaultData.gaugeData?.workingSupply!) * (veToken.totalSupply / 1e18)) - (veToken.balance / 1e18)
+  const boostApy = (vaultData.gaugeData?.workingBalance! / Number(gauge?.balance.value || 0)) * 5 * vaultData.gaugeData?.lowerAPR!
+  const boost = (vaultData.gaugeData?.workingBalance! / Number(gauge?.balance.value || 0)) * 5
+  const missingVeBalance = ((Number(gauge?.balance.value || 0) / vaultData.gaugeData?.workingSupply!)
+    * Number(formatBalance(veToken.totalSupply, veToken.decimals)))
+    - Number(veToken.balance.formatted)
   return (
     <div className="bg-customNeutral200 p-6 rounded-lg">
       <p className="text-white text-2xl font-bold mb-4">Your Boost 🚀</p>

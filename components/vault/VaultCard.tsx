@@ -1,8 +1,6 @@
-import { useEffect, useState, type PropsWithChildren } from "react";
-
+import { useEffect, useState } from "react";
 import { isAddress, zeroAddress } from "viem";
 import { useAtom } from "jotai";
-
 import {
   NumberFormatter,
   formatAndRoundNumber,
@@ -10,7 +8,7 @@ import {
 } from "@/lib/utils/formatBigNumber";
 import type { Token, VaultData } from "@/lib/types";
 import { tokensAtom } from "@/lib/atoms";
-import { cn } from "@/lib/utils/helpers";
+import { cn, formatBalance } from "@/lib/utils/helpers";
 import { useRouter } from "next/router";
 import AssetWithName from "@/components/common/AssetWithName";
 import CardStat from "@/components/common/CardStat";
@@ -44,10 +42,10 @@ export default function VaultCard({
       const vault_ = tokens[chainId][vaultAddress];
       const gauge_ = gaugeAddress && gaugeAddress !== zeroAddress ? tokens[chainId][gaugeAddress] : undefined
 
-      let depositValue_ = (vault_.balance * vault_.price) / (10 ** vault_.decimals)
-      if (gauge_) depositValue_ += (gauge_.balance * gauge_.price) / (10 ** gauge_.decimals)
+      let depositValue_ = Number(vault!.balance.formattedUSD)
+      if (gauge_) depositValue_ += Number(gauge!.balance.formattedUSD)
 
-      setWalletValue((asset_.balance * asset_.price) / (10 ** asset_.decimals))
+      setWalletValue(Number(asset!.balance.formattedUSD))
       setDepositValue(depositValue_)
 
       setAsset(asset_);
@@ -56,7 +54,7 @@ export default function VaultCard({
     }
   }, [vaultData])
 
-  const boost = ((vaultData.gaugeData?.workingBalance! / (gauge?.balance || 0)) * 5) || 1
+  const boost = ((vaultData.gaugeData?.workingBalance! / Number(gauge?.balance.value || 0)) * 5) || 1
 
   const baseTooltipId = vaultData.address.slice(1);
 
@@ -103,19 +101,19 @@ export default function VaultCard({
         <CardStat
           id={`${baseTooltipId}-wallet`}
           label="Your Wallet"
-          value={`$ ${walletValue < 1 ? "0" : NumberFormatter.format(walletValue)}`}
-          secondaryValue={`${walletValue < 1 ? "0" : formatAndRoundNumber(asset.balance, asset.decimals)} ${asset.symbol}`}
+          value={`$ ${walletValue < 1 ? "0" : walletValue}`}
+          secondaryValue={`${walletValue < 1 ? "0" : asset.balance.formatted} ${asset.symbol}`}
           tooltip="Value of deposit assets held in your wallet"
         />
         <CardStat
           id={`${baseTooltipId}-deposit`}
           label="Your Deposit"
-          value={`$ ${depositValue < 1 ? "0" : NumberFormatter.format(depositValue)}`}
+          value={`$ ${depositValue < 1 ? "0" : depositValue}`}
           secondaryValue={`${depositValue < 1 ? "0" :
             (
               !!gauge ?
-                NumberFormatter.format(((gauge.balance) / 10 ** gauge.decimals) + ((vault?.balance!) / 10 ** vault?.decimals!))
-                : formatAndRoundNumber(vault?.balance!, vault?.decimals!)
+                Number(gauge.balance.formatted) + Number(vault!.balance.formatted)
+                : vault!.balance.formatted
             )
             } ${asset.symbol}`}
           tooltip="Value of your vault deposits"
@@ -123,8 +121,8 @@ export default function VaultCard({
         <CardStat
           id={`${baseTooltipId}-tvl`}
           label="TVL"
-          value={`$ ${vaultData.tvl < 1 ? "0" : NumberFormatter.format(vaultData.tvl)}`}
-          secondaryValue={`${formatAndRoundNumber(vaultData.totalAssets, asset.decimals)} ${asset.symbol}`}
+          value={`$ ${vaultData.tvl < 1 ? "0" : vaultData.tvl}`}
+          secondaryValue={`${formatBalance(vaultData.totalAssets, asset.decimals)} ${asset.symbol}`}
           tooltip="Total value of all assets deposited into the vault"
         />
         <CardStat

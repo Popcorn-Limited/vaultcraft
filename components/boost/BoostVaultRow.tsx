@@ -12,11 +12,10 @@ import { cn } from "@/lib/utils/helpers";
 import AssetWithName from "@/components/common/AssetWithName";
 import { Fragment, useEffect, useState } from "react";
 import useGaugeWeights from "@/lib/gauges/useGaugeWeights";
-import TokenIcon from "@/components/common/TokenIcon";
 import useWeeklyEmissions from "@/lib/gauges/useWeeklyEmissions";
 import { LABELS_WITH_TOOLTIP } from "@/components/boost/BoostVaultsTable";
 import { VE_VCX } from "@/lib/constants";
-import { WithTooltip } from "../common/Tooltip";
+import { WithTooltip } from "@/components/common/Tooltip";
 
 export default function BoostVaultRow({
   isDeprecated,
@@ -89,7 +88,7 @@ export default function BoostVaultRow({
       value = value - (potentialNewTotalVotes - 10000);
     }
 
-    const veBal = tokens[1][VE_VCX].balance / 1e18;
+    const veBal = Number(tokens[1][VE_VCX].balance.formatted)
     const userWeightImpact = (value / 10_000) * veBal
     const currentWeight = (Number(weights?.[1] || 0) / 1e18) * totalWeight
     const newRelativeWeight = (currentWeight + userWeightImpact) / totalWeight

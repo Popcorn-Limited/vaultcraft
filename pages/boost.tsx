@@ -124,7 +124,7 @@ function VePopContainer() {
         account: account as Address,
       });
       setVoteData(voteData_);
-      setCanCastVote(!!account && tokens[1][VE_VCX].balance > 0);
+      setCanCastVote(!!account && tokens[1][VE_VCX].balance.value > BigInt(0));
     }
     if (Object.keys(tokens).length > 0 && Object.keys(vaults).length > 0) initialSetup();
   }, [account, vaults]);

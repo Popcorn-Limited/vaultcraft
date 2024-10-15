@@ -72,12 +72,7 @@ function RewardColumn({ gauge, reward, token, chainId }: { gauge: Address, rewar
 
   function handleMaxClick() {
     if (!token) return;
-    const stringBal = token.balance.toLocaleString("fullwide", {
-      useGrouping: false,
-    });
-    const rounded = safeRound(BigInt(stringBal), token.decimals);
-    const formatted = formatUnits(rounded, token.decimals);
-    handleChangeInput({ currentTarget: { value: formatted } });
+    handleChangeInput({ currentTarget: { value: token.balance.formatted } });
   }
 
   async function handleApprove() {

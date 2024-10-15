@@ -4,14 +4,12 @@ import { useAtom } from "jotai";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import NoSSR from "react-no-ssr";
-import { yieldOptionsAtom } from "@/lib/atoms/sdk";
 import VaultInputs from "@/components/vault/VaultInputs";
 import { showSuccessToast } from "@/lib/toasts";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { Square2StackIcon } from "@heroicons/react/24/outline";
 import { tokensAtom } from "@/lib/atoms";
 import LeftArrowIcon from "@/components/svg/LeftArrowIcon";
-import ManageLoanInterface from "@/components/lending/ManageLoanInterface";
 import { VeTokenByChain, ZapAssetAddressesByChain } from "@/lib/constants";
 import StrategyDescription from "@/components/vault/StrategyDescription";
 import ApyChart from "@/components/vault/ApyChart";
@@ -23,7 +21,6 @@ import HtmlRenderer from "@/components/common/HtmlRenderer";
 export default function Index() {
   const router = useRouter();
   const { query } = router;
-  const [yieldOptions] = useAtom(yieldOptionsAtom);
 
   const [tokens] = useAtom(tokensAtom)
   const [vaults] = useAtom(vaultsAtom);
@@ -102,7 +99,7 @@ export default function Index() {
               </div>
 
               <div className="w-full md:w-2/3 mt-8 md:mt-0 space-y-4">
-                {gauge && gauge?.balance > 0 && Object.keys(tokens).length > 0 && (vaultData.gaugeData?.lowerAPR || 0) > 0 &&
+                {gauge && gauge?.balance.value > BigInt(0) && Object.keys(tokens).length > 0 && (vaultData.gaugeData?.lowerAPR || 0) > 0 &&
                   <UserBoostSection vaultData={vaultData} gauge={gauge} veToken={tokens[vaultData.chainId][VeTokenByChain[vaultData.chainId]]} />
                 }
 

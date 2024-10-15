@@ -85,7 +85,7 @@ export default function BoostVaultCard({
       value = value - (potentialNewTotalVotes - 10000);
     }
 
-    const veBal = tokens[1][VE_VCX].balance / 1e18;
+    const veBal = Number(tokens[1][VE_VCX].balance.formatted)
     const userWeightImpact = (value / 10_000) * veBal
     const currentWeight = (Number(weights?.[1] || 0) / 1e18) * totalWeight
     const newRelativeWeight = (currentWeight + userWeightImpact) / totalWeight

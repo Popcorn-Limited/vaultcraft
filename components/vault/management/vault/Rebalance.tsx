@@ -1,15 +1,13 @@
 import MainActionButton from "@/components/button/MainActionButton";
-import CopyAddress from "@/components/common/CopyAddress";
-import { IconByProtocol } from "@/components/common/ProtocolIcon";
 import StrategyName from "@/components/common/StrategyName";
 import TabSelector from "@/components/common/TabSelector";
 import InputNumber from "@/components/input/InputNumber";
 import { strategiesAtom, tokensAtom } from "@/lib/atoms";
-import { addStrategyData } from "@/lib/getTokenAndVaultsData";
 import { Token, VaultAllocation, VaultData } from "@/lib/types";
 import { formatNumber } from "@/lib/utils/formatBigNumber";
-import { validateInput } from "@/lib/utils/helpers";
+import { formatBalance, validateInput } from "@/lib/utils/helpers";
 import { allocateToStrategies, deallocateFromStrategies } from "@/lib/vault/management/interactions";
+import { addStrategyData } from "@/lib/vault/prepareVaultData";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { useAccount, useBalance, useBlockNumber, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
@@ -59,7 +57,7 @@ export default function VaultRebalance({
 
     if (activeTab === "Deallocate") {
       // Cant deallocate more than the allocation of a strategy
-      const formattedAllocation = vaultData.strategies[i].allocation / (10 ** asset!.decimals)
+      const formattedAllocation = Number(formatBalance(vaultData.strategies[i].allocation, asset?.decimals || 0))
       if (Number(newValue) > formattedAllocation) {
         newValue = String(formattedAllocation)
       }
@@ -90,7 +88,7 @@ export default function VaultRebalance({
     let allocations: VaultAllocation[] = []
     if (activeTab === "Deallocate") {
       allocations = inputValues.map((value, i) => {
-        const amount = Number(value) >= (vaultData.strategies[i].allocation / (10 ** asset!.decimals))
+        const amount = Number(value) >= Number(formatBalance(vaultData.strategies[i].allocation, asset?.decimals || 0))
           ? vaultData.strategies[i].allocation
           : (Number(value) * (10 ** asset!.decimals))
         return {
@@ -157,9 +155,9 @@ export default function VaultRebalance({
             Keep in mind that by dellocating or allocating funds you might be charged fees or slippage from the underlying protocols.
           </p>
           <div className="mb-4">
-            <p>Total Assets: {formatNumber(vaultData.totalAssets / (10 ** (asset?.decimals || 0)))} {asset?.symbol}</p>
-            <p>Liquid Assets: {formatNumber(vaultData.liquid / (10 ** (asset?.decimals || 0)))} {asset?.symbol}</p>
-            <p>Idle Assets: {formatNumber(vaultData.idle / (10 ** (asset?.decimals || 0)))} {asset?.symbol}</p>
+            <p>Total Assets: {formatBalance(vaultData.totalAssets, asset?.decimals || 0)} {asset?.symbol}</p>
+            <p>Liquid Assets: {formatBalance(vaultData.liquid, asset?.decimals || 0)} {asset?.symbol}</p>
+            <p>Idle Assets: {formatBalance(vaultData.idle, asset?.decimals || 0)} {asset?.symbol}</p>
           </div>
           <TabSelector activeTab={activeTab} availableTabs={["Deallocate", "Allocate"]} setActiveTab={switchTab} />
           {(asset && float) ?
@@ -186,7 +184,7 @@ export default function VaultRebalance({
                         </td>
 
                         <td className="whitespace-nowrap px-3 py-4 text-gray-500">
-                          {strategy.allocation / (10 ** asset.decimals)} {asset.symbol}
+                          {formatBalance(strategy.allocation, asset?.decimals || 0)} {asset?.symbol}
                         </td>
 
                         <td className="whitespace-nowrap px-3 py-4 text-gray-500">
@@ -202,10 +200,10 @@ export default function VaultRebalance({
 
                         <td className="whitespace-nowrap px-3 py-4 text-gray-500">
                           {activeTab === "Deallocate"
-                            ? (strategy.allocation / (10 ** asset.decimals)) - Number(inputValues[i])
-                            : (strategy.allocation / (10 ** asset.decimals)) + Number(inputValues[i])
+                            ? Number(formatBalance(strategy.allocation, asset?.decimals || 0)) - Number(inputValues[i])
+                            : Number(formatBalance(strategy.allocation, asset?.decimals || 0)) + Number(inputValues[i])
                           }
-                          {" "}{asset.symbol}
+                          {" "}{asset?.symbol}
                         </td>
                       </tr>
                   )}

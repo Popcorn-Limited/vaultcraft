@@ -57,7 +57,7 @@ export default async function handleVaultInteraction({
   referral,
   tokensAtom
 }: HandleVaultInteractionProps): Promise<() => Promise<boolean>> {
-  let postBal = 0;
+  let postBal = BigInt(0);
   switch (action) {
     case SmartVaultActionType.Deposit:
       switch (stepCounter) {
@@ -203,31 +203,29 @@ export default async function handleVaultInteraction({
             tokensAtom
           })
         case 2:
-          postBal = Number(
+          postBal =
             await clients.publicClient.readContract({
               address: vaultData.asset,
               abi: erc20Abi,
               functionName: "balanceOf",
               args: [account],
             })
-          );
           return () =>
             handleAllowance({
               token: vaultData.asset,
-              amount: postBal - asset.balance,
+              amount: Number(postBal - asset.balance.value),
               account,
               spender: vaultData.address,
               clients,
             });
         case 3:
-          postBal = Number(
+          postBal =
             await clients.publicClient.readContract({
               address: vaultData.asset,
               abi: erc20Abi,
               functionName: "balanceOf",
               args: [account],
             })
-          );
           return () =>
             vaultDeposit({
               chainId,
@@ -235,7 +233,7 @@ export default async function handleVaultInteraction({
               asset,
               vault,
               account,
-              amount: postBal - asset.balance,
+              amount: Number(postBal - asset.balance.value),
               clients,
               fireEvent,
               referral,
@@ -267,19 +265,18 @@ export default async function handleVaultInteraction({
             clients
           })
         case 2:
-          postBal = Number(
+          postBal =
             await clients.publicClient.readContract({
               address: vaultData.asset,
               abi: erc20Abi,
               functionName: "balanceOf",
               args: [account]
             })
-          )
           return () => zap({
             chainId,
             sellToken: asset,
             buyToken: outputToken,
-            amount: postBal - asset.balance,
+            amount: Number(postBal - asset.balance.value),
             account,
             zapProvider,
             slippage,
@@ -312,28 +309,28 @@ export default async function handleVaultInteraction({
             tokensAtom
           })
         case 2:
-          postBal = Number(
+          postBal =
             await clients.publicClient.readContract({
               address: vaultData.asset,
               abi: erc20Abi,
               functionName: "balanceOf",
               args: [account]
-            }))
+            })
           return () => handleAllowance({
             token: vaultData.asset,
-            amount: postBal - asset.balance,
+            amount: Number(postBal - asset.balance.value),
             account,
             spender: VaultRouterByChain[chainId],
             clients
           })
         case 3:
-          postBal = Number(
+          postBal =
             await clients.publicClient.readContract({
               address: vaultData.asset,
               abi: erc20Abi,
               functionName: "balanceOf",
               args: [account]
-            }))
+            })
           return () => vaultDepositAndStake({
             chainId,
             router: VaultRouterByChain[chainId],
@@ -341,7 +338,7 @@ export default async function handleVaultInteraction({
             asset,
             vault,
             account,
-            amount: postBal - asset.balance,
+            amount: Number(postBal - asset.balance.value),
             clients,
             fireEvent,
             referral,

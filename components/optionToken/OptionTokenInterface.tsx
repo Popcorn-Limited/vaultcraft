@@ -1,8 +1,7 @@
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction } from "react";
 import {
   useAccount,
-  useBalance,
   usePublicClient,
   useSwitchChain,
   useWalletClient,
@@ -157,9 +156,7 @@ export default function OptionTokenInterface({ setShowOptionTokenModal }: Option
           </div>
           <p className="font-bold">
             {`$${tokens[1][OptionTokenByChain[1]].balance && tokens?.[1]?.[VCX]?.price > 0
-              ? NumberFormatter.format(
-                (tokens[1][OptionTokenByChain[1]].balance / 1e18) * (tokens?.[1]?.[VCX]?.price * 0.25)
-              )
+              ? tokens[1][OptionTokenByChain[1]].balance.formattedUSD
               : "0"
               }`}
           </p>

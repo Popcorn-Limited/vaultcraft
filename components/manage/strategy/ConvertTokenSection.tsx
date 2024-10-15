@@ -142,12 +142,7 @@ function ConvertToken({ token, strategy, asset, yieldToken, settings, chainId, u
 
   function handleMaxClick() {
     if (!inputToken) return;
-    const stringBal = inputToken.balance.toLocaleString("fullwide", {
-      useGrouping: false,
-    });
-    const rounded = safeRound(BigInt(stringBal), inputToken.decimals);
-    const formatted = formatUnits(rounded, inputToken.decimals);
-    handleChangeInput({ currentTarget: { value: formatted } });
+    handleChangeInput({ currentTarget: { value: inputToken.balance.formatted } });
   }
 
   async function handleApprove() {
@@ -242,7 +237,7 @@ function ConvertToken({ token, strategy, asset, yieldToken, settings, chainId, u
       const newPrice = input.price * 10 ** 18 / asset.price;
 
       setPrice(newPrice);
-      setDepositLimit(((input.balance / (10 ** asset.decimals)) - float) / (newPrice / 1e18));
+      setDepositLimit((Number(input.balance.formatted) - float) / (newPrice / 1e18));
     }
     else {
       setIsZap(false);
