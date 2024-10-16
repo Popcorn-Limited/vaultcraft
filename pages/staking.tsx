@@ -5,7 +5,7 @@ import NoSSR from "react-no-ssr";
 import { showErrorToast, showLoadingToast, showSuccessToast } from "@/lib/toasts";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { ArrowDownIcon, Square2StackIcon } from "@heroicons/react/24/outline";
-import { loadingProgressAtom, networthAtom, tokensAtom, tvlAtom } from "@/lib/atoms";
+import { networthAtom, tokensAtom, tvlAtom } from "@/lib/atoms";
 import { FEE_RECIPIENT_PROXY, OptionTokenByChain, ST_VCX, VCX, ZapAssetAddressesByChain } from "@/lib/constants";
 import { Address, createPublicClient, http, parseUnits } from "viem";
 import { mainnet } from "viem/chains";
@@ -24,7 +24,7 @@ import ActionSteps from "@/components/vault/ActionSteps";
 import { handleAllowance } from "@/lib/approve";
 import { claim, deposit, increaseDeposit, withdraw } from "@/lib/vault/lockVault/interactions";
 import LockTimeButton from "@/components/button/LockTimeButton";
-import Loader from "@/components/common/Loader";
+import SpinningLogo from "@/components/common/SpinningLogo";
 
 async function getUserLockVaultData(user: Address, vault: Address) {
   const client = createPublicClient({
@@ -107,7 +107,6 @@ export default function Staking() {
   const { switchChainAsync } = useSwitchChain();
   const { openConnectModal } = useConnectModal();
 
-  const [progress] = useAtom(loadingProgressAtom)
   const [tokens, setTokens] = useAtom(tokensAtom)
 
   const [tokenOptions, setTokenOptions] = useState<Token[]>([]);
@@ -254,7 +253,7 @@ export default function Staking() {
                     id={"wallet"}
                     label="Your Wallet"
                     value={walletValue < 1 ? "$ 0" : `$ ${NumberFormatter.format(walletValue)}`}
-                    secondaryValue={walletValue < 1 ? `0 ${asset.symbol}` : `${asset.balance.formatted} ${asset.symbol}`}
+                    secondaryValue={walletValue < 1 ? `0 ${asset.symbol}` : `${NumberFormatter.format(Number(asset.balance.formatted))} ${asset.symbol}`}
                     tooltip="Value of deposit assets held in your wallet"
                   />
                 </div>
@@ -264,7 +263,7 @@ export default function Staking() {
                     label="Deposits"
                     value={depositValue < 1 ? "$ 0" : `$ ${NumberFormatter.format(depositValue)}`}
                     // @dev Shares are always minted 1:1 so we dont need to convert the vault balance to asset balance
-                    secondaryValue={depositValue < 1 ? `0 ${asset.symbol}` : `${vault.balance.formatted} ${asset.symbol}`}
+                    secondaryValue={depositValue < 1 ? `0 ${asset.symbol}` : `${NumberFormatter.format(Number(vault.balance.formatted))} ${asset.symbol}`}
                     tooltip="Value of your vault deposits"
                   />
                 </div>
@@ -276,7 +275,7 @@ export default function Staking() {
                       }`}
                     secondaryValue={
                       asset
-                        ? `${formatBalance(vault.totalSupply, 18)} ${asset?.symbol!}`
+                        ? `${NumberFormatter.format(Number(formatBalance(vault.totalSupply, 18)))} ${asset?.symbol!}`
                         : "0"
                     }
                     tooltip={``}
@@ -392,7 +391,7 @@ export default function Staking() {
                       allowInput={false}
                     />
                     {!userLockVaultData?.isExit &&
-                      <p className="text-white">
+                      <p className="text-white mt-2">
                         Expected APY: ~{lockTime === 7889400 ? "5" : lockTime === 15778800 ? "10" : lockTime === 23668200 ? "15" : "25"} %
                       </p>
                     }
@@ -546,7 +545,7 @@ export default function Staking() {
         </>
       )
         :
-        <Loader progress={progress} />
+        <SpinningLogo />
     }
   </NoSSR >
 }

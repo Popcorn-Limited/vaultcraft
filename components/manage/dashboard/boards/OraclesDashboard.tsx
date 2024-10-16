@@ -1,3 +1,4 @@
+import SpinningLogo from "@/components/common/SpinningLogo"
 import TabSelector from "@/components/common/TabSelector"
 import { strategiesAtom, tokensAtom } from "@/lib/atoms"
 import { vaultsAtom } from "@/lib/atoms/vaults"
@@ -24,7 +25,7 @@ export default function OraclesDashboard({ dashboardData }: { dashboardData: any
     || Object.keys(vaultsData).length === 0
     || Object.keys(tokens).length === 0
     || Object.keys(strategies).length === 0
-  ) return <p className="text-white">Loading...</p>
+  ) return <SpinningLogo />
   return (
     <>
       <TabSelector

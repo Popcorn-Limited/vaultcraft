@@ -8,7 +8,7 @@ import VaultInputs from "@/components/vault/VaultInputs";
 import { showSuccessToast } from "@/lib/toasts";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { Square2StackIcon } from "@heroicons/react/24/outline";
-import { loadingProgressAtom, tokensAtom } from "@/lib/atoms";
+import { tokensAtom } from "@/lib/atoms";
 import LeftArrowIcon from "@/components/svg/LeftArrowIcon";
 import { VeTokenByChain, ZapAssetAddressesByChain } from "@/lib/constants";
 import StrategyDescription from "@/components/vault/StrategyDescription";
@@ -17,13 +17,12 @@ import VaultHero from "@/components/vault/VaultHero";
 import { isAddress, zeroAddress } from "viem";
 import UserBoostSection from "@/components/vault/UserBoostSection";
 import HtmlRenderer from "@/components/common/HtmlRenderer";
-import Loader from "@/components/common/Loader";
+import SpinningLogo from "@/components/common/SpinningLogo";
 
 export default function Index() {
   const router = useRouter();
   const { query } = router;
 
-  const [progress] = useAtom(loadingProgressAtom)
   const [tokens] = useAtom(tokensAtom)
   const [vaults] = useAtom(vaultsAtom);
   const [vaultData, setVaultData] = useState<VaultData>();
@@ -194,7 +193,7 @@ export default function Index() {
           </div>
         </>
       )
-        : <Loader progress={progress} />
+        : <SpinningLogo />
     }
   </NoSSR >
 }

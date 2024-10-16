@@ -1,4 +1,5 @@
 import AssetWithName from "@/components/common/AssetWithName";
+import SpinningLogo from "@/components/common/SpinningLogo";
 import { tokensAtom } from "@/lib/atoms";
 import { vaultsAtom } from "@/lib/atoms/vaults";
 import { VaultData } from "@/lib/types";
@@ -109,5 +110,5 @@ export default function VaultsDashboard({ dashboardData }: { dashboardData: any 
         </div>
       </div>
     )
-    : <p className="text-white">Loading...</p>
+    : <SpinningLogo />
 }

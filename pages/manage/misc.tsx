@@ -1,5 +1,6 @@
 import MainActionButton from "@/components/button/MainActionButton";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
+import SpinningLogo from "@/components/common/SpinningLogo";
 import TabSelector from "@/components/common/TabSelector";
 import InputNumber from "@/components/input/InputNumber";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
@@ -20,7 +21,7 @@ import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import NoSSR from "react-no-ssr";
-import { encodeAbiParameters, formatUnits, getAddress } from "viem";
+import { encodeAbiParameters, getAddress } from "viem";
 import { mainnet, optimism } from "viem/chains";
 import { useAccount, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
 
@@ -183,7 +184,7 @@ function SetOptionTokenOracleParams(): JSX.Element {
       </div>
     </div>
   ) : (
-    <p className="text-white">Loading...</p>
+    <SpinningLogo />
   );
 }
 
@@ -594,5 +595,5 @@ function StakingRewardFunding() {
         }
       </div>
     </div>
-    : <p>Loading...</p>
+    : <SpinningLogo />
 }

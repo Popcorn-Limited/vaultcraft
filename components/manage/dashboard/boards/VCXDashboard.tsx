@@ -1,3 +1,4 @@
+import SpinningLogo from "@/components/common/SpinningLogo";
 import { GAUGE_NETWORKS, ChainById } from "@/lib/utils/connectors";
 import { NumberFormatter } from "@/lib/utils/helpers";
 
@@ -54,5 +55,5 @@ export default function VCXDashboard({ dashboardData }: { dashboardData: any }) 
       </div>
     </div >
   )
-    : <p className="text-white">Loading...</p>
+    : <SpinningLogo />
 }

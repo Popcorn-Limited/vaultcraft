@@ -29,6 +29,7 @@ import { handleAllowance } from "@/lib/approve";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 import { mainnet } from "viem/chains";
+import SpinningLogo from "@/components/common/SpinningLogo";
 
 const SLIPPAGE = 0.01; // @dev adding some slippage to the call -- TODO -> we should later allow users to change that
 
@@ -335,7 +336,7 @@ export default function ExerciseOptionTokenInterface({ chainId, setShowModal }: 
           </div>
           <span className="flex flex-row items-center justify-between pb-6 border-b border-customNeutral100"></span>
         </>)
-        : <p className="text-white">Loading...</p>
+        : <SpinningLogo />
       }
     </div>
   );

@@ -15,6 +15,7 @@ import VaultWithdrawalQueue from "./WithdrawalQueue";
 import VaultTakeFees from "./Fees";
 import VaultV2FeeConfiguration from "./VaultV2FeeConfiguration";
 import VaultV2Strategies from "./VaultV2Strategies";
+import SpinningLogo from "@/components/common/SpinningLogo";
 
 const DEFAULT_TABS = [
   "Rebalance",
@@ -210,7 +211,7 @@ export default function VaultsV2Settings({ vaultData }: { vaultData: VaultData, 
           )}
         </div>
       ) : (
-        <p className="text-white">Loading...</p>
+        <SpinningLogo />
       )}
     </section>
   )

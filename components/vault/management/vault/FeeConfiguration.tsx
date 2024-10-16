@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import { Address, parseUnits, zeroAddress } from "viem";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 import CommonFeeConfiguration from "@/components/vault/management/vault/CommonFeeConfiguration";
+import SpinningLogo from "@/components/common/SpinningLogo";
 
 export default function VaultFeeConfiguration({
   vaultData,
@@ -63,7 +64,7 @@ export default function VaultFeeConfiguration({
                 )}
               />
             ) : (
-              <p className="text-white">Loading Configuration...</p>
+              <SpinningLogo />
             )}
           </>
         )}

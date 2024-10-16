@@ -31,7 +31,7 @@ import BridgeModal from "@/components/bridge/BridgeModal";
 import axios from "axios";
 import BroadcastVeBalanceInterface from "@/components/boost/modals/manage/BroadcastVeBalanceInterface";
 import { NumberFormatter } from "@/lib/utils/helpers";
-import { loadingProgressAtom, tokensAtom } from "@/lib/atoms";
+import { tokensAtom } from "@/lib/atoms";
 import ResponsiveTooltip from "@/components/common/Tooltip";
 import BoostVaultsTable from "@/components/boost/BoostVaultsTable";
 import BoostVaultCard from "@/components/boost/BoostVaultCard";
@@ -39,7 +39,7 @@ import useWeeklyEmissions from "@/lib/gauges/useWeeklyEmissions";
 import { mainnet } from "viem/chains";
 import { GAUGE_NETWORKS, RPC_URLS } from "@/lib/utils/connectors";
 import Carousel from "@/components/common/Carousel";
-import Loader from "@/components/common/Loader";
+import SpinningLogo from "@/components/common/SpinningLogo";
 
 let hiddenGauges: AddressesByChain = {};
 async function getHiddenGauges(): Promise<AddressesByChain> {
@@ -63,7 +63,7 @@ function VePopContainer() {
   const { address: account, chain } = useAccount();
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
-  const [progress] = useAtom(loadingProgressAtom)
+
   const [tokens] = useAtom(tokensAtom);
 
   const weeklyEmissions = useWeeklyEmissions();
@@ -277,7 +277,7 @@ function VePopContainer() {
               />
             </div>
           </>
-          : <p className="text-white text-center py-12">Loading Gauges...</p>
+          : <SpinningLogo />
         }
 
         <div className="fixed left-0 bottom-10 w-full">
@@ -316,7 +316,7 @@ function VePopContainer() {
       </div>
     </>
   )
-    : <Loader progress={progress} />
+    : <SpinningLogo />
 }
 
 export default function VeVCX() {

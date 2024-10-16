@@ -5,7 +5,6 @@ import { useAtom } from "jotai";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useAccount, usePublicClient } from "wagmi";
 import Footer from "@/components/common/Footer";
-import { useRouter } from "next/router";
 import { Address, createPublicClient, http, zeroAddress } from "viem";
 import Modal from "@/components/modal/Modal";
 import MainActionButton from "../button/MainActionButton";
@@ -20,6 +19,7 @@ import fetchVaultron from "@/lib/vaultron";
 import { mainnet, polygon } from "viem/chains";
 import { ST_VCX, VCX_LP, VE_VCX } from "@/lib/constants/addresses";
 import { formatBalanceUSD } from "@/lib/utils/helpers";
+import ProgressBar from "@/components/common/ProgressBar";
 
 interface TermsModalProps {
   showModal: boolean;
@@ -143,11 +143,10 @@ export default function Page({
 }: {
   children: JSX.Element;
 }): JSX.Element {
-  const router = useRouter();
   const { address: account } = useAccount();
   const publicClient = usePublicClient();
 
-  const [, setLoadingProgress] = useAtom(loadingProgressAtom);
+  const [progress, setLoadingProgress] = useAtom(loadingProgressAtom);
   const [, setVaults] = useAtom(vaultsAtom);
   const [, setTokens] = useAtom(tokensAtom);
   const [, setStrategies] = useAtom(strategiesAtom);
@@ -357,6 +356,11 @@ export default function Page({
       <div className="bg-customNeutral300 w-full min-h-screen h-full mx-auto font-khTeka flex flex-col">
         <Navbar />
         <div className="flex-1 container p-0">
+          {progress < 100 &&
+            <div className="">
+              <ProgressBar progress={progress} />
+            </div>
+          }
           <TermsModal
             showModal={showTermsModal}
             setShowModal={setShowTermsModal}

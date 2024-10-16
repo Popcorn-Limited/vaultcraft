@@ -18,6 +18,7 @@ import VaultsV2Settings from "@/components/vault/management/vault/VaultsV2Settin
 import StrategyDescription from "@/components/vault/StrategyDescription";
 import Link from "next/link";
 import CopyAddress from "@/components/common/CopyAddress";
+import SpinningLogo from "@/components/common/SpinningLogo";
 
 async function getLogs(vault: VaultData, asset: Token) {
   const client = createPublicClient({
@@ -237,9 +238,8 @@ export default function Index() {
           }
 
         </div >
-      ) : (
-        <p className="text-white">Loading...</p>
       )
+        : <SpinningLogo />
       }
     </NoSSR >
   );

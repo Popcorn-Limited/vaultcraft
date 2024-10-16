@@ -1,3 +1,4 @@
+import SpinningLogo from "@/components/common/SpinningLogo";
 import { NumberFormatter } from "@/lib/utils/helpers";
 
 export default function AutomationDashboard({ dashboardData }: { dashboardData: any }) {
@@ -9,7 +10,7 @@ export default function AutomationDashboard({ dashboardData }: { dashboardData: 
   if (!dashboardData
     || Object.keys(dashboardData).length === 0
     || Object.keys(dashboardData?.automationData).length === 0
-  ) return <p className="text-white">Loading...</p>
+  ) return <SpinningLogo />
   return (
     <div className="flex flex-row flex-wrap w-full">
 

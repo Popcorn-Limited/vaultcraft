@@ -13,6 +13,7 @@ import VaultFeeRecipient from "@/components/vault/management/vault/FeeRecipient"
 import VaultDepositLimit from "@/components/vault/management/vault/DepositLimit";
 import VaultTakeFees from "@/components/vault/management/vault/Fees";
 import VaultPausing from "@/components/vault/management/vault/Pausing";
+import SpinningLogo from "@/components/common/SpinningLogo";
 
 const DEFAULT_TABS = [
   "Strategy",
@@ -228,7 +229,7 @@ export default function VaultsV1Settings({ vaultData }: { vaultData: VaultData, 
           )}
         </div>
       ) : (
-        <p className="text-white">Loading...</p>
+        <SpinningLogo />
       )}
     </section>
   )

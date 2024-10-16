@@ -13,6 +13,7 @@ import { Address, createPublicClient, http } from "viem";
 import { arbitrum } from "viem/chains";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 import axios from "axios";
+import SpinningLogo from "@/components/common/SpinningLogo";
 
 
 async function exitLockVault({ account, vault, clients }: { account: Address, vault: Address, clients: Clients }) {
@@ -187,7 +188,7 @@ export default function LockVaults() {
               : <p className="text-white">You have no deposits in any Lock Vaults</p>
           }
         </>
-        : <p className="text-white">Loading Lock Vaults...</p>
+        : <SpinningLogo />
       }
     </section>
   </div>

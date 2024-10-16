@@ -1,4 +1,5 @@
 import MainActionButton from "@/components/button/MainActionButton";
+import SpinningLogo from "@/components/common/SpinningLogo";
 import StrategyName from "@/components/common/StrategyName";
 import TabSelector from "@/components/common/TabSelector";
 import InputNumber from "@/components/input/InputNumber";
@@ -227,7 +228,7 @@ export default function VaultRebalance({
                 </div>
               </div>
             </div>
-            : <p className="text-white">Loading...</p>
+            : <SpinningLogo />
           }
         </div>
       </div >
