@@ -1,9 +1,8 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { ChainById } from "@/lib/utils/connectors";
 import { zeroAddress } from "viem";
-import { TokenReward, VaultData, VaultDataByAddress } from "@/lib/types";
+import { TokenReward, VaultData } from "@/lib/types";
 import getTokenAndVaultsDataByChain from "@/lib/getTokenAndVaultsData";
-import getGaugesData from "@/lib/gauges/getGaugeData";
 
 type VaultApiData = VaultData & {
   baseApy?: number;

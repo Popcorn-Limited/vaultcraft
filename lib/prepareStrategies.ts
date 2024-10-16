@@ -1,9 +1,8 @@
 import { Address, erc20Abi, PublicClient } from "viem";
-import { LlamaApy, VaultDataByAddress, StrategyByAddress } from "@/lib/types";
-import { AnyToAnyDepositorAbi, VaultAbi } from "@/lib/constants";
 import axios from "axios";
+import { LlamaApy, VaultDataByAddress, StrategyByAddress, Strategy } from "@/lib/types";
+import { AnyToAnyDepositorAbi, VaultAbi, LeverageLooperAbi } from "@/lib/constants";
 import { EMPTY_LLAMA_APY_ENTRY, getApy, getCustomApy } from "@/lib/resolver/apy";
-import { LeverageLooperAbi } from "./constants/abi/LeverageLooper";
 
 export default async function prepareStrategies(vaults: VaultDataByAddress, chainId: number, client: PublicClient): Promise<StrategyByAddress> {
   const uniqueStrategyAdresses: Address[] = [];
@@ -63,10 +62,10 @@ export default async function prepareStrategies(vaults: VaultDataByAddress, chai
     uniqueStrategyAdresses.map(async (address, i) => {
       if (i > 0) i = i * 5;
 
-      const totalAssets = Number(strategyRes[i].result!);
-      const totalSupply = Number(strategyRes[i + 1].result!);
+      const totalAssets = strategyRes[i].result as bigint || BigInt(0);
+      const totalSupply = strategyRes[i + 1].result as bigint || BigInt(0);
       const assetsPerShare =
-        totalSupply > 0 ? totalAssets / totalSupply : Number(1);
+        totalSupply > 0 ? Number(totalAssets) / Number(totalSupply) : 1;
 
       const desc = strategyDescriptions[address]
       let apy: LlamaApy;
@@ -104,14 +103,14 @@ export default async function prepareStrategies(vaults: VaultDataByAddress, chai
           apySource: desc.apySource
         },
         resolver: desc.resolver,
-        allocation: 0,
+        allocation: BigInt(0),
         allocationPerc: 0,
-        totalAssets,
-        totalSupply,
-        assetsPerShare,
-        idle: ["AnyToAnyV1", "AnyToAnyCompounderV1"].includes(desc.type) ? Number(strategyRes[i + 2].result!) - Number(strategyRes[i + 3].result!) : totalAssets,
+        totalAssets: totalAssets,
+        totalSupply: totalSupply,
+        assetsPerShare: assetsPerShare,
+        idle: ["AnyToAnyV1", "AnyToAnyCompounderV1"].includes(desc.type) ? (strategyRes[i + 2].result as bigint || BigInt(0)) - (strategyRes[i + 3].result as bigint || BigInt(0)) : totalAssets,
         leverage: desc.type === "LeverageV1" ? 1e18 / (1e18 - Number(strategyRes[i + 4].result)) : undefined
-      }
+      } as Strategy
     })
   )
   return strategies

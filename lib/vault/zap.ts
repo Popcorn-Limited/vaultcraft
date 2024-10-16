@@ -3,11 +3,11 @@ import { Address, createPublicClient, getAddress, http, zeroAddress } from "viem
 import { showErrorToast, showLoadingToast, showSuccessToast } from "@/lib/toasts";
 import { AddressByChain, Clients, Token, TokenByAddress, ZapProvider } from "@/lib/types";
 import { handleAllowance } from "@/lib/approve";
-import mutateTokenBalance from "./mutateTokenBalance";
+import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
 import { mainnet, arbitrum, optimism, polygon, xLayer } from "viem/chains";
 import { ChainById, networkMap, RPC_URLS } from "@/lib/utils/connectors";
-import { ALT_NATIVE_ADDRESS, FeeRecipientByChain } from "../constants";
-import { formatNumber } from "../utils/formatBigNumber";
+import { ALT_NATIVE_ADDRESS, FeeRecipientByChain } from "@/lib/constants";
+import { formatBalance } from "../utils/helpers";
 
 interface BaseProps {
   chainId: number;
@@ -149,7 +149,7 @@ export default async function zap({
   tradeTimeout = 60,
   clients,
   tokensAtom }: ZapProps): Promise<boolean> {
-  showLoadingToast(`Selling ${formatNumber(amount / (10 ** sellToken.decimals))} ${sellToken.symbol} for ${buyToken.symbol} using ${String(ZapProvider[zapProvider])}...`)
+  showLoadingToast(`Selling ${formatBalance(amount, sellToken.decimals)} ${sellToken.symbol} for ${buyToken.symbol} using ${String(ZapProvider[zapProvider])}...`)
 
   const transaction = await getZapTransaction({ chainId, sellToken, buyToken, amount, account, zapProvider, slippage, tradeTimeout })
 
@@ -157,7 +157,7 @@ export default async function zap({
     const hash = await clients.walletClient.sendTransaction(transaction)
     const receipt = await clients.publicClient.waitForTransactionReceipt({ hash })
 
-    showSuccessToast(`Sold ${formatNumber(amount / (10 ** sellToken.decimals))} ${sellToken.symbol} for ${buyToken.symbol} using ${String(ZapProvider[zapProvider])}!`)
+    showSuccessToast(`Sold ${formatBalance(amount, sellToken.decimals)} ${sellToken.symbol} for ${buyToken.symbol} using ${String(ZapProvider[zapProvider])} !`)
 
     await mutateTokenBalance({
       tokensToUpdate: [sellToken.address, buyToken.address],

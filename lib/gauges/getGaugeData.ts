@@ -366,9 +366,9 @@ async function getRewardsApy({
 
 
 function calcWorkingBalance(veToken: Token, gauge: Token, tokenlessProduction: number) {
-  let workingBalance = (gauge.balance * tokenlessProduction) / 100
-  if (veToken.balance > 0) {
-    workingBalance += ((gauge.totalSupply * veToken.balance) / veToken.totalSupply) * ((100 - tokenlessProduction) / 100)
+  let workingBalance = (Number(gauge.balance.value) * tokenlessProduction) / 100
+  if (veToken.balance.value > 0) {
+    workingBalance += Number((gauge.totalSupply * veToken.balance.value) / veToken.totalSupply) * ((100 - tokenlessProduction) / 100)
   }
-  return Math.min(gauge.balance, workingBalance)
+  return Math.min(Number(gauge.balance.value), workingBalance)
 }

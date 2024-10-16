@@ -1,5 +1,8 @@
 import axios, { AxiosResponse } from "axios";
-import { cleanFileName } from "@/lib/utils/helpers";
+
+function cleanFileName(fileName: string): string {
+  return fileName.replace(/ /g, "-").replace(/[^a-zA-Z0-9]/g, "");
+}
 
 export interface IIpfsClient {
   get: <T>(cid: string) => Promise<T>;
@@ -65,18 +68,18 @@ export const IpfsClient: IIpfsClient = {
     };
     const config = setUploadProgress
       ? {
-          headers,
-          // @ts-ignore
-          onUploadProgress: (progressEvent) => {
-            var percentCompleted = Math.round(
-              (progressEvent.loaded * 100) / progressEvent.total
-            );
-            setUploadProgress(percentCompleted);
-          },
-        }
+        headers,
+        // @ts-ignore
+        onUploadProgress: (progressEvent) => {
+          var percentCompleted = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
+          setUploadProgress(percentCompleted);
+        },
+      }
       : {
-          headers,
-        };
+        headers,
+      };
     return await axios
       .post(`${process.env.IPFS_GATEWAY_PIN}`, data, config)
       .then((result) => {

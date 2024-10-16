@@ -2,7 +2,7 @@ import DiscordIcon from "@/components/svg/socialMedia/DiscordIcon";
 import MediumIcon from "@/components/svg/socialMedia/MediumIcon";
 import TwitterIcon from "@/components/svg/socialMedia/TwitterIcon";
 import YoutubeIcon from "@/components/svg/socialMedia/YoutubeIcon";
-import TelegramIcon from "../svg/socialMedia/TelegramIcon";
+import TelegramIcon from "@/components/svg/socialMedia/TelegramIcon";
 
 interface SocialMediaLinksProps {
   color: string;

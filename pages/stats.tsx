@@ -14,10 +14,10 @@ import {
   VotingEscrowAbi,
   WETH,
 } from "@/lib/constants";
-import { formatToFixedDecimals } from "@/lib/utils/formatBigNumber";
 import { DuneQueryResult } from "@/lib/types";
 import { useAtom } from "jotai";
 import { tokensAtom } from "@/lib/atoms";
+import { NumberFormatter } from "@/lib/utils/helpers";
 
 
 const vaultTvlChartColors = [
@@ -552,7 +552,7 @@ export default function Vaults() {
               <h2
                 className={`text-2xl md:text-lg lg:text-xl xl:text-2xl font-bold`}
               >
-                {formatToFixedDecimals(statistics.totalSupply, 0)}
+                {NumberFormatter.format(statistics.totalSupply)}
               </h2>
             </div>
             <div className={`flex flex-col`}>
@@ -560,7 +560,7 @@ export default function Vaults() {
               <h2
                 className={`text-2xl md:text-lg lg:text-xl xl:text-2xl font-bold`}
               >
-                {formatToFixedDecimals(statistics.liquidSupply, 0)}
+                {NumberFormatter.format(statistics.liquidSupply)}
               </h2>
             </div>
             <div className={`flex flex-col`}>
@@ -568,7 +568,7 @@ export default function Vaults() {
               <h2
                 className={`text-2xl md:text-lg lg:text-xl xl:text-2xl font-bold`}
               >
-                ${formatToFixedDecimals(statistics.fdv, 0)}
+                ${NumberFormatter.format(statistics.fdv)}
               </h2>
             </div>
             <div className={`flex flex-col`}>
@@ -576,7 +576,7 @@ export default function Vaults() {
               <h2
                 className={`text-2xl md:text-lg lg:text-xl xl:text-2xl font-bold`}
               >
-                ${formatToFixedDecimals(statistics.marketCap, 0)}
+                ${NumberFormatter.format(statistics.marketCap)}
               </h2>
             </div>
             <div className={`flex flex-col`}>
@@ -596,7 +596,7 @@ export default function Vaults() {
               <h2
                 className={`text-2xl md:text-lg lg:text-xl xl:text-2xl font-bold`}
               >
-                {formatToFixedDecimals(statistics.burnedVcx, 0)} VCX
+                {NumberFormatter.format(statistics.burnedVcx)} VCX
               </h2>
             </div>
           </div>
@@ -623,37 +623,37 @@ export default function Vaults() {
                 <div className={`flex justify-between`}>
                   <p>VCX in 80/20 BAL pool</p>
                   <p className={`font-bold text-right`}>
-                    ${formatToFixedDecimals(statistics.vcxInBalPool, 0)}
+                    ${NumberFormatter.format(statistics.vcxInBalPool)}
                   </p>
                 </div>
                 <div className={`flex justify-between`}>
                   <p>WETH in 80/20 BAL pool</p>
                   <p className={`font-bold text-right`}>
-                    ${formatToFixedDecimals(statistics.wethInBalPool, 0)}
+                    ${NumberFormatter.format(statistics.wethInBalPool)}
                   </p>
                 </div>
                 <div className={`flex justify-between`}>
                   <p>BAL LPs</p>
                   <p className={`font-bold text-right`}>
-                    ${formatToFixedDecimals(statistics.balLp, 0)}
+                    ${NumberFormatter.format(statistics.balLp)}
                   </p>
                 </div>
                 <div className={`flex justify-between`}>
                   <p>veVCX (staked LPs)</p>
                   <p className={`font-bold text-right`}>
-                    ${formatToFixedDecimals(statistics.veVcx, 0)}
+                    ${NumberFormatter.format(statistics.veVcx)}
                   </p>
                 </div>
                 <div className={`flex justify-between`}>
                   <p>oVCX emissions</p>
                   <p className={`font-bold text-right`}>
-                    ${formatToFixedDecimals(statistics.oVcxEmissions, 0)}
+                    ${NumberFormatter.format(statistics.oVcxEmissions)}
                   </p>
                 </div>
                 <div className={`flex justify-between`}>
                   <p>oVCX exercised</p>
                   <p className={`font-bold text-right`}>
-                    {formatToFixedDecimals(statistics.oVcxExercised, 0)} VCX
+                    {NumberFormatter.format(statistics.oVcxExercised)} VCX
                   </p>
                 </div>
               </div>
@@ -683,7 +683,7 @@ export default function Vaults() {
                       <div key={idx} className={`flex justify-between`}>
                         <p>{item.title}</p>
                         <p className={`font-bold text-right`}>
-                          ${formatToFixedDecimals(item.count, 0)}
+                          ${NumberFormatter.format(item.count)}
                         </p>
                       </div>
                     );
@@ -705,7 +705,7 @@ export default function Vaults() {
                 <div className={`flex justify-between`}>
                   <p>Total Revenue</p>
                   <p className={`font-bold text-right`}>
-                    ${formatToFixedDecimals(statistics.totalRevenue, 0)}
+                    ${NumberFormatter.format(statistics.totalRevenue)}
                   </p>
                 </div>
                 {/*<div className={`flex justify-between`}>
@@ -719,43 +719,43 @@ export default function Vaults() {
                 <div className={`flex justify-between`}>
                   <p>7 Day Dex Volume</p>
                   <p className={`font-bold text-right`}>
-                    ${formatToFixedDecimals(statistics.weekDexVolume, 0)}
+                    ${NumberFormatter.format(statistics.weekDexVolume)}
                   </p>
                 </div>
                 <div className={`flex justify-between`}>
                   <p>Total Holder</p>
                   <p className={`font-bold text-right`}>
-                    {formatToFixedDecimals(statistics.holderTotal, 0)}
+                    {NumberFormatter.format(statistics.holderTotal)}
                   </p>
                 </div>
                 <div className={`flex justify-between`}>
                   <p>Wallets with 100-1K VCX</p>
                   <p className={`font-bold text-right`}>
-                    {formatToFixedDecimals(statistics.holderPlankton, 0)}
+                    {NumberFormatter.format(statistics.holderPlankton)}
                   </p>
                 </div>
                 <div className={`flex justify-between`}>
                   <p>Wallets with 1K - 100K VCX</p>
                   <p className={`font-bold text-right`}>
-                    {formatToFixedDecimals(statistics.holderShrimp, 0)}
+                    {NumberFormatter.format(statistics.holderShrimp)}
                   </p>
                 </div>
                 <div className={`flex justify-between`}>
                   <p>Wallets with 100K-1M VCX</p>
                   <p className={`font-bold text-right`}>
-                    {formatToFixedDecimals(statistics.holderFish, 0)}
+                    {NumberFormatter.format(statistics.holderFish)}
                   </p>
                 </div>
                 <div className={`flex justify-between`}>
                   <p>Wallets with 1M-10M VCX</p>
                   <p className={`font-bold text-right`}>
-                    {formatToFixedDecimals(statistics.holderDolphin, 0)}
+                    {NumberFormatter.format(statistics.holderDolphin)}
                   </p>
                 </div>
                 <div className={`flex justify-between`}>
                   <p>Wallets with 10M+ VCX</p>
                   <p className={`font-bold text-right`}>
-                    {formatToFixedDecimals(statistics.holderWhale, 0)}
+                    {NumberFormatter.format(statistics.holderWhale)}
                   </p>
                 </div>
               </div>
@@ -771,10 +771,7 @@ export default function Vaults() {
                 <p className={`text-sm`}>Total Value locked</p>
                 <p className={`text-2xl leading-none font-bold`}>
                   $
-                  {Intl.NumberFormat("en-US", {
-                    notation: "compact",
-                    compactDisplay: "short",
-                  }).format(statistics.tvl)}
+                  {NumberFormatter.format(statistics.tvl)}
                 </p>
               </span>
             </div>

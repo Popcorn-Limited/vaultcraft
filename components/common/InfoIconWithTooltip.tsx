@@ -1,5 +1,5 @@
 import React from "react";
-import ResponsiveTooltip from "./Tooltip";
+import ResponsiveTooltip from "@/components/common/Tooltip";
 
 export interface InfoIconWithTooltipProps {
   title?: string;

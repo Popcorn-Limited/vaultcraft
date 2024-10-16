@@ -5,7 +5,7 @@ import {
   useWalletClient,
 } from "wagmi";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { Address, WalletClient } from "viem";
+import { Address } from "viem";
 import Modal from "@/components/modal/Modal";
 import MainActionButton from "@/components/button/MainActionButton";
 import LpInfo from "@/components/boost/modals/lp/LpInfo";

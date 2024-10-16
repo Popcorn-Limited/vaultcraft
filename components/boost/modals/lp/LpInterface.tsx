@@ -2,17 +2,10 @@ import {
   Dispatch,
   FormEventHandler,
   SetStateAction,
-  useEffect,
-  useState,
 } from "react";
-import { useAccount, useBalance, useToken } from "wagmi";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
-import { numberToFormattedString, safeRound } from "@/lib/utils/formatBigNumber";
 import { validateInput } from "@/lib/utils/helpers";
-import { formatEther } from "viem";
-import { llama } from "@/lib/resolver/price/resolver";
 import { PlusIcon } from "@heroicons/react/24/outline";
-import { ZERO } from "@/lib/constants";
 import { VCX, WETH } from "@/lib/constants/addresses";
 import { tokensAtom } from "@/lib/atoms";
 import { useAtom } from "jotai";
@@ -31,18 +24,13 @@ export default function LpInterface({
   const [tokens] = useAtom(tokensAtom)
 
   function handleMaxWeth() {
-    const maxEth = numberToFormattedString(tokens[1][WETH].balance, tokens[1][WETH].decimals)
-
-    setWethAmount(maxEth);
-    setVcxAmount(getVcxAmount(Number(maxEth)));
+    setWethAmount(tokens[1][WETH].balance.formatted);
+    setVcxAmount(getVcxAmount(Number(tokens[1][WETH].balance.formatted)));
   }
 
   function handleMaxOPop() {
-    const maxVcx = numberToFormattedString(tokens[1][VCX].balance, tokens[1][VCX].decimals)
-
-
-    setWethAmount(getWethAmount(Number(maxVcx)));
-    setVcxAmount(maxVcx);
+    setWethAmount(getWethAmount(Number(tokens[1][VCX].balance.formatted)));
+    setVcxAmount(tokens[1][VCX].balance.formatted);
   }
 
   function getWethAmount(oVcxAmount: number) {
@@ -87,7 +75,7 @@ export default function LpInterface({
           allowInput={true}
           selectedToken={tokens[1][VCX]}
           errorMessage={
-            Number(vcxAmount) > (tokens[1][VCX].balance / 1e18)
+            Number(vcxAmount) > Number(tokens[1][VCX].balance.formatted)
               ? "Insufficient Balance"
               : ""
           }
@@ -108,7 +96,7 @@ export default function LpInterface({
           selectedToken={tokens[1][WETH]}
           tokenList={[]}
           errorMessage={
-            Number(wethAmount) > (tokens[1][WETH].balance / 1e18)
+            Number(wethAmount) > Number(tokens[1][WETH].balance.formatted)
               ? "Insufficient Balance"
               : ""
           }

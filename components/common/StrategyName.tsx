@@ -1,6 +1,6 @@
 import { Strategy, Token } from "@/lib/types";
-import { IconByProtocol } from "./ProtocolIcon";
-import CopyAddress from "./CopyAddress";
+import { IconByProtocol } from "@/components/common/ProtocolIcon";
+import CopyAddress from "@/components/common/CopyAddress";
 
 export default function StrategyName({ strategy, asset, yieldToken }: { strategy: Strategy, asset: Token, yieldToken?: Token }): JSX.Element {
   return (

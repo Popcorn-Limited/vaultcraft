@@ -15,10 +15,6 @@ const links: { label: string; url: string; onClick?: Function }[] = [
     url: "/boost",
   },
   {
-    label: "Create Vaults",
-    url: "/create-vault",
-  },
-  {
     label: "Lock Vaults",
     url: "/vaults/lock",
   },

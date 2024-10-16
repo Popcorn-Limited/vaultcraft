@@ -9,6 +9,7 @@ import { useAccount, usePublicClient, useSwitchChain, useWalletClient } from "wa
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { handleSwitchChain } from "@/lib/utils/helpers";
 import StrategyName from "@/components/common/StrategyName";
+import SpinningLogo from "@/components/common/SpinningLogo";
 
 export default function VaultAutoDeposit({
   vaultData,
@@ -118,5 +119,5 @@ export default function VaultAutoDeposit({
       </div>
     </div >
   )
-    : <p className="text-white">Loading...</p>
+    : <SpinningLogo />
 }

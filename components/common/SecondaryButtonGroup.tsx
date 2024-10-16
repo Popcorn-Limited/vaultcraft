@@ -1,6 +1,6 @@
 import { handleSwitchChain } from "@/lib/utils/helpers";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import { useAccount, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
+import { useAccount, useSwitchChain } from "wagmi";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 
 export default function SecondaryButtonGroup({ label, mainAction, chainId, disabled }: { label: string, mainAction: Function, chainId: number, disabled: boolean }) {

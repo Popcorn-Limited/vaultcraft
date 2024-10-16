@@ -16,20 +16,20 @@ import TokenIcon from "@/components/common/TokenIcon";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import { BalancerOracleAbi, ZERO } from "@/lib/constants";
 import { ExerciseByChain, ExerciseOracleByChain, OVCX_ORACLE, OptionTokenByChain, VCX, VcxByChain, WETH, WethByChain } from "@/lib/constants/addresses";
-import { formatNumber, safeRound } from "@/lib/utils/formatBigNumber";
-import { handleSwitchChain, validateInput } from "@/lib/utils/helpers";
+import { handleSwitchChain, NumberFormatter, validateInput } from "@/lib/utils/helpers";
 import { Token } from "@/lib/types";
 import { Address, createPublicClient, formatEther, http, parseEther } from "viem";
 import { useAtom } from "jotai";
 import { tokensAtom } from "@/lib/atoms";
-import ActionSteps from "../../vault/ActionSteps";
+import ActionSteps from "@/components/vault/ActionSteps";
 import { ActionStep, EXERCISE_OVCX_STEPS } from "@/lib/getActionSteps";
-import MainActionButton from "../../button/MainActionButton";
+import MainActionButton from "@/components/button/MainActionButton";
 import { exerciseOPop } from "@/lib/optionToken/interactions";
 import { handleAllowance } from "@/lib/approve";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 import { mainnet } from "viem/chains";
+import SpinningLogo from "@/components/common/SpinningLogo";
 
 const SLIPPAGE = 0.01; // @dev adding some slippage to the call -- TODO -> we should later allow users to change that
 
@@ -91,18 +91,14 @@ export default function ExerciseOptionTokenInterface({ chainId, setShowModal }: 
 
   function handleMaxWeth() {
     if (!weth) return
-    const maxEth = formatEther(safeRound(BigInt(weth.balance), 18));
-
-    setMaxPaymentAmount(maxEth);
-    setAmount(getOPopAmount(Number(maxEth)));
+    setMaxPaymentAmount(weth.balance.formatted);
+    setAmount(getOPopAmount(Number(weth.balance.formatted)));
   }
 
   function handleMaxOPop() {
     if (!ovcx) return
-    const maxOPop = formatEther(safeRound(BigInt(ovcx.balance), 18));
-
-    setMaxPaymentAmount(getMaxPaymentAmount(Number(maxOPop)));
-    setAmount(maxOPop);
+    setMaxPaymentAmount(getMaxPaymentAmount(Number(ovcx.balance.formatted)));
+    setAmount(ovcx.balance.formatted);
   }
 
   function getMaxPaymentAmount(oVcxAmount: number) {
@@ -218,8 +214,8 @@ export default function ExerciseOptionTokenInterface({ chainId, setShowModal }: 
       {!!ovcx && !!weth ? (
         <>
           <p className="text-white font-semibold">
-            Strike Price: $ {formatNumber(strikePrice)} | oVCX Price: ${" "}
-            {formatNumber(vcxPrice - strikePrice)} | VCX Price: $ {formatNumber(vcxPrice)} | Discount:{" "}
+            Strike Price: $ {NumberFormatter.format(strikePrice)} | oVCX Price: ${" "}
+            {NumberFormatter.format(vcxPrice - strikePrice)} | VCX Price: $ {NumberFormatter.format(vcxPrice)} | Discount:{" "}
             {((1 - (strikePrice / vcxPrice)) * 100).toFixed(2)} %
           </p>
 
@@ -234,13 +230,13 @@ export default function ExerciseOptionTokenInterface({ chainId, setShowModal }: 
               allowInput={true}
               selectedToken={ovcx}
               errorMessage={
-                Number(amount) > (ovcx.balance / 1e18)
+                Number(amount) > Number(ovcx.balance.formatted)
                   ? "Insufficient Balance"
                   : ""
               }
               tokenList={[]}
             />
-            <div className="flex justify-center -mt-2 mb-4">
+            <div className="flex justify-center mt-4">
               <PlusIcon className="w-8 h-8 text-customGray500" />
             </div>
 
@@ -255,7 +251,7 @@ export default function ExerciseOptionTokenInterface({ chainId, setShowModal }: 
               selectedToken={weth}
               tokenList={[]}
               errorMessage={
-                Number(maxPaymentAmount) > (weth.balance / 1e18)
+                Number(maxPaymentAmount) > Number(weth.balance.formatted)
                   ? "Insufficient Balance"
                   : ""
               }
@@ -340,7 +336,7 @@ export default function ExerciseOptionTokenInterface({ chainId, setShowModal }: 
           </div>
           <span className="flex flex-row items-center justify-between pb-6 border-b border-customNeutral100"></span>
         </>)
-        : <p className="text-white">Loading...</p>
+        : <SpinningLogo />
       }
     </div>
   );

@@ -1,4 +1,5 @@
-import { formatNumber } from "@/lib/utils/formatBigNumber"
+import SpinningLogo from "@/components/common/SpinningLogo";
+import { NumberFormatter } from "@/lib/utils/helpers";
 
 export default function AutomationDashboard({ dashboardData }: { dashboardData: any }) {
   // TODO
@@ -9,7 +10,7 @@ export default function AutomationDashboard({ dashboardData }: { dashboardData: 
   if (!dashboardData
     || Object.keys(dashboardData).length === 0
     || Object.keys(dashboardData?.automationData).length === 0
-  ) return <p className="text-white">Loading...</p>
+  ) return <SpinningLogo />
   return (
     <div className="flex flex-row flex-wrap w-full">
 
@@ -19,7 +20,7 @@ export default function AutomationDashboard({ dashboardData }: { dashboardData: 
           <h2 className="mt-2 text-white text-3xl font-bold">
             Gelato
           </h2>
-          <p className="mt-2 text-white">Balance: ${formatNumber(dashboardData?.automationData.gelatoBalance)}</p>
+          <p className="mt-2 text-white">Balance: ${NumberFormatter.format(dashboardData?.automationData.gelatoBalance)}</p>
         </div>
       </div>
 
@@ -29,8 +30,8 @@ export default function AutomationDashboard({ dashboardData }: { dashboardData: 
           <h2 className="mt-2 text-white text-3xl font-bold">
             Trade Bot
           </h2>
-          <p className="mt-2 text-white">Gas Balance: {formatNumber(Number(dashboardData?.automationData.tradebot.eth) / 1e18)} ETH</p>
-          <p className="mt-2 text-white">Buy Balance: {formatNumber(Number(dashboardData?.automationData.tradebot.weth) / 1e18)} WETH</p>
+          <p className="mt-2 text-white">Gas Balance: {NumberFormatter.format(Number(dashboardData?.automationData.tradebot.eth) / 1e18)} ETH</p>
+          <p className="mt-2 text-white">Buy Balance: {NumberFormatter.format(Number(dashboardData?.automationData.tradebot.weth) / 1e18)} WETH</p>
         </div>
       </div>
 

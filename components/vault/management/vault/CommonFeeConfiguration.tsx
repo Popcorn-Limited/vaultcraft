@@ -73,7 +73,7 @@ interface FeeConfigurationProps {
   openCategories?: boolean[];
 }
 
-function FeeConfiguration({
+export default function CommonFeeConfiguration({
   showFeeRecipient = true,
   openCategories = [false, false, false, false, false],
 }: FeeConfigurationProps): JSX.Element {
@@ -229,5 +229,3 @@ function FeeConfiguration({
     </section>
   );
 }
-
-export default FeeConfiguration;

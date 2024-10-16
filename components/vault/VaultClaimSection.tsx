@@ -4,7 +4,6 @@ import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { useAccount, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
 import { Address, zeroAddress } from "viem";
-import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import getGaugeRewards from "@/lib/gauges/getGaugeRewards";
 import { claimOPop } from "@/lib/optionToken/interactions";
 import { gaugeRewardsAtom, tokensAtom } from "@/lib/atoms";
@@ -12,12 +11,12 @@ import { MinterByChain, OptionTokenByChain, RewardsClaimerByChain, VCX, WrappedO
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import { claimRewards } from "@/lib/gauges/interactions";
-import LargeCardStat from "../common/LargeCardStat";
-import MainActionButton from "../button/MainActionButton";
+import LargeCardStat from "@/components/common/LargeCardStat";
+import MainActionButton from "@/components/button/MainActionButton";
 import { getClaimableRewards } from "@/lib/gauges/useGaugeRewardData";
 import { handleAllowance } from "@/lib/approve";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import { handleSwitchChain } from "@/lib/utils/helpers";
+import { handleSwitchChain, NumberFormatter } from "@/lib/utils/helpers";
 
 export default function VaultClaimSection({ vaultData }: { vaultData: VaultData }) {
   const { switchChainAsync } = useSwitchChain();

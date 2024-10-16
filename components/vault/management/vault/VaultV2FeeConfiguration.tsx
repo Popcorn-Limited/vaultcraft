@@ -1,15 +1,8 @@
-
-
-import MainActionButton from "@/components/button/MainActionButton";
 import MainButtonGroup from "@/components/common/MainButtonGroup";
-import FeeConfiguration from "@/components/deploymentSections/FeeConfiguration";
 import InputNumber from "@/components/input/InputNumber";
-import { feeAtom } from "@/lib/atoms";
-import { VaultData, VaultsV2Fee, VaultsV2FeeConfig } from "@/lib/types";
+import { VaultData,  VaultsV2FeeConfig } from "@/lib/types";
 import { validateInput } from "@/lib/utils/helpers";
-import { acceptFees, proposeFees, setV2Fees } from "@/lib/vault/management/interactions";
-import { useConnectModal } from "@rainbow-me/rainbowkit";
-import { useAtom } from "jotai";
+import { setV2Fees } from "@/lib/vault/management/interactions";
 import { useEffect, useState } from "react";
 import { Address, formatEther, parseEther, parseUnits, zeroAddress } from "viem";
 import { useAccount, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";

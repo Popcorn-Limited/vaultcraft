@@ -1,18 +1,26 @@
-import { isAddress, zeroAddress } from "viem";
+import { zeroAddress } from "viem";
 import { useAtom } from "jotai";
-
-import {
-  NumberFormatter,
-  formatAndRoundNumber,
-  formatTwoDecimals,
-} from "@/lib/utils/formatBigNumber";
 import type { Token, VaultData } from "@/lib/types";
 import { tokensAtom } from "@/lib/atoms";
-import { cn } from "@/lib/utils/helpers";
+import { cn, formatBalance, NumberFormatter } from "@/lib/utils/helpers";
 import { useRouter } from "next/router";
 import AssetWithName from "@/components/common/AssetWithName";
 import { useEffect, useState } from "react";
-import { WithTooltip } from "@/components/common/Tooltip";
+import LargeCardStat from "@/components/common/LargeCardStat";
+import CardStat from "../common/CardStat";
+import { WithTooltip } from "../common/Tooltip";
+
+function depositValue(vault: Token, gauge?: Token): number {
+  let result = Number(vault.balance.formattedUSD)
+  if (gauge) result += Number(gauge.balance.formattedUSD)
+  return result
+}
+
+function boostValue(vaultData: VaultData, gauge?: Token): number {
+  if (!vaultData || !gauge) return 1
+  let boost = (vaultData.gaugeData!.workingBalance / Number(gauge.balance.value || 0)) * 5;
+  return boost > 1 ? boost : 1
+}
 
 export default function VaultRow({
   searchTerm,
@@ -39,32 +47,12 @@ export default function VaultRow({
   const [asset, setAsset] = useState<Token>();
   const [vault, setVault] = useState<Token>();
   const [gauge, setGauge] = useState<Token>();
-  const [walletValue, setWalletValue] = useState<number>(0)
-  const [depositValue, setDepositValue] = useState<number>(0)
-  const [boost, setBoost] = useState<number>(1);
-  const [vAPR, setVAPR] = useState<number>(0);
 
   useEffect(() => {
     if (vaultData) {
       const asset_ = tokens[chainId][assetAddress];
       const vault_ = tokens[chainId][vaultAddress];
       const gauge_ = gaugeAddress && gaugeAddress !== zeroAddress ? tokens[chainId][gaugeAddress] : undefined
-
-      let depositValue_ = (vault_.balance * vault_.price) / (10 ** vault_.decimals)
-      if (gauge_) depositValue_ += (gauge_.balance * gauge_.price) / (10 ** gauge_.decimals)
-
-      setWalletValue((asset_.balance * asset_.price) / (10 ** asset_.decimals))
-      setDepositValue(depositValue_)
-
-      let vAPR_ = apyData.targetApy;
-      if (gaugeData && gauge) {
-        let boost_ = (gaugeData.workingBalance / (gauge.balance || 0)) * 5;
-        if (boost_ > 1) setBoost(boost_);
-
-        if (gaugeData.rewardApy.apy) vAPR_ += gaugeData.rewardApy.apy
-        if (gaugeData.lowerAPR) vAPR_ += (gaugeData.lowerAPR * boost)
-      }
-      setVAPR(vAPR_)
 
       setAsset(asset_);
       setVault(vault_);
@@ -108,69 +96,93 @@ export default function VaultRow({
 
       <td className="text-right">
         <p className="text-lg">
-          $ {walletValue < 1 ? "0" : NumberFormatter.format(walletValue)}
+          {Number(asset.balance.formattedUSD) < 1 ? "$ 0" : `$ ${NumberFormatter.format(Number(asset.balance.formattedUSD))}`}
         </p>
         <p className="text-sm -mt-0.5 text-customGray200">
-          {walletValue < 1 ? "0" : formatAndRoundNumber(asset.balance, asset.decimals)} {asset.symbol}
+          {Number(asset.balance.formattedUSD) < 1 ? `0 ${asset.symbol}` : `${NumberFormatter.format(Number(asset.balance.formatted))} ${asset.symbol}`}
         </p>
       </td>
 
       <td className="text-right">
         <p className="text-lg">
-          $ {depositValue < 0.1 ? "0" : NumberFormatter.format(depositValue)}
+          {depositValue(vault, gauge) < 1 ? "$ 0" : `$ ${NumberFormatter.format(depositValue(vault, gauge))}`}
         </p>
         <p className="text-sm -mt-0.5 text-customGray200">
-          {depositValue < 0.1 ? "0" :
-            (
+          {depositValue(vault, gauge) < 1 ? "0" :
+            `${NumberFormatter.format(
               !!gauge ?
-                NumberFormatter.format(((gauge.balance) / 10 ** gauge.decimals) + ((vault?.balance!) / 10 ** vault?.decimals!))
-                : formatAndRoundNumber(vault?.balance!, vault?.decimals!)
-            )
-          } {asset.symbol}
+                Number(gauge.balance.formatted) + Number(vault!.balance.formatted)
+                : Number(vault!.balance.formatted)
+            )} ${asset.symbol}`}
         </p>
       </td>
 
-      <td className="text-right whitespace-nowrap">
-        <WithTooltip content={`This Vault deploys its TVL $ ${tvl < 1 ? "0" : NumberFormatter.format(tvl)}
-        (${formatAndRoundNumber(vaultData.totalAssets, asset.decimals)} ${asset.symbol}) 
-        in $ ${formatTwoDecimals(vaultData.strategies.reduce((a, b) => a + b.apyData.apyHist[b.apyData.apyHist.length - 1].tvl, 0))} TVL of underlying protocols`}>
+      <td className="text-right">
+        <WithTooltip
+          content={`This Vault deploys its TVL $ ${vaultData.tvl < 1 ? "0" : NumberFormatter.format(vaultData.tvl)}
+                      (${NumberFormatter.format(Number(formatBalance(vaultData.totalAssets, asset?.decimals || 0)))} ${asset?.symbol || "TKN"}) 
+                      in $ ${NumberFormatter.format(vaultData.strategies.reduce((a, b) => a + b.apyData.apyHist[b.apyData.apyHist.length - 1].tvl, 0))} 
+                      TVL of underlying protocols`}
+        >
           <p className="text-lg">
-            $ {tvl < 1 ? "0" : NumberFormatter.format(tvl)}
+            {vaultData.tvl < 1 ? "$ 0" : `$ ${NumberFormatter.format(vaultData.tvl)}`}
           </p>
           <p className="text-sm -mt-0.5 text-customGray200">
-            {formatAndRoundNumber(vaultData.totalAssets, asset.decimals)} {asset.symbol}
+            {vaultData.tvl < 1 ? "0" :
+              `${NumberFormatter.format(Number(formatBalance(vaultData.totalAssets, asset.decimals)))} ${asset.symbol}`}
+          </p>
+        </WithTooltip>
+      </td>
+
+      <td className="text-right whitespace-nowrap">
+        <WithTooltip
+          content={`vAPR-${vaultAddress}`}
+          tooltipChild={
+            <div className="w-40">
+              {vaultData.apyData.targetApy !== (vaultData.apyData.baseApy + vaultData.apyData.rewardApy) &&
+                <span className="w-full flex justify-between">
+                  <p className="font-bold text-lg">Target vAPY:</p>
+                  <p className="font-bold text-lg">{NumberFormatter.format(vaultData.apyData.targetApy)} %</p>
+                </span>
+              }
+              <span className="w-full flex justify-between">
+                <p className="font-bold text-lg">Total vAPY:</p>
+                <p className="font-bold text-lg">{NumberFormatter.format(vaultData.apyData.baseApy + vaultData.apyData.rewardApy)} %</p>
+              </span>
+              <span className="w-full flex justify-between">
+                <p className="">Base vAPY:</p>
+                <p className="">{NumberFormatter.format(vaultData.apyData.baseApy)} %</p>
+              </span>
+              {vaultData.apyData.rewardApy && vaultData.apyData.rewardApy > 0
+                ? <span className="w-full flex justify-between">
+                  <p className="">Reward vAPY:</p>
+                  <p className="">{NumberFormatter.format(vaultData.apyData.rewardApy)} %</p>
+                </span>
+                : <></>
+              }
+            </div>
+          }
+        >
+          <p className="text-lg">
+            {`${NumberFormatter.format(vaultData.apyData.targetApy)} %`}
+          </p>
+          <p className="text-sm -mt-0.5 text-customGray200">
+            {`${NumberFormatter.format(vaultData.apyData.baseApy + vaultData.apyData.rewardApy)} %`}
           </p>
         </WithTooltip>
       </td>
 
       <td className="text-right text-lg">
         <WithTooltip
-          content={`vAPR-${vaultAddress}`}
-          tooltipChild={
-            <div className="w-42">
-              {apyData.targetApy !== (apyData.baseApy + apyData.rewardApy) && <p>Target APR: {formatTwoDecimals(apyData.targetApy)} %</p>}
-              <p>Vault APR: {formatTwoDecimals(apyData.baseApy + apyData.rewardApy)} %</p>
-              {gaugeData?.lowerAPR && gaugeData?.lowerAPR > 0 ? <p>Your Boost: {formatTwoDecimals(gaugeData?.lowerAPR * boost)} %</p> : <></>}
-              {gaugeData?.rewardApy.apy && gaugeData?.rewardApy.apy > 0 ? <p>Additional Rewards: {formatTwoDecimals(gaugeData?.rewardApy.apy)} %</p> : <></>}
-            </div>
-          }
-        >
+          content={`Earn between ${NumberFormatter.format(gaugeData?.lowerAPR || 0)}-${NumberFormatter.format(gaugeData?.upperAPR || 0)} % oVCX boost APR depending your balance of veVCX. (Based on the current emissions of ${NumberFormatter.format((gaugeData?.annualEmissions || 0) / 5)}-${NumberFormatter.format(gaugeData?.annualEmissions || 0)} oVCX p.Year)`}>
           <p className="text-lg">
-            {formatTwoDecimals(vAPR)}%
-          </p>
-        </WithTooltip>
-      </td>
-
-      <td className="text-right text-lg">
-        <WithTooltip content={`Earn between ${formatTwoDecimals(gaugeData?.lowerAPR || 0)}-${formatTwoDecimals(gaugeData?.upperAPR || 0)} % oVCX boost APR depending your balance of veVCX. (Based on the current emissions of ${formatTwoDecimals((gaugeData?.annualEmissions || 0) / 5)}-${formatTwoDecimals(gaugeData?.annualEmissions || 0)} oVCX p.Year)`}>
-          <p className="text-lg">
-            {formatTwoDecimals(gaugeData?.upperAPR || 0)}%
+            {NumberFormatter.format(gaugeData?.upperAPR || 0)}%
           </p>
           <p className="text-sm -mt-0.5 text-customGray200">
-            {formatTwoDecimals(gaugeData?.lowerAPR || 0)}%
+            {NumberFormatter.format(gaugeData?.lowerAPR || 0)}%
           </p>
         </WithTooltip>
       </td>
-    </tr>
+    </tr >
   );
 }

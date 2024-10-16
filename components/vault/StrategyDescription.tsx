@@ -1,19 +1,15 @@
 import { IconByProtocol } from "@/components/common/ProtocolIcon";
 import CardStat from "@/components/common/CardStat";
-import { NumberFormatter, formatAndRoundNumber, formatNumber, formatTwoDecimals } from "@/lib/utils/formatBigNumber";
-import { roundToTwoDecimalPlaces } from "@/lib/utils/helpers";
+import { formatBalance, formatBalanceUSD, NumberFormatter } from "@/lib/utils/helpers";
 import { Strategy, Token } from "@/lib/types";
 import { showSuccessToast } from "@/lib/toasts";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { Square2StackIcon } from "@heroicons/react/24/outline";
 import { useAtom } from "jotai";
 import { tokensAtom } from "@/lib/atoms";
-import SecondaryActionButton from "../button/SecondaryActionButton";
 import { adjustLeverage } from "@/lib/vault/management/strategyInteractions";
-import { getPublicClient } from "@wagmi/core";
-import MainButtonGroup from "../common/MainButtonGroup";
-import SecondaryButtonGroup from "../common/SecondaryButtonGroup";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
+import SecondaryButtonGroup from "@/components/common/SecondaryButtonGroup";
 
 interface StrategyDescriptionProps {
   strategy: Strategy;
@@ -70,35 +66,35 @@ export default function StrategyDescription({ strategy, asset, chainId, i, strat
         >
           <span className="md:flex md:flex-row md:items-center w-full md:space-x-2">
             <p className="text-white text-xl leading-6 md:leading-8 text-end md:text-start">
-              $ {formatAndRoundNumber(strategy.allocation * asset?.price!, asset?.decimals!)}
+              $ {NumberFormatter.format(Number(formatBalanceUSD(strategy.allocation, asset?.decimals!, asset?.price!)))}
             </p>
             <p className="hidden md:block text-white">|</p>
             <p className="text-white text-xl leading-6 md:leading-8 text-end md:text-start">
-              {NumberFormatter.format(roundToTwoDecimalPlaces(strategy.allocationPerc * 100))} %
+              {NumberFormatter.format(strategy.allocationPerc * 100)} %
             </p>
           </span>
         </CardStat>
         <CardStat
           id={`${strategy.resolver}-${i}-apy`}
           label="APY"
-          value={strategy.apyData.totalApy === 0 ? "TBD" : `${NumberFormatter.format(roundToTwoDecimalPlaces(strategy.apyData.totalApy))} %`}
+          value={strategy.apyData.totalApy === 0 ? "TBD" : `${NumberFormatter.format(strategy.apyData.totalApy)} %`}
           tooltip="Current variable apy of the strategy"
         />
         {isManaged && ["AnyToAnyV1", "AnyToAnyCompounderV1"].includes(strategy.metadata.type) &&
           <CardStat
             id={`${strategy.resolver}-${i}-utilization`}
             label="Utilization"
-            value={`${formatTwoDecimals(100 - (strategy.idle / strategy.totalAssets) * 100)} %`}
-            secondaryValue={`${formatNumber(strategy.idle / (10 ** asset?.decimals))} ${asset?.symbol}`}
-            tooltip={`This Vault has deployed ${formatTwoDecimals(100 - (strategy.idle / strategy.totalAssets) * 100)} % of assets in managed strategies. ${formatNumber(strategy.idle / (10 ** asset?.decimals))} ${asset?.symbol} are instantly available for withdrawal. Additional funds need to be freed up by the vault manager.`}
+            value={`${NumberFormatter.format(100 - (Number(strategy.idle) / Number(strategy.totalAssets)) * 100)} %`}
+            secondaryValue={`${formatBalance(strategy.idle, asset?.decimals!)} ${asset?.symbol}`}
+            tooltip={`This Vault has deployed ${NumberFormatter.format(100 - (Number(strategy.idle) / Number(strategy.totalAssets)) * 100)} % of assets in managed strategies. ${formatBalance(strategy.idle, asset?.decimals!)} ${asset?.symbol} are instantly available for withdrawal. Additional funds need to be freed up by the vault manager.`}
           />
         }
         {strategy.metadata.type === "LeverageV1" &&
           <CardStat
             id={`${strategy.resolver}-${i}-leverage`}
             label="Leverage"
-            value={`${formatTwoDecimals(strategy.leverage || 0)}X`}
-            tooltip={`This strategy levers its assets ${formatTwoDecimals(strategy.leverage || 0)}X to earn additional yield.`}
+            value={`${NumberFormatter.format(strategy.leverage || 0)}X`}
+            tooltip={`This strategy levers its assets ${NumberFormatter.format(strategy.leverage || 0)}X to earn additional yield.`}
           />
         }
       </div>

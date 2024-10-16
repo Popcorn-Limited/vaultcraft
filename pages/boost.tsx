@@ -30,7 +30,7 @@ import Modal from "@/components/modal/Modal";
 import BridgeModal from "@/components/bridge/BridgeModal";
 import axios from "axios";
 import BroadcastVeBalanceInterface from "@/components/boost/modals/manage/BroadcastVeBalanceInterface";
-import { NumberFormatter } from "@/lib/utils/formatBigNumber";
+import { NumberFormatter } from "@/lib/utils/helpers";
 import { tokensAtom } from "@/lib/atoms";
 import ResponsiveTooltip from "@/components/common/Tooltip";
 import BoostVaultsTable from "@/components/boost/BoostVaultsTable";
@@ -39,6 +39,7 @@ import useWeeklyEmissions from "@/lib/gauges/useWeeklyEmissions";
 import { mainnet } from "viem/chains";
 import { GAUGE_NETWORKS, RPC_URLS } from "@/lib/utils/connectors";
 import Carousel from "@/components/common/Carousel";
+import SpinningLogo from "@/components/common/SpinningLogo";
 
 let hiddenGauges: AddressesByChain = {};
 async function getHiddenGauges(): Promise<AddressesByChain> {
@@ -62,6 +63,7 @@ function VePopContainer() {
   const { address: account, chain } = useAccount();
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
+
   const [tokens] = useAtom(tokensAtom);
 
   const weeklyEmissions = useWeeklyEmissions();
@@ -124,7 +126,7 @@ function VePopContainer() {
         account: account as Address,
       });
       setVoteData(voteData_);
-      setCanCastVote(!!account && tokens[1][VE_VCX].balance > 0);
+      setCanCastVote(!!account && tokens[1][VE_VCX].balance.value > BigInt(0));
     }
     if (Object.keys(tokens).length > 0 && Object.keys(vaults).length > 0) initialSetup();
   }, [account, vaults]);
@@ -275,7 +277,7 @@ function VePopContainer() {
               />
             </div>
           </>
-          : <p className="text-white text-center py-12">Loading Gauges...</p>
+          : <SpinningLogo />
         }
 
         <div className="fixed left-0 bottom-10 w-full">
@@ -314,7 +316,7 @@ function VePopContainer() {
       </div>
     </>
   )
-    : <p className="text-white">Loading...</p>
+    : <SpinningLogo />
 }
 
 export default function VeVCX() {

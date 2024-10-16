@@ -28,7 +28,7 @@ const Vaults: NextPage = () => {
   return Object.keys(hiddenVaults).length > 0 ? (
     <VaultsContainer hiddenVaults={hiddenVaults} displayVaults={{}} />
   ) : (
-    <p className="text-white">Loading...</p>
+    <></>
   );
 };
 
