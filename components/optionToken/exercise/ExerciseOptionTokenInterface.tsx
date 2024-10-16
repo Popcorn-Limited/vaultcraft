@@ -235,7 +235,7 @@ export default function ExerciseOptionTokenInterface({ chainId, setShowModal }: 
               }
               tokenList={[]}
             />
-            <div className="flex justify-center -mt-2 mb-4">
+            <div className="flex justify-center mt-4">
               <PlusIcon className="w-8 h-8 text-customGray500" />
             </div>
 

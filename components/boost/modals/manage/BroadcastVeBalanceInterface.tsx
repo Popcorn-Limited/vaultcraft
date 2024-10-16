@@ -3,7 +3,7 @@ import { tokensAtom } from "@/lib/atoms";
 import { VeRecipientByChain, VE_BEACON, VE_VCX } from "@/lib/constants/addresses";
 import { broadcastVeBalance } from "@/lib/gauges/interactions";
 import { RPC_URLS } from "@/lib/utils/connectors";
-import { formatBalance, handleSwitchChain } from "@/lib/utils/helpers";
+import { formatBalance, handleSwitchChain, NumberFormatter } from "@/lib/utils/helpers";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { Address, Chain, createPublicClient, erc20Abi, http } from "viem";
@@ -62,15 +62,15 @@ export default function BroadcastVeBalanceInterface({ setShowModal }: { setShowM
         <div className="mt-10">
           <span className="flex flex-row items-center justify-between">
             <p className="text-white font-semibold mb-1">Mainnet veBalance:</p>
-            <p className="w-32 text-customGray300">{tokens[1][VE_VCX].balance.formatted || "0"}</p>
+            <p className="w-32 text-customGray300">{NumberFormatter.format(Number(tokens[1][VE_VCX].balance.formatted || "0"))}</p>
           </span>
           <span className="flex flex-row items-center justify-between">
             <p className="text-white font-semibold mb-1">Optimism veBalance:</p>
-            <p className="w-32 text-customGray300">{opVeBal || "0"}</p>
+            <p className="w-32 text-customGray300">{NumberFormatter.format(Number(opVeBal || "0"))}</p>
           </span>
           <span className="flex flex-row items-center justify-between">
             <p className="text-white font-semibold mb-1">Arbitrum veBalance:</p>
-            <p className="w-32 text-customGray300">{arbVeBal || "0"}</p>
+            <p className="w-32 text-customGray300">{NumberFormatter.format(Number(arbVeBal || "0"))}</p>
           </span>
         </div>
         <div className="flex flex-row space-x-4 mt-10">

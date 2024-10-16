@@ -97,7 +97,7 @@ export default function VaultHero({
                   : "0 TKN"
               }
               tooltip={`This Vault deploys its TVL $ ${vaultData.tvl < 1 ? "0" : NumberFormatter.format(vaultData.tvl)}
-                      (${formatBalance(vaultData.totalAssets, asset?.decimals || 0)} ${asset?.symbol || "TKN"}) 
+                      (${NumberFormatter.format(Number(formatBalance(vaultData.totalAssets, asset?.decimals || 0)))} ${asset?.symbol || "TKN"}) 
                       in $ ${NumberFormatter.format(vaultData.strategies.reduce((a, b) => a + b.apyData.apyHist[b.apyData.apyHist.length - 1].tvl, 0))} 
                       TVL of underlying protocols`}
             />
@@ -108,8 +108,8 @@ export default function VaultHero({
                 id={"utilization"}
                 label="Utilization"
                 value={`${NumberFormatter.format(100 - (Number(vaultData.liquid) / Number(vaultData.totalAssets)) * 100)} %`}
-                secondaryValue={`${formatBalance(vaultData.liquid, asset?.decimals || 0)} ${asset?.symbol}`}
-                tooltip={`This Vault has deployed ${NumberFormatter.format(100 - (Number(vaultData.liquid) / Number(vaultData.totalAssets)) * 100)} % of assets in managed strategies. ${formatBalance(vaultData.liquid, asset?.decimals || 0)} ${asset?.symbol} are instantly available for withdrawal. Additional funds need to be freed up by the vault manager.`}
+                secondaryValue={`${NumberFormatter.format(Number(formatBalance(vaultData.liquid, asset?.decimals || 0)))} ${asset?.symbol}`}
+                tooltip={`This Vault has deployed ${NumberFormatter.format(100 - (Number(vaultData.liquid) / Number(vaultData.totalAssets)) * 100)} % of assets in managed strategies. ${NumberFormatter.format(Number(formatBalance(vaultData.liquid, asset?.decimals || 0)))} ${asset?.symbol} are instantly available for withdrawal. Additional funds need to be freed up by the vault manager.`}
               />
             </div>
           }

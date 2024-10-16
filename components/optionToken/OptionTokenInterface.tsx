@@ -155,7 +155,7 @@ export default function OptionTokenInterface({ setShowOptionTokenModal }: Option
           </div>
           <p className="font-bold">
             {`$${tokens[1][OptionTokenByChain[1]].balance && tokens?.[1]?.[VCX]?.price > 0
-              ? tokens[1][OptionTokenByChain[1]].balance.formattedUSD
+              ? NumberFormatter.format(Number(tokens[1][OptionTokenByChain[1]].balance.formattedUSD))
               : "0"
               }`}
           </p>

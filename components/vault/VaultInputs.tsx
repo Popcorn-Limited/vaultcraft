@@ -322,8 +322,8 @@ export default function VaultInputs({
       onMaxClick={() => { }}
       chainId={chainId}
       value={
-        Number(inputBalance.formattedUSD) /
-        (outputToken?.price || 0)
+        (Number(inputBalance.formattedUSD) /
+          (outputToken?.price || 0)) || "0"
       }
       onChange={() => { }}
       selectedToken={outputToken}
