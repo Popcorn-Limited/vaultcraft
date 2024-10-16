@@ -16,7 +16,7 @@ import { gaugeDeposit, gaugeWithdraw } from "@/lib/gauges/interactions"
 import { showErrorToast, showLoadingToast, showSuccessToast } from "@/lib/toasts"
 import { Balance, Clients, SmartVaultActionType, Token, TokenByAddress, TokenType, VaultData, ZapProvider } from "@/lib/types"
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors"
-import { EMPTY_BALANCE, formatBalance, formatBalanceUSD, NumberFormatter } from "@/lib/utils/helpers"
+import { calcBalance, EMPTY_BALANCE, formatBalance, formatBalanceUSD, NumberFormatter } from "@/lib/utils/helpers"
 import { vaultDeposit, vaultDepositAndStake, vaultRedeem, vaultUnstakeAndWithdraw } from "@/lib/vault/interactions"
 import zap, { getZapProvider, handleZapAllowance } from "@/lib/vault/zap"
 import { ArrowDownIcon } from "@heroicons/react/24/outline"
@@ -396,7 +396,7 @@ export default function VaultInputs({
         _inputToken={inputToken}
         _outputToken={outputToken}
         zapProvider={zapProvider}
-        _amount={Number(inputBalance) * (10 ** inputToken.decimals)}
+        _inputBalance={inputBalance}
         _action={steps[0]}
         actionSeries={action}
         actions={steps}
@@ -407,13 +407,13 @@ export default function VaultInputs({
   </>
 }
 
-function InteractionContainer({ _inputToken, _outputToken, zapProvider, _amount, _action, actionSeries, actions, vaultData, setShowModal }:
-  { _inputToken: Token, _outputToken: Token, _amount: number, zapProvider: ZapProvider, _action: Action, actionSeries: SmartVaultActionType, actions: Action[], vaultData: VaultData, setShowModal: Function }): JSX.Element {
+function InteractionContainer({ _inputToken, _outputToken, zapProvider, _inputBalance, _action, actionSeries, actions, vaultData, setShowModal }:
+  { _inputToken: Token, _outputToken: Token, _inputBalance: Balance, zapProvider: ZapProvider, _action: Action, actionSeries: SmartVaultActionType, actions: Action[], vaultData: VaultData, setShowModal: Function }): JSX.Element {
   const publicClient = usePublicClient({ chainId: vaultData.chainId });
 
   const [inputToken, setInputToken] = useState<Token>(_inputToken)
   const [outputToken, setOutputToken] = useState<Token>(_outputToken)
-  const [amount, setAmount] = useState<number>(_amount)
+  const [inputBalance, setInputBalance] = useState<Balance>(_inputBalance)
   const [valueStorage, setValueStorage] = useAtom(valueStorageAtom)
   const [action, setAction] = useState<Action>(_action)
   const [step, setStep] = useState<number>(0);
@@ -443,13 +443,12 @@ function InteractionContainer({ _inputToken, _outputToken, zapProvider, _amount,
         }
       }
       if (action === Action.zap) {
-        // Set the `amount` as the output amount from zap
-        console.log({ balance: tokens[vaultData.chainId][vaultData.asset].balance, valueStorage })
-        setAmount(Number(
-          formatBalance(
-            tokens[vaultData.chainId][vaultData.asset].balance.value - valueStorage,
-            tokens[vaultData.chainId][vaultData.asset].decimals
-          )))
+        // Set the `amount` as the output amount from zap        
+        setInputBalance(calcBalance(
+          tokens[vaultData.chainId][vaultData.asset].balance.value - valueStorage,
+          tokens[vaultData.chainId][vaultData.asset].decimals,
+          tokens[vaultData.chainId][vaultData.asset].price
+        ))
         // Reset outputToken in case its deposit (reset doesnt matter on withdrawal since its the last action)
         setOutputToken(_outputToken)
         // Set to asset in case its deposit (reset doesnt matter on withdrawal since its the last action)
@@ -478,7 +477,7 @@ function InteractionContainer({ _inputToken, _outputToken, zapProvider, _amount,
       zapProvider={zapProvider}
       vaultData={vaultData}
       action={action}
-      amount={amount}
+      inputBalance={inputBalance}
       interactionHooks={[interactionPreHook, interactionPostHook]}
       setShowModal={setShowModal}
     />
@@ -501,8 +500,8 @@ function InteractionContainer({ _inputToken, _outputToken, zapProvider, _amount,
   </div>
 }
 
-function Interaction({ inputToken, outputToken, amount, zapProvider, action, vaultData, interactionHooks, setShowModal }:
-  { inputToken: Token, outputToken: Token, amount: number, zapProvider: ZapProvider, action: Action, vaultData: VaultData, interactionHooks: [(e?: any) => Promise<any>, (e?: any) => Promise<any>], setShowModal: Function }): JSX.Element {
+function Interaction({ inputToken, outputToken, inputBalance, zapProvider, action, vaultData, interactionHooks, setShowModal }:
+  { inputToken: Token, outputToken: Token, inputBalance: Balance, zapProvider: ZapProvider, action: Action, vaultData: VaultData, interactionHooks: [(e?: any) => Promise<any>, (e?: any) => Promise<any>], setShowModal: Function }): JSX.Element {
   const [preHook, postHook] = interactionHooks
   const publicClient = usePublicClient({ chainId: vaultData.chainId });
   const { data: walletClient } = useWalletClient();
@@ -519,7 +518,7 @@ function Interaction({ inputToken, outputToken, amount, zapProvider, action, vau
     const success = await handleInteraction(
       inputToken,
       outputToken,
-      amount,
+      inputBalance.value,
       action,
       vaultData,
       tokens[vaultData.chainId][vaultData.asset],
@@ -535,14 +534,14 @@ function Interaction({ inputToken, outputToken, amount, zapProvider, action, vau
   return (
     <>
       <p className="text-white text-start text-2xl font-bold leading-none mb-1">{getLabel(action)}</p>
-      <p className="text-white text-start mb-2">{getDescription(inputToken, outputToken, amount, action, vaultData)}</p>
+      <p className="text-white text-start mb-2">{getDescription(inputToken, outputToken, Number(inputBalance.formatted), action, vaultData)}</p>
       <MainActionButton label={getLabel(action)} handleClick={handleMainAction} />
     </>
   )
 }
 
 function getDescription(inputToken: Token, outputToken: Token, amount: number, action: Action, vaultData: VaultData) {
-  const val = formatBalance(amount, inputToken.decimals)
+  const val = NumberFormatter.format(amount)
   switch (action) {
     case Action.depositApprove:
       return `Approving ${val} ${inputToken.symbol} for Vault deposit.`
@@ -674,7 +673,7 @@ function selectActions(action: SmartVaultActionType) {
 function handleInteraction(
   inputToken: Token,
   outputToken: Token,
-  amount: number,
+  amount: bigint,
   action: Action,
   vaultData: VaultData,
   asset: Token,
@@ -689,7 +688,7 @@ function handleInteraction(
       return () =>
         handleAllowance({
           token: inputToken.address,
-          amount,
+          amount: Number(amount),
           account,
           spender: vaultData.address,
           clients,
@@ -698,7 +697,7 @@ function handleInteraction(
       return () =>
         handleAllowance({
           token: inputToken.address,
-          amount,
+          amount: Number(amount),
           account,
           spender: vaultData.gauge!,
           clients,
@@ -708,7 +707,7 @@ function handleInteraction(
       return () =>
         handleAllowance({
           token: inputToken.address,
-          amount,
+          amount: Number(amount),
           account,
           spender: VaultRouterByChain[vaultData.chainId],
           clients,
@@ -716,7 +715,7 @@ function handleInteraction(
     case Action.zapApprove:
       return () => handleZapAllowance({
         token: inputToken.address,
-        amount,
+        amount: Number(amount),
         account,
         zapProvider,
         clients
@@ -800,7 +799,7 @@ function handleInteraction(
         chainId: vaultData.chainId,
         sellToken: inputToken,
         buyToken: outputToken,
-        amount,
+        amount: Number(amount),
         account,
         zapProvider,
         slippage: 100,
