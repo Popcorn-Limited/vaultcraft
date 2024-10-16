@@ -1,7 +1,6 @@
 import MainButtonGroup from "@/components/common/MainButtonGroup";
 import InputNumber from "@/components/input/InputNumber";
-import { feeAtom } from "@/lib/atoms";
-import { VaultData, VaultsV2FeeConfig } from "@/lib/types";
+import { VaultData,  VaultsV2FeeConfig } from "@/lib/types";
 import { validateInput } from "@/lib/utils/helpers";
 import { setV2Fees } from "@/lib/vault/management/interactions";
 import { useEffect, useState } from "react";

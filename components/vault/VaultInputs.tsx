@@ -14,17 +14,15 @@ import { vaultsAtom } from "@/lib/atoms/vaults"
 import { VaultRouterByChain } from "@/lib/constants"
 import { gaugeDeposit, gaugeWithdraw } from "@/lib/gauges/interactions"
 import { showErrorToast, showLoadingToast, showSuccessToast } from "@/lib/toasts"
-import { Clients, SmartVaultActionType, Token, TokenByAddress, TokenType, VaultData, ZapProvider } from "@/lib/types"
+import { Balance, Clients, SmartVaultActionType, Token, TokenByAddress, TokenType, VaultData, ZapProvider } from "@/lib/types"
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors"
-import { formatNumber, formatTwoDecimals, safeRound } from "@/lib/utils/formatBigNumber"
-import { formatBalance, formatBalanceUSD, validateInput } from "@/lib/utils/helpers"
+import { EMPTY_BALANCE, formatBalance, formatBalanceUSD, NumberFormatter } from "@/lib/utils/helpers"
 import { vaultDeposit, vaultDepositAndStake, vaultRedeem, vaultUnstakeAndWithdraw } from "@/lib/vault/interactions"
 import zap, { getZapProvider, handleZapAllowance } from "@/lib/vault/zap"
 import { ArrowDownIcon } from "@heroicons/react/24/outline"
-import { useConnectModal } from "@rainbow-me/rainbowkit"
 import { useAtom } from "jotai"
 import { useState } from "react"
-import { Address, erc20Abi, formatUnits, maxUint256, PublicClient } from "viem"
+import { Address, erc20Abi, formatUnits, maxUint256, parseUnits, PublicClient } from "viem"
 import getVaultErrorMessage from "@/lib/vault/errorMessage";
 import MainButtonGroup from "../common/MainButtonGroup";
 
@@ -46,9 +44,6 @@ export default function VaultInputs({
   const gauge = tokenOptions.find(t => t.address === vaultData.gauge)
 
   const { address: account, chain } = useAccount();
-  const { switchChainAsync } = useSwitchChain();
-  const { openConnectModal } = useConnectModal();
-
   const [tokens] = useAtom(tokensAtom)
   const [inputToken, setInputToken] = useState<Token>();
   const [outputToken, setOutputToken] = useState<Token>();
@@ -58,7 +53,7 @@ export default function VaultInputs({
     SmartVaultActionType.Deposit
   );
 
-  const [inputBalance, setInputBalance] = useState<string>("0");
+  const [inputBalance, setInputBalance] = useState<Balance>(EMPTY_BALANCE);
   const [isDeposit, setIsDeposit] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string>("");
 
@@ -168,7 +163,7 @@ export default function VaultInputs({
   }
 
   function switchTokens() {
-    setInputBalance("0")
+    setInputBalance(EMPTY_BALANCE)
     setShowModal(false)
 
     if (isDeposit) {
@@ -197,8 +192,19 @@ export default function VaultInputs({
   function handleChangeInput(e: any) {
     if (!inputToken || !outputToken) return
     let value = e.currentTarget.value;
-    value = validateInput(value).isValid ? value : "0"
-    setInputBalance(value);
+
+    const [integers, decimals] = String(value).split('.');
+    let inputAmt = value;
+
+    // if precision is more than token decimal, cut it
+    if (decimals?.length > inputToken.decimals) {
+      inputAmt = `${integers}.${decimals.slice(0, inputToken.decimals)}`;
+    }
+
+    // covert string amt to bigint
+    const newAmt = parseUnits(inputAmt, inputToken.decimals)
+
+    setInputBalance({ value: newAmt, formatted: inputAmt, formattedUSD: String(Number(inputAmt) * (inputToken.price || 0)) });
     setErrorMessage(getVaultErrorMessage(value, vaultData, inputToken, outputToken, isDeposit, action, tokens))
     setShowModal(false)
   }
@@ -210,7 +216,7 @@ export default function VaultInputs({
 
   async function findZapProvider(): Promise<boolean> {
     if (!inputToken || !outputToken || !asset || !account) return false
-    const val = Number(inputBalance) * (10 ** inputToken.decimals)
+    const val = Number(inputBalance.value)
 
     let newZapProvider = zapProvider
     if (newZapProvider === ZapProvider.none && [SmartVaultActionType.ZapDeposit, SmartVaultActionType.ZapDepositAndStake, SmartVaultActionType.ZapUnstakeAndWithdraw, SmartVaultActionType.ZapWithdrawal].includes(action)) {
@@ -253,7 +259,7 @@ export default function VaultInputs({
       }
       onMaxClick={handleMaxClick}
       chainId={chainId}
-      value={inputBalance}
+      value={inputBalance.formatted}
       onChange={handleChangeInput}
       selectedToken={inputToken}
       errorMessage={errorMessage}
@@ -316,8 +322,8 @@ export default function VaultInputs({
       onMaxClick={() => { }}
       chainId={chainId}
       value={
-        (Number(inputBalance) * Number(inputToken?.price)) /
-        Number(outputToken?.price) || 0
+        Number(inputBalance.formattedUSD) /
+        (outputToken?.price || 0)
       }
       onChange={() => { }}
       selectedToken={outputToken}
@@ -357,10 +363,10 @@ export default function VaultInputs({
       {
         vaultData.address === "0xCe3Ac66020555EdcE9b54dAD5EC1c35E0478B887" &&
         !isDeposit &&
-        Number(inputBalance) > Number(formatBalance(vaultData.withdrawalLimit, vault?.decimals || 0)) && // Input > withdrawalLimit
+        inputBalance.value > vaultData.withdrawalLimit && // Input > withdrawalLimit
         <div className="w-full bg-secondaryYellow bg-opacity-20 border border-secondaryYellow rounded-lg p-4 mb-4">
           <p className="text-secondaryYellow">
-            At this time, {formatTwoDecimals(100 - (Number(vaultData.liquid) / Number(vaultData.totalAssets) * 100))} % of the funds are being utilized in the LBTC Smart Vault&apos;s strategies. You cannot withdraw more than the specified withdrawal limit of {formatBalance(vaultData.withdrawalLimit, vault?.decimals || 0)} {vault?.symbol}. Funds available for withdrawal will be released once a day at 18:00 CET. Please check back later. In the near future, withdrawals will be automated with withdrawal queues. Please log a ticket on Discord if you need more help:{" "}
+            At this time, {NumberFormatter.format(100 - (Number(vaultData.liquid) / Number(vaultData.totalAssets) * 100))} % of the funds are being utilized in the LBTC Smart Vault&apos;s strategies. You cannot withdraw more than the specified withdrawal limit of {formatBalance(vaultData.withdrawalLimit, vault?.decimals || 0)} {vault?.symbol}. Funds available for withdrawal will be released once a day at 18:00 CET. Please check back later. In the near future, withdrawals will be automated with withdrawal queues. Please log a ticket on Discord if you need more help:{" "}
             <a
               href="https://discord.com/channels/810280562626658334/1178741499605815448"
               target="_blank"
@@ -377,9 +383,9 @@ export default function VaultInputs({
         disabled={
           (!isDeposit
             && vaultData.address === "0xCe3Ac66020555EdcE9b54dAD5EC1c35E0478B887"
-            && Number(inputBalance) > Number(formatBalance(vaultData.withdrawalLimit, vault?.decimals || 0)) // Input > withdrawalLimit
+            && inputBalance.value > vaultData.withdrawalLimit // Input > withdrawalLimit
           ) ||
-          !account || !inputToken || inputBalance === "0" ||  // Not connected / selected properly
+          !account || !inputToken || inputBalance.formatted === "0" ||  // Not connected / selected properly
           showModal // Already in transactions
         }
       />
@@ -536,7 +542,7 @@ function Interaction({ inputToken, outputToken, amount, zapProvider, action, vau
 }
 
 function getDescription(inputToken: Token, outputToken: Token, amount: number, action: Action, vaultData: VaultData) {
-  const val = formatNumber(amount / (10 ** inputToken.decimals))
+  const val = formatBalance(amount, inputToken.decimals)
   switch (action) {
     case Action.depositApprove:
       return `Approving ${val} ${inputToken.symbol} for Vault deposit.`

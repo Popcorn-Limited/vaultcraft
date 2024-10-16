@@ -1,7 +1,7 @@
 import { Token } from "@/lib/types";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
-import { Address, formatUnits, PublicClient } from "viem";
+import { Address, PublicClient } from "viem";
 import axios from "axios";
 import { AnyToAnyDepositorAbi, PendleRouterByChain } from "@/lib/constants";
 import { tokensAtom } from "@/lib/atoms";
@@ -10,11 +10,10 @@ import InputTokenWithError from "@/components/input/InputTokenWithError";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import MainActionButton from "@/components/button/MainActionButton";
 import { handleAllowance } from "@/lib/approve";
-import { formatNumber, safeRound } from "@/lib/utils/formatBigNumber";
-import { validateInput } from "@/lib/utils/helpers";
+import { NumberFormatter, validateInput } from "@/lib/utils/helpers";
 import { useAccount, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
 import { claimReserve, pullFunds, pushFunds } from "@/lib/vault/management/strategyInteractions";
-import { PassThroughProps } from "./AnyToAnyV1DepositorSettings";
+import { PassThroughProps } from "@/components/manage/strategy/AnyToAnyV1DepositorSettings";
 import TabSelector from "@/components/common/TabSelector";
 import { ZapAssetAddressesByChain } from "@/lib/constants";
 import { showErrorToast } from "@/lib/toasts";
@@ -88,26 +87,26 @@ export default function ConvertTokenSection({ strategy, asset, yieldToken, setti
           <p className="text-xl">Price</p>
           <span className="flex space-x-2">
             <p>Assets per. YieldToken:</p>
-            <p className="text-customGray300">1 {yieldToken.symbol} = {formatNumber(settings.bqPrice / 1e18)} {asset.symbol}</p>
+            <p className="text-customGray300">1 {yieldToken.symbol} = {NumberFormatter.format(settings.bqPrice / 1e18)} {asset.symbol}</p>
           </span>
           <span className="flex space-x-2">
             <p>YieldTokens per. Asset:</p>
-            <p className="text-customGray300">1 {asset.symbol} = {formatNumber(settings.qbPrice / 1e18)} {yieldToken.symbol}</p>
+            <p className="text-customGray300">1 {asset.symbol} = {NumberFormatter.format(settings.qbPrice / 1e18)} {yieldToken.symbol}</p>
           </span>
         </div>
         <div className="w-1/2 px-4">
           <p className="text-xl">Balance</p>
           <span className="flex space-x-2">
             <p>Assets:</p>
-            <p className="text-customGray300">{formatNumber(settings.assetBal / (10 ** asset.decimals))} {asset.symbol}</p>
+            <p className="text-customGray300">{NumberFormatter.format(settings.assetBal / (10 ** asset.decimals))} {asset.symbol}</p>
           </span>
           <span className="flex space-x-2">
             <p>YieldTokens:</p>
-            <p className="text-customGray300">{formatNumber(settings.yieldTokenBal / (10 ** yieldToken.decimals))} {yieldToken.symbol}</p>
+            <p className="text-customGray300">{NumberFormatter.format(settings.yieldTokenBal / (10 ** yieldToken.decimals))} {yieldToken.symbol}</p>
           </span>
           <span className="flex space-x-2">
             <p>Total Assets:</p>
-            <p className="text-customGray300">{formatNumber(settings.totalAssets / (10 ** asset.decimals))} {asset.symbol}</p>
+            <p className="text-customGray300">{NumberFormatter.format(settings.totalAssets / (10 ** asset.decimals))} {asset.symbol}</p>
           </span>
         </div>
       </div>
@@ -264,9 +263,9 @@ function ConvertToken({ token, strategy, asset, yieldToken, settings, chainId, u
             allowInput={true}
           />
           <p
-            onClick={() => handleChangeInput({ currentTarget: { value: formatNumber(depositLimit).replace(",", ".") } })}
+            onClick={() => handleChangeInput({ currentTarget: { value: NumberFormatter.format(depositLimit).replace(",", ".") } })}
           >
-            {isAsset ? "Withdraw" : "Deposit"} Limit: {formatNumber(depositLimit)}
+            {isAsset ? "Withdraw" : "Deposit"} Limit: {NumberFormatter.format(depositLimit)}
           </p>
         </div>
         <div className="relative py-4">

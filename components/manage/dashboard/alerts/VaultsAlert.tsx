@@ -2,8 +2,7 @@ import { tokensAtom } from "@/lib/atoms";
 import { vaultsAtom } from "@/lib/atoms/vaults";
 import { VaultData, VaultLabel } from "@/lib/types";
 import { ChainById, SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
-import { formatNumber, formatTwoDecimals } from "@/lib/utils/formatBigNumber";
-import { formatBalanceUSD } from "@/lib/utils/helpers";
+import { formatBalanceUSD, NumberFormatter } from "@/lib/utils/helpers";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 
@@ -53,7 +52,7 @@ export default function VaultsAlert() {
                           : vault.strategies[0].metadata.protocol}
                       </p>
                       <p className="text-secondaryYellow text-sm">
-                        {`Free up cash for withdrawals. Either deallocate funds from strategies or convert YieldTokens in strategies. (${formatTwoDecimals(Number(vault.liquid / vault.totalAssets * BigInt(100)))}% < 20% )`}
+                        {`Free up cash for withdrawals. Either deallocate funds from strategies or convert YieldTokens in strategies. (${NumberFormatter.format(Number(vault.liquid / vault.totalAssets * BigInt(100)))}% < 20% )`}
                       </p>
                     </div>
                   </div>

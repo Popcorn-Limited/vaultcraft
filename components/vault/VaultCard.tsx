@@ -1,14 +1,9 @@
 import { useEffect, useState } from "react";
 import { isAddress, zeroAddress } from "viem";
 import { useAtom } from "jotai";
-import {
-  NumberFormatter,
-  formatAndRoundNumber,
-  formatTwoDecimals,
-} from "@/lib/utils/formatBigNumber";
 import type { Token, VaultData } from "@/lib/types";
 import { tokensAtom } from "@/lib/atoms";
-import { cn, formatBalance } from "@/lib/utils/helpers";
+import { cn, formatBalance,NumberFormatter } from "@/lib/utils/helpers";
 import { useRouter } from "next/router";
 import AssetWithName from "@/components/common/AssetWithName";
 import CardStat from "@/components/common/CardStat";
@@ -42,10 +37,10 @@ export default function VaultCard({
       const vault_ = tokens[chainId][vaultAddress];
       const gauge_ = gaugeAddress && gaugeAddress !== zeroAddress ? tokens[chainId][gaugeAddress] : undefined
 
-      let depositValue_ = Number(vault!.balance.formattedUSD)
-      if (gauge_) depositValue_ += Number(gauge!.balance.formattedUSD)
+      let depositValue_ = Number(vault_!.balance.formattedUSD)
+      if (gauge_) depositValue_ += Number(gauge_!.balance.formattedUSD)
 
-      setWalletValue(Number(asset!.balance.formattedUSD))
+      setWalletValue(Number(asset_!.balance.formattedUSD))
       setDepositValue(depositValue_)
 
       setAsset(asset_);
@@ -108,7 +103,7 @@ export default function VaultCard({
         <CardStat
           id={`${baseTooltipId}-deposit`}
           label="Your Deposit"
-          value={`$ ${depositValue < 1 ? "0" : depositValue}`}
+          value={`$ ${depositValue < 1 ? "0" : NumberFormatter.format(depositValue)}`}
           secondaryValue={`${depositValue < 1 ? "0" :
             (
               !!gauge ?
@@ -128,7 +123,7 @@ export default function VaultCard({
         <CardStat
           id={`${baseTooltipId}-vApy`}
           label="vAPY"
-          value={`${formatTwoDecimals(vaultData.apyData.totalApy)} %`}
+          value={`${NumberFormatter.format(vaultData.apyData.totalApy)} %`}
           tooltip="Current variable APY of the vault"
         />
         {vaultData?.gaugeData?.upperAPR && vaultData?.gaugeData?.upperAPR > 0
@@ -137,28 +132,28 @@ export default function VaultCard({
             <CardStat
               id={`${baseTooltipId}-minBoost`}
               label="Min Boost APR"
-              value={`${formatTwoDecimals(vaultData?.gaugeData?.lowerAPR)} %`}
-              secondaryValue={gaugeData && gaugeData?.rewardApy.apy > 0 ? `+ ${formatTwoDecimals(gaugeData?.rewardApy.apy)}%` : undefined}
+              value={`${NumberFormatter.format(vaultData?.gaugeData?.lowerAPR)} %`}
+              secondaryValue={gaugeData && gaugeData?.rewardApy.apy > 0 ? `+ ${NumberFormatter.format(gaugeData?.rewardApy.apy)}%` : undefined}
               tooltip={`Minimum oVCX boost APR based on most current epoch's distribution. (Based on the current emissions for this gauge of ${NumberFormatter.format(vaultData?.gaugeData.annualEmissions / 5)} oVCX p. year)`}
             />
             <CardStat
               id={`${baseTooltipId}-maxBoost`}
               label="Max Boost APR"
-              value={`${formatTwoDecimals(vaultData?.gaugeData?.upperAPR)} %`}
-              secondaryValue={gaugeData && gaugeData?.rewardApy.apy > 0 ? `+ ${formatTwoDecimals(gaugeData?.rewardApy.apy)}%` : undefined}
+              value={`${NumberFormatter.format(vaultData?.gaugeData?.upperAPR)} %`}
+              secondaryValue={gaugeData && gaugeData?.rewardApy.apy > 0 ? `+ ${NumberFormatter.format(gaugeData?.rewardApy.apy)}%` : undefined}
               tooltip={`Maximum oVCX boost APR based on most current epoch's distribution. (Based on the current emissions for this gauge of ${NumberFormatter.format(vaultData?.gaugeData.annualEmissions)} oVCX p. year)`}
             />
             <CardStat
               id="boost"
               label="Your Boost"
-              value={`${formatTwoDecimals(boost)} X`}
+              value={`${NumberFormatter.format(boost)} X`}
               tooltip="Your Boost depends on the proportion of locked liquidity, veVCX, you provide relative to the total veVCX held by all gauge holders. For instance, to receive the maximum 5x boost, if you own 10% of the supply of Gauge A you also would need to own 10% of cumulative veVCX supply of all gauge share holders to earn the maximum boost of 5x. Liquidity providers are guaranteed a minimum boost of 1x."
             />
             <CardStat
               id="your-apy"
               label="Your Boost APY"
-              value={`${formatTwoDecimals(boost * vaultData.gaugeData?.lowerAPR!)} %`}
-              tooltip={`Your rewards APY depends on the proportion of locked liquidity, veVCX, you provide relative to the total veVCX held by all gauge holders. For instance, to receive the maximum rewards APY, if you own 10% of the supply of Gauge A you also would need to own 10% of cumulative veVCX supply of all gauge share holders to earn the maximum rewards apy of ${formatTwoDecimals(vaultData.gaugeData?.upperAPR!)} %. Liquidity providers are guaranteed a minimum rewards apy of ${formatTwoDecimals(vaultData.gaugeData?.lowerAPR!)}`}
+              value={`${NumberFormatter.format(boost * vaultData.gaugeData?.lowerAPR!)} %`}
+              tooltip={`Your rewards APY depends on the proportion of locked liquidity, veVCX, you provide relative to the total veVCX held by all gauge holders. For instance, to receive the maximum rewards APY, if you own 10% of the supply of Gauge A you also would need to own 10% of cumulative veVCX supply of all gauge share holders to earn the maximum rewards apy of ${NumberFormatter.format(vaultData.gaugeData?.upperAPR!)} %. Liquidity providers are guaranteed a minimum rewards apy of ${NumberFormatter.format(vaultData.gaugeData?.lowerAPR!)}`}
             />
           </>
           : <></>

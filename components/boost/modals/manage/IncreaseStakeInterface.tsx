@@ -1,10 +1,7 @@
 import { Dispatch, SetStateAction } from "react";
-import {
-  formatAndRoundBigNumber,
-} from "@/lib/utils/formatBigNumber";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import { calcDaysToUnlock, calculateVeOut } from "@/lib/gauges/utils";
-import { handleChangeInput, handleMaxClick, validateInput } from "@/lib/utils/helpers";
+import { formatBalance, handleChangeInput, handleMaxClick } from "@/lib/utils/helpers";
 import { useAtom } from "jotai";
 import { tokensAtom } from "@/lib/atoms";
 import { VCX_LP } from "@/lib/constants/addresses";
@@ -57,7 +54,7 @@ export default function IncreaseStakeInterface({
         <div className="flex flex-row items-center justify-between text-customGray300">
           <p>Current Lock Amount</p>
           <p>
-            {lockedBal ? formatAndRoundBigNumber(lockedBal?.amount, 18) : ""}{" "}
+            {lockedBal ? formatBalance(lockedBal?.amount, 18) : ""}{" "}
             VCX
           </p>
         </div>

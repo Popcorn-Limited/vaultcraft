@@ -30,7 +30,7 @@ import Modal from "@/components/modal/Modal";
 import BridgeModal from "@/components/bridge/BridgeModal";
 import axios from "axios";
 import BroadcastVeBalanceInterface from "@/components/boost/modals/manage/BroadcastVeBalanceInterface";
-import { NumberFormatter } from "@/lib/utils/formatBigNumber";
+import { NumberFormatter } from "@/lib/utils/helpers";
 import { tokensAtom } from "@/lib/atoms";
 import ResponsiveTooltip from "@/components/common/Tooltip";
 import BoostVaultsTable from "@/components/boost/BoostVaultsTable";

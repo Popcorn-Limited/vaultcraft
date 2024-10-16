@@ -1,13 +1,11 @@
 import { type Address } from "viem";
 import { useAccount } from "wagmi";
 import Slider from "rc-slider";
-import { formatAndRoundNumber, formatTwoDecimals, NumberFormatter } from "@/lib/utils/formatBigNumber";
 import { VaultLabel, type VaultData } from "@/lib/types";
-import { cn } from "@/lib/utils/helpers";
+import { cn, NumberFormatter } from "@/lib/utils/helpers";
 import AssetWithName from "@/components/common/AssetWithName";
 import { type PropsWithChildren, useEffect, useState } from "react";
 import useGaugeWeights from "@/lib/gauges/useGaugeWeights";
-import TokenIcon from "@/components/common/TokenIcon";
 import useWeeklyEmissions from "@/lib/gauges/useWeeklyEmissions";
 import CardStat from "@/components/common/CardStat";
 import { VE_VCX } from "@/lib/constants";
@@ -109,9 +107,9 @@ export default function BoostVaultCard({
         <CardStat
           id={`${baseTooltipId}-boost`}
           label="Current Boost"
-          value={`${formatTwoDecimals(gaugeData?.upperAPR || 0)} %`}
-          secondaryValue={`${formatTwoDecimals(gaugeData?.lowerAPR || 0)} %`}
-          tooltip={`Earn between ${formatTwoDecimals(gaugeData?.lowerAPR || 0)}-${formatTwoDecimals(gaugeData?.upperAPR || 0)} % oVCX boost APR depending your balance of veVCX. (Based on the current emissions of ${formatTwoDecimals((gaugeData?.annualEmissions || 0) / 5)}-${formatTwoDecimals(gaugeData?.annualEmissions || 0)} oVCX p.Year)`}
+          value={`${NumberFormatter.format(gaugeData?.upperAPR || 0)} %`}
+          secondaryValue={`${NumberFormatter.format(gaugeData?.lowerAPR || 0)} %`}
+          tooltip={`Earn between ${NumberFormatter.format(gaugeData?.lowerAPR || 0)}-${NumberFormatter.format(gaugeData?.upperAPR || 0)} % oVCX boost APR depending your balance of veVCX. (Based on the current emissions of ${NumberFormatter.format((gaugeData?.annualEmissions || 0) / 5)}-${NumberFormatter.format(gaugeData?.annualEmissions || 0)} oVCX p.Year)`}
         />
         <CardStat
           id={`${baseTooltipId}-vote-weight`}

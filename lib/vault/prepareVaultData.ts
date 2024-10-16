@@ -228,7 +228,7 @@ export async function addStrategyData(vaults: VaultDataByAddress, strategies: { 
 
         // calc allocation in assets
         const allocation = ((strategyBalances[n].result as bigint ?? BigInt(0))
-          * parseEther(strategyData.assetsPerShare.toLocaleString("fullwide", { useGrouping: false }))
+          * parseEther(strategyData.assetsPerShare.toLocaleString("fullwide", { useGrouping: false }).replace(",", "."))
         ) / parseEther("1")
 
         // calc allocation percentage
@@ -266,7 +266,7 @@ export async function addStrategyData(vaults: VaultDataByAddress, strategies: { 
     vaults[address].apyData.totalApy = apyBase + apyRewards;
     vaults[address].apyData.targetApy = apyBase + apyRewards;
     vaults[address].liquid = liquid + vaults[address].idle;
-    vaults[address].withdrawalLimit = ((liquid + vaults[address].idle) * parseEther("1")) / parseEther(vaults[address].assetsPerShare.toLocaleString("fullwide", { useGrouping: false }))
+    vaults[address].withdrawalLimit = BigInt((Math.ceil(Number(liquid + vaults[address].idle) / vaults[address].assetsPerShare)).toLocaleString("fullwide", { useGrouping: false }).replace(",", "."))
   })
 
 

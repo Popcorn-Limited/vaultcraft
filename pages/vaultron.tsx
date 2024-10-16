@@ -5,8 +5,7 @@ import MainActionButton from "@/components/button/MainActionButton";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import { useAtom } from "jotai";
 import { vaultronAtom } from "@/lib/atoms";
-import { NumberFormatter } from "@/lib/utils/formatBigNumber";
-
+import { NumberFormatter } from "@/lib/utils/helpers";
 const AIRDROP_VCX = 1_000_000
 
 const LevelNameByValue: { [key: number]: string } = {

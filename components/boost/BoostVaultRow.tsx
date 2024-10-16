@@ -2,13 +2,9 @@ import { type Address } from "viem";
 import { useAtom } from "jotai";
 import { useAccount } from "wagmi";
 import Slider from "rc-slider";
-import {
-  NumberFormatter,
-  formatTwoDecimals,
-} from "@/lib/utils/formatBigNumber";
 import { VaultLabel, type VaultData } from "@/lib/types";
 import { tokensAtom } from "@/lib/atoms";
-import { cn } from "@/lib/utils/helpers";
+import { cn,NumberFormatter } from "@/lib/utils/helpers";
 import AssetWithName from "@/components/common/AssetWithName";
 import { Fragment, useEffect, useState } from "react";
 import useGaugeWeights from "@/lib/gauges/useGaugeWeights";
@@ -125,12 +121,12 @@ export default function BoostVaultRow({
         </td>
 
         <td className="text-right">
-          <WithTooltip content={`Earn between ${formatTwoDecimals(gaugeData?.lowerAPR || 0)}-${formatTwoDecimals(gaugeData?.upperAPR || 0)} % oVCX boost APR depending your balance of veVCX. (Based on the current emissions of ${formatTwoDecimals((gaugeData?.annualEmissions || 0) / 5)}-${formatTwoDecimals(gaugeData?.annualEmissions || 0)} oVCX p.Year)`}>
+          <WithTooltip content={`Earn between ${NumberFormatter.format(gaugeData?.lowerAPR || 0)}-${NumberFormatter.format(gaugeData?.upperAPR || 0)} % oVCX boost APR depending your balance of veVCX. (Based on the current emissions of ${NumberFormatter.format((gaugeData?.annualEmissions || 0) / 5)}-${NumberFormatter.format(gaugeData?.annualEmissions || 0)} oVCX p.Year)`}>
             <p className="text-lg">
-              {formatTwoDecimals(gaugeData?.upperAPR || 0)} %
+              {NumberFormatter.format(gaugeData?.upperAPR || 0)} %
             </p>
             <p className="text-sm -mt-0.5 text-customGray200">
-              {formatTwoDecimals(gaugeData?.lowerAPR || 0)} %
+              {NumberFormatter.format(gaugeData?.lowerAPR || 0)} %
             </p>
           </WithTooltip>
         </td>

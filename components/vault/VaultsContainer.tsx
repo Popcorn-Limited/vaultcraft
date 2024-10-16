@@ -1,8 +1,6 @@
 import NoSSR from "react-no-ssr";
-import { Fragment, useEffect, useState } from "react";
-import { useAccount, useBalance } from "wagmi";
+import { useEffect, useState } from "react";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
-import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import useNetworkFilter from "@/lib/useNetworkFilter";
 import NetworkFilter from "@/components/network/NetworkFilter";
 import MainActionButton from "@/components/button/MainActionButton";
@@ -21,7 +19,7 @@ import {
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import OptionTokenExerciseModal from "@/components/optionToken/exercise/OptionTokenExerciseModal";
 import VaultCard from "@/components/vault/VaultCard";
-
+import { NumberFormatter } from "@/lib/utils/helpers";
 import SearchBar from "@/components/input/SearchBar";
 import VaultsSorting from "@/components/vault/VaultsSorting";
 import VaultsTable from "@/components/vault/VaultsTable";

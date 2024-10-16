@@ -4,7 +4,6 @@ import { Token } from "@/lib/types";
 import TokenIcon from "@/components/common/TokenIcon";
 import { ZapAssetAddressesByChain } from "@/lib/constants";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { formatNumber } from "@/lib/utils/formatBigNumber";
 
 interface SearchTokenProps {
   selectToken: (token: Token) => void;

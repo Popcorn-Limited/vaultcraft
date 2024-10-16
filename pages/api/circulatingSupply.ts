@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
-import https from "https";
 import { DuneQueryResult } from "@/lib/types";
 
 export default async function handler(

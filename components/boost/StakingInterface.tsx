@@ -4,7 +4,7 @@ import { useAccount, useBalance, useBlockNumber } from "wagmi";
 import { getVotePeriodEndTime } from "@/lib/gauges/utils";
 import MainActionButton from "@/components/button/MainActionButton";
 import useLockedBalanceOf from "@/lib/gauges/useLockedBalanceOf";
-import { NumberFormatter } from "@/lib/utils/formatBigNumber";
+import { NumberFormatter } from "@/lib/utils/helpers";
 import { Address, formatEther } from "viem";
 import { OptionTokenByChain, VCX_LP, VOTING_ESCROW } from "@/lib/constants/addresses";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";

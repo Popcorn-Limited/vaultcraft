@@ -1,4 +1,3 @@
-import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import { Dispatch, SetStateAction } from "react";
 import {
   useAccount,
@@ -18,7 +17,7 @@ import getGaugeRewards from "@/lib/gauges/getGaugeRewards";
 import { vaultsAtom } from "@/lib/atoms/vaults";
 import NetworkSticker from "@/components/network/NetworkSticker";
 import TokenIcon from "@/components/common/TokenIcon";
-import { handleSwitchChain } from "@/lib/utils/helpers";
+import { handleSwitchChain, NumberFormatter } from "@/lib/utils/helpers";
 
 interface OptionTokenInterfaceProps {
   setShowOptionTokenModal?: Dispatch<SetStateAction<boolean>>;

@@ -7,13 +7,14 @@ import { StakingVaultAbi } from "@/lib/constants";
 import { showLoadingToast } from "@/lib/toasts";
 import { Clients, Token } from "@/lib/types";
 import { RPC_URLS } from "@/lib/utils/connectors";
-import { formatAndRoundNumber } from "@/lib/utils/formatBigNumber";
-import { handleCallResult, simulateCall } from "@/lib/utils/helpers";
+import { handleCallResult, simulateCall, NumberFormatter } from "@/lib/utils/helpers";
 import { useEffect, useState } from "react";
 import { Address, createPublicClient, http } from "viem";
 import { arbitrum } from "viem/chains";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 import axios from "axios";
+
+
 async function exitLockVault({ account, vault, clients }: { account: Address, vault: Address, clients: Clients }) {
   showLoadingToast("Exiting Lock Vault...");
 
@@ -155,7 +156,7 @@ export default function LockVaults() {
                       <CardStat
                         id={`${vault.address.slice(1)}-deposit`}
                         label="Your Deposit"
-                        value={`${formatAndRoundNumber(vault.balance, vault.token.decimals)}`}
+                        value={`${NumberFormatter.format(Number(vault.balance.formatted))}`}
                         tooltip="Vault Shares held in your wallet"
                       />
                       <CardStat

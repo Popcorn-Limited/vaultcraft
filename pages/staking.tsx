@@ -1,24 +1,23 @@
-import { Clients, Token, TokenByAddress, TokenType, VaultData, ZapProvider } from "@/lib/types";
+import { Clients, Token, TokenByAddress, ZapProvider } from "@/lib/types";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import NoSSR from "react-no-ssr";
 import { showErrorToast, showLoadingToast, showSuccessToast } from "@/lib/toasts";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { ArrowDownIcon, Square2StackIcon } from "@heroicons/react/24/outline";
-import { Networth, networthAtom, tokensAtom, TVL, tvlAtom } from "@/lib/atoms";
-import { FEE_RECIPIENT_PROXY, OptionTokenByChain, ST_VCX, VCX, VeTokenByChain, ZapAssetAddressesByChain } from "@/lib/constants";
-import { Address, createPublicClient, erc20Abi, formatUnits, http, isAddress, parseUnits, PublicClient, zeroAddress } from "viem";
+import { networthAtom, tokensAtom, tvlAtom } from "@/lib/atoms";
+import { FEE_RECIPIENT_PROXY, OptionTokenByChain, ST_VCX, VCX, ZapAssetAddressesByChain } from "@/lib/constants";
+import { Address, createPublicClient, http, parseUnits } from "viem";
 import { mainnet } from "viem/chains";
-import { RPC_URLS, SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
+import { RPC_URLS } from "@/lib/utils/connectors";
 import { LockVaultAbi } from "@/lib/constants/abi/LockVault";
 import { useAccount, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import LargeCardStat from "@/components/common/LargeCardStat";
-import { formatAndRoundNumber, formatNumber, formatTwoDecimals, safeRound } from "@/lib/utils/formatBigNumber";
 import NetworkSticker from "@/components/network/NetworkSticker";
 import TokenIcon from "@/components/common/TokenIcon";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
-import { formatBalance, formatBalanceUSD, handleSwitchChain, validateInput } from "@/lib/utils/helpers";
+import { formatBalance, formatBalanceUSD, handleSwitchChain, NumberFormatter, validateInput } from "@/lib/utils/helpers";
 import zap, { getZapProvider, handleZapAllowance } from "@/lib/vault/zap";
 import MainActionButton from "@/components/button/MainActionButton";
 import ActionSteps from "@/components/vault/ActionSteps";
@@ -253,7 +252,7 @@ export default function Staking() {
                   <LargeCardStat
                     id={"wallet"}
                     label="Your Wallet"
-                    value={walletValue < 1 ? "$ 0" : `$ ${formatTwoDecimals(walletValue)}`}
+                    value={walletValue < 1 ? "$ 0" : `$ ${NumberFormatter.format(walletValue)}`}
                     secondaryValue={walletValue < 1 ? `0 ${asset.symbol}` : `${asset.balance.formatted} ${asset.symbol}`}
                     tooltip="Value of deposit assets held in your wallet"
                   />
@@ -262,7 +261,7 @@ export default function Staking() {
                   <LargeCardStat
                     id={"deposits"}
                     label="Deposits"
-                    value={depositValue < 1 ? "$ 0" : `$ ${formatTwoDecimals(depositValue)}`}
+                    value={depositValue < 1 ? "$ 0" : `$ ${NumberFormatter.format(depositValue)}`}
                     // @dev Shares are always minted 1:1 so we dont need to convert the vault balance to asset balance
                     secondaryValue={depositValue < 1 ? `0 ${asset.symbol}` : `${vault.balance.formatted} ${asset.symbol}`}
                     tooltip="Value of your vault deposits"
@@ -272,7 +271,7 @@ export default function Staking() {
                   <LargeCardStat
                     id={"tvl"}
                     label="TVL"
-                    value={`$ ${tvl < 1 ? "0" : formatTwoDecimals(tvl)
+                    value={`$ ${tvl < 1 ? "0" : NumberFormatter.format(tvl)
                       }`}
                     secondaryValue={
                       asset
@@ -297,7 +296,7 @@ export default function Staking() {
                       <LargeCardStat
                         id={"yourApy"}
                         label="Your APY"
-                        value={`${formatTwoDecimals(userLockVaultData.multiplier * 25)} %`}
+                        value={`${NumberFormatter.format(userLockVaultData.multiplier * 25)} %`}
                         tooltip="Current variable APY of the vault"
                       />
                     </div>
@@ -313,8 +312,8 @@ export default function Staking() {
                       <LargeCardStat
                         id={"rewards"}
                         label="Claimable"
-                        value={`$ ${formatNumber(((userLockVaultData.accruedVCX / 1e18) * asset.price) + ((userLockVaultData.accruedOVCX / 1e18) * tokens[1][OptionTokenByChain[1]].price))}`}
-                        tooltip={`${formatNumber(userLockVaultData.accruedVCX / 1e18)} VCX + ${formatNumber(userLockVaultData.accruedOVCX / 1e18)} oVCX`}
+                        value={`$ ${formatBalance((userLockVaultData.accruedVCX * asset.price) + (userLockVaultData.accruedOVCX * tokens[1][OptionTokenByChain[1]].price), 18)}`}
+                        tooltip={`${formatBalance(userLockVaultData.accruedVCX, 18)} VCX + ${formatBalance(userLockVaultData.accruedOVCX, 18)} oVCX`}
                       />
                       <div className="h-14">
                         <MainActionButton

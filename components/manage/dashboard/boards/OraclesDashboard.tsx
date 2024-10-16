@@ -2,7 +2,7 @@ import TabSelector from "@/components/common/TabSelector"
 import { strategiesAtom, tokensAtom } from "@/lib/atoms"
 import { vaultsAtom } from "@/lib/atoms/vaults"
 import { ChainById, GAUGE_NETWORKS, SUPPORTED_NETWORKS } from "@/lib/utils/connectors"
-import { formatNumber } from "@/lib/utils/formatBigNumber"
+import { NumberFormatter } from "@/lib/utils/helpers"
 import { useAtom } from "jotai"
 import { useState } from "react"
 
@@ -56,7 +56,7 @@ export default function OraclesDashboard({ dashboardData }: { dashboardData: any
                     oVCX
                   </td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm text-customGray200">
-                    $ {formatNumber(dashboardData?.vcxData[chain].ovcxPrice)}
+                    $ {NumberFormatter.format(dashboardData?.vcxData[chain].ovcxPrice)}
                   </td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm text-customGray200">
                     {new Date(Number(dashboardData?.vcxData[chain].lastUpdate) * 1000).toLocaleString()}
@@ -78,7 +78,7 @@ export default function OraclesDashboard({ dashboardData }: { dashboardData: any
                             {tokens[chain][log.log.args.base].symbol}
                           </td>
                           <td className="whitespace-nowrap px-3 py-4 text-sm text-customGray200">
-                            {formatNumber(Number(log.log.args.bqPrice) / 1e18)} {tokens[chain][log.log.args.quote].symbol}
+                            {NumberFormatter.format(Number(log.log.args.bqPrice) / 1e18)} {tokens[chain][log.log.args.quote].symbol}
                           </td>
                           <td className="whitespace-nowrap px-3 py-4 text-sm text-customGray200">
                             {new Date(Number(log.lastUpdate) * 1000).toLocaleString()}
@@ -89,7 +89,7 @@ export default function OraclesDashboard({ dashboardData }: { dashboardData: any
                             {tokens[chain][log.log.args.quote].symbol}
                           </td>
                           <td className="whitespace-nowrap px-3 py-4 text-sm text-customGray200">
-                            {formatNumber(Number(log.log.args.qbPrice) / 1e18)} {tokens[chain][log.log.args.base].symbol}
+                            {NumberFormatter.format(Number(log.log.args.qbPrice) / 1e18)} {tokens[chain][log.log.args.base].symbol}
                           </td>
                           <td className="whitespace-nowrap px-3 py-4 text-sm text-customGray200">
                             {new Date(Number(log.lastUpdate) * 1000).toLocaleString()}

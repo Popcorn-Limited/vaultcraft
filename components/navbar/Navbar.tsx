@@ -10,13 +10,13 @@ import SocialMediaLinks from "@/components/common/SocialMediaLinks";
 import NavbarLinks from "@/components/navbar/NavbarLinks";
 import { aaveAccountDataAtom } from "@/lib/atoms/lending";
 import { useAtom } from "jotai";
-import { formatToFixedDecimals } from "@/lib/utils/formatBigNumber";
 import { vaultsAtom } from "@/lib/atoms/vaults";
 import { useRouter } from "next/router";
 import ResponsiveTooltip from "@/components/common/Tooltip";
 import { VaultData } from "@/lib/types";
 import { getHealthFactorColor } from "@/lib/external/aave";
 import { isAddress } from "viem";
+import { NumberFormatter } from "@/lib/utils/helpers";
 
 export default function Navbar(): JSX.Element {
   const router = useRouter();
@@ -109,10 +109,7 @@ export default function Navbar(): JSX.Element {
                   userAccountData[chain.id].healthFactor
                 )}`}
               >
-                {formatToFixedDecimals(
-                  userAccountData[chain.id].healthFactor || 0,
-                  2
-                )}
+                {NumberFormatter.format(userAccountData[chain.id].healthFactor || 0)}
               </p>
               <ResponsiveTooltip
                 id="global-health-factor"
@@ -207,7 +204,7 @@ export default function Navbar(): JSX.Element {
                       <NavbarLinks />
                       <div className="md:hidden space-y-4">
                         <BuyVCXButton />
-                        <StakeVCXButton/>
+                        <StakeVCXButton />
                       </div>
                     </div>
                     <div className="pt-12 md:pt-0">

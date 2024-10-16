@@ -1,19 +1,12 @@
-import { isAddress, zeroAddress } from "viem";
+import { zeroAddress } from "viem";
 import { useAtom } from "jotai";
-
-import {
-  NumberFormatter,
-  formatAndRoundNumber,
-  formatTwoDecimals,
-} from "@/lib/utils/formatBigNumber";
 import type { Token, VaultData } from "@/lib/types";
 import { tokensAtom } from "@/lib/atoms";
-import { cn, formatBalance, roundToTwoDecimalPlaces } from "@/lib/utils/helpers";
+import { cn, formatBalance, NumberFormatter } from "@/lib/utils/helpers";
 import { useRouter } from "next/router";
 import AssetWithName from "@/components/common/AssetWithName";
 import { useEffect, useState } from "react";
-import { WithTooltip } from "@/components/common/Tooltip";
-import LargeCardStat from "../common/LargeCardStat";
+import LargeCardStat from "@/components/common/LargeCardStat";
 
 function depositValue(vault: Token, gauge?: Token): number {
   let result = Number(vault.balance.formattedUSD)
@@ -132,9 +125,9 @@ export default function VaultRow({
               ? `${formatBalance(vaultData.totalAssets, asset.decimals)} ${asset.symbol}`
               : "0 TKN"
           }
-          tooltip={`This Vault deploys its TVL $ ${vaultData.tvl < 1 ? "0" : formatTwoDecimals(vaultData.tvl)}
+          tooltip={`This Vault deploys its TVL $ ${vaultData.tvl < 1 ? "0" : NumberFormatter.format(vaultData.tvl)}
                       (${formatBalance(vaultData.totalAssets, asset?.decimals || 0)} ${asset?.symbol || "TKN"}) 
-                      in $ ${formatTwoDecimals(vaultData.strategies.reduce((a, b) => a + b.apyData.apyHist[b.apyData.apyHist.length - 1].tvl, 0))} 
+                      in $ ${NumberFormatter.format(vaultData.strategies.reduce((a, b) => a + b.apyData.apyHist[b.apyData.apyHist.length - 1].tvl, 0))} 
                       TVL of underlying protocols`}
         />
       </td>
@@ -142,28 +135,28 @@ export default function VaultRow({
         <LargeCardStat
           id={"vapy"}
           label="vAPY"
-          value={`${formatTwoDecimals(vaultData.apyData.targetApy)} %`}
-          secondaryValue={`${formatTwoDecimals(vaultData.apyData.baseApy + vaultData.apyData.rewardApy)} %`}
+          value={`${NumberFormatter.format(vaultData.apyData.targetApy)} %`}
+          secondaryValue={`${NumberFormatter.format(vaultData.apyData.baseApy + vaultData.apyData.rewardApy)} %`}
           tooltipChild={
             <div className="w-40">
               {vaultData.apyData.targetApy !== (vaultData.apyData.baseApy + vaultData.apyData.rewardApy) &&
                 <span className="w-full flex justify-between">
                   <p className="font-bold text-lg">Target vAPY:</p>
-                  <p className="font-bold text-lg">{formatTwoDecimals(vaultData.apyData.targetApy)} %</p>
+                  <p className="font-bold text-lg">{NumberFormatter.format(vaultData.apyData.targetApy)} %</p>
                 </span>
               }
               <span className="w-full flex justify-between">
                 <p className="font-bold text-lg">Total vAPY:</p>
-                <p className="font-bold text-lg">{formatTwoDecimals(vaultData.apyData.baseApy + vaultData.apyData.rewardApy)} %</p>
+                <p className="font-bold text-lg">{NumberFormatter.format(vaultData.apyData.baseApy + vaultData.apyData.rewardApy)} %</p>
               </span>
               <span className="w-full flex justify-between">
                 <p className="">Base vAPY:</p>
-                <p className="">{formatTwoDecimals(vaultData.apyData.baseApy)} %</p>
+                <p className="">{NumberFormatter.format(vaultData.apyData.baseApy)} %</p>
               </span>
               {vaultData.apyData.rewardApy && vaultData.apyData.rewardApy > 0
                 ? <span className="w-full flex justify-between">
                   <p className="">Reward vAPY:</p>
-                  <p className="">{formatTwoDecimals(vaultData.apyData.rewardApy)} %</p>
+                  <p className="">{NumberFormatter.format(vaultData.apyData.rewardApy)} %</p>
                 </span>
                 : <></>
               }
@@ -177,9 +170,9 @@ export default function VaultRow({
             <LargeCardStat
               id={"boost"}
               label="Boost APR"
-              value={`${formatTwoDecimals(vaultData.gaugeData?.lowerAPR * boostValue(vaultData, gauge))} %`}
+              value={`${NumberFormatter.format(vaultData.gaugeData?.lowerAPR * boostValue(vaultData, gauge))} %`}
               tooltip={`Minimum oVCX boost APR based on most current epoch's distribution. (Based on the current emissions for this gauge of
-                     ${formatTwoDecimals((vaultData?.gaugeData.annualEmissions / 5) * boostValue(vaultData, gauge))} oVCX p. year)`}
+                     ${NumberFormatter.format((vaultData?.gaugeData.annualEmissions / 5) * boostValue(vaultData, gauge))} oVCX p. year)`}
             />
           </td>
         )
@@ -191,14 +184,14 @@ export default function VaultRow({
             <LargeCardStat
               id={"add-rewards"}
               label="Add. Rewards"
-              value={`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData.gaugeData?.rewardApy.apy))} %`}
+              value={`${NumberFormatter.format(vaultData.gaugeData?.rewardApy.apy)} %`}
               tooltipChild={
                 <div className="w-42">
                   <p className="font-bold">Annual Rewards</p>
                   {vaultData.gaugeData?.rewardApy.rewards
                     .filter(reward => reward.emissions > 0)
                     .map(reward =>
-                      <p key={reward.address}>{NumberFormatter.format(reward.emissions)} {tokens[vaultData.chainId][reward.address].symbol} | ${NumberFormatter.format(reward.emissionsValue)} | {NumberFormatter.format(roundToTwoDecimalPlaces(reward.apy))}%</p>
+                      <p key={reward.address}>{NumberFormatter.format(reward.emissions)} {tokens[vaultData.chainId][reward.address].symbol} | ${NumberFormatter.format(reward.emissionsValue)} | {NumberFormatter.format(reward.apy)}%</p>
                     )}
                 </div>
               }

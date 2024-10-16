@@ -12,7 +12,6 @@ import { transmitRewards } from "@/lib/gauges/interactions";
 import { ActionStep, getSmartVaultActionSteps } from "@/lib/getActionSteps";
 import { showLoadingToast } from "@/lib/toasts";
 import { SimulationResponse, SmartVaultActionType, Token } from "@/lib/types";
-import { safeRound } from "@/lib/utils/formatBigNumber";
 import { handleCallResult, handleSwitchChain, validateInput } from "@/lib/utils/helpers";
 import { fundReward } from "@/lib/vault/lockVault/interactions";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";

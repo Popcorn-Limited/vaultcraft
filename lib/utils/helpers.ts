@@ -1,140 +1,9 @@
 import { showErrorToast, showLoadingToast, showSuccessToast } from "@/lib/toasts";
 import { Balance, Clients, SimulationResponse, Token } from "@/lib/types";
 import { Abi, Address, PublicClient, isAddress } from "viem";
-import { ADDRESS_ZERO } from "@/lib/constants";
 import { sendMessageToDiscord } from "@/lib/discord/discordBot";
 import clsx, { type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-
-export function validateInput(value: string | number): {
-  formatted: string;
-  isValid: boolean;
-} {
-  const formatted =
-    value === "." ? "0" : (`${value || "0"}`.replace(/\.$/, ".0") as any);
-  return {
-    formatted,
-    isValid: value === "" || isFinite(Number(formatted)),
-  };
-}
-
-interface HandleCallResultProps {
-  successMessage: string;
-  simulationResponse: SimulationResponse;
-  clients: Clients;
-}
-
-export async function handleCallResult({
-  successMessage,
-  simulationResponse,
-  clients
-}: HandleCallResultProps): Promise<boolean> {
-  if (simulationResponse.success) {
-    try {
-      const hash = await clients.walletClient.writeContract(
-        simulationResponse.request
-      );
-      const receipt = await clients.publicClient.waitForTransactionReceipt({
-        hash,
-      });
-      showSuccessToast(successMessage);
-      return true;
-    } catch (error: any) {
-      console.log({ error });
-      console.log("CALL ERROR")
-
-      await sendMessageToDiscord({
-        chainId: clients.publicClient.chain?.id ?? 0,
-        target: simulationResponse.request?.address ?? "0x",
-        user: simulationResponse.request?.account.address ?? "0x",
-        isSimulation: false,
-        method: simulationResponse.request?.functionName ?? "",
-        reason: error.shortMessage ?? "",
-        args: simulationResponse.request.args ? [...simulationResponse.request.args] : [],
-      });
-
-      showErrorToast(error.shortMessage);
-      return false;
-    }
-  } else {
-    // already sent the discord message on the simulation
-    showErrorToast(simulationResponse.error);
-    return false;
-  }
-}
-
-export const roundToTwoDecimalPlaces = (
-  numberToRound: number,
-  decimals = 2
-): number =>
-  Number(
-    (
-      Math.round(numberToRound * Math.pow(10, decimals)) /
-      Math.pow(10, decimals)
-    ).toFixed(decimals)
-  );
-
-export function cleanTokenName(token: Token): string {
-  if (token.name.includes("Hop")) {
-    return token.name.slice(0, token.name.indexOf(" LP Token"));
-  } else if (token.name.includes("Curve.fi Factory USD Metapool")) {
-    return token.name.slice(31);
-  } else if (token.name.includes("Curve.fi Factory Pool:")) {
-    return token.name.slice(23);
-  } else if (token.name.includes("StableV")) {
-    return token.name.slice(15);
-  } else if (token.name.includes("VolatileV")) {
-    return token.name.slice(17);
-  }
-  return token.name;
-}
-
-export function cleanTokenSymbol(token: Token): string {
-  if (token.symbol.includes("HOP-LP")) {
-    const split = token.symbol.split("LP-");
-    return split[0] + split[1];
-  } else if (token.symbol.includes("AMMV2")) {
-    const split = token.symbol.split("AMMV2-");
-    return split[0].slice(0, -1) + split[1];
-  } else if (token.symbol.includes("AMM")) {
-    const split = token.symbol.split("AMM-");
-    return split[0].slice(0, -1) + split[1];
-  }
-  return token.symbol;
-}
-
-export function noOp() { }
-
-export const beautifyAddress = (addr: string) =>
-  `${addr.slice(0, 4)}...${addr.slice(-5, 5)}`;
-
-export function transformNetwork(network: string | undefined): string {
-  switch (network) {
-    case "homestead":
-    case undefined:
-      return "ethereum";
-    case "matic":
-      return "polygon";
-    default:
-      return network.toLowerCase();
-  }
-}
-
-export function cleanFileName(fileName: string): string {
-  return fileName.replace(/ /g, "-").replace(/[^a-zA-Z0-9]/g, "");
-}
-
-export function extractRevertReason(error: any): string {
-  if (error.reason) {
-    return error.reason;
-  }
-
-  if (error.data && error.data.message) {
-    return error.data.message;
-  }
-
-  return error;
-}
 
 export type SimulationContract = {
   address: Address;
@@ -184,7 +53,83 @@ export async function simulateCall({
   }
 }
 
+
+interface HandleCallResultProps {
+  successMessage: string;
+  simulationResponse: SimulationResponse;
+  clients: Clients;
+}
+
+export async function handleCallResult({
+  successMessage,
+  simulationResponse,
+  clients
+}: HandleCallResultProps): Promise<boolean> {
+  if (simulationResponse.success) {
+    try {
+      const hash = await clients.walletClient.writeContract(
+        simulationResponse.request
+      );
+      const receipt = await clients.publicClient.waitForTransactionReceipt({
+        hash,
+      });
+      showSuccessToast(successMessage);
+      return true;
+    } catch (error: any) {
+      console.log({ error });
+      console.log("CALL ERROR")
+
+      await sendMessageToDiscord({
+        chainId: clients.publicClient.chain?.id ?? 0,
+        target: simulationResponse.request?.address ?? "0x",
+        user: simulationResponse.request?.account.address ?? "0x",
+        isSimulation: false,
+        method: simulationResponse.request?.functionName ?? "",
+        reason: error.shortMessage ?? "",
+        args: simulationResponse.request.args ? [...simulationResponse.request.args] : [],
+      });
+
+      showErrorToast(error.shortMessage);
+      return false;
+    }
+  } else {
+    // already sent the discord message on the simulation
+    showErrorToast(simulationResponse.error);
+    return false;
+  }
+}
+
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
+
+export function noOp() { }
+
+export const beautifyAddress = (addr: string) =>
+  `${addr.slice(0, 4)}...${addr.slice(-5, 5)}`;
+
+
+export function extractRevertReason(error: any): string {
+  if (error.reason) {
+    return error.reason;
+  }
+
+  if (error.data && error.data.message) {
+    return error.data.message;
+  }
+
+  return error;
+}
+
+export function validateInput(value: string | number): {
+  formatted: string;
+  isValid: boolean;
+} {
+  const formatted =
+    value === "." ? "0" : (`${value || "0"}`.replace(/\.$/, ".0") as any);
+  return {
+    formatted,
+    isValid: value === "" || isFinite(Number(formatted)),
+  };
+}
 
 export function handleChangeInput(e: any, setter: Function) {
   const value = e.currentTarget.value;
@@ -194,7 +139,6 @@ export function handleChangeInput(e: any, setter: Function) {
 export function handleMaxClick(token: Token, setter: Function) {
   setter(validateInput(token.balance.formatted).isValid ? token.balance.formatted : "0");
 }
-
 
 export async function handleSwitchChain(chainId: number, switchChainAsync: Function) {
   showLoadingToast("Switching chain..")
@@ -206,6 +150,11 @@ export async function handleSwitchChain(chainId: number, switchChainAsync: Funct
     return;
   }
 }
+
+export const NumberFormatter = Intl.NumberFormat("en", {
+  //@ts-ignore
+  notation: "compact",
+});
 
 export const formatBalance = (value: bigint | number, decimals: number, fixed?: number): string => {
   const bigValue = typeof value === 'bigint' ? value : BigInt(Math.floor(Number(value)));

@@ -3,7 +3,6 @@ import { tokensAtom } from "@/lib/atoms";
 import { VeRecipientByChain, VE_BEACON, VE_VCX } from "@/lib/constants/addresses";
 import { broadcastVeBalance } from "@/lib/gauges/interactions";
 import { RPC_URLS } from "@/lib/utils/connectors";
-import { formatNumber } from "@/lib/utils/formatBigNumber";
 import { formatBalance, handleSwitchChain } from "@/lib/utils/helpers";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";

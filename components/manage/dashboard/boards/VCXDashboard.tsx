@@ -1,5 +1,5 @@
 import { GAUGE_NETWORKS, ChainById } from "@/lib/utils/connectors";
-import { formatNumber } from "@/lib/utils/formatBigNumber";
+import { NumberFormatter } from "@/lib/utils/helpers";
 
 export default function VCXDashboard({ dashboardData }: { dashboardData: any }) {
   return dashboardData && Object.keys(dashboardData).length > 0 && Object.keys(dashboardData?.vcxData).length > 0 ? (
@@ -40,7 +40,7 @@ export default function VCXDashboard({ dashboardData }: { dashboardData: any }) 
                           }
                         </>
                       }
-                      {!key.includes("last") && formatNumber(Number(dashboardData.vcxData[chain][key]) / (["oVCXInCirculation", "exercisableVCX"].includes(key) ? 1e18 : 1))}
+                      {!key.includes("last") && NumberFormatter.format(Number(dashboardData.vcxData[chain][key]) / (["oVCXInCirculation", "exercisableVCX"].includes(key) ? 1e18 : 1))}
                       {key === "discount" && " %"}
                       {key === "oVCXInCirculation" && " oVCX"}
                       {key === "exercisableVCX" && " VCX"}

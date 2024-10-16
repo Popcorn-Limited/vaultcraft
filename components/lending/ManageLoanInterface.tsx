@@ -5,8 +5,7 @@ import { useAtom } from "jotai";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useAccount, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
 import { zeroAddress } from "viem";
-import { formatNumber, formatToFixedDecimals, safeRound } from "@/lib/utils/formatBigNumber";
-import { EMPTY_BALANCE, validateInput } from "@/lib/utils/helpers";
+import { EMPTY_BALANCE, NumberFormatter, validateInput } from "@/lib/utils/helpers";
 import MainActionButton from "@/components/button/MainActionButton";
 import { tokensAtom } from "@/lib/atoms";
 import TabSelector from "@/components/common/TabSelector";
@@ -321,7 +320,7 @@ export default function ManageLoanInterface({ visibilityState, vaultData }: { vi
                       && reserveData[vaultData.chainId].find(d => d.asset === repayToken?.address)?.borrowAmount > 0)
                       ? "<0.001"
                       // @ts-ignore
-                      : `${formatNumber(reserveData[vaultData.chainId].find(d => d.asset === repayToken?.address)?.borrowAmount)}`}
+                      : `${NumberFormatter.format(reserveData[vaultData.chainId].find(d => d.asset === repayToken?.address)?.borrowAmount)}`}
                 </p>
               }
               <div className="mt-8">
@@ -432,12 +431,12 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
               >
                 <span className="w-full text-end md:text-start">
                   <p className="text-white text-xl">
-                    {formatToFixedDecimals(userAccountData[chainId].healthFactor || 0, 2)}
+                    {NumberFormatter.format(userAccountData[chainId].healthFactor || 0)}
                   </p>
                   {inputAmount > 0 &&
                     <>
                       <p className={`text-sm ${getHealthFactorColor("text", newUserAccountData.healthFactor)}`}>
-                        {formatToFixedDecimals(newUserAccountData.healthFactor || 0, 2)}
+                        {NumberFormatter.format(newUserAccountData.healthFactor || 0)}
                       </p>
                     </>}
                 </span>
@@ -450,12 +449,12 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
               >
                 <span className="w-full text-end md:text-start">
                   <p className="text-white text-xl">
-                    $ {formatToFixedDecimals(((userAccountData[chainId].ltv * userAccountData[chainId].totalCollateral) - userAccountData[chainId].totalBorrowed) || 0, 2)}
+                    $ {NumberFormatter.format(((userAccountData[chainId].ltv * userAccountData[chainId].totalCollateral) - userAccountData[chainId].totalBorrowed) || 0)}
                   </p>
                   {inputAmount > 0 &&
                     <>
                       <p className={`text-sm text-white`}>
-                        $ {formatToFixedDecimals(((newUserAccountData.ltv * newUserAccountData.totalCollateral) - newUserAccountData.totalBorrowed) || 0, 2)}
+                        $ {NumberFormatter.format(((newUserAccountData.ltv * newUserAccountData.totalCollateral) - newUserAccountData.totalBorrowed) || 0)}
                       </p>
                     </>}
                 </span>
@@ -467,12 +466,12 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
               >
                 <span className="w-full text-end md:text-start">
                   <p className="text-white text-xl">
-                    {formatToFixedDecimals(userAccountData[chainId].netRate || 0, 2)} %
+                    {NumberFormatter.format(userAccountData[chainId].netRate || 0)} %
                   </p>
                   {inputAmount > 0 &&
                     <>
                       <p className={`text-sm text-white`}>
-                        {formatToFixedDecimals(newUserAccountData.netRate || 0, 2)} %
+                        {NumberFormatter.format(newUserAccountData.netRate || 0)} %
                       </p>
                     </>}
                 </span>
@@ -484,12 +483,12 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
               >
                 <span className="w-full text-end md:text-start">
                   <p className="text-white text-xl">
-                    $ {formatToFixedDecimals(userAccountData[chainId].totalCollateral || 0, 2)}
+                    $ {NumberFormatter.format(userAccountData[chainId].totalCollateral || 0)}
                   </p>
                   {inputAmount > 0 &&
                     <>
                       <p className={`text-sm text-white`}>
-                        $ {formatToFixedDecimals(newUserAccountData.totalCollateral || 0, 2)}
+                        $ {NumberFormatter.format(newUserAccountData.totalCollateral || 0)}
                       </p>
                     </>}
                 </span>
@@ -501,12 +500,12 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
               >
                 <span className="w-full text-end md:text-start">
                   <p className="text-white text-xl">
-                    $ {formatNumber(userAccountData[chainId].totalBorrowed || 0)}
+                    $ {NumberFormatter.format(userAccountData[chainId].totalBorrowed || 0)}
                   </p>
                   {inputAmount > 0 &&
                     <>
                       <p className={`text-sm text-white`}>
-                        $ {formatNumber(newUserAccountData.totalBorrowed || 0)}
+                        $ {NumberFormatter.format(newUserAccountData.totalBorrowed || 0)}
                       </p>
                     </>}
                 </span>
@@ -518,12 +517,12 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
               >
                 <span className="w-full text-end md:text-start">
                   <p className="text-white text-xl">
-                    $ {formatNumber(userAccountData[chainId].netValue || 0)}
+                    $ {NumberFormatter.format(userAccountData[chainId].netValue || 0)}
                   </p>
                   {inputAmount > 0 &&
                     <>
                       <p className={`text-sm text-white`}>
-                        $ {formatNumber(newUserAccountData.netValue || 0)}
+                        $ {NumberFormatter.format(newUserAccountData.netValue || 0)}
                       </p>
                     </>}
                 </span>
@@ -546,7 +545,7 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
                   <span className="flex flex-row items-center">
                     <TokenIcon token={supplyToken} icon={supplyToken.logoURI} chainId={10} imageSize={"w-6 h-6 mb-0.5"} />
                     <p className="ml-2 mb-1.5 text-xl text-white">
-                      {formatToFixedDecimals(supplyReserve.supplyRate || 0, 2)} %
+                      {NumberFormatter.format(supplyReserve.supplyRate || 0)} %
                     </p>
                   </span>
                 </div>
@@ -560,7 +559,7 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
                   <span className="flex flex-row items-center">
                     <TokenIcon token={borrowToken} icon={borrowToken.logoURI} chainId={10} imageSize={"w-6 h-6 mb-0.5"} />
                     <p className="ml-2 mb-1.5 text-xl text-white">
-                      {formatToFixedDecimals(borrowReserve.borrowRate || 0, 2)} %
+                      {NumberFormatter.format(borrowReserve.borrowRate || 0)} %
                     </p>
                   </span>
                 </div>

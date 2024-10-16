@@ -3,8 +3,7 @@ import { tokensAtom } from "@/lib/atoms";
 import { vaultsAtom } from "@/lib/atoms/vaults";
 import { VaultData } from "@/lib/types";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
-import { formatNumber, formatTwoDecimals } from "@/lib/utils/formatBigNumber";
-import { formatBalance } from "@/lib/utils/helpers";
+import { formatBalance, NumberFormatter } from "@/lib/utils/helpers";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 
@@ -74,7 +73,7 @@ export default function VaultsDashboard({ dashboardData }: { dashboardData: any 
                           {formatBalance(vault.liquid, tokens[vault.chainId][vault.asset].decimals)}
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                          {formatTwoDecimals(Number((vault.liquid / vault.totalAssets) * BigInt(100)))} %
+                          {NumberFormatter.format(Number((vault.liquid / vault.totalAssets) * BigInt(100)))} %
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                           {formatBalance(vault.idle, tokens[vault.chainId][vault.asset].decimals)}
@@ -95,7 +94,7 @@ export default function VaultsDashboard({ dashboardData }: { dashboardData: any 
                             {formatBalance(strategy.idle, tokens[vault.chainId][vault.asset].decimals)}
                           </td>
                           <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            {formatTwoDecimals(Number((strategy.idle / strategy.allocation) * BigInt(100)))} %
+                            {NumberFormatter.format(Number((strategy.idle / strategy.allocation) * BigInt(100)))} %
                           </td>
                           <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                             0

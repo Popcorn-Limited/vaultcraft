@@ -4,7 +4,6 @@ import TabSelector from "@/components/common/TabSelector";
 import InputNumber from "@/components/input/InputNumber";
 import { strategiesAtom, tokensAtom } from "@/lib/atoms";
 import { Token, VaultAllocation, VaultData } from "@/lib/types";
-import { formatNumber } from "@/lib/utils/formatBigNumber";
 import { formatBalance, validateInput } from "@/lib/utils/helpers";
 import { allocateToStrategies, deallocateFromStrategies } from "@/lib/vault/management/interactions";
 import { addStrategyData } from "@/lib/vault/prepareVaultData";

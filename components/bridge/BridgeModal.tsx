@@ -4,7 +4,6 @@ import TabSelector from "@/components/common/TabSelector";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import MainActionButton from "@/components/button/MainActionButton";
 import ActionSteps from "@/components/vault/ActionSteps";
-import { safeRound } from "@/lib/utils/formatBigNumber";
 import { encodeAbiParameters, formatUnits } from "viem";
 import { handleSwitchChain, validateInput } from "@/lib/utils/helpers";
 import { ArrowDownIcon } from "@heroicons/react/24/outline";

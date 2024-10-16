@@ -2,7 +2,7 @@ import type { HTMLProps } from "react";
 import { Token } from "@/lib/types";
 import SelectToken from "@/components/input/SelectToken";
 import InputNumber from "@/components/input/InputNumber";
-import { formatBalance } from "@/lib/utils/helpers";
+import { NumberFormatter } from "@/lib/utils/helpers";
 
 export default function InputTokenWithError({
   tokenList,
@@ -63,7 +63,7 @@ export default function InputTokenWithError({
 
           <div className="flex justify-between items-center mt-4 w-full text-customGray500">
             <p className="group-hover/max:text-white">
-              $ {Number(props.value) * (selectedToken?.price || 0)}
+              $ {NumberFormatter.format(Number(props.value) * (selectedToken?.price || 0))}
             </p>
 
             <div

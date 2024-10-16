@@ -16,15 +16,14 @@ import TokenIcon from "@/components/common/TokenIcon";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import { BalancerOracleAbi, ZERO } from "@/lib/constants";
 import { ExerciseByChain, ExerciseOracleByChain, OVCX_ORACLE, OptionTokenByChain, VCX, VcxByChain, WETH, WethByChain } from "@/lib/constants/addresses";
-import { formatNumber, safeRound } from "@/lib/utils/formatBigNumber";
-import { handleSwitchChain, validateInput } from "@/lib/utils/helpers";
+import { handleSwitchChain, NumberFormatter, validateInput } from "@/lib/utils/helpers";
 import { Token } from "@/lib/types";
 import { Address, createPublicClient, formatEther, http, parseEther } from "viem";
 import { useAtom } from "jotai";
 import { tokensAtom } from "@/lib/atoms";
-import ActionSteps from "../../vault/ActionSteps";
+import ActionSteps from "@/components/vault/ActionSteps";
 import { ActionStep, EXERCISE_OVCX_STEPS } from "@/lib/getActionSteps";
-import MainActionButton from "../../button/MainActionButton";
+import MainActionButton from "@/components/button/MainActionButton";
 import { exerciseOPop } from "@/lib/optionToken/interactions";
 import { handleAllowance } from "@/lib/approve";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
@@ -214,8 +213,8 @@ export default function ExerciseOptionTokenInterface({ chainId, setShowModal }: 
       {!!ovcx && !!weth ? (
         <>
           <p className="text-white font-semibold">
-            Strike Price: $ {formatNumber(strikePrice)} | oVCX Price: ${" "}
-            {formatNumber(vcxPrice - strikePrice)} | VCX Price: $ {formatNumber(vcxPrice)} | Discount:{" "}
+            Strike Price: $ {NumberFormatter.format(strikePrice)} | oVCX Price: ${" "}
+            {NumberFormatter.format(vcxPrice - strikePrice)} | VCX Price: $ {NumberFormatter.format(vcxPrice)} | Discount:{" "}
             {((1 - (strikePrice / vcxPrice)) * 100).toFixed(2)} %
           </p>
 
