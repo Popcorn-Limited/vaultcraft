@@ -9,7 +9,7 @@ import { useRouter } from "next/router";
 import { Address, createPublicClient, http, zeroAddress } from "viem";
 import Modal from "@/components/modal/Modal";
 import MainActionButton from "../button/MainActionButton";
-import { gaugeRewardsAtom, networthAtom, strategiesAtom, tokensAtom, tvlAtom, vaultronAtom } from "@/lib/atoms";
+import { gaugeRewardsAtom, loadingProgressAtom, networthAtom, strategiesAtom, tokensAtom, tvlAtom, vaultronAtom } from "@/lib/atoms";
 import { ReserveData, StrategiesByChain, TokenByAddress, TokenType, UserAccountData, VaultData } from "@/lib/types";
 import getTokenAndVaultsDataByChain from "@/lib/getTokenAndVaultsData";
 import { aaveAccountDataAtom, aaveReserveDataAtom } from "@/lib/atoms/lending";
@@ -147,6 +147,7 @@ export default function Page({
   const { address: account } = useAccount();
   const publicClient = usePublicClient();
 
+  const [, setLoadingProgress] = useAtom(loadingProgressAtom);
   const [, setVaults] = useAtom(vaultsAtom);
   const [, setTokens] = useAtom(tokensAtom);
   const [, setStrategies] = useAtom(strategiesAtom);
@@ -160,6 +161,7 @@ export default function Page({
   useEffect(() => {
     async function getData() {
       console.log(`FETCHING APP DATA (${new Date()})`)
+      setLoadingProgress(0);
       const getDataStart = Number(new Date())
 
       // get vaultsData and tokens
@@ -170,6 +172,7 @@ export default function Page({
       console.log(`Fetching Token and Vaults Data (${new Date()})`)
       let start = Number(new Date())
 
+      setLoadingProgress(10);
       await Promise.all(
         SUPPORTED_NETWORKS.map(async (chain) => {
           console.log(`Fetching Data for chain ${chain.id} (${new Date()})`)
@@ -186,6 +189,8 @@ export default function Page({
           newVaultsData[chain.id] = vaultsData
           newTokens[chain.id] = tokens;
           newStrategies[chain.id] = strategies
+
+          setLoadingProgress(prev => prev + (70 / SUPPORTED_NETWORKS.length))
         })
       );
 
@@ -252,6 +257,7 @@ export default function Page({
       setVaults(prev => ({ ...newVaultsData }));
       setTokens(prev => ({ ...newTokens }));
       setStrategies(prev => ({ ...newStrategies }));
+      setLoadingProgress(prev => 90)
 
       // setAaveReserveData(newReserveData);
       // setAaveAccountData(newUserAccountData);
@@ -327,6 +333,7 @@ export default function Page({
       }
       console.log(`COMPLETED FETCHING APP DATA (${new Date()})`)
       console.log(`Took ${Number(new Date()) - getDataStart}ms to load`)
+      setLoadingProgress(prev => 100)
     }
     getData();
   }, [account]);
@@ -359,7 +366,7 @@ export default function Page({
         </div>
         <div className="py-10"></div>
         <Footer />
-      </div>
+      </div >
     </>
   );
 }

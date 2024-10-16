@@ -5,7 +5,7 @@ import NoSSR from "react-no-ssr";
 import { showErrorToast, showLoadingToast, showSuccessToast } from "@/lib/toasts";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { ArrowDownIcon, Square2StackIcon } from "@heroicons/react/24/outline";
-import { networthAtom, tokensAtom, tvlAtom } from "@/lib/atoms";
+import { loadingProgressAtom, networthAtom, tokensAtom, tvlAtom } from "@/lib/atoms";
 import { FEE_RECIPIENT_PROXY, OptionTokenByChain, ST_VCX, VCX, ZapAssetAddressesByChain } from "@/lib/constants";
 import { Address, createPublicClient, http, parseUnits } from "viem";
 import { mainnet } from "viem/chains";
@@ -24,6 +24,7 @@ import ActionSteps from "@/components/vault/ActionSteps";
 import { handleAllowance } from "@/lib/approve";
 import { claim, deposit, increaseDeposit, withdraw } from "@/lib/vault/lockVault/interactions";
 import LockTimeButton from "@/components/button/LockTimeButton";
+import Loader from "@/components/common/Loader";
 
 async function getUserLockVaultData(user: Address, vault: Address) {
   const client = createPublicClient({
@@ -106,12 +107,12 @@ export default function Staking() {
   const { switchChainAsync } = useSwitchChain();
   const { openConnectModal } = useConnectModal();
 
+  const [progress] = useAtom(loadingProgressAtom)
   const [tokens, setTokens] = useAtom(tokensAtom)
 
   const [tokenOptions, setTokenOptions] = useState<Token[]>([]);
   const [asset, setAsset] = useState<Token>();
   const [vault, setVault] = useState<Token>();
-  const [lockVaultData, setLockVaultData] = useState<any>()
   const [userLockVaultData, setUserLockVaultData] = useState<any>()
   const [walletValue, setWalletValue] = useState<number>(0)
   const [depositValue, setDepositValue] = useState<number>(0)
@@ -545,7 +546,7 @@ export default function Staking() {
         </>
       )
         :
-        <p className="text-white ml-4 md:ml-0">Loading...</p>
+        <Loader progress={progress} />
     }
   </NoSSR >
 }

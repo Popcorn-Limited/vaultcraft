@@ -12,6 +12,7 @@ import OptionTokenInterface from "@/components/optionToken/OptionTokenInterface"
 import type { AddressesByChain, VaultData } from "@/lib/types";
 import {
   gaugeRewardsAtom,
+  loadingProgressAtom,
   networthAtom,
   tokensAtom,
   tvlAtom,
@@ -24,6 +25,7 @@ import SearchBar from "@/components/input/SearchBar";
 import VaultsSorting from "@/components/vault/VaultsSorting";
 import VaultsTable from "@/components/vault/VaultsTable";
 import LargeCardStat from "@/components/common/LargeCardStat";
+import Loader from "../common/Loader";
 
 interface VaultsContainerProps {
   hiddenVaults: AddressesByChain;
@@ -45,6 +47,7 @@ export default function VaultsContainer({
     }
   }, [vaultsData, vaults]);
 
+  const [progress] = useAtom(loadingProgressAtom)
   const [tvl] = useAtom(tvlAtom);
   const [networth] = useAtom(networthAtom);
   const [tokens] = useAtom(tokensAtom);
@@ -61,7 +64,7 @@ export default function VaultsContainer({
     setSearchTerm(value);
   }
 
-  return Object.keys(tokens).length > 0 ? (
+  return Object.keys(tokens).length === 0 ? (
     <NoSSR >
       <Modal visibility={[showOptionTokenModal, setShowOptionTokenModal]}>
         <OptionTokenInterface />
@@ -198,5 +201,5 @@ export default function VaultsContainer({
       </div>
     </NoSSR >
   )
-    : <p className="text-white">Loading...</p>
+    : <Loader progress={progress} />
 }
