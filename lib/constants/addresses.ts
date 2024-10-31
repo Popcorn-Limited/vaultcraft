@@ -133,6 +133,18 @@ export const XVCXByChain: AddressByChain = {
   [bsc.id]: zeroAddress,
 }
 
+export const WVCXByChain: AddressByChain = {
+  [mainnet.id]: "0x18445923592be303fbd3BC164ee685C7457051b4",
+  [optimism.id]: "0x43Ad2CFDDA3CEFf40d832eB9bc33eC3FACE86829",
+  [arbitrum.id]: "0xFeae6470A79b7779888f4a64af315Ca997D6cF33",
+  [xLayer.id]: zeroAddress,
+  [base.id]: zeroAddress,
+  [fraxtal.id]: zeroAddress,
+  [avalanche.id]: zeroAddress,
+  [polygon.id]: zeroAddress,
+  [bsc.id]: zeroAddress,
+}
+
 export const VcxByChain: AddressByChain = {
   [mainnet.id]: VCX,
   [optimism.id]: XVCXByChain[optimism.id],
@@ -194,8 +206,8 @@ export const LockboxAdapterByChain: AddressByChain = {
 
 export const ExerciseByChain: AddressByChain = {
   [mainnet.id]: OptionTokenByChain[mainnet.id],
-  [optimism.id]: "0x63421beE7a26966156403FF1c8ACBE79c2EaFB1f",
-  [arbitrum.id]: "0x63421beE7a26966156403FF1c8ACBE79c2EaFB1f",
+  [optimism.id]: "0x925Efe4B78a823d6AB22Ac5894516b898293a9E5",
+  [arbitrum.id]: "0x89DC6A4549AFc3f9B111b0059d520Fd66cD510B7",
   [xLayer.id]: zeroAddress,
   [base.id]: zeroAddress,
   [fraxtal.id]: zeroAddress,

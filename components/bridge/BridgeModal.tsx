@@ -4,11 +4,11 @@ import TabSelector from "@/components/common/TabSelector";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import MainActionButton from "@/components/button/MainActionButton";
 import ActionSteps from "@/components/vault/ActionSteps";
-import { safeRound } from "@/lib/utils/formatBigNumber";
+import { NumberFormatter, safeRound } from "@/lib/utils/formatBigNumber";
 import { encodeAbiParameters, formatUnits } from "viem";
 import { handleSwitchChain, validateInput } from "@/lib/utils/helpers";
 import { ArrowDownIcon } from "@heroicons/react/24/outline";
-import { LockboxAdapterByChain, VCX, XVCXByChain } from "@/lib/constants/addresses";
+import { LockboxAdapterByChain, VCX, WVCXByChain, XVCXByChain } from "@/lib/constants/addresses";
 import { SmartVaultActionType, Token } from "@/lib/types";
 import { ActionStep, getSmartVaultActionSteps } from "@/lib/getActionSteps";
 import { handleAllowance } from "@/lib/approve";
@@ -18,16 +18,20 @@ import { useAtom } from "jotai";
 import bridgeToken, { DestinationIdByChain } from "@/lib/bridging/bridgeToken";
 import { useAccount, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
 import { mainnet } from "viem/chains";
+import SecondaryActionButton from "../button/SecondaryActionButton";
+import { useRouter } from "next/router";
 
 export default function BridgeModal({ show }: { show: [boolean, Dispatch<SetStateAction<boolean>>] }): JSX.Element {
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
   const { address: account, chain } = useAccount();
   const { switchChainAsync } = useSwitchChain();
+  const router = useRouter();
 
   const [tokens, setTokens] = useAtom(tokensAtom)
 
   const [xVCX, setXVCX] = useState<Token>()
+  const [wVCX, setWVCX] = useState<Token>()
 
   const [activeTab, setActiveTab] = useState<string>("OP -> ETH")
   const [chainId, setChainId] = useState<number>(10)
@@ -41,6 +45,7 @@ export default function BridgeModal({ show }: { show: [boolean, Dispatch<SetStat
   useEffect(() => {
     if (Object.keys(tokens).length > 0 && Object.keys(tokens[10]).length > 0) {
       setXVCX(tokens[10][XVCXByChain[10]])
+      setWVCX(tokens[10][WVCXByChain[10]])
     }
   }, [account, tokens])
 
@@ -52,9 +57,11 @@ export default function BridgeModal({ show }: { show: [boolean, Dispatch<SetStat
     if (newTab === "OP -> ETH") {
       setChainId(10)
       setXVCX(tokens[10][XVCXByChain[10]])
+      setWVCX(tokens[10][WVCXByChain[10]])
     } else {
       setChainId(42161)
       setXVCX(tokens[42161][XVCXByChain[42161]])
+      setWVCX(tokens[42161][WVCXByChain[42161]])
     }
 
     setActiveTab(newTab)
@@ -143,7 +150,7 @@ export default function BridgeModal({ show }: { show: [boolean, Dispatch<SetStat
   }
 
   return (
-    <Modal visibility={show}>
+    <Modal visibility={show} title={<h2 className="text-2xl font-bold">Bridge VCX</h2>}>
       <TabSelector
         className="mb-6"
         availableTabs={["OP -> ETH", "ARB -> ETH"]}
@@ -151,80 +158,33 @@ export default function BridgeModal({ show }: { show: [boolean, Dispatch<SetStat
         setActiveTab={switchTab}
       />
       {
-        Object.keys(tokens).length > 0 && xVCX?.address &&
+        Object.keys(tokens).length > 0 && xVCX?.address && wVCX?.address &&
         <>
-          <InputTokenWithError
-            captionText={"Bridge Amount"}
-            onSelectToken={() => { }}
-            onMaxClick={handleMaxClick}
-            chainId={chainId}
-            value={inputAmount}
-            onChange={handleChangeInput}
-            selectedToken={xVCX}
-            errorMessage={""}
-            tokenList={[]}
-            allowSelection={false}
-            allowInput
-          />
-          <div className="relative py-4">
-            <div className="absolute inset-0 flex items-center" aria-hidden="true">
-              <div className="w-full border-t border-customGray500" />
+          <div className="text-start ">
+            <div className="mt-4 w-full bg-customNeutral300 bg-opacity-30 border border-customNeutral100 rounded-lg p-4">
+              <h3 className="text-lg font-bold">wVCX</h3>
+              <div className="flex flex-row gap-4">
+                <p className="w-2/3">You have <b>{NumberFormatter.format(wVCX.balance / (10 ** wVCX.decimals))} wVCX</b>. Bridge it via wormhole with unparalled security and speed. Tokens are on average transfered in under 30 minutes on Portal.</p>
+                <div className="w-1/3 flex flex-row gap-4">
+                  <MainActionButton label="Bridge wVCX" handleClick={() => router.push("https://portalbridge.com/")} />
+                </div>
+              </div>
             </div>
-            <div className="relative flex justify-center">
-              <span className="bg-customNeutral200 px-4">
-                <ArrowDownIcon
-                  className="h-10 w-10 p-2 text-customGray500 border border-customGray500 rounded-full cursor-pointer hover:text-white hover:border-white"
-                  aria-hidden="true"
-                />
-              </span>
+            <div className="mt-4 w-full bg-customNeutral300 bg-opacity-30 border border-customNeutral100 rounded-lg p-4">
+              <h3 className="text-lg font-bold">xVCX</h3>
+              <div className="flex flex-row gap-4">
+                <p className="w-2/3">You have <b>{NumberFormatter.format(xVCX.balance / (10 ** xVCX.decimals))}</b> xVCX. xVCX is no longer actively used but you can still bridge it to ethereum and redeem it for VCX.</p>
+                <div className="w-1/3 flex flex-row gap-4">
+                  <SecondaryActionButton
+                    label="Bridge xVCX"
+                    handleClick={() => router.push(activeTab === "OP -> ETH" ?
+                      "https://bridge.connext.network/VCX-from-optimism-to-ethereum?symbol=VCX"
+                      : "https://bridge.connext.network/VCX-from-arbitrum-to-ethereum?symbol=VCX")}
+                  />
+                </div>
+              </div>
             </div>
           </div>
-          <InputTokenWithError
-            captionText={"Output Amount"}
-            onSelectToken={() => { }}
-            onMaxClick={() => { }}
-            chainId={1}
-            value={inputAmount}
-            onChange={() => { }}
-            selectedToken={tokens[1][VCX]}
-            errorMessage={""}
-            tokenList={[]}
-            allowSelection={false}
-            allowInput={false}
-          />
-          <div className="w-full flex justify-center my-6">
-            <ActionSteps steps={steps} stepCounter={stepCounter} />
-          </div>
-          <div className="w-full bg-primaryYellow bg-opacity-30 border border-primaryYellow rounded-lg p-4">
-            <p className="text-primaryYellow">
-              Note that bridging is performed in batches. It might take up to 12 hours before you receive the tokens in your wallet.
-            </p>
-          </div>
-          <div className="mt-6">
-            {chain?.id !== chainId
-              ? <MainActionButton
-                label="Switch Chain"
-                handleClick={() => handleSwitchChain(chainId, switchChainAsync)}
-              />
-              : <MainActionButton
-                label="Bridge"
-                handleClick={handleMainAction}
-              />
-            }
-          </div>
-          <p className="text-start mt-4">
-            If you encounter issues with this interface try using {" "}
-            <a href={
-              activeTab === "OP -> ETH" ?
-                "https://bridge.connext.network/VCX-from-optimism-to-ethereum?symbol=VCX"
-                : "https://bridge.connext.network/VCX-from-arbitrum-to-ethereum?symbol=VCX"
-            }
-              target="_blank"
-              className="text-secondaryBlue">
-              Connext
-            </a>
-            {" "} directly
-          </p>
         </>
       }
     </Modal >
