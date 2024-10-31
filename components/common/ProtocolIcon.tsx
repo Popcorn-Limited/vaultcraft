@@ -39,6 +39,10 @@ export const IconByProtocol: { [key: string]: string } = {
   Corn: "/images/icons/cornLogo.svg",
   Symbiotic: "https://icons.llamao.fi/icons/protocols/symbiotic?w=48&h=48",
   Morpho: "https://icons.llamao.fi/icons/protocols/morpho?w=48&h=48",
+  Maker: "https://icons.llamao.fi/icons/protocols/maker?w=48&h=48",
+  Gearbox: "https://icons.llamao.fi/icons/protocols/gearbox?w=48&h=48",
+  Spark: "https://icons.llamao.fi/icons/protocols/spark?w=48&h=48",
+  Fluid: "https://icons.llamao.fi/icons/protocols/fluid?w=48&h=48",
   Multistrategy: "/images/tokens/vcx.svg",
   VaultCraft: "/images/tokens/vcx.svg",
   None: "/images/tokens/vcx.svg"
