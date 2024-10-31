@@ -36,6 +36,7 @@ async function getLogs(vault: VaultData, asset: Token) {
     fromBlock: "earliest",
     toBlock: "latest",
   });
+  if (depositLogs.length === 0) return []
   const withdrawLogs = await client.getContractEvents({
     address: vault.address,
     abi: VaultAbi,

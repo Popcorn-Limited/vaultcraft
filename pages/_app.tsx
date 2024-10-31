@@ -23,7 +23,7 @@ import {
 } from "@rainbow-me/rainbowkit/wallets";
 import { Analytics } from "@vercel/analytics/react"
 import { WagmiProvider, http } from "wagmi";
-import { arbitrum, fraxtal, base, mainnet, optimism, polygon, xLayer, avalanche } from "viem/chains";
+import { arbitrum, fraxtal, base, mainnet, optimism, polygon, xLayer } from "viem/chains";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createWallet } from "@passkeys/core";
 import { WalletProvider, WalletWidget } from "@passkeys/react";
