@@ -77,7 +77,7 @@ const config = getDefaultConfig({
     [xLayer.id]: http(RPC_URLS[xLayer.id]),
     [base.id]: http(RPC_URLS[base.id]),
     [fraxtal.id]: http(RPC_URLS[fraxtal.id]),
-    [avalanche.id]: http(RPC_URLS[avalanche.id]),
+    // [avalanche.id]: http(RPC_URLS[avalanche.id]),
   },
   connectors
 })
