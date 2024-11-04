@@ -16,11 +16,11 @@ import { EMPTY_LLAMA_APY_ENTRY, getApy } from "@/lib/resolver/apy";
 
 export async function getInitialVaultsData(chainId: number, client: PublicClient): Promise<VaultDataByAddress> {
   const { data: allVaults } = await axios.get(
-    `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/vaults/${chainId}.json`
+    `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/vaults/${chainId}.json`
   );
 
   const { data: hiddenVaults } = await axios.get(
-    `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/vaults/hidden/${chainId}.json`
+    `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/vaults/hidden/${chainId}.json`
   );
 
   const filteredVaults = Object.values(allVaults)
