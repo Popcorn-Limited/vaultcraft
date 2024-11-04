@@ -79,7 +79,7 @@ export const SUPPORTED_NETWORKS: Chain[] = [
   },
   base,
   fraxtal,
-  avalanche,
+  // avalanche,
 ]
 
 export const GAUGE_NETWORKS = [1, 10, 42161];

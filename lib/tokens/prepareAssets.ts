@@ -9,7 +9,7 @@ import { EMPTY_BALANCE } from "@/lib/utils/helpers";
 
 export async function prepareAssets(addresses: Address[], chainId: number, client: PublicClient): Promise<TokenByAddress> {
   const { data: assets } = await axios.get(
-    `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/assets/tokens/${chainId}.json`
+    `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/assets/tokens/${chainId}.json`
   );
 
   const { data: priceData } = await axios.get(

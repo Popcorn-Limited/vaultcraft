@@ -15,7 +15,7 @@ export default async function prepareStrategies(vaults: VaultDataByAddress, chai
   });
 
   const { data: strategyDescriptions } = await axios.get(
-    `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/descriptions/strategies/${chainId}.json`
+    `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/strategies/${chainId}.json`
   );
 
   // @ts-ignore

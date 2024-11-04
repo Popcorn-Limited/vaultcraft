@@ -50,7 +50,7 @@ async function getHiddenGauges(): Promise<AddressesByChain> {
   await Promise.all(
     GAUGE_NETWORKS.map(async (chain) => {
       const res = await axios.get(
-        `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/gauges/hidden/${chain}.json`
+        `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/gauges/hidden/${chain}.json`
       );
       result[chain] = res.data;
     })

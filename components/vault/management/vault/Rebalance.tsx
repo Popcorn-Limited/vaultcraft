@@ -26,7 +26,7 @@ export default function VaultRebalance({
   const [strategies] = useAtom(strategiesAtom)
   const [asset, setAsset] = useState<Token>()
 
-  const { data: blockNumber } = useBlockNumber({ watch: true })
+  const { data: blockNumber } = useBlockNumber({ chainId: vaultData.chainId, watch: true })
   const { data: float, refetch } = useBalance({
     chainId: vaultData.chainId,
     address: vaultData.address,

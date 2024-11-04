@@ -37,10 +37,10 @@ async function exitLockVault({ account, vault, clients }: { account: Address, va
 
 async function getLockVaults(user: Address) {
   const { data: allVaults } = await axios.get(
-    `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/vaults/42161.json`
+    `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/vaults/42161.json`
   );
   const { data: vaultTokens } = await axios.get(
-    `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/vaults/tokens/42161.json`
+    `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/vaults/tokens/42161.json`
   );
   const lockVaults = Object.values(allVaults)
     .filter((vault: any) => vault.type === "single-asset-lock-vault-v1")

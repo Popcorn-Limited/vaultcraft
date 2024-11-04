@@ -42,7 +42,7 @@ export default function StakingInterface({
   setShowSyncModal,
 }: StakingInterfaceProps): JSX.Element {
   const { address: account } = useAccount();
-  const { data: blockNumber } = useBlockNumber({ watch: true })
+  const { data: blockNumber } = useBlockNumber({ chainId: 1, watch: true })
   const [tokens] = useAtom(tokensAtom);
 
   const { data: lockedBal } = useLockedBalanceOf({

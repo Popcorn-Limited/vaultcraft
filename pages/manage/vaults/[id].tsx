@@ -4,7 +4,7 @@ import { useAtom } from "jotai";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import NoSSR from "react-no-ssr";
-import { createPublicClient, http, isAddress } from "viem";
+import { createPublicClient, http, isAddress, zeroAddress } from "viem";
 import { VaultAbi } from "@/lib/constants";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 import { tokensAtom } from "@/lib/atoms";
@@ -19,57 +19,36 @@ import StrategyDescription from "@/components/vault/StrategyDescription";
 import Link from "next/link";
 import CopyAddress from "@/components/common/CopyAddress";
 import SpinningLogo from "@/components/common/SpinningLogo";
+import { avalanche } from "viem/chains";
 
 async function getLogs(vault: VaultData, asset: Token) {
+  if (vault.chainId === avalanche.id) return []
+
   const client = createPublicClient({
     chain: ChainById[vault.chainId],
     transport: http(RPC_URLS[vault.chainId]),
   });
 
-  const initLog = await client.getContractEvents({
-    address: vault.address,
-    abi: VaultAbi,
-    eventName: "VaultInitialized",
-    fromBlock: "earliest",
-    toBlock: "latest",
-  });
-  const creationBlockNumber = initLog[0].blockNumber;
-  const creationBlock = await client.getBlock({
-    blockNumber: creationBlockNumber,
-  });
-  const creationTime = new Date(Number(creationBlock.timestamp) * 1000);
-  const creationDate = Date.UTC(
-    creationTime.getFullYear(),
-    creationTime.getMonth(),
-    creationTime.getDate(),
-    0,
-    0,
-    0
-  );
-
   const depositLogs = await client.getContractEvents({
     address: vault.address,
     abi: VaultAbi,
     eventName: "Deposit",
-    fromBlock: creationBlockNumber,
+    fromBlock: "earliest",
     toBlock: "latest",
   });
+  if (depositLogs.length === 0) return []
   const withdrawLogs = await client.getContractEvents({
     address: vault.address,
     abi: VaultAbi,
     eventName: "Withdraw",
-    fromBlock: creationBlockNumber,
+    fromBlock: "earliest",
     toBlock: "latest",
   });
 
   const latestBlock = await client.getBlock({ blockTag: "latest" });
 
   let result = [];
-  let startBlock =
-    creationBlockNumber -
-    BigInt(
-      Math.floor((Number(creationBlock.timestamp) - creationDate / 1000) / 13)
-    );
+  let startBlock = depositLogs[0].blockNumber;
   let day = 0;
   while (startBlock < latestBlock.number) {
     const newBlock = startBlock + BigInt(7200);
@@ -123,7 +102,7 @@ export default function Index() {
         (vault) => vault.address === query?.id
       );
 
-      if (vault_) {
+      if (vault_ && vault_?.address !== zeroAddress) {
         const logs_ = await getLogs(
           vault_,
           tokens[vault_.chainId][vault_.asset]

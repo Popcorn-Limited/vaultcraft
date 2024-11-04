@@ -1,10 +1,13 @@
-import { Address, createPublicClient, http } from "viem";
+import { Address, createPublicClient, http, zeroAddress } from "viem";
 import * as chains from "viem/chains";
 import { ChildGaugeAbi, GaugeAbi } from "@/lib/constants";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 import { ClaimableReward, TokenByAddress } from "@/lib/types";
+import { avalanche } from "viem/chains";
 
 export async function getRewardData(gauge: Address, chainId: number) {
+  if (gauge === zeroAddress || chainId === avalanche.id) return []
+
   const client = createPublicClient({
     chain: ChainById[chainId],
     transport: http(RPC_URLS[chainId]),
@@ -24,15 +27,15 @@ export async function getRewardData(gauge: Address, chainId: number) {
     // @ts-ignore
     rewardData = await client.multicall({
       contracts: rewardLogs.map(log => {
-          return {
-              address: gauge,
-              abi: chainId === chains.mainnet.id ? GaugeAbi : ChildGaugeAbi,
-              functionName: "reward_data",
-              args: [log.args.reward_token]
-          }
+        return {
+          address: gauge,
+          abi: chainId === chains.mainnet.id ? GaugeAbi : ChildGaugeAbi,
+          functionName: "reward_data",
+          args: [log.args.reward_token]
+        }
       }),
       allowFailure: false
-  }) as any[];
+    }) as any[];
 
 
     const currentTimestamp = Math.floor(Date.now() / 1000);
