@@ -2,7 +2,6 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import Modal from "@/components/modal/Modal";
 import TabSelector from "@/components/common/TabSelector";
 import MainActionButton from "@/components/button/MainActionButton";
-import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import { WVCXByChain, XVCXByChain } from "@/lib/constants/addresses";
 import { Token } from "@/lib/types";
 import { tokensAtom } from "@/lib/atoms";
@@ -10,6 +9,7 @@ import { useAtom } from "jotai";
 import { useAccount } from "wagmi";
 import SecondaryActionButton from "../button/SecondaryActionButton";
 import { useRouter } from "next/router";
+import { NumberFormatter } from "@/lib/utils/helpers";
 
 export default function BridgeModal({ show }: { show: [boolean, Dispatch<SetStateAction<boolean>>] }): JSX.Element {
   const { address: account } = useAccount();
@@ -57,7 +57,7 @@ export default function BridgeModal({ show }: { show: [boolean, Dispatch<SetStat
             <div className="mt-4 w-full bg-customNeutral300 bg-opacity-30 border border-customNeutral100 rounded-lg p-4">
               <h3 className="text-lg font-bold">wVCX</h3>
               <div className="flex flex-row gap-4">
-                <p className="w-2/3">You have <b>{NumberFormatter.format(wVCX.balance / (10 ** wVCX.decimals))} wVCX</b>. Bridge it via wormhole with unparalled security and speed. Tokens are on average transfered in under 30 minutes on Portal.</p>
+                <p className="w-2/3">You have <b>{NumberFormatter.format(Number(wVCX.balance.formatted))} wVCX</b>. Bridge it via wormhole with unparalled security and speed. Tokens are on average transfered in under 30 minutes on Portal.</p>
                 <div className="w-1/3 flex flex-row gap-4">
                   <MainActionButton label="Bridge wVCX" handleClick={() => router.push("https://portalbridge.com/")} />
                 </div>
@@ -66,7 +66,7 @@ export default function BridgeModal({ show }: { show: [boolean, Dispatch<SetStat
             <div className="mt-4 w-full bg-customNeutral300 bg-opacity-30 border border-customNeutral100 rounded-lg p-4">
               <h3 className="text-lg font-bold">xVCX</h3>
               <div className="flex flex-row gap-4">
-                <p className="w-2/3">You have <b>{NumberFormatter.format(xVCX.balance / (10 ** xVCX.decimals))}</b> xVCX. xVCX is no longer actively used but you can still bridge it to ethereum and redeem it for VCX.</p>
+                <p className="w-2/3">You have <b>{NumberFormatter.format(Number(wVCX.balance.formatted))}</b> xVCX. xVCX is no longer actively used but you can still bridge it to ethereum and redeem it for VCX.</p>
                 <div className="w-1/3 flex flex-row gap-4">
                   <SecondaryActionButton
                     label="Bridge xVCX"

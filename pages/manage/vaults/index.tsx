@@ -1,3 +1,4 @@
+import SpinningLogo from "@/components/common/SpinningLogo";
 import VaultsContainer from "@/components/vault/VaultsContainer";
 import { vaultsAtom } from "@/lib/atoms/vaults";
 import { AddressesByChain } from "@/lib/types";
@@ -17,5 +18,5 @@ export default function ManageVault() {
     }
   }, [vaultsData, displayVaults])
 
-  return Object.keys(displayVaults).length > 0 ? <VaultsContainer hiddenVaults={{}} displayVaults={displayVaults} manage /> : <p className="text-white">Loading...</p>
+  return Object.keys(displayVaults).length > 0 ? <VaultsContainer hiddenVaults={{}} displayVaults={displayVaults} manage /> : <SpinningLogo />
 }

@@ -50,7 +50,7 @@ export default function LockVcxInterface({
           onChange={handleChangeInput}
           selectedToken={tokens[1][VCX_LP]}
           errorMessage={
-            Number(amount) > (tokens[1][VCX_LP].balance / 1e18)
+            Number(amount) > Number(tokens[1][VCX_LP].balance.formatted)
               ? "Insufficient Balance"
               : ""
           }

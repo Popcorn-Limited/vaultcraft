@@ -4,11 +4,10 @@ import { ReserveData, Token, UserAccountData, VaultData } from "@/lib/types";
 import { useAtom } from "jotai";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useAccount, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
-import { formatUnits, zeroAddress } from "viem";
-import { formatNumber, formatToFixedDecimals, safeRound } from "@/lib/utils/formatBigNumber";
-import { validateInput } from "@/lib/utils/helpers";
+import { zeroAddress } from "viem";
+import { EMPTY_BALANCE, NumberFormatter, validateInput } from "@/lib/utils/helpers";
 import MainActionButton from "@/components/button/MainActionButton";
-import { DEFAULT_ASSET, tokensAtom } from "@/lib/atoms";
+import { tokensAtom } from "@/lib/atoms";
 import TabSelector from "@/components/common/TabSelector";
 import Modal from "@/components/modal/Modal";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
@@ -53,7 +52,7 @@ export default function ManageLoanInterface({ visibilityState, vaultData }: { vi
 
   useEffect(() => {
     if (Object.keys(reserveData).length > 0 && Object.keys(vaultData).length > 0 && Object.keys(tokens).length > 0 && reserveData[vaultData.chainId]?.length > 0) {
-      let sorted = reserveData[vaultData.chainId].sort((a, b) => a.balance - b.balance)
+      let sorted = reserveData[vaultData.chainId].sort((a, b) => Number(a.balance.formatted) - Number(b.balance.formatted))
       setTokenList(sorted.map(e => tokens[vaultData.chainId][e.asset]))
 
       const _supplyToken = sorted[0].asset === vaultData.asset ? reserveData[vaultData.chainId][1].asset : reserveData[vaultData.chainId][0].asset
@@ -68,7 +67,7 @@ export default function ManageLoanInterface({ visibilityState, vaultData }: { vi
       sorted = reserveData[vaultData.chainId].filter(e => e.borrowAmount > 0).sort((a, b) => b.borrowAmount - a.borrowAmount)
       setRepayToken(sorted.length === 0 ? null : tokens[vaultData.chainId][sorted[0].asset])
 
-      sorted = reserveData[vaultData.chainId].filter(e => e.borrowAmount === 0).filter(e => e.balance > 0).sort((a, b) => b.balance - a.balance)
+      sorted = reserveData[vaultData.chainId].filter(e => e.borrowAmount === 0).filter(e => Number(e.balance.formatted) > 0).sort((a, b) => Number(b.balance.formatted) - Number(a.balance.formatted))
       setWithdrawToken(!account || sorted.length === 0 ? null : tokens[vaultData.chainId][sorted[0].asset])
     }
   }, [reserveData, vaultData, tokens])
@@ -84,7 +83,7 @@ export default function ManageLoanInterface({ visibilityState, vaultData }: { vi
 
     switch (newTab) {
       case "Supply":
-        sorted = reserveData[vaultData.chainId].filter(e => e.asset !== vaultData.asset).sort((a, b) => b.balance - a.balance)
+        sorted = reserveData[vaultData.chainId].filter(e => e.asset !== vaultData.asset).sort((a, b) => Number(b.balance.formatted) - Number(a.balance.formatted))
         setTokenList(sorted.map(e => tokens[vaultData.chainId][e.asset]))
 
         if (!supplyToken) {
@@ -188,7 +187,7 @@ export default function ManageLoanInterface({ visibilityState, vaultData }: { vi
         handleChangeInput({
           currentTarget: {
             value:
-              String((reserveData[vaultData.chainId].find(d => d.asset === inputToken?.address)?.balance || 0) * (10 ** inputToken.decimals))
+              String(Number(reserveData[vaultData.chainId].find(d => d.asset === inputToken?.address)?.balance.formatted || 0) * (10 ** inputToken.decimals))
           }
         })
       case "Repay":
@@ -199,10 +198,7 @@ export default function ManageLoanInterface({ visibilityState, vaultData }: { vi
           }
         })
       default:
-        const stringBal = inputToken.balance.toLocaleString("fullwide", { useGrouping: false })
-        const rounded = safeRound(BigInt(stringBal), inputToken.decimals)
-        const formatted = formatUnits(rounded, inputToken.decimals)
-        handleChangeInput({ currentTarget: { value: formatted } })
+        handleChangeInput({ currentTarget: { value: inputToken.balance.formatted } })
     }
   }
 
@@ -227,7 +223,7 @@ export default function ManageLoanInterface({ visibilityState, vaultData }: { vi
       val >= ((reserveData[vaultData.chainId].find(d => d.asset === repayToken?.address)?.borrowAmount || 0) * (10 ** inputToken.decimals))) {
       val = -1
     } else if (AaveActionType.Withdraw === action &&
-      val === ((reserveData[vaultData.chainId].find(d => d.asset === repayToken?.address)?.balance || 0) * (10 ** inputToken.decimals))) {
+      val === (Number(reserveData[vaultData.chainId].find(d => d.asset === repayToken?.address)?.balance.formatted || 0) * (10 ** inputToken.decimals))) {
       val = -1
     }
 
@@ -306,7 +302,8 @@ export default function ManageLoanInterface({ visibilityState, vaultData }: { vi
                 selectedToken={activeTab === "Withdraw" ?
                   {
                     ...inputToken,
-                    balance: reserveData[vaultData.chainId].find(d => d.asset === inputToken?.address)?.balance || 0
+                    balance: reserveData[vaultData.chainId].find(d => d.asset === inputToken?.address)?.balance
+                      || EMPTY_BALANCE
                   }
                   : inputToken}
                 errorMessage={""}
@@ -323,7 +320,7 @@ export default function ManageLoanInterface({ visibilityState, vaultData }: { vi
                       && reserveData[vaultData.chainId].find(d => d.asset === repayToken?.address)?.borrowAmount > 0)
                       ? "<0.001"
                       // @ts-ignore
-                      : `${formatNumber(reserveData[vaultData.chainId].find(d => d.asset === repayToken?.address)?.borrowAmount)}`}
+                      : `${NumberFormatter.format(reserveData[vaultData.chainId].find(d => d.asset === repayToken?.address)?.borrowAmount)}`}
                 </p>
               }
               <div className="mt-8">
@@ -340,7 +337,17 @@ export default function ManageLoanInterface({ visibilityState, vaultData }: { vi
             <AaveUserAccountData
               supplyToken={supplyToken}
               borrowToken={borrowToken}
-              inputToken={inputToken || DEFAULT_ASSET}
+              inputToken={inputToken ||
+              {
+                name: "Choose an Asset",
+                symbol: "none",
+                decimals: 0,
+                logoURI: "",
+                address: zeroAddress,
+                balance: EMPTY_BALANCE,
+                totalSupply: BigInt(0),
+                price: 0,
+              }}
               inputAmount={Number(inputAmount)}
               activeTab={activeTab}
               chainId={vaultData.chainId}
@@ -424,12 +431,12 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
               >
                 <span className="w-full text-end md:text-start">
                   <p className="text-white text-xl">
-                    {formatToFixedDecimals(userAccountData[chainId].healthFactor || 0, 2)}
+                    {NumberFormatter.format(userAccountData[chainId].healthFactor || 0)}
                   </p>
                   {inputAmount > 0 &&
                     <>
                       <p className={`text-sm ${getHealthFactorColor("text", newUserAccountData.healthFactor)}`}>
-                        {formatToFixedDecimals(newUserAccountData.healthFactor || 0, 2)}
+                        {NumberFormatter.format(newUserAccountData.healthFactor || 0)}
                       </p>
                     </>}
                 </span>
@@ -442,12 +449,12 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
               >
                 <span className="w-full text-end md:text-start">
                   <p className="text-white text-xl">
-                    $ {formatToFixedDecimals(((userAccountData[chainId].ltv * userAccountData[chainId].totalCollateral) - userAccountData[chainId].totalBorrowed) || 0, 2)}
+                    $ {NumberFormatter.format(((userAccountData[chainId].ltv * userAccountData[chainId].totalCollateral) - userAccountData[chainId].totalBorrowed) || 0)}
                   </p>
                   {inputAmount > 0 &&
                     <>
                       <p className={`text-sm text-white`}>
-                        $ {formatToFixedDecimals(((newUserAccountData.ltv * newUserAccountData.totalCollateral) - newUserAccountData.totalBorrowed) || 0, 2)}
+                        $ {NumberFormatter.format(((newUserAccountData.ltv * newUserAccountData.totalCollateral) - newUserAccountData.totalBorrowed) || 0)}
                       </p>
                     </>}
                 </span>
@@ -459,12 +466,12 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
               >
                 <span className="w-full text-end md:text-start">
                   <p className="text-white text-xl">
-                    {formatToFixedDecimals(userAccountData[chainId].netRate || 0, 2)} %
+                    {NumberFormatter.format(userAccountData[chainId].netRate || 0)} %
                   </p>
                   {inputAmount > 0 &&
                     <>
                       <p className={`text-sm text-white`}>
-                        {formatToFixedDecimals(newUserAccountData.netRate || 0, 2)} %
+                        {NumberFormatter.format(newUserAccountData.netRate || 0)} %
                       </p>
                     </>}
                 </span>
@@ -476,12 +483,12 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
               >
                 <span className="w-full text-end md:text-start">
                   <p className="text-white text-xl">
-                    $ {formatToFixedDecimals(userAccountData[chainId].totalCollateral || 0, 2)}
+                    $ {NumberFormatter.format(userAccountData[chainId].totalCollateral || 0)}
                   </p>
                   {inputAmount > 0 &&
                     <>
                       <p className={`text-sm text-white`}>
-                        $ {formatToFixedDecimals(newUserAccountData.totalCollateral || 0, 2)}
+                        $ {NumberFormatter.format(newUserAccountData.totalCollateral || 0)}
                       </p>
                     </>}
                 </span>
@@ -493,12 +500,12 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
               >
                 <span className="w-full text-end md:text-start">
                   <p className="text-white text-xl">
-                    $ {formatNumber(userAccountData[chainId].totalBorrowed || 0)}
+                    $ {NumberFormatter.format(userAccountData[chainId].totalBorrowed || 0)}
                   </p>
                   {inputAmount > 0 &&
                     <>
                       <p className={`text-sm text-white`}>
-                        $ {formatNumber(newUserAccountData.totalBorrowed || 0)}
+                        $ {NumberFormatter.format(newUserAccountData.totalBorrowed || 0)}
                       </p>
                     </>}
                 </span>
@@ -510,12 +517,12 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
               >
                 <span className="w-full text-end md:text-start">
                   <p className="text-white text-xl">
-                    $ {formatNumber(userAccountData[chainId].netValue || 0)}
+                    $ {NumberFormatter.format(userAccountData[chainId].netValue || 0)}
                   </p>
                   {inputAmount > 0 &&
                     <>
                       <p className={`text-sm text-white`}>
-                        $ {formatNumber(newUserAccountData.netValue || 0)}
+                        $ {NumberFormatter.format(newUserAccountData.netValue || 0)}
                       </p>
                     </>}
                 </span>
@@ -538,7 +545,7 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
                   <span className="flex flex-row items-center">
                     <TokenIcon token={supplyToken} icon={supplyToken.logoURI} chainId={10} imageSize={"w-6 h-6 mb-0.5"} />
                     <p className="ml-2 mb-1.5 text-xl text-white">
-                      {formatToFixedDecimals(supplyReserve.supplyRate || 0, 2)} %
+                      {NumberFormatter.format(supplyReserve.supplyRate || 0)} %
                     </p>
                   </span>
                 </div>
@@ -552,7 +559,7 @@ export function AaveUserAccountData({ supplyToken, borrowToken, inputToken, inpu
                   <span className="flex flex-row items-center">
                     <TokenIcon token={borrowToken} icon={borrowToken.logoURI} chainId={10} imageSize={"w-6 h-6 mb-0.5"} />
                     <p className="ml-2 mb-1.5 text-xl text-white">
-                      {formatToFixedDecimals(borrowReserve.borrowRate || 0, 2)} %
+                      {NumberFormatter.format(borrowReserve.borrowRate || 0)} %
                     </p>
                   </span>
                 </div>

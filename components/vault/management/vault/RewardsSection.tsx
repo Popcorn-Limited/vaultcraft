@@ -7,8 +7,7 @@ import { tokensAtom } from "@/lib/atoms";
 import { fundReward } from "@/lib/gauges/interactions";
 import { getRewardData } from "@/lib/gauges/useGaugeRewardData";
 import { Token } from "@/lib/types";
-import { formatAndRoundNumber, safeRound } from "@/lib/utils/formatBigNumber";
-import { validateInput } from "@/lib/utils/helpers";
+import { formatBalance, validateInput } from "@/lib/utils/helpers";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { Address, formatUnits } from "viem";
@@ -72,12 +71,7 @@ function RewardColumn({ gauge, reward, token, chainId }: { gauge: Address, rewar
 
   function handleMaxClick() {
     if (!token) return;
-    const stringBal = token.balance.toLocaleString("fullwide", {
-      useGrouping: false,
-    });
-    const rounded = safeRound(BigInt(stringBal), token.decimals);
-    const formatted = formatUnits(rounded, token.decimals);
-    handleChangeInput({ currentTarget: { value: formatted } });
+    handleChangeInput({ currentTarget: { value: token.balance.formatted } });
   }
 
   async function handleApprove() {
@@ -144,8 +138,8 @@ function RewardColumn({ gauge, reward, token, chainId }: { gauge: Address, rewar
           <strong>${token?.symbol ?? "TKN"}</strong>
         </nav>
       </td>
-      <td className="text-left">{formatAndRoundNumber(reward.rate, token.decimals)} {token?.symbol!}/s</td>
-      <td className="text-left">{formatAndRoundNumber(reward.remainingRewards, token.decimals)} {token?.symbol!}</td>
+      <td className="text-left">{formatBalance(reward.rate, token.decimals)} {token?.symbol!}/s</td>
+      <td className="text-left">{formatBalance(reward.remainingRewards, token.decimals)} {token?.symbol!}</td>
       <td className="text-left">
         {reward.periodFinish.toLocaleDateString()}
       </td>

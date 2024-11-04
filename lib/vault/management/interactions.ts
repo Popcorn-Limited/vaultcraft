@@ -1,9 +1,7 @@
 import { MultiStrategyVaultAbi, MultiStrategyVaultV2_1Abi, MultiStrategyVaultV2Abi, VaultAbi, VaultControllerAbi, VaultControllerByChain } from "@/lib/constants";
 import { showLoadingToast } from "@/lib/toasts"
-import { AddressByChain, Clients, SimulationResponse, VaultAllocation, VaultData, VaultsV2FeeConfig } from "@/lib/types"
+import { Clients, VaultAllocation, VaultData, VaultsV2FeeConfig } from "@/lib/types"
 import { SimulationContract, handleCallResult, simulateCall } from "@/lib/utils/helpers"
-import { MdPanoramaWideAngleSelect } from "react-icons/md";
-import { VaultController } from "vaultcraft-sdk";
 import { Address, maxUint256 } from "viem"
 
 interface BaseWriteProps {

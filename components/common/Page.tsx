@@ -1,17 +1,14 @@
 import Navbar from "@/components/navbar/Navbar";
-import { yieldOptionsAtom } from "@/lib/atoms/sdk";
 import { vaultsAtom } from "@/lib/atoms/vaults";
 import { GAUGE_NETWORKS, RPC_URLS, SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { useAtom } from "jotai";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { CachedProvider, YieldOptions } from "vaultcraft-sdk";
 import { useAccount, usePublicClient } from "wagmi";
 import Footer from "@/components/common/Footer";
-import { useRouter } from "next/router";
 import { Address, createPublicClient, http, zeroAddress } from "viem";
 import Modal from "@/components/modal/Modal";
 import MainActionButton from "../button/MainActionButton";
-import { gaugeRewardsAtom, networthAtom, strategiesAtom, tokensAtom, tvlAtom, vaultronAtom } from "@/lib/atoms";
+import { gaugeRewardsAtom, loadingProgressAtom, networthAtom, strategiesAtom, tokensAtom, tvlAtom, vaultronAtom } from "@/lib/atoms";
 import { ReserveData, StrategiesByChain, TokenByAddress, TokenType, UserAccountData, VaultData } from "@/lib/types";
 import getTokenAndVaultsDataByChain from "@/lib/getTokenAndVaultsData";
 import { aaveAccountDataAtom, aaveReserveDataAtom } from "@/lib/atoms/lending";
@@ -19,15 +16,10 @@ import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
 import axios from "axios";
 import { VotingEscrowAbi } from "@/lib/constants";
 import fetchVaultron from "@/lib/vaultron";
-import { mainnet, polygon, xLayer } from "viem/chains";
+import { mainnet, polygon } from "viem/chains";
 import { ST_VCX, VCX_LP, VE_VCX } from "@/lib/constants/addresses";
-
-async function setUpYieldOptions() {
-  const ttl = 360_000;
-  const provider = new CachedProvider();
-  return new YieldOptions({ provider, ttl });
-}
-
+import { formatBalanceUSD } from "@/lib/utils/helpers";
+import ProgressBar from "@/components/common/ProgressBar";
 
 interface TermsModalProps {
   showModal: boolean;
@@ -151,18 +143,10 @@ export default function Page({
 }: {
   children: JSX.Element;
 }): JSX.Element {
-  const router = useRouter();
   const { address: account } = useAccount();
   const publicClient = usePublicClient();
 
-  const [yieldOptions, setYieldOptions] = useAtom(yieldOptionsAtom);
-
-  useEffect(() => {
-    if (!yieldOptions) {
-      setUpYieldOptions().then((res: any) => setYieldOptions(res));
-    }
-  }, []);
-
+  const [progress, setLoadingProgress] = useAtom(loadingProgressAtom);
   const [, setVaults] = useAtom(vaultsAtom);
   const [, setTokens] = useAtom(tokensAtom);
   const [, setStrategies] = useAtom(strategiesAtom);
@@ -176,6 +160,7 @@ export default function Page({
   useEffect(() => {
     async function getData() {
       console.log(`FETCHING APP DATA (${new Date()})`)
+      setLoadingProgress(0);
       const getDataStart = Number(new Date())
 
       // get vaultsData and tokens
@@ -186,6 +171,7 @@ export default function Page({
       console.log(`Fetching Token and Vaults Data (${new Date()})`)
       let start = Number(new Date())
 
+      setLoadingProgress(10);
       await Promise.all(
         SUPPORTED_NETWORKS.map(async (chain) => {
           console.log(`Fetching Data for chain ${chain.id} (${new Date()})`)
@@ -202,6 +188,8 @@ export default function Page({
           newVaultsData[chain.id] = vaultsData
           newTokens[chain.id] = tokens;
           newStrategies[chain.id] = strategies
+
+          setLoadingProgress(prev => prev + (70 / SUPPORTED_NETWORKS.length))
         })
       );
 
@@ -253,7 +241,7 @@ export default function Page({
       } catch (e) {
         stakingTVL = 762000;
       }
-      stakingTVL += (newTokens[1][ST_VCX].totalSupply * newTokens[1][ST_VCX].price) / 1e18
+      stakingTVL += Number(formatBalanceUSD(newTokens[1][ST_VCX].totalSupply, newTokens[1][ST_VCX].decimals, newTokens[1][ST_VCX].price))
 
       console.log(`Completed fetching TVL (${new Date()})`)
       console.log(`Took ${Number(new Date()) - start}ms to load`)
@@ -268,6 +256,7 @@ export default function Page({
       setVaults(prev => ({ ...newVaultsData }));
       setTokens(prev => ({ ...newTokens }));
       setStrategies(prev => ({ ...newStrategies }));
+      setLoadingProgress(prev => 90)
 
       // setAaveReserveData(newReserveData);
       // setAaveAccountData(newUserAccountData);
@@ -278,10 +267,10 @@ export default function Page({
 
         const vaultNetworth = SUPPORTED_NETWORKS.map(chain =>
           Object.values(newTokens[chain.id])).flat().filter(t => t.type === TokenType.Vault || t.type === TokenType.Gauge)
-          .reduce((a, b) => a + ((b.balance / (10 ** b.decimals)) * b.price), 0)
+          .reduce((a, b) => a + Number(b.balance.formattedUSD), 0)
         const assetNetworth = SUPPORTED_NETWORKS.map(chain =>
           Object.values(newTokens[chain.id])).flat().filter(t => t.type === TokenType.Asset)
-          .reduce((a, b) => a + ((b.balance / (10 ** b.decimals)) * b.price), 0)
+          .reduce((a, b) => a + Number(b.balance.formattedUSD), 0)
 
         const stake = await createPublicClient({
           chain: mainnet,
@@ -293,7 +282,7 @@ export default function Page({
           args: [account],
         });
 
-        const stakeNetworth = ((Number(stake.amount) / 1e18) * newTokens[1][VCX_LP].price) + ((newTokens[1][ST_VCX].balance * newTokens[1][ST_VCX].price) / 1e18);
+        const stakeNetworth = Number(formatBalanceUSD(stake.amount, 18, newTokens[1][VCX_LP].price)) + Number(newTokens[1][ST_VCX].balance.formattedUSD);
         const lockVaultNetworth = 0; // @dev hardcoded since we removed lock vaults
 
         console.log(`Completed fetching Networth (${new Date()})`)
@@ -343,6 +332,7 @@ export default function Page({
       }
       console.log(`COMPLETED FETCHING APP DATA (${new Date()})`)
       console.log(`Took ${Number(new Date()) - getDataStart}ms to load`)
+      setLoadingProgress(prev => 100)
     }
     getData();
   }, [account]);
@@ -366,6 +356,11 @@ export default function Page({
       <div className="bg-customNeutral300 w-full min-h-screen h-full mx-auto font-khTeka flex flex-col">
         <Navbar />
         <div className="flex-1 container p-0">
+          {progress < 100 &&
+            <div className="">
+              <ProgressBar progress={progress} />
+            </div>
+          }
           <TermsModal
             showModal={showTermsModal}
             setShowModal={setShowTermsModal}
@@ -375,7 +370,7 @@ export default function Page({
         </div>
         <div className="py-10"></div>
         <Footer />
-      </div>
+      </div >
     </>
   );
 }

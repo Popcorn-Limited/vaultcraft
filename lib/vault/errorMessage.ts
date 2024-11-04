@@ -13,7 +13,7 @@ export default function getVaultErrorMessage(
   const outputAmount = ((Number(value) * Number(inputToken?.price)) / Number(outputToken?.price) || 0) * (10 ** outputToken.decimals)
 
   // Input > Balance
-  if (inputAmount > inputToken.balance) return "Insufficient balance"
+  if (Number(value) > Number(inputToken.balance.formatted)) return "Insufficient balance"
   // Input > depositLimit
   if (isDeposit && inputAmount > vaultData.depositLimit) return "Insufficient deposit limit"
   // Input > withdrawalLimit

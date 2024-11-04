@@ -5,7 +5,6 @@ import { privateKeyToAccount } from "viem/accounts";
 import { SwapKind, Balancer, SingleSwap } from "@/lib/external/balancer";
 import { ERC20 } from "@/lib/tokens/erc20";
 import { BALANCER_VAULT, VCX, VCX_POOL_ID, WETH } from "@/lib/constants";
-import { loadingStyle } from "@/lib/toasts/toastStyles";
 
 export const dynamic = 'force-dynamic'; // static by default, unless reading the request
 export const runtime = 'nodejs';

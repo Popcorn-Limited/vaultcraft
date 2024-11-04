@@ -17,10 +17,6 @@ const ProductLinks = [
     href: "/boost",
   },
   {
-    label: "Create Vaults",
-    href: "/create-vault",
-  },
-  {
     label: "Manage",
     href: "/manage",
   },
@@ -65,7 +61,7 @@ const GovernanceLinks = [
 
 const Footer = () => {
   return (
-    <footer className=" bg-customNeutral200">
+    <footer className="bg-customNeutral200">
       <section className="w-full container flex flex-col md:flex-row py-12 px-8">
         <div className="w-full md:w-1/4 md:mr-8">
           <div className="flex flex-row">

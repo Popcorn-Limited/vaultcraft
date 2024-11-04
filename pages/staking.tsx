@@ -1,30 +1,32 @@
-import { Clients, Token, TokenByAddress, TokenType, VaultData, ZapProvider } from "@/lib/types";
+import { Clients, Token, TokenByAddress, ZapProvider } from "@/lib/types";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import NoSSR from "react-no-ssr";
 import { showErrorToast, showLoadingToast, showSuccessToast } from "@/lib/toasts";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { ArrowDownIcon, Square2StackIcon } from "@heroicons/react/24/outline";
-import { Networth, networthAtom, tokensAtom, TVL, tvlAtom } from "@/lib/atoms";
-import { FEE_RECIPIENT_PROXY, OptionTokenByChain, ST_VCX, VCX, VeTokenByChain, ZapAssetAddressesByChain } from "@/lib/constants";
-import { Address, createPublicClient, erc20Abi, formatUnits, http, isAddress, PublicClient, zeroAddress } from "viem";
+import { networthAtom, tokensAtom, tvlAtom } from "@/lib/atoms";
+import { FEE_RECIPIENT_PROXY, OptionTokenByChain, ST_VCX, VCX, ZapAssetAddressesByChain } from "@/lib/constants";
+import { Address, createPublicClient, http, parseUnits } from "viem";
 import { mainnet } from "viem/chains";
-import { RPC_URLS, SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
+import { RPC_URLS } from "@/lib/utils/connectors";
 import { LockVaultAbi } from "@/lib/constants/abi/LockVault";
 import { useAccount, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import LargeCardStat from "@/components/common/LargeCardStat";
-import { formatAndRoundNumber, formatNumber, formatTwoDecimals, safeRound } from "@/lib/utils/formatBigNumber";
 import NetworkSticker from "@/components/network/NetworkSticker";
 import TokenIcon from "@/components/common/TokenIcon";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
-import { handleSwitchChain, validateInput } from "@/lib/utils/helpers";
-import zap, { getZapProvider, handleZapAllowance } from "@/lib/vault/zap";
+import { formatBalance, formatBalanceUSD, handleSwitchChain, NumberFormatter, validateInput } from "@/lib/utils/helpers";
 import MainActionButton from "@/components/button/MainActionButton";
 import ActionSteps from "@/components/vault/ActionSteps";
 import { handleAllowance } from "@/lib/approve";
 import { claim, deposit, increaseDeposit, withdraw } from "@/lib/vault/lockVault/interactions";
 import LockTimeButton from "@/components/button/LockTimeButton";
+import SpinningLogo from "@/components/common/SpinningLogo";
+import { getZapProvider } from "@/lib/zap/zapProvider";
+import { handleZapAllowance } from "@/lib/zap/zapAllowance";
+import zap from "@/lib/zap";
 
 async function getUserLockVaultData(user: Address, vault: Address) {
   const client = createPublicClient({
@@ -112,7 +114,6 @@ export default function Staking() {
   const [tokenOptions, setTokenOptions] = useState<Token[]>([]);
   const [asset, setAsset] = useState<Token>();
   const [vault, setVault] = useState<Token>();
-  const [lockVaultData, setLockVaultData] = useState<any>()
   const [userLockVaultData, setUserLockVaultData] = useState<any>()
   const [walletValue, setWalletValue] = useState<number>(0)
   const [depositValue, setDepositValue] = useState<number>(0)
@@ -148,9 +149,9 @@ export default function Staking() {
 
       setAsset(_asset)
       setVault(_vault)
-      setWalletValue((_asset.balance * _asset.price) / 1e18)
-      setDepositValue((_vault.balance * _asset.price) / 1e18)
-      setTvl((_vault.totalSupply * _asset.price) / 1e18)
+      setWalletValue(Number(_asset.balance.formattedUSD))
+      setDepositValue(Number(_vault.balance.formattedUSD))
+      setTvl(Number(formatBalanceUSD(_vault.totalSupply, _vault.decimals, _vault.price)))
 
     }
   }, [tokens, account]);
@@ -164,7 +165,7 @@ export default function Staking() {
     setOutputToken(_userLockVaultData.isExit ? _asset : _vault)
     setActionType(_userLockVaultData.isExit ? StakeActionType.Withdraw : _userLockVaultData.hasLock ? StakeActionType.IncreaseAmount : StakeActionType.Deposit)
     if (_userLockVaultData.isExit) {
-      setInputBalance(String(_vault.balance / 1e18))
+      setInputBalance(_vault.balance.formatted)
     }
   }
 
@@ -178,12 +179,7 @@ export default function Staking() {
 
   function handleMaxClick() {
     if (!asset) return;
-    const stringBal = asset.balance.toLocaleString("fullwide", {
-      useGrouping: false,
-    });
-    const rounded = safeRound(BigInt(stringBal), asset.decimals);
-    const formatted = formatUnits(rounded, asset.decimals);
-    handleChangeInput({ currentTarget: { value: formatted } });
+    handleChangeInput({ currentTarget: { value: asset.balance.formatted } });
   }
 
   function handleTokenSelect(option: Token) {
@@ -258,8 +254,8 @@ export default function Staking() {
                   <LargeCardStat
                     id={"wallet"}
                     label="Your Wallet"
-                    value={walletValue < 1 ? "$ 0" : `$ ${formatTwoDecimals(walletValue)}`}
-                    secondaryValue={walletValue < 1 ? `0 ${asset.symbol}` : `${formatTwoDecimals(asset.balance / 10 ** asset.decimals)} ${asset.symbol}`}
+                    value={walletValue < 1 ? "$ 0" : `$ ${NumberFormatter.format(walletValue)}`}
+                    secondaryValue={walletValue < 1 ? `0 ${asset.symbol}` : `${NumberFormatter.format(Number(asset.balance.formatted))} ${asset.symbol}`}
                     tooltip="Value of deposit assets held in your wallet"
                   />
                 </div>
@@ -267,8 +263,9 @@ export default function Staking() {
                   <LargeCardStat
                     id={"deposits"}
                     label="Deposits"
-                    value={depositValue < 1 ? "$ 0" : `$ ${formatTwoDecimals(depositValue)}`}
-                    secondaryValue={depositValue < 1 ? "$ 0" : `${formatAndRoundNumber(vault?.balance!, vault?.decimals!)} ${asset.symbol}`}
+                    value={depositValue < 1 ? "$ 0" : `$ ${NumberFormatter.format(depositValue)}`}
+                    // @dev Shares are always minted 1:1 so we dont need to convert the vault balance to asset balance
+                    secondaryValue={depositValue < 1 ? `0 ${asset.symbol}` : `${NumberFormatter.format(Number(vault.balance.formatted))} ${asset.symbol}`}
                     tooltip="Value of your vault deposits"
                   />
                 </div>
@@ -276,12 +273,12 @@ export default function Staking() {
                   <LargeCardStat
                     id={"tvl"}
                     label="TVL"
-                    value={`$ ${tvl < 1 ? "0" : formatTwoDecimals(tvl)
+                    value={`$ ${tvl < 1 ? "0" : NumberFormatter.format(tvl)
                       }`}
                     secondaryValue={
                       asset
-                        ? `${formatTwoDecimals(vault.totalSupply / 1e18)} ${asset?.symbol!}`
-                        : "0 TKN"
+                        ? `${NumberFormatter.format(Number(formatBalance(vault.totalSupply, 18)))} ${asset?.symbol!}`
+                        : "0"
                     }
                     tooltip={``}
                   />
@@ -301,7 +298,7 @@ export default function Staking() {
                       <LargeCardStat
                         id={"yourApy"}
                         label="Your APY"
-                        value={`${formatTwoDecimals(userLockVaultData.multiplier * 25)} %`}
+                        value={`${NumberFormatter.format(userLockVaultData.multiplier * 25)} %`}
                         tooltip="Current variable APY of the vault"
                       />
                     </div>
@@ -317,8 +314,8 @@ export default function Staking() {
                       <LargeCardStat
                         id={"rewards"}
                         label="Claimable"
-                        value={`$ ${formatNumber(((userLockVaultData.accruedVCX / 1e18) * asset.price) + ((userLockVaultData.accruedOVCX / 1e18) * tokens[1][OptionTokenByChain[1]].price))}`}
-                        tooltip={`${formatNumber(userLockVaultData.accruedVCX / 1e18)} VCX + ${formatNumber(userLockVaultData.accruedOVCX / 1e18)} oVCX`}
+                        value={`$ ${formatBalance((userLockVaultData.accruedVCX * asset.price) + (userLockVaultData.accruedOVCX * tokens[1][OptionTokenByChain[1]].price), 18)}`}
+                        tooltip={`${formatBalance(userLockVaultData.accruedVCX, 18)} VCX + ${formatBalance(userLockVaultData.accruedOVCX, 18)} oVCX`}
                       />
                       <div className="h-14">
                         <MainActionButton
@@ -396,7 +393,7 @@ export default function Staking() {
                       allowInput={false}
                     />
                     {!userLockVaultData?.isExit &&
-                      <p className="text-white">
+                      <p className="text-white mt-2">
                         Expected APY: ~{lockTime === 7889400 ? "5" : lockTime === 15778800 ? "10" : lockTime === 23668200 ? "15" : "25"} %
                       </p>
                     }
@@ -550,7 +547,7 @@ export default function Staking() {
         </>
       )
         :
-        <p className="text-white ml-4 md:ml-0">Loading...</p>
+        <SpinningLogo />
     }
   </NoSSR >
 }
@@ -571,7 +568,7 @@ function InteractionContainer({ inputToken, outputToken, asset, vault, zapProvid
   actions: Action[], refreshUserData: Function
 }): JSX.Element {
   const [inputAmount, setInputAmount] = useState<number>(amount)
-  const [valueStorage, setValueStorage] = useState<number>(amount)
+  const [valueStorage, setValueStorage] = useState<bigint>(parseUnits(String(amount), inputToken.decimals))
   const [currentAction, setCurrentAction] = useState<Action>(action)
   const [step, setStep] = useState<number>(0);
 
@@ -580,7 +577,7 @@ function InteractionContainer({ inputToken, outputToken, asset, vault, zapProvid
 
   async function interactionPreHook() {
     if (action === Action.zap) {
-      setValueStorage(asset.balance)
+      setValueStorage(asset.balance.value)
     }
   }
 
@@ -597,7 +594,7 @@ function InteractionContainer({ inputToken, outputToken, asset, vault, zapProvid
         setNetworth({ ...networth, stake: networth.stake - val, total: networth.total - val })
         refreshUserData();
       } else if (action === Action.zap) {
-        setInputAmount(asset.balance - valueStorage)
+        setInputAmount(Number(asset.balance.value - valueStorage))
       }
       const nextStep = step + 1
       setCurrentAction(actions[nextStep])

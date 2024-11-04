@@ -1,5 +1,5 @@
 import { networthAtom, tvlAtom, vaultronAtom } from "@/lib/atoms";
-import { NumberFormatter } from "@/lib/utils/formatBigNumber";
+import { NumberFormatter } from "@/lib/utils/helpers";
 import { useAtom } from "jotai";
 import LargeCardStat from "@/components/common/LargeCardStat";
 

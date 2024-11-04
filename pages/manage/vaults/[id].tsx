@@ -7,7 +7,6 @@ import NoSSR from "react-no-ssr";
 import { createPublicClient, http, isAddress, zeroAddress } from "viem";
 import { VaultAbi } from "@/lib/constants";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
-import { yieldOptionsAtom } from "@/lib/atoms/sdk";
 import { tokensAtom } from "@/lib/atoms";
 import LeftArrowIcon from "@/components/svg/LeftArrowIcon";
 import ApyChart from "@/components/vault/management/vault/ApyChart";
@@ -19,6 +18,7 @@ import VaultsV2Settings from "@/components/vault/management/vault/VaultsV2Settin
 import StrategyDescription from "@/components/vault/StrategyDescription";
 import Link from "next/link";
 import CopyAddress from "@/components/common/CopyAddress";
+import SpinningLogo from "@/components/common/SpinningLogo";
 import { avalanche } from "viem/chains";
 
 async function getLogs(vault: VaultData, asset: Token) {
@@ -85,8 +85,6 @@ export default function Index() {
   const router = useRouter();
   const { query } = router;
 
-  const [yieldOptions] = useAtom(yieldOptionsAtom);
-
   const [vaults] = useAtom(vaultsAtom);
   const [tokens] = useAtom(tokensAtom);
 
@@ -121,11 +119,10 @@ export default function Index() {
       !vaultData &&
       query &&
       Object.keys(vaults).length > 0 &&
-      Object.keys(tokens).length > 0 &&
-      yieldOptions
+      Object.keys(tokens).length > 0
     )
       setupVault();
-  }, [vaults, tokens, query, vaultData, yieldOptions]);
+  }, [vaults, tokens, query, vaultData]);
 
   return (
     <NoSSR>
@@ -220,9 +217,8 @@ export default function Index() {
           }
 
         </div >
-      ) : (
-        <p className="text-white">Loading...</p>
       )
+        : <SpinningLogo />
       }
     </NoSSR >
   );

@@ -1,6 +1,7 @@
-import { TokenByAddress, TokenType, VaultData } from "@/lib/types";
+import { Token, TokenByAddress, TokenType, VaultData } from "@/lib/types";
 import { PublicClient } from "viem";
-import { GaugeAbi } from "../constants";
+import { GaugeAbi } from "@/lib/constants";
+import { EMPTY_BALANCE } from "@/lib/utils/helpers";
 
 export async function prepareGauges(vaultsWithGauges: VaultData[], vaults: TokenByAddress, client: PublicClient): Promise<TokenByAddress> {
   // @ts-ignore
@@ -12,7 +13,7 @@ export async function prepareGauges(vaultsWithGauges: VaultData[], vaults: Token
         functionName: "totalSupply",
       }
     }),
-    allowFailure: false
+    allowFailure: true
   })
 
   let result: TokenByAddress = {}
@@ -23,14 +24,13 @@ export async function prepareGauges(vaultsWithGauges: VaultData[], vaults: Token
       symbol: `st-${vaults[vault.address].symbol}`,
       decimals: vaults[vault.address].decimals, // Number(res[i + 1]),
       logoURI: "/images/tokens/vcx.svg", // wont be used, just here for consistency
-      balance: 0,
-      totalSupply: Number(res[i]),
+      balance: EMPTY_BALANCE,
+      totalSupply: (res[i].result as bigint) ?? BigInt(0),
       price: vaults[vault.address].price, // * (10 ** (Number(res[i + 1]) - vaults[vault.address].decimals)),
       chainId: vault.chainId,
       type: TokenType.Gauge
-    }
-  }
-  )
+    } as Token
+  })
 
   return result;
 }

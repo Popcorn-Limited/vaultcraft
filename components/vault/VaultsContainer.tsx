@@ -1,8 +1,6 @@
 import NoSSR from "react-no-ssr";
-import { Fragment, useEffect, useState } from "react";
-import { useAccount, useBalance } from "wagmi";
+import { useEffect, useState } from "react";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
-import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import useNetworkFilter from "@/lib/useNetworkFilter";
 import NetworkFilter from "@/components/network/NetworkFilter";
 import MainActionButton from "@/components/button/MainActionButton";
@@ -21,11 +19,12 @@ import {
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import OptionTokenExerciseModal from "@/components/optionToken/exercise/OptionTokenExerciseModal";
 import VaultCard from "@/components/vault/VaultCard";
-
+import { formatBalanceUSD, NumberFormatter } from "@/lib/utils/helpers";
 import SearchBar from "@/components/input/SearchBar";
 import VaultsSorting from "@/components/vault/VaultsSorting";
 import VaultsTable from "@/components/vault/VaultsTable";
 import LargeCardStat from "@/components/common/LargeCardStat";
+import SpinningLogo from "@/components/common/SpinningLogo";
 
 interface VaultsContainerProps {
   hiddenVaults: AddressesByChain;
@@ -107,9 +106,7 @@ export default function VaultsContainer({
                   id="total-my-ovcx"
                   label="My oVCX"
                   value={`$${tokens[1][OptionTokenByChain[1]].balance && tokens[1] && tokens[1][VCX]
-                    ? NumberFormatter.format(
-                      (tokens[1][OptionTokenByChain[1]].balance / 1e18) * (tokens[1][VCX].price * 0.25)
-                    )
+                    ? NumberFormatter.format(Number(tokens[1][OptionTokenByChain[1]].balance.formattedUSD))
                     : "0"
                     }`}
                   tooltip="Value of oVCX held in your wallet across all blockchains."
@@ -122,10 +119,9 @@ export default function VaultsContainer({
                   id="total-claimable-ovcx"
                   label="Claimable oVCX"
                   value={`$${gaugeRewards && tokens[1] && tokens[1][VCX]
-                    ? NumberFormatter.format(
-                      (Number(gaugeRewards?.[1]?.total + gaugeRewards?.[10]?.total + gaugeRewards?.[42161]?.total || 0) / 1e18) *
-                      (tokens[1][VCX].price * 0.25)
-                    )
+                    ? NumberFormatter.format(Number(
+                      formatBalanceUSD(gaugeRewards?.[1]?.total + gaugeRewards?.[10]?.total + gaugeRewards?.[42161]?.total || BigInt(0), 18, tokens[1][VCX].price * 0.25)
+                    ))
                     : "0"
                     }`}
                   tooltip="Cumulative value of claimable oVCX from vaults across all blockchains."
@@ -203,5 +199,5 @@ export default function VaultsContainer({
       </div>
     </NoSSR >
   )
-    : <p className="text-white">Loading...</p>
+    : <div className="mt-12"><SpinningLogo /></div>
 }

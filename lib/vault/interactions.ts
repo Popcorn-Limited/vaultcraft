@@ -3,7 +3,7 @@ import { Clients, SimulationResponse, Token, TokenByAddress, VaultData } from "@
 import { VaultAbi } from "@/lib/constants";
 import { Address, PublicClient } from "viem";
 import { VaultRouterAbi } from "@/lib/constants/abi/VaultRouter";
-import { handleCallResult } from "@/lib/utils/helpers";
+import { formatBalance, handleCallResult } from "@/lib/utils/helpers";
 import { networkMap } from "@/lib/utils/connectors";
 import mutateTokenBalance from "./mutateTokenBalance";
 
@@ -13,7 +13,7 @@ interface VaultWriteProps {
   asset: Token;
   vault: Token;
   account: Address;
-  amount: number;
+  amount: bigint;
   clients: Clients;
   fireEvent?: (
     type: string,
@@ -46,7 +46,7 @@ interface VaultSimulateProps extends BaseSimulateProps {
 }
 
 interface VaultRouterSimulateProps extends BaseSimulateProps {
-  amount: number;
+  amount: bigint;
   vault: Address;
   gauge: Address;
 }
@@ -90,13 +90,10 @@ async function simulateVaultRouterCall({
       abi: VaultRouterAbi,
       // @ts-ignore
       functionName,
-      // @dev Since numbers get converted to strings like 1e+21 or similar we need to convert it back to numbers like 10000000000000 and than cast them into BigInts
       args: [
         vault,
         gauge,
-        BigInt(
-          Number(amount).toLocaleString("fullwide", { useGrouping: false })
-        ),
+        amount,
         account,
       ],
     });
@@ -125,11 +122,8 @@ export async function vaultDeposit({
     simulationResponse: await simulateVaultCall({
       address: vaultData.address,
       account,
-      // @dev Since numbers get converted to strings like 1e+21 or similar we need to convert it back to numbers like 10000000000000 and than cast them into BigInts
       args: [
-        BigInt(
-          Number(amount).toLocaleString("fullwide", { useGrouping: false })
-        ),
+        amount,
         account,
       ],
       functionName: "deposit",
@@ -150,7 +144,7 @@ export async function vaultDeposit({
       user_address: account,
       network: networkMap[chainId].toLowerCase(),
       contract_address: vaultData.address,
-      asset_amount: String(amount / 10 ** asset.decimals),
+      asset_amount: formatBalance(amount, asset.decimals),
       asset_ticker: asset.symbol,
       additionalEventData: {
         referral: referral,
@@ -183,10 +177,9 @@ export async function vaultRedeem({
   });
 
   if (
-    maxRedeem <
-    BigInt(Number(amount).toLocaleString("fullwide", { useGrouping: false }))
+    maxRedeem < amount
   ) {
-    amount = Number(maxRedeem);
+    amount = maxRedeem;
   }
 
   const success = await handleCallResult({
@@ -194,11 +187,8 @@ export async function vaultRedeem({
     simulationResponse: await simulateVaultCall({
       address: vaultData.address,
       account,
-      // @dev Since numbers get converted to strings like 1e+21 or similar we need to convert it back to numbers like 10000000000000 and than cast them into BigInts
       args: [
-        BigInt(
-          Number(amount).toLocaleString("fullwide", { useGrouping: false })
-        ),
+        amount,
         account,
         account,
       ],
@@ -220,7 +210,7 @@ export async function vaultRedeem({
       user_address: account,
       network: networkMap[chainId].toLowerCase(),
       contract_address: vaultData.address,
-      asset_amount: String(amount / 10 ** vault.decimals),
+      asset_amount: formatBalance(amount, vault.decimals),
       asset_ticker: asset.symbol,
       additionalEventData: {
         referral: referral,
@@ -271,7 +261,7 @@ export async function vaultDepositAndStake({
       user_address: account,
       network: networkMap[chainId].toLowerCase(),
       contract_address: vaultData.address,
-      asset_amount: String(amount / 10 ** asset.decimals),
+      asset_amount: formatBalance(amount, asset.decimals),
       asset_ticker: asset.symbol,
       additionalEventData: {
         referral: referral,
@@ -322,7 +312,7 @@ export async function vaultUnstakeAndWithdraw({
       user_address: account,
       network: networkMap[chainId].toLowerCase(),
       contract_address: vaultData.address,
-      asset_amount: String(amount / 10 ** vault.decimals),
+      asset_amount: formatBalance(amount, vault.decimals),
       asset_ticker: asset.symbol,
       additionalEventData: {
         referral: referral,

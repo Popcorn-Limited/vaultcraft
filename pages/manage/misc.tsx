@@ -1,5 +1,6 @@
 import MainActionButton from "@/components/button/MainActionButton";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
+import SpinningLogo from "@/components/common/SpinningLogo";
 import InputNumber from "@/components/input/InputNumber";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import { handleAllowance } from "@/lib/approve";
@@ -8,14 +9,13 @@ import { BalancerOracleAbi, OptionTokenByChain, OVCX_ORACLE, ROOT_GAUGE_FACTORY,
 import { transmitRewards } from "@/lib/gauges/interactions";
 import { showLoadingToast } from "@/lib/toasts";
 import { SimulationResponse } from "@/lib/types";
-import { safeRound } from "@/lib/utils/formatBigNumber";
 import { handleCallResult, handleSwitchChain, validateInput } from "@/lib/utils/helpers";
 import { fundReward } from "@/lib/vault/lockVault/interactions";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import NoSSR from "react-no-ssr";
-import { formatUnits, getAddress } from "viem";
+import { getAddress } from "viem";
 import { useAccount, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
 
 async function simulateCall({
@@ -177,7 +177,7 @@ function SetOptionTokenOracleParams(): JSX.Element {
       </div>
     </div>
   ) : (
-    <p className="text-white">Loading...</p>
+    <SpinningLogo />
   );
 }
 
@@ -272,13 +272,7 @@ function StakingRewardFunding() {
   function handleMaxClick(isVCX: boolean) {
     if (!tokens) return
     const inputToken = isVCX ? tokens[1][VCX] : tokens[1][OptionTokenByChain[1]]
-
-    const stringBal = inputToken.balance.toLocaleString("fullwide", {
-      useGrouping: false,
-    });
-    const rounded = safeRound(BigInt(stringBal), inputToken.decimals);
-    const formatted = formatUnits(rounded, inputToken.decimals);
-    handleChangeInput({ currentTarget: { value: formatted } }, isVCX);
+    handleChangeInput({ currentTarget: { value: inputToken.balance.formatted } }, isVCX);
   }
 
   async function handleMainAction() {
@@ -379,5 +373,5 @@ function StakingRewardFunding() {
         }
       </div>
     </div>
-    : <p>Loading...</p>
+    : <SpinningLogo />
 }

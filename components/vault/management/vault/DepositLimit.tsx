@@ -2,6 +2,7 @@ import MainActionButton from "@/components/button/MainActionButton";
 import Input from "@/components/input/Input";
 import { tokensAtom } from "@/lib/atoms";
 import { VaultData } from "@/lib/types";
+import { formatBalance } from "@/lib/utils/helpers";
 import { changeDepositLimit } from "@/lib/vault/management/interactions";
 import { useAtom } from "jotai";
 import { FormEventHandler, useState } from "react";
@@ -24,7 +25,7 @@ export default function VaultDepositLimit({
   const [tokens] = useAtom(tokensAtom)
 
   const [depositLimit, setDepositLimit] = useState<string>(
-    String(vaultData.depositLimit / 10 ** tokens[vaultData.chainId][vaultData.asset].decimals)
+    formatBalance(vaultData.depositLimit, tokens[vaultData.chainId][vaultData.asset].decimals)
   );
 
   const handleChangeInput: FormEventHandler<HTMLInputElement> = ({
@@ -45,9 +46,9 @@ export default function VaultDepositLimit({
         <div className="mb-8 mt-4">
           <p className="font-bold">Old Deposit Limit</p>
           <p className="">
-            {vaultData.depositLimit === Number(maxUint256)
+            {vaultData.depositLimit === maxUint256
               ? "∞"
-              : vaultData.depositLimit / 10 ** tokens[vaultData.chainId][vaultData.asset].decimals}{" "}
+              : formatBalance(vaultData.depositLimit, tokens[vaultData.chainId][vaultData.asset].decimals)}{" "}
             {tokens[vaultData.chainId][vaultData.asset].symbol}
           </p>
         </div>
@@ -72,8 +73,7 @@ export default function VaultDepositLimit({
             }
             disabled={
               disabled ||
-              Number(depositLimit) ===
-              vaultData.depositLimit / 10 ** tokens[vaultData.chainId][vaultData.asset].decimals ||
+              Number(depositLimit) === Number(formatBalance(vaultData.depositLimit, tokens[vaultData.chainId][vaultData.asset].decimals)) ||
               Number(depositLimit) === 0
             }
           />

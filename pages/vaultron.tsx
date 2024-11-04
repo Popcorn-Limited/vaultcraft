@@ -5,8 +5,7 @@ import MainActionButton from "@/components/button/MainActionButton";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import { useAtom } from "jotai";
 import { vaultronAtom } from "@/lib/atoms";
-import { NumberFormatter } from "@/lib/utils/formatBigNumber";
-
+import { NumberFormatter } from "@/lib/utils/helpers";
 const AIRDROP_VCX = 1_000_000
 
 const LevelNameByValue: { [key: number]: string } = {
@@ -38,8 +37,6 @@ export default function Vaultron() {
       window.open(`https://opensea.io/assets/matic/0x590e3a9260ffb7887ffd54a57d1facf7db59c751/${tokenId}`, '_blank').focus()
     }
   }
-
-  console.log({ vaultronStats })
 
   return (
     <NoSSR>

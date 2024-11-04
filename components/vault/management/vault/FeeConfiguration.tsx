@@ -1,5 +1,4 @@
 import MainActionButton from "@/components/button/MainActionButton";
-import FeeConfiguration from "@/components/deploymentSections/FeeConfiguration";
 import { feeAtom } from "@/lib/atoms";
 import { VaultData } from "@/lib/types";
 import { acceptFees, proposeFees } from "@/lib/vault/management/interactions";
@@ -7,6 +6,8 @@ import { useAtom } from "jotai";
 import { useEffect } from "react";
 import { Address, parseUnits, zeroAddress } from "viem";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
+import CommonFeeConfiguration from "@/components/vault/management/vault/CommonFeeConfiguration";
+import SpinningLogo from "@/components/common/SpinningLogo";
 
 export default function VaultFeeConfiguration({
   vaultData,
@@ -28,10 +29,10 @@ export default function VaultFeeConfiguration({
   useEffect(() => {
     if (vaultData)
       setFees({
-        deposit: String(vaultData.fees.deposit / 1e16),
-        withdrawal: String(vaultData.fees.withdrawal / 1e16),
-        management: String(vaultData.fees.management / 1e16),
-        performance: String(vaultData.fees.performance / 1e16),
+        deposit: String(Number(vaultData.fees.deposit) / 1e16),
+        withdrawal: String(Number(vaultData.fees.withdrawal) / 1e16),
+        management: String(Number(vaultData.fees.management) / 1e16),
+        performance: String(Number(vaultData.fees.performance) / 1e16),
         recipient: String(vaultData.metadata.feeRecipient),
       });
   }, [vaultData]);
@@ -48,22 +49,22 @@ export default function VaultFeeConfiguration({
         {proposedFeeTime > 0 ? (
           <div className="mt-4">
             <p className="font-bold">Proposed Fee Configuration</p>
-            <p>Deposit: {vaultData.fees.deposit / 1e16} %</p>
-            <p>Withdrawal: {vaultData.fees.withdrawal / 1e16} %</p>
-            <p>Performance: {vaultData.fees.performance / 1e16} %</p>
-            <p>Management: {vaultData.fees.management / 1e16} %</p>
+            <p>Deposit: {Number(vaultData.fees.deposit) / 1e16} %</p>
+            <p>Withdrawal: {Number(vaultData.fees.withdrawal) / 1e16} %</p>
+            <p>Performance: {Number(vaultData.fees.performance) / 1e16} %</p>
+            <p>Management: {Number(vaultData.fees.management) / 1e16} %</p>
           </div>
         ) : (
           <>
             {vaultData.metadata.feeRecipient !== zeroAddress ? (
-              <FeeConfiguration
+              <CommonFeeConfiguration
                 showFeeRecipient={false}
                 openCategories={Object.values(vaultData.fees).map(
                   (v) => Number(v) > 0
                 )}
               />
             ) : (
-              <p className="text-white">Loading Configuration...</p>
+              <SpinningLogo />
             )}
           </>
         )}

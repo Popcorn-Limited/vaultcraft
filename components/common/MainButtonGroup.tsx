@@ -1,12 +1,10 @@
 import MainActionButton from "@/components/button/MainActionButton";
 import { handleSwitchChain } from "@/lib/utils/helpers";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import { useAccount, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
+import { useAccount, useSwitchChain } from "wagmi";
 
 export default function MainButtonGroup({ label, mainAction, chainId, disabled }: { label: string, mainAction: Function, chainId: number, disabled: boolean }) {
   const { address: account, chain } = useAccount();
-  const publicClient = usePublicClient({ chainId });
-  const { data: walletClient } = useWalletClient();
   const { switchChainAsync } = useSwitchChain();
   const { openConnectModal } = useConnectModal();
 
