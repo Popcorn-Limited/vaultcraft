@@ -25,12 +25,9 @@ import { ST_VCX, VCX_LP, VE_VCX } from "@/lib/constants/addresses";
 async function setUpYieldOptions() {
   const ttl = 360_000;
   const provider = new CachedProvider();
-  await provider.initialize(
-    "https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/apy-data.json"
-  );
-
   return new YieldOptions({ provider, ttl });
 }
+
 
 interface TermsModalProps {
   showModal: boolean;

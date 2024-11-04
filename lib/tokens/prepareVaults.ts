@@ -4,7 +4,7 @@ import { getAddress } from "viem";
 
 export async function prepareVaults(vaultsData: VaultDataByAddress, assets: TokenByAddress, chainId: number): Promise<TokenByAddress> {
   const { data: vaultTokens } = await axios.get(
-    `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/vaults/tokens/${chainId}.json`
+    `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/vaults/tokens/${chainId}.json`
   );
 
   let result: TokenByAddress = {}

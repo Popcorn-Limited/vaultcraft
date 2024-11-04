@@ -10,7 +10,7 @@ async function getHiddenVaults(): Promise<AddressesByChain> {
   await Promise.all(
     SUPPORTED_NETWORKS.map(async (chain) => {
       const res = await axios.get(
-        `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/vaults/hidden/${chain.id}.json`
+        `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/vaults/hidden/${chain.id}.json`
       );
       result[chain.id] = res.data;
     })
