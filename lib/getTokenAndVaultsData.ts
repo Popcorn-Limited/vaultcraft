@@ -6,7 +6,7 @@ import {
   zeroAddress,
 } from "viem";
 import { StrategyByAddress, TokenByAddress, VaultData } from "@/lib/types";
-import { ChildGaugeAbi, GaugeAbi, OptionTokenByChain, ST_VCX, VCX, VCX_LP, VE_VCX, VeTokenByChain, XVCXByChain, ZapAssetAddressesByChain } from "@/lib/constants";
+import { ChildGaugeAbi, GaugeAbi, OptionTokenByChain, ST_VCX, VCX, VCX_LP, VE_VCX, VeTokenByChain, XVCXByChain,WVCXByChain, ZapAssetAddressesByChain } from "@/lib/constants";
 import { GAUGE_NETWORKS, RPC_URLS } from "@/lib/utils/connectors";
 import { prepareAssets, prepareVaults, addBalances, prepareGauges } from "@/lib/tokens";
 import { mainnet } from "viem/chains";
@@ -50,7 +50,7 @@ export default async function getTokenAndVaultsDataByChain({
   // Create token array
   const uniqueAssetAdresses: Address[] = [...ZapAssetAddressesByChain[chainId]];
   if (chainId === 1) uniqueAssetAdresses.push(...[VCX, VCX_LP, VE_VCX, ST_VCX])
-  if (GAUGE_NETWORKS.includes(chainId)) uniqueAssetAdresses.push(...[OptionTokenByChain[chainId], VeTokenByChain[chainId], XVCXByChain[chainId]])
+  if (GAUGE_NETWORKS.includes(chainId)) uniqueAssetAdresses.push(...[OptionTokenByChain[chainId], VeTokenByChain[chainId], XVCXByChain[chainId], WVCXByChain[chainId]])
 
   // Add vault assets
   Object.values(vaultsData).forEach((vault) => {

@@ -3,6 +3,7 @@ import { TokenByAddress } from "@/lib/types";
 import { ChainById, GAUGE_NETWORKS, RPC_URLS, SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { createPublicClient, erc20Abi, http, parseAbiItem, PublicClient, zeroAddress } from "viem";
 import axios from "axios";
+import { avalanche } from "viem/chains";
 
 export default async function loadDashboardData(tokens: { [key: number]: TokenByAddress }) {
   const vcxData = await loadVCXData(tokens);
@@ -137,7 +138,7 @@ async function loadAssetOracleData() {
   const assetOracleData: { [key: number]: any } = {}
   await Promise.all(
     chains.map(async (chain) => {
-      assetOracleData[chain] = await loadAssetOracleDataByChain(chain)
+      assetOracleData[chain] = chain === avalanche.id ? [] : await loadAssetOracleDataByChain(chain)
     })
   )
   return assetOracleData
