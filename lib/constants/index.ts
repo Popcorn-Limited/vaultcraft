@@ -7,7 +7,7 @@ export * from "./abi";
 
 export async function getAssetsByChain(chainId: number): Promise<Token[]> {
   const { data: assets } = await axios.get(
-    `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/archive/assets/tokens/${chainId}.json`
+    `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/assets/tokens/${chainId}.json`
   );
 
   return Object.values(assets).map((asset) => {
