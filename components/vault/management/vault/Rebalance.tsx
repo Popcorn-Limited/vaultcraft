@@ -4,12 +4,13 @@ import StrategyName from "@/components/common/StrategyName";
 import TabSelector from "@/components/common/TabSelector";
 import InputNumber from "@/components/input/InputNumber";
 import { strategiesAtom, tokensAtom } from "@/lib/atoms";
-import { Token, VaultAllocation, VaultData } from "@/lib/types";
-import { formatBalance, validateInput } from "@/lib/utils/helpers";
+import { Strategy, Token, VaultAllocation, VaultData } from "@/lib/types";
+import { formatBalance, NumberFormatter, validateInput } from "@/lib/utils/helpers";
 import { allocateToStrategies, deallocateFromStrategies } from "@/lib/vault/management/interactions";
 import { addStrategyData } from "@/lib/vault/prepareVaultData";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
+import { parseUnits } from "viem";
 import { useAccount, useBalance, useBlockNumber, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
 
 export default function VaultRebalance({
@@ -35,7 +36,7 @@ export default function VaultRebalance({
 
   useEffect(() => { refetch() }, [blockNumber])
 
-  const [activeTab, setActiveTab] = useState<string>("Deallocate")
+  const [activeTab, setActiveTab] = useState<string>("Allocate")
   const [inputValues, setInputValues] = useState<string[]>(vaultData.strategies.map(s => "0"))
 
   useEffect(() => {
@@ -159,13 +160,14 @@ export default function VaultRebalance({
             <p>Liquid Assets: {formatBalance(vaultData.liquid, asset?.decimals || 0)} {asset?.symbol}</p>
             <p>Idle Assets: {formatBalance(vaultData.idle, asset?.decimals || 0)} {asset?.symbol}</p>
           </div>
-          <TabSelector activeTab={activeTab} availableTabs={["Deallocate", "Allocate"]} setActiveTab={switchTab} />
+          <TabSelector activeTab={activeTab} availableTabs={["Allocate", "Deallocate"]} setActiveTab={switchTab} />
           {(asset && float) ?
             <div className="mt-4">
               <table className="table-auto w-full">
                 <thead>
                   <tr>
                     <th scope="col" className="py-3.5 pl-4 pr-3 text-left font-semibold sm:pl-0">Strategy</th>
+                    <th scope="col" className="px-3 py-3.5 text-left font-semibold">vAPY</th>
                     <th scope="col" className="px-3 py-3.5 text-left font-semibold">Allocation</th>
                     <th scope="col" className="px-3 py-3.5 text-left font-semibold">Change</th>
                     <th scope="col" className="px-3 py-3.5 text-left font-semibold">New Allocation</th>
@@ -173,7 +175,7 @@ export default function VaultRebalance({
                 </thead>
                 <tbody>
                   {vaultData.strategies.map(
-                    (strategy, i) =>
+                    (strategy: Strategy, i: number) =>
                       <tr key={strategy.address}>
                         <td className="whitespace-nowrap py-4 pl-4 pr-3 font-medium sm:pl-0">
                           <StrategyName
@@ -184,7 +186,17 @@ export default function VaultRebalance({
                         </td>
 
                         <td className="whitespace-nowrap px-3 py-4 text-gray-500">
-                          {formatBalance(strategy.allocation, asset?.decimals || 0)} {asset?.symbol}
+                          {strategy.apyData.totalApy === 0 ? "TBD" : `${NumberFormatter.format(strategy.apyData.totalApy)} %`}
+                        </td>
+
+                        <td className="whitespace-nowrap px-3 py-4 text-gray-500">
+                          <p className="text-gray-500">
+                            {Number(formatBalance(strategy.allocation, asset?.decimals || 0))}
+                            {" "}{asset?.symbol}
+                          </p>
+                          <p className="text-gray-500">
+                            {NumberFormatter.format(strategy.allocationPerc * 100)} %
+                          </p>
                         </td>
 
                         <td className="whitespace-nowrap px-3 py-4 text-gray-500">
@@ -198,12 +210,21 @@ export default function VaultRebalance({
                         </td>
 
 
-                        <td className="whitespace-nowrap px-3 py-4 text-gray-500">
-                          {activeTab === "Deallocate"
-                            ? Number(formatBalance(strategy.allocation, asset?.decimals || 0)) - Number(inputValues[i])
-                            : Number(formatBalance(strategy.allocation, asset?.decimals || 0)) + Number(inputValues[i])
-                          }
-                          {" "}{asset?.symbol}
+                        <td className="whitespace-nowrap px-3 py-4">
+                          <p className="text-gray-500">
+                            {activeTab === "Deallocate"
+                              ? Number(formatBalance(strategy.allocation, asset?.decimals || 0)) - Number(inputValues[i])
+                              : Number(formatBalance(strategy.allocation, asset?.decimals || 0)) + Number(inputValues[i])
+                            }
+                            {" "}{asset?.symbol}
+                          </p>
+                          <p className="text-gray-500">
+                            {activeTab === "Deallocate"
+                              ? NumberFormatter.format(Number(strategy.allocation - parseUnits(inputValues[i], asset?.decimals || 0)) / Number(vaultData.totalAssets) * 100)
+                              : NumberFormatter.format(Number(strategy.allocation + parseUnits(inputValues[i], asset?.decimals || 0)) / Number(vaultData.totalAssets) * 100)
+                            }
+                            {" "}%
+                          </p>
                         </td>
                       </tr>
                   )}
