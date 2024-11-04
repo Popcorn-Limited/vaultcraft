@@ -22,6 +22,13 @@ import fetchVaultron from "@/lib/vaultron";
 import { mainnet, polygon, xLayer } from "viem/chains";
 import { ST_VCX, VCX_LP, VE_VCX } from "@/lib/constants/addresses";
 
+async function setUpYieldOptions() {
+  const ttl = 360_000;
+  const provider = new CachedProvider();
+  return new YieldOptions({ provider, ttl });
+}
+
+
 interface TermsModalProps {
   showModal: boolean;
   setShowModal: Dispatch<SetStateAction<boolean>>;
