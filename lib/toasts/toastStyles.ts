@@ -12,7 +12,7 @@ export const loadingStyle: ToastOptions = {
     primary: "#23262f",
     secondary: "#FFFFFF",
   },
-  position: "top-center" as ToastPosition,
+  position: "bottom-left" as ToastPosition,
 };
 
 export const successStyle: ToastOptions = {
@@ -27,7 +27,7 @@ export const successStyle: ToastOptions = {
     primary: "#23262f",
     secondary: "#34C759",
   },
-  position: "top-center" as ToastPosition,
+  position: "bottom-left" as ToastPosition,
 };
 
 export const errorStyle: ToastOptions = {
@@ -42,5 +42,5 @@ export const errorStyle: ToastOptions = {
     primary: "#D43D44",
     secondary: "#FFFFFF",
   },
-  position: "top-center" as ToastPosition,
+  position: "bottom-left" as ToastPosition,
 };

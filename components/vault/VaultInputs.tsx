@@ -279,7 +279,7 @@ export default function VaultInputs({
         <>
           {vaultData.depositLimit < maxUint256 &&
             <span
-              className="flex flex-row items-center justify-between text-customGray100 hover:text-customGray200 cursor-pointer"
+              className="flex flex-row items-center justify-between text-customGray100 hover:text-customGray200 cursor-pointer mt-2"
               onClick={() => handleChangeInput({ currentTarget: { value: formatBalance(vaultData.depositLimit, asset?.decimals || 0) } })}
             >
               <p>Deposit Limit:</p>
@@ -291,7 +291,7 @@ export default function VaultInputs({
         <>
           {vaultData.withdrawalLimit < vaultData.totalSupply &&
             <span
-              className="flex flex-row items-center justify-between text-customGray100 hover:text-customGray200 cursor-pointer"
+              className="flex flex-row items-center justify-between text-customGray100 hover:text-customGray200 cursor-pointer mt-2"
               onClick={() => handleChangeInput({ currentTarget: { value: formatBalance(vaultData.withdrawalLimit, vault?.decimals || 0) } })}
             >
               <p>Withdraw Limit:</p>
