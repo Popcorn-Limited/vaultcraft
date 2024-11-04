@@ -157,6 +157,8 @@ export const NumberFormatter = Intl.NumberFormat("en", {
 });
 
 export const formatBalance = (value: bigint | number, decimals: number, fixed?: number): string => {
+  if ((typeof value === "number" && isNaN(Number(value))) || isNaN(decimals) ) return "0"
+
   const bigValue = typeof value === 'bigint' ? value : BigInt(Math.floor(Number(value)));
   const divisor = BigInt(10 ** decimals);
   const displayValue = bigValue / divisor;

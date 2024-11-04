@@ -18,13 +18,15 @@ import NetworkSticker from "@/components/network/NetworkSticker";
 import TokenIcon from "@/components/common/TokenIcon";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import { formatBalance, formatBalanceUSD, handleSwitchChain, NumberFormatter, validateInput } from "@/lib/utils/helpers";
-import zap, { getZapProvider, handleZapAllowance } from "@/lib/vault/zap";
 import MainActionButton from "@/components/button/MainActionButton";
 import ActionSteps from "@/components/vault/ActionSteps";
 import { handleAllowance } from "@/lib/approve";
 import { claim, deposit, increaseDeposit, withdraw } from "@/lib/vault/lockVault/interactions";
 import LockTimeButton from "@/components/button/LockTimeButton";
 import SpinningLogo from "@/components/common/SpinningLogo";
+import { getZapProvider } from "@/lib/zap/zapProvider";
+import { handleZapAllowance } from "@/lib/zap/zapAllowance";
+import zap from "@/lib/zap";
 
 async function getUserLockVaultData(user: Address, vault: Address) {
   const client = createPublicClient({

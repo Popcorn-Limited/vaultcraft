@@ -60,7 +60,7 @@ export type Point = {
 }
 
 export type ApyData = {
-  targetApy:number;
+  targetApy: number;
   baseApy: number;
   rewardApy: number;
   totalApy: number;
@@ -339,4 +339,11 @@ export type VaultsV2Fee = {
 export type VaultsV2FeeConfig = {
   performance: VaultsV2Fee;
   management: VaultsV2Fee;
+}
+
+export type Transaction = {
+  from: Address;
+  to: Address;
+  data: Address;
+  value: bigint;
 }

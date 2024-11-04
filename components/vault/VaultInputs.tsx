@@ -18,13 +18,15 @@ import { Balance, Clients, SmartVaultActionType, Token, TokenByAddress, TokenTyp
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors"
 import { calcBalance, EMPTY_BALANCE, formatBalance, formatBalanceUSD, NumberFormatter } from "@/lib/utils/helpers"
 import { vaultDeposit, vaultDepositAndStake, vaultRedeem, vaultUnstakeAndWithdraw } from "@/lib/vault/interactions"
-import zap, { getZapProvider, handleZapAllowance } from "@/lib/vault/zap"
 import { ArrowDownIcon } from "@heroicons/react/24/outline"
 import { useAtom } from "jotai"
 import { useState } from "react"
 import { Address, erc20Abi, formatUnits, maxUint256, parseUnits, PublicClient } from "viem"
 import getVaultErrorMessage from "@/lib/vault/errorMessage";
 import MainButtonGroup from "../common/MainButtonGroup";
+import { getZapProvider } from "@/lib/zap/zapProvider";
+import { handleZapAllowance } from "@/lib/zap/zapAllowance";
+import zap from "@/lib/zap";
 
 export interface VaultInputsProps {
   vaultData: VaultData;
