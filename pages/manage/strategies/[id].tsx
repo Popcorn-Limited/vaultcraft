@@ -18,6 +18,7 @@ import ProtocolIcon from "@/components/common/ProtocolIcon";
 import NetworkSticker from "@/components/network/NetworkSticker";
 import TokenIcon from "@/components/common/TokenIcon";
 import AnyToAnyV1DepositorSettings from "@/components/manage/strategy/AnyToAnyV1DepositorSettings";
+import SpinningLogo from "@/components/common/SpinningLogo";
 
 async function getLogs(vault: Address, asset: Token, chainId: number) {
   const client = createPublicClient({
@@ -274,7 +275,7 @@ export default function Index() {
 
         </div>
       ) : (
-        <p className="text-white">Loading...</p>
+        <SpinningLogo />
       )}
     </NoSSR>
   );

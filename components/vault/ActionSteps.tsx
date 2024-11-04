@@ -1,5 +1,4 @@
 import { ActionStep } from "@/lib/getActionSteps";
-import { ArrowRightIcon, CheckIcon, XMarkIcon } from "@heroicons/react/24/outline";
 
 function getStepColor(preFix: string, step: any): string {
   if (step.loading || step.success) return `${preFix}-primaryYellow`;

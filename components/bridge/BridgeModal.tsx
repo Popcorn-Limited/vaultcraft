@@ -4,7 +4,6 @@ import TabSelector from "@/components/common/TabSelector";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import MainActionButton from "@/components/button/MainActionButton";
 import ActionSteps from "@/components/vault/ActionSteps";
-import { safeRound } from "@/lib/utils/formatBigNumber";
 import { encodeAbiParameters, formatUnits } from "viem";
 import { handleSwitchChain, validateInput } from "@/lib/utils/helpers";
 import { ArrowDownIcon } from "@heroicons/react/24/outline";
@@ -67,13 +66,7 @@ export default function BridgeModal({ show }: { show: [boolean, Dispatch<SetStat
 
   function handleMaxClick() {
     if (!xVCX) return
-
-    const stringBal = xVCX.balance.toLocaleString("fullwide", {
-      useGrouping: false,
-    });
-    const rounded = safeRound(BigInt(stringBal), xVCX.decimals);
-    const formatted = formatUnits(rounded, xVCX.decimals);
-    handleChangeInput({ currentTarget: { value: formatted } });
+    handleChangeInput({ currentTarget: { value: xVCX.balance.formatted } });
   }
 
   async function handleMainAction() {

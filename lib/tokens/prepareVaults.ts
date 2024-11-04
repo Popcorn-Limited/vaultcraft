@@ -1,6 +1,7 @@
 import axios from "axios";
-import { TokenByAddress, TokenType, VaultDataByAddress } from "@/lib/types";
+import { Token, TokenByAddress, TokenType, VaultDataByAddress } from "@/lib/types";
 import { getAddress } from "viem";
+import { EMPTY_BALANCE } from "@/lib/utils/helpers";
 
 export async function prepareVaults(vaultsData: VaultDataByAddress, assets: TokenByAddress, chainId: number): Promise<TokenByAddress> {
   const { data: vaultTokens } = await axios.get(
@@ -17,11 +18,11 @@ export async function prepareVaults(vaultsData: VaultDataByAddress, assets: Toke
       ...vaultTokens[getAddress(vault.address)],
       address: getAddress(vault.address),
       price,
-      balance: 0,
+      balance: EMPTY_BALANCE,
       totalSupply: vaultData.totalSupply,
       chainId: chainId,
       type: TokenType.Vault
-    }
+    } as Token
   })
 
   return result;

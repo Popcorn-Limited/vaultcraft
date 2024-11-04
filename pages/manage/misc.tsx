@@ -1,5 +1,6 @@
 import MainActionButton from "@/components/button/MainActionButton";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
+import SpinningLogo from "@/components/common/SpinningLogo";
 import TabSelector from "@/components/common/TabSelector";
 import InputNumber from "@/components/input/InputNumber";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
@@ -12,7 +13,6 @@ import { transmitRewards } from "@/lib/gauges/interactions";
 import { ActionStep, getSmartVaultActionSteps } from "@/lib/getActionSteps";
 import { showLoadingToast } from "@/lib/toasts";
 import { SimulationResponse, SmartVaultActionType, Token } from "@/lib/types";
-import { safeRound } from "@/lib/utils/formatBigNumber";
 import { handleCallResult, handleSwitchChain, validateInput } from "@/lib/utils/helpers";
 import { fundReward } from "@/lib/vault/lockVault/interactions";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
@@ -21,7 +21,7 @@ import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import NoSSR from "react-no-ssr";
-import { encodeAbiParameters, formatUnits, getAddress } from "viem";
+import { encodeAbiParameters, getAddress } from "viem";
 import { mainnet, optimism } from "viem/chains";
 import { useAccount, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
 
@@ -184,7 +184,7 @@ function SetOptionTokenOracleParams(): JSX.Element {
       </div>
     </div>
   ) : (
-    <p className="text-white">Loading...</p>
+    <SpinningLogo />
   );
 }
 
@@ -331,13 +331,7 @@ function BridgeVCX() {
 
   function handleMaxClick() {
     if (!inputToken) return
-
-    const stringBal = inputToken.balance.toLocaleString("fullwide", {
-      useGrouping: false,
-    });
-    const rounded = safeRound(BigInt(stringBal), inputToken.decimals);
-    const formatted = formatUnits(rounded, inputToken.decimals);
-    handleChangeInput({ currentTarget: { value: formatted } });
+    handleChangeInput({ currentTarget: { value: inputToken.balance.formatted } });
   }
 
   async function handleMainAction() {
@@ -500,13 +494,7 @@ function StakingRewardFunding() {
   function handleMaxClick(isVCX: boolean) {
     if (!tokens) return
     const inputToken = isVCX ? tokens[1][VCX] : tokens[1][OptionTokenByChain[1]]
-
-    const stringBal = inputToken.balance.toLocaleString("fullwide", {
-      useGrouping: false,
-    });
-    const rounded = safeRound(BigInt(stringBal), inputToken.decimals);
-    const formatted = formatUnits(rounded, inputToken.decimals);
-    handleChangeInput({ currentTarget: { value: formatted } }, isVCX);
+    handleChangeInput({ currentTarget: { value: inputToken.balance.formatted } }, isVCX);
   }
 
   async function handleMainAction() {
@@ -607,5 +595,5 @@ function StakingRewardFunding() {
         }
       </div>
     </div>
-    : <p>Loading...</p>
+    : <SpinningLogo />
 }

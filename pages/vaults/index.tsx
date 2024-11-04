@@ -31,7 +31,7 @@ const Vaults: NextPage = () => {
       <Carousel />
       <VaultsContainer hiddenVaults={{}} displayVaults={flagshipVaults} />
     </>
-    : <p className="text-white">Loading...</p>;
+    : <></>
 };
 
 export default Vaults;

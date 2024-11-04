@@ -47,6 +47,9 @@ module.exports = {
       // => @media (min-"2560px) { ... }
     },
     extend: {
+      animation: {
+        "spin-slow": "spin 2.5s linear infinite",
+      },
       borderRadius: {
         "4xl": "2rem",
         "5xl": "2.5rem",

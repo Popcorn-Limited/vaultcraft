@@ -64,9 +64,9 @@ async function loadVCXDataByChain(chainId: number, mainnetClient: PublicClient, 
       ],
       allowFailure: false
     })
-    const bridgedOVCX = GAUGE_NETWORKS.filter(chain => chain !== chainId).reduce((amount, chain) => tokens[chain][OptionTokenByChain[chain]].totalSupply + amount, 0)
-    oVCXInCirculation = tokens[chainId][OptionTokenByChain[chainId]].totalSupply - Number(balanceRes[0]) - bridgedOVCX
-    exercisableVCX = Number(balanceRes[1])
+    const bridgedOVCX = GAUGE_NETWORKS.filter(chain => chain !== chainId).reduce((amount, chain) => tokens[chain][OptionTokenByChain[chain]].totalSupply + amount, BigInt(0))
+    oVCXInCirculation = tokens[chainId][OptionTokenByChain[chainId]].totalSupply - balanceRes[0] - bridgedOVCX
+    exercisableVCX = balanceRes[1]
 
     const block = await client.getBlock()
     lastUpdate = block.timestamp
@@ -90,8 +90,8 @@ async function loadVCXDataByChain(chainId: number, mainnetClient: PublicClient, 
       allowFailure: false
     })
 
-    oVCXInCirculation = tokens[chainId][OptionTokenByChain[chainId]].totalSupply - Number(balanceRes[0])
-    exercisableVCX = Number(balanceRes[1])
+    oVCXInCirculation = tokens[chainId][OptionTokenByChain[chainId]].totalSupply - balanceRes[0]
+    exercisableVCX = balanceRes[1]
 
     const updateLogs = await client.getLogs({
       address: ExerciseOracleByChain[chainId],

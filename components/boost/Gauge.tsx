@@ -7,8 +7,7 @@ import { Token, VaultData, VaultLabel } from "@/lib/types";
 import Accordion from "@/components/common/Accordion";
 import CardStat from "@/components/common/CardStat";
 import useGaugeWeights from "@/lib/gauges/useGaugeWeights";
-import { NumberFormatter } from "@/lib/utils/formatBigNumber";
-import { roundToTwoDecimalPlaces } from "@/lib/utils/helpers";
+import { NumberFormatter } from "@/lib/utils/helpers";
 import { useAtom } from "jotai";
 import { tokensAtom } from "@/lib/atoms";
 import { Address } from "viem";
@@ -114,13 +113,13 @@ export default function Gauge({
             <CardStat
               id={`${baseTooltipId}-minRewards`}
               label="Min Rewards Apy"
-              value={`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData?.gaugeData?.lowerAPR!))} %`}
+              value={`${NumberFormatter.format(vaultData?.gaugeData?.lowerAPR!)} %`}
               tooltip="Minimum oVCX boost APR based on most current epoch&apos;s distribution"
             />
             <CardStat
               id={`${baseTooltipId}-maxRewards`}
               label="Max Rewards Apy"
-              value={`${NumberFormatter.format(roundToTwoDecimalPlaces(vaultData?.gaugeData?.upperAPR!))} %`}
+              value={`${NumberFormatter.format(vaultData?.gaugeData?.upperAPR!)} %`}
               tooltip="Maximum oVCX boost APR based on most current epoch&apos;s distribution"
             />
             <CardStat

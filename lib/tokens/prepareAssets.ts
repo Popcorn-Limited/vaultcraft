@@ -1,10 +1,11 @@
 import { Address, PublicClient, erc20Abi, getAddress, maxUint256 } from "viem";
 import axios from "axios";
-import { TokenByAddress, TokenType } from "@/lib/types";
+import { Token, TokenByAddress, TokenType } from "@/lib/types";
 import { networkMap } from "@/lib/utils/connectors";
 import { vcx as getVcxPrice, vcxLp as getVcxLpPrice } from "@/lib/resolver/price/resolver";
 import { ALT_NATIVE_ADDRESS, OptionTokenByChain, ST_VCX, VCX, VCX_LP, WrappedOptionTokenByChain } from "@/lib/constants";
 import { mainnet } from "viem/chains";
+import { EMPTY_BALANCE } from "@/lib/utils/helpers";
 
 export async function prepareAssets(addresses: Address[], chainId: number, client: PublicClient): Promise<TokenByAddress> {
   const { data: assets } = await axios.get(
@@ -46,11 +47,11 @@ export async function prepareAssets(addresses: Address[], chainId: number, clien
       ...assets[getAddress(address)],
       address: getAddress(address),
       price: tokenPrice,
-      balance: 0,
-      totalSupply: address === ALT_NATIVE_ADDRESS ? Number(maxUint256) : Number(ts[i].result),
+      balance: EMPTY_BALANCE,
+      totalSupply: address === ALT_NATIVE_ADDRESS ? maxUint256 : ts[i].result as bigint,
       chainId: chainId,
       type: TokenType.Asset
-    }
+    } as Token
   })
 
   return result;

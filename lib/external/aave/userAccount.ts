@@ -40,7 +40,7 @@ export async function fetchAaveReserveData(account: Address, tokens: TokenByAddr
       supplyValue: supplyAmount * tokens[d.underlyingAsset].price,
       borrowValue: borrowAmount * tokens[d.underlyingAsset].price,
       balance: tokens[d.underlyingAsset].balance,
-      balanceValue: tokens[d.underlyingAsset].balance * tokens[d.underlyingAsset].price,
+      balanceValue: Number(tokens[d.underlyingAsset].balance.formattedUSD),
       supplyBalance: account === zeroAddress ? 0 : Math.floor(Number(formatUnits(uData?.scaledATokenBalance || BigInt(0), decimals)) * Number(formatUnits(d.liquidityIndex, 27)) * (10 ** decimals))
     }
   })

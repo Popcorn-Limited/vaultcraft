@@ -6,6 +6,7 @@ import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 import TabSelector from "@/components/common/TabSelector";
 import ConvertTokenSection from "./ConvertTokenSection";
 import ChangeSettingSection from "./ChangeSettingSetion";
+import SpinningLogo from "@/components/common/SpinningLogo";
 
 export interface ProposedChange {
   value: bigint;
@@ -175,5 +176,5 @@ export default function AnyToAnyV1DepositorSettings({ strategy, asset, yieldToke
       }
     </section>
   )
-    : <p className="text-white">Loading...</p>
+    : <SpinningLogo />
 }

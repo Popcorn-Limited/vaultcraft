@@ -13,6 +13,7 @@ import VaultFeeRecipient from "@/components/vault/management/vault/FeeRecipient"
 import VaultDepositLimit from "@/components/vault/management/vault/DepositLimit";
 import VaultTakeFees from "@/components/vault/management/vault/Fees";
 import VaultPausing from "@/components/vault/management/vault/Pausing";
+import SpinningLogo from "@/components/common/SpinningLogo";
 
 const DEFAULT_TABS = [
   "Strategy",
@@ -102,10 +103,10 @@ async function getVaultSettings(vault: VaultData,): Promise<VaultV1Settings> {
     proposedStrategies: vault.strategies.length > 1 ? res[0] : [res[0]],
     proposedStrategyTime: Number(res[1]),
     proposedFees: {
-      deposit: Number(res[2][0]),
-      withdrawal: Number(res[2][1]),
-      management: Number(res[2][2]),
-      performance: Number(res[2][3]),
+      deposit: res[2][0],
+      withdrawal: res[2][1],
+      management: res[2][2],
+      performance: res[2][3],
     },
     proposedFeeTime: Number(res[3]),
     paused: res[4],
@@ -228,7 +229,7 @@ export default function VaultsV1Settings({ vaultData }: { vaultData: VaultData, 
           )}
         </div>
       ) : (
-        <p className="text-white">Loading...</p>
+        <SpinningLogo />
       )}
     </section>
   )

@@ -1,8 +1,6 @@
-import { NumberFormatter } from "@/lib/utils/formatBigNumber";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction } from "react";
 import {
   useAccount,
-  useBalance,
   usePublicClient,
   useSwitchChain,
   useWalletClient,
@@ -19,7 +17,7 @@ import getGaugeRewards from "@/lib/gauges/getGaugeRewards";
 import { vaultsAtom } from "@/lib/atoms/vaults";
 import NetworkSticker from "@/components/network/NetworkSticker";
 import TokenIcon from "@/components/common/TokenIcon";
-import { handleSwitchChain } from "@/lib/utils/helpers";
+import { handleSwitchChain, NumberFormatter } from "@/lib/utils/helpers";
 
 interface OptionTokenInterfaceProps {
   setShowOptionTokenModal?: Dispatch<SetStateAction<boolean>>;
@@ -157,9 +155,7 @@ export default function OptionTokenInterface({ setShowOptionTokenModal }: Option
           </div>
           <p className="font-bold">
             {`$${tokens[1][OptionTokenByChain[1]].balance && tokens?.[1]?.[VCX]?.price > 0
-              ? NumberFormatter.format(
-                (tokens[1][OptionTokenByChain[1]].balance / 1e18) * (tokens?.[1]?.[VCX]?.price * 0.25)
-              )
+              ? NumberFormatter.format(Number(tokens[1][OptionTokenByChain[1]].balance.formattedUSD))
               : "0"
               }`}
           </p>

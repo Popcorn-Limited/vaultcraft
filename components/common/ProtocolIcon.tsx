@@ -1,4 +1,4 @@
-import ResponsiveTooltip from "./Tooltip";
+import ResponsiveTooltip from "@/components/common/Tooltip";
 
 export const IconByProtocol: { [key: string]: string } = {
   Aave: "https://icons.llamao.fi/icons/protocols/aave?w=48&h=48",

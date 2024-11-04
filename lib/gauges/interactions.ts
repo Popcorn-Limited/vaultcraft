@@ -202,7 +202,7 @@ export async function withdrawLock({
 
 interface GaugeInteractionProps {
   vaultData: VaultData,
-  amount: number;
+  amount: bigint;
   account: Address;
   clients: Clients;
   tokensAtom: [{ [key: number]: TokenByAddress }, Function]
