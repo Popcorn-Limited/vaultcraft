@@ -20,7 +20,7 @@ const Cards = [
   {
     title: "Safe Vaults",
     description: "Manage Safe Vault withdrawals...",
-    link: "/manage/safe"
+    link: "/manage/vaults/safe"
   }
 ]
 
