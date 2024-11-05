@@ -232,14 +232,38 @@ export default function VaultRebalance({
                 </tbody>
               </table>
               <div className="flex flex-row justify-center items-center space-x-4">
-                <p className="text-lg mt-4">
-                  Float: {float?.formatted}{" "}
-                  {activeTab === "Deallocate"
-                    ? <span className="text-green-500">+ {inputValues.reduce((a, b) => Number(a) + Number(b), 0)}</span>
-                    : <span className="text-red-500">- {inputValues.reduce((a, b) => Number(a) + Number(b), 0)}</span>
-                  }
-                  {" "}{asset.symbol}
-                </p>
+                <div>
+                  <p className="text-lg mt-4">
+                    Float: {float?.formatted}{" "}
+                    {activeTab === "Deallocate"
+                      ? <span className="text-green-500">+{inputValues.reduce((a, b) => Number(a) + Number(b), 0)}</span>
+                      : <span className="text-red-500">-{inputValues.reduce((a, b) => Number(a) + Number(b), 0)}</span>
+                    }
+                    {" "}{asset.symbol}
+                  </p>
+                  <p className="text-lg text-gray-500">
+                    <span className="text-customNeutral300">Float: </span>
+                    {NumberFormatter.format(Number(float.value) / Number(vaultData.totalAssets) * 100)}
+                    {" "}
+                    {activeTab === "Deallocate"
+                      ? <span className="text-green-500">
+                        +{NumberFormatter.format(
+                          (inputValues.reduce((a, b) => Number(a) + Number(b), 0) * (10 ** asset?.decimals || 0))
+                          / Number(vaultData.totalAssets)
+                          * 100)
+                        } %
+                      </span>
+                      : <span className="text-red-500">
+                        -{NumberFormatter.format(
+                          (inputValues.reduce((a, b) => Number(a) + Number(b), 0) * (10 ** asset?.decimals || 0))
+                          / Number(vaultData.totalAssets)
+                          * 100)
+                        } %
+                      </span>
+                    }
+                    {" "}
+                  </p>
+                </div>
                 <div className="w-60 mt-4">
                   <MainActionButton
                     label={activeTab}

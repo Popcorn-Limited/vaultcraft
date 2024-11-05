@@ -1,6 +1,7 @@
 import { thisPeriodTimestamp } from "@/lib/gauges/utils"
 import { ChainById } from "@/lib/utils/connectors"
 import { NumberFormatter } from "@/lib/utils/helpers";
+import { parseEther } from "viem";
 
 export default function OptionTokenAlert({ chainId, vcxData }: { chainId: number, vcxData: any }) {
   const lastBridge = Number(vcxData.lastBridge) * 1000
@@ -26,7 +27,7 @@ export default function OptionTokenAlert({ chainId, vcxData }: { chainId: number
           <div className="border border-red-500 bg-red-500 bg-opacity-30 rounded-lg p-4">
             <p className="text-red-500 text-lg">Exercisable oVCX: {ChainById[chainId].name}</p>
             <p className="text-red-500 text-sm">
-              {`Fund the exercise contract. VCX balance of the exercise contract is running low (${NumberFormatter.format(vcxData.exercisableVCX / 1e18)} VCX < 1000 VCX)`}
+              {`Fund the exercise contract. VCX balance of the exercise contract is running low (${NumberFormatter.format(vcxData.exercisableVCX / parseEther("1"))} VCX < 1000 VCX)`}
             </p>
           </div>
         </div>
@@ -36,7 +37,7 @@ export default function OptionTokenAlert({ chainId, vcxData }: { chainId: number
               <div className="border border-secondaryYellow bg-secondaryYellow bg-opacity-30 rounded-lg p-4">
                 <p className="text-secondaryYellow text-lg">Exercisable oVCX: {ChainById[chainId].name}</p>
                 <p className="text-secondaryYellow text-sm">
-                  {`Fund the exercise contract. VCX balance of the exercise contract is running low (${NumberFormatter.format(vcxData.exercisableVCX / 1e18)} VCX < ${NumberFormatter.format(minExercisableVCX / 1e18)} VCX)`}
+                  {`Fund the exercise contract. VCX balance of the exercise contract is running low (${NumberFormatter.format(vcxData.exercisableVCX / parseEther("1"))} VCX < ${NumberFormatter.format(minExercisableVCX / 1e18)} VCX)`}
                 </p>
               </div>
             </div>

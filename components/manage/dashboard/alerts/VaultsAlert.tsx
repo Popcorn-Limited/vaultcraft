@@ -43,7 +43,7 @@ export default function VaultsAlert() {
                 </div>
               </div>
               : <>
-                {((vault.liquid / vault.totalAssets) * BigInt(100)) < BigInt(20) &&
+                {((vault.liquid / (vault.totalAssets || BigInt(1))) * BigInt(100)) < BigInt(20) &&
                   <div className="w-1/3 p-4">
                     <div className="border border-secondaryYellow bg-secondaryYellow bg-opacity-30 rounded-lg p-4">
                       <p className="text-secondaryYellow text-lg">
@@ -52,7 +52,7 @@ export default function VaultsAlert() {
                           : vault.strategies[0].metadata.protocol}
                       </p>
                       <p className="text-secondaryYellow text-sm">
-                        {`Free up cash for withdrawals. Either deallocate funds from strategies or convert YieldTokens in strategies. (${NumberFormatter.format(Number(vault.liquid / vault.totalAssets * BigInt(100)))}% < 20% )`}
+                        {`Free up cash for withdrawals. Either deallocate funds from strategies or convert YieldTokens in strategies. (${NumberFormatter.format(Number(vault.liquid / (vault.totalAssets || BigInt(1)) * BigInt(100)))}% < 20% )`}
                       </p>
                     </div>
                   </div>

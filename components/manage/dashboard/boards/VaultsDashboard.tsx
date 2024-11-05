@@ -74,7 +74,7 @@ export default function VaultsDashboard({ dashboardData }: { dashboardData: any 
                           {formatBalance(vault.liquid, tokens[vault.chainId][vault.asset].decimals)}
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                          {NumberFormatter.format(Number((vault.liquid / vault.totalAssets) * BigInt(100)))} %
+                          {NumberFormatter.format(Number((vault.liquid / (vault.totalAssets || BigInt(1))) * BigInt(100)))} %
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                           {formatBalance(vault.idle, tokens[vault.chainId][vault.asset].decimals)}
@@ -95,7 +95,7 @@ export default function VaultsDashboard({ dashboardData }: { dashboardData: any 
                             {formatBalance(strategy.idle, tokens[vault.chainId][vault.asset].decimals)}
                           </td>
                           <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            {NumberFormatter.format(Number((strategy.idle / strategy.allocation) * BigInt(100)))} %
+                            {NumberFormatter.format(Number((strategy.idle / (strategy.allocation || BigInt(1))) * BigInt(100)))} %
                           </td>
                           <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                             0
