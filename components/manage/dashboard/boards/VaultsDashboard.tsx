@@ -1,8 +1,12 @@
 import AssetWithName from "@/components/common/AssetWithName";
 import SpinningLogo from "@/components/common/SpinningLogo";
+import SearchBar from "@/components/input/SearchBar";
+import NetworkFilter from "@/components/network/NetworkFilter";
+import VaultsSorting from "@/components/vault/VaultsSorting";
 import { tokensAtom } from "@/lib/atoms";
 import { vaultsAtom } from "@/lib/atoms/vaults";
 import { VaultData } from "@/lib/types";
+import useNetworkFilter from "@/lib/useNetworkFilter";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { formatBalance, NumberFormatter } from "@/lib/utils/helpers";
 import { useAtom } from "jotai";
@@ -12,12 +16,18 @@ export default function VaultsDashboard({ dashboardData }: { dashboardData: any 
   const [vaultsData] = useAtom(vaultsAtom)
   const [tokens] = useAtom(tokensAtom)
   const [vaults, setVaults] = useState<VaultData[]>([]);
+  const [selectedNetworks, selectNetwork] = useNetworkFilter(SUPPORTED_NETWORKS.map((network) => network.id));
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     if (Object.keys(vaultsData).length > 0 && vaults.length === 0) {
       setVaults(SUPPORTED_NETWORKS.map((chain) => vaultsData[chain.id]).flat());
     }
   }, [vaultsData, vaults]);
+
+  function handleSearch(value: string) {
+    setSearchTerm(value);
+  }
 
   // TODO
   // - fees
@@ -27,7 +37,27 @@ export default function VaultsDashboard({ dashboardData }: { dashboardData: any 
     (
       <div className="mt-8 flow-root">
         <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+
           <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+            <nav className="[&_>*]:shrink-0 mt-8 [&_.my-10]:my-0 whitespace-nowrap flex flex-col smmd:flex-row gap-4 mb-10">
+              <NetworkFilter
+                supportedNetworks={SUPPORTED_NETWORKS.map((chain) => chain.id)}
+                selectNetwork={selectNetwork}
+              />
+
+              <section className="flex gap-3 flex-grow items-center justify-end">
+                <SearchBar
+                  className="!w-full [&_input]:w-full smmd:!w-auto h-[3.5rem] !border-customGray500"
+                  searchTerm={searchTerm}
+                  handleSearch={handleSearch}
+                />
+                <VaultsSorting
+                  className="[&_button]:h-[3.5rem]"
+                  vaultState={[vaults, setVaults]}
+                />
+              </section>
+            </nav>
+
             <table className="min-w-full">
               <thead className="">
                 <tr>
@@ -50,6 +80,20 @@ export default function VaultsDashboard({ dashboardData }: { dashboardData: any 
               </thead>
               <tbody className="">
                 {vaults
+                  .filter(
+                    (vault) => selectedNetworks.includes(vault.chainId)
+                  )
+                  .filter(
+                    (vault) => searchTerm.length > 0 ? (
+                      vault.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                      vault.metadata.vaultName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                      vault.asset?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                      tokens[vault.chainId][vault.asset].symbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                      tokens[vault.chainId][vault.asset].name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                      vault.strategies.some(strategy => strategy.metadata.name?.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                      searchTerm.toLowerCase().includes("multi") && vault.strategies.length > 1
+                    ) : true
+                  )
                   .map(vault =>
                     <>
                       <tr className="border-t border-gray-200">

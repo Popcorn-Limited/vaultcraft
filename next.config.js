@@ -21,6 +21,8 @@ const nextConfig = {
     BOT_PRIVATE_KEY: process.env.BOT_PRIVATE_KEY,
     MIN_AMOUNT: process.env.MIN_AMOUNT,
     WATCH_LIST: process.env.WATCH_LIST,
+    ZK_FETCH_APP_ID: process.env.ZK_FETCH_APP_ID,
+    ZK_FETCH_SECRET: process.env.ZK_FETCH_SECRET,
   },
   async rewrites() {
     return [

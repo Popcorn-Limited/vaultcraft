@@ -170,7 +170,19 @@ export default function VaultsContainer({
               Object.keys(displayVaults).length > 0
                 ? displayVaults[vault.chainId].includes(vault.address)
                 : !hiddenVaults[vault.chainId].includes(vault.address)
-            ).map((vaultData) => (
+            )
+            .filter(
+              (vault) => searchTerm.length > 0 ? (
+                vault.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                vault.metadata.vaultName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                vault.asset?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                tokens[vault.chainId][vault.asset].symbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                tokens[vault.chainId][vault.asset].name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                vault.strategies.some(strategy => strategy.metadata.name?.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                searchTerm.toLowerCase().includes("multi") && vault.strategies.length > 1
+              ) : true
+            )
+            .map((vaultData) => (
               <VaultCard
                 {...vaultData}
                 key={`sm-mb-${vaultData.address}`}
