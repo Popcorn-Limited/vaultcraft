@@ -369,7 +369,7 @@ function SafeVaultsWithdrawals() {
           ) : true
         )
         .map(vault =>
-          <div className="">
+          <div className="" key={vault.address}>
             <div
               className="bg-customGray600 py-2 pl-4 pr-3 text-left text-sm font-semibold text-white sm:pl-3 flex flex-row justify-between"
             >

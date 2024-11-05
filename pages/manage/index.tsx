@@ -17,6 +17,11 @@ const Cards = [
     description: "See all protocol stats in one page...",
     link: "/manage/dashboard"
   },
+  {
+    title: "Safe Vaults",
+    description: "Manage Safe Vault withdrawals...",
+    link: "/manage/safe"
+  }
 ]
 
 export default function ManagementPage() {
