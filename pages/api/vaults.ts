@@ -1,16 +1,36 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { ChainById } from "@/lib/utils/connectors";
 import { zeroAddress } from "viem";
-import { TokenReward, VaultData } from "@/lib/types";
+import { Strategy, TokenReward, VaultData } from "@/lib/types";
 import getTokenAndVaultsDataByChain from "@/lib/getTokenAndVaultsData";
 
-type VaultApiData = VaultData & {
+type VaultApiData = Omit<VaultData, "totalAssets" | "totalSupply" | "depositLimit" | "withdrawalLimit" | "idle" | "liquid" | "fees" | "strategies"> & {
+  totalAssets: number;
+  totalSupply: number;
+  depositLimit: number;
+  withdrawalLimit: number;
+  idle: number;
+  liquid: number;
+  fees:{
+    deposit: number;
+    withdrawal: number;
+    management: number;
+    performance: number;
+  };
+  strategies: StrategyApiData[];
   baseApy?: number;
   minBoost?: number;
   maxBoost?: number;
   gaugeLowerApr?: number;
   gaugeUpperApr?: number;
   rewards?: TokenReward[];
+}
+
+type StrategyApiData = Omit<Strategy, "allocation" | "totalAssets" | "totalSupply" | "idle" | "liquid"> & {
+  allocation: number;
+  totalAssets: number;
+  totalSupply: number;
+  idle: number;
 }
 
 export default async function handler(
@@ -32,6 +52,16 @@ export default async function handler(
   const result = vaultsDataArray.map(vault => {
     const vaultData: VaultApiData = {
       ...vault,
+      totalAssets: Number(vault.totalAssets),
+      totalSupply: Number(vault.totalSupply),
+      depositLimit: Number(vault.depositLimit),
+      withdrawalLimit: Number(vault.withdrawalLimit),
+      fees: {
+        deposit: Number(vault.fees.deposit),
+        withdrawal: Number(vault.fees.withdrawal),
+        management: Number(vault.fees.management),
+        performance: Number(vault.fees.performance),
+      },
       apyData: {
         ...vault.apyData,
         apyHist: [],
@@ -39,12 +69,18 @@ export default async function handler(
       strategies: vault.strategies.map(strategy => {
         return {
           ...strategy,
+          allocation: Number(strategy.allocation),
+          totalAssets: Number(strategy.totalAssets),
+          totalSupply: Number(strategy.totalSupply),
+          idle: Number(strategy.idle),
           apyData: {
             ...strategy.apyData,
             apyHist: [],
           },
         }
       }),
+      idle: Number(vault.idle),
+      liquid: Number(vault.liquid),
       baseApy: vault.apyData.baseApy + vault.apyData.rewardApy
     }
 
