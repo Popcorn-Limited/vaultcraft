@@ -24,6 +24,26 @@ const nextConfig = {
     ZK_FETCH_APP_ID: process.env.ZK_FETCH_APP_ID,
     ZK_FETCH_SECRET: process.env.ZK_FETCH_SECRET,
   },
+  async headers() {
+    return [{
+      source: '/(.*)',
+      headers: [
+        {
+          key: 'Access-Control-Allow-Origin',
+          value: '*',
+        },
+        {
+          key: 'Access-Control-Allow-Methods',
+          value: 'GET',
+        },
+        {
+          key: 'Access-Control-Allow-Headers',
+          value: 'X-Requested-With, Content-Type, Authorization',
+        },
+      ]
+    }
+    ]
+  },
   async rewrites() {
     return [
       {
