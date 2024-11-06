@@ -149,6 +149,20 @@ export default function App({ Component, pageProps }: AppProps) {
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" type={"image/png"} href="/images/icons/favicon.ico" />
+        <script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-SL758RNPEV"
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-SL758RNPEV');
+            `,
+          }}
+        />
       </Head>
       <main className={nextFont.className}>
         <style
