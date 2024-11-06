@@ -4,29 +4,9 @@
     "description": "Manage Vaults with Gnosis",
     "icons": [
       {
-        "src": "logo.svg",
+        "src": "images/tokens/vcx.svg",
         "sizes": "any",
         "type": "image/svg+xml"
-      },
-      {
-        "src": "favicon.ico",
-        "sizes": "64x64 32x32 24x24 16x16",
-        "type": "image/x-icon"
-      },
-      {
-        "src": "favicon.ico",
-        "sizes": "64x64 32x32 24x24 16x16",
-        "type": "image/x-icon"
-      },
-      {
-        "src": "logo192.png",
-        "type": "image/png",
-        "sizes": "192x192"
-      },
-      {
-        "src": "logo512.png",
-        "type": "image/png",
-        "sizes": "512x512"
       }
     ],
     "start_url": ".",
