@@ -230,9 +230,11 @@ export default function Index() {
     setVaultAllowance(data.vaultAllowance)
   }
 
+  console.log(vaultData, asset, vault, tokenOptions, requestBalance)
+
   return <NoSSR>
     {
-      (vaultData && asset && vault && tokenOptions.length > 0 && requestBalance) ? (
+      (vaultData && asset && vault && tokenOptions.length > 0) ? (
         <>
           <div className="min-h-screen">
             <button
@@ -270,13 +272,15 @@ export default function Index() {
                   </div>
                 </div>
                 <div className="">
-                  <ClaimableWithdrawal
-                    vault={vault}
-                    asset={asset}
-                    tokenOptions={tokenOptions}
-                    requestBalance={requestBalance}
-                    setUp={setUp}
-                  />
+                  {!!requestBalance &&
+                    <ClaimableWithdrawal
+                      vault={vault}
+                      asset={asset}
+                      tokenOptions={tokenOptions}
+                      requestBalance={requestBalance}
+                      setUp={setUp}
+                    />
+                  }
                 </div>
               </div>
 

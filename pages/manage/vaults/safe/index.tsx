@@ -376,13 +376,13 @@ function SafeVaultsWithdrawals() {
               <AssetWithName vault={vault} />
               <div className="flex flex-row gap-2 w-1/2 justify-end">
                 <div className="text-base">
-                  <p>{formatBalance(availableAssets, tokens[vault.chainId][vault.asset].decimals)} Available Assets</p>
-                  <p>{formatBalance(requiredAssets, tokens[vault.chainId][vault.asset].decimals)} Total Required</p>
-                  <p>{formatBalance(queuedAssets, tokens[vault.chainId][vault.asset].decimals)} Total Queued</p>
+                  <p>{formatBalance(availableAssets, tokens[vault.chainId][vault.asset].decimals)} {tokens[vault.chainId][vault.asset].symbol} Available</p>
+                  <p>{formatBalance(requiredAssets, tokens[vault.chainId][vault.asset].decimals)} {tokens[vault.chainId][vault.asset].symbol} Required</p>
+                  <p>{formatBalance(queuedAssets, tokens[vault.chainId][vault.asset].decimals)} {tokens[vault.chainId][vault.asset].symbol} Queued</p>
                 </div>
                 <div className="h-16 w-40">
                   <MainButtonGroup
-                    label="Fulfill All"
+                    label="Withdraw All"
                     mainAction={handleFulfillAll}
                     chainId={vault.chainId}
                     disabled={requiredAssets > availableAssets || requiredAssets === BigInt(0)}
@@ -441,7 +441,7 @@ function SafeVaultsWithdrawals() {
                       <td className="whitespace-nowrap px-3 py-4 flex flex-row justify-end gap-2">
                         <div className="h-16 w-40">
                           <MainButtonGroup
-                            label="Fulfill"
+                            label="Withdraw"
                             mainAction={() => handleFulfillRedeem(request)}
                             chainId={vault.chainId}
                             disabled={request.requiredAssets > availableAssets}
