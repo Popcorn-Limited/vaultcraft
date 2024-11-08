@@ -18,6 +18,7 @@ import { isAddress, zeroAddress } from "viem";
 import UserBoostSection from "@/components/vault/UserBoostSection";
 import HtmlRenderer from "@/components/common/HtmlRenderer";
 import SpinningLogo from "@/components/common/SpinningLogo";
+import SafeVaultInteraction from "@/components/vault/safe/SafeVaultInteraction";
 
 export default function Index() {
   const router = useRouter();
@@ -87,16 +88,19 @@ export default function Index() {
 
             <section className="w-full md:flex md:flex-row md:justify-between md:space-x-8 py-10 px-4 md:px-0">
               <div className="w-full md:w-1/3">
-                <div className="bg-customNeutral200 p-6 rounded-lg">
-                  <div className="bg-customNeutral300 px-6 py-6 rounded-lg">
-                    <VaultInputs
-                      vaultData={vaultData}
-                      tokenOptions={tokenOptions}
-                      chainId={vaultData.chainId}
-                      hideModal={() => router.reload()}
-                    />
+                {vaultData.metadata.type === "safe-vault-v1"
+                  ? <SafeVaultInteraction vaultData={vaultData} tokenOptions={tokenOptions} chainId={vaultData.chainId} hideModal={() => router.reload()} />
+                  : <div className="bg-customNeutral200 p-6 rounded-lg">
+                    <div className="bg-customNeutral300 px-6 py-6 rounded-lg">
+                      <VaultInputs
+                        vaultData={vaultData}
+                        tokenOptions={tokenOptions}
+                        chainId={vaultData.chainId}
+                        hideModal={() => router.reload()}
+                      />
+                    </div>
                   </div>
-                </div>
+                }
               </div>
 
               <div className="w-full md:w-2/3 mt-8 md:mt-0 space-y-4">

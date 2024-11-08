@@ -350,3 +350,10 @@ export type Transaction = {
   data: Address;
   value: bigint;
 }
+
+export type RequestBalance = {
+  pendingShares: bigint;
+  requestTime: bigint;
+  claimableShares: bigint;
+  claimableAssets: bigint;
+}
