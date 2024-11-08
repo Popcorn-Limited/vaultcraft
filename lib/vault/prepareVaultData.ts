@@ -1,8 +1,11 @@
 import {
   Address,
   PublicClient,
+  createPublicClient,
   erc20Abi,
   getAddress,
+  http,
+  parseAbiItem,
   parseEther,
   zeroAddress,
 } from "viem";
@@ -12,6 +15,7 @@ import { ApyData, Strategy, TokenByAddress, VaultData, VaultDataByAddress, Vault
 import { ERC20Abi, OracleVaultAbi, VeTokenByChain } from "@/lib/constants";
 import getGaugesData from "@/lib/gauges/getGaugeData";
 import { EMPTY_LLAMA_APY_ENTRY, getApy } from "@/lib/resolver/apy";
+import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 
 
 export async function getInitialVaultsData(chainId: number, client: PublicClient): Promise<VaultDataByAddress> {
@@ -186,7 +190,49 @@ export async function addDynamicVaultsData(vaults: VaultDataByAddress, client: P
 
 
 async function getSafeVaultApy(vault: VaultData): Promise<LlamaApy[]> {
-  return []
+  const client = createPublicClient({
+    chain: ChainById[vault.chainId],
+    transport: http(RPC_URLS[vault.chainId])
+  })
+
+  const logs = await client.getLogs({
+    address: "0xf7C42Db8bdD563539861de0ef2520Aa80c28e8c4",
+    event: parseAbiItem("event PriceUpdated(address base, address quote, uint256 bqPrice, uint256 qbPrice)"),
+    args: {
+      base: vault.address,
+      quote: vault.asset
+    },
+    fromBlock: "earliest",
+    toBlock: "latest",
+  })
+
+  const firstBlock = await client.getBlock({
+    blockNumber: logs[0].blockNumber
+  })
+  const lastBlock = await client.getBlock({
+    blockNumber: logs[logs.length - 1].blockNumber
+  })
+
+  const priceIncrease = logs[logs.length - 1].args!.bqPrice! - parseEther("1")
+  const timeElapsedInSeconds = Number(lastBlock.timestamp - firstBlock.timestamp)
+  const secondsInYear = 365 * 24 * 60 * 60
+
+  // TODO check this math
+  // Annualize the price increase using compound interest formula
+  // (1 + r)^t = P/P0, where t is time in years
+  const annualizedReturn = (Math.pow(1 + Number(priceIncrease) / Number(parseEther("1")), secondsInYear / timeElapsedInSeconds) - 1) * 100
+
+  return logs.map((log: any, i: number) => {
+    const result = new Date();
+    result.setDate(result.getDate() + (logs.length - 1 - i));
+    return {
+      apy: annualizedReturn,
+      apyBase: annualizedReturn,
+      apyReward: 0,
+      tvl: vault.tvl,
+      date: result
+    }
+  })
 }
 
 
@@ -205,12 +251,18 @@ export async function addApyHist(vaults: VaultDataByAddress): Promise<VaultDataB
   Object.values(vaults).forEach((vault: any, i: number) => {
     let hist = apyHistAll[i]
 
-    // Cut off the first few days to normalise the apy chart (first few days of a new vault with low deposits arent representable)
-    if (hist.length > 10) {
-      hist = hist.slice(10, hist.length - 1)
-    }
+    // // Cut off the first few days to normalise the apy chart (first few days of a new vault with low deposits arent representable)
+    // if (hist.length > 10) {
+    //   hist = hist.slice(10, hist.length - 1)
+    // }
 
     vaults[vault.address].apyData.apyHist = hist
+    if (hist.length > 0) {
+      vaults[vault.address].apyData.baseApy = hist[hist.length - 1].apyBase;
+      vaults[vault.address].apyData.rewardApy = hist[hist.length - 1].apyReward;
+      vaults[vault.address].apyData.totalApy = hist[hist.length - 1].apy;
+      vaults[vault.address].apyData.targetApy = hist[hist.length - 1].apy;
+    }
   })
 
   return vaults
