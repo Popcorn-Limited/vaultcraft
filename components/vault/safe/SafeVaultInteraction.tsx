@@ -98,8 +98,6 @@ export default function SafeVaultInteraction({
   const { address: account } = useAccount();
 
   const [tokens] = useAtom(tokensAtom)
-  const asset = tokens[chainId][vaultData.asset]
-  const vault = tokens[chainId][vaultData.vault]
 
   const [requestBalance, setRequestBalance] = useState<RequestBalance>();
   const [assetAllowance, setAssetAllowance] = useState<bigint>(BigInt(0));
@@ -117,7 +115,7 @@ export default function SafeVaultInteraction({
     setVaultAllowance(data.vaultAllowance)
   }
 
-  return (
+  return Object.keys(tokens).length > 0 ? (
     <>
       <div className="bg-customNeutral200 p-6 rounded-lg">
         <div className="bg-customNeutral300 px-6 py-6 rounded-lg">
@@ -135,8 +133,8 @@ export default function SafeVaultInteraction({
       <div className="">
         {!!requestBalance &&
           <ClaimableWithdrawal
-            vault={vault}
-            asset={asset}
+            vault={tokens[chainId][vaultData.vault]}
+            asset={tokens[chainId][vaultData.asset]}
             tokenOptions={tokenOptions}
             requestBalance={requestBalance}
             setUp={setUp}
@@ -144,7 +142,7 @@ export default function SafeVaultInteraction({
         }
       </div>
     </>
-  )
+  ) : <SpinningLogo />
 }
 
 function SafeVaultInputs({
@@ -165,8 +163,8 @@ function SafeVaultInputs({
   const vault = tokens[chainId][vaultData.vault]
   const gauge = vaultData.gauge && vaultData.gauge !== zeroAddress ? tokens[chainId][vaultData.gauge] : undefined
 
-  const [inputToken, setInputToken] = useState<Token>();
-  const [outputToken, setOutputToken] = useState<Token>();
+  const [inputToken, setInputToken] = useState<Token>(asset);
+  const [outputToken, setOutputToken] = useState<Token>(vault);
 
   const [inputBalance, setInputBalance] = useState<Balance>(EMPTY_BALANCE);
   const [isDeposit, setIsDeposit] = useState<boolean>(true);
