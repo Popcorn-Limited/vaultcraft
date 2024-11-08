@@ -64,6 +64,7 @@ const SAFE_VAULT: VaultData = {
   assetsPerShare: 0,
   depositLimit: maxUint256,
   withdrawalLimit: maxUint256,
+  minLimit: BigInt(0),
   tvl: 0,
   apyData: {
     targetApy: 0,

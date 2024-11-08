@@ -8,8 +8,8 @@ import {
 } from "viem";
 import axios from "axios";
 import { VaultAbi } from "@/lib/constants/abi/Vault";
-import { ApyData, Strategy, TokenByAddress, VaultData, VaultDataByAddress, VaultLabel, VaultMetadata, StrategyMetadata } from "@/lib/types";
-import { ERC20Abi, VeTokenByChain } from "@/lib/constants";
+import { ApyData, Strategy, TokenByAddress, VaultData, VaultDataByAddress, VaultLabel, VaultMetadata, StrategyMetadata, LlamaApy } from "@/lib/types";
+import { ERC20Abi, OracleVaultAbi, VeTokenByChain } from "@/lib/constants";
 import getGaugesData from "@/lib/gauges/getGaugeData";
 import { EMPTY_LLAMA_APY_ENTRY, getApy } from "@/lib/resolver/apy";
 
@@ -34,6 +34,7 @@ export async function getInitialVaultsData(chainId: number, client: PublicClient
       vault: getAddress(vault.address),
       asset: getAddress(vault.assetAddress),
       gauge: getAddress(vault.gauge || zeroAddress),
+      safe: getAddress(vault.safe || zeroAddress),
       chainId: vault.chainId,
       fees: vault.fees,
       totalAssets: BigInt(0),
@@ -41,6 +42,7 @@ export async function getInitialVaultsData(chainId: number, client: PublicClient
       assetsPerShare: 0,
       depositLimit: BigInt(0),
       withdrawalLimit: BigInt(0),
+      minLimit: BigInt(0),
       tvl: 0,
       apyData: {
         targetApy: 0,
@@ -106,29 +108,53 @@ export async function addDynamicVaultsData(vaults: VaultDataByAddress, client: P
   const dynamicValues = await client.multicall({
     contracts: Object.values(vaults)
       .map((vault: any) => {
-        return [
-          {
-            address: vault.address,
-            abi: VaultAbi,
-            functionName: "totalAssets"
-          },
-          {
-            address: vault.address,
-            abi: VaultAbi,
-            functionName: "totalSupply"
-          },
-          {
-            address: vault.address,
-            abi: VaultAbi,
-            functionName: "depositLimit"
-          },
-          {
-            address: vault.asset,
-            abi: erc20Abi,
-            functionName: "balanceOf",
-            args: [vault.address]
-          },
-        ]
+        return vaults[vault.address].metadata.type === "safe-vault-v1" ?
+          [
+            {
+              address: vault.address,
+              abi: VaultAbi,
+              functionName: "totalAssets"
+            },
+            {
+              address: vault.address,
+              abi: VaultAbi,
+              functionName: "totalSupply"
+            },
+            {
+              address: vault.address,
+              abi: OracleVaultAbi,
+              functionName: "limits"
+            },
+            {
+              address: vault.asset,
+              abi: erc20Abi,
+              functionName: "balanceOf",
+              args: [vault.safe]
+            },
+          ]
+          : [
+            {
+              address: vault.address,
+              abi: VaultAbi,
+              functionName: "totalAssets"
+            },
+            {
+              address: vault.address,
+              abi: VaultAbi,
+              functionName: "totalSupply"
+            },
+            {
+              address: vault.address,
+              abi: VaultAbi,
+              functionName: "depositLimit"
+            },
+            {
+              address: vault.asset,
+              abi: erc20Abi,
+              functionName: "balanceOf",
+              args: [vault.address]
+            },
+          ]
       })
       .flat(),
     allowFailure: false,
@@ -141,20 +167,39 @@ export async function addDynamicVaultsData(vaults: VaultDataByAddress, client: P
 
     vaults[vault.address].totalAssets = totalAssets;
     vaults[vault.address].totalSupply = totalSupply;
-    vaults[vault.address].depositLimit = dynamicValues[i + 2] as bigint;
     vaults[vault.address].withdrawalLimit = totalSupply;
     vaults[vault.address].assetsPerShare = totalSupply > 0 ? Number(totalAssets) / Number(totalSupply) : 1;
     vaults[vault.address].idle = dynamicValues[i + 3] as bigint;
+
+    if (vaults[vault.address].metadata.type === "safe-vault-v1") {
+      // @ts-ignore
+      vaults[vault.address].depositLimit = dynamicValues[i + 2][0] as unknown as bigint;
+      // @ts-ignore
+      vaults[vault.address].minLimit = dynamicValues[i + 2][1] as unknown as bigint;
+    } else {
+      vaults[vault.address].depositLimit = dynamicValues[i + 2] as bigint;
+    }
   })
 
   return vaults;
 }
 
 
+async function getSafeVaultApy(vault: VaultData): Promise<LlamaApy[]> {
+  return []
+}
+
+
 export async function addApyHist(vaults: VaultDataByAddress): Promise<VaultDataByAddress> {
   const apyHistAll = await Promise.all(Object.values(vaults).map(async (vault: VaultData) => {
-    if (vault.apyData.apyId?.length > 0) return getApy(vault.apyData.apyId)
-    return []
+    if (vault.apyData.apyId?.length > 0) {
+      return getApy(vault.apyData.apyId)
+    }
+    else if (vault.metadata.type === "safe-vault-v1") {
+      return getSafeVaultApy(vault)
+    } else {
+      return []
+    }
   }))
 
   Object.values(vaults).forEach((vault: any, i: number) => {
@@ -189,6 +234,8 @@ export async function addStrategyData(vaults: VaultDataByAddress, strategies: { 
 
   let n = 0
   Object.keys(vaults).forEach((address: any) => {
+    if (vaults[address].metadata.type === "safe-vault-v1") return
+
     let apyBase = 0;
     let apyRewards = 0;
     let liquid = BigInt(0);
@@ -269,6 +316,46 @@ export async function addStrategyData(vaults: VaultDataByAddress, strategies: { 
     vaults[address].withdrawalLimit = BigInt((Math.ceil(Number(liquid + vaults[address].idle) / vaults[address].assetsPerShare)).toLocaleString("fullwide", { useGrouping: false }).replace(",", "."))
   })
 
+
+  return vaults
+}
+
+
+export async function addSafeStrategyData(vaults: VaultDataByAddress, chainId: number, client: PublicClient): Promise<VaultDataByAddress> {
+  const { data: safeStrategies } = await axios.get(
+    `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/strategies/safe/${chainId}.json`
+  );
+
+  Object.keys(safeStrategies).forEach((address: string) => {
+    const vaultAddress = getAddress(address)
+    const strategies = safeStrategies[address]
+
+    vaults[vaultAddress].strategies = strategies.map((strategy: any) => {
+      const allocation = vaults[vaultAddress].totalAssets * BigInt(strategy.allocationPerc) / BigInt(100)
+      return {
+        address: zeroAddress,
+        asset: vaults[vaultAddress].asset,
+        yieldToken: strategy.yieldToken === zeroAddress ? undefined : strategy.yieldToken,
+        metadata: strategy.metadata,
+        resolver: strategy.resolver,
+        allocation: allocation,
+        allocationPerc: strategy.allocationPerc / 100,
+        apyData: {
+          targetApy: 0,
+          baseApy: 0,
+          rewardApy: 0,
+          totalApy: 0,
+          apyHist: [EMPTY_LLAMA_APY_ENTRY],
+          apyId: "",
+          apySource: "custom"
+        },
+        totalAssets: allocation,
+        totalSupply: allocation,
+        assetsPerShare: 1,
+        idle: 0
+      }
+    })
+  })
 
   return vaults
 }

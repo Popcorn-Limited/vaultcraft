@@ -37,6 +37,7 @@ export type VaultData = {
   vault: Address;
   asset: Address;
   gauge?: Address;
+  safe?: Address;
   chainId: number;
   fees: VaultFees;
   totalAssets: bigint;
@@ -44,6 +45,7 @@ export type VaultData = {
   assetsPerShare: number;
   depositLimit: bigint;
   withdrawalLimit: bigint;
+  minLimit: bigint;
   tvl: number;
   apyData: ApyData;
   gaugeData?: GaugeData;
@@ -119,7 +121,8 @@ export type VaultMetadata = {
   | "single-asset-lock-vault-v1"
   | "multi-strategy-vault-v1"
   | "multi-strategy-vault-v2"
-  | "multi-strategy-vault-v2.5";
+  | "multi-strategy-vault-v2.5"
+  | "safe-vault-v1";
   creator: Address;
   feeRecipient: Address;
 };

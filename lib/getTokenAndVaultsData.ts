@@ -11,7 +11,7 @@ import { GAUGE_NETWORKS, RPC_URLS } from "@/lib/utils/connectors";
 import { prepareAssets, prepareVaults, addBalances, prepareGauges } from "@/lib/tokens";
 import { mainnet } from "viem/chains";
 import prepareStrategies from "@/lib/prepareStrategies";
-import { addApyHist, addDynamicVaultsData, addGaugeData, addStrategyData, getInitialVaultsData } from "@/lib/vault/prepareVaultData";
+import { addApyHist, addDynamicVaultsData, addGaugeData, addSafeStrategyData, addStrategyData, getInitialVaultsData } from "@/lib/vault/prepareVaultData";
 import { formatBalance } from "./utils/helpers";
 
 interface GetVaultsByChainProps {
@@ -46,6 +46,9 @@ export default async function getTokenAndVaultsDataByChain({
 
   // Add strategy data
   vaultsData = await addStrategyData(vaultsData, strategies, client)
+
+  // Add safe strategy data
+  vaultsData = await addSafeStrategyData(vaultsData, chainId, client)
 
   // Create token array
   const uniqueAssetAdresses: Address[] = [...ZapAssetAddressesByChain[chainId]];
