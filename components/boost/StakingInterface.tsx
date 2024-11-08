@@ -163,7 +163,8 @@ export default function StakingInterface({
             handleClick={() => setShowLpModal(true)}
           />
           <SecondaryActionButton
-            label="Bridge your VCX"
+            label="Bridge VCX"
+            // icon="/images/icons/wormholeWhite.svg"
             handleClick={() => setShowBridgeModal(true)}
           />
           <SecondaryActionButton

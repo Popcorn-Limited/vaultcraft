@@ -18,7 +18,7 @@ export default function SecondaryActionButton({
       onClick={handleClick}
       disabled={disabled}
     >
-      <span className="flex flex-row items-center justify-center gap-2">
+      <span className="flex flex-wrap items-center justify-center gap-2">
         <span className="font-bold">{label}</span>
         {icon && <img src={icon} alt={label} className="w-5 h-5" />}
       </span>

@@ -325,12 +325,12 @@ function SafeVaultWithdrawals({ vault }: { vault: VaultData }) {
             <p>{formatBalance(queuedAssets, tokens[vault.chainId][vault.asset].decimals)} {tokens[vault.chainId][vault.asset].symbol} Queued</p>
           </div>
           <div className="h-16 w-40">
-            <MainButtonGroup
+            {/* <MainButtonGroup
               label="Withdraw All"
               mainAction={handleFulfillAll}
               chainId={vault.chainId}
               disabled={requiredAssets > availableAssets || requiredAssets === BigInt(0)}
-            />
+            /> */}
           </div>
           <div className="h-16 w-40">
             <SecondaryButtonGroup
