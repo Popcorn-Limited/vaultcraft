@@ -59,9 +59,14 @@ export default function BridgeModal({ show }: { show: [boolean, Dispatch<SetStat
               <div className="flex flex-row gap-4">
                 <p className="w-2/3">You have <b>{NumberFormatter.format(Number(wVCX.balance.formatted))} wVCX</b>. Bridge it via wormhole with unparalled security and speed. Tokens are on average transfered in under 30 minutes on Portal.</p>
                 <div className="w-1/3 flex flex-row gap-4">
-                  <MainActionButton label="Bridge wVCX" handleClick={() => router.push(activeTab === "OP -> ETH" ?
-                    "https://portalbridge.com/?sourceChain=optimism&targetChain=ethereum&asset=0x43Ad2CFDDA3CEFf40d832eB9bc33eC3FACE86829"
-                    : "https://portalbridge.com/?sourceChain=arbitrum&targetChain=ethereum&asset=0xFeae6470A79b7779888f4a64af315Ca997D6cF33")} />
+                  <MainActionButton
+                    label="Bridge wVCX"
+                    icon="/images/icons/wormhole.svg"
+                    handleClick={() => router.push(activeTab === "OP -> ETH" ?
+                      "https://portalbridge.com/?sourceChain=optimism&targetChain=ethereum&asset=0x43Ad2CFDDA3CEFf40d832eB9bc33eC3FACE86829"
+                      : "https://portalbridge.com/?sourceChain=arbitrum&targetChain=ethereum&asset=0xFeae6470A79b7779888f4a64af315Ca997D6cF33")
+                    }
+                  />
                 </div>
               </div>
             </div>

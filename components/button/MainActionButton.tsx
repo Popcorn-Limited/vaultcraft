@@ -2,6 +2,7 @@ import React from "react";
 
 export interface ButtonProps {
   label: string;
+  icon?: string;
   handleClick?: (event: React.MouseEvent<HTMLElement>) => void;
   disabled?: boolean;
   hidden?: boolean;
@@ -10,6 +11,7 @@ export interface ButtonProps {
 
 export default function MainActionButton({
   label,
+  icon,
   handleClick,
   className,
   disabled = false,
@@ -26,7 +28,10 @@ export default function MainActionButton({
       type="button"
       disabled={disabled}
     >
-      {label}
+      <span className="flex flex-row items-center justify-center gap-2">
+        <span className="font-bold">{label}</span>
+        {icon && <img src={icon} alt={label} className="w-5 h-5" />}
+      </span>
     </button>
   );
 }
