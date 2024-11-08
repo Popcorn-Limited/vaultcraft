@@ -90,14 +90,12 @@ async function fetchRequests(vault: VaultData) {
   const requests: { [key: Address]: Request } = {}
   requestLogs.forEach(log => {
     if (Object.keys(requests).includes(log.args.controller!)) {
-      // TODO: rename this to shares
-      requests[log.args.controller!].shares += log.args.assets!
+      requests[log.args.controller!].shares += log.args.shares!
       requests[log.args.controller!].requestTime = Math.max(Number(requests[log.args.controller!].requestTime), Number(log.args.timestamp!))
     } else {
       requests[log.args.controller!] = {
         user: log.args.controller!,
-        // TODO: rename this to shares
-        shares: log.args.assets!,
+        shares: log.args.shares!,
         requiredAssets: BigInt(0),
         requestTime: Number(log.args.timestamp!)
       }
