@@ -40,15 +40,15 @@ export async function simulateCall({
     return { request: request, success: true, error: null };
   } catch (error: any) {
     console.log("SIMULATION ERROR")
-    await sendMessageToDiscord({
-      chainId: publicClient.chain?.id ?? 0,
-      target: contract.address,
-      user: account,
-      isSimulation: true,
-      method: functionName,
-      reason: error.shortMessage ?? "",
-      args
-    });
+    // await sendMessageToDiscord({
+    //   chainId: publicClient.chain?.id ?? 0,
+    //   target: contract.address,
+    //   user: account,
+    //   isSimulation: true,
+    //   method: functionName,
+    //   reason: error.shortMessage ?? "",
+    //   args
+    // });
     return { request: null, success: false, error: error.shortMessage };
   }
 }
@@ -79,15 +79,15 @@ export async function handleCallResult({
       console.log({ error });
       console.log("CALL ERROR")
 
-      await sendMessageToDiscord({
-        chainId: clients.publicClient.chain?.id ?? 0,
-        target: simulationResponse.request?.address ?? "0x",
-        user: simulationResponse.request?.account.address ?? "0x",
-        isSimulation: false,
-        method: simulationResponse.request?.functionName ?? "",
-        reason: error.shortMessage ?? "",
-        args: simulationResponse.request.args ? [...simulationResponse.request.args] : [],
-      });
+      // await sendMessageToDiscord({
+      //   chainId: clients.publicClient.chain?.id ?? 0,
+      //   target: simulationResponse.request?.address ?? "0x",
+      //   user: simulationResponse.request?.account.address ?? "0x",
+      //   isSimulation: false,
+      //   method: simulationResponse.request?.functionName ?? "",
+      //   reason: error.shortMessage ?? "",
+      //   args: simulationResponse.request.args ? [...simulationResponse.request.args] : [],
+      // });
 
       showErrorToast(error.shortMessage);
       return false;

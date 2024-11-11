@@ -180,6 +180,7 @@ export async function addDynamicVaultsData(vaults: VaultDataByAddress, client: P
       vaults[vault.address].depositLimit = dynamicValues[i + 2][0] as unknown as bigint;
       // @ts-ignore
       vaults[vault.address].minLimit = dynamicValues[i + 2][1] as unknown as bigint;
+      vaults[vault.address].liquid = dynamicValues[i + 3] as bigint;
     } else {
       vaults[vault.address].depositLimit = dynamicValues[i + 2] as bigint;
     }
