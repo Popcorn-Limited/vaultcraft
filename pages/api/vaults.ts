@@ -4,7 +4,7 @@ import { zeroAddress } from "viem";
 import { Strategy, TokenReward, VaultData } from "@/lib/types";
 import getTokenAndVaultsDataByChain from "@/lib/getTokenAndVaultsData";
 
-type VaultApiData = Omit<VaultData, "totalAssets" | "totalSupply" | "depositLimit" | "withdrawalLimit" | "idle" | "liquid" | "fees" | "strategies"> & {
+type VaultApiData = Omit<VaultData, "totalAssets" | "totalSupply" | "depositLimit" | "withdrawalLimit" | "minLimit" | "idle" | "liquid" | "fees" | "strategies"> & {
   totalAssets: number;
   totalSupply: number;
   depositLimit: number;
@@ -12,7 +12,7 @@ type VaultApiData = Omit<VaultData, "totalAssets" | "totalSupply" | "depositLimi
   minLimit: number;
   idle: number;
   liquid: number;
-  fees:{
+  fees: {
     deposit: number;
     withdrawal: number;
     management: number;
