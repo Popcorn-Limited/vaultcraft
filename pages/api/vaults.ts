@@ -9,6 +9,7 @@ type VaultApiData = Omit<VaultData, "totalAssets" | "totalSupply" | "depositLimi
   totalSupply: number;
   depositLimit: number;
   withdrawalLimit: number;
+  minLimit: number;
   idle: number;
   liquid: number;
   fees:{
@@ -56,6 +57,7 @@ export default async function handler(
       totalSupply: Number(vault.totalSupply),
       depositLimit: Number(vault.depositLimit),
       withdrawalLimit: Number(vault.withdrawalLimit),
+      minLimit: Number(vault.minLimit),
       fees: {
         deposit: Number(vault.fees.deposit),
         withdrawal: Number(vault.fees.withdrawal),
