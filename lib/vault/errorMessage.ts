@@ -1,4 +1,4 @@
-import { SmartVaultActionType, Token, TokenByAddress, VaultData } from "@/lib/types";
+import { VaultActionType, Token, TokenByAddress, VaultData } from "@/lib/types";
 
 export default function getVaultErrorMessage(
   value: string,
@@ -6,7 +6,7 @@ export default function getVaultErrorMessage(
   inputToken: Token,
   outputToken: Token,
   isDeposit: boolean,
-  action: SmartVaultActionType,
+  action: VaultActionType,
   tokens: { [key: number]: TokenByAddress }
 ): string {
   const inputAmount = Number(value) * (10 ** inputToken.decimals);

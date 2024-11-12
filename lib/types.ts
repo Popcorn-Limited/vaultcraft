@@ -176,17 +176,50 @@ export type ClaimableReward = {
   value: number;
 }
 
-export enum SmartVaultActionType {
+export enum VaultActionType {
   Deposit,
   Withdrawal,
+  RequestWithdrawal,
+  CancelRequest,
   Stake,
   Unstake,
   DepositAndStake,
   UnstakeAndWithdraw,
+  UnstakeAndRequestWithdrawal,
+  UnstakeAndRequestFulfillWithdraw,
+  FulfillAndWithdraw,
+  RequestFulfillAndWithdraw,
   ZapDeposit,
   ZapWithdrawal,
   ZapDepositAndStake,
   ZapUnstakeAndWithdraw,
+  ZapFulfillAndWithdraw,
+  ZapRequestFulfillAndWithdraw,
+  ZapUnstakeAndRequestFulfillWithdraw
+}
+
+export enum VaultAction {
+  depositApprove,
+  stakeApprove,
+  depositAndStakeApprove,
+  unstakeAndWithdrawApprove,
+  asyncApprove,
+  asyncRouterApprove,
+  zapApprove,
+  deposit,
+  stake,
+  depositAndStake,
+  withdraw,
+  requestWithdrawal,
+  cancelRequest,
+  fulfillAndWithdraw,
+  requestFulfillAndWithdraw,
+  unstake,
+  unstakeAndWithdraw,
+  unstakeAndRequestWithdrawal,
+  unstakeAndRequestFulfillWithdraw,
+  zap,
+  done
 }
 
 export type DuneQueryResult<T> = {

@@ -1,17 +1,17 @@
-import { Balance, RequestBalance, Token, VaultData } from "@/lib/types";
+import { Balance, RequestBalance, VaultActionType, Token, VaultAction, VaultData, ZapProvider } from "@/lib/types";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { VaultInputsProps } from "@/components/vault/VaultInputs";
 import { showLoadingToast } from "@/lib/toasts";
 import { ArrowDownIcon } from "@heroicons/react/24/outline";
 import { tokensAtom } from "@/lib/atoms";
-import { OracleVaultAbi, AsyncVaultRouterAbi } from "@/lib/constants";
-import { http, createPublicClient, zeroAddress, Address, parseUnits, maxUint256, formatUnits, erc20Abi } from "viem";
+import { OracleVaultAbi } from "@/lib/constants";
+import { http, createPublicClient, zeroAddress, Address, parseUnits, maxUint256, erc20Abi } from "viem";
 import SpinningLogo from "@/components/common/SpinningLogo";
 import { arbitrum } from "viem/chains";
 import { RPC_URLS } from "@/lib/utils/connectors";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
-import { EMPTY_BALANCE, formatBalance, handleCallResult, simulateCall } from "@/lib/utils/helpers";
+import { calcBalance, EMPTY_BALANCE, formatBalance, formatBalanceUSD, handleCallResult, simulateCall } from "@/lib/utils/helpers";
 import MainButtonGroup from "@/components/common/MainButtonGroup";
 import TabSelector from "@/components/common/TabSelector";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
@@ -19,8 +19,12 @@ import getVaultErrorMessage from "@/lib/vault/errorMessage";
 import TokenIcon from "@/components/common/TokenIcon";
 import SecondaryButtonGroup from "@/components/common/SecondaryButtonGroup";
 import SelectToken from "@/components/input/SelectToken";
-import { handleAllowance } from "@/lib/approve";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
+import VaultFeeBreakdown from "../VaultFees";
+import findZapProvider from "@/lib/zap/findZapProvider";
+import { selectActions } from "@/lib/vault/vaultHelpers";
+import VaultInteractionContainer from "../VaultInteraction";
+import { vaultCancelRedeem, vaultRedeem } from "@/lib/vault/interactions";
 
 
 async function fetchData(user: Address, vaultData: VaultData) {
@@ -52,18 +56,6 @@ async function fetchData(user: Address, vaultData: VaultData) {
         abi: OracleVaultAbi,
         functionName: "getRequestBalance",
         args: [user]
-      },
-      {
-        address: vaultData.asset,
-        abi: erc20Abi,
-        functionName: "allowance",
-        args: [user, vaultData.address]
-      },
-      {
-        address: vaultData.address,
-        abi: erc20Abi,
-        functionName: "allowance",
-        args: [user, vaultData.address]
       }
     ]
   })
@@ -73,13 +65,10 @@ async function fetchData(user: Address, vaultData: VaultData) {
     totalSupply: vault[1].result as bigint,
     assetsPerShare: Number(vault[1].result) / Number(vault[0].result),
     balance: vault[2].result as bigint,
-    requestBalance: vault[3].result as RequestBalance,
-    assetAllowance: vault[4].result as bigint,
-    vaultAllowance: vault[5].result as bigint
+    requestBalance: vault[3].result as RequestBalance
   }
 }
 
-const ROUTER = "0x9E3c42A34140C0a72b1001751e836aac743F0208"
 
 export default function SafeVaultInteraction({
   vaultData,
@@ -88,12 +77,8 @@ export default function SafeVaultInteraction({
   hideModal,
 }: VaultInputsProps) {
   const { address: account } = useAccount();
-
   const [tokens] = useAtom(tokensAtom)
-
   const [requestBalance, setRequestBalance] = useState<RequestBalance>();
-  const [assetAllowance, setAssetAllowance] = useState<bigint>(BigInt(0));
-  const [vaultAllowance, setVaultAllowance] = useState<bigint>(BigInt(0));
 
   useEffect(() => {
     if (account) setUp()
@@ -103,8 +88,6 @@ export default function SafeVaultInteraction({
     const data = await fetchData(account ? account : zeroAddress, vaultData)
 
     setRequestBalance(data.requestBalance)
-    setAssetAllowance(data.assetAllowance)
-    setVaultAllowance(data.vaultAllowance)
   }
 
   return Object.keys(tokens).length > 0 ? (
@@ -117,14 +100,13 @@ export default function SafeVaultInteraction({
             chainId={chainId}
             hideModal={() => { }}
             setUp={setUp}
-            assetAllowance={assetAllowance}
-            vaultAllowance={vaultAllowance}
           />
         </div>
       </div>
       <div className="">
         {!!requestBalance &&
           <ClaimableWithdrawal
+            vaultData={vaultData}
             vault={tokens[chainId][vaultData.vault]}
             asset={tokens[chainId][vaultData.asset]}
             tokenOptions={tokenOptions}
@@ -143,14 +125,11 @@ function SafeVaultInputs({
   chainId,
   hideModal,
   setUp,
-  assetAllowance,
-  vaultAllowance
-}: VaultInputsProps & { setUp: Function, assetAllowance: bigint, vaultAllowance: bigint }) {
-  const { address: account, chain } = useAccount();
-  const { data: walletClient } = useWalletClient();
-  const publicClient = usePublicClient({ chainId });
+}: VaultInputsProps & { setUp: Function }) {
+  const { address: account } = useAccount();
+  const publicClient = usePublicClient({ chainId })
 
-  const [tokens, setTokens] = useAtom(tokensAtom)
+  const [tokens] = useAtom(tokensAtom)
   const asset = tokens[chainId][vaultData.asset]
   const vault = tokens[chainId][vaultData.vault]
   const gauge = vaultData.gauge && vaultData.gauge !== zeroAddress ? tokens[chainId][vaultData.gauge] : undefined
@@ -159,8 +138,39 @@ function SafeVaultInputs({
   const [outputToken, setOutputToken] = useState<Token>(vault);
 
   const [inputBalance, setInputBalance] = useState<Balance>(EMPTY_BALANCE);
+
+  const [steps, setSteps] = useState<VaultAction[]>(selectActions(VaultActionType.Deposit));
+  const [action, setAction] = useState<VaultActionType>(VaultActionType.Deposit);
   const [isDeposit, setIsDeposit] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string>("");
+  const [showModal, setShowModal] = useState<boolean>(false)
+  const [zapProvider, setZapProvider] = useState<ZapProvider>(ZapProvider.none)
+
+  function switchTokens() {
+    if (isDeposit) {
+      setInputToken(vault)
+      setOutputToken(asset)
+      setAction(VaultActionType.RequestWithdrawal)
+      setSteps(selectActions(VaultActionType.RequestWithdrawal))
+    } else {
+      setInputToken(asset)
+      setOutputToken(vault)
+      setAction(VaultActionType.Deposit)
+      setSteps(selectActions(VaultActionType.Deposit))
+    }
+    setIsDeposit(!isDeposit)
+    setShowModal(false)
+  }
+
+  function handleTokenSelect(option: Token, vault: Token) {
+    setInputToken(option)
+    setOutputToken(vault)
+
+    if (option.address !== asset.address) {
+      setAction(VaultActionType.ZapDeposit)
+      setSteps(selectActions(VaultActionType.ZapDeposit))
+    }
+  }
 
   function handleChangeInput(e: any) {
     if (!inputToken || !outputToken) return
@@ -178,7 +188,8 @@ function SafeVaultInputs({
     const newAmt = parseUnits(inputAmt, inputToken.decimals)
 
     setInputBalance({ value: newAmt, formatted: inputAmt, formattedUSD: String(Number(inputAmt) * (inputToken.price || 0)) });
-    setErrorMessage(getVaultErrorMessage(value, vaultData, inputToken, outputToken, isDeposit, 1, tokens))
+    setErrorMessage(getVaultErrorMessage(value, vaultData, inputToken, outputToken, isDeposit, action, tokens))
+    setShowModal(false)
   }
 
   function handleMaxClick() {
@@ -186,204 +197,48 @@ function SafeVaultInputs({
     handleChangeInput({ currentTarget: { value: inputToken.balance.formatted } });
   }
 
-  function switchTokens() {
-    if (isDeposit) {
-      setInputToken(vault)
-      setOutputToken(asset)
-    } else {
-      setInputToken(asset)
-      setOutputToken(vault)
-    }
-    setIsDeposit(!isDeposit)
+  async function handlePreview() {
+    if (!inputToken || !outputToken || !asset || !account || !publicClient) return;
 
-  }
-
-  function handleTokenSelect(option: Token, vault: Token) {
-    setInputToken(option)
-    setOutputToken(vault)
-  }
-
-  async function handleDeposit() {
-    if (!account || !walletClient) return;
-
-    showLoadingToast("Depositing...");
-
-    const success = await handleCallResult({
-      successMessage: "Deposited!",
-      simulationResponse: await simulateCall({
-        account,
-        contract: {
-          address: vaultData.address,
-          abi: OracleVaultAbi,
-        },
-        functionName: "deposit",
-        publicClient: publicClient!,
-        args: [inputBalance.value, account]
-      }),
-      clients: {
-        publicClient: publicClient!,
-        walletClient: walletClient!
-      },
-    });
-
-    if (success) {
-      setUp()
-      mutateTokenBalance({
-        tokensToUpdate: [vault.address, asset.address],
-        account,
-        tokensAtom: [tokens, setTokens],
-        chainId
-      })
-      setInputBalance({ value: BigInt(0), formatted: "0", formattedUSD: "0" });
-    }
-  }
-
-  async function handleWithdraw() {
-    if (!publicClient) return;
-
-    const res = await publicClient.multicall({
-      contracts: [
-        {
-          address: vaultData.address,
-          abi: OracleVaultAbi,
-          functionName: "convertToAssets",
-          args: [inputBalance.value]
-        },
-        {
-          address: vaultData.asset,
-          abi: erc20Abi,
-          functionName: "balanceOf",
-          args: [vaultData.safe!]
-        }
-      ]
-    })
-
-    const expectedAssets = res[0].result as bigint;
-    const float = res[1].result as bigint;
-
-    if (float >= expectedAssets) {
-      handleRequestFulfillWithdraw()
-    } else {
-      handleRequestRedeem()
-    }
-  }
-
-  async function handleRequestFulfillWithdraw() {
-    if (!account || !walletClient) return;
-
-    showLoadingToast("Redeeming...");
-
-    const success = await handleCallResult({
-      successMessage: "Redeemed!",
-      simulationResponse: await simulateCall({
-        account,
-        contract: {
-          address: ROUTER,
-          abi: AsyncVaultRouterAbi,
-        },
-        functionName: "requestFulfillWithdraw",
-        publicClient: publicClient!,
-        args: [vaultData.address, account, inputBalance.value]
-      }),
-      clients: {
-        publicClient: publicClient!,
-        walletClient: walletClient!
-      },
-    });
-
-    if (success) {
-      setUp()
-      mutateTokenBalance({
-        tokensToUpdate: [vault.address, asset.address],
-        account,
-        tokensAtom: [tokens, setTokens],
-        chainId
-      })
-      setInputBalance({ value: BigInt(0), formatted: "0", formattedUSD: "0" });
-    }
-  }
-
-  async function handleRequestRedeem() {
-    if (!account || !walletClient) return;
-
-    showLoadingToast("Requesting redeem...");
-
-    const success = await handleCallResult({
-      successMessage: "Redeem requested!",
-      simulationResponse: await simulateCall({
-        account,
-        contract: {
-          address: vaultData.address,
-          abi: OracleVaultAbi,
-        },
-        functionName: "requestRedeem",
-        publicClient: publicClient!,
-        args: [inputBalance.value, account, account]
-      }),
-      clients: {
-        publicClient: publicClient!,
-        walletClient: walletClient!
-      },
-    });
-
-    if (success) {
-      setUp()
-      mutateTokenBalance({
-        tokensToUpdate: [vault.address],
-        account,
-        tokensAtom: [tokens, setTokens],
-        chainId
-      })
-      setInputBalance({ value: BigInt(0), formatted: "0", formattedUSD: "0" });
-    }
-  }
-
-  async function handleApprove() {
-    if (!account || !walletClient || !publicClient || !inputToken) return;
-
-    const success1 = await handleAllowance({
-      token: inputToken.address,
-      amount: Number(inputBalance.value),
-      account: account,
-      spender: vaultData.liquid >= inputBalance.value ? ROUTER : vaultData.address,
-      clients: {
-        publicClient: publicClient,
-        walletClient: walletClient
-      },
-    })
-
-
-    // Handle Operator
-    const isOperator = await publicClient.readContract({
-      address: vaultData.address,
-      abi: OracleVaultAbi,
-      functionName: "isOperator",
-      args: [account, ROUTER]
-    })
-    let success2 = true;
-    if (!isOperator) {
-      success2 = await handleCallResult({
-        successMessage: "Operator set!",
-        simulationResponse: await simulateCall({
-          account,
-          contract: {
+    if (!isDeposit) {
+      const res = await publicClient.multicall({
+        contracts: [
+          {
             address: vaultData.address,
             abi: OracleVaultAbi,
+            functionName: "convertToAssets",
+            args: [inputBalance.value]
           },
-          functionName: "setOperator",
-          publicClient: publicClient,
-          args: [ROUTER, true]
-        }),
-        clients: {
-          publicClient: publicClient,
-          walletClient: walletClient
-        },
-      });
+          {
+            address: vaultData.asset,
+            abi: erc20Abi,
+            functionName: "balanceOf",
+            args: [vaultData.safe!]
+          }
+        ]
+      })
+
+      const expectedAssets = res[0].result as bigint;
+      const float = res[1].result as bigint;
+
+      if (float >= expectedAssets) {
+        setAction(VaultActionType.RequestFulfillAndWithdraw)
+        setSteps(selectActions(VaultActionType.RequestFulfillAndWithdraw))
+      }
     }
 
-    if (success1 && success2) {
-      setUp()
-    }
+    const success = await findZapProvider({
+      action,
+      inputToken,
+      outputToken,
+      asset,
+      inputBalance,
+      zapProvider,
+      account,
+      vaultData,
+      setter: setZapProvider
+    });
+    if (success) setShowModal(true)
   }
 
   return (
@@ -405,8 +260,8 @@ function SafeVaultInputs({
         onChange={handleChangeInput}
         selectedToken={inputToken}
         errorMessage={errorMessage}
-        tokenList={[]}
-        allowSelection={false}
+        tokenList={isDeposit ? tokenOptions : []}
+        allowSelection={isDeposit}
         disabled={!isDeposit && !outputToken}
         allowInput
       />
@@ -471,50 +326,38 @@ function SafeVaultInputs({
         allowInput={false}
         disabled={isDeposit && !inputToken}
       />
-      <div className="mt-4">
-        <p className="text-white font-bold mb-2 text-start">Fee Breakdown</p>
-        <div className="bg-customNeutral200 py-2 px-4 rounded-lg space-y-2">
-          <span className="flex flex-row items-center justify-between text-white">
-            <p>Deposit Fee</p>
-            <p>{formatUnits(vaultData.fees.deposit, 16)} %</p>
-          </span>
-          <span className="flex flex-row items-center justify-between text-white">
-            <p>Withdrawal Fee</p>
-            <p>{formatUnits(vaultData.fees.withdrawal, 16)} %</p>
-          </span>
-          <span className="flex flex-row items-center justify-between text-white">
-            <p>Management Fee</p>
-            <p>{formatUnits(vaultData.fees.management, 16)} %</p>
-          </span>
-          <span className="flex flex-row items-center justify-between text-white">
-            <p>Performance Fee</p>
-            <p>{formatUnits(vaultData.fees.performance, 16)} %</p>
-          </span>
-        </div>
-      </div>
+
+      <VaultFeeBreakdown vaultData={vaultData} />
 
       <div className="py-6 space-y-4">
         <MainButtonGroup
-          label={isDeposit ? "Deposit" : "Request Withdraw"}
-          mainAction={isDeposit ? handleDeposit : handleWithdraw}
+          label={"Preview"}
+          mainAction={handlePreview}
           chainId={vaultData.chainId}
-          disabled={!account || !inputToken || inputBalance.formatted === "0" || // Not connected / selected properly
-            (isDeposit && assetAllowance < inputBalance.value) || // Not enough allowance
-            (!isDeposit && vaultAllowance < inputBalance.value) // Not enough allowance
-          }
-        />
-        <SecondaryButtonGroup
-          label="Approve"
-          mainAction={handleApprove}
-          chainId={vaultData.chainId}
-          disabled={false}
+          disabled={!account || !inputToken || inputBalance.formatted === "0" || showModal}
         />
       </div>
+
+      {inputToken && outputToken && showModal &&
+        <VaultInteractionContainer
+          _inputToken={inputToken}
+          _outputToken={outputToken}
+          zapProvider={zapProvider}
+          _inputBalance={inputBalance}
+          _action={steps[0]}
+          actionSeries={action}
+          actions={steps}
+          vaultData={vaultData}
+          setShowModal={setShowModal}
+          callback={setUp}
+        />
+      }
     </>
   )
 }
 
 interface ClaimableWithdrawalProps {
+  vaultData: VaultData;
   vault: Token;
   asset: Token;
   tokenOptions: Token[];
@@ -522,51 +365,68 @@ interface ClaimableWithdrawalProps {
   setUp: Function;
 }
 
-function ClaimableWithdrawal({ vault, asset, tokenOptions, requestBalance, setUp }: ClaimableWithdrawalProps): JSX.Element {
-  return <>
-    <ClaimableAssets claimableAssets={requestBalance.claimableAssets} vault={vault} asset={asset} tokenOptions={tokenOptions} setUp={setUp} />
-    <RequestedShares requestShares={requestBalance.pendingShares} asset={asset} vault={vault} setUp={setUp} />
-  </>
+function ClaimableWithdrawal({ vaultData, vault, asset, tokenOptions, requestBalance, setUp }: ClaimableWithdrawalProps): JSX.Element {
+  return (
+    <>
+      {requestBalance.claimableAssets > BigInt(0) &&
+        <ClaimableAssets
+          vaultData={vaultData}
+          requestBalance={requestBalance}
+          vault={vault}
+          asset={asset}
+          tokenOptions={tokenOptions}
+          setUp={setUp}
+        />
+      }
+      {requestBalance.pendingShares > BigInt(0) &&
+        <RequestedShares
+          vaultData={vaultData}
+          requestBalance={requestBalance}
+          asset={asset}
+          vault={vault}
+          tokenOptions={tokenOptions}
+          setUp={setUp}
+        />
+      }
+    </>
+  )
 }
 
-function ClaimableAssets({ claimableAssets, vault, asset, tokenOptions, setUp }: { claimableAssets: bigint, vault: Token, asset: Token, tokenOptions: Token[], setUp: Function }): JSX.Element {
-  const [tokens, setTokens] = useAtom(tokensAtom)
-  const { address: account, chain } = useAccount();
-  const publicClient = usePublicClient({ chainId: asset.chainId });
-  const { data: walletClient } = useWalletClient();
+function ClaimableAssets({ vaultData, vault, asset, tokenOptions, requestBalance, setUp }: ClaimableWithdrawalProps): JSX.Element {
+  const { address: account } = useAccount();
+  const publicClient = usePublicClient({ chainId: vaultData.chainId });
 
-  async function handleWithdraw() {
-    if (!account || !walletClient) return;
+  const [outputToken, setOutputToken] = useState<Token>(vault);
 
-    showLoadingToast("Withdrawing...");
+  const [steps, setSteps] = useState<VaultAction[]>(selectActions(VaultActionType.Withdrawal));
+  const [action, setAction] = useState<VaultActionType>(VaultActionType.Withdrawal);
+  const [showModal, setShowModal] = useState<boolean>(false)
+  const [zapProvider, setZapProvider] = useState<ZapProvider>(ZapProvider.none)
 
-    const success = await handleCallResult({
-      successMessage: "Withdrawn!",
-      simulationResponse: await simulateCall({
-        account,
-        contract: {
-          address: vault.address,
-          abi: OracleVaultAbi,
-        },
-        functionName: "withdraw",
-        publicClient: publicClient!,
-        args: [claimableAssets, account, account]
-      }),
-      clients: {
-        publicClient: publicClient!,
-        walletClient: walletClient!
-      },
-    });
+  function handleTokenSelect(vault: Token, option: Token) {
+    setOutputToken(option)
 
-    if (success) {
-      setUp()
-      mutateTokenBalance({
-        tokensToUpdate: [vault.address, asset.address],
-        account,
-        tokensAtom: [tokens, setTokens],
-        chainId: vault.chainId!
-      })
+    if (option.address !== asset.address) {
+      setAction(VaultActionType.ZapWithdrawal)
+      setSteps(selectActions(VaultActionType.ZapWithdrawal))
     }
+  }
+
+  async function handlePreview() {
+    if (!asset || !outputToken || !asset || !account || !publicClient) return;
+
+    const success = await findZapProvider({
+      action,
+      inputToken: asset,
+      outputToken,
+      asset,
+      inputBalance: calcBalance(requestBalance.claimableAssets, asset.decimals, asset.price),
+      zapProvider,
+      account,
+      vaultData,
+      setter: setZapProvider
+    });
+    if (success) setShowModal(true)
   }
 
   return (
@@ -576,7 +436,7 @@ function ClaimableAssets({ claimableAssets, vault, asset, tokenOptions, setUp }:
         <p>Assets:</p>
         <span className="flex flex-row items-center">
           <p className="">
-            {formatBalance(claimableAssets, asset.decimals)}
+            {formatBalance(requestBalance.claimableAssets, asset.decimals)}
           </p>
           <TokenIcon
             token={asset}
@@ -591,69 +451,67 @@ function ClaimableAssets({ claimableAssets, vault, asset, tokenOptions, setUp }:
         <p>Withdrawal Amount:</p>
         <span className="flex flex-row items-center">
           <p className="mr-2">
-            {asset ? `~ ${formatBalance(claimableAssets, asset.decimals)}` : ""}
+            {asset ? `~ ${Number(formatBalanceUSD(requestBalance.claimableAssets, asset.decimals, asset.price)) / outputToken.price}` : ""}
           </p>
           <SelectToken
             chainId={asset.chainId!}
             allowSelection={false}
-            selectedToken={asset}
+            selectedToken={outputToken}
             options={tokenOptions}
-            selectToken={() => { }}
+            selectToken={(option) => handleTokenSelect(vault, option)}
           />
         </span>
       </span>
 
       <div className="mt-2">
         <SecondaryButtonGroup
-          label="Claim Withdrawal"
-          mainAction={handleWithdraw}
+          label="Preview"
+          mainAction={handlePreview}
           chainId={asset.chainId!}
-          disabled={claimableAssets === BigInt(0) || !asset}
+          disabled={requestBalance.claimableAssets === BigInt(0) || !asset}
         />
       </div>
+
+      {vault && outputToken && showModal &&
+        <VaultInteractionContainer
+          _inputToken={vault}
+          _outputToken={outputToken}
+          zapProvider={zapProvider}
+          _inputBalance={calcBalance(requestBalance.claimableShares, vault.decimals, vault.price)}
+          _action={steps[0]}
+          actionSeries={action}
+          actions={steps}
+          vaultData={vaultData}
+          setShowModal={setShowModal}
+          callback={setUp}
+        />
+      }
     </div>
   )
 }
 
 
-function RequestedShares({ requestShares, vault, asset, setUp }: { requestShares: bigint, vault: Token, asset: Token, setUp: Function }): JSX.Element {
+function RequestedShares({ vaultData, vault, asset, tokenOptions, requestBalance, setUp }: ClaimableWithdrawalProps): JSX.Element {
   const [tokens, setTokens] = useAtom(tokensAtom)
   const { address: account, chain } = useAccount();
   const publicClient = usePublicClient({ chainId: asset.chainId });
   const { data: walletClient } = useWalletClient();
 
   async function handleCancelRedeem() {
-    if (!account || !walletClient) return;
+    if (!account || !publicClient || !walletClient) return;
 
-    showLoadingToast("Canceling redeem request...");
+    const success = await vaultCancelRedeem({
+      chainId: vaultData.chainId,
+      vaultData: vaultData,
+      asset,
+      vault,
+      account,
+      amount: requestBalance.pendingShares,
+      clients: { publicClient, walletClient },
+      tokensAtom: [tokens, setTokens],
+    })
 
-    const success = await handleCallResult({
-      successMessage: "Redeem request canceled!",
-      simulationResponse: await simulateCall({
-        account,
-        contract: {
-          address: vault.address,
-          abi: OracleVaultAbi,
-        },
-        functionName: "cancelRedeemRequest",
-        publicClient: publicClient!,
-        args: [account]
-      }),
-      clients: {
-        publicClient: publicClient!,
-        walletClient: walletClient!
-      },
-    });
-
-    if (success) {
-      setUp()
-      mutateTokenBalance({
-        tokensToUpdate: [vault.address],
-        account,
-        tokensAtom: [tokens, setTokens],
-        chainId: vault.chainId!
-      })
-    }
+    if (success) setUp()
   }
 
   return (
@@ -662,7 +520,7 @@ function RequestedShares({ requestShares, vault, asset, setUp }: { requestShares
       <span className="text-white text-lg flex flex-row items-center justify-between">
         <p>Shares:</p>
         <span className="flex flex-row items-center">
-          {formatBalance(requestShares, vault.decimals)}
+          {formatBalance(requestBalance.pendingShares, vault.decimals)}
           <TokenIcon
             token={vault}
             icon={vault?.logoURI}
@@ -675,8 +533,7 @@ function RequestedShares({ requestShares, vault, asset, setUp }: { requestShares
       <span className="text-white text-lg flex flex-row items-center justify-between">
         <p>Assets:</p>
         <span className="flex flex-row items-center">
-          {/* TODO: Convert to assets */}
-          ~ {formatBalance(requestShares, vault.decimals)}
+          ~ {Number(formatBalanceUSD(requestBalance.pendingShares, vault.decimals, vault.price)) / asset.price}
           <TokenIcon
             token={asset}
             icon={asset?.logoURI}
@@ -688,10 +545,10 @@ function RequestedShares({ requestShares, vault, asset, setUp }: { requestShares
       </span>
       <div className="mt-2">
         <SecondaryButtonGroup
-          label="Cancel Request"
+          label="Cancel Withdrawal"
           mainAction={handleCancelRedeem}
           chainId={asset.chainId!}
-          disabled={false}
+          disabled={requestBalance.pendingShares === BigInt(0)}
         />
       </div>
     </div>

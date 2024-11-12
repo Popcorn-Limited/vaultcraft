@@ -1,32 +1,21 @@
-import {
-  useAccount,
-  usePublicClient,
-  useSwitchChain,
-  useWalletClient,
-} from "wagmi";
-import MainActionButton from "@/components/button/MainActionButton"
+import { useAccount } from "wagmi";
 import TabSelector from "@/components/common/TabSelector"
 import InputTokenWithError from "@/components/input/InputTokenWithError"
-import ActionSteps from "@/components/vault/ActionSteps"
-import { handleAllowance } from "@/lib/approve"
-import { Networth, networthAtom, tokensAtom, TVL, tvlAtom, valueStorageAtom } from "@/lib/atoms"
-import { vaultsAtom } from "@/lib/atoms/vaults"
-import { VaultRouterByChain } from "@/lib/constants"
-import { gaugeDeposit, gaugeWithdraw } from "@/lib/gauges/interactions"
+import { tokensAtom } from "@/lib/atoms"
 import { showErrorToast, showLoadingToast, showSuccessToast } from "@/lib/toasts"
-import { Balance, Clients, SmartVaultActionType, Token, TokenByAddress, TokenType, VaultData, ZapProvider } from "@/lib/types"
-import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors"
-import { calcBalance, EMPTY_BALANCE, formatBalance, formatBalanceUSD, NumberFormatter } from "@/lib/utils/helpers"
-import { vaultDeposit, vaultDepositAndStake, vaultRedeem, vaultUnstakeAndWithdraw } from "@/lib/vault/interactions"
+import { Balance, VaultActionType, Token, VaultAction, VaultData, ZapProvider } from "@/lib/types"
+import { EMPTY_BALANCE, formatBalance, NumberFormatter } from "@/lib/utils/helpers"
 import { ArrowDownIcon } from "@heroicons/react/24/outline"
 import { useAtom } from "jotai"
 import { useState } from "react"
-import { Address, erc20Abi, formatUnits, maxUint256, parseUnits, PublicClient } from "viem"
+import { maxUint256, parseUnits } from "viem"
 import getVaultErrorMessage from "@/lib/vault/errorMessage";
 import MainButtonGroup from "../common/MainButtonGroup";
 import { getZapProvider } from "@/lib/zap/zapProvider";
-import { handleZapAllowance } from "@/lib/zap/zapAllowance";
-import zap from "@/lib/zap";
+import VaultInteractionContainer from "./VaultInteraction";
+import { selectActions } from "@/lib/vault/vaultHelpers";
+import VaultFeeBreakdown from "./VaultFees";
+import findZapProvider from "@/lib/zap/findZapProvider";
 
 export interface VaultInputsProps {
   vaultData: VaultData;
@@ -50,10 +39,8 @@ export default function VaultInputs({
   const [inputToken, setInputToken] = useState<Token>();
   const [outputToken, setOutputToken] = useState<Token>();
 
-  const [steps, setSteps] = useState<Action[]>([]);
-  const [action, setAction] = useState<SmartVaultActionType>(
-    SmartVaultActionType.Deposit
-  );
+  const [steps, setSteps] = useState<VaultAction[]>([]);
+  const [action, setAction] = useState<VaultActionType>(VaultActionType.Deposit);
 
   const [inputBalance, setInputBalance] = useState<Balance>(EMPTY_BALANCE);
   const [isDeposit, setIsDeposit] = useState<boolean>(true);
@@ -76,14 +63,14 @@ export default function VaultInputs({
             return;
           case vault?.address!:
             setIsDeposit(true);
-            setAction(SmartVaultActionType.Deposit);
-            setSteps(selectActions(SmartVaultActionType.Deposit));
+            setAction(VaultActionType.Deposit);
+            setSteps(selectActions(VaultActionType.Deposit));
             return;
           case gauge?.address:
             setIsDeposit(true);
-            setAction(SmartVaultActionType.DepositAndStake);
+            setAction(VaultActionType.DepositAndStake);
             setSteps(
-              selectActions(SmartVaultActionType.DepositAndStake)
+              selectActions(VaultActionType.DepositAndStake)
             );
             return;
           default:
@@ -94,22 +81,22 @@ export default function VaultInputs({
         switch (output.address) {
           case asset?.address!:
             setIsDeposit(false);
-            setAction(SmartVaultActionType.Withdrawal);
-            setSteps(selectActions(SmartVaultActionType.Withdrawal));
+            setAction(VaultActionType.Withdrawal);
+            setSteps(selectActions(VaultActionType.Withdrawal));
             return;
           case vault?.address!:
             // error
             return;
           case gauge?.address:
             setIsDeposit(true);
-            setAction(SmartVaultActionType.Stake);
-            setSteps(selectActions(SmartVaultActionType.Stake));
+            setAction(VaultActionType.Stake);
+            setSteps(selectActions(VaultActionType.Stake));
             return;
           default:
             setIsDeposit(false);
-            setAction(SmartVaultActionType.ZapWithdrawal);
+            setAction(VaultActionType.ZapWithdrawal);
             setSteps(
-              selectActions(SmartVaultActionType.ZapWithdrawal)
+              selectActions(VaultActionType.ZapWithdrawal)
             );
             return;
         }
@@ -117,25 +104,25 @@ export default function VaultInputs({
         switch (output.address) {
           case asset?.address!:
             setIsDeposit(false);
-            setAction(SmartVaultActionType.UnstakeAndWithdraw);
+            setAction(VaultActionType.UnstakeAndWithdraw);
             setSteps(
-              selectActions(SmartVaultActionType.UnstakeAndWithdraw)
+              selectActions(VaultActionType.UnstakeAndWithdraw)
             );
             return;
           case vault?.address!:
             setIsDeposit(false);
-            setAction(SmartVaultActionType.Unstake);
-            setSteps(selectActions(SmartVaultActionType.Unstake));
+            setAction(VaultActionType.Unstake);
+            setSteps(selectActions(VaultActionType.Unstake));
             return;
           case gauge?.address:
             // error
             return;
           default:
             setIsDeposit(false);
-            setAction(SmartVaultActionType.ZapUnstakeAndWithdraw);
+            setAction(VaultActionType.ZapUnstakeAndWithdraw);
             setSteps(
               selectActions(
-                SmartVaultActionType.ZapUnstakeAndWithdraw
+                VaultActionType.ZapUnstakeAndWithdraw
               )
             );
             return;
@@ -147,14 +134,14 @@ export default function VaultInputs({
             return;
           case vault?.address!:
             setIsDeposit(true);
-            setAction(SmartVaultActionType.ZapDeposit);
-            setSteps(selectActions(SmartVaultActionType.ZapDeposit));
+            setAction(VaultActionType.ZapDeposit);
+            setSteps(selectActions(VaultActionType.ZapDeposit));
             return;
           case gauge?.address:
             setIsDeposit(true);
-            setAction(SmartVaultActionType.ZapDepositAndStake);
+            setAction(VaultActionType.ZapDepositAndStake);
             setSteps(
-              selectActions(SmartVaultActionType.ZapDepositAndStake)
+              selectActions(VaultActionType.ZapDepositAndStake)
             );
             return;
           default:
@@ -174,8 +161,8 @@ export default function VaultInputs({
       setOutputToken(undefined);
       setIsDeposit(false);
       const newAction = !!gauge
-        ? SmartVaultActionType.UnstakeAndWithdraw
-        : SmartVaultActionType.Withdrawal;
+        ? VaultActionType.UnstakeAndWithdraw
+        : VaultActionType.Withdrawal;
       setAction(newAction);
       setSteps(selectActions(newAction));
     } else {
@@ -184,8 +171,8 @@ export default function VaultInputs({
       setOutputToken(!!gauge ? gauge : vault);
       setIsDeposit(true);
       const newAction = !!gauge
-        ? SmartVaultActionType.DepositAndStake
-        : SmartVaultActionType.Deposit;
+        ? VaultActionType.DepositAndStake
+        : VaultActionType.Deposit;
       setAction(newAction);
       setSteps(selectActions(newAction));
     }
@@ -216,34 +203,20 @@ export default function VaultInputs({
     handleChangeInput({ currentTarget: { value: inputToken.balance.formatted } });
   }
 
-  async function findZapProvider(): Promise<boolean> {
-    if (!inputToken || !outputToken || !asset || !account) return false
-    const val = Number(inputBalance.value)
-
-    let newZapProvider = zapProvider
-    if (newZapProvider === ZapProvider.none && [SmartVaultActionType.ZapDeposit, SmartVaultActionType.ZapDepositAndStake, SmartVaultActionType.ZapUnstakeAndWithdraw, SmartVaultActionType.ZapWithdrawal].includes(action)) {
-      showLoadingToast("Searching for the best price...")
-      if ([SmartVaultActionType.ZapDeposit, SmartVaultActionType.ZapDepositAndStake].includes(action)) {
-        newZapProvider = await getZapProvider({ sellToken: inputToken, buyToken: asset, amount: val, chainId, account, feeRecipient: vaultData.metadata.feeRecipient })
-      } else {
-        newZapProvider = await getZapProvider({ sellToken: asset, buyToken: outputToken, amount: val, chainId, account, feeRecipient: vaultData.metadata.feeRecipient })
-      }
-
-      setZapProvider(newZapProvider)
-
-      if (newZapProvider === ZapProvider.notFound) {
-        showErrorToast("Zap not available. Please try a different token.")
-        return false
-      } else {
-        showSuccessToast(`Using ${String(ZapProvider[newZapProvider])} for your zap`)
-        return true
-      }
-    }
-    return true
-  }
-
   async function handlePreview() {
-    const success = await findZapProvider();
+    if (!inputToken || !outputToken || !asset || !account) return;
+
+    const success = await findZapProvider({
+      action,
+      inputToken,
+      outputToken,
+      asset,
+      inputBalance,
+      zapProvider,
+      account,
+      vaultData,
+      setter: setZapProvider
+    });
     if (success) setShowModal(true)
   }
 
@@ -339,27 +312,7 @@ export default function VaultInputs({
       allowInput={false}
       disabled={isDeposit && !inputToken}
     />
-    <div className="mt-4">
-      <p className="text-white font-bold mb-2 text-start">Fee Breakdown</p>
-      <div className="bg-customNeutral200 py-2 px-4 rounded-lg space-y-2">
-        <span className="flex flex-row items-center justify-between text-white">
-          <p>Deposit Fee</p>
-          <p>{formatUnits(vaultData.fees.deposit, 16)} %</p>
-        </span>
-        <span className="flex flex-row items-center justify-between text-white">
-          <p>Withdrawal Fee</p>
-          <p>{formatUnits(vaultData.fees.withdrawal, 16)} %</p>
-        </span>
-        <span className="flex flex-row items-center justify-between text-white">
-          <p>Management Fee</p>
-          <p>{formatUnits(vaultData.fees.management, 16)} %</p>
-        </span>
-        <span className="flex flex-row items-center justify-between text-white">
-          <p>Performance Fee</p>
-          <p>{formatUnits(vaultData.fees.performance, 16)} %</p>
-        </span>
-      </div>
-    </div>
+    <VaultFeeBreakdown vaultData={vaultData} />
 
     <div className="py-6">
       {
@@ -394,7 +347,7 @@ export default function VaultInputs({
     </div>
 
     {inputToken && outputToken && showModal &&
-      <InteractionContainer
+      <VaultInteractionContainer
         _inputToken={inputToken}
         _outputToken={outputToken}
         zapProvider={zapProvider}
@@ -407,477 +360,4 @@ export default function VaultInputs({
       />
     }
   </>
-}
-
-function InteractionContainer({ _inputToken, _outputToken, zapProvider, _inputBalance, _action, actionSeries, actions, vaultData, setShowModal }:
-  { _inputToken: Token, _outputToken: Token, _inputBalance: Balance, zapProvider: ZapProvider, _action: Action, actionSeries: SmartVaultActionType, actions: Action[], vaultData: VaultData, setShowModal: Function }): JSX.Element {
-  const publicClient = usePublicClient({ chainId: vaultData.chainId });
-
-  const [inputToken, setInputToken] = useState<Token>(_inputToken)
-  const [outputToken, setOutputToken] = useState<Token>(_outputToken)
-  const [inputBalance, setInputBalance] = useState<Balance>(_inputBalance)
-  const [valueStorage, setValueStorage] = useAtom(valueStorageAtom)
-  const [action, setAction] = useState<Action>(_action)
-  const [step, setStep] = useState<number>(0);
-
-  const [tokens, setTokens] = useAtom(tokensAtom);
-  const [vaults, setVaults] = useAtom(vaultsAtom);
-  const [tvl, setTVL] = useAtom(tvlAtom);
-  const [networth, setNetworth] = useAtom(networthAtom);
-
-  async function interactionPreHook() {
-    // if (action === Action.zap) {
-    //   setValueStorage(tokens[vaultData.chainId][vaultData.asset].balance)
-    // }
-    return
-  }
-
-  async function interactionPostHook(success: boolean) {
-    if (success) {
-      if ([Action.deposit, Action.stake, Action.depositAndStake, Action.withdraw, Action.unstake, Action.unstakeAndWithdraw].includes(action)) {
-        updateStats(publicClient!, tokens[vaultData.chainId][vaultData.address], vaultData, vaults, setVaults, tvl, setTVL, tokens, networth, setNetworth)
-
-        // Set asset as inputToken before zapApproving for zapOut
-        if ([Action.withdraw, Action.unstakeAndWithdraw].includes(action) &&
-          [SmartVaultActionType.ZapWithdrawal, SmartVaultActionType.ZapUnstakeAndWithdraw].includes(actionSeries)
-        ) {
-          setInputToken(tokens[vaultData.chainId][vaultData.asset])
-        }
-      }
-      if (action === Action.zap) {
-        // Set the `amount` as the output amount from zap        
-        setInputBalance(calcBalance(
-          tokens[vaultData.chainId][vaultData.asset].balance.value - valueStorage,
-          tokens[vaultData.chainId][vaultData.asset].decimals,
-          tokens[vaultData.chainId][vaultData.asset].price
-        ))
-        // Reset outputToken in case its deposit (reset doesnt matter on withdrawal since its the last action)
-        setOutputToken(_outputToken)
-        // Set to asset in case its deposit (reset doesnt matter on withdrawal since its the last action)
-        setInputToken(tokens[vaultData.chainId][vaultData.asset])
-      }
-
-      // Set asset as outputToken before zapping in
-      if (action === Action.zapApprove && [SmartVaultActionType.ZapDeposit, SmartVaultActionType.ZapDepositAndStake].includes(actionSeries)) {
-        setOutputToken(tokens[vaultData.chainId][vaultData.asset])
-        setValueStorage(tokens[vaultData.chainId][vaultData.asset].balance.value)
-      }
-
-      const nextStep = step + 1
-      setAction(actions[nextStep])
-      setStep(nextStep)
-    } else {
-      setAction(Action.done)
-    }
-    return
-  }
-
-  return <div className="w-full flex flex-col mt-5">
-    <Interaction
-      inputToken={inputToken}
-      outputToken={outputToken}
-      zapProvider={zapProvider}
-      vaultData={vaultData}
-      action={action}
-      inputBalance={inputBalance}
-      interactionHooks={[interactionPreHook, interactionPostHook]}
-      setShowModal={setShowModal}
-    />
-    <div className="mt-6">
-      <ActionSteps
-        steps={actions.slice(0, -1).map((a, i) => {
-          const isError = action === Action.done && step < actions.length
-          return {
-            step: i + 1,
-            label: getLabel(a),
-            success: i < step,
-            error: isError,
-            loading: !isError && i === step,
-            updateBalance: false
-          }
-        })}
-        stepCounter={step}
-      />
-    </div>
-  </div>
-}
-
-function Interaction({ inputToken, outputToken, inputBalance, zapProvider, action, vaultData, interactionHooks, setShowModal }:
-  { inputToken: Token, outputToken: Token, inputBalance: Balance, zapProvider: ZapProvider, action: Action, vaultData: VaultData, interactionHooks: [(e?: any) => Promise<any>, (e?: any) => Promise<any>], setShowModal: Function }): JSX.Element {
-  const [preHook, postHook] = interactionHooks
-  const publicClient = usePublicClient({ chainId: vaultData.chainId });
-  const { data: walletClient } = useWalletClient();
-  const { address: account, chain } = useAccount();
-  const [tokens, setTokens] = useAtom(tokensAtom);
-
-  async function handleMainAction() {
-    if (!account) return
-    if (action === Action.done) setShowModal(false)
-
-    await preHook()
-
-    const clients = { publicClient: publicClient!, walletClient: walletClient! }
-    const success = await handleInteraction(
-      inputToken,
-      outputToken,
-      inputBalance.value,
-      action,
-      vaultData,
-      tokens[vaultData.chainId][vaultData.asset],
-      tokens[vaultData.chainId][vaultData.address],
-      account,
-      zapProvider,
-      clients,
-      [tokens, setTokens]
-    )()
-    await postHook(success)
-  }
-
-  return (
-    <>
-      <p className="text-white text-start text-2xl font-bold leading-none mb-1">{getLabel(action)}</p>
-      <p className="text-white text-start mb-2">{getDescription(inputToken, outputToken, Number(inputBalance.formatted), action, vaultData)}</p>
-      <MainActionButton label={getLabel(action)} handleClick={handleMainAction} />
-    </>
-  )
-}
-
-function getDescription(inputToken: Token, outputToken: Token, amount: number, action: Action, vaultData: VaultData) {
-  const val = NumberFormatter.format(amount)
-  switch (action) {
-    case Action.depositApprove:
-      return `Approving ${val} ${inputToken.symbol} for Vault deposit.`
-    case Action.stakeApprove:
-      return `Approving ${val} ${inputToken.symbol} for Vault staking.`
-    case Action.depositAndStakeApprove:
-      return `Approving ${val} ${inputToken.symbol} for Vault deposit and staking.`
-    case Action.unstakeAndWithdrawApprove:
-      return `Approving ${val} ${inputToken.symbol} for Vault unstake and withdrawing.`
-    case Action.zapApprove:
-      return `Approving ${val} ${inputToken.symbol} for zapping.`
-    case Action.deposit:
-      return `Depositing ${val} ${inputToken.symbol} into the Vault.`
-    case Action.stake:
-      return `Staking ${val} ${inputToken.symbol} into the Gauge.`
-    case Action.depositAndStake:
-      return `Deposit and staking ${val} ${inputToken.symbol} into the Vault.`
-    case Action.withdraw:
-      return `Withdrawing ${val} ${inputToken.symbol}.`
-    case Action.unstake:
-      return `Unstaking ${val} ${inputToken.symbol}.`
-    case Action.unstakeAndWithdraw:
-      return `Withdraw and unstaking ${val} ${inputToken.symbol}.`
-    case Action.zap:
-      return `Selling ${val} ${inputToken.symbol} for ${outputToken.symbol}.`
-    case Action.done:
-      return ""
-  }
-}
-
-function getLabel(action: Action) {
-  switch (action) {
-    case Action.depositApprove:
-    case Action.stakeApprove:
-    case Action.depositAndStakeApprove:
-    case Action.unstakeAndWithdrawApprove:
-    case Action.zapApprove:
-      return "Approve"
-    case Action.deposit:
-      return "Deposit"
-    case Action.stake:
-      return "Stake"
-    case Action.depositAndStake:
-      return "Deposit"
-    case Action.withdraw:
-      return "Withdraw"
-    case Action.unstake:
-      return "Unstake"
-    case Action.unstakeAndWithdraw:
-      return "Withdraw"
-    case Action.zap:
-      return "Zap"
-    case Action.done:
-      return "Done"
-  }
-}
-
-
-function selectActions(action: SmartVaultActionType) {
-  switch (action) {
-    case SmartVaultActionType.Deposit:
-      return [
-        Action.depositApprove,
-        Action.deposit,
-        Action.done
-      ]
-    case SmartVaultActionType.ZapDeposit:
-      return [
-        Action.zapApprove,
-        Action.zap,
-        Action.depositApprove,
-        Action.deposit,
-        Action.done
-      ]
-    case SmartVaultActionType.Stake:
-      return [
-        Action.stakeApprove,
-        Action.stake,
-        Action.done
-      ]
-    case SmartVaultActionType.DepositAndStake:
-      return [
-        Action.depositAndStakeApprove,
-        Action.depositAndStake,
-        Action.done
-      ]
-    case SmartVaultActionType.ZapDepositAndStake:
-      return [
-        Action.zapApprove,
-        Action.zap,
-        Action.depositAndStakeApprove,
-        Action.depositAndStake,
-        Action.done
-      ]
-    case SmartVaultActionType.Withdrawal:
-      return [
-        Action.withdraw,
-        Action.done
-      ]
-    case SmartVaultActionType.ZapWithdrawal:
-      return [
-        Action.withdraw,
-        Action.zapApprove,
-        Action.zap,
-        Action.done
-      ]
-    case SmartVaultActionType.Unstake:
-      return [
-        Action.unstake,
-        Action.done
-      ]
-    case SmartVaultActionType.UnstakeAndWithdraw:
-      return [
-        Action.unstakeAndWithdrawApprove,
-        Action.unstakeAndWithdraw,
-        Action.done
-      ]
-    case SmartVaultActionType.ZapUnstakeAndWithdraw:
-      return [
-        Action.unstakeAndWithdrawApprove,
-        Action.unstakeAndWithdraw,
-        Action.zapApprove,
-        Action.zap,
-        Action.done
-      ]
-  }
-}
-
-function handleInteraction(
-  inputToken: Token,
-  outputToken: Token,
-  amount: bigint,
-  action: Action,
-  vaultData: VaultData,
-  asset: Token,
-  vault: Token,
-  account: Address,
-  zapProvider: ZapProvider,
-  clients: Clients,
-  tokensAtom: [{ [key: number]: TokenByAddress }, Function]
-) {
-  switch (action) {
-    case Action.depositApprove:
-      return () =>
-        handleAllowance({
-          token: inputToken.address,
-          amount: Number(amount),
-          account,
-          spender: vaultData.address,
-          clients,
-        });
-    case Action.stakeApprove:
-      return () =>
-        handleAllowance({
-          token: inputToken.address,
-          amount: Number(amount),
-          account,
-          spender: vaultData.gauge!,
-          clients,
-        });
-    case Action.depositAndStakeApprove:
-    case Action.unstakeAndWithdrawApprove:
-      return () =>
-        handleAllowance({
-          token: inputToken.address,
-          amount: Number(amount),
-          account,
-          spender: VaultRouterByChain[vaultData.chainId],
-          clients,
-        });
-    case Action.zapApprove:
-      return () => handleZapAllowance({
-        token: inputToken.address,
-        amount: Number(amount),
-        account,
-        zapProvider,
-        clients
-      })
-    case Action.deposit:
-      return () =>
-        vaultDeposit({
-          chainId: vaultData.chainId,
-          vaultData,
-          asset: inputToken,
-          vault: outputToken,
-          account,
-          amount,
-          clients,
-          fireEvent: undefined,
-          referral: undefined,
-          tokensAtom
-        });
-    case Action.stake:
-      return () =>
-        gaugeDeposit({
-          vaultData,
-          account,
-          amount,
-          clients,
-          tokensAtom
-        });
-    case Action.depositAndStake:
-      return () => vaultDepositAndStake({
-        chainId: vaultData.chainId,
-        router: VaultRouterByChain[vaultData.chainId],
-        vaultData,
-        asset,
-        vault,
-        account,
-        amount,
-        clients,
-        fireEvent: undefined,
-        referral: undefined,
-        tokensAtom
-      })
-    case Action.withdraw:
-      return () =>
-        vaultRedeem({
-          chainId: vaultData.chainId,
-          vaultData,
-          asset,
-          vault,
-          account,
-          amount,
-          clients,
-          fireEvent: undefined,
-          referral: undefined,
-          tokensAtom
-        });
-    case Action.unstake:
-      return () =>
-        gaugeWithdraw({
-          vaultData,
-          account,
-          amount,
-          clients,
-          tokensAtom
-        });
-    case Action.unstakeAndWithdraw:
-      return () => vaultUnstakeAndWithdraw({
-        chainId: vaultData.chainId,
-        router: VaultRouterByChain[vaultData.chainId],
-        vaultData,
-        asset,
-        vault,
-        account,
-        amount,
-        clients,
-        fireEvent: undefined,
-        referral: undefined,
-        tokensAtom
-      })
-    case Action.zap:
-      return () => zap({
-        chainId: vaultData.chainId,
-        sellToken: inputToken,
-        buyToken: outputToken,
-        amount: Number(amount),
-        account,
-        zapProvider,
-        slippage: 100,
-        tradeTimeout: 300,
-        clients,
-        tokensAtom
-      })
-    case Action.done:
-      return () => { }
-  }
-}
-
-async function updateStats(
-  publicClient: PublicClient,
-  vault: Token,
-  vaultData: VaultData,
-  vaults: { [key: number]: VaultData[] },
-  setVaults: Function,
-  tvl: TVL,
-  setTVL: Function,
-  tokens: { [key: number]: TokenByAddress },
-  networth: Networth,
-  setNetworth: Function
-) {
-  const newSupply = await publicClient?.readContract({
-    address: vaultData.address,
-    abi: erc20Abi,
-    functionName: "totalSupply"
-  })
-  const index = vaults[vaultData.chainId].findIndex(v => v.address === vaultData.address)
-  const newNetworkVaults = [...vaults[vaultData.chainId]]
-  newNetworkVaults[index] = {
-    ...vaultData,
-    totalSupply: newSupply,
-    tvl: Number(formatBalanceUSD(newSupply, vault.decimals, vault.price))
-  }
-  const newVaults = { ...vaults, [vaultData.chainId]: newNetworkVaults }
-
-  setVaults(newVaults)
-
-  const vaultTVL = SUPPORTED_NETWORKS.map(chain => newVaults[chain.id]).flat().reduce((a, b) => a + b.tvl, 0)
-  setTVL({
-    vault: vaultTVL,
-    lockVault: tvl.lockVault,
-    stake: tvl.stake,
-    total: vaultTVL + tvl.lockVault + tvl.stake
-  });
-
-  const vaultNetworth = SUPPORTED_NETWORKS.map(chain =>
-    Object.values(tokens[chain.id])).flat().filter(t => t.type === TokenType.Vault || t.type === TokenType.Gauge)
-    .reduce((a, b) => a + Number(b.balance.formattedUSD), 0)
-  const assetNetworth = SUPPORTED_NETWORKS.map(chain =>
-    Object.values(tokens[chain.id])).flat().filter(t => t.type === TokenType.Asset)
-    .reduce((a, b) => a + Number(b.balance.formattedUSD), 0)
-
-  setNetworth({
-    vault: vaultNetworth,
-    lockVault: networth.lockVault,
-    wallet: assetNetworth,
-    stake: networth.stake,
-    total: vaultNetworth + assetNetworth + networth.lockVault + networth.stake
-  })
-}
-
-enum Action {
-  depositApprove,
-  stakeApprove,
-  depositAndStakeApprove,
-  unstakeAndWithdrawApprove,
-  zapApprove,
-  deposit,
-  stake,
-  depositAndStake,
-  withdraw,
-  unstake,
-  unstakeAndWithdraw,
-  zap,
-  done
 }

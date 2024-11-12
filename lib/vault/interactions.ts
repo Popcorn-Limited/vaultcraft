@@ -1,9 +1,9 @@
 import { showLoadingToast } from "@/lib/toasts";
 import { Clients, SimulationResponse, Token, TokenByAddress, VaultData } from "@/lib/types";
-import { VaultAbi } from "@/lib/constants";
-import { Address, PublicClient } from "viem";
+import { AsyncRouterByChain, AsyncVaultRouterAbi, OracleVaultAbi, VaultAbi } from "@/lib/constants";
+import { Address, erc20Abi, PublicClient } from "viem";
 import { VaultRouterAbi } from "@/lib/constants/abi/VaultRouter";
-import { formatBalance, handleCallResult } from "@/lib/utils/helpers";
+import { formatBalance, handleCallResult, simulateCall } from "@/lib/utils/helpers";
 import { networkMap } from "@/lib/utils/connectors";
 import mutateTokenBalance from "./mutateTokenBalance";
 
@@ -15,18 +15,6 @@ interface VaultWriteProps {
   account: Address;
   amount: bigint;
   clients: Clients;
-  fireEvent?: (
-    type: string,
-    {
-      user_address,
-      network,
-      contract_address,
-      asset_amount,
-      asset_ticker,
-      additionalEventData,
-    }: any
-  ) => Promise<void>;
-  referral?: Address;
   tokensAtom: [{ [key: number]: TokenByAddress }, Function]
 }
 
@@ -111,8 +99,6 @@ export async function vaultDeposit({
   account,
   amount,
   clients,
-  fireEvent,
-  referral,
   tokensAtom
 }: VaultWriteProps): Promise<boolean> {
   showLoadingToast("Depositing into the vault...");
@@ -139,18 +125,6 @@ export async function vaultDeposit({
       tokensAtom,
       chainId
     })
-
-    if (fireEvent) void fireEvent("addLiquidity", {
-      user_address: account,
-      network: networkMap[chainId].toLowerCase(),
-      contract_address: vaultData.address,
-      asset_amount: formatBalance(amount, asset.decimals),
-      asset_ticker: asset.symbol,
-      additionalEventData: {
-        referral: referral,
-        vault_name: vaultData.metadata.vaultName,
-      },
-    });
   }
   return success;
 }
@@ -163,8 +137,6 @@ export async function vaultRedeem({
   account,
   amount,
   clients,
-  fireEvent,
-  referral,
   tokensAtom
 }: VaultWriteProps): Promise<boolean> {
   showLoadingToast("Withdrawing from the vault...");
@@ -205,18 +177,6 @@ export async function vaultRedeem({
       tokensAtom,
       chainId
     })
-
-    if (fireEvent) void fireEvent("removeLiquidity", {
-      user_address: account,
-      network: networkMap[chainId].toLowerCase(),
-      contract_address: vaultData.address,
-      asset_amount: formatBalance(amount, vault.decimals),
-      asset_ticker: asset.symbol,
-      additionalEventData: {
-        referral: referral,
-        vault_name: vaultData.metadata.vaultName,
-      },
-    });
   }
   return success;
 }
@@ -230,8 +190,6 @@ export async function vaultDepositAndStake({
   account,
   amount,
   clients,
-  fireEvent,
-  referral,
   tokensAtom
 }: VaultRouterWriteProps): Promise<boolean> {
   showLoadingToast("Depositing into the vault...");
@@ -256,18 +214,6 @@ export async function vaultDepositAndStake({
       tokensAtom,
       chainId
     })
-
-    if (fireEvent) void fireEvent("addLiquidity", {
-      user_address: account,
-      network: networkMap[chainId].toLowerCase(),
-      contract_address: vaultData.address,
-      asset_amount: formatBalance(amount, asset.decimals),
-      asset_ticker: asset.symbol,
-      additionalEventData: {
-        referral: referral,
-        vault_name: vaultData.metadata.vaultName,
-      },
-    });
   }
   return success;
 }
@@ -281,8 +227,6 @@ export async function vaultUnstakeAndWithdraw({
   account,
   amount,
   clients,
-  fireEvent,
-  referral,
   tokensAtom
 }: VaultRouterWriteProps): Promise<boolean> {
   showLoadingToast("Withdrawing from the vault...");
@@ -307,18 +251,179 @@ export async function vaultUnstakeAndWithdraw({
       tokensAtom,
       chainId
     })
-
-    if (fireEvent) void fireEvent("removeLiquidity", {
-      user_address: account,
-      network: networkMap[chainId].toLowerCase(),
-      contract_address: vaultData.address,
-      asset_amount: formatBalance(amount, vault.decimals),
-      asset_ticker: asset.symbol,
-      additionalEventData: {
-        referral: referral,
-        vault_name: vaultData.metadata.vaultName,
-      },
-    });
   }
+  return success;
+}
+
+export async function vaultAsyncWithdraw({
+  chainId,
+  vaultData,
+  asset,
+  vault,
+  account,
+  amount,
+  clients,
+  tokensAtom
+}: VaultWriteProps): Promise<boolean> {
+  const res = await clients.publicClient.multicall({
+    contracts: [
+      {
+        address: vaultData.address,
+        abi: OracleVaultAbi,
+        functionName: "convertToAssets",
+        args: [amount]
+      },
+      {
+        address: vaultData.asset,
+        abi: erc20Abi,
+        functionName: "balanceOf",
+        args: [vaultData.safe!]
+      }
+    ]
+  })
+
+  const expectedAssets = res[0].result as bigint;
+  const float = res[1].result as bigint;
+
+  let success = false;
+  if (float >= expectedAssets) {
+    success = await vaultRequestFulfillWithdraw({
+      chainId,
+      vaultData,
+      asset,
+      vault,
+      account,
+      amount,
+      clients,
+      tokensAtom
+    })
+  } else {
+    success = await vaultRequestRedeem({
+      chainId,
+      vaultData,
+      asset,
+      vault,
+      account,
+      amount,
+      clients,
+      tokensAtom
+    })
+  }
+
+  return success;
+}
+
+export async function vaultRequestFulfillWithdraw({
+  chainId,
+  vaultData,
+  asset,
+  vault,
+  account,
+  amount,
+  clients,
+  tokensAtom
+}: VaultWriteProps): Promise<boolean> {
+  showLoadingToast("Redeeming...");
+
+  const success = await handleCallResult({
+    successMessage: "Redeemed!",
+    simulationResponse: await simulateCall({
+      account,
+      contract: {
+        address: AsyncRouterByChain[chainId],
+        abi: AsyncVaultRouterAbi,
+      },
+      functionName: "requestFulfillWithdraw",
+      publicClient: clients.publicClient,
+      args: [vaultData.address, account, amount]
+    }),
+    clients,
+  });
+
+  if (success) {
+    mutateTokenBalance({
+      tokensToUpdate: [vault.address, asset.address],
+      account,
+      tokensAtom,
+      chainId
+    })
+  }
+  return success;
+}
+
+export async function vaultRequestRedeem({
+  chainId,
+  vaultData,
+  asset,
+  vault,
+  account,
+  amount,
+  clients,
+  tokensAtom
+}: VaultWriteProps): Promise<boolean> {
+  showLoadingToast("Requesting redeem...");
+
+  const success = await handleCallResult({
+    successMessage: "Redeem requested!",
+    simulationResponse: await simulateCall({
+      account,
+      contract: {
+        address: vaultData.address,
+        abi: OracleVaultAbi,
+      },
+      functionName: "requestRedeem",
+      publicClient: clients.publicClient,
+      args: [amount, account, account]
+    }),
+    clients,
+  });
+
+  if (success) {
+    mutateTokenBalance({
+      tokensToUpdate: [vault.address],
+      account,
+      tokensAtom,
+      chainId
+    })
+  }
+  return success;
+}
+
+export async function vaultCancelRedeem({
+  chainId,
+  vaultData,
+  asset,
+  vault,
+  account,
+  amount,
+  clients,
+  tokensAtom
+}: VaultWriteProps): Promise<boolean> {
+  showLoadingToast("Canceling redeem request...");
+
+  const success = await handleCallResult({
+    successMessage: "Redeem request canceled!",
+    simulationResponse: await simulateCall({
+      account,
+      contract: {
+        address: vault.address,
+        abi: OracleVaultAbi,
+      },
+      functionName: "cancelRedeemRequest",
+      publicClient: clients.publicClient,
+      args: [account]
+    }),
+    clients,
+  });
+
+  if (success) {
+    mutateTokenBalance({
+      tokensToUpdate: [vault.address],
+      account,
+      tokensAtom,
+      chainId
+    })
+  }
+
   return success;
 }

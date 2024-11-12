@@ -1,5 +1,5 @@
 import { Address, PublicClient, WalletClient } from "viem";
-import { ALT_NATIVE_ADDRESS, ERC20Abi, POP, ZERO } from "@/lib/constants";
+import { ALT_NATIVE_ADDRESS, AsyncRouterByChain, ERC20Abi, OracleVaultAbi, POP, ZERO } from "@/lib/constants";
 import {
   showErrorToast,
   showLoadingToast,
@@ -8,6 +8,7 @@ import {
 import { Clients, SimulationResponse } from "@/lib/types";
 import { UsdtAbi } from "@/lib/constants/abi/USDT";
 import { sendMessageToDiscord } from "@/lib/discord/discordBot";
+import { handleCallResult, simulateCall } from "./utils/helpers";
 
 interface HandleAllowanceProps {
   token: Address;
@@ -40,6 +41,13 @@ export async function handleAllowance({
   spender,
   clients,
 }: HandleAllowanceProps): Promise<boolean> {
+
+  // Set Operator if dealing with the AsyncRouter
+  if (spender === AsyncRouterByChain[clients.walletClient.chain?.id ?? 1]) {
+    const success = await setOperator({ account, address: token, router: spender, clients })
+    if (!success) return false
+  }
+
   // Native Token cant be approved
   if (token === ALT_NATIVE_ADDRESS) {
     return true
@@ -148,6 +156,34 @@ export default async function approve({
     return false;
   }
 }
+
+async function setOperator({ account, address, router, clients }: { account: Address, address: Address, router: Address, clients: Clients }) {
+  const isOperator = await clients.publicClient.readContract({
+    address: address,
+    abi: OracleVaultAbi,
+    functionName: "isOperator",
+    args: [account, router]
+  })
+  let success = true;
+  if (!isOperator) {
+    success = await handleCallResult({
+      successMessage: "Operator set!",
+      simulationResponse: await simulateCall({
+        account,
+        contract: {
+          address: address,
+          abi: OracleVaultAbi,
+        },
+        functionName: "setOperator",
+        publicClient: clients.publicClient,
+        args: [router, true]
+      }),
+      clients,
+    });
+  }
+  return success
+}
+
 
 async function simulateApprove({
   amount,

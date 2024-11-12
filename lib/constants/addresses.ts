@@ -61,6 +61,18 @@ export const VaultRouterByChain: AddressByChain = {
   [bsc.id]: zeroAddress,
 }
 
+export const AsyncRouterByChain: AddressByChain = {
+  [mainnet.id]: zeroAddress,
+  [optimism.id]: zeroAddress,
+  [arbitrum.id]: "0x9E3c42A34140C0a72b1001751e836aac743F0208",
+  [xLayer.id]: zeroAddress,
+  [base.id]: zeroAddress,
+  [fraxtal.id]: zeroAddress,
+  [avalanche.id]: zeroAddress,
+  [polygon.id]: zeroAddress,
+  [bsc.id]: zeroAddress,
+}
+
 export const VeRecipientByChain: AddressByChain = {
   [optimism.id]: "0xC1A6Db6793967Ff7fb7f211E044A4c285A0eB7FB",
   [arbitrum.id]: "0xC1A6Db6793967Ff7fb7f211E044A4c285A0eB7FB",
