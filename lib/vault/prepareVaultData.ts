@@ -12,7 +12,7 @@ import {
 import axios from "axios";
 import { VaultAbi } from "@/lib/constants/abi/Vault";
 import { ApyData, Strategy, TokenByAddress, VaultData, VaultDataByAddress, VaultLabel, VaultMetadata, StrategyMetadata, LlamaApy } from "@/lib/types";
-import { ERC20Abi, OracleVaultAbi, VeTokenByChain } from "@/lib/constants";
+import { ERC20Abi, OracleVaultAbi, SECONDS_PER_YEAR, VeTokenByChain } from "@/lib/constants";
 import getGaugesData from "@/lib/gauges/getGaugeData";
 import { EMPTY_LLAMA_APY_ENTRY, getApy } from "@/lib/resolver/apy";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
@@ -207,33 +207,36 @@ async function getSafeVaultApy(vault: VaultData): Promise<LlamaApy[]> {
     toBlock: "latest",
   })
 
-  const firstBlock = await client.getBlock({
+  if (logs.length === 0) return []
+
+  const entries: LlamaApy[] = []
+  let prevLog = logs[0]
+  let prevTimestamp = Number((await client.getBlock({
     blockNumber: logs[0].blockNumber
-  })
-  const lastBlock = await client.getBlock({
-    blockNumber: logs[logs.length - 1].blockNumber
-  })
+  })).timestamp)
+  
+  logs.slice(1).forEach(async (log: any, i: number) => {
+    // We only want to calculate the apy once per day (price updates happen every 6 hours)
+    if (i > 0 && i % 4 !== 0) return
+    const timeElapsedInSeconds = 24 * 60 * 60
+    const currentTimestamp = prevTimestamp + timeElapsedInSeconds;
 
-  const priceIncrease = logs[logs.length - 1].args!.bqPrice! - parseEther("1")
-  const timeElapsedInSeconds = Number(lastBlock.timestamp - firstBlock.timestamp)
-  const secondsInYear = 365 * 24 * 60 * 60
+    const priceDifference = log.args!.bqPrice! - prevLog.args!.bqPrice!
+    const annualizedReturn = Number((priceDifference / BigInt(timeElapsedInSeconds)) * BigInt(SECONDS_PER_YEAR)) / 1e16
+    const averagedApy = (entries.reduce((acc, entry) => acc + entry.apy, 0) + annualizedReturn) / (entries.length + 1)
 
-  // TODO check this math
-  // Annualize the price increase using compound interest formula
-  // (1 + r)^t = P/P0, where t is time in years
-  const annualizedReturn = (Math.pow(1 + Number(priceIncrease) / Number(parseEther("1")), secondsInYear / timeElapsedInSeconds) - 1) * 100
-
-  return logs.map((log: any, i: number) => {
-    const result = new Date();
-    result.setDate(result.getDate() + (logs.length - 1 - i));
-    return {
-      apy: annualizedReturn,
-      apyBase: annualizedReturn,
+    entries.push({
+      apy: averagedApy,
+      apyBase: averagedApy,
       apyReward: 0,
       tvl: vault.tvl,
-      date: result
-    }
+      date: new Date(currentTimestamp * 1000)
+    })
+
+    prevLog = log
+    prevTimestamp = currentTimestamp
   })
+  return entries
 }
 
 
