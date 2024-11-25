@@ -82,7 +82,7 @@ export default function VaultHero({
                   !!gauge ?
                     Number(gauge.balance.formatted) + Number(vault!.balance.formatted)
                     : Number(vault!.balance.formatted)
-                )} ${asset.symbol}`}
+                )} ${vault.symbol}`}
               tooltip="Value of your vault deposits"
             />
           </div>

@@ -18,6 +18,7 @@ export default function getVaultErrorMessage(
   if (isDeposit && inputAmount > vaultData.depositLimit) return "Insufficient deposit limit"
   // Input > withdrawalLimit
   if (
+    vaultData.metadata.type !== "safe-vault-v1" &&
     !isDeposit &&
     ((Number(value) * Number(inputToken?.price)) / Number(tokens[vaultData.chainId][vaultData.asset].price) || 0) * (10 ** tokens[vaultData.chainId][vaultData.asset].decimals)
     > vaultData.liquid

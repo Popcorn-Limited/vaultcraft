@@ -11,7 +11,7 @@ import SpinningLogo from "@/components/common/SpinningLogo";
 import { arbitrum } from "viem/chains";
 import { RPC_URLS } from "@/lib/utils/connectors";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
-import { calcBalance, EMPTY_BALANCE, formatBalance, formatBalanceUSD, handleCallResult, simulateCall } from "@/lib/utils/helpers";
+import { calcBalance, EMPTY_BALANCE, formatBalance, formatBalanceUSD, handleCallResult, NumberFormatter, simulateCall } from "@/lib/utils/helpers";
 import MainButtonGroup from "@/components/common/MainButtonGroup";
 import TabSelector from "@/components/common/TabSelector";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
@@ -451,7 +451,7 @@ function ClaimableAssets({ vaultData, vault, asset, tokenOptions, requestBalance
         <p>Withdrawal Amount:</p>
         <span className="flex flex-row items-center">
           <p className="mr-2">
-            {asset ? `~ ${Number(formatBalanceUSD(requestBalance.claimableAssets, asset.decimals, asset.price)) / outputToken.price}` : ""}
+            {asset ? `~ ${NumberFormatter.format(Number(formatBalanceUSD(requestBalance.claimableAssets, asset.decimals, asset.price)) / outputToken.price)}` : ""}
           </p>
           <SelectToken
             chainId={asset.chainId!}
