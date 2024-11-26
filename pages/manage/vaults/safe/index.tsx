@@ -86,18 +86,18 @@ async function fetchRequests(vault: VaultData) {
     toBlock: "latest",
   });
 
+  console.log({ chainId: vault.chainId, address: vault.address, requestLogs, cancelLogs, fulfillLogs })
+
   // Sort and sum requests by controller
   const requests: { [key: Address]: Request } = {}
   requestLogs.forEach(log => {
     if (Object.keys(requests).includes(log.args.controller!)) {
       requests[log.args.controller!].shares += log.args.shares!
-      requests[log.args.controller!].requestTime = Math.max(Number(requests[log.args.controller!].requestTime), Number(log.args.timestamp!))
     } else {
       requests[log.args.controller!] = {
         user: log.args.controller!,
         shares: log.args.shares!,
         requiredAssets: BigInt(0),
-        requestTime: Number(log.args.timestamp!)
       }
     }
   })
@@ -147,7 +147,6 @@ type Request = {
   user: Address,
   shares: bigint,
   requiredAssets: bigint,
-  requestTime: number
 }
 
 function SafeVaultsWithdrawals() {
@@ -353,9 +352,6 @@ function SafeVaultWithdrawals({ vault }: { vault: VaultData }) {
             <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-white">
               Required {tokens[vault.chainId][vault.asset].symbol}
             </th>
-            <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-white">
-              Request Time
-            </th>
             <th scope="col" className="px-3 py-3.5 justify-end">
 
             </th>
@@ -377,9 +373,6 @@ function SafeVaultWithdrawals({ vault }: { vault: VaultData }) {
                 </td>
                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                   {formatBalance(request.requiredAssets, tokens[vault.chainId][vault.asset].decimals)}
-                </td>
-                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                  {request.requestTime === 0 ? "N/A" : new Date(request.requestTime * 1000).toLocaleString()}
                 </td>
                 <td className="whitespace-nowrap px-3 py-4 flex flex-row justify-end gap-2">
                   <div className="h-16 w-40">
