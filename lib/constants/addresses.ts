@@ -219,9 +219,9 @@ export const VaultOracleByChain: AddressByChain = {
   [optimism.id]: "0xa7df2Ff7a6E1FAEb480617A01aD80b99CE39Bcc3",
   [arbitrum.id]: "0xf7C42Db8bdD563539861de0ef2520Aa80c28e8c4",
   [xLayer.id]: zeroAddress,
-  [base.id]: zeroAddress,
+  [base.id]: "0xDcC09A3984C6C3D6D349af3bc01C129d26609B42",
   [fraxtal.id]: zeroAddress,
-  [avalanche.id]: zeroAddress,
+  [avalanche.id]: "0x0AcFFe851833f934b3ba4d49F279563513F7e110",
   [polygon.id]: zeroAddress,
   [bsc.id]: zeroAddress,
 }
@@ -231,9 +231,9 @@ export const VaultOracleOwnerByChain: AddressByChain = {
   [optimism.id]: "0x9186a1B331112e17aE6555E941787b3dc87249d5",
   [arbitrum.id]: "0x9759573d033e09C9A224DFC429aa93E4BD677A6c",
   [xLayer.id]: zeroAddress,
-  [base.id]: zeroAddress,
+  [base.id]: "0x36ADB538a7a8b8295c059A1220fF4A7f6064D5a7",
   [fraxtal.id]: zeroAddress,
-  [avalanche.id]: zeroAddress,
+  [avalanche.id]: "0x6Ee09de47C67a858ae84ab0848a50ca2278bC959",
   [polygon.id]: zeroAddress,
   [bsc.id]: zeroAddress,
 }
