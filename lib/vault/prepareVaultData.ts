@@ -12,7 +12,7 @@ import {
 import axios from "axios";
 import { VaultAbi } from "@/lib/constants/abi/Vault";
 import { ApyData, Strategy, TokenByAddress, VaultData, VaultDataByAddress, VaultLabel, VaultMetadata, StrategyMetadata, LlamaApy } from "@/lib/types";
-import { ERC20Abi, OracleVaultAbi, SECONDS_PER_YEAR, VeTokenByChain } from "@/lib/constants";
+import { ERC20Abi, OracleVaultAbi, SECONDS_PER_YEAR, VaultOracleByChain, VeTokenByChain } from "@/lib/constants";
 import getGaugesData from "@/lib/gauges/getGaugeData";
 import { EMPTY_LLAMA_APY_ENTRY, getApy } from "@/lib/resolver/apy";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
@@ -197,7 +197,7 @@ async function getSafeVaultApy(vault: VaultData): Promise<LlamaApy[]> {
   })
 
   const logs = await client.getLogs({
-    address: "0xf7C42Db8bdD563539861de0ef2520Aa80c28e8c4",
+    address: VaultOracleByChain[vault.chainId],
     event: parseAbiItem("event PriceUpdated(address base, address quote, uint256 bqPrice, uint256 qbPrice)"),
     args: {
       base: vault.address,
