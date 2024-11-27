@@ -23,6 +23,7 @@ const nextConfig = {
     WATCH_LIST: process.env.WATCH_LIST,
     ZK_FETCH_APP_ID: process.env.ZK_FETCH_APP_ID,
     ZK_FETCH_SECRET: process.env.ZK_FETCH_SECRET,
+    DEBANK_API_KEY: process.env.DEBANK_API_KEY,
   },
   async headers() {
     return [{

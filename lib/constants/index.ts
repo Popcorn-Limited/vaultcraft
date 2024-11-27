@@ -14,3 +14,17 @@ export const ROUNDING_VALUE = 10_000;
 export const VCX_POOL_ID =
   "0x577a7f7ee659aa14dc16fd384b3f8078e23f1920000200000000000000000633";
 export const SECONDS_PER_YEAR = 31536000;
+
+
+
+export const DEBANK_CHAIN_IDS: { [key: number]: string } = {
+  [1]: `eth`,
+  [10]: `op`,
+  [42161]: `arb`,
+  [137]: `matic`,
+  [56]: `bsc`,
+  [196]: `xlayer`,
+  [8453]: `base`,
+  [252]: `frax`,
+  [43114]: `avax`
+}

@@ -215,7 +215,7 @@ export const AssetPushOracleOwnerByChain: AddressByChain = {
 }
 
 export const VaultOracleByChain: AddressByChain = {
-  [mainnet.id]: zeroAddress,
+  [mainnet.id]: "0x31f687C0F28bB10b0296DE15792407f6C0d62F5D",
   [optimism.id]: "0xa7df2Ff7a6E1FAEb480617A01aD80b99CE39Bcc3",
   [arbitrum.id]: "0xf7C42Db8bdD563539861de0ef2520Aa80c28e8c4",
   [xLayer.id]: zeroAddress,
@@ -227,7 +227,7 @@ export const VaultOracleByChain: AddressByChain = {
 }
 
 export const VaultOracleOwnerByChain: AddressByChain = {
-  [mainnet.id]: zeroAddress,
+  [mainnet.id]: "0xDF9b9c1151587D5c087cE208B38aea5a68083110",
   [optimism.id]: "0x9186a1B331112e17aE6555E941787b3dc87249d5",
   [arbitrum.id]: "0x9759573d033e09C9A224DFC429aa93E4BD677A6c",
   [xLayer.id]: zeroAddress,

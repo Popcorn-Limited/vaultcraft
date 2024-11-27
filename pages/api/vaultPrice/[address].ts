@@ -26,5 +26,5 @@ export default async function handler(
 
   const price = await getSafeVaultPrice({ vault, chainId: chainId })
 
-  return res.status(200).json({ shareValueInAssets: price.shareValueInAssets.toString(), assetValueInShares: price.assetValueInShares.toString() });
+  return res.status(200).json({ vault: vault, asset: price.asset, shareValueInAssets: price.shareValueInAssets.toString(), assetValueInShares: price.assetValueInShares.toString() });
 }
