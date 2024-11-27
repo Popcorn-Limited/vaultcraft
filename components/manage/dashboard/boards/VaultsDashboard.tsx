@@ -139,7 +139,8 @@ export default function VaultsDashboard({ dashboardData }: { dashboardData: any 
                             {formatBalance(strategy.idle, tokens[vault.chainId][vault.asset].decimals)}
                           </td>
                           <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            {NumberFormatter.format(Number((strategy.idle / (strategy.allocation || BigInt(1))) * BigInt(100)))} %
+                            {/* TODO: fix */}
+                            {/* {NumberFormatter.format(Number((strategy.idle / (strategy.allocation || BigInt(1))) * BigInt(100)))} % */}
                           </td>
                           <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                             0
