@@ -39,6 +39,7 @@ export type VaultData = {
   gauge?: Address;
   safe?: Address;
   chainId: number;
+  deployBlock?: bigint;
   fees: VaultFees;
   totalAssets: bigint;
   totalSupply: bigint;

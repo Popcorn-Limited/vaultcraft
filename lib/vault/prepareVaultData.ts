@@ -28,7 +28,7 @@ export async function getInitialVaultsData(chainId: number, client: PublicClient
   );
 
   const filteredVaults = Object.values(allVaults)
-    .filter((vault: any) => vault.chainId != 8453) // remove base until rpc issue is fixed
+    // .filter((vault: any) => vault.chainId != 8453) // remove base until rpc issue is fixed
     .filter((vault: any) => !hiddenVaults.includes(vault.address))
     .filter((vault: any) => vault.type !== "single-asset-lock-vault-v1")
 
@@ -41,6 +41,7 @@ export async function getInitialVaultsData(chainId: number, client: PublicClient
       gauge: getAddress(vault.gauge || zeroAddress),
       safe: getAddress(vault.safe || zeroAddress),
       chainId: vault.chainId,
+      deployBlock: vault.deployBlock ? BigInt(vault.deployBlock) : undefined,
       fees: vault.fees,
       totalAssets: BigInt(0),
       totalSupply: BigInt(0),
@@ -103,6 +104,10 @@ export async function getInitialVaultsData(chainId: number, client: PublicClient
       points: vault.points ? vault.points : []
     }
   })
+
+  // TODO fix with defi-db push
+  result["0xAe5CbB42F0Afa59B90769df4b4c6D623896E4573"].deployBlock = BigInt(22964246);
+  result["0x27d47664e034f3F2414d647DE7Cd1c1e8E72a89c"].deployBlock = BigInt(22965840);
 
   return result
 }
@@ -197,6 +202,8 @@ async function getSafeVaultApy(vault: VaultData): Promise<LlamaApy[]> {
     transport: http(RPC_URLS[vault.chainId])
   })
 
+  const fromBlock = vault.deployBlock ? vault.deployBlock : "earliest";
+
   const logs = await client.getLogs({
     address: VaultOracleByChain[vault.chainId],
     event: parseAbiItem("event PriceUpdated(address base, address quote, uint256 bqPrice, uint256 qbPrice)"),
@@ -204,7 +211,7 @@ async function getSafeVaultApy(vault: VaultData): Promise<LlamaApy[]> {
       base: vault.address,
       quote: vault.asset
     },
-    fromBlock: "earliest",
+    fromBlock,
     toBlock: "latest",
   })
 
