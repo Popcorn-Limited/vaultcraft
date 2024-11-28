@@ -196,6 +196,8 @@ async function getSafeVaultApy(vault: VaultData): Promise<LlamaApy[]> {
     transport: http(RPC_URLS[vault.chainId])
   })
 
+  const fromBlock = vault.chainId === 8453 ? BigInt(22963828) : "earliest";
+
   const logs = await client.getLogs({
     address: VaultOracleByChain[vault.chainId],
     event: parseAbiItem("event PriceUpdated(address base, address quote, uint256 bqPrice, uint256 qbPrice)"),
@@ -203,7 +205,7 @@ async function getSafeVaultApy(vault: VaultData): Promise<LlamaApy[]> {
       base: vault.address,
       quote: vault.asset
     },
-    fromBlock: "earliest",
+    fromBlock,
     toBlock: "latest",
   })
 
