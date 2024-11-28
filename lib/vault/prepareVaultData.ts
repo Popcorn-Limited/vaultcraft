@@ -41,7 +41,6 @@ export async function getInitialVaultsData(chainId: number, client: PublicClient
       gauge: getAddress(vault.gauge || zeroAddress),
       safe: getAddress(vault.safe || zeroAddress),
       chainId: vault.chainId,
-      deployBlock: vault.deployBlock ? BigInt(vault.deployBlock) : undefined,
       fees: vault.fees,
       totalAssets: BigInt(0),
       totalSupply: BigInt(0),
@@ -104,13 +103,6 @@ export async function getInitialVaultsData(chainId: number, client: PublicClient
       points: vault.points ? vault.points : []
     }
   })
-
-  // TODO fix with defi-db push
-  if(chainId === 8543) {
-    result["0xAe5CbB42F0Afa59B90769df4b4c6D623896E4573"].deployBlock = BigInt(22964246);
-    result["0x27d47664e034f3F2414d647DE7Cd1c1e8E72a89c"].deployBlock = BigInt(22965840);
-    result["0x02bF9c54B9A8Ee3103C53ebB3690Fb8cf177d70e"].deployBlock = BigInt(20839364);
-  }
 
   return result
 }
@@ -205,7 +197,7 @@ async function getSafeVaultApy(vault: VaultData): Promise<LlamaApy[]> {
     transport: http(RPC_URLS[vault.chainId])
   })
 
-  const fromBlock = vault.deployBlock ? vault.deployBlock : "earliest";
+  const fromBlock = vault.chainId === 8543 ? BigInt(22963828) : "earliest";
 
   const logs = await client.getLogs({
     address: VaultOracleByChain[vault.chainId],
