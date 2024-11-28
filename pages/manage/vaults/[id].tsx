@@ -22,7 +22,7 @@ import SpinningLogo from "@/components/common/SpinningLogo";
 import { avalanche } from "viem/chains";
 
 async function getLogs(vault: VaultData, asset: Token) {
-  if (vault.chainId === avalanche.id) return []
+  // if (vault.chainId === avalanche.id) return []
 
   const client = createPublicClient({
     chain: ChainById[vault.chainId],
