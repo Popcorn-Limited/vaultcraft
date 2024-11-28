@@ -108,6 +108,7 @@ export async function getInitialVaultsData(chainId: number, client: PublicClient
   // TODO fix with defi-db push
   result["0xAe5CbB42F0Afa59B90769df4b4c6D623896E4573"].deployBlock = BigInt(22964246);
   result["0x27d47664e034f3F2414d647DE7Cd1c1e8E72a89c"].deployBlock = BigInt(22965840);
+  result["0x02bF9c54B9A8Ee3103C53ebB3690Fb8cf177d70e"].deployBlock = BigInt(20839364);
 
   return result
 }
