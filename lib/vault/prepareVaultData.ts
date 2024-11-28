@@ -28,7 +28,6 @@ export async function getInitialVaultsData(chainId: number, client: PublicClient
   );
 
   const filteredVaults = Object.values(allVaults)
-    .filter((vault: any) => vault.chainId != 8453) // remove base until rpc issue is fixed
     .filter((vault: any) => !hiddenVaults.includes(vault.address))
     .filter((vault: any) => vault.type !== "single-asset-lock-vault-v1")
 
