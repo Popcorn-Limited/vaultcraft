@@ -191,54 +191,92 @@ export async function addDynamicVaultsData(vaults: VaultDataByAddress, client: P
 
 
 async function getSafeVaultApy(vault: VaultData): Promise<LlamaApy[]> {
-  const client = createPublicClient({
-    chain: ChainById[vault.chainId],
-    transport: http(RPC_URLS[vault.chainId])
-  })
-
-  const logs = await client.getLogs({
-    address: VaultOracleByChain[vault.chainId],
-    event: parseAbiItem("event PriceUpdated(address base, address quote, uint256 bqPrice, uint256 qbPrice)"),
-    args: {
-      base: vault.address,
-      quote: vault.asset
-    },
-    fromBlock: ORACLES_DEPLOY_BLOCK[vault.chainId] === 0 ? "earliest" : BigInt(ORACLES_DEPLOY_BLOCK[vault.chainId]),
-    toBlock: "latest",
-  })
-
-  if (logs.length === 0) return []
-
   const entries: LlamaApy[] = []
-  let prevLog = logs[0]
-  let prevTimestamp = Number((await client.getBlock({
-    blockNumber: logs[0].blockNumber
-  })).timestamp)
-  
-  logs.slice(1).forEach(async (log: any, i: number) => {
-    // We only want to calculate the apy once per day (price updates happen every 6 hours)
-    if (i > 0 && i % 4 !== 0) return
-    const timeElapsedInSeconds = 24 * 60 * 60
-    const currentTimestamp = prevTimestamp + timeElapsedInSeconds;
+  const ONE = BigInt(1e18);
 
-    const priceDifference = log.args!.bqPrice! - prevLog.args!.bqPrice!
-    const annualizedReturn = Number((priceDifference / BigInt(timeElapsedInSeconds)) * BigInt(SECONDS_PER_YEAR)) / 1e16
-    const averagedApy = (entries.reduce((acc, entry) => acc + entry.apy, 0) + annualizedReturn) / (entries.length + 1)
-
-    entries.push({
-      apy: averagedApy,
-      apyBase: averagedApy,
-      apyReward: 0,
-      tvl: vault.tvl,
-      date: new Date(currentTimestamp * 1000)
+  if (vault.address === "0x281992068b13fA2ec02F82ed1a3502f2f4A9CeeE") {
+    console.log("------------APY------------", vault.address, VaultOracleByChain[vault.chainId]);
+    const client = createPublicClient({
+      chain: ChainById[vault.chainId],
+      transport: http(RPC_URLS[vault.chainId])
     })
 
-    prevLog = log
-    prevTimestamp = currentTimestamp
-  })
+    const logs = await client.getLogs({
+      address: VaultOracleByChain[vault.chainId],
+      event: parseAbiItem("event PriceUpdated(address base, address quote, uint256 bqPrice, uint256 qbPrice)"),
+      args: {
+        base: vault.address,
+        quote: vault.asset
+      },
+      fromBlock: ORACLES_DEPLOY_BLOCK[vault.chainId] === 0 ? "earliest" : BigInt(ORACLES_DEPLOY_BLOCK[vault.chainId]),
+      toBlock: "latest",
+    })
+    
+    if (logs.length === 0) return []
+
+    // const entries: LlamaApy[] = []
+    let prevLog = logs[0]
+    let prevTimestamp = Number((await client.getBlock({
+      blockNumber: logs[0].blockNumber
+    })).timestamp)
+
+    // this is good enough but does not account for compounding - underestimates apy
+    // logs.slice(1, 13).forEach(async (log: any, i: number) => {
+    //   // We only want to calculate the apy once per day (price updates happen every 6 hours)
+    //   if (i > 0 && i % 4 !== 0) return
+    //   const timeElapsedInSeconds = 24 * 60 * 60
+    //   const currentTimestamp = prevTimestamp + timeElapsedInSeconds;
+  
+    //   const priceDifference = log.args!.bqPrice! - prevLog.args!.bqPrice!
+    //   const annualizedReturn = Number((priceDifference / BigInt(timeElapsedInSeconds)) * BigInt(SECONDS_PER_YEAR)) / 1e16
+    //   const averagedApy = (entries.reduce((acc, entry) => acc + entry.apy, 0) + annualizedReturn) / (entries.length + 1)
+  
+    //   entries.push({
+    //     apy: averagedApy,
+    //     apyBase: averagedApy,
+    //     apyReward: 0,
+    //     tvl: vault.tvl,
+    //     date: new Date(currentTimestamp * 1000)
+    //   })
+  
+    //   prevLog = log
+    //   prevTimestamp = currentTimestamp
+    // })
+
+    logs.slice(1, 13).forEach(async (log: any, i: number) => {
+      // We only want to calculate the apy once per day (price updates happen every 6 hours)
+      if (i > 0 && i % 4 !== 0) return
+
+      const timeElapsedInSeconds = 24 * 60 * 60 // TODO
+      const currentTimestamp = prevTimestamp + timeElapsedInSeconds;
+
+      // get period price change % = (priceAfter - priceBefore) / priceBefore
+      const dailyReturn = (Number(log.args!.bqPrice!) - Number(prevLog.args!.bqPrice!)) / Number(prevLog.args!.bqPrice!)
+      
+      console.log("DAILY", dailyReturn);
+
+      // calculate annualized compounded return = ((1 + daily) ^ 365 - 1) * 100
+      const annualizedReturn = Math.pow(dailyReturn + 1, 365) - 1;
+
+      // average out with previous values
+      // const averagedApy = (entries.reduce((acc, entry) => acc + entry.apy, 0) + annualizedReturn * 100) / (entries.length + 1)
+      
+      // push data point
+      entries.push({
+        apy: annualizedReturn * 100,
+        apyBase: annualizedReturn * 100,
+        apyReward: 0,
+        tvl: vault.tvl, 
+        date: new Date(currentTimestamp * 1000)
+      })
+
+      prevLog = log
+      prevTimestamp = currentTimestamp
+    })
+  }
+
   return entries
 }
-
 
 export async function addApyHist(vaults: VaultDataByAddress): Promise<VaultDataByAddress> {
   const apyHistAll = await Promise.all(Object.values(vaults).map(async (vault: VaultData) => {
