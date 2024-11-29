@@ -37,7 +37,7 @@ export type VaultData = {
   vault: Address;
   asset: Address;
   gauge?: Address;
-  safe?: Address;
+  safes?: Address[]; // first safe is the main safe, rest is optional
   chainId: number;
   fees: VaultFees;
   totalAssets: bigint;

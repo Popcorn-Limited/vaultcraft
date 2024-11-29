@@ -160,15 +160,15 @@ export default function Index() {
                       </div>
                     </div>
 
-                    {vaultData.safe && vaultData.safe !== zeroAddress &&
+                    {vaultData.safes && vaultData.safes![0] !== zeroAddress &&
                       <div className="w-full md:w-10/12 border border-customNeutral100 rounded-lg p-4">
                         <p className="text-white font-normal">Safe address:</p>
                         <div className="flex flex-row items-center justify-between">
                           <p className="font-bold text-white">
-                            {vaultData.safe.slice(0, 6)}...{vaultData.safe.slice(-4)}
+                            {vaultData.safes[0].slice(0, 6)}...{vaultData.safes[0].slice(-4)}
                           </p>
                           <div className='w-6 h-6 group/safeAddress'>
-                            <CopyToClipboard text={vaultData.safe} onCopy={() => showSuccessToast("Safe address copied!")}>
+                            <CopyToClipboard text={vaultData.safes[0]} onCopy={() => showSuccessToast("Safe address copied!")}>
                               <Square2StackIcon className="text-white group-hover/safeAddress:text-primaryYellow" />
                             </CopyToClipboard>
                           </div>

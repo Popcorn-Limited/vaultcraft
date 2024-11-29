@@ -277,7 +277,7 @@ export async function vaultAsyncWithdraw({
         address: vaultData.asset,
         abi: erc20Abi,
         functionName: "balanceOf",
-        args: [vaultData.safe!]
+        args: [vaultData.safes![0]]
       }
     ]
   })

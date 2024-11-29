@@ -128,7 +128,7 @@ async function fetchRequests(vault: VaultData) {
       address: vault.asset,
       abi: erc20Abi,
       functionName: "balanceOf",
-      args: [vault.safe!]
+      args: [vault.safes![0]]
     }]
   })
 

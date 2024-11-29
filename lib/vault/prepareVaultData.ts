@@ -12,7 +12,7 @@ import {
 import axios from "axios";
 import { VaultAbi } from "@/lib/constants/abi/Vault";
 import { ApyData, Strategy, TokenByAddress, VaultData, VaultDataByAddress, VaultLabel, VaultMetadata, StrategyMetadata, LlamaApy } from "@/lib/types";
-import { ERC20Abi, OracleVaultAbi, SECONDS_PER_YEAR, VaultOracleByChain, VeTokenByChain, ORACLES_DEPLOY_BLOCK } from "@/lib/constants";
+import { ERC20Abi, OracleVaultAbi, SECONDS_PER_YEAR, VaultOracleByChain, VeTokenByChain, ORACLES_DEPLOY_BLOCK, AssetPushOracleAbi } from "@/lib/constants";
 import getGaugesData from "@/lib/gauges/getGaugeData";
 import { EMPTY_LLAMA_APY_ENTRY, getApy } from "@/lib/resolver/apy";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
@@ -38,7 +38,7 @@ export async function getInitialVaultsData(chainId: number, client: PublicClient
       vault: getAddress(vault.address),
       asset: getAddress(vault.assetAddress),
       gauge: getAddress(vault.gauge || zeroAddress),
-      safe: getAddress(vault.safe || zeroAddress),
+      safes: vault.safes ? vault.safes.map((safe: Address) => getAddress(safe)) : [zeroAddress],
       chainId: vault.chainId,
       fees: vault.fees,
       totalAssets: BigInt(0),
@@ -111,7 +111,7 @@ export async function addDynamicVaultsData(vaults: VaultDataByAddress, client: P
   // @ts-ignore
   const dynamicValues = await client.multicall({
     contracts: Object.values(vaults)
-      .map((vault: any) => {
+      .map((vault: VaultData) => {
         return vaults[vault.address].metadata.type === "safe-vault-v1" ?
           [
             {
@@ -133,7 +133,7 @@ export async function addDynamicVaultsData(vaults: VaultDataByAddress, client: P
               address: vault.asset,
               abi: erc20Abi,
               functionName: "balanceOf",
-              args: [vault.safe]
+              args: [vault.safes![0]]
             },
           ]
           : [
@@ -196,18 +196,17 @@ async function getSafeVaultApy(vault: VaultData): Promise<LlamaApy[]> {
     transport: http(RPC_URLS[vault.chainId])
   })
 
-  const logs = await client.getLogs({
+  const logs = await client.getContractEvents({
     address: VaultOracleByChain[vault.chainId],
-    event: parseAbiItem("event PriceUpdated(address base, address quote, uint256 bqPrice, uint256 qbPrice)"),
-    args: {
-      base: vault.address,
-      quote: vault.asset
-    },
+    abi: AssetPushOracleAbi,
+    eventName: "PriceUpdated",
     fromBlock: ORACLES_DEPLOY_BLOCK[vault.chainId] === 0 ? "earliest" : BigInt(ORACLES_DEPLOY_BLOCK[vault.chainId]),
     toBlock: "latest",
   })
 
   if (logs.length === 0) return []
+
+  const filteredLogs = logs.filter((log) => log.args.base === vault.address && log.args.quote === vault.asset)
 
   const entries: LlamaApy[] = []
   let prevLog = logs[0]
@@ -215,7 +214,7 @@ async function getSafeVaultApy(vault: VaultData): Promise<LlamaApy[]> {
     blockNumber: logs[0].blockNumber
   })).timestamp)
 
-  logs.slice(1).forEach(async (log: any, i: number) => {
+  filteredLogs.slice(1).forEach(async (log: any, i: number) => {
     // We only want to calculate the apy once per day (price updates happen every 6 hours)
     if (i > 0 && i % 4 !== 0) return
     const timeElapsedInSeconds = 24 * 60 * 60
