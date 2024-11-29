@@ -28,3 +28,15 @@ export const DEBANK_CHAIN_IDS: { [key: number]: string } = {
   [252]: `frax`,
   [43114]: `avax`
 }
+
+export const ORACLES_DEPLOY_BLOCK: { [key: number]: number } = {
+  [1]: 0,
+  [10]: 0,
+  [42161]: 0,
+  [137]: 0,
+  [56]: 0,
+  [196]: 0,
+  [8453]: 22963828,
+  [252]: 0,
+  [43114]: 53621065
+}
