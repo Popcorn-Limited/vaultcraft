@@ -196,7 +196,7 @@ async function getSafeVaultApy(vault: VaultData): Promise<LlamaApy[]> {
     transport: http(RPC_URLS[vault.chainId])
   })
 
-  const fromBlock = vault.chainId === 8453 ? BigInt(22963828) : "earliest";
+  const fromBlock = vault.chainId === 8453 ? BigInt(22963828) : vault.chainId === 43114 ? BigInt(53621065) : "earliest";
 
   const logs = await client.getLogs({
     address: VaultOracleByChain[vault.chainId],
