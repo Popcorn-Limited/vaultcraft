@@ -163,6 +163,7 @@ function SafeVaultInputs({
   }
 
   function handleTokenSelect(option: Token, vault: Token) {
+    setShowModal(false)
     setInputToken(option)
     setOutputToken(vault)
 
