@@ -214,7 +214,7 @@ async function getSafeVaultApy(vault: VaultData): Promise<LlamaApy[]> {
   let prevTimestamp = Number((await client.getBlock({
     blockNumber: logs[0].blockNumber
   })).timestamp)
-  
+
   logs.slice(1).forEach(async (log: any, i: number) => {
     // We only want to calculate the apy once per day (price updates happen every 6 hours)
     if (i > 0 && i % 4 !== 0) return
@@ -328,11 +328,10 @@ export async function addStrategyData(vaults: VaultDataByAddress, strategies: { 
     } else {
       vaults[address].strategies.forEach((strategy: any, i: number) => {
         const strategyData = strategies[strategy.address]
-
         // calc allocation in assets
-        const allocation = ((strategyBalances[n].result as bigint ?? BigInt(0))
-          * parseEther(strategyData.assetsPerShare.toLocaleString("fullwide", { useGrouping: false }).replace(",", "."))
-        ) / parseEther("1")
+        const allocation = strategyData.totalSupply === BigInt(0) ?
+          BigInt(0) :
+          (strategyBalances[n].result as bigint ?? BigInt(0)) * strategyData.totalAssets / strategyData.totalSupply
 
         // calc allocation percentage
         const allocationPerc = Number(allocation) / Number(vaults[address].totalAssets) || 0
