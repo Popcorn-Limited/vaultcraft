@@ -3,6 +3,7 @@ import {
   PublicClient,
   createPublicClient,
   erc20Abi,
+  formatEther,
   getAddress,
   http,
   parseAbiItem,
@@ -204,36 +205,36 @@ async function getSafeVaultApy(vault: VaultData): Promise<LlamaApy[]> {
     toBlock: "latest",
   })
 
-  if (logs.length === 0) return []
+  if (logs.length < 2) return []
 
   const filteredLogs = logs.filter((log) => log.args.base === vault.address && log.args.quote === vault.asset)
 
   const entries: LlamaApy[] = []
-  let prevLog = logs[0]
-  let prevTimestamp = Number((await client.getBlock({
+  let firstLog = logs[0]
+  let firstTimestamp = Number((await client.getBlock({
     blockNumber: logs[0].blockNumber
   })).timestamp)
 
   filteredLogs.slice(1).forEach(async (log: any, i: number) => {
-    // We only want to calculate the apy once per day (price updates happen every 6 hours)
-    if (i > 0 && i % 4 !== 0) return
-    const timeElapsedInSeconds = 24 * 60 * 60
-    const currentTimestamp = prevTimestamp + timeElapsedInSeconds;
+    const currentTimestamp = Number((await client.getBlock({
+      blockNumber: log.blockNumber
+    })).timestamp)
+    const date = new Date(currentTimestamp * 1000)
 
-    const priceDifference = log.args!.bqPrice! - prevLog.args!.bqPrice!
-    const annualizedReturn = Number((priceDifference / BigInt(timeElapsedInSeconds)) * BigInt(SECONDS_PER_YEAR)) / 1e16
-    const averagedApy = (entries.reduce((acc, entry) => acc + entry.apy, 0) + annualizedReturn) / (entries.length + 1)
+    // Only add a new entry if the date is different from the last entry
+    if (i === 0 || (entries.length > 0 && date.getDate() > entries[entries.length - 1].date.getDate())) {
+      const timeElapsed = currentTimestamp - firstTimestamp
+      const priceDifference = log.args!.bqPrice! - firstLog.args!.bqPrice!
+      const annualizedReturn = Number((priceDifference / BigInt(timeElapsed)) * BigInt(SECONDS_PER_YEAR)) / 1e16
 
-    entries.push({
-      apy: averagedApy,
-      apyBase: averagedApy,
-      apyReward: 0,
-      tvl: vault.tvl,
-      date: new Date(currentTimestamp * 1000)
-    })
-
-    prevLog = log
-    prevTimestamp = currentTimestamp
+      entries.push({
+        apy: annualizedReturn, //Number(formatEther(log.args!.bqPrice)),
+        apyBase: annualizedReturn, //Number(formatEther(log.args!.bqPrice)),
+        apyReward: 0,
+        tvl: vault.tvl,
+        date: new Date(currentTimestamp * 1000)
+      })
+    }
   })
   return entries
 }
@@ -289,7 +290,16 @@ export async function addStrategyData(vaults: VaultDataByAddress, strategies: { 
 
   let n = 0
   Object.keys(vaults).forEach((address: any) => {
-    if (vaults[address].metadata.type === "safe-vault-v1") return
+    if (vaults[address].metadata.type === "safe-vault-v1") {
+      const safeVault = vaults[address]
+      const lastApy = safeVault.apyData.apyHist.length > 0 ? safeVault.apyData.apyHist[safeVault.apyData.apyHist.length - 1] : EMPTY_LLAMA_APY_ENTRY
+      
+      safeVault.apyData.baseApy = lastApy.apyBase;
+      safeVault.apyData.rewardApy = lastApy.apyReward;
+      safeVault.apyData.totalApy = lastApy.apy;
+      safeVault.apyData.targetApy = lastApy.apy;
+      return
+    }
 
     let apyBase = 0;
     let apyRewards = 0;

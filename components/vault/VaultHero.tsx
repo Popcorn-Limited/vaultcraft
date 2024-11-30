@@ -35,7 +35,7 @@ export default function VaultHero({
   isManaged?: boolean
 }): JSX.Element {
   const [tokens] = useAtom(tokensAtom);
-
+  
   return (
     <section className="md:border-b border-customNeutral100 pt-10 pb-6 px-4 md:px-0 ">
       <div className="w-full mb-12 flex flex-row items-center">
