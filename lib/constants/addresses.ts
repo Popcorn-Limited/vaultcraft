@@ -38,13 +38,13 @@ export const VaultRouterByChain: AddressByChain = {
 }
 
 export const AsyncRouterByChain: AddressByChain = {
-  [mainnet.id]: zeroAddress,
-  [optimism.id]: zeroAddress,
-  [arbitrum.id]: "0x9E3c42A34140C0a72b1001751e836aac743F0208",
+  [mainnet.id]: "0x7902c757a4A4B44C3B271Ce2f0c2A575C6D5f57A",
+  [optimism.id]: "0x7902c757a4A4B44C3B271Ce2f0c2A575C6D5f57A",
+  [arbitrum.id]: "0x7902c757a4A4B44C3B271Ce2f0c2A575C6D5f57A",
   [xLayer.id]: zeroAddress,
-  [base.id]: zeroAddress,
+  [base.id]: "0x7902c757a4A4B44C3B271Ce2f0c2A575C6D5f57A",
   [fraxtal.id]: zeroAddress,
-  [avalanche.id]: zeroAddress,
+  [avalanche.id]: "0x7902c757a4A4B44C3B271Ce2f0c2A575C6D5f57A",
   [polygon.id]: zeroAddress,
   [bsc.id]: zeroAddress,
 }
