@@ -129,9 +129,9 @@ export default function VaultHero({
               <LargeCardStat
                 id={"leverage"}
                 label="Leverage"
-                value={vaultData.metadata.vaultName?.match(/\d+X/)?.[0] || "0X"}
-                secondaryValue={vaultData.metadata.vaultName?.match(/\d+X/)?.[0] || "0X"}
-                tooltip={`This strategy levers its assets to earn additional yield. It targets a leverage ratio of ${vaultData.metadata.vaultName?.match(/\d+X/)?.[0] || "0X"}.`}
+                value={vaultData.metadata.vaultName?.match(/\d+[xX]/)?.[0] || "0X"}
+                secondaryValue={vaultData.metadata.vaultName?.match(/\d+[xX]/)?.[0] || "0X"}
+                tooltip={`This strategy levers its assets to earn additional yield. It targets a leverage ratio of ${vaultData.metadata.vaultName?.match(/\d+[xX]/)?.[0] || "0X"}.`}
               />
             </div>
           }

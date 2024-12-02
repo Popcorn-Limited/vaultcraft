@@ -293,7 +293,7 @@ export async function addStrategyData(vaults: VaultDataByAddress, strategies: { 
     if (vaults[address].metadata.type === "safe-vault-v1") {
       const safeVault = vaults[address]
       const lastApy = safeVault.apyData.apyHist.length > 0 ? safeVault.apyData.apyHist[safeVault.apyData.apyHist.length - 1] : EMPTY_LLAMA_APY_ENTRY
-      
+
       safeVault.apyData.baseApy = lastApy.apyBase;
       safeVault.apyData.rewardApy = lastApy.apyReward;
       safeVault.apyData.totalApy = lastApy.apy;
@@ -397,7 +397,7 @@ export async function addSafeStrategyData(vaults: VaultDataByAddress, chainId: n
     vaults[vaultAddress].strategies = strategies.map((strategy: any) => {
       const allocation = vaults[vaultAddress].totalAssets * BigInt(strategy.allocationPerc) / BigInt(100)
       return {
-        address: zeroAddress,
+        address: strategy.address,
         asset: vaults[vaultAddress].asset,
         yieldToken: strategy.yieldToken === zeroAddress ? undefined : strategy.yieldToken,
         metadata: strategy.metadata,
@@ -416,8 +416,10 @@ export async function addSafeStrategyData(vaults: VaultDataByAddress, chainId: n
         totalAssets: allocation,
         totalSupply: allocation,
         assetsPerShare: 1,
-        idle: 0
-      }
+        idle: BigInt(0),
+        leverage: strategy.leverage,
+        type: strategy.type
+      } as Strategy
     })
   })
 
