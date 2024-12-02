@@ -9,6 +9,7 @@ export const IconByProtocol: { [key: string]: string } = {
   Balancer: "https://icons.llamao.fi/icons/protocols/balancer?w=48&h=48",
   Beefy: "https://icons.llamao.fi/icons/protocols/beefy?w=48&h=48",
   Bedrock: "https://icons.llamao.fi/icons/protocols/bedrock?w=48&h=48",
+  Benqi: "https://icons.llamao.fi/icons/protocols/benqi?w=48&h=48",
   Compound: "https://icons.llamao.fi/icons/protocols/compound?w=48&h=48",
   CompoundV2: "https://icons.llamao.fi/icons/protocols/compound?w=48&h=48",
   CompoundV3: "https://icons.llamao.fi/icons/protocols/compound?w=48&h=48",
