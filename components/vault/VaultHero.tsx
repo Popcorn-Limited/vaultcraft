@@ -35,7 +35,7 @@ export default function VaultHero({
   isManaged?: boolean
 }): JSX.Element {
   const [tokens] = useAtom(tokensAtom);
-  
+
   return (
     <section className="md:border-b border-customNeutral100 pt-10 pb-6 px-4 md:px-0 ">
       <div className="w-full mb-12 flex flex-row items-center">
@@ -121,6 +121,17 @@ export default function VaultHero({
                 value={vaultData.metadata.vaultName?.includes("10X") ? "10X" : "5X"}
                 secondaryValue={`${NumberFormatter.format(vaultData.strategies.find(strategy => strategy.metadata.type === "LeverageV1")?.leverage || 0)}X`}
                 tooltip={`This strategy levers its assets to earn additional yield. It targets a leverage ratio of ${vaultData.metadata.vaultName?.includes("10X") ? "10X" : "5X"}. The actual rate currently is ${NumberFormatter.format(vaultData.strategies.find(strategy => strategy.metadata.type === "LeverageV1")?.leverage || 0)}X. Leverage is adjusted every 30min but can be adjusted manually.`}
+              />
+            </div>
+          }
+          {vaultData.strategies.filter(strategy => strategy.metadata.type === "LeverageV2").length > 0 &&
+            <div>
+              <LargeCardStat
+                id={"leverage"}
+                label="Leverage"
+                value={vaultData.metadata.vaultName?.match(/\d+X/)?.[0] || "0X"}
+                secondaryValue={vaultData.metadata.vaultName?.match(/\d+X/)?.[0] || "0X"}
+                tooltip={`This strategy levers its assets to earn additional yield. It targets a leverage ratio of ${vaultData.metadata.vaultName?.match(/\d+X/)?.[0] || "0X"}.`}
               />
             </div>
           }

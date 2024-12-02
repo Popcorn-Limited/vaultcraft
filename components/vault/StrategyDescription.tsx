@@ -89,7 +89,7 @@ export default function StrategyDescription({ strategy, asset, chainId, i, strat
             tooltip={`This Vault has deployed ${NumberFormatter.format(100 - (Number(strategy.idle) / Number(strategy.totalAssets)) * 100)} % of assets in managed strategies. ${formatBalance(strategy.idle, asset?.decimals!)} ${asset?.symbol} are instantly available for withdrawal. Additional funds need to be freed up by the vault manager.`}
           />
         }
-        {strategy.metadata.type === "LeverageV1" &&
+        {strategy.metadata.type === "LeverageV1" || strategy.metadata.type === "LeverageV2" &&
           <CardStat
             id={`${strategy.resolver}-${i}-leverage`}
             label="Leverage"

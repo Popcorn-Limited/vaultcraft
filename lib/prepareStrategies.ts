@@ -83,6 +83,11 @@ export default async function prepareStrategies(vaults: VaultDataByAddress, chai
       }
       const descriptionSplit = desc.description.split("** - ");
 
+      let leverage = desc.type === "LeverageV1" ? 1e18 / (1e18 - Number(strategyRes[i + 4].result)) : undefined
+      if(desc.type === "LeverageV2") {
+        leverage = desc.leverage;
+      }
+
       strategies[address] = {
         address,
         asset: desc.asset,
@@ -109,7 +114,7 @@ export default async function prepareStrategies(vaults: VaultDataByAddress, chai
         totalSupply: totalSupply,
         assetsPerShare: assetsPerShare,
         idle: ["AnyToAnyV1", "AnyToAnyCompounderV1"].includes(desc.type) ? (strategyRes[i + 2].result as bigint || BigInt(0)) - (strategyRes[i + 3].result as bigint || BigInt(0)) : totalAssets,
-        leverage: desc.type === "LeverageV1" ? 1e18 / (1e18 - Number(strategyRes[i + 4].result)) : undefined
+        leverage: leverage
       } as Strategy
     })
   )
