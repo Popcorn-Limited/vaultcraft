@@ -1,12 +1,19 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { ChainById } from "@/lib/utils/connectors";
-import { zeroAddress } from "viem";
-import { Strategy, TokenReward, VaultData } from "@/lib/types";
+import { Address, zeroAddress } from "viem";
+import { Balance, Point, Strategy, Token, TokenReward, VaultData, VaultMetadata } from "@/lib/types";
 import getTokenAndVaultsDataByChain from "@/lib/getTokenAndVaultsData";
 
-type VaultApiData = Omit<VaultData, "totalAssets" | "totalSupply" | "depositLimit" | "withdrawalLimit" | "minLimit" | "idle" | "liquid" | "fees" | "strategies"> & {
+type VaultApiData = {
+  address: Address;
+  vault: TokenApiData;
+  asset: TokenApiData;
+  gauge?: TokenApiData;
+  chainId: number;
   totalAssets: number;
   totalSupply: number;
+  assetsPerShare: number;
+  tvl: number;
   depositLimit: number;
   withdrawalLimit: number;
   minLimit: number;
@@ -25,6 +32,17 @@ type VaultApiData = Omit<VaultData, "totalAssets" | "totalSupply" | "depositLimi
   gaugeLowerApr?: number;
   gaugeUpperApr?: number;
   rewards?: TokenReward[];
+  metadata: VaultMetadata;
+  points: Point[];
+}
+
+type TokenApiData = Omit<Token, "balance" | "totalSupply"> & {
+  balance: BalanceApiData;
+  totalSupply: number;
+}
+
+type BalanceApiData = Omit<Balance, "value"> & {
+  value: number;
 }
 
 type StrategyApiData = Omit<Strategy, "allocation" | "totalAssets" | "totalSupply" | "idle" | "liquid"> & {
@@ -47,14 +65,37 @@ export default async function handler(
   }
 
   const chainId = Number(req.query.chainId)
+  const account = req.query.account as Address
 
-  let { vaultsData: vaultsDataArray, tokens, strategies } = await getTokenAndVaultsDataByChain({ chain: ChainById[chainId], account: zeroAddress })
+  let { vaultsData: vaultsDataArray, tokens, strategies } = await getTokenAndVaultsDataByChain({ chain: ChainById[chainId], account: account || zeroAddress })
 
   const result = vaultsDataArray.map(vault => {
+    const vaultToken: TokenApiData = {
+      ...tokens[vault.address],
+      totalSupply: Number(tokens[vault.address].totalSupply),
+      balance: { ...tokens[vault.address].balance, value: Number(tokens[vault.address].balance.value) }
+    }
+    const assetToken: TokenApiData = {
+      ...tokens[vault.asset],
+      totalSupply: Number(tokens[vault.asset].totalSupply),
+      balance: { ...tokens[vault.asset].balance, value: Number(tokens[vault.asset].balance.value) }
+    }
+    const gaugeToken: TokenApiData | undefined = vault.gauge && vault.gauge !== zeroAddress ? {
+      ...tokens[vault.gauge],
+      totalSupply: Number(tokens[vault.gauge].totalSupply),
+      balance: { ...tokens[vault.gauge].balance, value: Number(tokens[vault.gauge].balance.value) }
+    } : undefined
+
     const vaultData: VaultApiData = {
-      ...vault,
+      address: vault.address,
+      vault: vaultToken,
+      asset: assetToken,
+      gauge: gaugeToken,
+      chainId,
       totalAssets: Number(vault.totalAssets),
       totalSupply: Number(vault.totalSupply),
+      assetsPerShare: vault.assetsPerShare,
+      tvl: vault.tvl,
       depositLimit: Number(vault.depositLimit),
       withdrawalLimit: Number(vault.withdrawalLimit),
       minLimit: Number(vault.minLimit),
@@ -63,10 +104,6 @@ export default async function handler(
         withdrawal: Number(vault.fees.withdrawal),
         management: Number(vault.fees.management),
         performance: Number(vault.fees.performance),
-      },
-      apyData: {
-        ...vault.apyData,
-        apyHist: [],
       },
       strategies: vault.strategies.map(strategy => {
         return {
@@ -83,7 +120,9 @@ export default async function handler(
       }),
       idle: Number(vault.idle),
       liquid: Number(vault.liquid),
-      baseApy: vault.apyData.baseApy + vault.apyData.rewardApy
+      baseApy: vault.apyData.baseApy + vault.apyData.rewardApy,
+      metadata: vault.metadata,
+      points: vault.points,
     }
 
     if (vault.gauge && vault.gauge !== zeroAddress && vault.gaugeData) {
