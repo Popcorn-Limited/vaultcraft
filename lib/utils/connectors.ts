@@ -34,7 +34,7 @@ export const networkMap: { [key: number]: string } = {
   [ChainId.XLayer]: "XLayer",
   [ChainId.Base]: "Base",
   [ChainId.Fraxtal]: "Fraxtal",
-  [ChainId.Avalanche]: "Avalanche"
+  [ChainId.Avalanche]: "Avax"
 };
 
 export const networkLogos: { [key: number]: string } = {
