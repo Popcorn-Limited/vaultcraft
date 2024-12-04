@@ -1,0 +1,228 @@
+{
+  "0x893411580e590d62ddbca8a703d61cc4a8c7b2b9": {
+    "0x474cf53d": "depositETH(address lendingPool, address onBehalfOf, uint16 referralCode)"
+  },
+  "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": {
+    "0xa9059cbb": "transfer(address _to, uint256 _value)"
+  },
+  "0xcafeac0ff5da0a2777d915531bfa6b29d282ee62": {
+    "0xf6579632": "buyCover(tuple params,tuple[] poolAllocationRequests)"
+  },
+  "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2": {
+    "0xd0e30db0": "deposit()"
+  },
+  "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2": {
+    "0x69328dec": "withdraw(address token, uint256 amount, address destination)"
+  },
+  "0xbdfa7b7893081b35fb54027489e2bc7a38275129": {
+    "0xa9059cbb": "transfer(address _to, uint256 _value)"
+  },
+  "0xcd5fe23c85820f7b72d0926fc9b05b43e359b7ee": {
+    "0xde0e9a3e": "unwrap(uint256 amount)"
+  },
+  "0x6b175474e89094c44da98b954eedeac495271d0f": {
+    "0xa9059cbb": "transfer(address _to, uint256 _value)"
+  },
+  "0x16c6521dff6bab339122a0fe25a9116693265353": {
+    "0x5c9c18e2": "exchange(address[11] _route,uint256[5][5] _swap_params,uint256 _amount,uint256 _expected,address[5] _pools)"
+  },
+  "0x15700b564ca08d9439c58ca5053166e8317aa138": {
+    "0xa9059cbb": "transfer(address _to, uint256 _value)"
+  },
+  "0x5f6c431ac417f0f430b84a666a563fabe681da94": {
+    "0xd40ddb8c": "remove_liquidity(uint256 _amount, uint256[] min_amounts)"
+  },
+  "0x308861a430be4cce5502d0a12724771fc6daf216": {
+    "0x03dcfbdc": "requestWithdrawWithPermit(address _owner,uint256 _amount,tuple _permit)"
+  },
+  "0xc7963974280261736868f962e3959ee1e1b99712": {
+    "0x6ab498a3": "withdraw(address token,uint104 amount)"
+  },
+  "0x3b50805453023a91a8bf641e279401a0b23fa6f9": {
+    "0x095ea7b3": "approve(address _spender, uint256 _value)"
+  },
+  "0x7aec93210fd857bfb1e7919cb9ef30731494c003": {
+    "0x2e7ba6ef": "claim(uint256 index, address account, uint256 amount, bytes32[] merkleProof)"
+  },
+  "0xfe0c30065b384f05761f15d0cc899d4f9f9cc0eb": {
+    "0x095ea7b3": "approve(address _spender, uint256 _value)"
+  },
+  "0x35fa164735182de50811e8e2e824cfb9b6118ac2": {
+    "0x095ea7b3": "approve(address _spender, uint256 _value)"
+  },
+  "0xbd456973dfd5b00b07ce5307110c77e3f228ca3c": {
+    "0x2e7ba6ef": "claim(uint256 index, address account, uint256 amount, bytes32[] merkleProof)"
+  },
+  "0x2ec90ef34e312a855becf74762d198d8369eece1": {
+    "0x2e7ba6ef": "claim(uint256 index, address account, uint256 amount, bytes32[] merkleProof)"
+  },
+  "0xdac17f958d2ee523a2206206994597c13d831ec7": {
+    "0x095ea7b3": "approve(address _spender, uint256 _value)"
+  },
+  "0xec53bf9167f50cdeb3ae105f56099aaab9061f83": {
+    "0xa9059cbb": "transfer(address _to, uint256 _value)"
+  },
+  "0xea51d7853eefb32b6ee06b1c12e6dcca88be0ffe": {
+    "0xc04a8a10": "approveDelegation(address delegatee, uint256 amount)"
+  },
+  "0x70bf6634ee8cb27d04478f184b9b8bb13e5f4710": {
+    "0x1fff991f": "execute(tuple slippage,bytes[] actions,bytes32 )"
+  },
+  "0x0c1e1a20566321de81841e61a75b2b949610cb39": {
+    "0x2e7ba6ef": "claim(uint256 index, address account, uint256 amount, bytes32[] merkleProof)"
+  },
+  "0x6db24ee656843e3fe03eb8762a54d86186ba6b64": {
+    "0x1d7d4ebc": "claim(address account, uint256 cumulativeAmount, bytes32 expectedMerkleRoot, bytes32[] merkleProof)"
+  },
+  "0x8f08b70456eb22f6109f57b8fafe862ed28e6040": {
+    "0xdb006a75": "redeem(uint256 tokens)"
+  },
+  "0xce6460b8e97d7be72a9f525fa5b49c62d06d2b46": {
+    "0x2e7ba6ef": "claim(uint256 index, address account, uint256 amount, bytes32[] merkleProof)"
+  },
+  "0xc4ad29ba4b3c580e6d59105fff484999997675ff": {
+    "0x095ea7b3": "approve(address _spender, uint256 _value)"
+  },
+  "0xa434d495249abe33e031fe71a969b81f3c07950d": {
+    "0xbcc3c255": "repayETH(address target, uint256 nftID, address pineWallet)"
+  },
+  "0x7d5706f6ef3f89b3951e23e557cdfbc3239d4e2c": {
+    "0xb13acedd": "claimWithdraw(uint256 stakeId)"
+  },
+  "0x9ffdf407cde9a93c47611799da23924af3ef764f": {
+    "0xfe240f7e": "depositWithERC20WithPermit(address _token,uint256 _amount,address _referral,tuple _permit)"
+  },
+  "0x77ad9bf13a52517ad698d65913e8d381300c8bf3": {
+    "0xc04a8a10": "approveDelegation(address delegatee, uint256 amount)"
+  },
+  "0xdef1c0ded9bec7f1a1670819833240f027b25eff": {
+    "0xd9627aa4": "sellToUniswap(address[] tokens, uint256 sellAmount, uint256 minBuyAmount, bool isSushi)"
+  },
+  "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0": {
+    "0xea598cb0": "wrap(uint256 _amount)"
+  },
+  "0xbf5495efe5db9ce00f80364c8b423567e58d2110": {
+    "0x095ea7b3": "approve(address _spender, uint256 _value)"
+  },
+  "0xd7c49cee7e9188cca6ad8ff264c1da2e69d4cf3b": {
+    "0x095ea7b3": "approve(address _spender, uint256 _value)"
+  },
+  "0x64776b0907b839e759f91a5a328ea143067ddcd7": {
+    "0x2e7ba6ef": "claim(uint256 index, address account, uint256 amount, bytes32[] merkleProof)"
+  },
+  "0x87eb1c0f3827cb91bef234f61e4a5594280754e9": {
+    "0x2e7ba6ef": "claim(uint256 index, address account, uint256 amount, bytes32[] merkleProof)"
+  },
+  "0xc13e21b648a5ee794902342038ff3adab66be987": {
+    "0x02c205f0": "supplyWithPermit(address asset, uint256 amount, address onBehalfOf, uint16 referralCode, uint256 deadline, uint8 permitV, bytes32 permitR, bytes32 permitS)"
+  },
+  "0xa7995f71aa11525db02fc2473c37dee5dbf55107": {
+    "0xac9650d8": "multicall(bytes[] data)",
+    "allowedValues": {
+      "index": 0,
+      "allowed": ["0x", "0x1"]
+    }
+  },
+  "0xae7ab96520de3a18e5e111b5eaab095312d7fe84": {
+    "0xa9059cbb": "transfer(address _to, uint256 _value)"
+  },
+  "0x889edc2edab5f40e902b864ad4d7ade8e412f9b1": {
+    "0xacf41e4d": "requestWithdrawalsWithPermit(uint256[] _amounts,address _owner,tuple _permit)"
+  },
+  "0xd533a949740bb3306d119cc777fa900ba034cd52": {
+    "0x095ea7b3": "approve(address _spender, uint256 _value)"
+  },
+  "0xf0d4c12a5768d806021f80a262b4d39d26c58b8d": {
+    "0x5c9c18e2": "exchange(address[11] _route,uint256[5][5] _swap_params,uint256 _amount,uint256 _expected,address[5] _pools)"
+  },
+  "0xf939e0a03fb07f59a73314e73794be0e57ac1b4e": {
+    "0x095ea7b3": "approve(address _spender, uint256 _value)"
+  },
+  "0x4095f064b8d3c3548a3bebfd0bbfd04750e30077": {
+    "0xac9650d8": "multicall(bytes[] data)"
+  },
+  "0x6f0ed6f346007563d3266de350d174a831bde0ca": {
+    "0x095ea7b3": "approve(address _spender, uint256 _value)"
+  },
+  "0x7d2768de32b0b80b7a3454c06bdac94a69ddc7a9": {
+    "0x69328dec": "withdraw(address token, uint256 amount, address destination)"
+  },
+  "0xf55041e37e12cd407ad00ce2910b8269b01263b9": {
+    "0x51a60b02": "withdrawDelegated(address _indexer, address _delegateToIndexer)"
+  },
+  "0x3f29cb4111cbda8081642da1f75b3c12decf2516": {
+    "0x5a7b87f2": "claimRewards(address[] rewardContracts, address[] extraRewardContracts, address[] tokenRewardContracts, address[] tokenRewardTokens, uint256 depositCrvMaxAmount, uint256 minAmountOut, uint256 depositCvxMaxAmount, uint256 spendCvxAmount, uint256 options)"
+  },
+  "0xa1290d69c65a6fe4df752f95823fae25cb99e5a7": {
+    "0x095ea7b3": "approve(address _spender, uint256 _value)"
+  },
+  "0x3ff3a210e57cfe679d9ad1e9ba6453a716c56a2e": {
+    "0x095ea7b3": "approve(address _spender, uint256 _value)"
+  },
+  "0xcb08717451aae9ef950a2524e33b6dcaba60147b": {
+    "0x095ea7b3": "approve(address _spender, uint256 _value)"
+  },
+  "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599": {
+    "0x095ea7b3": "approve(address _spender, uint256 _value)"
+  },
+  "0x4ebdf703948ddcea3b11f675b4d1fba9d2414a14": {
+    "0x095ea7b3": "approve(address _spender, uint256 _value)"
+  },
+  "0xf5f5b97624542d72a9e06f04804bf81baa15e2b4": {
+    "0x095ea7b3": "approve(address _spender, uint256 _value)"
+  },
+  "0x853d955acef822db058eb8505911ed77f175b99e": {
+    "0x095ea7b3": "approve(address _spender, uint256 _value)"
+  },
+  "0x83f20f44975d03b1b09e64809b757c47f942beea": {
+    "0x095ea7b3": "approve(address _spender, uint256 _value)"
+  },
+  "0x2ddb11443bd9ceb92d4951a05f55eb7096eb53d3": {
+    "0x2e7ba6ef": "claim(uint256 index, address account, uint256 amount, bytes32[] merkleProof)"
+  },
+  "0x8e3a59427b1d87db234dd4ff63b25e4bf94672f4": {
+    "0x095ea7b3": {
+      "abi": "approve(address _spender, uint256 _value)",
+      "allowedValues": {
+        "index": 0,
+        "allowed": ["0x", "0x1"]
+      }
+    }
+  },
+  "0x036676389e48133b63a802f8635ad39e752d375d": {
+    "0xc3ae1766": "depositAsset(address asset,uint256 depositAmount,uint256 minRSETHAmountToReceive,string referralId)"
+  },
+  "0xba12222222228d8ba445958a75a0704d566bf2c8": {
+    "0x52bbbe29": "0x52bbbe29(int184, uint72[], bytes9[], int256, uint208[], bytes8[])"
+  },
+  "0xbd7d6a9ad7865463de44b05f04559f65e3b11704": {
+    "0x02c5fcf8": "repayETH(address lendingPool, uint256 amount, uint256 rateMode, address onBehalfOf)"
+  },
+  "0x4e3fbd56cd56c3e72c1403e103b45db9da5b9d2b": {
+    "0x095ea7b3": "approve(address _spender, uint256 _value)"
+  },
+  "0x596192bb6e41802428ac943d2f1476c1af25cc0e": {
+    "0x095ea7b3": "approve(address _spender, uint256 _value)"
+  },
+  "0xa8b309a75f0d64ed632d45a003c68a30e59a1d8b": {
+    "0x2e1a7d4d": "withdraw(uint256 amount)"
+  },
+  "0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0": {
+    "0x095ea7b3": "approve(address _spender, uint256 _value)"
+  },
+  "0x0000206329b97db379d5e1bf586bbdb969c63274": {
+    "0x095ea7b3": "approve(address _spender, uint256 _value)"
+  },
+  "0xcf5540fffcdc3d510b18bfca6d2b9987b0772559": {
+    "0x83bd37f9": "swapCompact()"
+  },
+  "0x514910771af9ca656af840dff83e8264ecf986ca": {
+    "0x095ea7b3": "approve(address _spender, uint256 _value)"
+  },
+  "0x62de59c08eb5dae4b7e6f7a8cad3006d6965ec16": {
+    "0xc8393ba9": "initiateWithdrawal(address destination, uint256 value)"
+  },
+  "0x0b9857ae2d4a3dbe74ffe1d7df045bb7f96e4840": {
+    "0x08635a95": "executeTransaction(bytes32[] proof, uint256 index, address l2Sender, address to, uint256 l2Block, uint256 l1Block, uint256 l2Timestamp, uint256 value, bytes data)"
+  }
+}

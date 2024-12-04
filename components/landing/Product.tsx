@@ -1,9 +1,9 @@
 import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { isAddress } from "viem";
 import LargeCardStat from "@/components/common/LargeCardStat";
 import { CardStatProps } from "@/components/common/CardStat";
+import { isAddress } from "viem";
 
 export interface ProductProps {
   title: JSX.Element;
