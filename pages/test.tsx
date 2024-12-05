@@ -1,8 +1,8 @@
 import { showLoadingToast } from '@/lib/toasts';
 import { Clients } from '@/lib/types';
-import { custom, RPC_URLS } from '@/lib/utils/connectors';
 import { simulateCall } from '@/lib/utils/helpers';
 import { handleCallResult } from '@/lib/utils/helpers';
+import { ethers } from 'ethers';
 import { useState } from 'react';
 import NoSSR from 'react-no-ssr';
 import { createWalletClient, encodeFunctionData, erc20Abi, erc4626Abi, getAddress, http, parseUnits, WalletClient } from 'viem';
@@ -12,8 +12,7 @@ import { Address } from 'viem';
 import { usePublicClient } from 'wagmi';
 import { useWalletClient } from 'wagmi';
 import { useAccount } from 'wagmi';
-import { createBundlerClient } from 'viem/account-abstraction'
-import { arbitrum } from 'viem/chains';
+import { Contract, Planner } from "@weiroll/weiroll.js"
 
 export default function Test() {
   return <NoSSR><TestContainer /></NoSSR>
@@ -38,46 +37,15 @@ function TestContainer() {
 
 async function executeCalls(calls: any[], account: Address, clients: Clients) {
   console.log("sending calls")
-  console.log(clients.walletClient.account)
 
-  const request = await clients.walletClient.prepareTransactionRequest({
-    account: account,
-    chain: arbitrum,
-    to: calls[0].to,
-    value: calls[0].value,
-    data: calls[0].data,
-  })
-  console.log({ request })
-  const serializedTransaction = await clients.walletClient.signTransaction({
-    account: account,
-    chain: arbitrum,
-    to: calls[0].to,
-    value: calls[0].value,
-    data: calls[0].data,
-    gas: request.gas,
-    maxFeePerGas: request.maxFeePerGas,
-    maxPriorityFeePerGas: request.maxPriorityFeePerGas,
-    nonce: request.nonce,
-  })
-  console.log({ serializedTransaction })
-  // const hash = await clients.walletClient.sendRawTransaction({ serializedTransaction })
-  // console.log(hash)
+  const ethersContract = new ethers.Contract("0xaf88d065e77c8cC2239327C5EDb3A432268e5831", erc20Abi);
+  console.log(ethersContract)
+  const contract = Contract.createContract(ethersContract);
 
-  // showLoadingToast("Executing calls...")
-  // const success = await handleCallResult({
-  //   successMessage: "Calls executed!",
-  //   simulationResponse: await simulateCall({
-  //     account,
-  //     contract: {
-  //       address: "0xcA11bde05977b3631167028862bE2a173976CA11",
-  //       abi: multicallAbi,
-  //     },
-  //     functionName: "aggregate3",
-  //     publicClient: clients.publicClient,
-  //     args: [[{ target: calls[0].to, callData: calls[0].data, allowFailure: false }]],
-  //   }),
-  //   clients,
-  // });
+  const planner = new Planner();
+  const ret = planner.add(contract.approve("0x55c4d29cCdf671cb901081dAF2e91891c95b07ba", "1000000"))
+  const { commands, state } = planner.plan();
+  console.log(commands, state)
 }
 
 async function getCalldata(account: Address, chain: Chain, publicClient: PublicClient) {
