@@ -250,7 +250,7 @@ export default function VaultInputs({
     {
       isDeposit ?
         <>
-          {vaultData.depositLimit < maxUint256 &&
+          {vaultData.depositLimit < parseUnits("1000000000", asset?.decimals || 0) &&
             <span
               className="flex flex-row items-center justify-between text-customGray100 hover:text-customGray200 cursor-pointer mt-2"
               onClick={() => handleChangeInput({ currentTarget: { value: formatBalance(vaultData.depositLimit, asset?.decimals || 0) } })}
