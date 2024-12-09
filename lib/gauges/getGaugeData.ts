@@ -1,6 +1,6 @@
 import { Address, PublicClient, createPublicClient, erc20Abi, http, zeroAddress } from "viem";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
-import { ChildGaugeAbi, GaugeAbi, VCX, } from "@/lib/constants";
+import { ChildGaugeAbi, GaugeAbi, ORACLES_DEPLOY_BLOCK, VCX, } from "@/lib/constants";
 import { vcx as getVcxPrice } from "@/lib/resolver/price/resolver";
 import { GaugeData, RewardApy, Token, TokenByAddress, VaultDataByAddress } from "@/lib/types";
 import { thisPeriodTimestamp } from "./utils";
@@ -323,7 +323,7 @@ async function getRewardsApy({
     address: gauge,
     abi: chainId === mainnet.id ? GaugeAbi : ChildGaugeAbi,
     eventName: chainId === mainnet.id ? "RewardDistributorUpdated" : "AddReward",
-    fromBlock: "earliest",
+    fromBlock: ORACLES_DEPLOY_BLOCK[chainId] === 0 ? "earliest" : BigInt(ORACLES_DEPLOY_BLOCK[chainId]),
     toBlock: "latest",
   }) as any[];
 

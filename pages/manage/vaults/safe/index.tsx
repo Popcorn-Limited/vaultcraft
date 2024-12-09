@@ -17,7 +17,7 @@ import SpinningLogo from "@/components/common/SpinningLogo";
 import MainButtonGroup from "@/components/common/MainButtonGroup";
 import SecondaryButtonGroup from "@/components/common/SecondaryButtonGroup";
 import { arbitrum } from "viem/chains";
-import { OracleVaultAbi } from "@/lib/constants";
+import { ORACLES_DEPLOY_BLOCK, OracleVaultAbi } from "@/lib/constants";
 import { useAccount, useWalletClient, usePublicClient } from "wagmi";
 import { showLoadingToast } from "@/lib/toasts";
 import { vaultsAtom } from "@/lib/atoms/vaults";
@@ -68,25 +68,23 @@ async function fetchRequests(vault: VaultData) {
     address: vault.address,
     abi: OracleVaultAbi,
     eventName: "RedeemRequested",
-    fromBlock: "earliest",
+    fromBlock: ORACLES_DEPLOY_BLOCK[vault.chainId] === 0 ? "earliest" : BigInt(ORACLES_DEPLOY_BLOCK[vault.chainId]),
     toBlock: "latest",
   });
   const cancelLogs = await client.getContractEvents({
     address: vault.address,
     abi: OracleVaultAbi,
     eventName: "RedeemRequestCanceled",
-    fromBlock: "earliest",
+    fromBlock: ORACLES_DEPLOY_BLOCK[vault.chainId] === 0 ? "earliest" : BigInt(ORACLES_DEPLOY_BLOCK[vault.chainId]),
     toBlock: "latest",
   });
   const fulfillLogs = await client.getContractEvents({
     address: vault.address,
     abi: OracleVaultAbi,
     eventName: "RedeemRequestFulfilled",
-    fromBlock: "earliest",
+    fromBlock: ORACLES_DEPLOY_BLOCK[vault.chainId] === 0 ? "earliest" : BigInt(ORACLES_DEPLOY_BLOCK[vault.chainId]),
     toBlock: "latest",
   });
-
-  console.log({ chainId: vault.chainId, address: vault.address, requestLogs, cancelLogs, fulfillLogs })
 
   // Sort and sum requests by controller
   const requests: { [key: Address]: Request } = {}
@@ -277,7 +275,7 @@ function SafeVaultWithdrawals({ vault }: { vault: VaultData }) {
     }
   }
 
-  async function handleFulfillRedeemMultiple() {
+  async function handleFulfillRedeemMultiple(queue_: Request[]) {
     if (!account || !walletClient) return;
 
     showLoadingToast("Fulfilling redeem request...");
@@ -292,7 +290,7 @@ function SafeVaultWithdrawals({ vault }: { vault: VaultData }) {
         },
         functionName: "fulfillMultipleRedeems",
         publicClient: publicClient!,
-        args: [queue.map(request => request.shares), queue.map(request => request.user)]
+        args: [queue_.map(request => request.shares), queue.map(request => request.user)]
       }),
       clients: {
         publicClient: publicClient!,
@@ -306,8 +304,7 @@ function SafeVaultWithdrawals({ vault }: { vault: VaultData }) {
   }
 
   function handleFulfillAll() {
-    setQueue(requests)
-    handleFulfillRedeemMultiple();
+    handleFulfillRedeemMultiple(requests);
   }
 
   return (
@@ -333,7 +330,7 @@ function SafeVaultWithdrawals({ vault }: { vault: VaultData }) {
           <div className="h-16 w-40">
             <SecondaryButtonGroup
               label="Fulfill Queue"
-              mainAction={handleFulfillRedeemMultiple}
+              mainAction={() => handleFulfillRedeemMultiple(queue)}
               chainId={vault.chainId}
               disabled={queuedAssets > availableAssets || queuedAssets === BigInt(0)}
             />

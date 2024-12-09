@@ -1,4 +1,4 @@
-import { AssetPushOracleAbi, AssetPushOracleByChain, BalancerOracleAbi, ExerciseByChain, ExerciseOracleByChain, OptionTokenByChain, OVCX_ORACLE, VCX, VcxByChain, WETH } from "@/lib/constants";
+import { AssetPushOracleAbi, AssetPushOracleByChain, BalancerOracleAbi, ExerciseByChain, ExerciseOracleByChain, OptionTokenByChain, ORACLES_DEPLOY_BLOCK, OVCX_ORACLE, VCX, VcxByChain, WETH } from "@/lib/constants";
 import { TokenByAddress } from "@/lib/types";
 import { ChainById, GAUGE_NETWORKS, RPC_URLS, SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { createPublicClient, erc20Abi, http, parseAbiItem, PublicClient, zeroAddress } from "viem";
@@ -97,7 +97,7 @@ async function loadVCXDataByChain(chainId: number, mainnetClient: PublicClient, 
     const updateLogs = await client.getLogs({
       address: ExerciseOracleByChain[chainId],
       event: parseAbiItem("event PriceUpdate(uint oldPrice, uint newPrice)"),
-      fromBlock: "earliest",
+      fromBlock: ORACLES_DEPLOY_BLOCK[chainId] === 0 ? "earliest" : BigInt(ORACLES_DEPLOY_BLOCK[chainId]),
       toBlock: "latest",
     });
     const block = await client.getBlock({ blockNumber: updateLogs[updateLogs.length - 1].blockNumber })
@@ -108,7 +108,7 @@ async function loadVCXDataByChain(chainId: number, mainnetClient: PublicClient, 
       bridgeLogs = await mainnetClient.getLogs({
         address: "0x99C9fc46f92E8a1c0deC1b1747d010903E884bE1",
         event: parseAbiItem("event ERC20BridgeInitiated(address indexed localToken, address indexed remoteToken, address indexed from, address to, uint256 amount, bytes extraData)"),
-        fromBlock: "earliest",
+        fromBlock: ORACLES_DEPLOY_BLOCK[chainId] === 0 ? "earliest" : BigInt(ORACLES_DEPLOY_BLOCK[chainId]),
         toBlock: "latest",
         args: {
           localToken: OptionTokenByChain[1]
@@ -118,7 +118,7 @@ async function loadVCXDataByChain(chainId: number, mainnetClient: PublicClient, 
       bridgeLogs = await mainnetClient.getLogs({
         address: "0x72Ce9c846789fdB6fC1f34aC4AD25Dd9ef7031ef",
         event: parseAbiItem("event TransferRouted(address indexed token, address indexed _userFrom, address indexed _userTo, address gateway)"),
-        fromBlock: "earliest",
+        fromBlock: ORACLES_DEPLOY_BLOCK[chainId] === 0 ? "earliest" : BigInt(ORACLES_DEPLOY_BLOCK[chainId]),
         toBlock: "latest",
         args: {
           token: OptionTokenByChain[1]
@@ -150,7 +150,7 @@ async function loadAssetOracleDataByChain(chainId: number) {
   const logs = await client.getLogs({
     address: AssetPushOracleByChain[chainId],
     event: AssetPushOracleAbi[6],
-    fromBlock: "earliest",
+    fromBlock: ORACLES_DEPLOY_BLOCK[chainId] === 0 ? "earliest" : BigInt(ORACLES_DEPLOY_BLOCK[chainId]),
     toBlock: "latest"
   });
 

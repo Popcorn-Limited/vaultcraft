@@ -3,7 +3,7 @@ import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { Address, PublicClient } from "viem";
 import axios from "axios";
-import { AnyToAnyDepositorAbi, PendleRouterByChain } from "@/lib/constants";
+import { AnyToAnyDepositorAbi, ORACLES_DEPLOY_BLOCK, PendleRouterByChain } from "@/lib/constants";
 import { tokensAtom } from "@/lib/atoms";
 import { ArrowDownIcon } from "@heroicons/react/24/outline";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
@@ -19,18 +19,20 @@ import { ZapAssetAddressesByChain } from "@/lib/constants";
 import { showErrorToast } from "@/lib/toasts";
 
 async function getReserveLogs(address: Address, account: Address, client: PublicClient) {
+  const chainId = client.chain?.id || 1
+
   let addedLogs = await client.getContractEvents({
     address: address,
     abi: AnyToAnyDepositorAbi,
     eventName: "ReserveAdded",
-    fromBlock: "earliest",
+    fromBlock: ORACLES_DEPLOY_BLOCK[chainId] === 0 ? "earliest" : BigInt(ORACLES_DEPLOY_BLOCK[chainId]),
     toBlock: "latest",
   });
   const removeLogs = await client.getContractEvents({
     address: address,
     abi: AnyToAnyDepositorAbi,
     eventName: "ReserveClaimed",
-    fromBlock: "earliest",
+    fromBlock: ORACLES_DEPLOY_BLOCK[chainId] === 0 ? "earliest" : BigInt(ORACLES_DEPLOY_BLOCK[chainId]),
     toBlock: "latest",
   });
   // Filter out claimed reserves

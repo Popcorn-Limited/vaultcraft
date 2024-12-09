@@ -1,6 +1,6 @@
 import { Address, createPublicClient, http, zeroAddress } from "viem";
 import * as chains from "viem/chains";
-import { ChildGaugeAbi, GaugeAbi } from "@/lib/constants";
+import { ChildGaugeAbi, GaugeAbi, ORACLES_DEPLOY_BLOCK } from "@/lib/constants";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 import { ClaimableReward, TokenByAddress } from "@/lib/types";
 import { avalanche } from "viem/chains";
@@ -17,7 +17,7 @@ export async function getRewardData(gauge: Address, chainId: number) {
     address: gauge,
     abi: chainId === chains.mainnet.id ? GaugeAbi : ChildGaugeAbi,
     eventName: chainId === chains.mainnet.id ? "RewardDistributorUpdated" : "AddReward",
-    fromBlock: "earliest",
+    fromBlock: ORACLES_DEPLOY_BLOCK[chainId] === 0 ? "earliest" : BigInt(ORACLES_DEPLOY_BLOCK[chainId]),
     toBlock: "latest",
   }) as any[];
 
@@ -69,7 +69,7 @@ export async function getClaimableRewards({ gauge, account, tokens, chainId }: {
     address: gauge,
     abi: chainId === chains.mainnet.id ? GaugeAbi : ChildGaugeAbi,
     eventName: chainId === chains.mainnet.id ? "RewardDistributorUpdated" : "AddReward",
-    fromBlock: "earliest",
+    fromBlock: ORACLES_DEPLOY_BLOCK[chainId] === 0 ? "earliest" : BigInt(ORACLES_DEPLOY_BLOCK[chainId]),
     toBlock: "latest",
   }) as any[];
 

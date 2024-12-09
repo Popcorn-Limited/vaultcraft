@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import NoSSR from "react-no-ssr";
 import { createPublicClient, http, isAddress, zeroAddress } from "viem";
-import { VaultAbi } from "@/lib/constants";
+import { ORACLES_DEPLOY_BLOCK, VaultAbi } from "@/lib/constants";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 import { tokensAtom } from "@/lib/atoms";
 import LeftArrowIcon from "@/components/svg/LeftArrowIcon";
@@ -33,7 +33,7 @@ async function getLogs(vault: VaultData, asset: Token) {
     address: vault.address,
     abi: VaultAbi,
     eventName: "Deposit",
-    fromBlock: "earliest",
+    fromBlock: ORACLES_DEPLOY_BLOCK[vault.chainId] === 0 ? "earliest" : BigInt(ORACLES_DEPLOY_BLOCK[vault.chainId]),
     toBlock: "latest",
   });
   if (depositLogs.length === 0) return []
@@ -41,7 +41,7 @@ async function getLogs(vault: VaultData, asset: Token) {
     address: vault.address,
     abi: VaultAbi,
     eventName: "Withdraw",
-    fromBlock: "earliest",
+    fromBlock: ORACLES_DEPLOY_BLOCK[vault.chainId] === 0 ? "earliest" : BigInt(ORACLES_DEPLOY_BLOCK[vault.chainId]),
     toBlock: "latest",
   });
 

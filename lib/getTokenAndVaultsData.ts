@@ -6,7 +6,7 @@ import {
   zeroAddress,
 } from "viem";
 import { StrategyByAddress, TokenByAddress, VaultData } from "@/lib/types";
-import { ChildGaugeAbi, GaugeAbi, OptionTokenByChain, ST_VCX, VCX, VCX_LP, VE_VCX, VeTokenByChain, XVCXByChain,WVCXByChain, ZapAssetAddressesByChain } from "@/lib/constants";
+import { ChildGaugeAbi, GaugeAbi, OptionTokenByChain, ST_VCX, VCX, VCX_LP, VE_VCX, VeTokenByChain, XVCXByChain,WVCXByChain, ZapAssetAddressesByChain, ORACLES_DEPLOY_BLOCK } from "@/lib/constants";
 import { GAUGE_NETWORKS, RPC_URLS } from "@/lib/utils/connectors";
 import { prepareAssets, prepareVaults, addBalances, prepareGauges } from "@/lib/tokens";
 import { mainnet } from "viem/chains";
@@ -84,7 +84,7 @@ export default async function getTokenAndVaultsDataByChain({
   // }
 
   // Add reward token addresses
-  if (GAUGE_NETWORKS.includes(client.chain.id)) {
+  if (GAUGE_NETWORKS.includes(chainId)) {
     // @ts-ignore
     for (let [i, vault] of Object.values(vaultsData).entries()) {
       if (vault.gauge !== zeroAddress) {
@@ -92,7 +92,7 @@ export default async function getTokenAndVaultsDataByChain({
           address: vault.gauge,
           abi: chainId === mainnet.id ? GaugeAbi : ChildGaugeAbi,
           eventName: chainId === mainnet.id ? "RewardDistributorUpdated" : "AddReward",
-          fromBlock: "earliest",
+          fromBlock: ORACLES_DEPLOY_BLOCK[chainId] === 0 ? "earliest" : BigInt(ORACLES_DEPLOY_BLOCK[chainId]),
           toBlock: "latest",
         }) as any[]
 
