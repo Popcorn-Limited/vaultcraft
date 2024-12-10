@@ -31,3 +31,4 @@ export * from "./LockVault";
 export * from "./LeverageLooper";
 export * from "./OracleVault";
 export * from "./AsyncVaultRouter";
+export * from "./OracleVaultController";

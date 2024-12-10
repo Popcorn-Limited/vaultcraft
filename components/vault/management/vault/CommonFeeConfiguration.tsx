@@ -204,7 +204,7 @@ export default function CommonFeeConfiguration({
             className="flex-grow"
             label="Fee Recipient"
             description="Which address should receive the fees?"
-            isSwitchNeeded={false}
+            
           >
             <Input
               onChange={(e) =>

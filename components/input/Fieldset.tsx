@@ -7,7 +7,6 @@ function Fieldset({
   className,
   isOpened,
   handleIsOpenedChange,
-  isSwitchNeeded = true,
 }: {
   children: any;
   label: string;
@@ -15,14 +14,13 @@ function Fieldset({
   className?: string;
   isOpened?: boolean;
   handleIsOpenedChange?: (val: boolean) => void;
-  isSwitchNeeded?: boolean;
 }) {
   return (
     <fieldset className={`${className} flex flex-col mt-4`}>
       <div>
         <div className={`flex justify-between`}>
           <h2 className="text-white text-lg">{label}</h2>
-          {isSwitchNeeded && (
+          {handleIsOpenedChange && (
             <Switch
               checked={isOpened}
               onChange={handleIsOpenedChange}
@@ -40,12 +38,12 @@ function Fieldset({
             </Switch>
           )}
         </div>
-        <p className="text-white opacity-40 text-sm">{description}</p>
+        {description && description !== "" && <p className="text-white opacity-40 text-sm">{description}</p>}
       </div>
 
       <div
-        className={`flex flex-col mt-4 ${
-          !isOpened && isSwitchNeeded && "hidden"
+        className={`flex flex-col mt-2 ${
+          !isOpened && handleIsOpenedChange && "hidden"
         }`}
       >
         {children}

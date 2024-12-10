@@ -4,7 +4,7 @@ import { Clients, VaultAllocation, VaultData, VaultsV2FeeConfig } from "@/lib/ty
 import { SimulationContract, handleCallResult, simulateCall } from "@/lib/utils/helpers"
 import { Address, maxUint256 } from "viem"
 
-interface BaseWriteProps {
+export interface BaseWriteProps {
   vaultData: VaultData;
   address: Address;
   account?: Address;

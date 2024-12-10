@@ -1,11 +1,12 @@
 import { ChainById, networkMap, RPC_URLS } from "@/lib/utils/connectors";
-import { Address, erc20Abi, erc4626Abi, formatUnits, parseEther, parseUnits } from "viem";
+import { Address, erc20Abi, erc4626Abi, formatUnits, parseEther, parseUnits, PublicClient } from "viem";
 import axios from "axios";
 import { http } from "viem";
 import { createPublicClient } from "viem";
 import { DEBANK_CHAIN_IDS, OracleVaultAbi } from "@/lib/constants";
+import { SafeVaultPriceUpdate } from "./getSafeVaultPriceV2";
 
-export default async function getSafeVaultPrice({ vault, chainId }: { vault: Address, chainId: number }) {
+export default async function getSafeVaultPrice({ vault, chainId }: { vault: Address, chainId: number }): Promise<SafeVaultPriceUpdate> {
   const client = createPublicClient({
     chain: ChainById[chainId],
     transport: http(RPC_URLS[chainId])
