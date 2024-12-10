@@ -97,7 +97,11 @@ export default function AssetWithName({
         <NetworkSticker chainId={vault.chainId} size={size} />
         <TokenIcon
           token={tokens[vault.chainId][vault.asset]}
-          icon={tokens[vault.chainId][vault.asset].logoURI}
+          icon={
+            tokens[vault.chainId][vault.address].logoURI === "https://app.vaultcraft.io/images/tokens/vcx.svg"
+              ? tokens[vault.chainId][vault.asset].logoURI
+              : tokens[vault.chainId][vault.address].logoURI
+          }
           chainId={vault.chainId}
           imageSize={iconSize[size]}
         />
