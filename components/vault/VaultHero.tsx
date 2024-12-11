@@ -98,7 +98,9 @@ export default function VaultHero({
               }
               tooltip={`This Vault deploys its TVL $ ${vaultData.tvl < 1 ? "0" : NumberFormatter.format(vaultData.tvl)}
                       (${NumberFormatter.format(Number(formatBalance(vaultData.totalAssets, asset?.decimals || 0)))} ${asset?.symbol || "TKN"}) 
-                      in $ ${NumberFormatter.format(vaultData.strategies.reduce((a, b) => a + b.apyData.apyHist[b.apyData.apyHist.length - 1].tvl, 0))} 
+                      in $ ${vaultData.metadata.type === "safe-vault-v1"
+                  ? "?"
+                  : NumberFormatter.format(vaultData.strategies.reduce((a, b) => a + b.apyData.apyHist[b.apyData.apyHist.length - 1].tvl, 0))} 
                       TVL of underlying protocols`}
             />
           </div>

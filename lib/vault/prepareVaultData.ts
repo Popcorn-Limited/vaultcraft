@@ -226,11 +226,12 @@ async function getSafeVaultApy(vault: VaultData): Promise<LlamaApy[]> {
       const timeElapsed = currentTimestamp - firstTimestamp
       const priceDifference = log.args!.bqPrice! - firstLog.args!.bqPrice!
       const annualizedReturn = Number((priceDifference / BigInt(timeElapsed)) * BigInt(SECONDS_PER_YEAR)) / 1e16
+      const apyReward = await getCustomRewardApy(vault)
 
       entries.push({
-        apy: annualizedReturn, //Number(formatEther(log.args!.bqPrice)),
+        apy: annualizedReturn + apyReward, //Number(formatEther(log.args!.bqPrice)),
         apyBase: annualizedReturn, //Number(formatEther(log.args!.bqPrice)),
-        apyReward: 0,
+        apyReward: apyReward,
         tvl: vault.tvl,
         date: new Date(currentTimestamp * 1000)
       })
@@ -239,6 +240,10 @@ async function getSafeVaultApy(vault: VaultData): Promise<LlamaApy[]> {
   return entries
 }
 
+async function getCustomRewardApy(vault: VaultData): Promise<number> {
+  if (vault.address === "0x27d47664e034f3F2414d647DE7Cd1c1e8E72a89c") return 1.24
+  return 0
+}
 
 export async function addApyHist(vaults: VaultDataByAddress): Promise<VaultDataByAddress> {
   const apyHistAll = await Promise.all(Object.values(vaults).map(async (vault: VaultData) => {
