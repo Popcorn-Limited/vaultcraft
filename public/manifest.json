@@ -1,7 +1,7 @@
 {
     "short_name": "Vaultcraft",
     "name": "Vaultcraft",
-    "description": "Manage Vaults with Gnosis",
+    "description": "Manage Vaults with Safe",
     "icons": [
       {
         "src": "images/tokens/vcx.svg",
