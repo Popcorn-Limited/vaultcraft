@@ -192,7 +192,7 @@ export default function SafeVaultConfiguration({ vault }: { vault: VaultData }) 
               </Fieldset>
 
               <Fieldset label="Share Value In Assets" description="" >
-                <SimpleInput type="text" value={vaultPriceInAssetsRaised} onChange={(e) => setVaultPriceInAssets(e.currentTarget.value)} />
+                <SimpleInput type="text" value={vaultPriceInAssetsRaised} onChange={(e) => setVaultPriceInAssetsRaised(e.currentTarget.value)} />
               </Fieldset>
 
               <Fieldset label="Asset Value in Shares" description="" >
