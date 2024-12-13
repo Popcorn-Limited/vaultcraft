@@ -224,7 +224,7 @@ async function getSafeVaultApy(vault: VaultData): Promise<LlamaApy[]> {
     // Only add a new entry if the date is different from the last entry
     if (i === 0 || (entries.length > 0 && date.getDate() > entries[entries.length - 1].date.getDate())) {
       const timeElapsed = currentTimestamp - firstTimestamp
-      const priceDifference = log.args!.bqPrice! - firstLog.args!.bqPrice!
+      const priceDifference = log.args!.bqPrice! < parseEther("1") ? BigInt(1) : log.args!.bqPrice! - firstLog.args!.bqPrice!
       const annualizedReturn = Number((priceDifference / BigInt(timeElapsed)) * BigInt(SECONDS_PER_YEAR)) / 1e16
       const apyReward = await getCustomRewardApy(vault)
 
