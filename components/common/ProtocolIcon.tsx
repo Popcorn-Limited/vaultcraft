@@ -45,6 +45,7 @@ export const IconByProtocol: { [key: string]: string } = {
   Spark: "https://icons.llamao.fi/icons/protocols/spark?w=48&h=48",
   Fluid: "https://icons.llamao.fi/icons/protocols/fluid?w=48&h=48",
   Safe: "https://icons.llamao.fi/icons/protocols/safe?w=48&h=48",
+  Matrixport: "/images/icons/matrixport.png",
   Multistrategy: "/images/tokens/vcx.svg",
   VaultCraft: "/images/tokens/vcx.svg",
   None: "/images/tokens/vcx.svg"
