@@ -69,7 +69,7 @@ function TermsModal({
             You can participate in the governance process by staking tokens in
             accordance with the rules and parameters summarized
             <a
-              className="text-secondaryBlue hover:text-primaryYellow focus:none outline-none"
+              className="text-secondaryBlue hover:text-primaryGreen focus:none outline-none"
               href="https://docs.vaultcraft.io/welcome-to-vaultcraft/introduction"
               target="_blank"
             >
@@ -124,7 +124,7 @@ function TermsModal({
         <p className="py-6 border-t-2 border-customNeutral100">
           By accepting you agree that you have read and accept the{" "}
           <a
-            className="text-secondaryBlue hover:text-primaryYellow focus:none outline-none"
+            className="text-secondaryBlue hover:text-primaryGreen focus:none outline-none"
             href="https://app.vaultcraft.io/disclaimer"
             target="_blank"
           >

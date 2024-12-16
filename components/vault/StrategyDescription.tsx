@@ -55,7 +55,7 @@ export default function StrategyDescription({ strategy, asset, chainId, i, strat
       <div className='flex flex-row items-center'>
         <p className="text-white">{strategy.address.slice(0, 6)}...{strategy.address.slice(-4)}</p>
         <CopyToClipboard text={strategy.address} onCopy={() => showSuccessToast("Strategy address copied!")}>
-          <Square2StackIcon className="w-4 h-4 ml-1 mb-0.5 cursor-pointer text-white hover:text-primaryYellow" />
+          <Square2StackIcon className="w-4 h-4 ml-1 mb-0.5 cursor-pointer text-white hover:text-primaryGreen" />
         </CopyToClipboard>
       </div>
       <div className="mt-2 md:flex md:flex-row md:items-center">

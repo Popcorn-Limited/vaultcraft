@@ -10,7 +10,7 @@ const banners = [
     description: 'Up to 25% APY and 4x voting power',
     buttonText: 'Stake now',
     buttonLink: 'staking',
-    imageSrc: 'images/banner/banner1.png',
+    imageSrc: 'images/banner/background.png',
     tokenSrc: 'images/banner/bannerToken1.svg'
   },
   {
@@ -19,7 +19,7 @@ const banners = [
     description: 'Lock your 80VCX 20WETH pool for max boost in oVCX and voting power',
     buttonText: 'Boost here',
     buttonLink: 'boost',
-    imageSrc: 'images/banner/banner2.png',
+    imageSrc: 'images/banner/background.png',
     tokenSrc: 'images/banner/bannerToken2.svg'
   },
   {
@@ -28,7 +28,7 @@ const banners = [
     description: 'Watch out for “additional rewards” in ARB and OP',
     buttonText: 'Check it out',
     buttonLink: 'vaults',
-    imageSrc: 'images/banner/banner3.png',
+    imageSrc: 'images/banner/background.png',
     tokenSrc: 'images/banner/bannerToken3.svg'
   },
   {
@@ -37,7 +37,7 @@ const banners = [
     description: 'Auto-compound AURA & BAL into VCX for 50%+ APY',
     buttonText: 'Deposit here',
     buttonLink: 'vaults/0x99a53fAB6fBD1eacb59AE998dA2DbF130BE94C38?chainId=1',
-    imageSrc: 'images/banner/banner2.png',
+    imageSrc: 'images/banner/background.png',
     tokenSrc: 'images/banner/bannerToken1.svg'
   },
 ]

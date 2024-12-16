@@ -69,11 +69,11 @@ export default function VaultWithdrawalQueue({
               <div key={vaultData.strategies[index].address + "-new"} className="w-max px-4 py-2 flex flex-row">
                 <div className="mr-4">
                   <ArrowUpIcon
-                    className="text-white h-5 w-5 cursor-pointer hover:text-primaryYellow"
+                    className="text-white h-5 w-5 cursor-pointer hover:text-primaryGreen"
                     onClick={() => adjustQueuePosition(i, i - 1)}
                   />
                   <ArrowDownIcon
-                    className="text-white h-5 w-5 cursor-pointer hover:text-primaryYellow"
+                    className="text-white h-5 w-5 cursor-pointer hover:text-primaryGreen"
                     onClick={() => adjustQueuePosition(i, i + 1)}
                   />
                 </div>

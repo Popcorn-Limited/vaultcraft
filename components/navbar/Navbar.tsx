@@ -186,7 +186,7 @@ export default function Navbar(): JSX.Element {
           <div className="fixed inset-0 overflow-hidden">
             <div className="absolute inset-0 overflow-hidden">
               <div className="fixed inset-x-0 top-0 bottom-0 w-[320px] flex">
-                <DialogPanel className="h-full w-full flex flex-col justify-between pt-12 px-8 shadow-xl bg-primaryYellow overflow-y-scroll">
+                <DialogPanel className="h-full w-full flex flex-col justify-between pt-12 px-8 shadow-xl bg-primaryGreen overflow-y-scroll">
                   <div className="flex flex-1 flex-col w-full space-y-4">
                     <div className="mb-6">
                       <Link href={(!!query?.ref && isAddress(query.ref as string)) ? `/?ref=${query.ref}` : `/`} passHref>
@@ -258,7 +258,7 @@ function BuyVCXButton(): JSX.Element {
     <>
       <button
         className={`w-48 px-4 py-2 rounded bg-white border border-white font-semibold text-base text-black
-                  transition-all ease-in-out duration-500 hover:bg-primaryYellow hover:border-primaryYellow
+                  transition-all ease-in-out duration-500 hover:bg-primaryGreen hover:border-primaryGreen
                   disabled:bg-customGray100 disabled:border-customGray100 disabled:text-white disabled:cursor-not-allowed
                   disabled:hover:border-customGray100 disabled:hover:bg-customGray100 disabled:hover:text-white
                   hidden md:flex flex-row items-center justify-center`}
@@ -274,7 +274,7 @@ function BuyVCXButton(): JSX.Element {
         <p className="ml-2 mt-1">Buy VCX</p>
       </button>
       <button
-        className={`w-48 px-4 py-2 rounded bg-black border border-black font-semibold text-base text-primaryYellow
+        className={`w-48 px-4 py-2 rounded bg-black border border-black font-semibold text-base text-primaryGreen
         transition-all ease-in-out duration-500 hover:bg-white hover:border-white hover:text-black
         disabled:bg-customGray100 disabled:border-customGray100 disabled:text-white disabled:cursor-not-allowed
         disabled:hover:border-customGray100 disabled:hover:bg-customGray100 disabled:hover:text-white
@@ -298,7 +298,7 @@ function StakeVCXButton(): JSX.Element {
   return (
     <>
       <button
-        className={`w-48 px-4 py-2 rounded bg-primaryYellow border border-primaryYellow font-semibold text-base text-black
+        className={`w-48 px-4 py-2 rounded bg-primaryGreen border border-primaryGreen font-semibold text-base text-black
                   transition-all ease-in-out duration-500 hover:bg-white hover:border-white
                   disabled:bg-customGray100 disabled:border-customGray100 disabled:text-white disabled:cursor-not-allowed
                   disabled:hover:border-customGray100 disabled:hover:bg-customGray100 disabled:hover:text-white
@@ -315,7 +315,7 @@ function StakeVCXButton(): JSX.Element {
         <p className="ml-2 mt-1">Stake VCX</p>
       </button>
       <button
-        className={`w-48 px-4 py-2 rounded bg-black border border-black font-semibold text-base text-primaryYellow
+        className={`w-48 px-4 py-2 rounded bg-black border border-black font-semibold text-base text-primaryGreen
         transition-all ease-in-out duration-500 hover:bg-white hover:border-white hover:text-black
         disabled:bg-customGray100 disabled:border-customGray100 disabled:text-white disabled:cursor-not-allowed
         disabled:hover:border-customGray100 disabled:hover:bg-customGray100 disabled:hover:text-white

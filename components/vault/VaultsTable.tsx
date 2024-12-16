@@ -42,7 +42,7 @@ export default function VaultsTable({
         <thead className="bg-customNeutral200 border-b border-customNeutral100">
           <tr>
             <th>
-              <nav className="flex [&_.space-x-2]:shrink-0 relative gap-3 [&_button:not(.bg-opacity-20)]:bg-opacity-0 [&_button:not(.bg-opacity-20)]:border-customGray100/40 [&_button:hover]:border-primaryYellow [&_button]:rounded-full [&_img]:w-5 [&_button]:px-5 [&_button]:py-2">
+              <nav className="flex [&_.space-x-2]:shrink-0 relative gap-3 [&_button:not(.bg-opacity-20)]:bg-opacity-0 [&_button:not(.bg-opacity-20)]:border-customGray100/40 [&_button:hover]:border-primaryGreen [&_button]:rounded-full [&_img]:w-5 [&_button]:px-5 [&_button]:py-2">
                 <fieldset
                   onBlurCapture={() => setShowSearchInput(false)}
                   onClick={() => setShowSearchInput(true)}

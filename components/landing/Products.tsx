@@ -323,7 +323,7 @@ function Tutorial(): JSX.Element {
     <div className="flex flex-row justify-between">
       <div className="text-start space-y-8 w-full lg:w-1/3 xl:w-1/2 lg:pr-8">
         <div className="">
-          <h2 className="text-lg font-bold text-primaryYellow border-b border-customGray500 pb-2">
+          <h2 className="text-lg font-bold text-primaryGreen border-b border-customGray500 pb-2">
             Step 1
           </h2>
           <div className="flex flex-row justify-between">
@@ -343,7 +343,7 @@ function Tutorial(): JSX.Element {
           />
         </div>
         <div>
-          <h2 className="text-lg font-bold text-primaryYellow border-b border-customGray500 pb-2">
+          <h2 className="text-lg font-bold text-primaryGreen border-b border-customGray500 pb-2">
             Step 2
           </h2>
           <div className="flex flex-row justify-between">
@@ -361,7 +361,7 @@ function Tutorial(): JSX.Element {
           />
         </div>
         <div>
-          <h2 className="text-lg font-bold text-primaryYellow border-b border-customGray500 pb-2">
+          <h2 className="text-lg font-bold text-primaryGreen border-b border-customGray500 pb-2">
             Step 3
           </h2>
           <div className="flex flex-row justify-between">
@@ -393,11 +393,11 @@ function Tutorial(): JSX.Element {
           </div>
           <div className="w-1/5 flex flex-row justify-end items-center">
             <ChevronLeftIcon
-              className="opacity-100 text-primaryYellow h-8 cursor-pointer hover:opacity-50"
+              className="opacity-100 text-primaryGreen h-8 cursor-pointer hover:opacity-50"
               onClick={() => handleStep(step - 1)}
             />
             <ChevronRightIcon
-              className="opacity-100 text-primaryYellow h-8 cursor-pointer hover:opacity-50"
+              className="opacity-100 text-primaryGreen h-8 cursor-pointer hover:opacity-50"
               onClick={() => handleStep(step + 1)}
             />
           </div>

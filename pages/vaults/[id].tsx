@@ -140,7 +140,7 @@ export default function Index() {
                         </p>
                         <div className='w-6 h-6 group/vaultAddress'>
                           <CopyToClipboard text={vaultData.address} onCopy={() => showSuccessToast("Vault address copied!")}>
-                            <Square2StackIcon className="text-white group-hover/vaultAddress:text-primaryYellow" />
+                            <Square2StackIcon className="text-white group-hover/vaultAddress:text-primaryGreen" />
                           </CopyToClipboard>
                         </div>
                       </div>
@@ -154,7 +154,7 @@ export default function Index() {
                         </p>
                         <div className='w-6 h-6 group/vaultAddress'>
                           <CopyToClipboard text={vaultData.asset} onCopy={() => showSuccessToast("Asset address copied!")}>
-                            <Square2StackIcon className="text-white group-hover/vaultAddress:text-primaryYellow" />
+                            <Square2StackIcon className="text-white group-hover/vaultAddress:text-primaryGreen" />
                           </CopyToClipboard>
                         </div>
                       </div>
@@ -169,7 +169,7 @@ export default function Index() {
                           </p>
                           <div className='w-6 h-6 group/safeAddress'>
                             <CopyToClipboard text={vaultData.safes[0]} onCopy={() => showSuccessToast("Safe address copied!")}>
-                              <Square2StackIcon className="text-white group-hover/safeAddress:text-primaryYellow" />
+                              <Square2StackIcon className="text-white group-hover/safeAddress:text-primaryGreen" />
                             </CopyToClipboard>
                           </div>
                         </div>
@@ -185,7 +185,7 @@ export default function Index() {
                           </p>
                           <div className='w-6 h-6 group/gaugeAddress'>
                             <CopyToClipboard text={vaultData.gauge} onCopy={() => showSuccessToast("Gauge address copied!")}>
-                              <Square2StackIcon className="text-white group-hover/gaugeAddress:text-primaryYellow" />
+                              <Square2StackIcon className="text-white group-hover/gaugeAddress:text-primaryGreen" />
                             </CopyToClipboard>
                           </div>
                         </div>

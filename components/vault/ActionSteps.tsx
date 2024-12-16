@@ -1,7 +1,7 @@
 import { ActionStep } from "@/lib/getActionSteps";
 
 function getStepColor(preFix: string, step: any): string {
-  if (step.loading || step.success) return `${preFix}-primaryYellow`;
+  if (step.loading || step.success) return `${preFix}-primaryGreen`;
   if (step.error) return `${preFix}-red-500`;
   return `${preFix}-customGray500`;
 }
@@ -21,15 +21,15 @@ export default function ActionSteps({
         {steps.map((step) => (
           <li key={`${step.label}-${step.step}`}>
             {step.success ? (
-              <a className="block h-5 w-5 rounded-full bg-primaryYellow hover:bg-primaryYellow">
+              <a className="block h-5 w-5 rounded-full bg-primaryGreen hover:bg-primaryGreen">
                 <span className="sr-only">{step.label}</span>
               </a>
             ) : step.loading ? (
               <a aria-current="step" className="relative flex items-center justify-center">
                 <span aria-hidden="true" className="absolute flex h-10 w-10 p-px">
-                  <span className="h-full w-full rounded-full bg-primaryYellow opacity-50" />
+                  <span className="h-full w-full rounded-full bg-primaryGreen opacity-50" />
                 </span>
-                <span aria-hidden="true" className="relative block h-5 w-5 rounded-full bg-primaryYellow" />
+                <span aria-hidden="true" className="relative block h-5 w-5 rounded-full bg-primaryGreen" />
                 <span className="sr-only">{step.label}</span>
               </a>
             ) : (

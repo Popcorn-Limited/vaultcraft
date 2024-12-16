@@ -94,7 +94,7 @@ const Footer = () => {
                   key={link.label}
                   href={link.href}
                   passHref
-                  className=" text-customGray100 hover:text-primaryYellow leading-6 mt-4"
+                  className=" text-customGray100 hover:text-primaryGreen leading-6 mt-4"
                 >
                   {link.label}
                 </Link>
@@ -111,7 +111,7 @@ const Footer = () => {
                   href={link.href}
                   passHref
                   target="_blank"
-                  className=" text-customGray100 hover:text-primaryYellow leading-6 mt-4"
+                  className=" text-customGray100 hover:text-primaryGreen leading-6 mt-4"
                 >
                   {link.label}
                 </Link>
@@ -130,7 +130,7 @@ const Footer = () => {
                   href={link.href}
                   passHref
                   target="_blank"
-                  className="text-customGray100 hover:text-primaryYellow leading-6 mt-4"
+                  className="text-customGray100 hover:text-primaryGreen leading-6 mt-4"
                 >
                   {link.label}
                 </Link>
@@ -149,7 +149,7 @@ const Footer = () => {
                   href={link.href}
                   passHref
                   target="_blank"
-                  className="text-customGray100 hover:text-primaryYellow leading-6 mt-4"
+                  className="text-customGray100 hover:text-primaryGreen leading-6 mt-4"
                 >
                   {link.label}
                 </Link>
