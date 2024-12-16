@@ -131,7 +131,7 @@ module.exports = {
         "10xl": "8rem",
       },
       fontFamily: {
-        khTeka: ["'KH Teka'", "sans-serif"],
+        "kh-teka": ["var(--font-kh-teka)"],
       },
       letterSpacing: {
         1: "1px",

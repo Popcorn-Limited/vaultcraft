@@ -20,6 +20,12 @@ import { mainnet, polygon } from "viem/chains";
 import { ST_VCX, VCX_LP, VE_VCX } from "@/lib/constants/addresses";
 import { formatBalanceUSD } from "@/lib/utils/helpers";
 import ProgressBar from "@/components/common/ProgressBar";
+import localFont from "next/font/local";
+
+const khTeka = localFont({
+  src: '../../public/KH_Teka/KHTeka-Regular.woff',
+  variable: '--font-kh-teka'
+})
 
 interface TermsModalProps {
   showModal: boolean;
@@ -352,8 +358,8 @@ export default function Page({
   }, [termsSigned]);
 
   return (
-    <>
-      <div className="bg-customNeutral300 w-full min-h-screen h-full mx-auto font-khTeka flex flex-col">
+    <div className={`${khTeka.variable} font-sans`}>
+      <div className="bg-customNeutral300 w-full min-h-screen h-full mx-auto flex flex-col font-khTeka">
         <Navbar />
         <div className="flex-1 container p-0">
           {progress < 100 &&
@@ -371,6 +377,6 @@ export default function Page({
         <div className="py-10"></div>
         <Footer />
       </div >
-    </>
+    </div>
   );
 }
