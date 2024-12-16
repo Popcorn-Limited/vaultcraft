@@ -245,9 +245,8 @@ export default function Page({
       try {
         stakingTVL = await axios.get(`https://pro-api.llama.fi/${process.env.DEFILLAMA_API_KEY}/api/protocol/vaultcraft`).then(res => res.data.currentChainTvls["staking"])
       } catch (e) {
-        stakingTVL = 762000;
+        stakingTVL = 2590000;
       }
-      stakingTVL += Number(formatBalanceUSD(newTokens[1][ST_VCX].totalSupply, newTokens[1][ST_VCX].decimals, newTokens[1][ST_VCX].price))
 
       console.log(`Completed fetching TVL (${new Date()})`)
       console.log(`Took ${Number(new Date()) - start}ms to load`)
