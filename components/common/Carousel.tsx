@@ -9,7 +9,7 @@ const banners = [
     title: 'VaultCraft V2 is here, Institutional DeFi',
     description: '',
     buttonText: 'Check it out',
-    buttonLink: 'vaults',
+    buttonLink: 'https://docs.vaultcraft.io/products/v2-safe-smart-vaults',
     imageSrc: 'images/background.png',
     tokenSrc: 'images/banner/bannerRebrand.png'
   },
