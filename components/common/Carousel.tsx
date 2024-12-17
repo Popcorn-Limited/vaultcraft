@@ -5,6 +5,15 @@ import MainActionButton from '@/components/button/MainActionButton'
 
 const banners = [
   {
+    id: 'bannerRebrand',
+    title: 'VaultCraft V2 is here, Institutional DeFi',
+    description: '',
+    buttonText: 'Check it out',
+    buttonLink: 'https://docs.vaultcraft.io/products/v2-safe-smart-vaults',
+    imageSrc: 'images/background.png',
+    tokenSrc: 'images/banner/bannerRebrand.png'
+  },
+  {
     id: 'bannerStake',
     title: 'Stake VCX',
     description: 'Up to 25% APY and 4x voting power',
@@ -23,21 +32,12 @@ const banners = [
     tokenSrc: 'images/banner/bannerToken2.svg'
   },
   {
-    id: 'bannerARB',
-    title: "It's raining ARB rewards",
-    description: 'Watch out for “additional rewards” in ARB and OP',
-    buttonText: 'Check it out',
-    buttonLink: 'vaults',
-    imageSrc: 'images/banner/banner3.png',
-    tokenSrc: 'images/banner/bannerToken3.svg'
-  },
-  {
     id: 'bannerVault',
     title: 'The VCX Smart Vault',
     description: 'Auto-compound AURA & BAL into VCX for 50%+ APY',
     buttonText: 'Deposit here',
     buttonLink: 'vaults/0x99a53fAB6fBD1eacb59AE998dA2DbF130BE94C38?chainId=1',
-    imageSrc: 'images/banner/banner2.png',
+    imageSrc: 'images/banner/banner3.png',
     tokenSrc: 'images/banner/bannerToken1.svg'
   },
 ]
@@ -67,23 +67,41 @@ export default function Carousel() {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="w-full h-48 relative rounded-xl border border-customNeutral100">
-              <img src={banner.imageSrc} alt={banner.title} className="w-full h-full object-cover object-bottom-left opacity-70 rounded-xl" />
-              <div className="absolute inset-0">
-                <div className='flex flex-row items-center justify-between'>
-                  <div className="flex flex-col px-8 text-white">
-                    <h2 className="text-white text-2xl font-bold mb-2">{banner.title}</h2>
-                    <p className="text-white mb-4">{banner.description}</p>
-                    <Link href={banner.buttonLink} passHref>
-                      <div className="w-40">
-                        <MainActionButton label={banner.buttonText} />
-                      </div>
-                    </Link>
+            {index === 0 ?
+              <div className="w-full h-48 relative rounded-xl border border-customNeutral100">
+                <img src={banner.imageSrc} alt={banner.title} className="w-full h-full object-cover object-bottom-left opacity-70 rounded-xl" />
+                <div className="absolute inset-0">
+                  <div className='flex flex-row items-center justify-between'>
+                    <div className="flex flex-col px-8 text-white">
+                      <h2 className="text-white text-3xl mb-2 w-2/3 leading-tight mt-4">{banner.title}</h2>
+                      <Link href={banner.buttonLink} passHref>
+                        <div className="w-40">
+                          <MainActionButton label={banner.buttonText} />
+                        </div>
+                      </Link>
+                    </div>
+                    <img src={banner.tokenSrc} alt={banner.title} className="hidden md:block w-72 h-full object-cover mt-8 mr-8" />
                   </div>
-                  <img src={banner.tokenSrc} alt={banner.title} className="hidden md:block w-72 h-full object-cover" />
                 </div>
               </div>
-            </div>
+              : <div className="w-full h-48 relative rounded-xl border border-customNeutral100">
+                <img src={banner.imageSrc} alt={banner.title} className="w-full h-full object-cover object-bottom-left opacity-70 rounded-xl" />
+                <div className="absolute inset-0">
+                  <div className='flex flex-row items-center justify-between'>
+                    <div className="flex flex-col px-8 text-white">
+                      <h2 className="text-white text-2xl font-bold mb-2">{banner.title}</h2>
+                      <p className="text-white mb-4">{banner.description}</p>
+                      <Link href={banner.buttonLink} passHref>
+                        <div className="w-40">
+                          <MainActionButton label={banner.buttonText} />
+                        </div>
+                      </Link>
+                    </div>
+                    <img src={banner.tokenSrc} alt={banner.title} className="hidden md:block w-72 h-full object-cover" />
+                  </div>
+                </div>
+              </div>
+            }
           </Transition>
         ))}
       </div>

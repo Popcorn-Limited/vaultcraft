@@ -20,7 +20,7 @@ export default function MainActionButton({
   return (
     <button
       className={`w-full px-2 py-2.5 rounded bg-white border border-customNeutral100 font-semibold text-base text-black
-                  transition-all ease-in-out duration-500 hover:bg-primaryYellow hover:border-primaryYellow 
+                  transition-all ease-in-out duration-500 hover:bg-primaryGreen hover:border-primaryGreen 
                   disabled:bg-customGray100 disabled:border-customGray100 disabled:text-white disabled:cursor-not-allowed 
                   disabled:hover:border-customGray100 disabled:hover:bg-customGray100 disabled:hover:text-white
                   ${hidden ? "hidden" : ""} ${className}`}

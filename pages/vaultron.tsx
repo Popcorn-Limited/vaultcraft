@@ -77,7 +77,7 @@ export default function Vaultron() {
           <p className="mt-10">
             Go to {" "}
             <a
-              className="text-primaryYellow cursor-pointer"
+              className="text-primaryGreen cursor-pointer"
               href="https://app.mercle.xyz/vaultcraft/events"
               target="_blank">https://app.mercle.xyz/vaultcraft/events
             </a>

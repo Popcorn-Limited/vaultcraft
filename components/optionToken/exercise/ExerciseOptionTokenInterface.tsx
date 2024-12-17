@@ -299,7 +299,7 @@ export default function ExerciseOptionTokenInterface({ chainId, setShowModal }: 
                     chainId={1}
                   />
                 </div>
-                <p className="font-medium text-lg leading-none hidden md:block text-white group-hover:text-primaryYellow">
+                <p className="font-medium text-lg leading-none hidden md:block text-white group-hover:text-primaryGreen">
                   VCX
                 </p>
               </span>

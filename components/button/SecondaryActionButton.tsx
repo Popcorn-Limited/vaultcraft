@@ -10,7 +10,7 @@ export default function SecondaryActionButton({
 }: ButtonProps): JSX.Element {
   return (
     <button
-      className={`w-full px-2 py-2.5 rounded bg-black border border-customNeutral100 font-semibold text-base text-primaryYellow
+      className={`w-full px-2 py-2.5 rounded bg-black border border-customNeutral100 font-semibold text-base text-primaryGreen
                   transition-all ease-in-out duration-500 hover:bg-white hover:border-white hover:text-black
                   disabled:bg-customGray100 disabled:border-customGray100 disabled:text-white disabled:cursor-not-allowed 
                   disabled:hover:border-customGray100 disabled:hover:bg-customGray100 disabled:hover:text-white

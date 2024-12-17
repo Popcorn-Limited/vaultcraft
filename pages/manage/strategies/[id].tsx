@@ -221,7 +221,7 @@ export default function Index() {
                       text={strategy.address}
                       onCopy={() => showSuccessToast("Vault address copied!")}
                     >
-                      <Square2StackIcon className="text-white group-hover/strategyAddress:text-primaryYellow" />
+                      <Square2StackIcon className="text-white group-hover/strategyAddress:text-primaryGreen" />
                     </CopyToClipboard>
                   </div>
                 </div>
@@ -238,7 +238,7 @@ export default function Index() {
                       text={asset.address}
                       onCopy={() => showSuccessToast("Asset address copied!")}
                     >
-                      <Square2StackIcon className="text-white group-hover/assetAddress:text-primaryYellow" />
+                      <Square2StackIcon className="text-white group-hover/assetAddress:text-primaryGreen" />
                     </CopyToClipboard>
                   </div>
                 </div>
@@ -255,7 +255,7 @@ export default function Index() {
                         text={strategy.yieldToken}
                         onCopy={() => showSuccessToast("YieldToken address copied!")}
                       >
-                        <Square2StackIcon className="text-white group-hover/yieldTokenAddress:text-primaryYellow" />
+                        <Square2StackIcon className="text-white group-hover/yieldTokenAddress:text-primaryGreen" />
                       </CopyToClipboard>
                     </div>
                   </div>

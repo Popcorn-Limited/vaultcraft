@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils/helpers";
 const vaultLabelColor: { [key: string]: string } = {
   Experimental: "text-white bg-orange-500 bg-opacity-90",
   Deprecated: "text-white bg-red-500 bg-opacity-80",
-  New: "text-primaryYellow bg-primaryYellow bg-opacity-30",
+  New: "text-primaryGreen bg-primaryGreen bg-opacity-30",
   Leverage: "text-secondaryBlue bg-secondaryBlue bg-opacity-30 text-white",
   Points: "text-secondaryBlue bg-secondaryBlue bg-opacity-30 text-white"
 };

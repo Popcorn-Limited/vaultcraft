@@ -442,7 +442,7 @@ export default function Staking() {
                   <p className="text-white text-2xl font-bold">Information</p>
                   <p className="text-white">
                     Lock stake your VCX up to 12 months for 4X voting power on {" "}
-                    <a className="text-secondaryBlue hover:text-primaryYellow focus:none outline-none"
+                    <a className="text-secondaryBlue hover:text-primaryGreen focus:none outline-none"
                       href="https://docs.vaultcraft.io/welcome-to-vaultcraft/introduction"
                       target="_blank"
                     >https://snapshot.org/#/vaultcraft-snapshot.eth
@@ -473,7 +473,7 @@ export default function Staking() {
                         </p>
                         <div className='w-6 h-6 group/vaultAddress'>
                           <CopyToClipboard text={vault.address} onCopy={() => showSuccessToast("Staking address copied!")}>
-                            <Square2StackIcon className="text-white group-hover/vaultAddress:text-primaryYellow" />
+                            <Square2StackIcon className="text-white group-hover/vaultAddress:text-primaryGreen" />
                           </CopyToClipboard>
                         </div>
                       </div>
@@ -487,7 +487,7 @@ export default function Staking() {
                         </p>
                         <div className='w-6 h-6 group/vaultAddress'>
                           <CopyToClipboard text={asset.address} onCopy={() => showSuccessToast("Asset address copied!")}>
-                            <Square2StackIcon className="text-white group-hover/vaultAddress:text-primaryYellow" />
+                            <Square2StackIcon className="text-white group-hover/vaultAddress:text-primaryGreen" />
                           </CopyToClipboard>
                         </div>
                       </div>

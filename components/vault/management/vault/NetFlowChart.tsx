@@ -130,7 +130,7 @@ export default function NetFlowChart({ logs, asset }: { logs: any[], asset?: Tok
                       {log.transactionHash.slice(0, 4)}...{log.transactionHash.slice(-4)}
                       <div className='w-6 h-6 cursor-pointer group/txHash'>
                         <CopyToClipboard text={log.transactionHash} onCopy={() => showSuccessToast("Tx Hash copied!")}>
-                          <Square2StackIcon className="text-white group-hover/txHash:text-primaryYellow" />
+                          <Square2StackIcon className="text-white group-hover/txHash:text-primaryGreen" />
                         </CopyToClipboard>
                       </div>
                     </div>

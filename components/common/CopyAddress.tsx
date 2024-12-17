@@ -10,12 +10,12 @@ export default function CopyAddress({ address, label }: { address: Address, labe
       onCopy={() => showSuccessToast(`${label} address copied!`)}
     >
       <div className="flex flex-row items-center justify-between group/address cursor-pointer">
-        <p className="font-bold group-hover/address:text-primaryYellow">
+        <p className="font-bold group-hover/address:text-primaryGreen">
           {address.slice(0, 6)}...
           {address.slice(-4)}
         </p>
         <div className={`w-6 h-6`}>
-          <Square2StackIcon className={`group-hover/address:text-primaryYellow`} />
+          <Square2StackIcon className={`group-hover/address:text-primaryGreen`} />
         </div>
       </div>
     </CopyToClipboard>

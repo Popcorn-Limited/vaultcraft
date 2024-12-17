@@ -73,7 +73,7 @@ export default function SearchToken({
             {quickOption.map((option) => (
               <div className="w-fit" key={option?.address}>
                 <button
-                  className="w-full flex items-center rounded-xl border border-customNeutral100 hover:bg-customNeutral100 transition ease-in-out duration-250 font-medium text-white py-2 px-3 md:py-2.5 md:px-4 text-base md:text-lg active:bg-primaryYellow active:bg-opacity-50 active:border-primaryYellow active:text-primaryYellow"
+                  className="w-full flex items-center rounded-xl border border-customNeutral100 hover:bg-customNeutral100 transition ease-in-out duration-250 font-medium text-white py-2 px-3 md:py-2.5 md:px-4 text-base md:text-lg active:bg-primaryGreen active:bg-opacity-50 active:border-primaryGreen active:text-primaryGreen"
                   onClick={() => {
                     selectToken(option);
                   }}
@@ -103,7 +103,7 @@ export default function SearchToken({
             >
               <span
                 className={`flex items-center py-3 px-3 ${selectedToken?.address === option.address
-                  ? "text-primaryYellow font-semibold"
+                  ? "text-primaryGreen font-semibold"
                   : "text-white font-normal  cursor-pointer"
                   }`}
               >

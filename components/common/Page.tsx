@@ -20,6 +20,12 @@ import { mainnet, polygon } from "viem/chains";
 import { ST_VCX, VCX_LP, VE_VCX } from "@/lib/constants/addresses";
 import { formatBalanceUSD } from "@/lib/utils/helpers";
 import ProgressBar from "@/components/common/ProgressBar";
+import localFont from "next/font/local";
+
+const khTeka = localFont({
+  src: '../../public/KH_Teka/KHTeka-Regular.woff',
+  variable: '--font-kh-teka'
+})
 
 interface TermsModalProps {
   showModal: boolean;
@@ -69,7 +75,7 @@ function TermsModal({
             You can participate in the governance process by staking tokens in
             accordance with the rules and parameters summarized
             <a
-              className="text-secondaryBlue hover:text-primaryYellow focus:none outline-none"
+              className="text-secondaryBlue hover:text-primaryGreen focus:none outline-none"
               href="https://docs.vaultcraft.io/welcome-to-vaultcraft/introduction"
               target="_blank"
             >
@@ -124,7 +130,7 @@ function TermsModal({
         <p className="py-6 border-t-2 border-customNeutral100">
           By accepting you agree that you have read and accept the{" "}
           <a
-            className="text-secondaryBlue hover:text-primaryYellow focus:none outline-none"
+            className="text-secondaryBlue hover:text-primaryGreen focus:none outline-none"
             href="https://app.vaultcraft.io/disclaimer"
             target="_blank"
           >
@@ -239,9 +245,8 @@ export default function Page({
       try {
         stakingTVL = await axios.get(`https://pro-api.llama.fi/${process.env.DEFILLAMA_API_KEY}/api/protocol/vaultcraft`).then(res => res.data.currentChainTvls["staking"])
       } catch (e) {
-        stakingTVL = 762000;
+        stakingTVL = 2590000;
       }
-      stakingTVL += Number(formatBalanceUSD(newTokens[1][ST_VCX].totalSupply, newTokens[1][ST_VCX].decimals, newTokens[1][ST_VCX].price))
 
       console.log(`Completed fetching TVL (${new Date()})`)
       console.log(`Took ${Number(new Date()) - start}ms to load`)
@@ -352,8 +357,8 @@ export default function Page({
   }, [termsSigned]);
 
   return (
-    <>
-      <div className="bg-customNeutral300 w-full min-h-screen h-full mx-auto font-khTeka flex flex-col">
+    <div className={`${khTeka.variable} font-sans`}>
+      <div className="bg-customNeutral300 w-full min-h-screen h-full mx-auto flex flex-col font-khTeka">
         <Navbar />
         <div className="flex-1 container p-0">
           {progress < 100 &&
@@ -371,6 +376,6 @@ export default function Page({
         <div className="py-10"></div>
         <Footer />
       </div >
-    </>
+    </div>
   );
 }

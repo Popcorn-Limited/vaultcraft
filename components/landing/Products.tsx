@@ -3,10 +3,7 @@ import Product from "@/components/landing/Product";
 import PopSmileyIcon from "@/components/svg/popcorn/PopSmileyIcon";
 import SmileyIcon from "@/components/svg/popcorn/SmileyIcon";
 import PopIcon from "@/components/svg/popcorn/PopIcon";
-import { useAtom } from "jotai";
 import Link from "next/link";
-import { tvlAtom } from "@/lib/atoms";
-import Modal from "@/components/modal/Modal";
 import {
   ChevronLeftIcon,
   ChevronRightIcon
@@ -25,39 +22,11 @@ export default function Products(): JSX.Element {
   const { query } = router;
   const { address: account } = useAccount();
 
-  const [showModal, setShowModal] = useState<boolean>(false);
-
   return (
     <>
-      <Modal
-        visibility={[showModal, setShowModal]}
-        title="How to use VaultCraft"
-      >
-        <Tutorial />
-      </Modal>
       <section className="py-12 md:py-10 mx-4 md:mx-0 h-max">
         <p className="text-2xl mb-6 text-white smmd:hidden"> Our products </p>
         <div className="flex flex-col gap-1 smmd:flex-wrap lg:flex-nowrap space-y-4 md:space-y-0 md:space-x-4 md:flex-row md:justify-between">
-          <Product
-            title={
-              <div className="flex flex-row w-full justify-between items-end">
-                <h2 className="text-white text-4xl md:text-6xl leading-none">
-                  Instruction <br className="hidden md:inline" />
-                  Manual
-                </h2>
-              </div>
-            }
-            customContent={
-              <PopIcon
-                size={"60"}
-                color={"white"}
-                className="group-hover:fill-secondaryYellow"
-              />
-            }
-            description="Learn how to use VaultCraft and optimize your yield with our perpetual call options 🚀"
-            route=""
-            handleClick={() => setShowModal(true)}
-          />
           <Product
             title={
               <div className="flex flex-row w-full justify-between items-end">
@@ -143,7 +112,7 @@ export default function Products(): JSX.Element {
               <div className="flex flex-row w-full justify-between items-end">
                 <h2 className="text-white text-4xl md:text-6xl leading-none">
                   Boost <br className="hidden md:inline" />
-                  Vaults
+                  Smart Vaults
                 </h2>
                 <div className="mb-3 z-10">
                   <InfoIconWithTooltip
@@ -230,6 +199,25 @@ export default function Products(): JSX.Element {
             stats={[]}
             route="boost"
           />
+          <Product
+            title={
+              <div className="flex flex-row w-full justify-between items-end">
+                <h2 className="text-white text-4xl md:text-6xl leading-none">
+                  Stake <br className="hidden md:inline" />
+                  VCX
+                </h2>
+              </div>
+            }
+            customContent={
+              <PopIcon
+                size={"60"}
+                color={"white"}
+                className="group-hover:fill-secondaryYellow"
+              />
+            }
+            description="Stake VCX to earn up to 25% APY and 4x voting power"
+            route="staking"
+          />
           <div className="w-full lg:max-w-full min-h-[40rem] relative flex flex-col space-y-4">
             <Link
               href={
@@ -295,115 +283,5 @@ export default function Products(): JSX.Element {
         </div>
       </section>
     </>
-  );
-}
-
-const TutorialImageByStep: { [key: number]: string } = {
-  1: "/images/tutorial/desktop/1.png",
-  2: "/images/tutorial/desktop/2.png",
-  3: "/images/tutorial/desktop/3.png",
-};
-
-const TutorialTitleByStep: { [key: number]: string } = {
-  1: "Deposit into a Smart Vault",
-  2: "Get and Lock VCX-LP",
-  3: "Vote on Gauges",
-};
-
-function Tutorial(): JSX.Element {
-  const [step, setStep] = useState<number>(1);
-
-  function handleStep(newStep: number) {
-    if (newStep === 0) newStep = 3;
-    if (newStep === 4) newStep = 1;
-    setStep(newStep);
-  }
-
-  return (
-    <div className="flex flex-row justify-between">
-      <div className="text-start space-y-8 w-full lg:w-1/3 xl:w-1/2 lg:pr-8">
-        <div className="">
-          <h2 className="text-lg font-bold text-primaryYellow border-b border-customGray500 pb-2">
-            Step 1
-          </h2>
-          <div className="flex flex-row justify-between">
-            <ul className="list-inside list-disc mt-2 ml-4">
-              <li>Deposit into Smart Vaults 🪙</li>
-              <li>Borrow and deposit more ♻️</li>
-              <li>Earn 10%+ base APY 🙂</li>
-              <li>Earn 25%+ APY with perpetual call options (oVCX) 😏</li>
-              <li>
-                Mint Vaultron NFT to earn XP Points for future airdrops 🪂
-              </li>
-            </ul>
-          </div>
-          <img
-            src={TutorialImageByStep[1]}
-            className="rounded-md mt-4 md:w-2/3 lg:hidden"
-          />
-        </div>
-        <div>
-          <h2 className="text-lg font-bold text-primaryYellow border-b border-customGray500 pb-2">
-            Step 2
-          </h2>
-          <div className="flex flex-row justify-between">
-            <ul className="list-inside list-disc mt-2 ml-4">
-              <li>Provide liquidity in the 80 VCX 20 WETH Balancer Pool 🤓</li>
-              <li>
-                Lock the VCX LP token on app.vaultcraft.io for voting power 🗳️
-              </li>
-              <li>Earn multiples on you oVCX 🚀</li>
-            </ul>
-          </div>
-          <img
-            src={TutorialImageByStep[2]}
-            className="rounded-md mt-4 md:w-2/3 lg:hidden"
-          />
-        </div>
-        <div>
-          <h2 className="text-lg font-bold text-primaryYellow border-b border-customGray500 pb-2">
-            Step 3
-          </h2>
-          <div className="flex flex-row justify-between">
-            <ul className="list-inside list-disc mt-2 ml-4">
-              <li>Claim your oVCX rewards 🫴 </li>
-              <li>
-                Exercise for VCX, and then you can either
-                <ul className="list-inside list-disc ml-6">
-                  <li>HODL 💎</li>
-                  <li>
-                    Provide more liquidity to earn higher multiples on oVCX 😝
-                  </li>
-                  <li>Arbitrage instantly for 25% ROI on Balancer 🤪</li>
-                </ul>
-              </li>
-            </ul>
-          </div>
-          <img
-            src={TutorialImageByStep[3]}
-            className="rounded-md mt-4 md:w-2/3 lg:hidden"
-          />
-        </div>
-      </div>
-      <div className="hidden lg:block lg:w-2/3 h-fit rounded-md border border-customGray500 bg-customNeutral300 px-4 pb-16 pt-4">
-        <div className="flex flex-row justify-between mb-2">
-          <div className="flex flex-row items-end">
-            <p className="mb-1 mr-2">{step}/3</p>
-            <h2 className="text-3xl">{TutorialTitleByStep[step]}</h2>
-          </div>
-          <div className="w-1/5 flex flex-row justify-end items-center">
-            <ChevronLeftIcon
-              className="opacity-100 text-primaryYellow h-8 cursor-pointer hover:opacity-50"
-              onClick={() => handleStep(step - 1)}
-            />
-            <ChevronRightIcon
-              className="opacity-100 text-primaryYellow h-8 cursor-pointer hover:opacity-50"
-              onClick={() => handleStep(step + 1)}
-            />
-          </div>
-        </div>
-        <img src={TutorialImageByStep[step]} className="rounded-md" />
-      </div>
-    </div>
   );
 }

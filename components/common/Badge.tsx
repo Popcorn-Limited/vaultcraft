@@ -7,7 +7,7 @@ function Badge({
   variant = "primaryGreen",
 }: PropsWithChildren<{
   className?: string;
-  variant?: "primaryGreen" | "primaryYellow";
+  variant?: "primaryGreen" | "primaryGreen";
 }>) {
   return (
     <div
@@ -15,8 +15,8 @@ function Badge({
         "px-3 py-0.5 rounded-xl inline-block",
         variant === "primaryGreen" &&
           "bg-customNeutral100/40 text-primaryGreen",
-        variant === "primaryYellow" &&
-          "bg-primaryYellow/[0.15] text-primaryYellow",
+        variant === "primaryGreen" &&
+          "bg-primaryGreen/[0.15] text-primaryGreen",
         className
       )}
     >

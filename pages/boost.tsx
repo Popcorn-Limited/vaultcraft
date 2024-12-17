@@ -188,7 +188,7 @@ function VePopContainer() {
           <div className="">
             <h1 className="text-2xl md:text-3xl font-normal">
               Lock your{" "}
-              <span className="text-primaryYellow font-bold md:font-normal md:underline md:decoration-solid">
+              <span className="text-primaryGreen font-bold md:font-normal md:underline md:decoration-solid">
                 VCX LP
               </span>{" "}
               for voting power, XP points, and oVCX multipliers

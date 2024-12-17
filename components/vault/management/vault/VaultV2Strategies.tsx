@@ -100,11 +100,11 @@ export default function VaultV2Strategies({
                       onCopy={() => showSuccessToast(`${strategy} address copied!`)}
                     >
                       <div className="flex flex-row items-center justify-between group/address cursor-pointer w-108">
-                        <p className="group-hover/address:text-primaryYellow">
+                        <p className="group-hover/address:text-primaryGreen">
                           {strategy}
                         </p>
                         <div className={`w-6 h-6`}>
-                          <Square2StackIcon className={`group-hover/address:text-primaryYellow`} />
+                          <Square2StackIcon className={`group-hover/address:text-primaryGreen`} />
                         </div>
                       </div>
                     </CopyToClipboard>
@@ -121,11 +121,11 @@ export default function VaultV2Strategies({
                     onCopy={() => showSuccessToast(`${settings.proposedStrategies[settings.proposedDepositIndex]} address copied!`)}
                   >
                     <div className="flex flex-row items-center justify-between group/address cursor-pointer w-108">
-                      <p className="group-hover/address:text-primaryYellow">
+                      <p className="group-hover/address:text-primaryGreen">
                         {settings.proposedStrategies[settings.proposedDepositIndex]}
                       </p>
                       <div className={`w-6 h-6`}>
-                        <Square2StackIcon className={`group-hover/address:text-primaryYellow`} />
+                        <Square2StackIcon className={`group-hover/address:text-primaryGreen`} />
                       </div>
                     </div>
                   </CopyToClipboard>
@@ -177,11 +177,11 @@ export default function VaultV2Strategies({
               <div key={strategy + "-new"} className="w-max px-4 py-2 flex flex-row items-center">
                 <div className="mr-4">
                   <ArrowUpIcon
-                    className="text-white h-5 w-5 cursor-pointer hover:text-primaryYellow"
+                    className="text-white h-5 w-5 cursor-pointer hover:text-primaryGreen"
                     onClick={() => adjustQueuePosition(i, i - 1)}
                   />
                   <ArrowDownIcon
-                    className="text-white h-5 w-5 cursor-pointer hover:text-primaryYellow"
+                    className="text-white h-5 w-5 cursor-pointer hover:text-primaryGreen"
                     onClick={() => adjustQueuePosition(i, i + 1)}
                   />
                 </div>
