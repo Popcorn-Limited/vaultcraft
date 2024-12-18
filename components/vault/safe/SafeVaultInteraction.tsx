@@ -2,14 +2,12 @@ import { Balance, RequestBalance, VaultActionType, Token, VaultAction, VaultData
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { VaultInputsProps } from "@/components/vault/VaultInputs";
-import { showLoadingToast } from "@/lib/toasts";
 import { ArrowDownIcon } from "@heroicons/react/24/outline";
 import { tokensAtom } from "@/lib/atoms";
 import { OracleVaultAbi } from "@/lib/constants";
 import { http, createPublicClient, zeroAddress, Address, parseUnits, maxUint256, erc20Abi } from "viem";
 import SpinningLogo from "@/components/common/SpinningLogo";
-import { arbitrum } from "viem/chains";
-import { RPC_URLS } from "@/lib/utils/connectors";
+import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 import { calcBalance, EMPTY_BALANCE, formatBalance, formatBalanceUSD, handleCallResult, NumberFormatter, simulateCall } from "@/lib/utils/helpers";
 import MainButtonGroup from "@/components/common/MainButtonGroup";
@@ -19,7 +17,6 @@ import getVaultErrorMessage from "@/lib/vault/errorMessage";
 import TokenIcon from "@/components/common/TokenIcon";
 import SecondaryButtonGroup from "@/components/common/SecondaryButtonGroup";
 import SelectToken from "@/components/input/SelectToken";
-import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
 import VaultFeeBreakdown from "../VaultFees";
 import findZapProvider from "@/lib/zap/findZapProvider";
 import { selectActions } from "@/lib/vault/vaultHelpers";
@@ -29,8 +26,8 @@ import { vaultCancelRedeem, vaultRedeem } from "@/lib/vault/interactions";
 
 async function fetchData(user: Address, vaultData: VaultData) {
   const client = createPublicClient({
-    chain: arbitrum,
-    transport: http(RPC_URLS[42161])
+    chain: ChainById[vaultData.chainId],
+    transport: http(RPC_URLS[vaultData.chainId])
   })
 
   const vault = await client.multicall({
@@ -86,7 +83,6 @@ export default function SafeVaultInteraction({
 
   async function setUp() {
     const data = await fetchData(account ? account : zeroAddress, vaultData)
-
     setRequestBalance(data.requestBalance)
   }
 
