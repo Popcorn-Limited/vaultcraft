@@ -111,8 +111,7 @@ export default function Products(): JSX.Element {
             title={
               <div className="flex flex-row w-full justify-between items-end">
                 <h2 className="text-white text-4xl md:text-6xl leading-none">
-                  Boost <br className="hidden md:inline" />
-                  Smart Vaults
+                  Voting
                 </h2>
                 <div className="mb-3 z-10">
                   <InfoIconWithTooltip
