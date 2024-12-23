@@ -14,6 +14,15 @@ const banners = [
     tokenSrc: 'images/banner/bannerRebrand.png'
   },
   {
+    id: 'bannerLido',
+    title: 'Maximize Your Earnings with Lido Vaults',
+    description: 'Effortless Staking Across Arbitrum, Optimism, and Base.',
+    buttonText: 'Explore vaults',
+    buttonLink: 'vaults',
+    imageSrc: 'images/banner/banner4.png',
+    tokenSrc: 'images/banner/bannerToken4.svg'
+  },
+  {
     id: 'bannerStake',
     title: 'Stake VCX',
     description: 'Up to 25% APY and 4x voting power',
@@ -48,7 +57,7 @@ export default function Carousel() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % banners.length)
-    }, 10000) // 10 seconds
+    }, 60000) // 10 seconds
 
     return () => clearInterval(interval)
   }, [])
@@ -85,7 +94,7 @@ export default function Carousel() {
                 </div>
               </div>
               : <div className="w-full h-48 relative rounded-xl border border-customNeutral100">
-                <img src={banner.imageSrc} alt={banner.title} className="w-full h-full object-cover object-bottom-left opacity-70 rounded-xl" />
+                <img src={banner.imageSrc} alt={banner.title} className="w-full h-48 object-cover object-bottom-left opacity-70 rounded-xl" />
                 <div className="absolute inset-0">
                   <div className='flex flex-row items-center justify-between'>
                     <div className="flex flex-col px-8 text-white">
@@ -97,7 +106,7 @@ export default function Carousel() {
                         </div>
                       </Link>
                     </div>
-                    <img src={banner.tokenSrc} alt={banner.title} className="hidden md:block w-72 h-full object-cover" />
+                    <img src={banner.tokenSrc} alt={banner.title} className="hidden md:block w-72 h-48 object-fill" />
                   </div>
                 </div>
               </div>
