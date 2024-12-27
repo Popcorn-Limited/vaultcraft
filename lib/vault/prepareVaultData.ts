@@ -399,6 +399,8 @@ export async function addSafeStrategyData(vaults: VaultDataByAddress, chainId: n
     const vaultAddress = getAddress(address)
     const strategies = safeStrategies[address]
 
+    if (!vaults[vaultAddress]) return
+
     vaults[vaultAddress].strategies = strategies.map((strategy: any) => {
       const allocation = vaults[vaultAddress].totalAssets * BigInt(strategy.allocationPerc) / BigInt(100)
       return {

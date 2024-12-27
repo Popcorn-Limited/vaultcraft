@@ -113,7 +113,7 @@ export const GaugeFactoryByChain: AddressByChain = {
   [optimism.id]: "0x6aa03ebAb1e9CB8d44Fd79153d3a258FFd48169A", // Same as Minter
   [arbitrum.id]: "0x6aa03ebAb1e9CB8d44Fd79153d3a258FFd48169A", // Same as Minter
   [xLayer.id]: zeroAddress,
-  [base.id]: zeroAddress,
+  [base.id]: "0x6aa03ebAb1e9CB8d44Fd79153d3a258FFd48169A", // Same as Minter
   [fraxtal.id]: zeroAddress,
   [avalanche.id]: zeroAddress,
   [polygon.id]: zeroAddress,
@@ -125,7 +125,7 @@ export const MinterByChain: AddressByChain = {
   [optimism.id]: "0x6aa03ebAb1e9CB8d44Fd79153d3a258FFd48169A", // Same as GaugeFactory
   [arbitrum.id]: "0x6aa03ebAb1e9CB8d44Fd79153d3a258FFd48169A", // Same as GaugeFactory
   [xLayer.id]: zeroAddress,
-  [base.id]: zeroAddress,
+  [base.id]: "0x6aa03ebAb1e9CB8d44Fd79153d3a258FFd48169A", // Same as GaugeFactory
   [fraxtal.id]: zeroAddress,
   [avalanche.id]: zeroAddress,
   [polygon.id]: zeroAddress,
