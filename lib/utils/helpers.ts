@@ -196,3 +196,7 @@ export const EMPTY_BALANCE: Balance = {
   formatted: "0",
   formattedUSD: "0"
 }
+
+export function returnBigIntResult(response: any) {
+  return response.status === "success" ? response.result : BigInt(0)
+}

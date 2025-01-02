@@ -1,7 +1,7 @@
 import { Address, PublicClient, erc20Abi } from "viem"
 import { Token, TokenByAddress } from "@/lib/types"
 import { ALT_NATIVE_ADDRESS } from "@/lib/constants"
-import { calcBalance } from "@/lib/utils/helpers"
+import { calcBalance, returnBigIntResult } from "@/lib/utils/helpers"
 
 export async function addBalances(tokens: TokenByAddress, account: Address, client: PublicClient): Promise<TokenByAddress> {
   const balances = await client.multicall({
@@ -28,7 +28,7 @@ export async function addBalances(tokens: TokenByAddress, account: Address, clie
       if (token.address === ALT_NATIVE_ADDRESS) {
         token.balance = calcBalance(nativeBalance, token.decimals, token.price)
       } else {
-        token.balance = calcBalance(balances[i].result as bigint, token.decimals, token.price)
+        token.balance = calcBalance(returnBigIntResult(balances[i]), token.decimals, token.price)
       }
     })
 

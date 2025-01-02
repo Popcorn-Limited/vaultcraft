@@ -17,6 +17,7 @@ import { ERC20Abi, OracleVaultAbi, SECONDS_PER_YEAR, VaultOracleByChain, VeToken
 import getGaugesData from "@/lib/gauges/getGaugeData";
 import { EMPTY_LLAMA_APY_ENTRY, getApy } from "@/lib/resolver/apy";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
+import { returnBigIntResult } from "@/lib/utils/helpers";
 
 
 export async function getInitialVaultsData(chainId: number, client: PublicClient): Promise<VaultDataByAddress> {
@@ -162,28 +163,28 @@ export async function addDynamicVaultsData(vaults: VaultDataByAddress, client: P
           ]
       })
       .flat(),
-    allowFailure: false,
+    allowFailure: true,
   });
 
   Object.values(vaults).forEach((vault: any, i: number) => {
     if (i > 0) i = i * 4;
-    const totalAssets = dynamicValues[i] as bigint;
-    const totalSupply = dynamicValues[i + 1] as bigint;
+    const totalAssets = returnBigIntResult(dynamicValues[i]);
+    const totalSupply = returnBigIntResult(dynamicValues[i + 1]);
 
     vaults[vault.address].totalAssets = totalAssets;
     vaults[vault.address].totalSupply = totalSupply;
     vaults[vault.address].withdrawalLimit = totalSupply;
     vaults[vault.address].assetsPerShare = totalSupply > 0 ? Number(totalAssets) / Number(totalSupply) : 1;
-    vaults[vault.address].idle = dynamicValues[i + 3] as bigint;
+    vaults[vault.address].idle = returnBigIntResult(dynamicValues[i + 3]);
 
     if (vaults[vault.address].metadata.type === "safe-vault-v1") {
       // @ts-ignore
-      vaults[vault.address].depositLimit = dynamicValues[i + 2][0] as unknown as bigint;
+      vaults[vault.address].depositLimit = dynamicValues[i + 2].status === "success" ? dynamicValues[i + 2].result[0] as unknown as bigint : BigInt(0);
       // @ts-ignore
-      vaults[vault.address].minLimit = dynamicValues[i + 2][1] as unknown as bigint;
-      vaults[vault.address].liquid = dynamicValues[i + 3] as bigint;
+      vaults[vault.address].minLimit = dynamicValues[i + 2].status === "success" ? dynamicValues[i + 2].result[1] as unknown as bigint : BigInt(0);
+      vaults[vault.address].liquid = returnBigIntResult(dynamicValues[i + 3]);
     } else {
-      vaults[vault.address].depositLimit = dynamicValues[i + 2] as bigint;
+      vaults[vault.address].depositLimit = returnBigIntResult(dynamicValues[i + 2]);
     }
   })
 
@@ -345,7 +346,7 @@ export async function addStrategyData(vaults: VaultDataByAddress, strategies: { 
         // calc allocation in assets
         const allocation = strategyData.totalSupply === BigInt(0) ?
           BigInt(0) :
-          (strategyBalances[n].result as bigint ?? BigInt(0)) * strategyData.totalAssets / strategyData.totalSupply
+          (returnBigIntResult(strategyBalances[n])) * strategyData.totalAssets / strategyData.totalSupply
 
         // calc allocation percentage
         const allocationPerc = Number(allocation) / Number(vaults[address].totalAssets) || 0
