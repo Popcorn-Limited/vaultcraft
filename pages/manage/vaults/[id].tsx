@@ -194,7 +194,7 @@ export default function Index() {
             </div>
 
             <div className="grid md:grid-cols-2 mb-12">
-              <ApyChart strategy={vaultData.strategies[0]} />
+              {vaultData.metadata.type === "safe-vault-v1" ? <></> : <ApyChart strategy={vaultData.strategies[0]} />}
               <NetFlowChart logs={logs} asset={asset} />
             </div>
           </section>
@@ -209,11 +209,16 @@ export default function Index() {
               </section>
             )
           }
-
+          {
+            ["safe-vault-v1"].includes(vaultData.metadata.type) && <></>
+          }
           {
             ["multi-strategy-vault-v2", "multi-strategy-vault-v2.5"].includes(vaultData.metadata.type)
-              ? <VaultsV2Settings vaultData={vaultData} />
-              : <VaultsV1Settings vaultData={vaultData} />
+            && <VaultsV2Settings vaultData={vaultData} />
+          }
+          {
+            ["multi-strategy-vault-v1"].includes(vaultData.metadata.type)
+            && <VaultsV1Settings vaultData={vaultData} />
           }
 
         </div >
