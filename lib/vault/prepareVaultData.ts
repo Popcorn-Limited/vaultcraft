@@ -17,7 +17,7 @@ import { ERC20Abi, OracleVaultAbi, SECONDS_PER_YEAR, VaultOracleByChain, VeToken
 import getGaugesData from "@/lib/gauges/getGaugeData";
 import { EMPTY_LLAMA_APY_ENTRY, getApy } from "@/lib/resolver/apy";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
-import { returnBigIntResult } from "@/lib/utils/helpers";
+import { daysDifferenceUTC, returnBigIntResult } from "@/lib/utils/helpers";
 
 
 export async function getInitialVaultsData(chainId: number, client: PublicClient): Promise<VaultDataByAddress> {
@@ -191,7 +191,6 @@ export async function addDynamicVaultsData(vaults: VaultDataByAddress, client: P
   return vaults;
 }
 
-
 async function getSafeVaultApy(vault: VaultData): Promise<LlamaApy[]> {
   const client = createPublicClient({
     chain: ChainById[vault.chainId],
@@ -210,40 +209,30 @@ async function getSafeVaultApy(vault: VaultData): Promise<LlamaApy[]> {
 
   const filteredLogs = logs.filter((log) => log.args.base === vault.address && log.args.quote === vault.asset)
 
-  const entries: LlamaApy[] = []
-  let firstLog = logs[0]
   let firstTimestamp = Number((await client.getBlock({
-    blockNumber: logs[0].blockNumber
+    blockNumber: filteredLogs[0].blockNumber
   })).timestamp)
 
-  filteredLogs.slice(1).forEach(async (log: any, i: number) => {
-    const currentTimestamp = Number((await client.getBlock({
-      blockNumber: log.blockNumber
-    })).timestamp)
-    const date = new Date(currentTimestamp * 1000)
+  const daysPast = daysDifferenceUTC(new Date(firstTimestamp * 1000), new Date())
+  const entries: LlamaApy[] = Array.from({ length: daysPast }, (_, i) => ({
+    apy: (vaultAddressToBaseApy[vault.address] || 0) + (vaultAddressToRewardApy[vault.address] || 0),
+    apyBase: vaultAddressToBaseApy[vault.address] || 0,
+    apyReward: vaultAddressToRewardApy[vault.address] || 0,
+    tvl: vault.tvl,
+    date: new Date(firstTimestamp * 1000 - i * 86400 * 1000)
+  }))
 
-    // Only add a new entry if the date is different from the last entry
-    if (i === 0 || (entries.length > 0 && date.getDate() > entries[entries.length - 1].date.getDate())) {
-      const timeElapsed = currentTimestamp - firstTimestamp
-      const priceDifference = log.args!.bqPrice! < parseEther("1") ? BigInt(1) : log.args!.bqPrice! - firstLog.args!.bqPrice!
-      const annualizedReturn = Number((priceDifference / BigInt(timeElapsed)) * BigInt(SECONDS_PER_YEAR)) / 1e16
-      const apyReward = await getCustomRewardApy(vault)
-
-      entries.push({
-        apy: annualizedReturn + apyReward, //Number(formatEther(log.args!.bqPrice)),
-        apyBase: annualizedReturn, //Number(formatEther(log.args!.bqPrice)),
-        apyReward: apyReward,
-        tvl: vault.tvl,
-        date: new Date(currentTimestamp * 1000)
-      })
-    }
-  })
   return entries
 }
 
-async function getCustomRewardApy(vault: VaultData): Promise<number> {
-  if (vault.address === "0x27d47664e034f3F2414d647DE7Cd1c1e8E72a89c") return 1.24
-  return 0
+const vaultAddressToBaseApy: { [key: Address]: number } = {
+  "0xEF4a9Ee0CD2a897bC0aF93E5aCD0C0324568A065": 6.09,
+  "0x27d47664e034f3F2414d647DE7Cd1c1e8E72a89c": 10.16,
+}
+
+const vaultAddressToRewardApy: { [key: Address]: number } = {
+  "0xEF4a9Ee0CD2a897bC0aF93E5aCD0C0324568A065": 9.81,
+  "0x27d47664e034f3F2414d647DE7Cd1c1e8E72a89c": 2.04
 }
 
 export async function addApyHist(vaults: VaultDataByAddress): Promise<VaultDataByAddress> {
