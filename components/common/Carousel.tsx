@@ -18,7 +18,7 @@ const banners = [
     title: 'Maximize Your Earnings with Lido Vaults',
     description: 'Effortless Staking Across Arbitrum, Optimism, and Base.',
     buttonText: 'Explore vaults',
-    buttonLink: 'vaults',
+    buttonLink: 'https://www.okx.com/web3/defi/activity/42',
     imageSrc: 'images/banner/banner4.png',
     tokenSrc: 'images/banner/bannerToken4.svg'
   },
