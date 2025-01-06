@@ -131,12 +131,12 @@ function SafeVaultInputs({
   const gauge = vaultData.gauge && vaultData.gauge !== zeroAddress ? tokens[chainId][vaultData.gauge] : undefined
 
   const [inputToken, setInputToken] = useState<Token>(asset);
-  const [outputToken, setOutputToken] = useState<Token>(vault);
+  const [outputToken, setOutputToken] = useState<Token>(gauge || vault);
 
   const [inputBalance, setInputBalance] = useState<Balance>(EMPTY_BALANCE);
 
-  const [steps, setSteps] = useState<VaultAction[]>(selectActions(VaultActionType.Deposit));
-  const [action, setAction] = useState<VaultActionType>(VaultActionType.Deposit);
+  const [steps, setSteps] = useState<VaultAction[]>(gauge ? selectActions(VaultActionType.DepositAndStake) : selectActions(VaultActionType.Deposit));
+  const [action, setAction] = useState<VaultActionType>(gauge ? VaultActionType.DepositAndStake : VaultActionType.Deposit);
   const [isDeposit, setIsDeposit] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [showModal, setShowModal] = useState<boolean>(false)
@@ -144,15 +144,15 @@ function SafeVaultInputs({
 
   function switchTokens() {
     if (isDeposit) {
-      setInputToken(vault)
+      setInputToken(gauge || vault)
       setOutputToken(asset)
-      setAction(VaultActionType.RequestWithdrawal)
-      setSteps(selectActions(VaultActionType.RequestWithdrawal))
+      setAction(gauge ? VaultActionType.UnstakeAndRequestWithdrawal : VaultActionType.RequestWithdrawal)
+      setSteps(selectActions(gauge ? VaultActionType.UnstakeAndRequestWithdrawal : VaultActionType.RequestWithdrawal))
     } else {
       setInputToken(asset)
-      setOutputToken(vault)
-      setAction(VaultActionType.Deposit)
-      setSteps(selectActions(VaultActionType.Deposit))
+      setOutputToken(gauge || vault)
+      setAction(gauge ? VaultActionType.DepositAndStake : VaultActionType.Deposit)
+      setSteps(selectActions(gauge ? VaultActionType.DepositAndStake : VaultActionType.Deposit))
     }
     setIsDeposit(!isDeposit)
     setShowModal(false)
@@ -161,11 +161,11 @@ function SafeVaultInputs({
   function handleTokenSelect(option: Token, vault: Token) {
     setShowModal(false)
     setInputToken(option)
-    setOutputToken(vault)
+    setOutputToken(gauge || vault)
 
     if (option.address !== asset.address) {
-      setAction(VaultActionType.ZapDeposit)
-      setSteps(selectActions(VaultActionType.ZapDeposit))
+      setAction(gauge ? VaultActionType.ZapDepositAndStake : VaultActionType.ZapDeposit)
+      setSteps(selectActions(gauge ? VaultActionType.ZapDepositAndStake : VaultActionType.ZapDeposit))
     }
   }
 
