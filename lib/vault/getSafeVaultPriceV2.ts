@@ -1,9 +1,7 @@
-import { ChainById, networkMap, RPC_URLS } from "@/lib/utils/connectors";
-import { Address, erc20Abi, erc4626Abi, formatUnits, parseEther, parseUnits, PublicClient } from "viem";
+import { Address, createPublicClient, erc20Abi, formatUnits, http, parseEther, parseUnits } from "viem";
 import axios from "axios";
-import { http } from "viem";
-import { createPublicClient } from "viem";
-import { DEBANK_CHAIN_IDS, OracleVaultAbi } from "@/lib/constants";
+import { DEBANK_CHAIN_IDS } from "@/lib/constants";
+import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 
 export type Configuration = {
   vault: Address,
@@ -25,6 +23,8 @@ export type SafeVaultPriceUpdate = {
   shareValueInAssets: bigint,
   assetValueInShares: bigint,
   totalValueUSD: number,
+  assetPrice: number,
+  totalValueInAssets: number,
   formattedTotalSupply: number,
   vaultPriceUSD: number,
 }
@@ -32,18 +32,24 @@ export type SafeVaultPriceUpdate = {
 export default async function getSafeVaultPriceV2({
   configuration,
   chainId,
-  totalSupply,
   decimals
 }: {
   configuration: Configuration,
   chainId: number,
-  totalSupply: bigint,
   decimals: number,
-}) :Promise<SafeVaultPriceUpdate>{
+}): Promise<SafeVaultPriceUpdate> {
   // Get Holdings
   const safeHoldings = await Promise.all(configuration.chainIds.map(async (chain) => await getSafeHoldings({ safes: configuration.safes, chainId: chain })))
   const hyperliquidAccountValue = await getHyperliquidAccountValue({ user: configuration.safes[0], config: configuration.hyperliquid })
   const totalValueUSD = hyperliquidAccountValue + safeHoldings.reduce((acc, curr) => acc + curr, 0)
+  const totalSupply = await createPublicClient({
+    chain: ChainById[chainId],
+    transport: http(RPC_URLS[chainId]),
+  }).readContract({
+    address: configuration.vault,
+    abi: erc20Abi,
+    functionName: "totalSupply",
+  });
 
   if (totalValueUSD === 0) {
     return {
@@ -52,18 +58,28 @@ export default async function getSafeVaultPriceV2({
       shareValueInAssets: parseEther('1'),
       assetValueInShares: parseEther('1'),
       totalValueUSD,
+      assetPrice: 0,
+      totalValueInAssets: 0,
       formattedTotalSupply: 0,
-      vaultPriceUSD: 1,
+      vaultPriceUSD: 0,
     }
   }
 
   // Get Asset Price
-  const { data: priceData } = await axios.get(
-    `https://pro-api.llama.fi/${process.env.DEFILLAMA_API_KEY}/coins/prices/current/${networkMap[chainId]}:${configuration.asset}?searchWidth=4h`
+  const { data: assetData } = await axios.get(
+    'https://pro-openapi.debank.com/v1/token',
+    {
+      params: {
+        id: configuration.asset,
+        chain_id: DEBANK_CHAIN_IDS[chainId]
+      },
+      headers: {
+        'accept': 'application/json',
+        'AccessKey': process.env.DEBANK_API_KEY
+      }
+    }
   );
-  const assetValueUSD = priceData.coins[`${networkMap[chainId]}:${configuration.asset}`].price
-
-  const totalValueInAssets = totalValueUSD / assetValueUSD
+  const totalValueInAssets = totalValueUSD / assetData.price
   const formattedTotalSupply = Number(formatUnits(totalSupply, decimals))
   const vaultPrice = totalValueInAssets / formattedTotalSupply
   const newPrice = parseUnits(String(vaultPrice), 18)
@@ -74,6 +90,8 @@ export default async function getSafeVaultPriceV2({
     shareValueInAssets: newPrice,
     assetValueInShares: parseEther('1') * parseEther('1') / newPrice,
     totalValueUSD,
+    assetPrice: assetData.price,
+    totalValueInAssets: totalValueInAssets,
     formattedTotalSupply,
     vaultPriceUSD: vaultPrice,
   }
@@ -101,6 +119,7 @@ async function getSafeHoldings({
         }
       }
     );
+    console.log(holdingsData)
     return holdingsData.usd_value
   }))
   return holdings.reduce((acc, curr) => acc + curr, 0)

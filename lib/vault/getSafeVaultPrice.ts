@@ -64,7 +64,9 @@ export default async function getSafeVaultPrice({ vault, chainId }: { vault: Add
       assetValueInShares: parseEther('1'),
       totalValueUSD,
       formattedTotalSupply: 0,
-      vaultPriceUSD: 1,
+      vaultPriceUSD: 0,
+      assetPrice: 0,
+      totalValueInAssets: 0,
     }
   }
 
@@ -87,5 +89,7 @@ export default async function getSafeVaultPrice({ vault, chainId }: { vault: Add
     totalValueUSD,
     formattedTotalSupply,
     vaultPriceUSD: vaultPrice,
+    assetPrice: assetValueUSD,
+    totalValueInAssets: totalValueUSD / assetValueUSD,
   }
 }

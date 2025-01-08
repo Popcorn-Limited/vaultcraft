@@ -1,21 +1,15 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 import { useAtom } from "jotai";
 import { tokensAtom } from "@/lib/atoms";
 import { VaultData } from "@/lib/types";
-import { OracleVaultAbi, VaultOracleOwnerByChain } from "@/lib/constants";
-import fetchWithdrawalRequests, { WithdrawalRequest } from "@/lib/vault/management/safe/fetchWithdrawalRequests";
+import {VaultOracleOwnerByChain } from "@/lib/constants";
 import { showLoadingToast, showSuccessToast } from "@/lib/toasts";
-import { formatBalance, simulateCall } from "@/lib/utils/helpers";
-import { handleCallResult } from "@/lib/utils/helpers";
 import MainButtonGroup from "@/components/common/MainButtonGroup";
-import SecondaryButtonGroup from "@/components/common/SecondaryButtonGroup";
 import AssetWithName from "@/components/common/AssetWithName";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import MainActionButton from "@/components/button/MainActionButton";
 import Fieldset from "@/components/input/Fieldset";
-import { Input } from "@headlessui/react";
-import InputNumber from "@/components/input/InputNumber";
 import SimpleInput from "@/components/input/SimpleInput";
 import { TiDivide, TiEquals } from "react-icons/ti";
 import getSafeVaultPriceV2 from "@/lib/vault/getSafeVaultPriceV2";
@@ -56,12 +50,11 @@ export default function SafeVaultConfiguration({ vault }: { vault: VaultData }) 
         }
       },
       chainId: vault.chainId,
-      totalSupply: vault.totalSupply,
       decimals: tokens[vault.chainId][vault.address].decimals
     })
 
     setVaultValueUSD(price.totalValueUSD.toString())
-    setAssetValueUSD(tokens[vault.chainId][vault.asset].price.toString())
+    setAssetValueUSD(price.assetPrice.toString())
     setTotalSupply(price.formattedTotalSupply.toString())
     setVaultPriceInAssets(formatEther(price.shareValueInAssets))
     setAssetPriceInShares(formatEther(price.assetValueInShares))
