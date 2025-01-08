@@ -228,6 +228,7 @@ async function getSafeVaultApy(vault: VaultData): Promise<LlamaApy[]> {
 const vaultAddressToBaseApy: { [key: Address]: number } = {
   "0xEF4a9Ee0CD2a897bC0aF93E5aCD0C0324568A065": 6.09,
   "0x27d47664e034f3F2414d647DE7Cd1c1e8E72a89c": 10.16,
+  "0xFdBa40D5502CbA8163b09955c7AbbBAFC349BCbE": 10.09
 }
 
 const vaultAddressToRewardApy: { [key: Address]: number } = {
