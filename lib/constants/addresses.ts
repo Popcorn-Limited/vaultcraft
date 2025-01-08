@@ -304,6 +304,9 @@ export const ZapAssetAddressesByChain: { [key: number]: Address[] } = {
     "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", // WETH
     "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599", // WBTC
     "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE", // ETH
+    "0xA35b1B31Ce002FBF2058D22F30f95D405200A15b", // ETHx
+    "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0", // wstETH
+    "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7", // rsETH
   ],
   [polygon.id]: [
     "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063", // DAI
