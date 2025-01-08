@@ -209,6 +209,8 @@ async function getSafeVaultApy(vault: VaultData): Promise<LlamaApy[]> {
 
   const filteredLogs = logs.filter((log) => log.args.base === vault.address && log.args.quote === vault.asset)
 
+  if (filteredLogs.length < 2) return []
+
   let firstTimestamp = Number((await client.getBlock({
     blockNumber: filteredLogs[0].blockNumber
   })).timestamp)
@@ -228,7 +230,8 @@ async function getSafeVaultApy(vault: VaultData): Promise<LlamaApy[]> {
 const vaultAddressToBaseApy: { [key: Address]: number } = {
   "0xEF4a9Ee0CD2a897bC0aF93E5aCD0C0324568A065": 6.09,
   "0x27d47664e034f3F2414d647DE7Cd1c1e8E72a89c": 10.16,
-  "0xFdBa40D5502CbA8163b09955c7AbbBAFC349BCbE": 10.09
+  "0xFdBa40D5502CbA8163b09955c7AbbBAFC349BCbE": 10.09,
+  "0xcF9273BA04b875F94E4A9D8914bbD6b3C1f08EDb": 10.09
 }
 
 const vaultAddressToRewardApy: { [key: Address]: number } = {
