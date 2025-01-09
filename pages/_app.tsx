@@ -22,10 +22,11 @@ import {
 } from "@rainbow-me/rainbowkit/wallets";
 import { Analytics } from "@vercel/analytics/react"
 import { WagmiProvider, http } from "wagmi";
-import { arbitrum, fraxtal, base, mainnet, optimism, polygon, xLayer, avalanche } from "viem/chains";
+import { arbitrum, fraxtal, base, mainnet, optimism, polygon, xLayer, avalanche, bsc } from "viem/chains";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createWallet } from "@passkeys/core";
 import { WalletProvider, WalletWidget } from "@passkeys/react";
+import binanceWallet from '@binance/w3w-rainbow-connector-v2'
 
 const PROJECT_ID = "9b83e8f348c7515d3f94d83f95a05749"
 
@@ -44,6 +45,7 @@ const connectors = connectorsForWallets([
       walletConnectWallet,
       safeWallet,
       rabbyWallet,
+      binanceWallet
     ],
   },
   {
@@ -77,6 +79,7 @@ const config = getDefaultConfig({
     [base.id]: http(RPC_URLS[base.id]),
     [fraxtal.id]: http(RPC_URLS[fraxtal.id]),
     [avalanche.id]: http(RPC_URLS[avalanche.id]),
+    [bsc.id]: http(RPC_URLS[bsc.id]),
   },
   connectors
 })

@@ -205,15 +205,24 @@ async function getSafeVaultApy(vault: VaultData): Promise<LlamaApy[]> {
     toBlock: "latest",
   })
 
-  if (logs.length < 2) return []
+  if (logs.length === 0) return []
 
   const filteredLogs = logs.filter((log) => log.args.base === vault.address && log.args.quote === vault.asset)
-
-  if (filteredLogs.length < 2) return []
 
   let firstTimestamp = Number((await client.getBlock({
     blockNumber: filteredLogs[0].blockNumber
   })).timestamp)
+
+  // If there is only one log, we can't calculate the apy, so we use the base apy and reward apy from the vault address
+  if (filteredLogs.length === 1) return [
+    {
+      apy: (vaultAddressToBaseApy[vault.address] || 0) + (vaultAddressToRewardApy[vault.address] || 0),
+      apyBase: vaultAddressToBaseApy[vault.address] || 0,
+      apyReward: vaultAddressToRewardApy[vault.address] || 0,
+      tvl: vault.tvl,
+      date: new Date(firstTimestamp * 1000)
+    }
+  ]
 
   const daysPast = daysDifferenceUTC(new Date(firstTimestamp * 1000), new Date())
   const entries: LlamaApy[] = Array.from({ length: daysPast }, (_, i) => ({
