@@ -45,6 +45,7 @@ export const IconByProtocol: { [key: string]: string } = {
   Spark: "https://icons.llamao.fi/icons/protocols/spark?w=48&h=48",
   Fluid: "https://icons.llamao.fi/icons/protocols/fluid?w=48&h=48",
   Safe: "https://icons.llamao.fi/icons/protocols/safe?w=48&h=48",
+  Eigenlayer: "https://icons.llamao.fi/icons/protocols/eigenlayer?w=48&h=48",
   Dolomite: "https://icons.llamao.fi/icons/protocols/dolomite?w=48&h=48",
   BeraBorrow: "/images/icons/beraborrow-logo.png",
   Kodiak: "/images/icons/kodiak-logo.svg",
