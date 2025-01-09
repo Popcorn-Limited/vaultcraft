@@ -54,7 +54,7 @@ export default function VaultHero({
                 }
                 className={`w-8 h-8 rounded-full border border-gray-400`}
               />
-              <p className="text-white text-lg mt-2" >{point.multiplier}x</p>
+              <p className="text-white text-lg mt-2" >{point.multiplier === 0 ? "TBD" : `${point.multiplier}x`}</p>
             </div>
           )}
         </div>
