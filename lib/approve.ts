@@ -12,6 +12,7 @@ import { handleCallResult, simulateCall } from "./utils/helpers";
 
 interface HandleAllowanceProps {
   token: Address;
+  vault?: Address;
   amount: number;
   account: Address;
   spender: Address;
@@ -36,6 +37,7 @@ const MAX_APPROVAL_AMOUNT = BigInt(
 
 export async function handleAllowance({
   token,
+  vault,
   amount,
   account,
   spender,
@@ -44,7 +46,7 @@ export async function handleAllowance({
 
   // Set Operator if dealing with the AsyncRouter
   if (spender === AsyncRouterByChain[clients.walletClient.chain?.id ?? 1]) {
-    const success = await setOperator({ account, address: token, router: spender, clients })
+    const success = await setOperator({ account, address: vault ?? token, router: spender, clients })
     if (!success) return false
   }
 
