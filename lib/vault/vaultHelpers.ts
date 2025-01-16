@@ -267,6 +267,7 @@ export function handleVaultInteraction(
       return () =>
         handleAllowance({
           token: inputToken.address,
+          vault: vaultData.gauge ? vaultData.address : undefined,
           amount: Number(amount),
           account,
           spender: AsyncRouterByChain[vaultData.chainId],
