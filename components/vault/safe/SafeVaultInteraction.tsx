@@ -166,6 +166,10 @@ function SafeVaultInputs({
     if (option.address !== asset.address) {
       setAction(gauge ? VaultActionType.ZapDepositAndStake : VaultActionType.ZapDeposit)
       setSteps(selectActions(gauge ? VaultActionType.ZapDepositAndStake : VaultActionType.ZapDeposit))
+    } else {
+      // reset after selecting another token 
+      setAction(gauge ? VaultActionType.DepositAndStake : VaultActionType.Deposit)
+      setSteps(selectActions(gauge ? VaultActionType.DepositAndStake : VaultActionType.Deposit))
     }
   }
 
