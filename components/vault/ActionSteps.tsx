@@ -41,7 +41,7 @@ export default function ActionSteps({
         ))}
       </ol>
       <p className="text-sm font-medium text-white mt-2">
-        Step {stepCounter + 1} of {steps.length}
+        Step {stepCounter + 1 > steps.length ? steps.length : stepCounter + 1} of {steps.length}
       </p>
     </nav>
   )
