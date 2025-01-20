@@ -3,12 +3,9 @@ import { useEffect, useState } from "react";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import useNetworkFilter from "@/lib/useNetworkFilter";
 import NetworkFilter from "@/components/network/NetworkFilter";
-import MainActionButton from "@/components/button/MainActionButton";
 import { useAtom } from "jotai";
 import { vaultsAtom } from "@/lib/atoms/vaults";
 import { OptionTokenByChain, VCX } from "@/lib/constants";
-import Modal from "@/components/modal/Modal";
-import OptionTokenInterface from "@/components/optionToken/OptionTokenInterface";
 import type { AddressesByChain, VaultData } from "@/lib/types";
 import {
   gaugeRewardsAtom,
@@ -16,8 +13,6 @@ import {
   tokensAtom,
   tvlAtom,
 } from "@/lib/atoms";
-import SecondaryActionButton from "@/components/button/SecondaryActionButton";
-import OptionTokenExerciseModal from "@/components/optionToken/exercise/OptionTokenExerciseModal";
 import VaultCard from "@/components/vault/VaultCard";
 import { formatBalanceUSD, NumberFormatter } from "@/lib/utils/helpers";
 import SearchBar from "@/components/input/SearchBar";
@@ -55,8 +50,6 @@ export default function VaultsContainer({
     SUPPORTED_NETWORKS.map((network) => network.id)
   );
   const [searchTerm, setSearchTerm] = useState("");
-  const [showOptionTokenModal, setShowOptionTokenModal] = useState(false);
-  const [showExerciseModal, setShowExerciseModal] = useState(false);
 
   function handleSearch(value: string) {
     setSearchTerm(value);
@@ -64,10 +57,6 @@ export default function VaultsContainer({
 
   return Object.keys(tokens).length > 0 ? (
     <NoSSR >
-      <Modal visibility={[showOptionTokenModal, setShowOptionTokenModal]}>
-        <OptionTokenInterface />
-      </Modal>
-      <OptionTokenExerciseModal show={[showExerciseModal, setShowExerciseModal]} />
       <section className="md:border-b border-customNeutral100 md:flex md:flex-row items-top justify-between py-4 md:py-10 px-4 md:px-0 md:gap-4">
         <div className="w-full md:w-max">
           <h1 className="text-5xl font-normal m-0 mb-4 md:mb-2 leading-0 text-white md:text-3xl leading-none">
@@ -128,16 +117,6 @@ export default function VaultsContainer({
                 />
               </div>
             </div>
-          </div>
-          <div className="w-full md:w-40 space-y-2 md:ml-4">
-            <MainActionButton
-              label="Claim oVCX"
-              handleClick={() => setShowOptionTokenModal(true)}
-            />
-            <SecondaryActionButton
-              label="Exercise oVCX"
-              handleClick={() => setShowExerciseModal(true)}
-            />
           </div>
         </div>
       </section>

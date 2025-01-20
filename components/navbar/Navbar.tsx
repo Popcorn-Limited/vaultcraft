@@ -8,15 +8,11 @@ import { networkLogos } from "@/lib/utils/connectors";
 import MainActionButton from "@/components/button/MainActionButton";
 import SocialMediaLinks from "@/components/common/SocialMediaLinks";
 import NavbarLinks from "@/components/navbar/NavbarLinks";
-import { aaveAccountDataAtom } from "@/lib/atoms/lending";
 import { useAtom } from "jotai";
 import { vaultsAtom } from "@/lib/atoms/vaults";
 import { useRouter } from "next/router";
-import ResponsiveTooltip from "@/components/common/Tooltip";
 import { VaultData } from "@/lib/types";
-import { getHealthFactorColor } from "@/lib/external/aave";
 import { isAddress } from "viem";
-import { NumberFormatter } from "@/lib/utils/helpers";
 
 export default function Navbar(): JSX.Element {
   const router = useRouter();
@@ -40,9 +36,7 @@ export default function Navbar(): JSX.Element {
     }
   }, [chain?.id, account])
 
-  const [userAccountData] = useAtom(aaveAccountDataAtom);
   const [vaults] = useAtom(vaultsAtom);
-  const [showLendModal, setShowLendModal] = useState(false);
 
   const [vaultData, setVaultData] = useState<VaultData>({
     chainId: chain?.id || 1,
@@ -66,12 +60,6 @@ export default function Navbar(): JSX.Element {
 
   return (
     <>
-      {/* {chain && Object.keys(vaultData).length > 0 && (
-        <ManageLoanInterface
-          visibilityState={[showLendModal, setShowLendModal]}
-          vaultData={vaultData}
-        />
-      )} */}
       <div className="flex container flex-row items-center justify-between w-full py-8 px-4 md:px-0 z-10">
         <div className="flex flex-row items-center gap-6">
           <div>
@@ -93,34 +81,8 @@ export default function Navbar(): JSX.Element {
         </div>
         <div className="flex flex-row items-center space-x-4">
           <div className="hidden md:flex flex-row space-x-4">
-            <BuyVCXButton />
-            <StakeVCXButton />
+            <MigrateVCXButton />
           </div>
-          {chain && userAccountData[chain?.id]?.healthFactor > 0 && (
-            <div
-              className={`w-48 cursor-pointer h-full py-2 bg-customNeutral300 md:bg-transparent md:py-2 px-4 hidden md:flex flex-row items-center justify-between border border-customGray100 rounded-4xl text-white`}
-              onClick={() => setShowLendModal(true)}
-              id="global-health-factor"
-            >
-              <p className="mr-2 leading-none hidden md:block">Health Factor</p>
-              <p
-                className={`md:ml-2 ${getHealthFactorColor(
-                  "text",
-                  userAccountData[chain.id].healthFactor
-                )}`}
-              >
-                {NumberFormatter.format(userAccountData[chain.id].healthFactor || 0)}
-              </p>
-              <ResponsiveTooltip
-                id="global-health-factor"
-                content={
-                  <p className="max-w-52">
-                    Health Factor of your Aave Account. (Click to manage)
-                  </p>
-                }
-              />
-            </div>
-          )}
           {account ? (
             <div className={`relative flex flex-container flex-row z-10`}>
               <div
@@ -203,8 +165,7 @@ export default function Navbar(): JSX.Element {
                     >
                       <NavbarLinks />
                       <div className="md:hidden space-y-4">
-                        <BuyVCXButton />
-                        <StakeVCXButton />
+                        <MigrateVCXButton />
                       </div>
                     </div>
                     <div className="pt-12 md:pt-0">
@@ -217,7 +178,7 @@ export default function Navbar(): JSX.Element {
                       <div className="flex justify-between pb-12 mt-12">
                         <SocialMediaLinks
                           color="#23262F"
-                          color2="#dfff1c"
+                          color2="#7AFB79"
                           size="24"
                         />
                       </div>
@@ -294,7 +255,7 @@ function BuyVCXButton(): JSX.Element {
   );
 }
 
-function StakeVCXButton(): JSX.Element {
+function MigrateVCXButton(): JSX.Element {
   return (
     <>
       <button
@@ -312,7 +273,7 @@ function StakeVCXButton(): JSX.Element {
           src="/images/tokens/vcx.svg"
           className="w-5 h-5 rounded-full border border-black"
         />
-        <p className="ml-2 mt-1">Stake VCX</p>
+        <p className="ml-2 mt-1">Migrate VCX</p>
       </button>
       <button
         className={`w-48 px-4 py-2 rounded bg-black border border-black font-semibold text-base text-primaryGreen

@@ -21,34 +21,7 @@ const banners = [
     buttonLink: 'https://www.okx.com/web3/defi/activity/42',
     imageSrc: 'images/banner/banner4.png',
     tokenSrc: 'images/banner/bannerToken4.svg'
-  },
-  {
-    id: 'bannerStake',
-    title: 'Stake VCX',
-    description: 'Up to 25% APY and 4x voting power',
-    buttonText: 'Stake now',
-    buttonLink: 'staking',
-    imageSrc: 'images/banner/banner1.png',
-    tokenSrc: 'images/banner/bannerToken1.svg'
-  },
-  {
-    id: 'bannerBoost',
-    title: 'Boost your oVCX rewards',
-    description: 'Lock your 80VCX 20WETH pool for max boost in oVCX and voting power',
-    buttonText: 'Boost here',
-    buttonLink: 'boost',
-    imageSrc: 'images/banner/banner2.png',
-    tokenSrc: 'images/banner/bannerToken2.svg'
-  },
-  {
-    id: 'bannerVault',
-    title: 'The VCX Smart Vault',
-    description: 'Auto-compound AURA & BAL into VCX for 50%+ APY',
-    buttonText: 'Deposit here',
-    buttonLink: 'vaults/0x99a53fAB6fBD1eacb59AE998dA2DbF130BE94C38?chainId=1',
-    imageSrc: 'images/banner/banner3.png',
-    tokenSrc: 'images/banner/bannerToken1.svg'
-  },
+  }
 ]
 
 export default function Carousel() {

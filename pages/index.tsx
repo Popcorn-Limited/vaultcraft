@@ -1,9 +1,7 @@
 import NoSSR from "react-no-ssr";
 import React, { useEffect } from "react";
 import { useRouter } from "next/router";
-import Hero from "@/components/landing/Hero";
-import Products from "@/components/landing/Products";
-import Carousel from "@/components/common/Carousel";
+import FlagshipVaultContainer from "@/components/vault/FlagshipVaultContainer";
 
 const IndexPage = () => {
   const router = useRouter();
@@ -15,11 +13,7 @@ const IndexPage = () => {
   }, [router.pathname]);
 
   return (
-    <NoSSR>
-      <Carousel />
-      <Hero />
-      <Products />
-    </NoSSR>
+    <FlagshipVaultContainer />
   );
 };
 

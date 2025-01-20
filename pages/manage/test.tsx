@@ -16,8 +16,7 @@ async function fetchYields(){
 }
 
 export default function Test() {
-  return <div>
-      
+  return <div className="text-white">
     <button onClick={fetchPerps}>Fetch Perps</button>
     <button onClick={fetchBorrow}>Fetch Borrow</button>
     <button onClick={fetchYields}>Fetch Yields</button>

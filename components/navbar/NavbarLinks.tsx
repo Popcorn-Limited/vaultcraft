@@ -11,14 +11,6 @@ const links: { label: string; url: string; onClick?: Function }[] = [
     url: "/vaults",
   },
   {
-    label: "Boost Vaults",
-    url: "/boost",
-  },
-  {
-    label: "Lock Vaults",
-    url: "/vaults/lock",
-  },
-  {
     label: "Stats",
     url: "/stats",
   },
@@ -26,10 +18,6 @@ const links: { label: string; url: string; onClick?: Function }[] = [
     label: "Archive",
     url: "https://archive.pop.network/",
   },
-  {
-    label: "Buy VCX",
-    url: "https://swap.cow.fi/#/1/swap/WETH/VCX",
-  }
 ];
 
 export default function NavbarLinks(): JSX.Element {

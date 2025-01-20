@@ -8,10 +8,9 @@ import Footer from "@/components/common/Footer";
 import { Address, createPublicClient, http, zeroAddress } from "viem";
 import Modal from "@/components/modal/Modal";
 import MainActionButton from "../button/MainActionButton";
-import { gaugeRewardsAtom, loadingProgressAtom, networthAtom, strategiesAtom, tokensAtom, tvlAtom, vaultronAtom } from "@/lib/atoms";
-import { ReserveData, StrategiesByChain, TokenByAddress, TokenType, UserAccountData, VaultData } from "@/lib/types";
+import { gaugeRewardsAtom, loadingProgressAtom, networthAtom, strategiesAtom, tokensAtom, tvlAtom} from "@/lib/atoms";
+import { StrategiesByChain, TokenByAddress, TokenType, VaultData } from "@/lib/types";
 import getTokenAndVaultsDataByChain from "@/lib/getTokenAndVaultsData";
-import { aaveAccountDataAtom, aaveReserveDataAtom } from "@/lib/atoms/lending";
 import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
 import axios from "axios";
 import { VotingEscrowAbi } from "@/lib/constants";
@@ -159,9 +158,6 @@ export default function Page({
   const [, setGaugeRewards] = useAtom(gaugeRewardsAtom);
   const [, setTVL] = useAtom(tvlAtom);
   const [, setNetworth] = useAtom(networthAtom);
-  const [, setAaveReserveData] = useAtom(aaveReserveDataAtom);
-  const [, setAaveAccountData] = useAtom(aaveAccountDataAtom);
-  const [, setVaultronStats] = useAtom(vaultronAtom);
 
   useEffect(() => {
     async function getData() {
@@ -202,39 +198,6 @@ export default function Page({
       console.log(`Completed fetching Token and Vaults Data (${new Date()})`)
       console.log(`Took ${Number(new Date()) - start}ms to load`)
 
-
-      const newReserveData: { [key: number]: ReserveData[] } = {}
-      const newUserAccountData: { [key: number]: UserAccountData } = {}
-
-      // console.log(`Fetching AaveData (${new Date()})`)
-      // start = Number(new Date())
-
-      // await Promise.all(
-      //   SUPPORTED_NETWORKS.map(async (chain) => {
-      //     if (chain.id === xLayer.id) {
-      //       newReserveData[chain.id] = []
-      //       newUserAccountData[chain.id] = {
-      //         totalCollateral: 0,
-      //         totalBorrowed: 0,
-      //         netValue: 0,
-      //         totalSupplyRate: 0,
-      //         totalBorrowRate: 0,
-      //         netRate: 0,
-      //         ltv: 0,
-      //         healthFactor: 0
-      //       }
-      //     } else {
-      //       const res = await fetchAaveData(account || zeroAddress, newTokens[chain.id], chain)
-      //       newReserveData[chain.id] = res.reserveData
-      //       newUserAccountData[chain.id] = res.userAccountData
-      //     }
-      //   })
-      // );
-
-      // console.log(`Completed fetching AaveData (${new Date()})`)
-      // console.log(`Took ${Number(new Date()) - start}ms to load`)
-
-
       console.log(`Fetching TVL (${new Date()})`)
       start = Number(new Date())
 
@@ -263,9 +226,6 @@ export default function Page({
       setStrategies(prev => ({ ...newStrategies }));
       setLoadingProgress(prev => 90)
 
-      // setAaveReserveData(newReserveData);
-      // setAaveAccountData(newUserAccountData);
-
       if (account) {
         console.log(`Fetching Networth (${new Date()})`)
         start = Number(new Date())
@@ -292,7 +252,6 @@ export default function Page({
 
         console.log(`Completed fetching Networth (${new Date()})`)
         console.log(`Took ${Number(new Date()) - start}ms to load`)
-
 
         console.log(`Fetching GaugeRewards (${new Date()})`)
         start = Number(new Date())
@@ -321,19 +280,6 @@ export default function Page({
             vaultNetworth + assetNetworth + stakeNetworth + lockVaultNetworth,
         }));
         setGaugeRewards(pre => ({ ...newRewards }));
-
-        console.log(`Fetching Vaultron (${new Date()})`)
-        start = Number(new Date())
-
-        const newVaultronStats = await fetchVaultron(account, createPublicClient({
-          chain: polygon,
-          transport: http(RPC_URLS[137]),
-        }))
-
-        console.log(`Completed fetching Vaultron (${new Date()})`)
-        console.log(`Took ${Number(new Date()) - start}ms to load`)
-
-        setVaultronStats(prev => ({ ...newVaultronStats }))
       }
       console.log(`COMPLETED FETCHING APP DATA (${new Date()})`)
       console.log(`Took ${Number(new Date()) - getDataStart}ms to load`)

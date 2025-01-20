@@ -1,5 +1,3 @@
-import { AaveActionType } from "./external/aave/handleAaveInteractions";
-
 export interface ActionStep {
   step: number;
   label: string;
@@ -69,45 +67,3 @@ export const EXERCISE_OVCX_STEPS = [
     ...BaseStepInfo
   }
 ]
-
-export function getAaveActionSteps(action: AaveActionType): ActionStep[] {
-  switch (action) {
-    case AaveActionType.Supply:
-      return [{
-        step: 1,
-        label: "Handle Allowance",
-        ...BaseStepInfo,
-        updateBalance: false
-      },
-      {
-        step: 2,
-        label: "Supply Asset",
-        ...BaseStepInfo
-      }]
-    case AaveActionType.Withdraw:
-      return [
-        {
-          step: 1,
-          label: "Withdraw Asset",
-          ...BaseStepInfo
-        }]
-    case AaveActionType.Borrow:
-      return [{
-        step: 1,
-        label: "Borrow Asset",
-        ...BaseStepInfo
-      }]
-    case AaveActionType.Repay:
-      return [{
-        step: 1,
-        label: "Handle Allowance",
-        ...BaseStepInfo,
-        updateBalance: false
-      },
-      {
-        step: 2,
-        label: "Repay Loan",
-        ...BaseStepInfo
-      }]
-  }
-}
