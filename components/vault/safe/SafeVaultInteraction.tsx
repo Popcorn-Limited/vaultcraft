@@ -257,7 +257,9 @@ function SafeVaultInputs({
         onChange={handleChangeInput}
         selectedToken={inputToken}
         errorMessage={errorMessage}
-        tokenList={isDeposit ? tokenOptions : []}
+        tokenList={isDeposit ? tokenOptions.filter(token => {
+          return token.address !== vault!.address && token.address !== gauge?.address
+        }) : []}
         allowSelection={isDeposit}
         disabled={!isDeposit && !outputToken}
         allowInput
