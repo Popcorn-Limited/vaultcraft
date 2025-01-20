@@ -196,7 +196,7 @@ export default function VaultClaimSection({ vaultData }: { vaultData: VaultData 
                 label="Claim oVCX"
                 handleClick={handleClaim}
                 disabled={
-                  !gaugeRewards || gaugeRewards?.[vaultData.chainId]?.total < 0
+                  !gaugeRewards || gaugeRewards?.[vaultData.chainId]?.total <= 0
                 }
               />
               {claimableRewards.length > 0 && rewardValue > 0.1 && (
