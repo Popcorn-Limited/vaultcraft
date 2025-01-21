@@ -223,8 +223,8 @@ function SafeVaultInputs({
       const float = res[1].result as bigint;
 
       if (float >= expectedAssets) {
-        setAction(VaultActionType.RequestFulfillAndWithdraw)
-        setSteps(selectActions(VaultActionType.RequestFulfillAndWithdraw))
+        setAction(gauge ? VaultActionType.UnstakeAndRequestFulfillWithdraw : VaultActionType.RequestFulfillAndWithdraw)
+        setSteps(selectActions(gauge ? VaultActionType.UnstakeAndRequestFulfillWithdraw : VaultActionType.RequestFulfillAndWithdraw))
       }
     }
 
