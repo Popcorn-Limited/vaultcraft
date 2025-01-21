@@ -166,6 +166,10 @@ function SafeVaultInputs({
     if (option.address !== asset.address) {
       setAction(gauge ? VaultActionType.ZapDepositAndStake : VaultActionType.ZapDeposit)
       setSteps(selectActions(gauge ? VaultActionType.ZapDepositAndStake : VaultActionType.ZapDeposit))
+    } else {
+      // reset after selecting another token 
+      setAction(gauge ? VaultActionType.DepositAndStake : VaultActionType.Deposit)
+      setSteps(selectActions(gauge ? VaultActionType.DepositAndStake : VaultActionType.Deposit))
     }
   }
 
@@ -219,8 +223,8 @@ function SafeVaultInputs({
       const float = res[1].result as bigint;
 
       if (float >= expectedAssets) {
-        setAction(VaultActionType.RequestFulfillAndWithdraw)
-        setSteps(selectActions(VaultActionType.RequestFulfillAndWithdraw))
+        setAction(gauge ? VaultActionType.UnstakeAndRequestFulfillWithdraw : VaultActionType.RequestFulfillAndWithdraw)
+        setSteps(selectActions(gauge ? VaultActionType.UnstakeAndRequestFulfillWithdraw : VaultActionType.RequestFulfillAndWithdraw))
       }
     }
 
@@ -257,7 +261,9 @@ function SafeVaultInputs({
         onChange={handleChangeInput}
         selectedToken={inputToken}
         errorMessage={errorMessage}
-        tokenList={isDeposit ? tokenOptions : []}
+        tokenList={isDeposit ? tokenOptions.filter(token => {
+          return token.address !== vault!.address && token.address !== gauge?.address
+        }) : []}
         allowSelection={isDeposit}
         disabled={!isDeposit && !outputToken}
         allowInput

@@ -313,6 +313,78 @@ export async function vaultAsyncWithdraw({
   return success;
 }
 
+export async function vaultAsyncUnstakeWithdraw({
+  chainId,
+  vaultData,
+  asset,
+  vault,
+  account,
+  amount,
+  clients,
+  tokensAtom
+}: VaultWriteProps): Promise<boolean> {
+  showLoadingToast("Unstaking and Redeeming...");
+
+  const res = await clients.publicClient.multicall({
+    contracts: [
+      {
+        address: vaultData.address,
+        abi: OracleVaultAbi,
+        functionName: "convertToAssets",
+        args: [amount]
+      },
+      {
+        address: vaultData.asset,
+        abi: erc20Abi,
+        functionName: "balanceOf",
+        args: [vaultData.safes![0]]
+      }
+    ]
+  });
+
+  const expectedAssets = res[0].result as bigint;
+  const float = res[1].result as bigint;
+
+  let success = false;
+  if (float >= expectedAssets) {
+    success = await handleCallResult({
+      successMessage: "Redeemed!",
+      simulationResponse: await simulateCall({
+        account,
+        contract: {
+          address: AsyncRouterByChain[chainId],
+          abi: AsyncVaultRouterAbi,
+        },
+        functionName: "unstakeRequestFulfillWithdraw",
+        publicClient: clients.publicClient,
+        args: [vaultData.gauge, vaultData.address, account, amount]
+      }),
+      clients,
+    });
+  } else {
+    success = await vaultUnstakeRequestRedeem({
+      chainId,
+      vaultData,
+      asset,
+      vault,
+      account,
+      amount,
+      clients,
+      tokensAtom
+    })
+  }
+
+  if (success) {
+    mutateTokenBalance({
+      tokensToUpdate: [vaultData.gauge!, asset.address],
+      account,
+      tokensAtom,
+      chainId
+    })
+  }
+  return success;
+}
+
 export async function vaultRequestFulfillWithdraw({
   chainId,
   vaultData,
@@ -374,6 +446,44 @@ export async function vaultRequestRedeem({
       functionName: "requestRedeem",
       publicClient: clients.publicClient,
       args: [amount, account, account]
+    }),
+    clients,
+  });
+
+  if (success) {
+    mutateTokenBalance({
+      tokensToUpdate: [vault.address],
+      account,
+      tokensAtom,
+      chainId
+    })
+  }
+  return success;
+}
+
+export async function vaultUnstakeRequestRedeem({
+  chainId,
+  vaultData,
+  asset,
+  vault,
+  account,
+  amount,
+  clients,
+  tokensAtom
+}: VaultWriteProps): Promise<boolean> {
+  showLoadingToast("Unstaking and Requesting redeem...");
+
+  const success = await handleCallResult({
+    successMessage: "Redeem requested!",
+    simulationResponse: await simulateCall({
+      account,
+      contract: {
+        address: AsyncRouterByChain[chainId],
+        abi: AsyncVaultRouterAbi,
+      },
+      functionName: "unstakeAndRequestWithdrawal",
+      publicClient: clients.publicClient,
+      args: [vaultData.gauge!, vault.address, account, amount]
     }),
     clients,
   });

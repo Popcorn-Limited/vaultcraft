@@ -31,9 +31,9 @@ interface ApproveProps extends SimulateApproveProps {
   walletClient: WalletClient;
 }
 
-const MAX_APPROVAL_AMOUNT = BigInt(
-  "115792089237316195423570985008687907853269984665640"
-);
+// const MAX_APPROVAL_AMOUNT = BigInt(
+//   "115792089237316195423570985008687907853269984665640"
+// );
 
 export async function handleAllowance({
   token,
@@ -43,7 +43,6 @@ export async function handleAllowance({
   spender,
   clients,
 }: HandleAllowanceProps): Promise<boolean> {
-
   // Set Operator if dealing with the AsyncRouter
   if (spender === AsyncRouterByChain[clients.walletClient.chain?.id ?? 1]) {
     const success = await setOperator({ account, address: vault ?? token, router: spender, clients })
@@ -65,9 +64,10 @@ export async function handleAllowance({
   };
   let allowance = await fetchAllowance();
 
+  // approve precise amount
   if (Number(allowance) === 0) {
     await approve({
-      amount: MAX_APPROVAL_AMOUNT,
+      amount: BigInt(amount),
       address: token,
       account,
       spender,

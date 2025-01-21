@@ -8,7 +8,7 @@ import zap from "@/lib/zap"
 import { gaugeDeposit, gaugeWithdraw } from "@/lib/gauges/interactions"
 import { handleAllowance } from "@/lib/approve"
 import { handleZapAllowance } from "@/lib/zap/zapAllowance"
-import { vaultCancelRedeem, vaultDeposit, vaultDepositAndStake, vaultRedeem, vaultRequestFulfillWithdraw, vaultRequestRedeem, vaultUnstakeAndWithdraw } from "./interactions"
+import { vaultCancelRedeem, vaultDeposit, vaultDepositAndStake, vaultRedeem, vaultRequestFulfillWithdraw, vaultRequestRedeem, vaultUnstakeAndWithdraw, vaultAsyncUnstakeWithdraw } from "./interactions"
 
 export function getDescription(inputToken: Token, outputToken: Token, amount: number, action: Action, vaultData: VaultData) {
   const val = NumberFormatter.format(amount)
@@ -393,8 +393,16 @@ export function handleVaultInteraction(
       })
     case Action.unstakeAndRequestWithdrawal:
     case Action.unstakeAndRequestFulfillWithdraw:
-      // TODO: Implement
-      return () => { }
+      return () => vaultAsyncUnstakeWithdraw({
+        chainId: vaultData.chainId,
+        vaultData,
+        asset,
+        vault,
+        account,
+        amount,
+        clients,
+        tokensAtom
+      })
     case Action.zap:
       return () => zap({
         chainId: vaultData.chainId,
