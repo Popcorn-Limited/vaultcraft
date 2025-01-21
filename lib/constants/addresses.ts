@@ -204,7 +204,7 @@ export const AssetPushOracleByChain: AddressByChain = {
 
 export const AssetPushOracleOwnerByChain: AddressByChain = {
   [mainnet.id]: "0x8A8A73B111e5fc0048a179a5d7DbC3BcA08D1EF4",
-  [optimism.id]: "0x0f16B4F10Bc3C31169b5d5B6AEb69835E710c6Bd", 
+  [optimism.id]: "0x0f16B4F10Bc3C31169b5d5B6AEb69835E710c6Bd",
   [arbitrum.id]: "0x86f8d1C5dBd755854C1820592f2D8383FC374695",
   [xLayer.id]: zeroAddress,
   [base.id]: "0xD0Bc541E7c558cA50c33C4166a63ED2b899d2C70",
@@ -264,6 +264,17 @@ export const FeeRecipientByChain: AddressByChain = {
   [fraxtal.id]: "0xe3Bf0045C12C1CF31D7DAc40D0Fc0a49a410bBA2",
 }
 
+export const TokenMigrationByChain: AddressByChain = {
+  [mainnet.id]: "0xC016759a2D1FdD11B290b085176Bf86091A0e04B",
+  [optimism.id]: "0xC016759a2D1FdD11B290b085176Bf86091A0e04B",
+  [arbitrum.id]: "0xC016759a2D1FdD11B290b085176Bf86091A0e04B",
+  [xLayer.id]: zeroAddress,
+  [base.id]: zeroAddress,
+  [fraxtal.id]: zeroAddress,
+  [avalanche.id]: zeroAddress,
+  [polygon.id]: zeroAddress,
+  [bsc.id]: zeroAddress,
+}
 
 // EXTERNAL
 export const ENSO_ROUTER: Address = "0x80EbA3855878739F4710233A8a19d89Bdd2ffB8E"
