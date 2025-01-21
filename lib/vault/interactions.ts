@@ -323,8 +323,6 @@ export async function vaultAsyncUnstakeWithdraw({
   clients,
   tokensAtom
 }: VaultWriteProps): Promise<boolean> {
-  showLoadingToast("Unstaking and Redeeming...");
-
   const res = await clients.publicClient.multicall({
     contracts: [
       {
@@ -347,6 +345,8 @@ export async function vaultAsyncUnstakeWithdraw({
 
   let success = false;
   if (float >= expectedAssets) {
+    showLoadingToast("Unstaking and Redeeming...");
+
     success = await handleCallResult({
       successMessage: "Redeemed!",
       simulationResponse: await simulateCall({
