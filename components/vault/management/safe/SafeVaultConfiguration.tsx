@@ -3,7 +3,7 @@ import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 import { useAtom } from "jotai";
 import { tokensAtom } from "@/lib/atoms";
 import { VaultData } from "@/lib/types";
-import {VaultOracleOwnerByChain } from "@/lib/constants";
+import { VaultOracleOwnerByChain } from "@/lib/constants";
 import { showLoadingToast, showSuccessToast } from "@/lib/toasts";
 import MainButtonGroup from "@/components/common/MainButtonGroup";
 import AssetWithName from "@/components/common/AssetWithName";
@@ -16,6 +16,7 @@ import getSafeVaultPriceV2 from "@/lib/vault/getSafeVaultPriceV2";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { formatEther, parseEther } from "viem";
 import { setVaultPrice } from "@/lib/vault/management/safe/interactions";
+import { arbitrum, avalanche, base, bsc, fraxtal, mainnet, optimism, polygon, xLayer } from "viem/chains";
 
 
 export default function SafeVaultConfiguration({ vault }: { vault: VaultData }) {
@@ -42,7 +43,7 @@ export default function SafeVaultConfiguration({ vault }: { vault: VaultData }) 
         vault: vault.address,
         asset: vault.asset,
         safes: vault.safes!,
-        chainIds: SUPPORTED_NETWORKS.map(chain => chain.id),
+        chainIds: [mainnet.id, arbitrum.id, optimism.id, polygon.id, base.id, bsc.id, avalanche.id],
         hyperliquid: {
           spot: true,
           perp: true,
@@ -78,7 +79,7 @@ export default function SafeVaultConfiguration({ vault }: { vault: VaultData }) 
 
   async function changeVaultPrice() {
     if (!account || !walletClient || !publicClient) return
-    
+
     setVaultPrice({
       vaultPrice: BigInt(vaultPriceInAssetsRaised),
       assetPrice: BigInt(assetPriceInSharesRaised),

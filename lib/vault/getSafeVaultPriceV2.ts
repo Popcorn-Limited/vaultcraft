@@ -1,6 +1,6 @@
 import { Address, createPublicClient, erc20Abi, formatUnits, http, parseEther, parseUnits } from "viem";
 import axios from "axios";
-import { DEBANK_CHAIN_IDS } from "@/lib/constants";
+import { DEBANK_CHAIN_IDS, ZERO } from "@/lib/constants";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 
 export type Configuration = {
@@ -51,20 +51,6 @@ export default async function getSafeVaultPriceV2({
     functionName: "totalSupply",
   });
 
-  if (totalValueUSD === 0) {
-    return {
-      vault: configuration.vault,
-      asset: configuration.asset,
-      shareValueInAssets: parseEther('1'),
-      assetValueInShares: parseEther('1'),
-      totalValueUSD,
-      assetPrice: 0,
-      totalValueInAssets: 0,
-      formattedTotalSupply: 0,
-      vaultPriceUSD: 0,
-    }
-  }
-
   // Get Asset Price
   const { data: assetData } = await axios.get(
     'https://pro-openapi.debank.com/v1/token',
@@ -79,6 +65,22 @@ export default async function getSafeVaultPriceV2({
       }
     }
   );
+
+  if (totalValueUSD === 0 || totalSupply === ZERO) {
+    return {
+      vault: configuration.vault,
+      asset: configuration.asset,
+      shareValueInAssets: parseEther('1'),
+      assetValueInShares: parseEther('1'),
+      totalValueUSD,
+      assetPrice: assetData.price,
+      totalValueInAssets: 0,
+      formattedTotalSupply: 0,
+      vaultPriceUSD: 0,
+    }
+  }
+
+  
   const totalValueInAssets = totalValueUSD / assetData.price
   const formattedTotalSupply = Number(formatUnits(totalSupply, decimals))
   const vaultPrice = totalValueInAssets / formattedTotalSupply
@@ -119,7 +121,6 @@ async function getSafeHoldings({
         }
       }
     );
-    console.log(holdingsData)
     return holdingsData.usd_value
   }))
   return holdings.reduce((acc, curr) => acc + curr, 0)
