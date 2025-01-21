@@ -67,7 +67,7 @@ export default function VaultHero({
             <LargeCardStat
               id={"wallet"}
               label="Your Wallet"
-              value={Number(asset.balance.formattedUSD) < 1 ? "$ 0" : `$ ${NumberFormatter.format(Number(asset.balance.formattedUSD))}`}
+              value={Number(asset.balance.formattedUSD) === 0 ? "$ 0" : (Number(asset.balance.formattedUSD) > 0 && Number(asset.balance.formattedUSD) < 0.01) ? "< $ 0.01" : `$ ${NumberFormatter.format(Number(asset.balance.formattedUSD))}`}
               secondaryValue={Number(asset.balance.formattedUSD) < 1 ? `0 ${asset.symbol}` : `${NumberFormatter.format(Number(asset.balance.formatted))} ${asset.symbol}`}
               tooltip="Value of deposit assets held in your wallet"
             />
@@ -76,8 +76,8 @@ export default function VaultHero({
             <LargeCardStat
               id={"deposits"}
               label="Deposits"
-              value={depositValue(vault, gauge) < 1 ? "$ 0" : `$ ${NumberFormatter.format(depositValue(vault, gauge))}`}
-              secondaryValue={depositValue(vault, gauge) < 1 ? "0" :
+              value={depositValue(vault, gauge) === 0 ? "$ 0" : (depositValue(vault, gauge) < 0.01 && depositValue(vault, gauge) > 0) ? "< $ 0.01" : `$ ${NumberFormatter.format(depositValue(vault, gauge))}`}
+              secondaryValue={depositValue(vault, gauge) === 0 ? "$ 0" : (depositValue(vault, gauge) < 0.01 && depositValue(vault, gauge) > 0) ? "< $ 0.01" :
                 `${NumberFormatter.format(
                   !!gauge ?
                     Number(gauge.balance.formatted) + Number(vault!.balance.formatted)
