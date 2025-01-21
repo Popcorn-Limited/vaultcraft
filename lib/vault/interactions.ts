@@ -376,7 +376,7 @@ export async function vaultAsyncUnstakeWithdraw({
 
   if (success) {
     mutateTokenBalance({
-      tokensToUpdate: [vault.address, asset.address],
+      tokensToUpdate: [vaultData.gauge!, asset.address],
       account,
       tokensAtom,
       chainId
