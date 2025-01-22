@@ -40,14 +40,14 @@ export default function Kelp() {
           </p>
         </div>
       </section>
-      <div className="flex flex-row gap-4">
-        <div className="w-1/2 border border-customGray100/40 rounded-lg p-4 hover:bg-primaryGreen/10 hover:border-primaryGreen cursor-pointer"
+      <div className="lg:flex lg:flex-row gap-4 space-y-4 lg:space-y-0 mx-4 md:mx-0">
+        <div className="lg:w-1/2 border border-customGray100/40 rounded-lg p-4 hover:bg-primaryGreen/10 hover:border-primaryGreen cursor-pointer"
           onClick={() => router.push(`/vaults/0xcF9273BA04b875F94E4A9D8914bbD6b3C1f08EDb?chainId=1`)}>
           <div className="p-4">
-            <div className="flex flex-row items-center justify-between">
+            <div className="sm:flex sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
               <div>
                 <div
-                  className={`flex items-center gap-4 max-w-full flex-wrap md:flex-nowrap flex-1`}
+                  className={`flex items-center gap-4 max-w-full flex-wrap sm:flex-nowrap flex-1`}
                 >
                   <div className="relative">
                     <NetworkSticker chainId={wethVault.chainId} size={3} />
@@ -135,11 +135,11 @@ export default function Kelp() {
             </div>
           </div>
         </div>
-        <div className="w-1/2 border border-customGray100/40 rounded-lg p-4 hover:bg-primaryGreen/10 hover:border-primaryGreen cursor-pointer"
+        <div className="lg:w-1/2 border border-customGray100/40 rounded-lg p-4 hover:bg-primaryGreen/10 hover:border-primaryGreen cursor-pointer"
           onClick={() => router.push(`/vaults/0xB64D29F6AB71A11e55953a6EE030A92E6ACB8814?chainId=1`)}>
           <div className="p-4">
-            <div className="flex flex-row items-center justify-between">
-              <div>
+          <div className="sm:flex sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+          <div>
                 <div
                   className={`flex items-center gap-4 max-w-full flex-wrap md:flex-nowrap flex-1`}
                 >
