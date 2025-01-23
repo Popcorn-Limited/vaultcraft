@@ -176,10 +176,10 @@ export default function VaultRow({
         <WithTooltip
           content={`Earn between ${NumberFormatter.format(gaugeData?.lowerAPR || 0)}-${NumberFormatter.format(gaugeData?.upperAPR || 0)} % oVCX boost APR depending your balance of veVCX. (Based on the current emissions of ${NumberFormatter.format((gaugeData?.annualEmissions || 0) / 5)}-${NumberFormatter.format(gaugeData?.annualEmissions || 0)} oVCX p.Year)`}>
           <p className="text-lg">
-            {NumberFormatter.format(gaugeData?.upperAPR || 0)}%
+            {gaugeData?.upperAPR && gaugeData?.upperAPR > 0 ? gaugeData?.upperAPR > 0.0001 ? NumberFormatter.format(gaugeData?.upperAPR || 0) : ">0" : "0"}%
           </p>
           <p className="text-sm -mt-0.5 text-customGray200">
-            {NumberFormatter.format(gaugeData?.lowerAPR || 0)}%
+            {gaugeData?.lowerAPR && gaugeData?.lowerAPR > 0 ? gaugeData?.lowerAPR > 0.0001 ? NumberFormatter.format(gaugeData?.lowerAPR || 0) : ">0" : "0"}%
           </p>
         </WithTooltip>
       </td>
