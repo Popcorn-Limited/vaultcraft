@@ -176,7 +176,7 @@ export default function VaultHero({
                 <LargeCardStat
                   id={"boost"}
                   label="Boost APR"
-                  value={`${NumberFormatter.format(vaultData.gaugeData?.lowerAPR * boostValue(vaultData, gauge))} %`}
+                  value={`${vaultData.gaugeData?.lowerAPR > 0 ? vaultData.gaugeData?.lowerAPR > 0.0001 ? NumberFormatter.format(vaultData.gaugeData?.lowerAPR * boostValue(vaultData, gauge)) : ">0" : "0"} %`}
                   tooltip={`Minimum oVCX boost APR based on most current epoch's distribution. (Based on the current emissions for this gauge of
                      ${NumberFormatter.format((vaultData?.gaugeData.annualEmissions / 5) * boostValue(vaultData, gauge))} oVCX p. year)`}
                 />
