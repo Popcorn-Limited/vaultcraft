@@ -161,16 +161,21 @@ function SafeVaultInputs({
   function handleTokenSelect(option: Token, vault: Token) {
     setShowModal(false)
     setInputToken(option)
-    setOutputToken(gauge || vault)
 
-    if (option.address !== asset.address) {
-      setAction(gauge ? VaultActionType.ZapDepositAndStake : VaultActionType.ZapDeposit)
-      setSteps(selectActions(gauge ? VaultActionType.ZapDepositAndStake : VaultActionType.ZapDeposit))
-    } else {
-      // reset after selecting another token 
-      setAction(gauge ? VaultActionType.DepositAndStake : VaultActionType.Deposit)
-      setSteps(selectActions(gauge ? VaultActionType.DepositAndStake : VaultActionType.Deposit))
+    if (isDeposit) {
+      setOutputToken(gauge || vault)
+
+      if (option.address !== asset.address) {
+        setAction(gauge ? VaultActionType.ZapDepositAndStake : VaultActionType.ZapDeposit)
+        setSteps(selectActions(gauge ? VaultActionType.ZapDepositAndStake : VaultActionType.ZapDeposit))
+      } else {
+        // reset after selecting another token 
+        setAction(gauge ? VaultActionType.DepositAndStake : VaultActionType.Deposit)
+        setSteps(selectActions(gauge ? VaultActionType.DepositAndStake : VaultActionType.Deposit))
+      }
     }
+
+    // the withdraw case is managed in the handle preview since the action there depends on float assets
   }
 
   function handleChangeInput(e: any) {
@@ -222,24 +227,45 @@ function SafeVaultInputs({
       const expectedAssets = res[0].result as bigint;
       const float = res[1].result as bigint;
 
-      if (float >= expectedAssets) {
-        setAction(gauge ? VaultActionType.UnstakeAndRequestFulfillWithdraw : VaultActionType.RequestFulfillAndWithdraw)
-        setSteps(selectActions(gauge ? VaultActionType.UnstakeAndRequestFulfillWithdraw : VaultActionType.RequestFulfillAndWithdraw))
-      }
-    }
+      const vaultWithdraw = inputToken.address === vaultData.address;
 
-    const success = await findZapProvider({
-      action,
-      inputToken,
-      outputToken,
-      asset,
-      inputBalance,
-      zapProvider,
-      account,
-      vaultData,
-      setter: setZapProvider
-    });
-    if (success) setShowModal(true)
+      if (float >= expectedAssets) {
+        if (vaultWithdraw) {
+          // instant withdrawing vault input 
+          setAction(VaultActionType.RequestFulfillAndWithdraw)
+          setSteps(selectActions(VaultActionType.RequestFulfillAndWithdraw));
+        } else {
+          // instant withdrawing gauge input
+          setAction(VaultActionType.UnstakeAndRequestFulfillWithdraw);
+          setSteps(selectActions(VaultActionType.UnstakeAndRequestFulfillWithdraw))
+        }
+      } else {
+        if (vaultWithdraw) {
+          // request withdraw vault input 
+          setAction(VaultActionType.RequestWithdrawal)
+          setSteps(selectActions(VaultActionType.RequestWithdrawal));
+        } else {
+          // request withdraw gauge input
+          setAction(VaultActionType.UnstakeAndRequestWithdrawal);
+          setSteps(selectActions(VaultActionType.UnstakeAndRequestWithdrawal))
+        }
+      }
+
+      setShowModal(true);
+    } else {
+      const success = await findZapProvider({
+        action,
+        inputToken,
+        outputToken,
+        asset,
+        inputBalance,
+        zapProvider,
+        account,
+        vaultData,
+        setter: setZapProvider
+      });
+      if (success) setShowModal(true)
+    }
   }
 
   return (
