@@ -190,7 +190,7 @@ export default function VaultHero({
                 <LargeCardStat
                   id={"add-rewards"}
                   label="Add. Rewards"
-                  value={`${NumberFormatter.format(vaultData.gaugeData?.rewardApy.apy)} %`}
+                  value={`${vaultData.gaugeData?.rewardApy.apy > 0 ? vaultData.gaugeData?.rewardApy.apy > 0.0001 ? NumberFormatter.format(vaultData.gaugeData?.rewardApy.apy) : ">0" : "0"} %`}
                   tooltipChild={
                     <div className="w-42">
                       <p className="font-bold">Annual Rewards</p>

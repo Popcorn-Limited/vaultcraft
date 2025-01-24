@@ -22,7 +22,7 @@ export default function Kelp() {
   useEffect(() => {
     if (Object.keys(vaults).length > 0) {
       setWethVault(vaults[1].find(vault => vault.address === "0xcF9273BA04b875F94E4A9D8914bbD6b3C1f08EDb"))
-      setRsethVault(vaults[1].find(vault => vault.address === "0xB64D29F6AB71A11e55953a6EE030A92E6ACB8814"))
+      setRsethVault(vaults[1].find(vault => vault.address === "0x11eAA7a46afE1023f47040691071e174125366C8"))
       setWeth(tokens[1]["0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"])
       setRseth(tokens[1]["0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7"])
     }

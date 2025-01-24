@@ -33,3 +33,4 @@ export * from "./OracleVault";
 export * from "./AsyncVaultRouter";
 export * from "./OracleVaultController";
 export * from "./TokenMigration";
+export * from "./RsETHAdapter";

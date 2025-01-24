@@ -23,7 +23,9 @@ export const ROOT_GAUGE_FACTORY: Address = "0x6aa03ebAb1e9CB8d44Fd79153d3a258FFd
 
 export const VAULTRON: Address = "0x590e3A9260ffb7887ffD54A57d1FACf7db59c751"
 
-export const FEE_RECIPIENT_PROXY = "0x47fd36ABcEeb9954ae9eA1581295Ce9A8308655E" // Is the same on all deployed chains
+export const FEE_RECIPIENT_PROXY: Address = "0x47fd36ABcEeb9954ae9eA1581295Ce9A8308655E" // Is the same on all deployed chains
+
+export const RS_ETH_ADAPTER: Address = "0x31CCeA38DaFdd20082645937f7235BCDC5aaaac2"
 
 export const VaultRouterByChain: AddressByChain = {
   [mainnet.id]: "0x4995F3bb85E1381D02699e2164bC1C6c6Fa243cd",

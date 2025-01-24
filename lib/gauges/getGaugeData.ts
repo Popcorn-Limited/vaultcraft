@@ -326,11 +326,19 @@ async function getRewardsApy({
     fromBlock: ORACLES_DEPLOY_BLOCK[chainId] === 0 ? "earliest" : BigInt(ORACLES_DEPLOY_BLOCK[chainId]),
     toBlock: "latest",
   }) as any[];
+  const rewardTokens: Address[] = []
+  const filteredRewardLogs: any[] = []
+  for (const log of rewardLogs) {
+    if (!rewardTokens.includes(log.args.reward_token)) {
+      rewardTokens.push(log.args.reward_token)
+      filteredRewardLogs.push(log)
+    }
+  }
 
-  if (rewardLogs.length > 0) {
+  if (filteredRewardLogs.length > 0) {
     // @ts-ignore
     const rewardRes = await client.multicall({
-      contracts: rewardLogs.map(log => {
+      contracts: filteredRewardLogs.map(log => {
         return {
           address: gauge,
           abi: chainId === mainnet.id ? GaugeAbi : ChildGaugeAbi,
@@ -348,7 +356,7 @@ async function getRewardsApy({
     const rewardData = rewardRes.map((data, i) => {
       const rewardAddress = rewardLogs[i].args.reward_token!;
       const rewardEnded = Date.UTC(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()) >= Number(data.period_finish) * 1000
-      const emissions = rewardEnded ? 0 : ((Number(data.rate) / 1e18) * 86400 * 365) / (10 ** assets[rewardAddress].decimals)
+      const emissions = rewardEnded ? 0 : (Number(data.rate) * 86400 * 365) / (10 ** assets[rewardAddress].decimals)
       const emissionsValue = emissions * assets[rewardAddress].price;
       return {
         address: rewardAddress,
