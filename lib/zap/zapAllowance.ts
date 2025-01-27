@@ -7,6 +7,7 @@ import { getOneInchSpender } from "./oneInch";
 import { getKyberSwapSpender } from "./kyperswap";
 import { getParaSwapSpender } from "./paraswap";
 import { getOpenOceanSpender } from "./openOcean";
+import { RS_ETH_ADAPTER } from "../constants";
 
 
 export function getZapSpender({ account, chainId, zapProvider }: { account: Address, chainId: number, zapProvider: ZapProvider }): Address {
@@ -23,6 +24,8 @@ export function getZapSpender({ account, chainId, zapProvider }: { account: Addr
       return getKyberSwapSpender({ account, chainId })
     case ZapProvider.openOcean:
       return getOpenOceanSpender({ account, chainId })
+    case ZapProvider.kelp:
+      return chainId === 1 ? RS_ETH_ADAPTER : zeroAddress
     default:
       return zeroAddress
   }

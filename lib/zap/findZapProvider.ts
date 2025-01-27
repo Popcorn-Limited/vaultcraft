@@ -7,7 +7,8 @@ const ZAP_ACTIONS = [
   VaultActionType.ZapDeposit,
   VaultActionType.ZapDepositAndStake,
   VaultActionType.ZapUnstakeAndWithdraw,
-  VaultActionType.ZapWithdrawal
+  VaultActionType.ZapWithdrawal,
+  VaultActionType.ZapRsETHDeposit
 ]
 const DEPOSIT_ACTIONS = [
   VaultActionType.ZapDeposit,
@@ -44,14 +45,19 @@ export default async function findZapProvider({
 
     showLoadingToast("Searching for the best price...")
 
-    newZapProvider = await getZapProvider({
-      sellToken: DEPOSIT_ACTIONS.includes(action) ? inputToken : asset,
-      buyToken: DEPOSIT_ACTIONS.includes(action) ? asset : outputToken,
-      amount: val,
-      chainId: inputToken.chainId!,
-      account,
-      feeRecipient: vaultData.metadata.feeRecipient
-    })
+    if (vaultData.address === "0x11eAA7a46afE1023f47040691071e174125366C8") {
+      newZapProvider = ZapProvider.kelp
+    } else {
+      newZapProvider = await getZapProvider({
+        sellToken: DEPOSIT_ACTIONS.includes(action) ? inputToken : asset,
+        buyToken: DEPOSIT_ACTIONS.includes(action) ? asset : outputToken,
+        amount: val,
+        chainId: inputToken.chainId!,
+        account,
+        feeRecipient: vaultData.metadata.feeRecipient
+      })
+    }
+
 
     setter(newZapProvider)
 

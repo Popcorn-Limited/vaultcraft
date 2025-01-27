@@ -44,6 +44,7 @@ export async function getZapQuote({ sellToken, buyToken, amount, chainId, accoun
       return getOpenOceanQuote({ sellToken, buyToken, amount, chainId, account, zapProvider })
     // Not supported
     case ZapProvider.zeroX:
+    case ZapProvider.kelp:
     default:
       return { zapProvider: ZapProvider.notFound, out: 0 }
   }

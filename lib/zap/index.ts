@@ -9,6 +9,7 @@ import { getKyberSwapTransaction } from "./kyperswap";
 import { getOpenOceanTransaction } from "./openOcean";
 import { ChainById } from "@/lib/utils/connectors";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
+import { getKelpTransaction } from "./kelp";
 
 export interface BaseZapProps {
   chainId: number;
@@ -38,6 +39,8 @@ async function getZapTransaction({ chainId, sellToken, buyToken, amount, account
       return getKyberSwapTransaction({ chainId, sellToken, buyToken, amount, account, zapProvider, slippage, tradeTimeout })
     case ZapProvider.openOcean:
       return getOpenOceanTransaction({ chainId, sellToken, buyToken, amount, account, zapProvider, slippage, tradeTimeout })
+    case ZapProvider.kelp:
+      return getKelpTransaction({ chainId, sellToken, buyToken, amount, account, zapProvider, slippage, tradeTimeout })
     // Not yet supported
     case ZapProvider.zeroX:
     default:

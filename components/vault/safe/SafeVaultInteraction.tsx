@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { VaultInputsProps } from "@/components/vault/VaultInputs";
 import { ArrowDownIcon } from "@heroicons/react/24/outline";
 import { tokensAtom } from "@/lib/atoms";
-import { OracleVaultAbi } from "@/lib/constants";
+import { OracleVaultAbi, RS_ETH_ASSETS } from "@/lib/constants";
 import { http, createPublicClient, zeroAddress, Address, parseUnits, maxUint256, erc20Abi } from "viem";
 import SpinningLogo from "@/components/common/SpinningLogo";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
@@ -22,7 +22,6 @@ import findZapProvider from "@/lib/zap/findZapProvider";
 import { selectActions } from "@/lib/vault/vaultHelpers";
 import VaultInteractionContainer from "../VaultInteraction";
 import { vaultCancelRedeem, vaultRedeem } from "@/lib/vault/interactions";
-
 
 async function fetchData(user: Address, vaultData: VaultData) {
   const client = createPublicClient({
@@ -166,8 +165,13 @@ function SafeVaultInputs({
       setOutputToken(gauge || vault)
 
       if (option.address !== asset.address) {
-        setAction(gauge ? VaultActionType.ZapDepositAndStake : VaultActionType.ZapDeposit)
-        setSteps(selectActions(gauge ? VaultActionType.ZapDepositAndStake : VaultActionType.ZapDeposit))
+        if (vaultData.address === "0x11eAA7a46afE1023f47040691071e174125366C8" && RS_ETH_ASSETS.includes(option.address)) {
+          setAction(VaultActionType.ZapRsETHDeposit)
+          setSteps(selectActions(VaultActionType.ZapRsETHDeposit))
+        } else {
+          setAction(gauge ? VaultActionType.ZapDepositAndStake : VaultActionType.ZapDeposit)
+          setSteps(selectActions(gauge ? VaultActionType.ZapDepositAndStake : VaultActionType.ZapDeposit))
+        }
       } else {
         // reset after selecting another token 
         setAction(gauge ? VaultActionType.DepositAndStake : VaultActionType.Deposit)
