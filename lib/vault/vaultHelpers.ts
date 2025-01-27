@@ -217,6 +217,12 @@ export function selectActions(action: VaultActionType) {
         Action.zap,
         Action.done
       ]
+    case VaultActionType.ZapRsETHDeposit:
+      return [
+        Action.zapApprove,
+        Action.zap,
+        Action.done
+      ]
   }
 }
 

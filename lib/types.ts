@@ -195,7 +195,8 @@ export enum VaultActionType {
   ZapUnstakeAndWithdraw,
   ZapFulfillAndWithdraw,
   ZapRequestFulfillAndWithdraw,
-  ZapUnstakeAndRequestFulfillWithdraw
+  ZapUnstakeAndRequestFulfillWithdraw,
+  ZapRsETHDeposit
 }
 
 export enum VaultAction {
