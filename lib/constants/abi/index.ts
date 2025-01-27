@@ -34,3 +34,5 @@ export * from "./AsyncVaultRouter";
 export * from "./OracleVaultController";
 export * from "./TokenMigration";
 export * from "./RsETHAdapter";
+export * from "./OracleVaultControllerV2";
+export * from "./PushOracleV2";

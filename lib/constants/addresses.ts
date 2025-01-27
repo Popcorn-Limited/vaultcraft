@@ -240,6 +240,30 @@ export const VaultOracleOwnerByChain: AddressByChain = {
   [bsc.id]: zeroAddress,
 }
 
+export const VaultOracleV2ByChain: AddressByChain = {
+  [mainnet.id]: "0xff30A56c6413A5429d260a041d494509C8876E20",
+  [optimism.id]: "0x7EbEa6054BDA446C4D781E323bE2068A57261889",
+  [arbitrum.id]: "0x233E9cE41C553616141a000cC8E99BC9Ed9345e9",
+  [xLayer.id]: zeroAddress,
+  [base.id]: "0xA76331558b8D501dd644603e98aE02e291bBD197",
+  [fraxtal.id]: zeroAddress,
+  [avalanche.id]: zeroAddress,
+  [polygon.id]: zeroAddress,
+  [bsc.id]: zeroAddress,
+}
+
+export const VaultOracleOwnerV2ByChain: AddressByChain = {
+  [mainnet.id]: "0xD158eC0bc85c1b109B1d2fe962BE492F9f50499E",
+  [optimism.id]: "0x04AE0847765C3a3894c147BfAe1C09f22d1acF64",
+  [arbitrum.id]: "0xFfDca6ac9BF315409f8b4a60C9f2bc6af1e5dDdf",
+  [xLayer.id]: zeroAddress,
+  [base.id]: "0x1dD54D16B256658950d37a6D8657B3dD1a98B260",
+  [fraxtal.id]: zeroAddress,
+  [avalanche.id]: zeroAddress,
+  [polygon.id]: zeroAddress,
+  [bsc.id]: zeroAddress,
+}
+
 export const ManagementMultisigByChain: AddressByChain = {
   [mainnet.id]: "0xB85e0d4ad9078676Ca86C6bAa51228aB3E21F5da",
   [optimism.id]: "0xE8021873695943499168052AF6983aE674285aF1",
