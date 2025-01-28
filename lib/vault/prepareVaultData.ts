@@ -13,7 +13,7 @@ import {
 import axios from "axios";
 import { VaultAbi } from "@/lib/constants/abi/Vault";
 import { ApyData, Strategy, TokenByAddress, VaultData, VaultDataByAddress, VaultLabel, VaultMetadata, StrategyMetadata, LlamaApy } from "@/lib/types";
-import { ERC20Abi, OracleVaultAbi, SECONDS_PER_YEAR, VaultOracleByChain, VeTokenByChain, ORACLES_DEPLOY_BLOCK, AssetPushOracleAbi } from "@/lib/constants";
+import { ERC20Abi, OracleVaultAbi, SECONDS_PER_YEAR, VaultOracleByChain, VeTokenByChain, ORACLES_DEPLOY_BLOCK, AssetPushOracleAbi, VaultOracleV2ByChain } from "@/lib/constants";
 import getGaugesData from "@/lib/gauges/getGaugeData";
 import { EMPTY_LLAMA_APY_ENTRY, getApy } from "@/lib/resolver/apy";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
@@ -198,7 +198,7 @@ async function getSafeVaultApy(vault: VaultData): Promise<LlamaApy[]> {
   })
 
   const logs = await client.getContractEvents({
-    address: VaultOracleByChain[vault.chainId],
+    address: vault.address === "0x22BE8D6596595B6E29e3a8A71C551D9a6388C236" ? VaultOracleV2ByChain[vault.chainId] : VaultOracleByChain[vault.chainId],
     abi: AssetPushOracleAbi,
     eventName: "PriceUpdated",
     fromBlock: ORACLES_DEPLOY_BLOCK[vault.chainId] === 0 ? "earliest" : BigInt(ORACLES_DEPLOY_BLOCK[vault.chainId]),
