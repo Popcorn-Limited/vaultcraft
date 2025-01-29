@@ -114,7 +114,7 @@ export async function addDynamicVaultsData(vaults: VaultDataByAddress, client: P
   const dynamicValues = await client.multicall({
     contracts: Object.values(vaults)
       .map((vault: VaultData) => {
-        return vaults[vault.address].metadata.type === "safe-vault-v1" ?
+        return vaults[vault.address].metadata.type.includes("safe-vault") ?
           [
             {
               address: vault.address,
@@ -177,7 +177,7 @@ export async function addDynamicVaultsData(vaults: VaultDataByAddress, client: P
     vaults[vault.address].assetsPerShare = totalSupply > 0 ? Number(totalAssets) / Number(totalSupply) : 1;
     vaults[vault.address].idle = returnBigIntResult(dynamicValues[i + 3]);
 
-    if (vaults[vault.address].metadata.type === "safe-vault-v1") {
+    if (vaults[vault.address].metadata.type.includes("safe-vault")) {
       // @ts-ignore
       vaults[vault.address].depositLimit = dynamicValues[i + 2].status === "success" ? dynamicValues[i + 2].result[0] as unknown as bigint : BigInt(0);
       // @ts-ignore
@@ -254,7 +254,7 @@ export async function addApyHist(vaults: VaultDataByAddress): Promise<VaultDataB
     if (vault.apyData.apyId?.length > 0) {
       return getApy(vault.apyData.apyId)
     }
-    else if (vault.metadata.type === "safe-vault-v1") {
+    else if (vault.metadata.type.includes("safe-vault")) {
       return getSafeVaultApy(vault)
     } else {
       return []
@@ -299,7 +299,7 @@ export async function addStrategyData(vaults: VaultDataByAddress, strategies: { 
 
   let n = 0
   Object.keys(vaults).forEach((address: any) => {
-    if (vaults[address].metadata.type === "safe-vault-v1") {
+    if (vaults[address].metadata.type.includes("safe-vault")) {
       const safeVault = vaults[address]
       const lastApy = safeVault.apyData.apyHist.length > 0 ? safeVault.apyData.apyHist[safeVault.apyData.apyHist.length - 1] : EMPTY_LLAMA_APY_ENTRY
 

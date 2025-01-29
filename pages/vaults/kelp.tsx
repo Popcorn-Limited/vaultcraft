@@ -95,7 +95,7 @@ export default function Kelp() {
                   }
                   tooltip={`This Vault deploys its TVL $ ${wethVault.tvl < 1 ? "0" : NumberFormatter.format(wethVault.tvl)}
                       (${NumberFormatter.format(Number(formatBalance(wethVault.totalAssets, weth?.decimals || 0)))} ${weth?.symbol || "TKN"}) 
-                      in $ ${wethVault.metadata.type === "safe-vault-v1"
+                      in $ ${wethVault.metadata.type.includes("safe-vault")
                       ? "?"
                       : NumberFormatter.format(wethVault.strategies.reduce((a, b) => a + b.apyData.apyHist[b.apyData.apyHist.length - 1].tvl, 0))} 
                       TVL of underlying protocols`}
@@ -193,7 +193,7 @@ export default function Kelp() {
                   }
                   tooltip={`This Vault deploys its TVL $ ${rsethVault.tvl < 1 ? "0" : NumberFormatter.format(rsethVault.tvl)}
                       (${NumberFormatter.format(Number(formatBalance(rsethVault.totalAssets, rseth?.decimals || 0)))} ${rseth?.symbol || "TKN"}) 
-                      in $ ${rsethVault.metadata.type === "safe-vault-v1"
+                      in $ ${rsethVault.metadata.type.includes("safe-vault")
                       ? "?"
                       : NumberFormatter.format(rsethVault.strategies.reduce((a, b) => a + b.apyData.apyHist[b.apyData.apyHist.length - 1].tvl, 0))} 
                       TVL of underlying protocols`}

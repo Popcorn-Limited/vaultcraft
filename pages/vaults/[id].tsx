@@ -88,7 +88,7 @@ export default function Index() {
 
             <section className="w-full md:flex md:flex-row md:justify-between md:space-x-8 py-10 px-4 md:px-0">
               <div className="w-full md:w-1/3">
-                {vaultData.metadata.type === "safe-vault-v1"
+                {vaultData.metadata.type.includes("safe-vault")
                   ? <SafeVaultInteraction vaultData={vaultData} tokenOptions={tokenOptions} chainId={vaultData.chainId} hideModal={() => router.reload()} />
                   : <div className="bg-customNeutral200 p-6 rounded-lg">
                     <div className="bg-customNeutral300 px-6 py-6 rounded-lg">

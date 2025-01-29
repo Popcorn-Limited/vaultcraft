@@ -21,7 +21,7 @@ export default function WithdrawalProcessingContainer() {
 
   useEffect(() => {
     if (Object.keys(vaultsData).length > 0 && vaults.length === 0) {
-      setVaults(SUPPORTED_NETWORKS.map((chain) => vaultsData[chain.id]).flat().filter(vault => vault.metadata.type === "safe-vault-v1"));
+      setVaults(SUPPORTED_NETWORKS.map((chain) => vaultsData[chain.id]).flat().filter(vault => vault.metadata.type.includes("safe-vault")));
     }
   }, [vaultsData, vaults]);
 
