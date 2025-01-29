@@ -53,6 +53,8 @@ export const IconByProtocol: { [key: string]: string } = {
   Matrixport: "/images/icons/matrixport.png",
   UltraYield: "/images/icons/ultrayield.svg",
   Keyrock: "/images/icons/keyrock.png",
+  Kernel: "/images/icons/kernel.png",
+  Dinero: "/images/icons/dinero.png",
   Multistrategy: "/images/tokens/vcx.svg",
   VaultCraft: "/images/tokens/vcx.svg",
   None: "/images/tokens/vcx.svg"
