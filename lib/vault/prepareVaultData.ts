@@ -198,7 +198,7 @@ async function getSafeVaultApy(vault: VaultData): Promise<LlamaApy[]> {
   })
 
   const logs = await client.getContractEvents({
-    address: vault.address === "0x22BE8D6596595B6E29e3a8A71C551D9a6388C236" ? VaultOracleV2ByChain[vault.chainId] : VaultOracleByChain[vault.chainId],
+    address: vault.metadata.type === "safe-vault-v1.5" ? VaultOracleV2ByChain[vault.chainId] : VaultOracleByChain[vault.chainId],
     abi: AssetPushOracleAbi,
     eventName: "PriceUpdated",
     fromBlock: ORACLES_DEPLOY_BLOCK[vault.chainId] === 0 ? "earliest" : BigInt(ORACLES_DEPLOY_BLOCK[vault.chainId]),

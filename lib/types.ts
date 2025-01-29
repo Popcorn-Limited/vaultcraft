@@ -122,7 +122,8 @@ export type VaultMetadata = {
   | "multi-strategy-vault-v1"
   | "multi-strategy-vault-v2"
   | "multi-strategy-vault-v2.5"
-  | "safe-vault-v1";
+  | "safe-vault-v1"
+  | "safe-vault-v1.5";
   creator: Address;
   feeRecipient: Address;
 };
