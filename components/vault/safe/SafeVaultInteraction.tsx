@@ -125,9 +125,9 @@ function SafeVaultInputs({
   const publicClient = usePublicClient({ chainId })
 
   const [tokens] = useAtom(tokensAtom)
-  const asset = tokens[chainId][vaultData.asset]
-  const vault = tokens[chainId][vaultData.vault]
-  const gauge = vaultData.gauge && vaultData.gauge !== zeroAddress ? tokens[chainId][vaultData.gauge] : undefined
+  const [asset, setAsset] = useState<Token>(tokens[chainId][vaultData.asset])
+  const [vault, setVault] = useState<Token>(tokens[chainId][vaultData.vault])
+  const [gauge, setGauge] = useState<Token | undefined>(vaultData.gauge && vaultData.gauge !== zeroAddress ? tokens[chainId][vaultData.gauge] : undefined)
 
   const [inputToken, setInputToken] = useState<Token>(asset);
   const [outputToken, setOutputToken] = useState<Token>(gauge || vault);
@@ -140,6 +140,14 @@ function SafeVaultInputs({
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [showModal, setShowModal] = useState<boolean>(false)
   const [zapProvider, setZapProvider] = useState<ZapProvider>(ZapProvider.none)
+
+  useEffect(() => {
+    setAsset(tokens[chainId][vaultData.asset])
+    setVault(tokens[chainId][vaultData.vault])
+    setGauge(vaultData.gauge && vaultData.gauge !== zeroAddress ? tokens[chainId][vaultData.gauge] : undefined)
+    setInputToken(tokens[chainId][vaultData.asset])
+    setOutputToken(vaultData.gauge && vaultData.gauge !== zeroAddress ? tokens[chainId][vaultData.gauge] : tokens[chainId][vaultData.vault])
+  }, [account, tokens])
 
   function switchTokens() {
     if (isDeposit) {
