@@ -10,7 +10,7 @@ import { Token } from "@/lib/types";
 import { formatBalance, validateInput } from "@/lib/utils/helpers";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
-import { Address, formatUnits } from "viem";
+import { Address, formatUnits, parseUnits } from "viem";
 import { useAccount, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
 
 export default function RewardsSection({ gauge, chainId }: { gauge: Address; chainId: number }) {
@@ -90,7 +90,7 @@ function RewardColumn({ gauge, reward, token, chainId }: { gauge: Address, rewar
     handleAllowance({
       token: token.address,
       spender: gauge,
-      amount: val,
+      amount: parseUnits(amount, 18),
       account: account,
       clients: {
         publicClient,

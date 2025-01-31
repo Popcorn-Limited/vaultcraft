@@ -28,7 +28,7 @@ import BroadcastVeBalanceInterface from "./BroadcastVeBalanceInterface";
 import mutateTokenBalance from "@/lib/vault/mutateTokenBalance";
 import { tokensAtom } from "@/lib/atoms";
 import { useAtom } from "jotai";
-import { Address } from "viem";
+import { Address, parseUnits } from "viem";
 
 export enum ManagementOption {
   IncreaseLock,
@@ -99,7 +99,7 @@ export default function ManageLockModal({
       if ((val || 0) === 0) return;
       await handleAllowance({
         token: VCX_LP,
-        amount: val * 10 ** 18 || 0,
+        amount: parseUnits(String(amount), 18),
         account: account,
         spender: VOTING_ESCROW,
         clients

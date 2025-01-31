@@ -1,4 +1,4 @@
-import { Address } from "viem";
+import { Address, parseUnits } from "viem";
 import { handleAllowance } from "@/lib/approve";
 import { Clients, Token } from "@/lib/types";
 import { borrowFromAave, repayToAave, supplyToAave, withdrawFromAave } from "./interactions";
@@ -27,7 +27,7 @@ export default async function handleAaveInteraction({ action, stepCounter, chain
       if (stepCounter === 0) {
         return () => handleAllowance({
           token: inputToken.address,
-          amount,
+          amount: parseUnits(String(amount), inputToken.decimals),
           account,
           spender: AavePoolByChain[chainId],
           clients
@@ -64,7 +64,7 @@ export default async function handleAaveInteraction({ action, stepCounter, chain
       if (stepCounter === 0) {
         return () => handleAllowance({
           token: inputToken.address,
-          amount,
+          amount: parseUnits(String(amount), inputToken.decimals),
           account,
           spender: AavePoolByChain[chainId],
           clients

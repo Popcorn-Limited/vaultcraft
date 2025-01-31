@@ -89,7 +89,7 @@ export default function LockModal({
       case 0:
         success = await handleAllowance({
           token: VCX_LP,
-          amount: val,
+          amount: parseUnits(amount, 18),
           account: account as Address,
           spender: VOTING_ESCROW,
           clients: {

@@ -245,7 +245,7 @@ export function handleVaultInteraction(
       return () =>
         handleAllowance({
           token: inputToken.address,
-          amount: Number(amount),
+          amount: amount,
           account,
           spender: vaultData.address,
           clients,
@@ -254,7 +254,7 @@ export function handleVaultInteraction(
       return () =>
         handleAllowance({
           token: inputToken.address,
-          amount: Number(amount),
+          amount: amount,
           account,
           spender: vaultData.gauge!,
           clients,
@@ -264,7 +264,7 @@ export function handleVaultInteraction(
       return () =>
         handleAllowance({
           token: inputToken.address,
-          amount: Number(amount),
+          amount: amount,
           account,
           spender: VaultRouterByChain[vaultData.chainId],
           clients,
@@ -274,7 +274,7 @@ export function handleVaultInteraction(
         handleAllowance({
           token: inputToken.address,
           vault: vaultData.gauge ? vaultData.address : undefined,
-          amount: Number(amount),
+          amount: amount,
           account,
           spender: AsyncRouterByChain[vaultData.chainId],
           clients,
@@ -282,7 +282,7 @@ export function handleVaultInteraction(
     case Action.zapApprove:
       return () => handleZapAllowance({
         token: inputToken.address,
-        amount: Number(amount),
+        amount: amount,
         account,
         zapProvider,
         clients

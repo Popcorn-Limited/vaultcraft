@@ -18,7 +18,7 @@ import { BalancerOracleAbi, ZERO } from "@/lib/constants";
 import { ExerciseByChain, ExerciseOracleByChain, OVCX_ORACLE, OptionTokenByChain, VCX, VcxByChain, WETH, WethByChain } from "@/lib/constants/addresses";
 import { handleSwitchChain, NumberFormatter, validateInput } from "@/lib/utils/helpers";
 import { Token } from "@/lib/types";
-import { Address, createPublicClient, formatEther, http, parseEther } from "viem";
+import { Address, createPublicClient, formatEther, http, parseEther, parseUnits } from "viem";
 import { useAtom } from "jotai";
 import { tokensAtom } from "@/lib/atoms";
 import ActionSteps from "@/components/vault/ActionSteps";
@@ -150,7 +150,7 @@ export default function ExerciseOptionTokenInterface({ chainId, setShowModal }: 
       case 0:
         success = await handleAllowance({
           token: WethByChain[chainId],
-          amount: Number(maxPaymentAmount) * 10 ** 18 || 0,
+          amount: parseUnits(maxPaymentAmount, 18),
           account: account as Address,
           spender: ExerciseByChain[chainId],
           clients: {
@@ -162,7 +162,7 @@ export default function ExerciseOptionTokenInterface({ chainId, setShowModal }: 
       case 1:
         success = chainId === mainnet.id || await handleAllowance({
           token: OptionTokenByChain[chainId],
-          amount: Number(amount) * 10 ** 18 || 0,
+          amount: parseUnits(amount, 18),
           account: account as Address,
           spender: ExerciseByChain[chainId],
           clients: {

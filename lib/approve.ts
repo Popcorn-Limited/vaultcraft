@@ -13,7 +13,7 @@ import { handleCallResult, simulateCall } from "./utils/helpers";
 interface HandleAllowanceProps {
   token: Address;
   vault?: Address;
-  amount: number;
+  amount: bigint;
   account: Address;
   spender: Address;
   clients: Clients;
@@ -67,7 +67,7 @@ export async function handleAllowance({
   // approve precise amount
   if (Number(allowance) === 0) {
     await approve({
-      amount: BigInt(amount),
+      amount,
       address: token,
       account,
       spender,
@@ -88,7 +88,7 @@ export async function handleAllowance({
     }
 
     await approve({
-      amount: BigInt(amount),
+      amount: amount,
       address: token,
       account,
       spender,
@@ -118,7 +118,7 @@ export default async function approve({
     success,
     error: simulationError,
   } = await simulateApprove({
-    amount,
+    amount: amount * BigInt(110) / BigInt(100),
     address,
     account,
     spender,

@@ -15,7 +15,7 @@ import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import NoSSR from "react-no-ssr";
-import { getAddress } from "viem";
+import { getAddress, parseUnits } from "viem";
 import { useAccount, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
 
 async function simulateCall({
@@ -343,7 +343,7 @@ function StakingRewardFunding() {
               label="Approve VCX"
               handleClick={() => handleAllowance({
                 token: VCX,
-                amount: Number(vcxAmount) * 1e18,
+                amount: parseUnits(String(vcxAmount), 18),
                 account,
                 spender: ST_VCX,
                 clients: {
@@ -356,7 +356,7 @@ function StakingRewardFunding() {
               label="Approve oVCX"
               handleClick={() => handleAllowance({
                 token: OptionTokenByChain[1],
-                amount: Number(ovcxAmount) * 1e18,
+                amount: parseUnits(String(ovcxAmount), 18),
                 account,
                 spender: ST_VCX,
                 clients: {

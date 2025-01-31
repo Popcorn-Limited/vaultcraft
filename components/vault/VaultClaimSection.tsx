@@ -3,7 +3,7 @@ import { ClaimableReward, VaultData } from "@/lib/types";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { useAccount, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
-import { Address, zeroAddress } from "viem";
+import { Address, parseUnits, zeroAddress } from "viem";
 import getGaugeRewards from "@/lib/gauges/getGaugeRewards";
 import { claimOPop } from "@/lib/optionToken/interactions";
 import { gaugeRewardsAtom, tokensAtom } from "@/lib/atoms";
@@ -70,7 +70,7 @@ export default function VaultClaimSection({ vaultData }: { vaultData: VaultData 
     if (wrappedTokenReward && wrappedTokenReward.amount > 0) {
       success = await handleAllowance({
         token: wrappedTokenReward.token.address,
-        amount: wrappedTokenReward.amount,
+        amount: parseUnits(String(wrappedTokenReward.amount), 18),
         account: account,
         spender: RewardsClaimerByChain[vaultData?.chainId],
         clients

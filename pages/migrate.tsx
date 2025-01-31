@@ -92,7 +92,7 @@ export default function Migrate() {
     handleAllowance({
       token: selectedTab === "VCX" ? VcxByChain[chainId] : OptionTokenByChain[chainId],
       spender: TokenMigrationByChain[chainId],
-      amount: Number(amount) * 1e18,
+      amount: parseUnits(amount, 18),
       account: account,
       clients: {
         publicClient,

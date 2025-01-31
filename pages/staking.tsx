@@ -768,7 +768,7 @@ function handleInteraction(
       return () =>
         handleAllowance({
           token: inputToken.address,
-          amount,
+          amount: parseUnits(String(amount), inputToken.decimals),
           account,
           spender: vault.address,
           clients,
@@ -776,7 +776,7 @@ function handleInteraction(
     case Action.zapApprove:
       return () => handleZapAllowance({
         token: inputToken.address,
-        amount,
+        amount: parseUnits(String(amount), inputToken.decimals),
         account,
         zapProvider,
         clients

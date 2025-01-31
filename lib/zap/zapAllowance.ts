@@ -33,7 +33,7 @@ export function getZapSpender({ account, chainId, zapProvider }: { account: Addr
 
 interface HandleZapAllowanceProps {
   token: Address;
-  amount: number;
+  amount: bigint;
   account: Address;
   zapProvider: ZapProvider;
   clients: Clients;

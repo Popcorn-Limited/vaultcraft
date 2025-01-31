@@ -5,7 +5,7 @@ import {
   useWalletClient,
 } from "wagmi";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { Address } from "viem";
+import { Address, parseUnits } from "viem";
 import Modal from "@/components/modal/Modal";
 import MainActionButton from "@/components/button/MainActionButton";
 import LpInfo from "@/components/boost/modals/lp/LpInfo";
@@ -76,7 +76,7 @@ export default function LpModal({
       case 0:
         success = await handleAllowance({
           token: WETH,
-          amount: wethVal,
+          amount: parseUnits(wethAmount, 18),
           account: account as Address,
           spender: BALANCER_VAULT,
           clients: {
@@ -88,7 +88,7 @@ export default function LpModal({
       case 1:
         success = await handleAllowance({
           token: VCX,
-          amount: vcxVal,
+          amount: parseUnits(vcxAmount, 18),
           account: account,
           spender: BALANCER_VAULT,
           clients: {
