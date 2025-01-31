@@ -1,7 +1,7 @@
 import { Token } from "@/lib/types";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
-import { Address, PublicClient } from "viem";
+import { Address, parseUnits, PublicClient } from "viem";
 import axios from "axios";
 import { AnyToAnyDepositorAbi, ORACLES_DEPLOY_BLOCK, PendleRouterByChain } from "@/lib/constants";
 import { tokensAtom } from "@/lib/atoms";
@@ -162,7 +162,7 @@ function ConvertToken({ token, strategy, asset, yieldToken, settings, chainId, u
     handleAllowance({
       token: inputToken.address,
       spender: isZap ? PendleRouterByChain[1] : strategy.address,
-      amount: val,
+      amount: parseUnits(String(val), token.decimals),
       account: account,
       clients: {
         publicClient,

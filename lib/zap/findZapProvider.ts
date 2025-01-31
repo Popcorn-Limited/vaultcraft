@@ -2,6 +2,7 @@ import { showLoadingToast, showErrorToast, showSuccessToast } from "@/lib/toasts
 import { Balance, VaultActionType, Token, VaultData, ZapProvider } from "@/lib/types";
 import { getZapProvider } from "./zapProvider";
 import { Address } from "viem";
+import { RS_ETH_ASSETS } from "../constants/addresses";
 
 const ZAP_ACTIONS = [
   VaultActionType.ZapDeposit,
@@ -45,7 +46,7 @@ export default async function findZapProvider({
 
     showLoadingToast("Searching for the best price...")
 
-    if (vaultData.address === "0x11eAA7a46afE1023f47040691071e174125366C8") {
+    if (vaultData.address === "0x11eAA7a46afE1023f47040691071e174125366C8" && RS_ETH_ASSETS.includes(inputToken.address)) {
       newZapProvider = ZapProvider.kelp
     } else {
       newZapProvider = await getZapProvider({
