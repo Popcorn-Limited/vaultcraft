@@ -87,7 +87,7 @@ export default function InputTokenWithError({
                 </svg>
               </div>
               <p className={`${allowInput ? "group-hover/max:text-white" : ""}`}>
-                {selectedToken?.balance.formatted || "0"}
+                {Intl.NumberFormat("en", { useGrouping: true }).format(Number(selectedToken?.balance.formatted || "0"))}
               </p>
             </div>
           </div>
