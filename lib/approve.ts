@@ -65,7 +65,7 @@ export async function handleAllowance({
   let allowance = await fetchAllowance();
 
   // approve precise amount
-  if (Number(allowance) === 0) {
+  if (allowance === BigInt(0)) {
     await approve({
       amount,
       address: token,
@@ -74,7 +74,7 @@ export async function handleAllowance({
       publicClient: clients.publicClient,
       walletClient: clients.walletClient,
     });
-  } else if (Number(allowance) < amount) {
+  } else if (allowance < amount) {
     // We need to zero the allowance first with POP
     if (token === POP) {
       await approve({
