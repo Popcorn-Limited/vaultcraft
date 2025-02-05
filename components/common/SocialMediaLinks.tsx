@@ -23,7 +23,7 @@ export default function SocialMediaLinks({
       <a href="https://discord.com/invite/kgCun7SbkR" target="_blank">
         <DiscordIcon color={color} size={size} />
       </a>
-      <a href="https://t.me/vaultcraft" target="_blank">
+      <a href="https://t.me/+d1cPfC5NI-tkN2Fi" target="_blank">
         <TelegramIcon color={color} size={size} />
       </a>
       <a href="https://medium.com/vaultcraft" target="_blank">
