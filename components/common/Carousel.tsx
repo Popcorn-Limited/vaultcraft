@@ -5,15 +5,6 @@ import MainActionButton from '@/components/button/MainActionButton'
 
 const banners = [
   {
-    id: 'bannerRebrand',
-    title: 'VaultCraft V2 is here, Institutional DeFi',
-    description: '',
-    buttonText: 'Check it out',
-    buttonLink: 'https://docs.vaultcraft.io/products/v2-safe-smart-vaults',
-    imageSrc: 'images/background.png',
-    tokenSrc: 'images/banner/bannerRebrand.png'
-  },
-  {
     id: 'bannerMigration',
     title: 'VCX migration to Base',
     description: 'Please migrate your VCX on Ethereum to Base by April 1, 2025, as per VIP-41',
@@ -21,6 +12,15 @@ const banners = [
     buttonLink: '/migrate',
     imageSrc: 'images/banner/bannerMigration.png',
     tokenSrc: 'images/banner/migrationIcon.png'
+  },
+  {
+    id: 'bannerRebrand',
+    title: 'VaultCraft V2 is here, Institutional DeFi',
+    description: '',
+    buttonText: 'Check it out',
+    buttonLink: 'https://docs.vaultcraft.io/products/v2-safe-smart-vaults',
+    imageSrc: 'images/background.png',
+    tokenSrc: 'images/banner/bannerRebrand.png'
   }
 ]
 
@@ -51,11 +51,12 @@ export default function Carousel() {
           >
             {index === 0 ?
               <div className="w-full h-48 relative rounded-xl border border-customNeutral100">
-                <img src={banner.imageSrc} alt={banner.title} className="w-full h-full object-cover object-bottom-left opacity-70 rounded-xl" />
+                <img src={banner.imageSrc} alt={banner.title} className="w-full h-48 object-cover object-bottom-left opacity-70 rounded-xl" />
                 <div className="absolute inset-0">
                   <div className='flex flex-row items-center justify-between'>
                     <div className="flex flex-col px-8 text-white">
-                      <h2 className="text-white text-3xl mb-2 w-2/3 leading-tight mt-4">{banner.title}</h2>
+                      <h2 className="text-white text-2xl font-bold mb-2 mt-6">{banner.title}</h2>
+                      <p className="text-white mb-4">{banner.description}</p>
                       <Link href={banner.buttonLink} passHref>
                         <div className="w-40">
                           <MainActionButton label={banner.buttonText} />
@@ -66,13 +67,13 @@ export default function Carousel() {
                   </div>
                 </div>
               </div>
-              : <div className="w-full h-48 relative rounded-xl border border-customNeutral100">
-                <img src={banner.imageSrc} alt={banner.title} className="w-full h-48 object-cover object-bottom-left opacity-70 rounded-xl" />
+              :
+              <div className="w-full h-48 relative rounded-xl border border-customNeutral100">
+                <img src={banner.imageSrc} alt={banner.title} className="w-full h-full object-cover object-bottom-left opacity-70 rounded-xl" />
                 <div className="absolute inset-0">
                   <div className='flex flex-row items-center justify-between'>
                     <div className="flex flex-col px-8 text-white">
-                      <h2 className="text-white text-2xl font-bold mb-2 mt-6">{banner.title}</h2>
-                      <p className="text-white mb-4">{banner.description}</p>
+                      <h2 className="text-white text-3xl mb-2 w-2/3 leading-tight mt-4">{banner.title}</h2>
                       <Link href={banner.buttonLink} passHref>
                         <div className="w-40">
                           <MainActionButton label={banner.buttonText} />
