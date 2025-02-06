@@ -1,11 +1,10 @@
-import { showLoadingToast, showSuccessToast, showErrorToast } from "@/lib/toasts";
-import { toast } from "react-hot-toast";
 import axios from "axios";
 
-export type AssistantMessages = {
+export type AssistantMessage = {
     role: string;
     content: string;
     timestamp: number;
+    error?: boolean;
 }
 
 export interface CreateThreadRunProps {
@@ -31,8 +30,6 @@ export async function createThreadAndRun({
     agentId,
     message
 }: CreateThreadRunProps): Promise<string | null> {
-    showLoadingToast("Sending message..");
-
     try {
         const response = await axios.post(`https://api.openai.com/v1/threads/runs`, {
             "assistant_id": `${agentId}`,
@@ -49,11 +46,8 @@ export async function createThreadAndRun({
             },
         });
 
-        showSuccessToast("ok");
-
         return response.data.thread_id;
     } catch (error) {
-        showErrorToast(`OpenAI API Error:, ${error}`);
         console.error("OpenAI API Error sending message:", error);
         return null;
     }
@@ -63,8 +57,6 @@ export async function sendAgentMessage({
     threadId,
     message
 }: SendMessageProps): Promise<boolean> {
-    showLoadingToast("Sending message..");
-
     try {
         const response = await axios.post(`https://api.openai.com/v1/threads/${threadId}/messages`, {
             "role": "user",
@@ -76,20 +68,28 @@ export async function sendAgentMessage({
                 "OpenAI-Beta": "assistants=v2"
             },
         });
-        showSuccessToast("ok");
-
         return true;
     } catch (error) {
-        showErrorToast(`OpenAI API Error:, ${error}`);
         console.error("OpenAI API Error sending message:", error);
         return false;
     }
 }
 
+const formatContent = (msg:string):string => {
+    return msg.replace(/【[^】]*】/g, ""); // removes "[source]" from text
+}
+
+const filterAndMapMessages = (thread: any[]): AssistantMessage[] => {
+    return thread.filter((msg: any) => msg.content.length > 0).map((msg: any) => ({
+        role: msg.role, // "user" or "assistant"
+        content: formatContent(msg.content[0].text.value),
+        timestamp: msg.created_at
+    }));
+}
+
 export async function getMessages({
     threadId
-}: GetMessagesProps): Promise<AssistantMessages[]> {
-    showLoadingToast("Fetching thread..");
+}: GetMessagesProps): Promise<AssistantMessage[]> {
     try {
         const response = await axios.get(`https://api.openai.com/v1/threads/${threadId}/messages`, {
             headers: {
@@ -99,30 +99,20 @@ export async function getMessages({
             },
         });
 
-        const formattedMessages = response.data.data.map((msg: any) => ({
-            role: msg.role, // "user" or "assistant"
-            content: msg.content[0].text.value,
-            timestamp: msg.created_at
-        }));
-
-        showSuccessToast("ok");
-
-        return formattedMessages
+        return filterAndMapMessages(response.data.data);
     } catch (error) {
-        showErrorToast(`OpenAI API Error:, ${error}`);
         console.error("OpenAI API Error:", error);
         return [];
     }
 }
 
+// todo res object
 export async function agentReply({
     threadId,
     agentId
 }: AgentReplyProps): Promise<boolean> {
-    showLoadingToast("Waiting for agent to reply..")
     try {
-        // todo response obj?
-        const response = await axios.post(`https://api.openai.com/v1/threads/${threadId}/runs`, {
+        await axios.post(`https://api.openai.com/v1/threads/${threadId}/runs`, {
             "assistant_id": `${agentId}`
         }, {
             headers: {
@@ -132,12 +122,8 @@ export async function agentReply({
             },
         });
 
-        showSuccessToast("Ok")
         return true;
-
     } catch (error) {
-        showErrorToast(error);
-
         return false;
     }
 }
