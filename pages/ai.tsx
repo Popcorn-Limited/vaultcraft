@@ -154,7 +154,7 @@ export default function VaultcraftAgent() {
                 placeholder="Type something..."
             />
             <div style={{display: "flex", gap: "10px", marginTop: "20px"}}>
-                <MainActionButton label="Send Message" handleClick={() => { thread === "" ? createThread(userInput) : sendMessage(userInput) }}/>
+                <MainActionButton disabled={userInput === ""} label="Send Message" handleClick={() => { thread === "" ? createThread(userInput) : sendMessage(userInput) }}/>
                 <MainActionButton disabled={thread === ""} label="Reload thread" handleClick={() => pollResponse(thread)}/>
             </div>
         </div>
