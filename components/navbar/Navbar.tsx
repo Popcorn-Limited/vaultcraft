@@ -305,14 +305,14 @@ function StakeVCXButton(): JSX.Element {
                   hidden md:flex flex-row items-center justify-center`}
         type="button"
         onClick={() =>
-          window.open("https://app.vaultcraft.io/staking", "_blank")
+          window.open("https://app.vaultcraft.io/migrate", "_blank")
         }
       >
         <img
           src="/images/tokens/vcx.svg"
           className="w-5 h-5 rounded-full border border-black"
         />
-        <p className="ml-2 mt-1">Stake VCX</p>
+        <p className="ml-2 mt-1">Migrate VCX</p>
       </button>
       <button
         className={`w-48 px-4 py-2 rounded bg-black border border-black font-semibold text-base text-primaryGreen

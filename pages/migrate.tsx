@@ -130,7 +130,7 @@ export default function Migrate() {
         </div>
       </section>
 
-      <section className="mt-8 space-y-8">
+      <section className="mt-8 space-y-8 px-4 md:px-0">
         <TabSelector
           availableTabs={["VCX", "oVCX"]}
           activeTab={selectedTab}
@@ -159,7 +159,7 @@ export default function Migrate() {
           </div>
         </div>
       </section>
-      <div className="flex flex-row gap-4 mt-8 border-t border-customNeutral100 pt-8">
+      <div className="flex flex-row gap-4 mt-8 border-t border-customNeutral100 pt-8 px-4 md:px-0">
         <SecondaryActionButton
           handleClick={() => setChainId(mainnet.id)}
           disabled={chainId === mainnet.id}
