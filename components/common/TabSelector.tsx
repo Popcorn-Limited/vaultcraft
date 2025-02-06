@@ -24,7 +24,7 @@ export default function TabSelector({
           onClick={(e) => setActiveTab(tab)}
         >
           <p
-            className={`text-base md:text-center mb-4 cursor-pointer word-spacing-full sm:word-spacing-normal 
+            className={`text-base md:text-center mb-1 cursor-pointer word-spacing-full sm:word-spacing-normal 
             ${
               activeTab === tab
                 ? "text-white font-medium"

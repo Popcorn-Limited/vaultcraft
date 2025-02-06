@@ -66,6 +66,8 @@ export async function getInitialVaultsData(chainId: number, client: PublicClient
           ? vault.labels.map((label: string) => <VaultLabel>label)
           : undefined,
         description: vault.description || undefined,
+        riskDescription: vault.riskDescription || undefined,
+        otherDescription: vault.otherDescription || undefined,
         type: vault.type,
         creator: getAddress(vault.creator || zeroAddress),
         feeRecipient: getAddress(vault.feeRecipient || zeroAddress),

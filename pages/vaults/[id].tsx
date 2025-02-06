@@ -5,9 +5,6 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import NoSSR from "react-no-ssr";
 import VaultInputs from "@/components/vault/VaultInputs";
-import { showSuccessToast } from "@/lib/toasts";
-import CopyToClipboard from "react-copy-to-clipboard";
-import { Square2StackIcon } from "@heroicons/react/24/outline";
 import { tokensAtom } from "@/lib/atoms";
 import LeftArrowIcon from "@/components/svg/LeftArrowIcon";
 import { VeTokenByChain, ZapAssetAddressesByChain } from "@/lib/constants";
@@ -16,9 +13,9 @@ import ApyChart from "@/components/vault/ApyChart";
 import VaultHero from "@/components/vault/VaultHero";
 import { isAddress, zeroAddress } from "viem";
 import UserBoostSection from "@/components/vault/UserBoostSection";
-import HtmlRenderer from "@/components/common/HtmlRenderer";
 import SpinningLogo from "@/components/common/SpinningLogo";
 import SafeVaultInteraction from "@/components/vault/safe/SafeVaultInteraction";
+import VaultInformation from "@/components/vault/VaultInformation";
 
 export default function Index() {
   const router = useRouter();
@@ -125,75 +122,7 @@ export default function Index() {
 
                 {vaultData.apyData.apyHist.length > 0 && <ApyChart vault={vaultData} />}
 
-                <div className="bg-customNeutral200 p-6 rounded-lg">
-                  <p className="text-white text-2xl font-bold">Information</p>
-                  <div className="text-white">
-                    {vaultData.metadata.description && vaultData.metadata.description.length > 0 && <HtmlRenderer htmlContent={vaultData.metadata.description} />}
-                  </div>
-                  <div className="md:flex md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4 mt-4">
-
-                    <div className="w-full md:w-10/12 border border-customNeutral100 rounded-lg p-4">
-                      <p className="text-white font-normal">Vault address:</p>
-                      <div className="flex flex-row items-center justify-between">
-                        <p className="font-bold text-white">
-                          {vaultData.address.slice(0, 6)}...{vaultData.address.slice(-4)}
-                        </p>
-                        <div className='w-6 h-6 group/vaultAddress'>
-                          <CopyToClipboard text={vaultData.address} onCopy={() => showSuccessToast("Vault address copied!")}>
-                            <Square2StackIcon className="text-white group-hover/vaultAddress:text-primaryGreen" />
-                          </CopyToClipboard>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="w-full md:w-10/12 border border-customNeutral100 rounded-lg p-4">
-                      <p className="text-white font-normal">Asset address:</p>
-                      <div className="flex flex-row items-center justify-between">
-                        <p className="font-bold text-white">
-                          {vaultData.asset.slice(0, 6)}...{vaultData.asset.slice(-4)}
-                        </p>
-                        <div className='w-6 h-6 group/vaultAddress'>
-                          <CopyToClipboard text={vaultData.asset} onCopy={() => showSuccessToast("Asset address copied!")}>
-                            <Square2StackIcon className="text-white group-hover/vaultAddress:text-primaryGreen" />
-                          </CopyToClipboard>
-                        </div>
-                      </div>
-                    </div>
-
-                    {vaultData.safes && vaultData.safes![0] !== zeroAddress &&
-                      <div className="w-full md:w-10/12 border border-customNeutral100 rounded-lg p-4">
-                        <p className="text-white font-normal">Safe address:</p>
-                        <div className="flex flex-row items-center justify-between">
-                          <p className="font-bold text-white">
-                            {vaultData.safes[0].slice(0, 6)}...{vaultData.safes[0].slice(-4)}
-                          </p>
-                          <div className='w-6 h-6 group/safeAddress'>
-                            <CopyToClipboard text={vaultData.safes[0]} onCopy={() => showSuccessToast("Safe address copied!")}>
-                              <Square2StackIcon className="text-white group-hover/safeAddress:text-primaryGreen" />
-                            </CopyToClipboard>
-                          </div>
-                        </div>
-                      </div>
-                    }
-
-                    {vaultData.gauge && vaultData.gauge !== zeroAddress &&
-                      <div className="w-full md:w-10/12 border border-customNeutral100 rounded-lg p-4">
-                        <p className="text-white font-normal">Gauge address:</p>
-                        <div className="flex flex-row items-center justify-between">
-                          <p className="font-bold text-white">
-                            {vaultData.gauge.slice(0, 6)}...{vaultData.gauge.slice(-4)}
-                          </p>
-                          <div className='w-6 h-6 group/gaugeAddress'>
-                            <CopyToClipboard text={vaultData.gauge} onCopy={() => showSuccessToast("Gauge address copied!")}>
-                              <Square2StackIcon className="text-white group-hover/gaugeAddress:text-primaryGreen" />
-                            </CopyToClipboard>
-                          </div>
-                        </div>
-                      </div>
-                    }
-
-                  </div>
-                </div>
+                <VaultInformation vaultData={vaultData} />
 
                 <div className="bg-customNeutral200 p-6 rounded-lg">
                   <p className="text-white text-2xl font-bold">Strategies</p>

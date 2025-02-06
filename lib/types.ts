@@ -116,6 +116,8 @@ export type VaultMetadata = {
   vaultName?: string;
   labels?: VaultLabel[];
   description?: string;
+  riskDescription?: string;
+  otherDescription?: string;
   type:
   | "single-asset-vault-v1"
   | "single-asset-lock-vault-v1"
