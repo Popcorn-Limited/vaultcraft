@@ -7,6 +7,7 @@ export default function VaultcraftAgent() {
     const [messages, setMessages] = useState<AssistantMessage[]>([]);
     const [userInput, setUserInput] = useState("");
     const [thread, setThread] = useState("");
+    const [polling, setPolling] = useState(false);
 
     const createThread = async (input: string) => {
         toast.loading("Waiting for agent..");
@@ -38,19 +39,22 @@ export default function VaultcraftAgent() {
 
         while (attempts < 20) {
             const newMessages = await getMessages({ threadId: thread });
+            
+            console.log("ATTEMPT", attempts);
 
             if (newMessages.length > 0) {
                 if (newMessages[0].role === "assistant") {
                     setMessages(newMessages);
                     toast.dismiss();
+                    setPolling(false);
                     return;
                 }
             }
 
-            await new Promise(resolve => setTimeout(resolve, 3000));
+            await new Promise(resolve => setTimeout(resolve, 5000));
             attempts++;
         }
-
+        setPolling(false);
         // error polling
         setMessages([
             { role: "assistant", content: "Error loading up the thread, try refreshing the page!", timestamp: Date.now() / 1000, error: true },
@@ -66,6 +70,7 @@ export default function VaultcraftAgent() {
 
         if (res) {
             // pull response
+            setPolling(true);
             await pollResponse(thread);
         } else {
             // reply error
@@ -110,7 +115,7 @@ export default function VaultcraftAgent() {
 
     return (
         <div style={{ maxWidth: "800px", margin: "0 auto", height: "auto", width: "auto", backgroundColor: "#f0f2f5", padding: "20px", boxSizing: "border-box" }}>
-            <h1 style={{ textAlign: "center", color: "#333"}}><b>Chat with the Vaultcraft Agent</b></h1>
+            <h1 style={{ textAlign: "center", color: "#333" }}><b>Chat with the Vaultcraft Agent</b></h1>
             <div
                 style={{
                     border: "1px solid #ccc",
@@ -146,16 +151,16 @@ export default function VaultcraftAgent() {
                     </div>
                 ))}
             </div>
-            <input style={{marginTop: "20px"}}
+            <input style={{ marginTop: "20px" }}
                 type="text"
                 value={userInput}
                 onChange={handleChange}
                 className="border border-gray-300 rounded p-2 w-full"
                 placeholder="Type something..."
             />
-            <div style={{display: "flex", gap: "10px", marginTop: "20px"}}>
-                <MainActionButton disabled={userInput === ""} label="Send Message" handleClick={() => { thread === "" ? createThread(userInput) : sendMessage(userInput) }}/>
-                <MainActionButton disabled={thread === ""} label="Reload thread" handleClick={() => pollResponse(thread)}/>
+            <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
+                <MainActionButton disabled={userInput === ""} label="Send Message" handleClick={() => { thread === "" ? createThread(userInput) : sendMessage(userInput) }} />
+                <MainActionButton disabled={thread === "" || polling} label="Reload thread" handleClick={() => pollResponse(thread)} />
             </div>
         </div>
     );

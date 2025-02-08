@@ -26,17 +26,37 @@ export interface AgentReplyProps {
     agentId: string;
 }
 
+const getMessageBody = (message: string) => {
+    const fileSearch = message.toLowerCase().includes("mainnet") ? `${process.env.MAINNET_FILE_ID}`
+        : message.toLowerCase().includes("arbitrum") ? `${process.env.ARBITRUM_FILE_ID}`
+            : message.toLowerCase().includes("optimism") ? `${process.env.OPTIMISM_FILE_ID}`
+                : message.toLowerCase().includes("base") ? `${process.env.BASE_FILE_ID}`
+                    : "";
+
+    return fileSearch !== "" ?
+        {
+            "role": "user",
+            "content": `${message}`,
+            "attachments": [{ "file_id": fileSearch, "tools": [{ "type": "file_search" }] }]
+        }
+        :
+        {
+            "role": "user",
+            "content": `${message}`
+        }
+}
+
 export async function createThreadAndRun({
     agentId,
     message
 }: CreateThreadRunProps): Promise<string | null> {
+    console.log("creating thread");
+
     try {
         const response = await axios.post(`https://api.openai.com/v1/threads/runs`, {
             "assistant_id": `${agentId}`,
             "thread": {
-                "messages": [
-                    { "role": "user", "content": `${message}` }
-                ]
+                "messages": [getMessageBody(message)]
             }
         }, {
             headers: {
@@ -45,6 +65,7 @@ export async function createThreadAndRun({
                 "OpenAI-Beta": "assistants=v2"
             },
         });
+        console.log("OK", response.data.thread_id);
 
         return response.data.thread_id;
     } catch (error) {
@@ -58,10 +79,7 @@ export async function sendAgentMessage({
     message
 }: SendMessageProps): Promise<boolean> {
     try {
-        const response = await axios.post(`https://api.openai.com/v1/threads/${threadId}/messages`, {
-            "role": "user",
-            "content": `${message}`
-        }, {
+        const response = await axios.post(`https://api.openai.com/v1/threads/${threadId}/messages`, getMessageBody(message), {
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${process.env.OPEN_AI_KEY}`,
@@ -75,7 +93,7 @@ export async function sendAgentMessage({
     }
 }
 
-const formatContent = (msg:string):string => {
+const formatContent = (msg: string): string => {
     return msg.replace(/【[^】]*】/g, ""); // removes "[source]" from text
 }
 
