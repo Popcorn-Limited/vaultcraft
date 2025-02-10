@@ -112,8 +112,9 @@ export default function Test() {
     <button onClick={() => rebalance(
       farms,
       0,
-      parseUnits("0.1", ASSET.decimals),
+      parseUnits("0.1", ASSET.decimals), // @dev play around with this value to ensure that its not lower than ensos minimum order size
       parseUnits("1000", ASSET.decimals),
+      100, // @dev play around with this value to ensure a good balance between ideal execution and finding orders
       "0x3C99dEa58119DE3962253aea656e61E5fBE21613",
       ASSET,
       8453
@@ -123,7 +124,7 @@ export default function Test() {
   </div>;
 }
 
-async function rebalance(farms: Farm[], rebalanceThreshold: number, stepSize: bigint, minimumInvest: bigint, safe: Address, asset: Asset, chainId: number): Promise<void> {
+async function rebalance(farms: Farm[], rebalanceThreshold: number, stepSize: bigint, minimumInvest: bigint, slippage: number, safe: Address, asset: Asset, chainId: number): Promise<void> {
   console.log("!!! REBALANCING SAFE !!!")
   const client = createPublicClient({
     chain: ChainById[chainId],
@@ -161,7 +162,7 @@ async function rebalance(farms: Farm[], rebalanceThreshold: number, stepSize: bi
     for (const farm of farms) {
       if (farm.plannedAllocation < farm.allocation) {
         console.log("3. WITHDRAWING")
-        const success = await createTransaction(farm.address, asset.address, farm.allocation - farm.plannedAllocation, chainId, safe, client, 100)
+        const success = await createTransaction(farm.address, asset.address, farm.allocation - farm.plannedAllocation, chainId, safe, client, slippage)
         if (!success) {
           console.log("WITHDRAWAL FAILED")
           console.log("REBALANCING DONE")
@@ -176,7 +177,7 @@ async function rebalance(farms: Farm[], rebalanceThreshold: number, stepSize: bi
     for (const farm of farms) {
       if (farm.plannedAllocation > farm.allocation) {
         console.log("5. DEPOSITING")
-        const success = await createTransaction(asset.address, farm.address, farm.plannedAllocation - farm.allocation, chainId, safe, client, 100)
+        const success = await createTransaction(asset.address, farm.address, farm.plannedAllocation - farm.allocation, chainId, safe, client, slippage)
         if (!success) {
           console.log("DEPOSIT FAILED")
           console.log("REBALANCING DONE")
@@ -192,7 +193,7 @@ async function rebalance(farms: Farm[], rebalanceThreshold: number, stepSize: bi
       for (const farm of farms) {
         if (farm.plannedAllocation > farm.allocation) {
           console.log("3. DEPOSITING IDLE BUDGET")
-          const success = await createTransaction(asset.address, farm.address, farm.plannedAllocation - farm.allocation, chainId, safe, client, 100)
+          const success = await createTransaction(asset.address, farm.address, farm.plannedAllocation - farm.allocation, chainId, safe, client, slippage)
           if (!success) {
             console.log("DEPOSIT FAILED")
             console.log("REBALANCING DONE")
