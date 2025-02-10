@@ -36,6 +36,7 @@ export default function VaultcraftAgent() {
 
     const pollResponse = async (thread: string) => {
         let attempts = 0;
+        setPolling(true);
 
         while (attempts < 20) {
             const newMessages = await getMessages({ threadId: thread });
@@ -70,7 +71,6 @@ export default function VaultcraftAgent() {
 
         if (res) {
             // pull response
-            setPolling(true);
             await pollResponse(thread);
         } else {
             // reply error
@@ -121,7 +121,7 @@ export default function VaultcraftAgent() {
                     border: "1px solid #ccc",
                     padding: "10px",
                     borderRadius: "8px",
-                    height: "400px",
+                    height: "45vh",
                     overflowY: "auto",
                     backgroundColor: "#fff",
                     display: "flex",
