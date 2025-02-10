@@ -12,6 +12,7 @@ type Farm = {
   llamaId: string;
   address: Address;
   apy: number;
+  marginalAPR: number;
   tvl: number;
   yearlyYield: number;
   allocation: bigint;
@@ -37,6 +38,7 @@ const EMPTY_FARM: Farm = {
   llamaId: "",
   address: zeroAddress,
   apy: 0,
+  marginalAPR: 0,
   tvl: 0,
   yearlyYield: 0,
   allocation: BigInt(0),
@@ -106,10 +108,22 @@ const ASSET: Asset = {
 const ROUTER_ADDRESS = "0x80EbA3855878739F4710233A8a19d89Bdd2ffB8E"
 
 export default function Test() {
-  return <div className="text-white"><button onClick={() => rebalance(farms, 0, "0x3C99dEa58119DE3962253aea656e61E5fBE21613", ASSET, 8453)}>Do Stuff</button></div>;
+  return <div className="text-white">
+    <button onClick={() => rebalance(
+      farms,
+      0,
+      parseUnits("0.1", ASSET.decimals),
+      parseUnits("1000", ASSET.decimals),
+      "0x3C99dEa58119DE3962253aea656e61E5fBE21613",
+      ASSET,
+      8453
+    )}>
+      Do Stuff
+    </button>
+  </div>;
 }
 
-async function rebalance(farms: Farm[], rebalanceThreshold: number, safe: Address, asset: Asset, chainId: number): Promise<void> {
+async function rebalance(farms: Farm[], rebalanceThreshold: number, stepSize: bigint, minimumInvest: bigint, safe: Address, asset: Asset, chainId: number): Promise<void> {
   console.log("!!! REBALANCING SAFE !!!")
   const client = createPublicClient({
     chain: ChainById[chainId],
@@ -127,7 +141,7 @@ async function rebalance(farms: Farm[], rebalanceThreshold: number, safe: Addres
   console.log(`Budget: Total=${formatUnits(totalBudget, asset.decimals)} Idle=${formatUnits(idleBudget, asset.decimals)}`)
 
   console.log("1. CALCULATE OPTIMAL ALLOCATION")
-  farms = calculateOptimalAllocation(totalBudget, farms, parseUnits("0.1", asset.decimals), asset, true);
+  farms = calculateOptimalAllocation(totalBudget, farms, stepSize, asset, true);
 
   console.log("Farms: ", farms)
   const currentProfit = farms.reduce((acc, farm) =>
@@ -138,7 +152,7 @@ async function rebalance(farms: Farm[], rebalanceThreshold: number, safe: Addres
   const newProfit = farms.reduce((acc, farm) =>
     acc + (
       (Number(formatUnits(farm.plannedAllocation, asset.decimals)) * asset.price) *
-      (farm.apy / 100)),
+      (farm.marginalAPR / 100)),
     0);
 
   console.log(`Profit: Current=${currentProfit} New=${newProfit} RebalanceThreshold=${rebalanceThreshold}`)
@@ -156,6 +170,7 @@ async function rebalance(farms: Farm[], rebalanceThreshold: number, safe: Addres
       }
     }
     console.log("4. WAITING FOR WITHDRAWALS TO BE FINALISED")
+    // @dev play around with this value to ensure that the withdrawals are finalised
     await new Promise(resolve => setTimeout(resolve, 10000));
 
     for (const farm of farms) {
@@ -171,9 +186,9 @@ async function rebalance(farms: Farm[], rebalanceThreshold: number, safe: Addres
     }
   } else {
     console.log("!!! NOT REBALANCING SAFE !!!")
-    if (idleBudget > parseUnits("1000", asset.decimals)) {
+    if (idleBudget > minimumInvest) {
       console.log("2. CALCULATE OPTIMAL ALLOCATION FOR IDLE BUDGET")
-      farms = calculateOptimalAllocation(idleBudget, farms, parseUnits("1000", asset.decimals), asset, false);
+      farms = calculateOptimalAllocation(idleBudget, farms, stepSize, asset, false);
       for (const farm of farms) {
         if (farm.plannedAllocation > farm.allocation) {
           console.log("3. DEPOSITING IDLE BUDGET")
@@ -230,6 +245,7 @@ function calculateOptimalAllocation(
     if (bestFarm) {
       const currentAllocation = bestFarm.plannedAllocation
       bestFarm.plannedAllocation = currentAllocation + stepSize;
+      bestFarm.marginalAPR = bestAPR;
       remainingBudget -= stepSize;
       console.log(`Best Farm: ${bestFarm.name} with APR: ${bestAPR}. Planned Allocation: ${formatUnits(bestFarm.plannedAllocation, asset.decimals)}`)
       console.log(`Remaining Budget: ${formatUnits(remainingBudget, asset.decimals)}`)
@@ -250,6 +266,7 @@ async function prepareFarm(farm: Farm, safe: Address, asset: Asset, client: Publ
   return {
     ...farm,
     apy,
+    marginalAPR: apy,
     tvl,
     yearlyYield,
     allocation,
