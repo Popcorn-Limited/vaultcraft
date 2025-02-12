@@ -26,7 +26,7 @@ enum FarmType {
   ERC4626,
 }
 
-type Asset = {
+export type Asset = {
   address: Address;
   decimals: number;
   balance: Balance;
@@ -94,7 +94,7 @@ const farms: Farm[] = [
   },
 ];
 
-const ASSET: Asset = {
+export const ASSET: Asset = {
   address: "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
   decimals: 6,
   balance: {
@@ -105,7 +105,7 @@ const ASSET: Asset = {
   price: 1,
 }
 
-const ROUTER_ADDRESS = "0x80EbA3855878739F4710233A8a19d89Bdd2ffB8E"
+export const ROUTER_ADDRESS = "0x80EbA3855878739F4710233A8a19d89Bdd2ffB8E"
 
 export default function Test() {
   return <div className="text-white">
