@@ -59,11 +59,12 @@ export default function Migrate() {
   const [selectedTab, setSelectedTab] = useState<string>("VCX");
   const [amount, setAmount] = useState<string>("0");
   const [migrationData, setMigrationData] = useState<MigrationData[]>();
+  const [userMigrationData, setUserMigrationData] = useState<MigrationData[]>();
 
   useEffect(() => {
     const getData = async () => await getMigrationData();
     getData();
-  }, [])
+  }, [account])
 
 
   async function getMigrationData() {
@@ -111,6 +112,38 @@ export default function Migrate() {
         setMigrationData(migData);
       })
       .catch((error) => console.error("Multicall Error:", error));
+
+    if (account) {
+      const multicalls = clients.map((client, index) =>
+        client.multicall({
+          contracts: [
+            {
+              address: TokenMigrationByChain[chainConfigs[index].id],
+              abi: TokenMigrationAbi,
+              functionName: "burnedBalance",
+              args: [account, VcxByChain[chainConfigs[index].id]]
+            },
+            {
+              address: TokenMigrationByChain[chainConfigs[index].id],
+              abi: TokenMigrationAbi,
+              functionName: "burnedBalance",
+              args: [account, OptionTokenByChain[chainConfigs[index].id]]
+            }
+          ]
+        })
+      );
+
+      var userMigData: MigrationData[];
+      Promise.all(multicalls)
+        .then((results) => {
+          userMigData = results.map((chainResult) => {
+            return { vcx: Number(chainResult[0].result!), ovcx: Number(chainResult[1].result!) }
+          });
+
+          setUserMigrationData(userMigData);
+        })
+        .catch((error) => console.error("Multicall Error:", error));
+    }
   }
 
   async function handleMigrate() {
@@ -173,6 +206,30 @@ export default function Migrate() {
     setAmount(inputAmt)
   }
 
+  const MigrationTable = ({ title, migrationData }: { title: string, migrationData: MigrationData[] }) => (
+    <div className="bg-white shadow-lg rounded-lg border border-gray-200 p-4">
+      <h2 className="text-lg font-semibold text-gray-800 mb-4 text-center">{title}</h2>
+      <table className="w-full border-collapse border border-gray-300">
+        <thead>
+          <tr className="bg-gray-100">
+            <th className="border border-gray-300 p-2">Chain</th>
+            <th className="border border-gray-300 p-2">VCX</th>
+            <th className="border border-gray-300 p-2">OVCX</th>
+          </tr>
+        </thead>
+        <tbody>
+          {migrationData.map((data, index) => (
+            <tr key={index} className="text-center border border-gray-300">
+              <td className="border border-gray-300 p-2">{index === 0 ? "Ethereum" : index === 1 ? "Arbitrum" : "Optimism"}</td>
+              <td className="border border-gray-300 p-2">{data.vcx / 1e18}</td>
+              <td className="border border-gray-300 p-2">{data.ovcx / 1e18}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+
   return Object.keys(tokens).length > 0 ? (
     <>
       <section className="md:border-b border-customNeutral100 md:flex md:flex-row items-top justify-between py-4 md:py-10 px-4 md:px-0 md:gap-4">
@@ -233,35 +290,25 @@ export default function Migrate() {
         />
       </div>
       <section className="md:border-b border-customNeutral100 md:flex md:flex-row items-top justify-between py-4 md:py-10 px-4 md:px-0 md:gap-4">
-        <div className="max-w-lg mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg border border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4 text-center">
-            Total Migration Status
-          </h2>
-          <table className="w-full border-collapse border border-gray-300">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="border border-gray-300 p-2">Chain</th>
-                <th className="border border-gray-300 p-2">VCX</th>
-                <th className="border border-gray-300 p-2">OVCX</th>
-              </tr>
-            </thead>
-            <tbody>
-              {migrationData!.map((data, index) => (
-                <tr key={index} className="text-center border border-gray-300">
-                  <td className="border border-gray-300 p-2">{index === 0 ? "Ethereum" : index === 1 ? "Arbitrum" : "Optimism"}</td>
-                  <td className="border border-gray-300 p-2">{data.vcx / 1e18}</td>
-                  <td className="border border-gray-300 p-2">{data.ovcx / 1e18}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <div className="flex flex-row gap-4 mt-8 border-t border-customNeutral100 pt-8 px-4 md:px-0">
-            <SecondaryActionButton
-              handleClick={() => getMigrationData()}
-              label="Refresh"
-            />
-          </div>
+        <div className="w-full md:w-max">
+          <h1 className="text-5xl font-normal m-0 mb-4 md:mb-2 leading-0 text-white md:text-3xl leading-none margin-top:50px">
+            Migrated so far..
+          </h1>
         </div>
+      </section>
+
+      <section className="md:border-b border-customNeutral100 md:flex md:flex-row items-top justify-between py-4 md:py-10 px-4 md:px-0 md:gap-4">
+        <div className="flex flex-wrap justify-center gap-20 mt-10 w-full md:w-max">
+          <MigrationTable title="Global Migration Status" migrationData={migrationData!} />
+          {account && (
+            <MigrationTable title="User Status" migrationData={userMigrationData!} />
+          )}
+          <SecondaryActionButton
+            handleClick={() => getMigrationData()}
+            label="Refresh"
+          />
+        </div>
+
       </section>
     </>
   )
