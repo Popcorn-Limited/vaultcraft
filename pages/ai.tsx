@@ -1,28 +1,32 @@
 import React, { useState } from "react";
 import { toast } from "react-hot-toast";
-import { getMessages, agentReply, sendAgentMessage, createThreadAndRun, AssistantMessage } from "@/lib/openAI/";
+import { getMessages, agentReply, sendAgentMessage, createThreadAndRun, pollRunStatus, handleToolCalls } from "@/lib/openAI/";
+import { AssistantMessage, RunStatus, Thread} from "@/lib/openAI/types";
 import MainActionButton from "@/components/button/MainActionButton";
 
 export default function VaultcraftAgent() {
     const [messages, setMessages] = useState<AssistantMessage[]>([]);
     const [userInput, setUserInput] = useState("");
-    const [thread, setThread] = useState("");
+    const [threadId, setThread] = useState("");
+    const [runId, setRunId] = useState("");
     const [polling, setPolling] = useState(false);
 
     const createThread = async (input: string) => {
         toast.loading("Waiting for agent..");
         setUserInput("");
 
-        const threadId = await createThreadAndRun({ agentId: process.env.AGENT_ID!, message: input });
+        const thread: Thread | null = await createThreadAndRun({ agentId: process.env.AGENT_ID!, message: input });
 
-        if (threadId !== null) {
-            setThread(threadId);
+        if (thread !== null) {
+            console.log("THREEAD", thread);
+            setThread(thread.threadId);
+            setRunId(thread.runId);
 
             // add new message at beginning
             setMessages([{ role: "user", content: input, timestamp: Date.now() / 1000 }]);
 
             // run response - reload messages
-            await pollResponse(threadId);
+            await pollResponse(thread.threadId, thread.runId);
         } else {
             // append error
             toast.dismiss();
@@ -34,15 +38,18 @@ export default function VaultcraftAgent() {
         }
     }
 
-    const pollResponse = async (thread: string) => {
+    const loadThread = async (threadId: string) => {
         let attempts = 0;
         setPolling(true);
 
-        while (attempts < 20) {
-            const newMessages = await getMessages({ threadId: thread });
+        // load thread 
+        while (attempts < 10) {
+            const newMessages = await getMessages({ threadId });
             
-            console.log("ATTEMPT", attempts);
+            console.log("ATTEMPT", attempts, threadId);
 
+            // todo with 2 consecutives assistant message, last one might not be loaded
+            // if the getMessages happen when second one isn't in yet
             if (newMessages.length > 0) {
                 if (newMessages[0].role === "assistant") {
                     setMessages(newMessages);
@@ -55,12 +62,43 @@ export default function VaultcraftAgent() {
             await new Promise(resolve => setTimeout(resolve, 5000));
             attempts++;
         }
+
         setPolling(false);
+
         // error polling
         setMessages([
             { role: "assistant", content: "Error loading up the thread, try refreshing the page!", timestamp: Date.now() / 1000, error: true },
             ...messages
         ]);
+
+    }
+
+    const pollResponse = async (threadId: string, runId: string) => {
+        console.log("POLLIng", threadId, runId);
+
+        const runStatus = await pollRunStatus({threadId, runId });
+
+        if(runStatus.status === "completed") {
+            console.log("COMPLETED")
+            await loadThread(threadId);
+        } else if (runStatus.status === "requires_action") {
+            console.log("REQUIRES ACTION")
+            // function call response
+            const res:boolean= await handleToolCalls({threadId, runId}, runStatus.requiredActions!.toolCalls[0]);
+            
+            if(res) 
+                await loadThread(threadId);
+        } else if (runStatus.status === "in_progress") {
+            console.log("IN PROGRESS")
+
+            await new Promise(resolve => setTimeout(resolve, 3000));
+
+            await pollResponse(threadId, runId)
+        } else {
+            // error ?
+        }
+
+
     };
 
     const replyToMessage = async (thread: string) => {
@@ -71,7 +109,7 @@ export default function VaultcraftAgent() {
 
         if (res) {
             // pull response
-            await pollResponse(thread);
+            await pollResponse(thread, runId);
         } else {
             // reply error
             setMessages([{ role: "assistant", content: "Assistant has encountered issues replying, try refreshing the page!", timestamp: Date.now() / 1000, error: true }, ...messages]);
@@ -84,7 +122,7 @@ export default function VaultcraftAgent() {
         toast.loading("Sending message..");
         setUserInput("");
 
-        const res = await sendAgentMessage({ threadId: thread, message: input });
+        const res = await sendAgentMessage({ threadId, message: input });
 
         if (res) {
             toast.dismiss();
@@ -93,7 +131,7 @@ export default function VaultcraftAgent() {
             setMessages([{ role: "user", content: input, timestamp: Date.now() / 1000 }, ...messages]);
 
             // run response
-            await replyToMessage(thread);
+            await replyToMessage(threadId);
         } else {
             // error
             setMessages([{ role: "assistant", content: "Error sending the message", timestamp: Date.now() / 1000, error: true }, ...messages]);
@@ -159,8 +197,8 @@ export default function VaultcraftAgent() {
                 placeholder="Type something..."
             />
             <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
-                <MainActionButton disabled={userInput === ""} label="Send Message" handleClick={() => { thread === "" ? createThread(userInput) : sendMessage(userInput) }} />
-                <MainActionButton disabled={thread === "" || polling} label="Reload thread" handleClick={() => pollResponse(thread)} />
+                <MainActionButton disabled={userInput === ""} label="Send Message" handleClick={() => { threadId === "" ? createThread(userInput) : sendMessage(userInput) }} />
+                <MainActionButton disabled={threadId === "" || polling} label="Reload thread" handleClick={() => pollResponse(threadId, runId)} />
             </div>
         </div>
     );
