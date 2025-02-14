@@ -300,7 +300,7 @@ export default function Migrate() {
       <section className="md:border-b border-customNeutral100 md:flex md:flex-row items-top justify-between py-4 md:py-10 px-4 md:px-0 md:gap-4">
         <div className="flex flex-wrap justify-center gap-20 mt-10 w-full md:w-max">
           <MigrationTable title="Global Migration Status" migrationData={migrationData!} />
-          {account && (
+          {account && userMigrationData !== undefined && (
             <MigrationTable title="User Status" migrationData={userMigrationData!} />
           )}
           <SecondaryActionButton
