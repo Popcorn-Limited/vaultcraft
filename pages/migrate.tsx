@@ -4,18 +4,17 @@ import SpinningLogo from "@/components/common/SpinningLogo";
 import TabSelector from "@/components/common/TabSelector";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import { tokensAtom } from "@/lib/atoms";
-import { OptionTokenByChain, TokenMigrationAbi, TokenMigrationByChain, VCX, VcxByChain } from "@/lib/constants";
+import { ERC20Abi, OptionTokenAbi, OptionTokenByChain, TokenMigrationAbi, TokenMigrationByChain, VcxByChain } from "@/lib/constants";
 import { handleMaxClick, simulateCall } from "@/lib/utils/helpers";
 import { showLoadingToast } from "@/lib/toasts";
 import { Clients } from "@/lib/types";
 import { handleCallResult } from "@/lib/utils/helpers";
 import { useAtom } from "jotai";
-import { useState } from "react";
-import { Address, parseUnits } from "viem";
+import { useEffect, useState } from "react";
+import { Address, parseUnits, createPublicClient, http } from "viem";
 import { arbitrum, mainnet, optimism } from "viem/chains";
 import { useAccount, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
 import { handleAllowance } from "@/lib/approve";
-
 
 export async function migrate({
   token, amount, account, chainId, clients
@@ -45,6 +44,11 @@ export async function migrate({
 }
 
 
+export type MigrationData = {
+  vcx: number;
+  ovcx: number;
+}
+
 export default function Migrate() {
   const [tokens] = useAtom(tokensAtom);
   const { address: account, chain } = useAccount();
@@ -54,6 +58,60 @@ export default function Migrate() {
   const [chainId, setChainId] = useState<number>(mainnet.id);
   const [selectedTab, setSelectedTab] = useState<string>("VCX");
   const [amount, setAmount] = useState<string>("0");
+  const [migrationData, setMigrationData] = useState<MigrationData[]>();
+
+  useEffect(() => {
+    const getData = async () => await getMigrationData();
+    getData();
+  }, [])
+
+
+  async function getMigrationData() {
+    const chainConfigs = [
+      { chain: mainnet, id: 1 },
+      { chain: arbitrum, id: 42161 },
+      { chain: optimism, id: 10 }
+    ];
+
+    const clients = chainConfigs.map(({ chain, id }) =>
+      createPublicClient({
+        chain,
+        transport: http(),
+      })
+    );
+
+    const multicalls = clients.map((client, index) =>
+      client.multicall({
+        contracts: [
+          {
+            address: VcxByChain[chainConfigs[index].id],
+            abi: ERC20Abi,
+            functionName: "balanceOf",
+            args: [TokenMigrationByChain[chainConfigs[index].id]]
+          },
+          {
+            address: OptionTokenByChain[chainConfigs[index].id],
+            abi: OptionTokenAbi,
+            functionName: "balanceOf",
+            args: [TokenMigrationByChain[chainConfigs[index].id]]
+          }
+        ]
+      })
+    );
+
+    var migData: MigrationData[];
+    Promise.all(multicalls)
+      .then((results) => {
+        migData = results.map((chainResult) => {
+          return { vcx: Number(chainResult[0].result!), ovcx: Number(chainResult[1].result!) }
+        });
+
+        console.log("MIG DATA", migData);
+
+        setMigrationData(migData);
+      })
+      .catch((error) => console.error("Multicall Error:", error));
+  }
 
   async function handleMigrate() {
     if (!account || !walletClient || !publicClient) return;
@@ -115,8 +173,6 @@ export default function Migrate() {
     setAmount(inputAmt)
   }
 
-  console.log(amount)
-
   return Object.keys(tokens).length > 0 ? (
     <>
       <section className="md:border-b border-customNeutral100 md:flex md:flex-row items-top justify-between py-4 md:py-10 px-4 md:px-0 md:gap-4">
@@ -176,6 +232,37 @@ export default function Migrate() {
           label="Migrate on Arbitrum"
         />
       </div>
+      <section className="md:border-b border-customNeutral100 md:flex md:flex-row items-top justify-between py-4 md:py-10 px-4 md:px-0 md:gap-4">
+        <div className="max-w-lg mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg border border-gray-200">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4 text-center">
+            Total Migration Status
+          </h2>
+          <table className="w-full border-collapse border border-gray-300">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="border border-gray-300 p-2">Chain</th>
+                <th className="border border-gray-300 p-2">VCX</th>
+                <th className="border border-gray-300 p-2">OVCX</th>
+              </tr>
+            </thead>
+            <tbody>
+              {migrationData!.map((data, index) => (
+                <tr key={index} className="text-center border border-gray-300">
+                  <td className="border border-gray-300 p-2">{index === 0 ? "Ethereum" : index === 1 ? "Arbitrum" : "Optimism"}</td>
+                  <td className="border border-gray-300 p-2">{data.vcx / 1e18}</td>
+                  <td className="border border-gray-300 p-2">{data.ovcx / 1e18}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div className="flex flex-row gap-4 mt-8 border-t border-customNeutral100 pt-8 px-4 md:px-0">
+            <SecondaryActionButton
+              handleClick={() => getMigrationData()}
+              label="Refresh"
+            />
+          </div>
+        </div>
+      </section>
     </>
   )
     : <SpinningLogo />
