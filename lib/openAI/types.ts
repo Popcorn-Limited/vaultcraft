@@ -16,13 +16,22 @@ export type ToolCalls = {
 export type VaultDataToolCall = {
     chainId: number;
     items?: number;
-    sorting?: string;
+    apySort?: boolean;
     asset?: string;
+}
+
+export type VaultDepositToolCall = {
+    chainId: number;
+    asset: string;
+    amount: number;
+    vault: Address;
+    receiver?: Address;
 }
 
 export type VaultDataRes = {
     address: Address;
     asset: Address;
+    tvl: number;
     name: string;
     apy?: string;
     strategy?: string;

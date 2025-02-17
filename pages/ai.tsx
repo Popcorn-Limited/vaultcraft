@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { toast } from "react-hot-toast";
 import { getMessages, agentReply, sendAgentMessage, createThreadAndRun, pollRunStatus, handleToolCalls } from "@/lib/openAI/";
-import { AssistantMessage, RunStatus, Thread} from "@/lib/openAI/types";
+import { AssistantMessage, Thread, VaultDepositToolCall } from "@/lib/openAI/types";
 import MainActionButton from "@/components/button/MainActionButton";
+import { useAccount, usePublicClient, useWalletClient, useSwitchChain} from "wagmi";
 
 export default function VaultcraftAgent() {
     const [messages, setMessages] = useState<AssistantMessage[]>([]);
@@ -10,6 +11,11 @@ export default function VaultcraftAgent() {
     const [threadId, setThread] = useState("");
     const [runId, setRunId] = useState("");
     const [polling, setPolling] = useState(false);
+    const { address: account, chain } = useAccount();
+    const { switchChainAsync } = useSwitchChain();
+
+    const publicClient = usePublicClient();
+    const { data: walletClient } = useWalletClient();
 
     const createThread = async (input: string) => {
         toast.loading("Waiting for agent..");
@@ -40,12 +46,11 @@ export default function VaultcraftAgent() {
 
     const loadThread = async (threadId: string) => {
         let attempts = 0;
-        setPolling(true);
 
         // load thread 
         while (attempts < 10) {
             const newMessages = await getMessages({ threadId });
-            
+
             console.log("ATTEMPT", attempts, threadId);
 
             // todo with 2 consecutives assistant message, last one might not be loaded
@@ -56,14 +61,14 @@ export default function VaultcraftAgent() {
                     toast.dismiss();
                     setPolling(false);
                     return;
+                } else {
+                    setMessages(newMessages);
                 }
             }
 
             await new Promise(resolve => setTimeout(resolve, 5000));
             attempts++;
         }
-
-        setPolling(false);
 
         // error polling
         setMessages([
@@ -74,20 +79,40 @@ export default function VaultcraftAgent() {
     }
 
     const pollResponse = async (threadId: string, runId: string) => {
+        setPolling(true);
+
         console.log("POLLIng", threadId, runId);
 
-        const runStatus = await pollRunStatus({threadId, runId });
+        const runStatus = await pollRunStatus({ threadId, runId });
 
-        if(runStatus.status === "completed") {
+        console.log(runStatus);
+
+        if (runStatus.status === "completed") {
             console.log("COMPLETED")
             await loadThread(threadId);
         } else if (runStatus.status === "requires_action") {
             console.log("REQUIRES ACTION")
-            // function call response
-            const res:boolean= await handleToolCalls({threadId, runId}, runStatus.requiredActions!.toolCalls[0]);
+            // switch chain if necessary
             
-            if(res) 
-                await loadThread(threadId);
+            const args: VaultDepositToolCall = JSON.parse(runStatus.requiredActions!.toolCalls[0].arguments);
+            if (chain?.id !== args.chainId) {
+                try {
+                  await switchChainAsync?.({ chainId: args.chainId });
+                } catch (error) {
+                }
+            }
+
+            // function call response
+            const res: boolean = await handleToolCalls(
+                { threadId, runId },
+                runStatus.requiredActions!.toolCalls[0], 
+                account!, 
+                { publicClient: publicClient!, walletClient:walletClient! }
+            );
+
+            await new Promise(resolve => setTimeout(resolve, 3000));
+
+            await pollResponse(threadId, runId);
         } else if (runStatus.status === "in_progress") {
             console.log("IN PROGRESS")
 
@@ -98,24 +123,24 @@ export default function VaultcraftAgent() {
             // error ?
         }
 
-
+        setPolling(false);
     };
 
     const replyToMessage = async (thread: string) => {
         toast.loading("Waiting for agent to reply..");
 
         // trigger agent reply
-        const res = await agentReply({ threadId: thread, agentId: process.env.AGENT_ID! });
+        const res : string | null = await agentReply({ threadId: thread, agentId: process.env.AGENT_ID! });
 
-        if (res) {
-            // pull response
-            await pollResponse(thread, runId);
+        if (res !== null) {
+            // pull response - new runId is provided
+            setRunId(res); 
+            await pollResponse(thread, res);
         } else {
             // reply error
             setMessages([{ role: "assistant", content: "Assistant has encountered issues replying, try refreshing the page!", timestamp: Date.now() / 1000, error: true }, ...messages]);
             toast.dismiss();
         }
-
     }
 
     const sendMessage = async (input: string) => {
