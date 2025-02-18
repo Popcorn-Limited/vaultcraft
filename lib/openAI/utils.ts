@@ -5,7 +5,7 @@ import {
     ToolCalls
 } from "./types";
 import getTokenAndVaultsDataByChain from "@/lib/getTokenAndVaultsData";
-import { ChainById } from "@/lib/utils/connectors";
+import { ChainById, ChainId } from "@/lib/utils/connectors";
 import { handleAllowance } from "@/lib/approve"
 import { Address } from "viem";
 import { Clients } from "../types";
@@ -33,8 +33,7 @@ export async function handleToolCalls(toolCalls: ToolCalls, account: Address, cl
     }
 
     return output;
-} 
-
+}
 
 export const getMessageBody = (message: string) => {
     // TODO format message
@@ -56,9 +55,37 @@ export const filterAndMapMessages = (thread: any[]): AssistantMessage[] => {
 const handleVaultData = async (callArgs: string): Promise<VaultDataRes[]> => {
     const args: VaultDataToolCall = JSON.parse(callArgs);
 
-    const { vaultsData: allVaults } = await getTokenAndVaultsDataByChain({ chain: ChainById[args.chainId] });
+    const excludeChains = [ChainId.ALL, ChainId.XLayer];
 
-    return filterVaultData(allVaults, args);
+    if (args.chainId === 0) {
+        // user wants data across all chains
+        const chainIds = Object.values(ChainId)
+            .filter((chainId): chainId is ChainId => (typeof chainId === "number" && !excludeChains.includes(chainId)))
+
+        let allChainsVaults: VaultDataRes[] = [];
+        await Promise.all(
+            chainIds.map(async (chainId: number) => {
+                if (chainId !== 0) {
+                    console.log("fetching vaults", chainId);
+                    const { vaultsData: allVaults } = await getTokenAndVaultsDataByChain({ chain: ChainById[chainId] });
+                    let chainArgs = args;
+                    chainArgs.chainId = chainId;
+
+                    allChainsVaults.push(...filterVaultData(allVaults, chainArgs));
+                }
+            }));
+
+        return allChainsVaults.sort((a, b) => {
+            if (args?.apySort)
+                return Number(b.apy) - Number(a.apy)
+            else
+                return Number(b.tvl) - Number(a.tvl)
+        }).slice(0, args.items ?? 5);
+    } else {
+        // user specified a chain
+        const { vaultsData: allVaults } = await getTokenAndVaultsDataByChain({ chain: ChainById[args.chainId] });
+        return filterVaultData(allVaults, args);
+    }
 }
 
 // validate args and call enso
@@ -69,10 +96,10 @@ const prepareDepositTx = async (callArgs: string, account: Address, clients: Cli
     // get asset address from name
     // validate output vault 
     // return output in case of errors 
-    const asset = args.asset.slice(0,2) === "0x" ? args.asset : AssetAddressesByChainAndName[args.chainId][args.asset];
+    const asset = args.asset.slice(0, 2) === "0x" ? args.asset : AssetAddressesByChainAndName[args.chainId][args.asset];
 
     // TODO decimals
-    const amount = args.amount * 1e6;    
+    const amount = args.amount * 1e6;
     const ensoCallData = `https://api.enso.finance/api/v1/shortcuts/route?chainId=${args.chainId}&fromAddress=${account}&receiver=${account}&amountIn=${amount}&slippage=500&disableRFQs=false&tokenIn=${asset}&tokenOut=${args.vault}`;
 
     console.log("DEPOSIT tx", account, asset, ensoCallData);
@@ -85,7 +112,7 @@ const prepareDepositTx = async (callArgs: string, account: Address, clients: Cli
         });
 
         console.log("ENSO Call submitted", response);
-        
+
         const ensoRes: EnsoCalldata = response.data;
         ensoRes.amountIn = amount;
         ensoRes.chainId = args.chainId;
