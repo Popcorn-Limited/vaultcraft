@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { toast } from "react-hot-toast";
-import { getMessages, agentReply, sendAgentMessage, createThreadAndRun, pollRunStatus, handleToolCalls } from "@/lib/openAI/";
+import { getMessages, agentReply, sendAgentMessage, createThreadAndRun, pollRunStatus, serveToolCalls } from "@/lib/openAI/";
 import { AssistantMessage, Thread, VaultDepositToolCall } from "@/lib/openAI/types";
 import MainActionButton from "@/components/button/MainActionButton";
 import { useAccount, usePublicClient, useWalletClient, useSwitchChain} from "wagmi";
@@ -103,7 +103,7 @@ export default function VaultcraftAgent() {
             }
 
             // function call response
-            const res: boolean = await handleToolCalls(
+            const res: boolean = await serveToolCalls(
                 { threadId, runId },
                 runStatus.requiredActions!.toolCalls[0], 
                 account!, 

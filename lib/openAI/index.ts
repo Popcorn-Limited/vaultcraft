@@ -6,17 +6,10 @@ import {
 } from "./types";
 import { Address } from "viem";
 import { Clients } from "../types";
-import { handleVaultData, handleDepositTx, getMessageBody, filterAndMapMessages } from "./utils";
+import { handleToolCalls, getMessageBody, filterAndMapMessages } from "./utils";
 
-// todo refactor
-export async function handleToolCalls(runProps: PollRunProps, toolCalls: ToolCalls, account: Address, clients: Clients): Promise<boolean> {
-    let output;
-
-    if (toolCalls.functionName === "encode_deposit_transaction") {
-        output = "executing...";
-    } else if (toolCalls.functionName === "get_vault_data") {
-        output = JSON.stringify(await handleVaultData(toolCalls.arguments));
-    }
+export async function serveToolCalls(runProps: PollRunProps, toolCalls: ToolCalls, account: Address, clients: Clients): Promise<boolean> {
+    let output = await handleToolCalls(toolCalls, account, clients);
 
     try {
         const response = await axios.post(`https://api.openai.com/v1/threads/${runProps.threadId}/runs/${runProps.runId}/submit_tool_outputs`, {
@@ -34,11 +27,6 @@ export async function handleToolCalls(runProps: PollRunProps, toolCalls: ToolCal
             },
         });
         console.log("TOOL OUTPUT SUBMITTED", response);
-
-        if (toolCalls.functionName === "encode_deposit_transaction") {
-            // don't wait for it so agent can reply on chat
-            handleDepositTx(toolCalls.arguments, account, clients)
-        }
 
         return true;
     } catch (error) {
