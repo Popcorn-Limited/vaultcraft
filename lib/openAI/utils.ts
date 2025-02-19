@@ -10,14 +10,15 @@ import {
 import getTokenAndVaultsDataByChain from "@/lib/getTokenAndVaultsData";
 import { ChainById, ChainId } from "@/lib/utils/connectors";
 import { handleAllowance } from "@/lib/approve";
-import { Address } from "viem";
-import { Clients } from "../types";
+import { Address, zeroAddress } from "viem";
+import { Clients, TokenByAddress } from "../types";
 import { AssetAddressesByChainAndName } from "../constants/addresses";
 
 export async function handleToolCalls(
   toolCalls: ToolCalls,
   account: Address,
-  clients: Clients
+  clients: Clients,
+  tokens: { [key: number]: TokenByAddress }
 ): Promise<string> {
   let output;
 
@@ -25,7 +26,8 @@ export async function handleToolCalls(
     const res: EnsoCalldata | undefined = await prepareDepositTx(
       toolCalls.arguments,
       account,
-      clients
+      clients,
+      tokens
     );
 
     if (res !== undefined) {
@@ -47,8 +49,6 @@ export async function handleToolCalls(
 }
 
 export const getMessageBody = (message: string) => {
-  // TODO format message
-
   return {
     role: "user",
     content: `${message}`,
@@ -113,23 +113,24 @@ const handleVaultData = async (callArgs: string): Promise<VaultDataRes[]> => {
 const prepareDepositTx = async (
   callArgs: string,
   account: Address,
-  clients: Clients
+  clients: Clients,
+  tokens: { [key: number]: TokenByAddress }
 ): Promise<EnsoCalldata | undefined> => {
   const args: VaultDepositToolCall = JSON.parse(callArgs);
 
-  // get asset address from name
-  // validate output vault
-  // return output in case of errors
-  const asset =
+  const asset: Address =
     args.asset.slice(0, 2) === "0x"
-      ? args.asset
-      : AssetAddressesByChainAndName[args.chainId][args.asset];
+      ? args.asset as Address
+      : args.asset in AssetAddressesByChainAndName[args.chainId] ? AssetAddressesByChainAndName[args.chainId][args.asset!] : zeroAddress;
 
-  // TODO decimals
-  const amount = args.amount * 1e6;
+  // asset not found
+  if (asset === zeroAddress)
+    return undefined;
+
+  const amount = args.amount * (10 ** tokens[args.chainId][asset].decimals);
+
   const ensoCallData = `https://api.enso.finance/api/v1/shortcuts/route?chainId=${args.chainId}&fromAddress=${account}&receiver=${account}&amountIn=${amount}&slippage=500&disableRFQs=false&tokenIn=${asset}&tokenOut=${args.vault}`;
 
-  console.log("DEPOSIT tx", account, asset, ensoCallData);
   try {
     const response = await axios.get(ensoCallData, {
       headers: {
@@ -188,8 +189,9 @@ const filterVaultData = (
 
   // filter by asset
   if (args?.asset) {
-    const asset = AssetAddressesByChainAndName[args.chainId][args.asset];
-    filteredVaults = vaults.filter((vault) => vault.asset === asset);
+    const assetsByChain = AssetAddressesByChainAndName[args.chainId];
+    if (args.asset in assetsByChain)
+      filteredVaults = vaults.filter((vault) => vault.asset === AssetAddressesByChainAndName[args.chainId][args.asset!]);
   }
 
   filteredVaults = filteredVaults.map((vault) => ({

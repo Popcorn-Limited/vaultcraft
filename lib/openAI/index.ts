@@ -11,16 +11,17 @@ import {
   Thread,
 } from "./types";
 import { Address } from "viem";
-import { Clients } from "../types";
+import { Clients, TokenByAddress } from "../types";
 import { handleToolCalls, getMessageBody, filterAndMapMessages } from "./utils";
 
 export async function serveToolCalls(
   runProps: PollRunProps,
   toolCalls: ToolCalls,
   account: Address,
-  clients: Clients
+  clients: Clients,
+  tokens: { [key: number]: TokenByAddress }
 ): Promise<boolean> {
-  let output = await handleToolCalls(toolCalls, account, clients);
+  let output = await handleToolCalls(toolCalls, account, clients, tokens);
 
   try {
     const response = await axios.post(
