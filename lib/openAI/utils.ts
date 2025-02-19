@@ -198,6 +198,7 @@ const filterVaultData = (
     address: vault.address,
     asset: vault.asset,
     tvl: vault.tvl,
+    chain: ChainById[vault.chainId].name,
     name:
       vault.strategies[0] !== undefined
         ? vault.strategies[0].metadata.description

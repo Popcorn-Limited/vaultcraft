@@ -59,6 +59,7 @@ export type VaultDataRes = {
   asset: Address;
   tvl: number;
   name: string;
+  chainId: number;
   apy?: string;
   strategy?: string;
 };
