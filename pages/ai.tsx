@@ -20,6 +20,8 @@ import {
   useWalletClient,
   useSwitchChain,
 } from "wagmi";
+import { tokensAtom } from "@/lib/atoms";
+import { useAtom } from "jotai";
 
 export default function VaultcraftAgent() {
   const [messages, setMessages] = useState<AssistantMessage[]>([]);
@@ -27,6 +29,8 @@ export default function VaultcraftAgent() {
   const [threadId, setThread] = useState("");
   const [runId, setRunId] = useState("");
   const [polling, setPolling] = useState(false);
+  const [tokens] = useAtom(tokensAtom)
+  
   const { address: account, chain } = useAccount();
   const { switchChainAsync } = useSwitchChain();
 
@@ -74,7 +78,7 @@ export default function VaultcraftAgent() {
     let attempts = 0;
 
     // load thread
-    while (attempts < 10) {
+    while (attempts < 15) {
       const newMessages = await getMessages({ threadId });
 
       console.log("ATTEMPT", attempts, threadId);
@@ -92,7 +96,7 @@ export default function VaultcraftAgent() {
         }
       }
 
-      await new Promise((resolve) => setTimeout(resolve, 5000));
+      await new Promise((resolve) => setTimeout(resolve, 4000));
       attempts++;
     }
 
@@ -130,7 +134,7 @@ export default function VaultcraftAgent() {
       if (chain?.id !== args.chainId) {
         try {
           await switchChainAsync?.({ chainId: args.chainId });
-        } catch (error) {}
+        } catch (error) { }
       }
 
       // function call response
@@ -138,7 +142,8 @@ export default function VaultcraftAgent() {
         { threadId, runId },
         runStatus.requiredActions!.toolCalls[0],
         account!,
-        { publicClient: publicClient!, walletClient: walletClient! }
+        { publicClient: publicClient!, walletClient: walletClient! },
+        tokens
       );
 
       await new Promise((resolve) => setTimeout(resolve, 3000));
@@ -230,6 +235,39 @@ export default function VaultcraftAgent() {
     return `${date.getHours()}:${minutes.slice(-2)}:${seconds.slice(-2)}`;
   };
 
+
+  const formatText = (text: string) => {
+    const vaults = text.split(/(\d+\.\s)/g).filter(Boolean);
+
+    return (
+      <ul>
+        {vaults.map((vault, index) => {
+          if (/^\d+\.\s/.test(vault)) return null;
+
+          return (
+            <li key={index} style={{ marginBottom: "20px", lineHeight: "1.5" }}>
+              {formatBold(vault.replace(/-\s/g, ""))}
+            </li>
+          );
+        })}
+      </ul>
+    );
+  };
+
+  const formatBold = (text: string) => {
+    return text.split(/(\*\*.*?\*\*)/g).map((part, index) => {
+      if (part.startsWith("**") && part.endsWith("**")) {
+        return (
+          <div key={index}>
+            <b>{part.slice(2, -2)}</b>
+          </div>
+        );
+      }
+      return <span key={index}>{part}</span>;
+    });
+  };
+
+
   return (
     <div
       style={{
@@ -257,35 +295,37 @@ export default function VaultcraftAgent() {
           flexDirection: "column-reverse",
         }}
       >
-        {messages.map((msg, idx) => (
-          <div
-            key={idx}
-            style={{
-              display: "flex",
-              justifyContent: msg.role === "user" ? "flex-end" : "flex-start",
-              margin: "5px 0",
-            }}
-          >
-            <span
+        {messages.map((msg, idx) => {
+          return (
+            <div
+              key={idx}
               style={{
-                display: "inline-block",
-                padding: "10px 15px",
-                borderRadius: "20px",
-                backgroundColor: msg.role === "user" ? "#0084ff" : "#e5e5ea",
-                color: msg.error
-                  ? "#ff0000"
-                  : msg.role === "user"
-                  ? "#fff"
-                  : "#000",
-                maxWidth: "75%",
-                fontSize: "14px",
-                lineHeight: "1.4",
+                display: "flex",
+                justifyContent: msg.role === "user" ? "flex-end" : "flex-start",
+                margin: "5px 0",
               }}
             >
-              {`${msg.content} - ${displayDate(msg.timestamp)}`}
-            </span>
-          </div>
-        ))}
+              <span
+                style={{
+                  display: "inline-block",
+                  padding: "10px 15px",
+                  borderRadius: "20px",
+                  backgroundColor: msg.role === "user" ? "#0084ff" : "#e5e5ea",
+                  color: msg.error
+                    ? "#ff0000"
+                    : msg.role === "user"
+                      ? "#fff"
+                      : "#000",
+                  maxWidth: "75%",
+                  fontSize: "14px",
+                  lineHeight: "1.4",
+                }}
+              >
+                {formatText(msg.content)}{displayDate(msg.timestamp)}
+              </span>
+            </div>
+          )
+        })}
       </div>
       <input
         style={{ marginTop: "20px" }}
