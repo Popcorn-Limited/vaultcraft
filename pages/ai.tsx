@@ -263,7 +263,7 @@ export default function VaultcraftAgent() {
           </div>
         );
       }
-      return <span key={index}>{part}</span>;
+      return <span key={index}>{part.replace(/:\s/g, "")}</span>;
     });
   };
 

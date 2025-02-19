@@ -10,7 +10,7 @@ import {
 import getTokenAndVaultsDataByChain from "@/lib/getTokenAndVaultsData";
 import { ChainById, ChainId } from "@/lib/utils/connectors";
 import { handleAllowance } from "@/lib/approve";
-import { Address, zeroAddress } from "viem";
+import { Address, Hash, zeroAddress } from "viem";
 import { Clients, TokenByAddress } from "../types";
 import { AssetAddressesByChainAndName } from "../constants/addresses";
 
@@ -32,9 +32,9 @@ export async function handleToolCalls(
 
     if (res !== undefined) {
       // don't wait for execution so agent can reply on chat
-      handleDepositTx(res, account, clients);
+      const txHash = await handleDepositTx(res, account, clients);
 
-      output = "Ok, transaction is ready to be signed";
+      output = txHash === undefined ? "Something went wrong.." : `Here's your transaction hash ${txHash}`;
     } else {
       output = "Something went wrong, try again with different inputs";
     }
@@ -156,7 +156,7 @@ const handleDepositTx = async (
   ensoRes: EnsoCalldata,
   account: Address,
   clients: Clients
-) => {
+) : Promise<Hash | undefined> => {
   try {
     await handleAllowance({
       token: ensoRes.route[0].tokenIn[0],
@@ -166,8 +166,7 @@ const handleDepositTx = async (
       clients,
     });
 
-    // TODO validate output data
-    await clients.walletClient.sendTransaction({
+    const txHash = await clients.walletClient.sendTransaction({
       chain: ChainById[ensoRes.chainId!],
       account,
       to: ensoRes.tx.to,
@@ -175,9 +174,10 @@ const handleDepositTx = async (
       value: BigInt(ensoRes.tx.value),
     });
 
-    console.log("Ok");
+    return txHash;
   } catch (err) {
     console.log("Error", err);
+    return undefined;
   }
 };
 
