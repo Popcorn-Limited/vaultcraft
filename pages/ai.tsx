@@ -22,6 +22,7 @@ import {
 } from "wagmi";
 import { tokensAtom } from "@/lib/atoms";
 import { useAtom } from "jotai";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
 
 export default function VaultcraftAgent() {
   const [messages, setMessages] = useState<AssistantMessage[]>([]);
@@ -30,9 +31,10 @@ export default function VaultcraftAgent() {
   const [runId, setRunId] = useState("");
   const [polling, setPolling] = useState(false);
   const [tokens] = useAtom(tokensAtom)
-  
+
   const { address: account, chain } = useAccount();
   const { switchChainAsync } = useSwitchChain();
+  const { openConnectModal } = useConnectModal();
 
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
@@ -202,6 +204,7 @@ export default function VaultcraftAgent() {
 
       // push message
       setMessages([
+        { role: "assistant", content: "Thinking...", timestamp: Date.now() / 1000 },
         { role: "user", content: input, timestamp: Date.now() / 1000 },
         ...messages,
       ]);
@@ -269,86 +272,98 @@ export default function VaultcraftAgent() {
 
 
   return (
-    <div
-      style={{
-        maxWidth: "800px",
-        margin: "0 auto",
-        height: "auto",
-        width: "auto",
-        backgroundColor: "#f0f2f5",
-        padding: "20px",
-        boxSizing: "border-box",
-      }}
-    >
-      <h1 style={{ textAlign: "center", color: "#333" }}>
-        <b>Chat with the Vaultcraft Agent</b>
-      </h1>
+    <>
       <div
         style={{
-          border: "1px solid #ccc",
-          padding: "10px",
-          borderRadius: "8px",
-          height: "45vh",
-          overflowY: "auto",
-          backgroundColor: "#fff",
-          display: "flex",
-          flexDirection: "column-reverse",
+          maxWidth: "800px",
+          margin: "0 auto",
+          height: "auto",
+          width: "auto",
+          backgroundColor: "#f0f2f5",
+          padding: "20px",
+          boxSizing: "border-box",
         }}
       >
-        {messages.map((msg, idx) => {
-          return (
-            <div
-              key={idx}
-              style={{
-                display: "flex",
-                justifyContent: msg.role === "user" ? "flex-end" : "flex-start",
-                margin: "5px 0",
-              }}
-            >
-              <span
+        <h1 style={{ textAlign: "center", color: "#333" }}>
+          <b>Chat with the Vaultcraft Agent</b>
+        </h1>
+        <div
+          style={{
+            border: "1px solid #ccc",
+            padding: "10px",
+            borderRadius: "8px",
+            height: "45vh",
+            overflowY: "auto",
+            backgroundColor: "#fff",
+            display: "flex",
+            flexDirection: "column-reverse",
+          }}
+        >
+          {messages.map((msg, idx) => {
+            return (
+              <div
+                key={idx}
                 style={{
-                  display: "inline-block",
-                  padding: "10px 15px",
-                  borderRadius: "20px",
-                  backgroundColor: msg.role === "user" ? "#0084ff" : "#e5e5ea",
-                  color: msg.error
-                    ? "#ff0000"
-                    : msg.role === "user"
-                      ? "#fff"
-                      : "#000",
-                  maxWidth: "75%",
-                  fontSize: "14px",
-                  lineHeight: "1.4",
+                  display: "flex",
+                  justifyContent: msg.role === "user" ? "flex-end" : "flex-start",
+                  margin: "5px 0",
                 }}
               >
-                {formatText(msg.content)}{displayDate(msg.timestamp)}
-              </span>
-            </div>
-          )
-        })}
-      </div>
-      <input
-        style={{ marginTop: "20px" }}
-        type="text"
-        value={userInput}
-        onChange={handleChange}
-        className="border border-gray-300 rounded p-2 w-full"
-        placeholder="Type something..."
-      />
-      <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
-        <MainActionButton
-          disabled={userInput === ""}
-          label="Send Message"
-          handleClick={() => {
-            threadId === "" ? createThread(userInput) : sendMessage(userInput);
-          }}
+                <span
+                  style={{
+                    display: "inline-block",
+                    padding: "10px 15px",
+                    borderRadius: "20px",
+                    backgroundColor: msg.role === "user" ? "#0084ff" : "#e5e5ea",
+                    color: msg.error
+                      ? "#ff0000"
+                      : msg.role === "user"
+                        ? "#fff"
+                        : "#000",
+                    maxWidth: "75%",
+                    fontSize: "14px",
+                    lineHeight: "1.4",
+                  }}
+                >
+                  {formatText(msg.content)}{displayDate(msg.timestamp)}
+                </span>
+              </div>
+            )
+          })}
+        </div>
+        <input
+          style={{ marginTop: "20px" }}
+          type="text"
+          value={userInput}
+          onChange={handleChange}
+          className="border border-gray-300 rounded p-2 w-full"
+          placeholder="Type something..."
         />
-        <MainActionButton
-          disabled={threadId === "" || polling}
-          label="Reload thread"
-          handleClick={() => pollResponse(threadId, runId)}
-        />
+        <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
+          {!account &&
+            <MainActionButton
+              label={"Connect Wallet to continue"}
+              handleClick={openConnectModal}
+            />
+          }
+          {account &&
+            <>
+              <MainActionButton
+                disabled={userInput === ""}
+                label="Send Message"
+                handleClick={() => {
+                  threadId === "" ? createThread(userInput) : sendMessage(userInput);
+                }}
+              />
+              <MainActionButton
+                disabled={threadId === "" || polling}
+                label="Reload thread"
+                handleClick={() => pollResponse(threadId, runId)}
+              />
+            </>
+          }
+        </div>
       </div>
-    </div>
+    </>
   );
 }
