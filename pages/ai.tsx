@@ -349,7 +349,7 @@ export default function VaultcraftAgent() {
           {account &&
             <>
               <MainActionButton
-                disabled={userInput === ""}
+                disabled={userInput === "" || polling}
                 label="Send Message"
                 handleClick={() => {
                   threadId === "" ? createThread(userInput) : sendMessage(userInput);

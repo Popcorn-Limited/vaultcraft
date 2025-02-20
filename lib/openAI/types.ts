@@ -1,4 +1,5 @@
 import { Address, Hex } from "viem";
+import { Balance } from "../types";
 
 export type AssistantMessage = {
   role: string;
@@ -37,6 +38,14 @@ export type ToolCalls = {
   id: string;
   functionName: string;
   arguments: string;
+};
+export type VaultBalancesRes = {
+  [key: Address]: Balance;
+}
+
+export type VaultBalanceToolCall = {
+  chainId: number;
+  vault?: Address;
 };
 
 export type VaultDataToolCall = {

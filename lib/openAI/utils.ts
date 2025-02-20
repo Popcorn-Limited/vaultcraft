@@ -6,12 +6,14 @@ import {
   VaultDepositToolCall,
   EnsoCalldata,
   ToolCalls,
+  VaultBalanceToolCall,
+  VaultBalancesRes,
 } from "./types";
 import getTokenAndVaultsDataByChain from "@/lib/getTokenAndVaultsData";
 import { ChainById, ChainId } from "@/lib/utils/connectors";
 import { handleAllowance } from "@/lib/approve";
 import { Address, Hash, zeroAddress } from "viem";
-import { Clients, TokenByAddress } from "../types";
+import { Balance, Clients, TokenByAddress } from "../types";
 import { AssetAddressesByChainAndName } from "../constants/addresses";
 
 export async function handleToolCalls(
@@ -40,6 +42,11 @@ export async function handleToolCalls(
     }
   } else if (toolCalls.functionName === "get_vault_data") {
     output = JSON.stringify(await handleVaultData(toolCalls.arguments));
+  } else if (toolCalls.functionName === "get_balance") {
+    output = JSON.stringify(await handleBalanceCall(toolCalls.arguments, tokens), (_, value) =>
+      typeof value === "bigint" ? value.toString() : value
+    );
+    console.log("OUTPUT", output);
   } else {
     // uncovered functions to be implemented
     output = "I don't understand your request, specify more details please";
@@ -64,6 +71,39 @@ export const filterAndMapMessages = (thread: any[]): AssistantMessage[] => {
       timestamp: msg.created_at,
     }));
 };
+
+const handleBalanceCall = async (callArgs: string, tokens: { [key: number]: TokenByAddress }): Promise<VaultBalancesRes> => {
+  let balances: VaultBalancesRes = {}
+  const zeroBal: Balance = { value: BigInt(0), formatted: "0", formattedUSD: "0" };
+
+  const args: VaultBalanceToolCall = JSON.parse(callArgs);
+
+  if (args.vault !== undefined) {
+    // return balance of a specified chain and vault
+    if (args.chainId in ChainId)
+      if (args.vault! in tokens[args.chainId])
+        balances[args.vault!] = tokens[args.chainId][args.vault!].balance;
+      else
+        balances[args.vault!] = zeroBal;
+    else
+      balances[args.vault!] = zeroBal;
+  } else {
+    // return balances of all vaults on the specified chain
+    if (args.chainId in ChainId) {
+      const { vaultsData: allVaults } = await getTokenAndVaultsDataByChain({
+        chain: ChainById[args.chainId],
+      });
+
+      allVaults.flatMap((vault) => vault.gauge !== zeroAddress ? [vault.address, vault.gauge!] : [vault.address])
+        .filter((vault) => tokens[args.chainId][vault].balance.value > 0)
+        .map((vault) => balances[vault] = tokens[args.chainId][vault].balance)
+    } else {
+      balances[zeroAddress] = zeroBal;
+    }
+  }
+
+  return balances;
+}
 
 const handleVaultData = async (callArgs: string): Promise<VaultDataRes[]> => {
   const args: VaultDataToolCall = JSON.parse(callArgs);
@@ -156,7 +196,7 @@ const handleDepositTx = async (
   ensoRes: EnsoCalldata,
   account: Address,
   clients: Clients
-) : Promise<Hash | undefined> => {
+): Promise<Hash | undefined> => {
   try {
     await handleAllowance({
       token: ensoRes.route[0].tokenIn[0],
