@@ -39,8 +39,14 @@ export type ToolCalls = {
   functionName: string;
   arguments: string;
 };
+
+export type BalanceAndChain = {
+  balance: Balance;
+  chain: string;
+}
+
 export type VaultBalancesRes = {
-  [key: Address]: Balance;
+  [key: Address]: BalanceAndChain;
 }
 
 export type VaultBalanceToolCall = {

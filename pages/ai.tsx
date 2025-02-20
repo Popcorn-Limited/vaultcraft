@@ -128,7 +128,6 @@ export default function VaultcraftAgent() {
       await loadThread(threadId);
     } else if (runStatus.status === "requires_action") {
       console.log("REQUIRES ACTION");
-      // switch chain if necessary
 
       const args: VaultDepositToolCall = JSON.parse(
         runStatus.requiredActions!.toolCalls[0].arguments
