@@ -11,7 +11,7 @@ import {
 import {
   AssistantMessage,
   Thread,
-  VaultDepositToolCall,
+  VaultActionToolCall,
 } from "@/lib/openAI/types";
 import MainActionButton from "@/components/button/MainActionButton";
 import {
@@ -119,13 +119,18 @@ export default function VaultcraftAgent() {
     if (runStatus.status === "completed") {
       await loadThread(threadId);
     } else if (runStatus.status === "requires_action") {
-      const args: VaultDepositToolCall = JSON.parse(
-        runStatus.requiredActions!.toolCalls[0].arguments
-      );
-      if (chain?.id !== args.chainId) {
-        try {
-          await switchChainAsync?.({ chainId: args.chainId });
-        } catch (error) { }
+      if (
+        runStatus.requiredActions!.toolCalls[0].functionName === "encode_deposit_transaction"
+        || runStatus.requiredActions!.toolCalls[0].functionName === "encode_withdraw_transaction"
+      ) {
+        const args: VaultActionToolCall = JSON.parse(
+          runStatus.requiredActions!.toolCalls[0].arguments
+        );
+        if (chain?.id !== args.chainId) {
+          try {
+            await switchChainAsync?.({ chainId: args.chainId });
+          } catch (error) { }
+        }
       }
 
       // function call response
