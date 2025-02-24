@@ -3,7 +3,7 @@ import {
   AssistantMessage,
   VaultDataToolCall,
   VaultDataRes,
-  VaultDepositToolCall,
+  VaultActionToolCall,
   EnsoCalldata,
   ToolCalls,
   VaultBalanceToolCall,
@@ -25,17 +25,17 @@ export async function handleToolCalls(
 ): Promise<string> {
   let output;
 
-  if (toolCalls.functionName === "encode_deposit_transaction") {
-    const res: EnsoCalldata | undefined = await prepareDepositTx(
+  if (toolCalls.functionName === "encode_deposit_transaction" || toolCalls.functionName === "encode_withdraw_transaction") {
+    const res: EnsoCalldata | undefined = await prepareEnsoTx(
+      toolCalls.functionName,
       toolCalls.arguments,
       account,
-      clients,
       tokens
     );
 
     if (res !== undefined) {
       // don't wait for execution so agent can reply on chat
-      const txHash = await handleDepositTx(res, account, clients);
+      const txHash = await handleEnsoTx(res, account, clients);
 
       output = txHash === undefined ? "Something went wrong.." : `Here's your transaction hash ${txHash}`;
     } else {
@@ -50,7 +50,7 @@ export async function handleToolCalls(
     console.log("OUTPUT", output);
   } else {
     // uncovered functions to be implemented
-    output = "I don't understand your request, specify more details please";
+    output = "I don't understand your request, specify more details ple\ase";
   }
 
   return output;
@@ -79,6 +79,8 @@ const handleBalanceCall = async (callArgs: string, tokens: { [key: number]: Toke
 
   const args: VaultBalanceToolCall = JSON.parse(callArgs);
 
+  console.log(args);
+
   if (args.vault !== undefined) {
     // return balance of a specified chain and vault
     if (args.chainId in ChainId)
@@ -97,11 +99,18 @@ const handleBalanceCall = async (callArgs: string, tokens: { [key: number]: Toke
       });
 
       allVaults.flatMap((vault) => vault.gauge !== zeroAddress ? [vault.address, vault.gauge!] : [vault.address])
-        .filter((vault) => tokens[args.chainId][vault].balance.value > 0)
+        .filter((vault) => {
+          if (tokens[args.chainId] === undefined) {
+            return false;
+          } else {
+            if (vault in tokens[args.chainId])
+              return tokens[args.chainId][vault].balance.value > 0
+            return false;
+          }
+        })
         .map((vault) => balances[vault] = { balance: tokens[args.chainId][vault].balance, chain: ChainById[args.chainId].name })
     } else if (args.chainId === ChainId.ALL) {
       // return all balances across all chains
-
       const excludeChains = [ChainId.ALL, ChainId.XLayer];
       const chainIds = Object.values(ChainId).filter(
         (chainId): chainId is ChainId =>
@@ -111,13 +120,20 @@ const handleBalanceCall = async (callArgs: string, tokens: { [key: number]: Toke
       await Promise.all(
         chainIds.map(async (chainId: number) => {
           if (chainId !== 0) {
-            console.log("fetching vaults", chainId);
             const { vaultsData: allVaults } = await getTokenAndVaultsDataByChain({
               chain: ChainById[chainId],
             });
 
             allVaults.flatMap((vault) => vault.gauge !== zeroAddress ? [vault.address, vault.gauge!] : [vault.address])
-              .filter((vault) => tokens[chainId][vault].balance.value > 0)
+              .filter((vault) => {
+                if (tokens[chainId] === undefined) {
+                  return false;
+                } else {
+                  if (vault in tokens[chainId])
+                    return tokens[chainId][vault].balance.value > 0
+                  return false;
+                }
+              })
               .map((vault) => balances[vault] = { balance: tokens[chainId][vault].balance, chain: ChainById[chainId].name })
           }
         })
@@ -171,15 +187,16 @@ const handleVaultData = async (callArgs: string): Promise<VaultDataRes[]> => {
     return filterVaultData(allVaults, args);
   }
 };
-// validate args and call enso
-// notifies agent tx is ready to be signed
-const prepareDepositTx = async (
+
+const prepareEnsoTx = async (
+  functionName: string,
   callArgs: string,
   account: Address,
-  clients: Clients,
   tokens: { [key: number]: TokenByAddress }
 ): Promise<EnsoCalldata | undefined> => {
-  const args: VaultDepositToolCall = JSON.parse(callArgs);
+
+  const isDeposit: boolean = functionName === "encode_deposit_transaction";
+  const args: VaultActionToolCall = JSON.parse(callArgs);
 
   const asset: Address =
     args.asset.slice(0, 2) === "0x"
@@ -190,9 +207,20 @@ const prepareDepositTx = async (
   if (asset === zeroAddress)
     return undefined;
 
-  const amount = args.amount * (10 ** tokens[args.chainId][asset].decimals);
+  // TODO vault/asset existance
+  const amount = isDeposit
+    ? args.amount !== undefined
+      ? args.amount! ** (10 ** tokens[args.chainId][asset].decimals) // deposit specified amount
+      : Number(tokens[args.chainId][asset].balance.value) // deposit all asset balance
+    : args.amount !== undefined
+      ? args.amount! * (10 ** tokens[args.chainId][args.vault].decimals) // withdraw a specific amount of shares
+      : Number(tokens[args.chainId][args.vault].balance.value); // withdraw all shares
 
-  const ensoCallData = `https://api.enso.finance/api/v1/shortcuts/route?chainId=${args.chainId}&fromAddress=${account}&receiver=${account}&amountIn=${amount}&slippage=500&disableRFQs=false&tokenIn=${asset}&tokenOut=${args.vault}`;
+  let ensoCallData: string = "";
+  isDeposit ?
+    ensoCallData = `https://api.enso.finance/api/v1/shortcuts/route?chainId=${args.chainId}&fromAddress=${account}&receiver=${account}&amountIn=${amount}&slippage=500&disableRFQs=false&tokenIn=${asset}&tokenOut=${args.vault}`
+    :
+    ensoCallData = `https://api.enso.finance/api/v1/shortcuts/route?chainId=${args.chainId}&fromAddress=${account}&receiver=${account}&amountIn=${amount}&slippage=500&disableRFQs=false&tokenIn=${args.vault}&tokenOut=${asset}`;
 
   try {
     const response = await axios.get(ensoCallData, {
@@ -211,11 +239,11 @@ const prepareDepositTx = async (
     return ensoRes;
   } catch (error) {
     console.error("OpenAI API Error sending message:", error);
-    return undefined;
+    return undefined; // TODO err object
   }
 };
 
-const handleDepositTx = async (
+const handleEnsoTx = async (
   ensoRes: EnsoCalldata,
   account: Address,
   clients: Clients

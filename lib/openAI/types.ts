@@ -61,10 +61,10 @@ export type VaultDataToolCall = {
   asset?: string;
 };
 
-export type VaultDepositToolCall = {
+export type VaultActionToolCall = {
   chainId: number;
   asset: string;
-  amount: number;
+  amount?: number;
   vault: Address;
   receiver?: Address;
 };

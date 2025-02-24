@@ -49,7 +49,6 @@ export default function VaultcraftAgent() {
     });
 
     if (thread !== null) {
-      console.log("THREEAD", thread);
       setThread(thread.threadId);
       setRunId(thread.runId);
 
@@ -83,8 +82,6 @@ export default function VaultcraftAgent() {
     while (attempts < 15) {
       const newMessages = await getMessages({ threadId });
 
-      console.log("ATTEMPT", attempts, threadId);
-
       // todo with 2 consecutives assistant message, last one might not be loaded
       // if the getMessages happen when second one isn't in yet
       if (newMessages.length > 0) {
@@ -117,18 +114,11 @@ export default function VaultcraftAgent() {
   const pollResponse = async (threadId: string, runId: string) => {
     setPolling(true);
 
-    console.log("POLLIng", threadId, runId);
-
     const runStatus = await pollRunStatus({ threadId, runId });
 
-    console.log(runStatus);
-
     if (runStatus.status === "completed") {
-      console.log("COMPLETED");
       await loadThread(threadId);
     } else if (runStatus.status === "requires_action") {
-      console.log("REQUIRES ACTION");
-
       const args: VaultDepositToolCall = JSON.parse(
         runStatus.requiredActions!.toolCalls[0].arguments
       );
@@ -151,16 +141,24 @@ export default function VaultcraftAgent() {
 
       await pollResponse(threadId, runId);
     } else if (runStatus.status === "in_progress") {
-      console.log("IN PROGRESS");
-
       await new Promise((resolve) => setTimeout(resolve, 3000));
 
       await pollResponse(threadId, runId);
     } else {
-      // error ?
+      setPolling(false);
+      // append error
+      toast.dismiss();
+      setMessages([
+        {
+          role: "assistant",
+          content: "Error connecting to the assistant",
+          timestamp: Date.now() / 1000,
+          error: true,
+        },
+        ...messages,
+      ]);
+      // TODO error obj
     }
-
-    setPolling(false);
   };
 
   const replyToMessage = async (thread: string) => {
@@ -274,7 +272,7 @@ export default function VaultcraftAgent() {
     <>
       <div
         style={{
-          maxWidth: "800px",
+          maxWidth: "1800px",
           margin: "0 auto",
           height: "auto",
           width: "auto",
