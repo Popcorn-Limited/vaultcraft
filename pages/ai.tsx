@@ -43,6 +43,13 @@ export default function VaultcraftAgent() {
     toast.loading("Waiting for agent..");
     setUserInput("");
 
+
+    // add new message at beginning
+    setMessages([
+      { role: "assistant", content: "Thinking...", timestamp: Date.now() / 1000 },
+      { role: "user", content: input, timestamp: Date.now() / 1000 },
+    ]);
+
     const thread: Thread | null = await createThreadAndRun({
       agentId: process.env.AGENT_ID!,
       message: input,
@@ -51,11 +58,6 @@ export default function VaultcraftAgent() {
     if (thread !== null) {
       setThread(thread.threadId);
       setRunId(thread.runId);
-
-      // add new message at beginning
-      setMessages([
-        { role: "user", content: input, timestamp: Date.now() / 1000 },
-      ]);
 
       // run response - reload messages
       await pollResponse(thread.threadId, thread.runId);
@@ -199,18 +201,17 @@ export default function VaultcraftAgent() {
     toast.loading("Sending message..");
     setUserInput("");
 
+    // push message
+    setMessages([
+      { role: "assistant", content: "Thinking...", timestamp: Date.now() / 1000 },
+      { role: "user", content: input, timestamp: Date.now() / 1000 },
+      ...messages,
+    ]);
+
     const res = await sendAgentMessage({ threadId, message: input });
 
     if (res) {
       toast.dismiss();
-
-      // push message
-      setMessages([
-        { role: "assistant", content: "Thinking...", timestamp: Date.now() / 1000 },
-        { role: "user", content: input, timestamp: Date.now() / 1000 },
-        ...messages,
-      ]);
-
       // run response
       await replyToMessage(threadId);
     } else {
@@ -339,7 +340,7 @@ export default function VaultcraftAgent() {
           value={userInput}
           onChange={handleChange}
           className="border border-gray-300 rounded p-2 w-full"
-          placeholder="Type something..."
+          placeholder="Ask me anything..."
         />
         <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
           {!account &&
