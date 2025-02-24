@@ -47,7 +47,6 @@ export async function handleToolCalls(
     output = JSON.stringify(await handleBalanceCall(toolCalls.arguments, tokens), (_, value) =>
       typeof value === "bigint" ? value.toString() : value
     );
-    console.log("OUTPUT", output);
   } else {
     // uncovered functions to be implemented
     output = "I don't understand your request, specify more details ple\ase";
@@ -78,8 +77,6 @@ const handleBalanceCall = async (callArgs: string, tokens: { [key: number]: Toke
   const zeroBal: BalanceAndChain = { balance: { value: BigInt(0), formatted: "0", formattedUSD: "0" }, chain: "undefined" };
 
   const args: VaultBalanceToolCall = JSON.parse(callArgs);
-
-  console.log(args);
 
   if (args.vault !== undefined) {
     // return balance of a specified chain and vault
@@ -161,7 +158,6 @@ const handleVaultData = async (callArgs: string): Promise<VaultDataRes[]> => {
     await Promise.all(
       chainIds.map(async (chainId: number) => {
         if (chainId !== 0) {
-          console.log("fetching vaults", chainId);
           const { vaultsData: allVaults } = await getTokenAndVaultsDataByChain({
             chain: ChainById[chainId],
           });
@@ -229,8 +225,6 @@ const prepareEnsoTx = async (
         Authorization: `Bearer ${process.env.ENSO_API_KEY}`,
       },
     });
-
-    console.log("ENSO Call submitted", response);
 
     const ensoRes: EnsoCalldata = response.data;
     ensoRes.amountIn = amount;

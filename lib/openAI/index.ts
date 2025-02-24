@@ -42,7 +42,6 @@ export async function serveToolCalls(
         },
       }
     );
-    console.log("TOOL OUTPUT SUBMITTED", response);
 
     return true;
   } catch (error) {
@@ -55,8 +54,6 @@ export async function pollRunStatus({
   threadId,
   runId,
 }: PollRunProps): Promise<RunStatus> {
-  console.log("Poll run status");
-
   try {
     const res = await axios.get(
       `https://api.openai.com/v1/threads/${threadId}/runs/${runId}`,
@@ -108,8 +105,6 @@ export async function createThreadAndRun({
   agentId,
   message,
 }: CreateThreadRunProps): Promise<Thread | null> {
-  console.log("creating thread");
-
   try {
     const response = await axios.post(
       `https://api.openai.com/v1/threads/runs`,
@@ -127,7 +122,6 @@ export async function createThreadAndRun({
         },
       }
     );
-    console.log("OK", response.data.thread_id);
 
     return { threadId: response.data.thread_id, runId: response.data.id };
   } catch (error) {
@@ -152,7 +146,6 @@ export async function sendAgentMessage({
         },
       }
     );
-    console.log("MESSAGE SENT");
     return true;
   } catch (error) {
     console.error("OpenAI API Error sending message:", error);
@@ -200,8 +193,6 @@ export async function agentReply({
         },
       }
     );
-
-    console.log(res);
 
     return res.data.id;
   } catch (error) {
