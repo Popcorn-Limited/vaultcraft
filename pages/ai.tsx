@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { toast } from "react-hot-toast";
+import React, { useEffect, useState } from "react";
 import {
   getMessages,
   agentReply,
@@ -30,24 +29,38 @@ export default function VaultcraftAgent() {
   const [threadId, setThread] = useState("");
   const [runId, setRunId] = useState("");
   const [polling, setPolling] = useState(false);
-  const [tokens] = useAtom(tokensAtom)
+  const [tokens] = useAtom(tokensAtom);
 
   const { address: account, chain } = useAccount();
   const { switchChainAsync } = useSwitchChain();
   const { openConnectModal } = useConnectModal();
 
+  const introMessage = {
+    role: "assistant",
+    content:
+      "Hi, I'm your Vaultcraft Assistant! 🚀 I'm here to help you explore vaults, check balances, and assist with deposits and withdrawals. Not sure where to start? Just ask, 'What can you do?' and I'll guide you!",
+    timestamp: Date.now() / 1000,
+  };
+
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
 
-  const createThread = async (input: string) => {
-    toast.loading("Waiting for agent..");
-    setUserInput("");
+  useEffect(() => {
+    if (messages.length === 0) setMessages([introMessage]);
+  }, []);
 
+  const createThread = async (input: string) => {
+    setUserInput("");
 
     // add new message at beginning
     setMessages([
-      { role: "assistant", content: "Thinking...", timestamp: Date.now() / 1000 },
+      {
+        role: "assistant",
+        content: "Thinking...",
+        timestamp: Date.now() / 1000,
+      },
       { role: "user", content: input, timestamp: Date.now() / 1000 },
+      introMessage,
     ]);
 
     const thread: Thread | null = await createThreadAndRun({
@@ -63,7 +76,6 @@ export default function VaultcraftAgent() {
       await pollResponse(thread.threadId, thread.runId);
     } else {
       // append error
-      toast.dismiss();
       setMessages([
         {
           role: "assistant",
@@ -88,12 +100,11 @@ export default function VaultcraftAgent() {
       // if the getMessages happen when second one isn't in yet
       if (newMessages.length > 0) {
         if (newMessages[0].role === "assistant") {
-          setMessages(newMessages);
-          toast.dismiss();
+          setMessages([...newMessages, introMessage]);
           setPolling(false);
           return;
         } else {
-          setMessages(newMessages);
+          setMessages([...newMessages, introMessage]);
         }
       }
 
@@ -122,16 +133,19 @@ export default function VaultcraftAgent() {
       await loadThread(threadId);
     } else if (runStatus.status === "requires_action") {
       if (
-        runStatus.requiredActions!.toolCalls[0].functionName === "encode_deposit_transaction"
-        || runStatus.requiredActions!.toolCalls[0].functionName === "encode_withdraw_transaction"
+        runStatus.requiredActions!.toolCalls[0].functionName ===
+          "encode_deposit_transaction" ||
+        runStatus.requiredActions!.toolCalls[0].functionName ===
+          "encode_withdraw_transaction"
       ) {
         const args: VaultActionToolCall = JSON.parse(
           runStatus.requiredActions!.toolCalls[0].arguments
         );
+
         if (chain?.id !== args.chainId) {
           try {
             await switchChainAsync?.({ chainId: args.chainId });
-          } catch (error) { }
+          } catch (error) {}
         }
       }
 
@@ -153,8 +167,6 @@ export default function VaultcraftAgent() {
       await pollResponse(threadId, runId);
     } else {
       setPolling(false);
-      // append error
-      toast.dismiss();
       setMessages([
         {
           role: "assistant",
@@ -164,13 +176,10 @@ export default function VaultcraftAgent() {
         },
         ...messages,
       ]);
-      // TODO error obj
     }
   };
 
   const replyToMessage = async (thread: string) => {
-    toast.loading("Waiting for agent to reply..");
-
     // trigger agent reply
     const res: string | null = await agentReply({
       threadId: thread,
@@ -193,17 +202,19 @@ export default function VaultcraftAgent() {
         },
         ...messages,
       ]);
-      toast.dismiss();
     }
   };
 
   const sendMessage = async (input: string) => {
-    toast.loading("Sending message..");
     setUserInput("");
 
     // push message
     setMessages([
-      { role: "assistant", content: "Thinking...", timestamp: Date.now() / 1000 },
+      {
+        role: "assistant",
+        content: "Thinking...",
+        timestamp: Date.now() / 1000,
+      },
       { role: "user", content: input, timestamp: Date.now() / 1000 },
       ...messages,
     ]);
@@ -211,7 +222,6 @@ export default function VaultcraftAgent() {
     const res = await sendAgentMessage({ threadId, message: input });
 
     if (res) {
-      toast.dismiss();
       // run response
       await replyToMessage(threadId);
     } else {
@@ -225,7 +235,6 @@ export default function VaultcraftAgent() {
         },
         ...messages,
       ]);
-      toast.dismiss();
     }
   };
 
@@ -240,7 +249,6 @@ export default function VaultcraftAgent() {
 
     return `${date.getHours()}:${minutes.slice(-2)}:${seconds.slice(-2)}`;
   };
-
 
   const formatText = (text: string) => {
     const vaults = text.split(/(\d+\.\s)/g).filter(Boolean);
@@ -273,31 +281,31 @@ export default function VaultcraftAgent() {
     });
   };
 
-
   return (
     <>
       <div
         style={{
           maxWidth: "1800px",
           margin: "0 auto",
-          height: "auto",
+          height: "85vh",
           width: "auto",
-          backgroundColor: "#f0f2f5",
+          backgroundColor: "#212121",
           padding: "20px",
           boxSizing: "border-box",
         }}
       >
-        <h1 style={{ textAlign: "center", color: "#333" }}>
-          <b>Chat with the Vaultcraft Agent</b>
+        <h1 className="relative text-5xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-green-400 drop-shadow-md">
+          Meet the Vaultcraft Agent
+          <span className="absolute left-1/2 transform -translate-x-1/2 bottom-[-5px] w-40 h-1 bg-gradient-to-r from-blue-400 to-green-400 rounded-full animate-pulse"></span>
         </h1>
         <div
           style={{
             border: "1px solid #ccc",
             padding: "10px",
             borderRadius: "8px",
-            height: "45vh",
+            height: "65vh",
             overflowY: "auto",
-            backgroundColor: "#fff",
+            backgroundColor: "#212121",
             display: "flex",
             flexDirection: "column-reverse",
           }}
@@ -308,30 +316,33 @@ export default function VaultcraftAgent() {
                 key={idx}
                 style={{
                   display: "flex",
-                  justifyContent: msg.role === "user" ? "flex-end" : "flex-start",
+                  justifyContent:
+                    msg.role === "user" ? "flex-end" : "flex-start",
                   margin: "5px 0",
                 }}
               >
                 <span
                   style={{
                     display: "inline-block",
-                    padding: "10px 15px",
-                    borderRadius: "20px",
-                    backgroundColor: msg.role === "user" ? "#0084ff" : "#e5e5ea",
+                    padding: "15px 20px",
+                    borderRadius: "10px",
+                    backgroundColor:
+                      msg.role === "user" ? "#91f086" : "#e5e5ea",
                     color: msg.error
                       ? "#ff0000"
                       : msg.role === "user"
-                        ? "#fff"
-                        : "#000",
+                      ? "#000"
+                      : "#000",
                     maxWidth: "75%",
-                    fontSize: "14px",
+                    fontSize: "16px",
                     lineHeight: "1.4",
                   }}
                 >
-                  {formatText(msg.content)}{displayDate(msg.timestamp)}
+                  {formatText(msg.content)}
+                  {displayDate(msg.timestamp)}
                 </span>
               </div>
-            )
+            );
           })}
         </div>
         <input
@@ -343,19 +354,21 @@ export default function VaultcraftAgent() {
           placeholder="Ask me anything..."
         />
         <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
-          {!account &&
+          {!account && (
             <MainActionButton
               label={"Connect Wallet to continue"}
               handleClick={openConnectModal}
             />
-          }
-          {account &&
+          )}
+          {account && (
             <>
               <MainActionButton
                 disabled={userInput === "" || polling}
                 label="Send Message"
                 handleClick={() => {
-                  threadId === "" ? createThread(userInput) : sendMessage(userInput);
+                  threadId === ""
+                    ? createThread(userInput)
+                    : sendMessage(userInput);
                 }}
               />
               <MainActionButton
@@ -364,7 +377,7 @@ export default function VaultcraftAgent() {
                 handleClick={() => pollResponse(threadId, runId)}
               />
             </>
-          }
+          )}
         </div>
       </div>
     </>
