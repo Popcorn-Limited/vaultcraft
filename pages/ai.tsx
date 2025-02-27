@@ -27,8 +27,8 @@ export default function VaultcraftAgent() {
   const [messages, setMessages] = useState<AssistantMessage[]>([]);
   const [userInput, setUserInput] = useState("");
   const [threadId, setThread] = useState("");
-  const [runId, setRunId] = useState("");
   const [polling, setPolling] = useState(false);
+  const [showQuickActions, setShowQuickActions] = useState(false);
   const [tokens] = useAtom(tokensAtom);
 
   const { address: account, chain } = useAccount();
@@ -70,7 +70,6 @@ export default function VaultcraftAgent() {
 
     if (thread !== null) {
       setThread(thread.threadId);
-      setRunId(thread.runId);
 
       // run response - reload messages
       await pollResponse(thread.threadId, thread.runId);
@@ -134,9 +133,9 @@ export default function VaultcraftAgent() {
     } else if (runStatus.status === "requires_action") {
       if (
         runStatus.requiredActions!.toolCalls[0].functionName ===
-          "encode_deposit_transaction" ||
+        "encode_deposit_transaction" ||
         runStatus.requiredActions!.toolCalls[0].functionName ===
-          "encode_withdraw_transaction"
+        "encode_withdraw_transaction"
       ) {
         const args: VaultActionToolCall = JSON.parse(
           runStatus.requiredActions!.toolCalls[0].arguments
@@ -145,7 +144,7 @@ export default function VaultcraftAgent() {
         if (chain?.id !== args.chainId) {
           try {
             await switchChainAsync?.({ chainId: args.chainId });
-          } catch (error) {}
+          } catch (error) { }
         }
       }
 
@@ -188,7 +187,6 @@ export default function VaultcraftAgent() {
 
     if (res !== null) {
       // pull response - new runId is provided
-      setRunId(res);
       await pollResponse(thread, res);
     } else {
       // reply error
@@ -259,7 +257,7 @@ export default function VaultcraftAgent() {
           if (/^\d+\.\s/.test(vault)) return null;
 
           return (
-            <li key={index} style={{ marginBottom: "20px", lineHeight: "1.5" }}>
+            <li key={index} style={{ marginBottom: "20px", lineHeight: "1.8" }}>
               {formatBold(vault.replace(/-\s/g, ""))}
             </li>
           );
@@ -294,7 +292,7 @@ export default function VaultcraftAgent() {
           boxSizing: "border-box",
         }}
       >
-        <h1 className="relative text-5xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-green-400 drop-shadow-md">
+        <h1 className="relative text-4xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-green-400 drop-shadow-md">
           Meet the Vaultcraft Agent
           <span className="absolute left-1/2 transform -translate-x-1/2 bottom-[-5px] w-40 h-1 bg-gradient-to-r from-blue-400 to-green-400 rounded-full animate-pulse"></span>
         </h1>
@@ -303,7 +301,8 @@ export default function VaultcraftAgent() {
             border: "1px solid #ccc",
             padding: "10px",
             borderRadius: "8px",
-            minHeight: "50vh",
+            minHeight: "30vh",
+            maxHeight: "60vh",
             overflowY: "auto",
             backgroundColor: "#212121",
             display: "flex",
@@ -327,15 +326,15 @@ export default function VaultcraftAgent() {
                     padding: "15px 20px",
                     borderRadius: "10px",
                     backgroundColor:
-                      msg.role === "user" ? "#91f086" : "#e5e5ea",
+                      msg.role === "user" ? "#91f086" : "#212121",
                     color: msg.error
                       ? "#ff0000"
                       : msg.role === "user"
-                      ? "#000"
-                      : "#000",
-                    maxWidth: "75%",
-                    fontSize: "16px",
-                    lineHeight: "1.4",
+                        ? "#000"
+                        : "#fff",
+                    maxWidth: "80%",
+                    fontSize: "18px",
+                    lineHeight: "1.5",
                   }}
                 >
                   {formatText(msg.content)}
@@ -372,9 +371,63 @@ export default function VaultcraftAgent() {
                 }}
               />
               <MainActionButton
-                disabled={threadId === "" || polling}
-                label="Reload thread"
-                handleClick={() => pollResponse(threadId, runId)}
+                label="Quick Actions"
+                handleClick={() => setShowQuickActions(!showQuickActions)}
+              />
+              {/* {threadId !== "" && !polling && (
+                <MainActionButton
+                  disabled={threadId === "" || polling}
+                  label="Reload thread"
+                  handleClick={() => pollResponse(threadId, runId)}
+                />
+              )} */}
+            </>
+          )}
+        </div>
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "20px",
+          width: "100%",
+          marginTop: "40px",
+        }}>
+          {account && showQuickActions && (
+            <>
+              <MainActionButton
+                disabled={polling}
+                label="I want to deposit"
+                handleClick={() => {
+                  threadId === ""
+                    ? createThread("I want to deposit into a vault")
+                    : sendMessage("I want to deposit into a vault");
+                }}
+              />
+              <MainActionButton
+                disabled={polling}
+                label="I want to withdraw"
+                handleClick={() => {
+                  threadId === ""
+                    ? createThread("I want to withdraw from a vault")
+                    : sendMessage("I want to withdraw from a vault");
+                }}
+              />
+              <MainActionButton
+                disabled={polling}
+                label="Vault analytics"
+                handleClick={() => {
+                  threadId === ""
+                    ? createThread("Can you show me the best vaults on Vaultcraft")
+                    : sendMessage("Can you show me the best vaults on Vaultcraft");
+                }}
+              />
+              <MainActionButton
+                disabled={polling}
+                label="I want to see my balances"
+                handleClick={() => {
+                  threadId === ""
+                    ? createThread("Can you show me my balances on all vaults")
+                    : sendMessage("Can you show me my balances on all vaults");
+                }}
               />
             </>
           )}
