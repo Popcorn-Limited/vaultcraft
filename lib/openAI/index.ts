@@ -92,7 +92,6 @@ export async function pollRunStatus({
     ) {
       return { status: "in_progress" };
     } else {
-      // TODO
       return { status: "error" };
     }
   } catch (error) {

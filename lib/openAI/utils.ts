@@ -203,10 +203,9 @@ const prepareEnsoTx = async (
   if (asset === zeroAddress)
     return undefined;
 
-  // TODO vault/asset existance
   const amount = isDeposit
     ? args.amount !== undefined
-      ? args.amount! ** (10 ** tokens[args.chainId][asset].decimals) // deposit specified amount
+      ? args.amount! * (10 ** tokens[args.chainId][asset].decimals) // deposit specified amount
       : Number(tokens[args.chainId][asset].balance.value) // deposit all asset balance
     : args.amount !== undefined
       ? args.amount! * (10 ** tokens[args.chainId][args.vault].decimals) // withdraw a specific amount of shares
@@ -284,11 +283,11 @@ const filterVaultData = (
     asset: vault.asset,
     tvl: vault.tvl,
     chain: ChainById[vault.chainId].name,
-    name:
-      vault.strategies[0] !== undefined
-        ? vault.strategies[0].metadata.description
-        : "Not found",
+    name: vault.metadata.vaultName?? undefined,
     apy: vault.apyData.totalApy,
+    strategy: vault.strategies[0] !== undefined
+      ? vault.strategies[0].metadata.description
+      : undefined
   }));
 
   // order by tvl or apy if requested
