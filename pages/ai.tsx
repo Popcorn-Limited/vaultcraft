@@ -287,7 +287,7 @@ export default function VaultcraftAgent() {
         style={{
           maxWidth: "1800px",
           margin: "0 auto",
-          height: "85vh",
+          height: "auto",
           width: "auto",
           backgroundColor: "#212121",
           padding: "20px",
@@ -303,7 +303,7 @@ export default function VaultcraftAgent() {
             border: "1px solid #ccc",
             padding: "10px",
             borderRadius: "8px",
-            height: "65vh",
+            minHeight: "50vh",
             overflowY: "auto",
             backgroundColor: "#212121",
             display: "flex",
