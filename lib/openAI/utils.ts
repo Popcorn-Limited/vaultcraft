@@ -273,9 +273,22 @@ const filterVaultData = (
 
   // filter by asset
   if (args?.asset) {
-    const assetsByChain = AssetAddressesByChainAndName[args.chainId];
-    if (args.asset in assetsByChain)
-      filteredVaults = vaults.filter((vault) => vault.asset === AssetAddressesByChainAndName[args.chainId][args.asset!]);
+    const filterAssets = args.asset.includes("LST") 
+      ? [
+        AssetAddressesByChainAndName[args.chainId]["ETHx"], 
+        AssetAddressesByChainAndName[args.chainId]["wstETH"], 
+        AssetAddressesByChainAndName[args.chainId]["rsETH"],
+        AssetAddressesByChainAndName[args.chainId]["stETH"]
+      ]
+      : args.asset.includes("stablecoin")
+      ? [
+        AssetAddressesByChainAndName[args.chainId]["USDC"], 
+        AssetAddressesByChainAndName[args.chainId]["USDT"], 
+        AssetAddressesByChainAndName[args.chainId]["DAI"]
+      ]
+      : [AssetAddressesByChainAndName[args.chainId][args.asset!]];
+    
+    filteredVaults = vaults.filter((vault) => filterAssets.includes(vault.asset));
   }
 
   filteredVaults = filteredVaults.map((vault) => ({

@@ -361,6 +361,8 @@ export const AssetAddressesByChainAndName: {[key:number]: {[key:string]: Address
     "LUSD": "0xc40F949F8a4e094D1b49a23ea9241D289B7b2819", // LUSD
     "WETH": "0x4200000000000000000000000000000000000006", // WETH
     "WBTC": "0x68f180fcCe6836688e9084f035309E29Bf0A2095", // WBTC
+    "wstETH": "0x1f32b1c2345538c0c6f582fcb022739c4a194ebb",
+    "rsETH": "0x4186bfc76e2e237523cbc30fd220fe055156b41f"
   },
   [arbitrum.id]: {
     "DAI": "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1", // DAI
@@ -370,6 +372,7 @@ export const AssetAddressesByChainAndName: {[key:number]: {[key:string]: Address
     "LUSD": "0x93b346b6BC2548dA6A1E7d98E9a421B42541425b", // LUSD
     "WETH": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1", // WETH
     "WBTC": "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f", // WBTC
+    "wstETH": "0x0fBcbaEA96Ce0cF7Ee00A8c19c3ab6f5Dc8E1921"
   },
   [bsc.id]: {},
   [xLayer.id]: {},
