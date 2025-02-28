@@ -5,16 +5,18 @@ import TabSelector from "@/components/common/TabSelector";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import { tokensAtom } from "@/lib/atoms";
 import { ERC20Abi, OptionTokenAbi, OptionTokenByChain, TokenMigrationAbi, TokenMigrationByChain, VcxByChain } from "@/lib/constants";
-import { handleMaxClick, simulateCall } from "@/lib/utils/helpers";
+import { formatBalance, handleMaxClick, simulateCall } from "@/lib/utils/helpers";
 import { showLoadingToast } from "@/lib/toasts";
 import { Clients } from "@/lib/types";
 import { handleCallResult } from "@/lib/utils/helpers";
 import { useAtom } from "jotai";
-import { useEffect, useState } from "react";
-import { Address, parseUnits, createPublicClient, http } from "viem";
+import { useEffect, useRef, useState } from "react";
+import { Address, parseUnits, createPublicClient, http, zeroAddress } from "viem";
 import { arbitrum, mainnet, optimism } from "viem/chains";
 import { useAccount, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
 import { handleAllowance } from "@/lib/approve";
+import { ChainById, GAUGE_NETWORKS, RPC_URLS } from "@/lib/utils/connectors";
+import Highcharts from "highcharts";
 
 export async function migrate({
   token, amount, account, chainId, clients
@@ -45,8 +47,18 @@ export async function migrate({
 
 
 export type MigrationData = {
-  vcx: number;
-  ovcx: number;
+  vcx: bigint;
+  ovcx: bigint;
+}
+
+export type MigrationDataByChain = {
+  [key: number]: MigrationData;
+}
+
+const DEFAULT_MIGRATION_DATA: MigrationDataByChain = {
+  [mainnet.id]: { vcx: BigInt(0), ovcx: BigInt(0) },
+  [arbitrum.id]: { vcx: BigInt(0), ovcx: BigInt(0) },
+  [optimism.id]: { vcx: BigInt(0), ovcx: BigInt(0) },
 }
 
 export default function Migrate() {
@@ -58,92 +70,116 @@ export default function Migrate() {
   const [chainId, setChainId] = useState<number>(mainnet.id);
   const [selectedTab, setSelectedTab] = useState<string>("VCX");
   const [amount, setAmount] = useState<string>("0");
-  const [migrationData, setMigrationData] = useState<MigrationData[]>();
-  const [userMigrationData, setUserMigrationData] = useState<MigrationData[]>();
+
+  const globalStatsElem = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const getData = async () => await getMigrationData();
-    getData();
-  }, [account])
+    if (globalStatsElem.current) {
+      getMigrationData(globalStatsElem.current);
+    }
+  }, [globalStatsElem])
 
+  async function getMigrationData(elem: HTMLDivElement) {
+    const _migrationData: MigrationDataByChain = {};
 
-  async function getMigrationData() {
-    const chainConfigs = [
-      { chain: mainnet, id: 1 },
-      { chain: arbitrum, id: 42161 },
-      { chain: optimism, id: 10 }
-    ];
-
-    const clients = chainConfigs.map(({ chain, id }) =>
-      createPublicClient({
-        chain,
-        transport: http(),
+    for (const chainId of GAUGE_NETWORKS) {
+      const client = createPublicClient({
+        chain: ChainById[chainId],
+        transport: http(RPC_URLS[chainId])
       })
-    );
 
-    const multicalls = clients.map((client, index) =>
-      client.multicall({
+      const globalData = await client.multicall({
         contracts: [
           {
-            address: VcxByChain[chainConfigs[index].id],
+            address: VcxByChain[chainId],
             abi: ERC20Abi,
             functionName: "balanceOf",
-            args: [TokenMigrationByChain[chainConfigs[index].id]]
+            args: [TokenMigrationByChain[chainId]]
           },
           {
-            address: OptionTokenByChain[chainConfigs[index].id],
+            address: OptionTokenByChain[chainId],
             abi: OptionTokenAbi,
             functionName: "balanceOf",
-            args: [TokenMigrationByChain[chainConfigs[index].id]]
+            args: [TokenMigrationByChain[chainId]]
           }
         ]
       })
-    );
 
-    var migData: MigrationData[];
-    Promise.all(multicalls)
-      .then((results) => {
-        migData = results.map((chainResult) => {
-          return { vcx: Number(chainResult[0].result!), ovcx: Number(chainResult[1].result!) }
-        });
-
-        console.log("MIG DATA", migData);
-
-        setMigrationData(migData);
-      })
-      .catch((error) => console.error("Multicall Error:", error));
-
-    if (account) {
-      const multicalls = clients.map((client, index) =>
-        client.multicall({
-          contracts: [
-            {
-              address: TokenMigrationByChain[chainConfigs[index].id],
-              abi: TokenMigrationAbi,
-              functionName: "burnedBalance",
-              args: [account, VcxByChain[chainConfigs[index].id]]
-            },
-            {
-              address: TokenMigrationByChain[chainConfigs[index].id],
-              abi: TokenMigrationAbi,
-              functionName: "burnedBalance",
-              args: [account, OptionTokenByChain[chainConfigs[index].id]]
-            }
-          ]
-        })
-      );
-
-      var userMigData: MigrationData[];
-      Promise.all(multicalls)
-        .then((results) => {
-          userMigData = results.map((chainResult) => {
-            return { vcx: Number(chainResult[0].result!), ovcx: Number(chainResult[1].result!) }
-          });
-
-          setUserMigrationData(userMigData);
-        })
-        .catch((error) => console.error("Multicall Error:", error));
+      _migrationData[chainId] = {
+        vcx: globalData[0].result!,
+        ovcx: globalData[1].result!
+      }
     }
+
+    Highcharts.chart(elem, {
+      chart: {
+        type: 'column',
+        backgroundColor: "transparent",
+      },
+      title: {
+        text: ''
+      },
+      legend: {
+        itemStyle: {
+          color: "#fff",
+        },
+      },
+      xAxis: {
+        categories: ["VCX", "oVCX"],
+        crosshair: true,
+        accessibility: {
+          description: 'Tokens'
+        },
+        labels: {
+          style: {
+            color: "#fff",
+          },
+        },
+      },
+      yAxis: {
+        min: 0,
+        title: {
+          text: ''
+        },
+        labels: {
+          style: {
+            color: "#fff",
+          },
+        },
+      },
+      plotOptions: {
+        column: {
+          pointPadding: 0.2,
+          borderWidth: 0
+        }
+      },
+      series: [
+        {
+          name: 'Mainnet',
+          data: [
+            Number(formatBalance(_migrationData[mainnet.id].vcx, 18, 2)),
+            Number(formatBalance(_migrationData[mainnet.id].ovcx, 18, 2))
+          ],
+          type: 'column'
+        },
+        {
+          name: 'Arbitrum',
+          data: [
+            Number(formatBalance(_migrationData[arbitrum.id].vcx, 18, 2)),
+            Number(formatBalance(_migrationData[arbitrum.id].ovcx, 18, 2))
+          ],
+          type: 'column'
+        },
+        {
+          name: 'Optimism',
+          data: [
+            Number(formatBalance(_migrationData[optimism.id].vcx, 18, 2)),
+            Number(formatBalance(_migrationData[optimism.id].ovcx, 18, 2))
+          ],
+          type: 'column'
+        }
+      ]
+    })
   }
 
   async function handleMigrate() {
@@ -206,31 +242,7 @@ export default function Migrate() {
     setAmount(inputAmt)
   }
 
-  const MigrationTable = ({ title, migrationData }: { title: string, migrationData: MigrationData[] }) => (
-    <div className="bg-white shadow-lg rounded-lg border border-gray-200 p-4">
-      <h2 className="text-lg font-semibold text-gray-800 mb-4 text-center">{title}</h2>
-      <table className="w-full border-collapse border border-gray-300">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="border border-gray-300 p-2">Chain</th>
-            <th className="border border-gray-300 p-2">VCX</th>
-            <th className="border border-gray-300 p-2">OVCX</th>
-          </tr>
-        </thead>
-        <tbody>
-          {migrationData.map((data, index) => (
-            <tr key={index} className="text-center border border-gray-300">
-              <td className="border border-gray-300 p-2">{index === 0 ? "Ethereum" : index === 1 ? "Arbitrum" : "Optimism"}</td>
-              <td className="border border-gray-300 p-2">{data.vcx / 1e18}</td>
-              <td className="border border-gray-300 p-2">{data.ovcx / 1e18}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-
-  return Object.keys(tokens).length > 0 ? (
+  return (
     <>
       <section className="md:border-b border-customNeutral100 md:flex md:flex-row items-top justify-between py-4 md:py-10 px-4 md:px-0 md:gap-4">
         <div className="w-full md:w-max">
@@ -244,73 +256,93 @@ export default function Migrate() {
       </section>
 
       <section className="mt-8 space-y-8 px-4 md:px-0">
-        <TabSelector
-          availableTabs={["VCX", "oVCX"]}
-          activeTab={selectedTab}
-          setActiveTab={setSelectedTab}
+        <div
+          className={`w-full h-[20rem] flex justify-center`}
+          ref={globalStatsElem}
         />
-        <div className="">
-          <InputTokenWithError
-            onMaxClick={() => handleMaxClick(tokens[chainId][selectedTab === "VCX" ? VcxByChain[chainId] : OptionTokenByChain[chainId]], setAmount)}
-            value={amount}
-            onChange={handleChangeInput}
-            onSelectToken={() => { }}
-            tokenList={[tokens[chainId][selectedTab === "VCX" ? VcxByChain[chainId] : OptionTokenByChain[chainId]]]}
-            selectedToken={tokens[chainId][selectedTab === "VCX" ? VcxByChain[chainId] : OptionTokenByChain[chainId]]}
-            chainId={chainId}
-            allowInput
-          />
-          <div className="flex flex-row gap-4 mt-2">
-            <SecondaryActionButton
-              handleClick={handleApprove}
-              label={`Approve ${selectedTab === "VCX" ? "VCX" : "oVCX"} Migration`}
+        {Object.keys(tokens).length > 0 ?
+          <>
+            <TabSelector
+              availableTabs={["VCX", "oVCX"]}
+              activeTab={selectedTab}
+              setActiveTab={setSelectedTab}
             />
-            <MainActionButton
-              handleClick={handleMigrate}
-              label={`Migrate ${selectedTab === "VCX" ? "VCX" : "oVCX"}`}
-            />
-          </div>
-        </div>
-      </section>
-      <div className="flex flex-row gap-4 mt-8 border-t border-customNeutral100 pt-8 px-4 md:px-0">
-        <SecondaryActionButton
-          handleClick={() => setChainId(mainnet.id)}
-          disabled={chainId === mainnet.id}
-          label="Migrate on Ethereum"
-        />
-        <SecondaryActionButton
-          handleClick={() => setChainId(optimism.id)}
-          disabled={chainId === optimism.id}
-          label="Migrate on OP"
-        />
-        <SecondaryActionButton
-          handleClick={() => setChainId(arbitrum.id)}
-          disabled={chainId === arbitrum.id}
-          label="Migrate on Arbitrum"
-        />
-      </div>
-      <section className="md:border-b border-customNeutral100 md:flex md:flex-row items-top justify-between py-4 md:py-10 px-4 md:px-0 md:gap-4">
-        <div className="w-full md:w-max">
-          <h1 className="text-5xl font-normal m-0 mb-4 md:mb-2 leading-0 text-white md:text-3xl leading-none margin-top:50px">
-            Migrated so far..
-          </h1>
-        </div>
-      </section>
-
-      <section className="md:border-b border-customNeutral100 md:flex md:flex-row items-top justify-between py-4 md:py-10 px-4 md:px-0 md:gap-4">
-        <div className="flex flex-wrap justify-center gap-20 mt-10 w-full md:w-max">
-          <MigrationTable title="Global Migration Status" migrationData={migrationData!} />
-          {account && userMigrationData !== undefined && (
-            <MigrationTable title="User Status" migrationData={userMigrationData!} />
-          )}
-          <SecondaryActionButton
-            handleClick={() => getMigrationData()}
-            label="Refresh"
-          />
-        </div>
-
+            <div className="">
+              <InputTokenWithError
+                onMaxClick={() => handleMaxClick(tokens[chainId][selectedTab === "VCX" ? VcxByChain[chainId] : OptionTokenByChain[chainId]], setAmount)}
+                value={amount}
+                onChange={handleChangeInput}
+                onSelectToken={() => { }}
+                tokenList={[tokens[chainId][selectedTab === "VCX" ? VcxByChain[chainId] : OptionTokenByChain[chainId]]]}
+                selectedToken={tokens[chainId][selectedTab === "VCX" ? VcxByChain[chainId] : OptionTokenByChain[chainId]]}
+                chainId={chainId}
+                allowInput
+              />
+              <div className="flex flex-row gap-4 mt-2">
+                <SecondaryActionButton
+                  handleClick={handleApprove}
+                  label={`Approve ${selectedTab === "VCX" ? "VCX" : "oVCX"} Migration`}
+                />
+                <MainActionButton
+                  handleClick={handleMigrate}
+                  label={`Migrate ${selectedTab === "VCX" ? "VCX" : "oVCX"}`}
+                />
+              </div>
+            </div>
+            <div className="flex flex-row gap-4 mt-8 border-t border-customNeutral100 pt-8 px-4 md:px-0">
+              <SecondaryActionButton
+                handleClick={() => setChainId(mainnet.id)}
+                disabled={chainId === mainnet.id}
+                label="Migrate on Ethereum"
+              />
+              <SecondaryActionButton
+                handleClick={() => setChainId(optimism.id)}
+                disabled={chainId === optimism.id}
+                label="Migrate on OP"
+              />
+              <SecondaryActionButton
+                handleClick={() => setChainId(arbitrum.id)}
+                disabled={chainId === arbitrum.id}
+                label="Migrate on Arbitrum"
+              />
+            </div>
+          </>
+          : <SpinningLogo />
+        }
       </section>
     </>
   )
-    : <SpinningLogo />
+}
+
+
+function MigrationTable({ title, migrationData }: { title: string, migrationData: MigrationDataByChain }) {
+  return (
+    <div className="shadow-lg rounded-lg border border-gray-200 p-4">
+      <h2 className="text-lg font-semibold text-gray-800 mb-4 text-center">{title}</h2>
+      <table className="w-full border-collapse border border-gray-300">
+        <thead>
+          <tr className="bg-gray-100">
+            <th className="border border-gray-300 p-2">Chain</th>
+            <th className="border border-gray-300 p-2">VCX</th>
+            <th className="border border-gray-300 p-2">oVCX</th>
+          </tr>
+        </thead>
+        <tbody>
+          {Object.keys(migrationData).map((chainId) => (
+            <tr key={chainId} className="text-center border border-gray-300">
+              <td className="border border-gray-300 p-2">
+                {ChainById[Number(chainId)].name}
+              </td>
+              <td className="border border-gray-300 p-2">
+                {formatBalance(migrationData[Number(chainId)].vcx, 18, 2)}
+              </td>
+              <td className="border border-gray-300 p-2">
+                {formatBalance(migrationData[Number(chainId)].ovcx, 18, 2)}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
 }
