@@ -333,7 +333,7 @@ export default function VaultcraftAgent() {
                         ? "#000"
                         : "#fff",
                     maxWidth: "80%",
-                    fontSize: "18px",
+                    fontSize: "15px",
                     lineHeight: "1.5",
                   }}
                 >
