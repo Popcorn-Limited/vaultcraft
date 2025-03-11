@@ -1,4 +1,8 @@
-import { showErrorToast, showLoadingToast, showSuccessToast } from "@/lib/toasts";
+import {
+  showErrorToast,
+  showLoadingToast,
+  showSuccessToast,
+} from "@/lib/toasts";
 import { Balance, Clients, SimulationResponse, Token } from "@/lib/types";
 import { Abi, Address, PublicClient, isAddress } from "viem";
 import { sendMessageToDiscord } from "@/lib/discord/discordBot";
@@ -39,7 +43,7 @@ export async function simulateCall({
     });
     return { request: request, success: true, error: null };
   } catch (error: any) {
-    console.log("SIMULATION ERROR")
+    console.log("SIMULATION ERROR");
     // await sendMessageToDiscord({
     //   chainId: publicClient.chain?.id ?? 0,
     //   target: contract.address,
@@ -53,7 +57,6 @@ export async function simulateCall({
   }
 }
 
-
 interface HandleCallResultProps {
   successMessage: string;
   simulationResponse: SimulationResponse;
@@ -63,7 +66,7 @@ interface HandleCallResultProps {
 export async function handleCallResult({
   successMessage,
   simulationResponse,
-  clients
+  clients,
 }: HandleCallResultProps): Promise<boolean> {
   if (simulationResponse.success) {
     try {
@@ -77,7 +80,7 @@ export async function handleCallResult({
       return true;
     } catch (error: any) {
       console.log({ error });
-      console.log("CALL ERROR")
+      console.log("CALL ERROR");
 
       // await sendMessageToDiscord({
       //   chainId: clients.publicClient.chain?.id ?? 0,
@@ -101,11 +104,10 @@ export async function handleCallResult({
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
-export function noOp() { }
+export function noOp() {}
 
 export const beautifyAddress = (addr: string) =>
   `${addr.slice(0, 4)}...${addr.slice(-5, 5)}`;
-
 
 export function extractRevertReason(error: any): string {
   if (error.reason) {
@@ -137,16 +139,23 @@ export function handleChangeInput(e: any, setter: Function) {
 }
 
 export function handleMaxClick(token: Token, setter: Function) {
-  setter(validateInput(token.balance.formatted).isValid ? token.balance.formatted : "0");
+  setter(
+    validateInput(token.balance.formatted).isValid
+      ? token.balance.formatted
+      : "0"
+  );
 }
 
-export async function handleSwitchChain(chainId: number, switchChainAsync: Function) {
-  showLoadingToast("Switching chain..")
+export async function handleSwitchChain(
+  chainId: number,
+  switchChainAsync: Function
+) {
+  showLoadingToast("Switching chain..");
   try {
     await switchChainAsync?.({ chainId: Number(chainId) });
     showSuccessToast("Success");
   } catch (error) {
-    showErrorToast("Failed switching chain")
+    showErrorToast("Failed switching chain");
     return;
   }
 }
@@ -156,10 +165,16 @@ export const NumberFormatter = Intl.NumberFormat("en", {
   notation: "compact",
 });
 
-export const formatBalance = (value: bigint | number, decimals: number, fixed?: number): string => {
-  if ((typeof value === "number" && isNaN(Number(value))) || isNaN(decimals) ) return "0"
+export const formatBalance = (
+  value: bigint | number,
+  decimals: number,
+  fixed?: number
+): string => {
+  if ((typeof value === "number" && isNaN(Number(value))) || isNaN(decimals))
+    return "0";
 
-  const bigValue = typeof value === 'bigint' ? value : BigInt(Math.floor(Number(value)));
+  const bigValue =
+    typeof value === "bigint" ? value : BigInt(Math.floor(Number(value)));
   const divisor = BigInt(10 ** decimals);
   const displayValue = bigValue / divisor;
   const fraction = bigValue % divisor;
@@ -168,37 +183,47 @@ export const formatBalance = (value: bigint | number, decimals: number, fixed?: 
     return `${displayValue}`;
   }
 
-  let fractionStr = fraction.toString().padStart(decimals, '0');
+  let fractionStr = fraction.toString().padStart(decimals, "0");
   if (fixed === undefined) {
-    return `${displayValue}.${fractionStr.replace(/0+$/, '')}`;
+    return `${displayValue}.${fractionStr.replace(/0+$/, "")}`;
   }
-  fractionStr = fractionStr.substring(0, fixed).padEnd(fixed, '0');
+  fractionStr = fractionStr.substring(0, fixed).padEnd(fixed, "0");
   return `${displayValue}.${fractionStr}`;
 };
 
-export function formatBalanceUSD(balance: bigint, decimals: number, price: number, fixed?: number): string {
-  const formatted = formatBalance(balance, decimals, fixed)
-  return String(Number(formatted) * price)
+export function formatBalanceUSD(
+  balance: bigint,
+  decimals: number,
+  price: number,
+  fixed?: number
+): string {
+  const formatted = formatBalance(balance, decimals, fixed);
+  return String(Number(formatted) * price);
 }
 
-export function calcBalance(balance: bigint, decimals: number, price: number, fixed?: number): Balance {
-  const formatted = formatBalance(balance, decimals, fixed)
-  const formattedUSD = String(Number(formatted) * price)
+export function calcBalance(
+  balance: bigint,
+  decimals: number,
+  price: number,
+  fixed?: number
+): Balance {
+  const formatted = formatBalance(balance, decimals, fixed);
+  const formattedUSD = String(Number(formatted) * price);
   return {
     value: balance,
     formatted,
-    formattedUSD
-  }
+    formattedUSD,
+  };
 }
 
 export const EMPTY_BALANCE: Balance = {
   value: BigInt(0),
   formatted: "0",
-  formattedUSD: "0"
-}
+  formattedUSD: "0",
+};
 
-export function returnBigIntResult(response: any) {
-  return response.status === "success" ? response.result : BigInt(0)
+export function returnBigIntResult(response: any): bigint {
+  return response.status === "success" ? response.result : BigInt(0);
 }
 
 export function daysDifferenceUTC(date1: Date, date2: Date): number {
