@@ -214,12 +214,14 @@ export async function addDynamicVaultsData(
       // @ts-ignore
       vaults[vault.address].depositLimit =
         dynamicValues[i + 2].status === "success"
-          ? (dynamicValues[i + 2].result[0] as unknown as bigint)
+          ? // @ts-ignore
+            (dynamicValues[i + 2].result[0] as unknown as bigint)
           : BigInt(0);
       // @ts-ignore
       vaults[vault.address].minLimit =
         dynamicValues[i + 2].status === "success"
-          ? (dynamicValues[i + 2].result[1] as unknown as bigint)
+          ? // @ts-ignore
+            (dynamicValues[i + 2].result[1] as unknown as bigint)
           : BigInt(0);
       vaults[vault.address].liquid = returnBigIntResult(dynamicValues[i + 3]);
     } else {
