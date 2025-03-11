@@ -198,11 +198,7 @@ export async function addDynamicVaultsData(
     const totalSupply = returnBigIntResult(dynamicValues[i + 1]);
 
     let totalAssets = returnBigIntResult(dynamicValues[i]);
-    // Add 10 NBTC to the total assets of the vault (minted on Hemi)
-    if (vault.address === "0x77e88cA17A6D384DCBB13747F6767F30e3753e63") {
-      totalAssets += BigInt(1000000000);
-    }
-
+  
     vaults[vault.address].totalAssets = totalAssets;
     vaults[vault.address].totalSupply = totalSupply;
     vaults[vault.address].withdrawalLimit = totalSupply;
