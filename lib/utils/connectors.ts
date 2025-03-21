@@ -9,6 +9,7 @@ import {
   optimism,
   polygon,
   xLayer,
+  hemi
 } from "viem/chains";
 
 export enum ChainId {
@@ -21,7 +22,8 @@ export enum ChainId {
   XLayer = 196,
   Base = 8453,
   Fraxtal = 252,
-  Avalanche = 43114
+  Avalanche = 43114,
+  Hemi = 43111
 }
 
 export const networkMap: { [key: number]: string } = {
@@ -34,7 +36,8 @@ export const networkMap: { [key: number]: string } = {
   [ChainId.XLayer]: "XLayer",
   [ChainId.Base]: "Base",
   [ChainId.Fraxtal]: "Fraxtal",
-  [ChainId.Avalanche]: "Avax"
+  [ChainId.Avalanche]: "Avax",
+  [ChainId.Hemi]: "Hemi"
 };
 
 export const networkLogos: { [key: number]: string } = {
@@ -47,7 +50,8 @@ export const networkLogos: { [key: number]: string } = {
   [ChainId.XLayer]: "/images/networks/xLayer.png",
   [ChainId.Base]: "/images/networks/base.svg",
   [ChainId.Fraxtal]: "/images/networks/fraxtal.svg",
-  [ChainId.Avalanche]: "/images/networks/avalanche.svg"
+  [ChainId.Avalanche]: "/images/networks/avalanche.svg",
+  [ChainId.Hemi]: "/images/networks/hemi.png"
 };
 
 export const RPC_URLS: { [key: number]: string } = {
@@ -59,7 +63,8 @@ export const RPC_URLS: { [key: number]: string } = {
   [ChainId.XLayer]: "https://rpc.xlayer.tech",
   [ChainId.Base]: `https://base-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`,
   [ChainId.Fraxtal]: `https://rpc.frax.com`,
-  [ChainId.Avalanche]: `https://avax-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`
+  [ChainId.Avalanche]: `https://avax-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`,
+  [ChainId.Hemi]: `https://rpc.hemi.network/rpc`
 };
 
 export const SUPPORTED_NETWORKS: Chain[] = [
@@ -80,6 +85,7 @@ export const SUPPORTED_NETWORKS: Chain[] = [
   base,
   fraxtal,
   avalanche,
+  hemi
 ]
 
 export const GAUGE_NETWORKS = [1, 10, 42161];
@@ -93,5 +99,6 @@ export const ChainById: { [key: number]: Chain } = {
   196: xLayer,
   8453: base,
   252: fraxtal,
-  43114: avalanche
+  43114: avalanche,
+  43111: hemi
 }

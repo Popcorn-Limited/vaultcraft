@@ -4,13 +4,18 @@ import { Token, TokenByAddress, TokenType } from "@/lib/types";
 import { networkMap } from "@/lib/utils/connectors";
 import { vcx as getVcxPrice, vcxLp as getVcxLpPrice } from "@/lib/resolver/price/resolver";
 import { ALT_NATIVE_ADDRESS, OptionTokenByChain, ST_VCX, VCX, VCX_LP, WrappedOptionTokenByChain } from "@/lib/constants";
-import { mainnet } from "viem/chains";
+import { hemi, mainnet } from "viem/chains";
 import { EMPTY_BALANCE } from "@/lib/utils/helpers";
 
 export async function prepareAssets(addresses: Address[], chainId: number, client: PublicClient): Promise<TokenByAddress> {
   const { data: assets } = await axios.get(
     `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/assets/tokens/${chainId}.json`
   );
+
+  if (chainId === hemi.id) {
+    return handleChainException(addresses, assets, chainId, client)
+  }
+
 
   const { data: priceData } = await axios.get(
     `https://pro-api.llama.fi/${process.env.DEFILLAMA_API_KEY}/coins/prices/current/${String(
@@ -36,12 +41,11 @@ export async function prepareAssets(addresses: Address[], chainId: number, clien
     allowFailure: true,
   });
 
-
   let result: TokenByAddress = {}
   addresses.forEach((address, i) => {
     let tokenPrice = Number(priceData.coins[`${networkMap[chainId].toLowerCase()}:${address}`]?.price) || 0
 
-    tokenPrice = handleTokenPriceExpection(address, tokenPrice, vcxPrice, vcxLpPrice, chainId)
+    tokenPrice = handleTokenPriceException(address, tokenPrice, vcxPrice, vcxLpPrice, chainId)
 
     result[getAddress(address)] = {
       ...assets[getAddress(address)],
@@ -57,7 +61,7 @@ export async function prepareAssets(addresses: Address[], chainId: number, clien
   return result;
 }
 
-function handleTokenPriceExpection(address: Address, tokenPrice: number, vcxPrice: number, vcxLpPrice: number, chainId: number): number {
+function handleTokenPriceException(address: Address, tokenPrice: number, vcxPrice: number, vcxLpPrice: number, chainId: number): number {
   switch (address) {
     case VCX:
     case ST_VCX:
@@ -74,4 +78,40 @@ function handleTokenPriceExpection(address: Address, tokenPrice: number, vcxPric
     default:
       return tokenPrice
   }
+}
+
+async function handleChainException(addresses: Address[], assets: any, chainId: number, client: PublicClient): Promise<TokenByAddress> {
+  const ts = await client.multicall({
+    contracts: addresses
+      .map((address: Address) => {
+        return {
+          address: address,
+          abi: erc20Abi,
+          functionName: "totalSupply"
+        }
+      })
+      .flat(),
+    allowFailure: true,
+  });
+
+  const { data: nbtcPriceData } = await axios.get(
+    `https://pro-api.llama.fi/${process.env.DEFILLAMA_API_KEY}/coins/prices/current/ethereum:0x8BB97A618211695f5a6a889faC3546D1a573ea77`
+  );
+
+  let result: TokenByAddress = {}
+  addresses.forEach((address, i) => {
+    let tokenPrice = address === "0xC93B7aae2802f57eb9D98E2B6a68217d75a0658c" ? Number(nbtcPriceData.coins["ethereum:0x8BB97A618211695f5a6a889faC3546D1a573ea77"]?.price) || 0 : 0
+
+    result[getAddress(address)] = {
+      ...assets[getAddress(address)],
+      address: getAddress(address),
+      price: tokenPrice,
+      balance: EMPTY_BALANCE,
+      totalSupply: address === ALT_NATIVE_ADDRESS ? maxUint256 : ts[i].result as bigint,
+      chainId: chainId,
+      type: TokenType.Asset
+    } as Token
+  })
+
+  return result
 }
