@@ -1,5 +1,5 @@
 import { VotingEscrowAbi } from "@/lib/constants";
-import { Address } from "viem";
+import { Address, zeroAddress } from "viem";
 import { useReadContract } from "wagmi";
 
 export interface LockedBalance {
@@ -21,7 +21,7 @@ export default function useLockedBalanceOf({
     chainId: Number(chainId),
     abi: VotingEscrowAbi,
     functionName: "locked",
-    args: (!!account && [account]) || [],
+    args: (!!account && [account]) || [zeroAddress],
     scopeKey: `lockedBalanceOf:${chainId}:${address}:${account}`,
   });
 }

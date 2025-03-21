@@ -122,7 +122,7 @@ export default function CommonFeeConfiguration({
       const inputErrors = [];
 
       if (key === "recipient") {
-        if (!isAddress(val) && val.length > 0)
+        if (!isAddress(val))
           inputErrors.push("Recipient must be a valid address");
         if (val === ADDRESS_ZERO)
           inputErrors.push("Recipient must not be the zero address");

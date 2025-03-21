@@ -89,8 +89,8 @@ export const SUPPORTED_NETWORKS: Chain[] = [
     ...hemi,
     contracts: {
       multicall3: {
-        address: "0x3FBA66680F0F468089233bB14E40725eCB66AF7A",
-        blockCreated: 1304241
+        address: "0xcA11bde05977b3631167028862bE2a173976CA11",
+        blockCreated: 1384621
       }
     }
   }
@@ -104,9 +104,9 @@ export const ChainById: { [key: number]: Chain } = {
   42161: arbitrum,
   137: polygon,
   56: bsc,
-  196: xLayer,
+  196: SUPPORTED_NETWORKS[5], // xLayer with multicall3 override
   8453: base,
   252: fraxtal,
   43114: avalanche,
-  43111: hemi
+  43111: SUPPORTED_NETWORKS[9], // hemi with multicall3 override
 }

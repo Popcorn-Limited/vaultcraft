@@ -65,7 +65,13 @@ export default async function zap({
   const transaction = await getZapTransaction({ chainId, sellToken, buyToken, amount, account, zapProvider, slippage, tradeTimeout })
 
   try {
-    const hash = await clients.walletClient.sendTransaction({ chain: ChainById[chainId], account, to: transaction.to, data: transaction.data, value: transaction.value })
+    const hash = await clients.walletClient.sendTransaction({ 
+      chain: ChainById[chainId], 
+      account, 
+      to: transaction.to,
+      data: transaction.data as `0x${string}`,
+      value: transaction.value 
+      })
     const receipt = await clients.publicClient.waitForTransactionReceipt({ hash })
 
     showSuccessToast(`Sold ${formatBalance(amount, sellToken.decimals)} ${sellToken.symbol} for ${buyToken.symbol} using ${String(ZapProvider[zapProvider])} !`)
