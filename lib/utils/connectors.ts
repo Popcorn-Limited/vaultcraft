@@ -85,7 +85,15 @@ export const SUPPORTED_NETWORKS: Chain[] = [
   base,
   fraxtal,
   avalanche,
-  hemi
+  {
+    ...hemi,
+    contracts: {
+      multicall3: {
+        address: "0x3FBA66680F0F468089233bB14E40725eCB66AF7A",
+        blockCreated: 1304241
+      }
+    }
+  }
 ]
 
 export const GAUGE_NETWORKS = [1, 10, 42161];

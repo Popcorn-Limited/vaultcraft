@@ -377,7 +377,8 @@ export const ZapAssetAddressesByChain: { [key: number]: Address[] } = {
   [xLayer.id]: [],
   [base.id]: [],
   [fraxtal.id]: [],
-  [avalanche.id]: []
+  [avalanche.id]: [],
+  [hemi.id]: []
 }
 
 
