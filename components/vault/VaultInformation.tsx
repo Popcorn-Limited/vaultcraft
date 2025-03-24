@@ -97,22 +97,6 @@ export default function VaultInformation({ vaultData }: { vaultData: VaultData }
                 </CopyToClipboard>
               </div>
             </div>
-            {vaultData.address === "0x77e88cA17A6D384DCBB13747F6767F30e3753e63" &&
-              <div className="w-full">
-                <p className="text-white font-normal">Hemi chain:</p>
-                <div className="flex flex-row items-center justify-between">
-                  <p className="font-bold text-white">
-                    {"0xe22A32633dC5313c6E2F012d802863357545d3d7".slice(0, 6)}...{"0xe22A32633dC5313c6E2F012d802863357545d3d7".slice(-4)}
-                  </p>
-                  <div className='w-6 h-6 group/safeAddress'>
-                    <CopyToClipboard text={"0xe22A32633dC5313c6E2F012d802863357545d3d7"} onCopy={() => showSuccessToast("Safe address copied!")}>
-                      <Square2StackIcon className="text-white group-hover/safeAddress:text-primaryGreen" />
-                    </CopyToClipboard>
-                  </div>
-                </div>
-              </div>
-            }
-
           </div>
         }
 

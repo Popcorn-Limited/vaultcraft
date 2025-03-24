@@ -195,9 +195,9 @@ export async function addDynamicVaultsData(
 
   Object.values(vaults).forEach((vault: any, i: number) => {
     if (i > 0) i = i * 4;
-    const totalSupply = returnBigIntResult(dynamicValues[i + 1]);
+    const totalSupply = vault.address === "0x77e88cA17A6D384DCBB13747F6767F30e3753e63" ? BigInt(0) : returnBigIntResult(dynamicValues[i + 1]);
 
-    let totalAssets = returnBigIntResult(dynamicValues[i]);
+    let totalAssets = vault.address === "0x77e88cA17A6D384DCBB13747F6767F30e3753e63" ? BigInt(0) : returnBigIntResult(dynamicValues[i]);
   
     vaults[vault.address].totalAssets = totalAssets;
     vaults[vault.address].totalSupply = totalSupply;
