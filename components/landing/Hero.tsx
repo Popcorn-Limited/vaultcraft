@@ -1,4 +1,4 @@
-import { networthAtom, tvlAtom, vaultronAtom } from "@/lib/atoms";
+import { networthAtom, tvlAtom } from "@/lib/atoms";
 import { NumberFormatter } from "@/lib/utils/helpers";
 import { useAtom } from "jotai";
 import LargeCardStat from "@/components/common/LargeCardStat";
@@ -6,7 +6,6 @@ import LargeCardStat from "@/components/common/LargeCardStat";
 export default function Hero(): JSX.Element {
   const [networth] = useAtom(networthAtom)
   const [tvl] = useAtom(tvlAtom)
-  const [vaultronStats] = useAtom(vaultronAtom)
 
   return (
     <section className="pb-8 pt-8 sm:pb-6 border-b border-customGray300">
@@ -39,14 +38,6 @@ export default function Hero(): JSX.Element {
               label="Net Worth"
               value={`$ ${networth.total > 0.01 ? NumberFormatter.format(networth.total) : "0"}`}
               tooltip="This value aggregates your VaultCraft-related holdings across all blockchain networks."
-            />
-          </div>
-          <div className="flex flex-row items-center md:w-fit">
-            <LargeCardStat
-              id="networth-xp"
-              label="XP"
-              value={`${vaultronStats.xp} XP`}
-              tooltip="This value shows your Vaultron XP used to determine your allocation in future airdrops"
             />
           </div>
         </div>

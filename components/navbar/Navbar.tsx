@@ -8,7 +8,6 @@ import { networkLogos } from "@/lib/utils/connectors";
 import MainActionButton from "@/components/button/MainActionButton";
 import SocialMediaLinks from "@/components/common/SocialMediaLinks";
 import NavbarLinks from "@/components/navbar/NavbarLinks";
-import { aaveAccountDataAtom } from "@/lib/atoms/lending";
 import { useAtom } from "jotai";
 import { vaultsAtom } from "@/lib/atoms/vaults";
 import { useRouter } from "next/router";
@@ -40,9 +39,7 @@ export default function Navbar(): JSX.Element {
     }
   }, [chain?.id, account])
 
-  const [userAccountData] = useAtom(aaveAccountDataAtom);
   const [vaults] = useAtom(vaultsAtom);
-  const [showLendModal, setShowLendModal] = useState(false);
 
   const [vaultData, setVaultData] = useState<VaultData>({
     chainId: chain?.id || 1,
@@ -66,12 +63,6 @@ export default function Navbar(): JSX.Element {
 
   return (
     <>
-      {/* {chain && Object.keys(vaultData).length > 0 && (
-        <ManageLoanInterface
-          visibilityState={[showLendModal, setShowLendModal]}
-          vaultData={vaultData}
-        />
-      )} */}
       <div className="flex container flex-row items-center justify-between w-full py-8 px-4 md:px-0 z-10">
         <div className="flex flex-row items-center gap-6">
           <div>
@@ -96,31 +87,6 @@ export default function Navbar(): JSX.Element {
             <BuyVCXButton />
             <StakeVCXButton />
           </div>
-          {chain && userAccountData[chain?.id]?.healthFactor > 0 && (
-            <div
-              className={`w-48 cursor-pointer h-full py-2 bg-customNeutral300 md:bg-transparent md:py-2 px-4 hidden md:flex flex-row items-center justify-between border border-customGray100 rounded-4xl text-white`}
-              onClick={() => setShowLendModal(true)}
-              id="global-health-factor"
-            >
-              <p className="mr-2 leading-none hidden md:block">Health Factor</p>
-              <p
-                className={`md:ml-2 ${getHealthFactorColor(
-                  "text",
-                  userAccountData[chain.id].healthFactor
-                )}`}
-              >
-                {NumberFormatter.format(userAccountData[chain.id].healthFactor || 0)}
-              </p>
-              <ResponsiveTooltip
-                id="global-health-factor"
-                content={
-                  <p className="max-w-52">
-                    Health Factor of your Aave Account. (Click to manage)
-                  </p>
-                }
-              />
-            </div>
-          )}
           {account ? (
             <div className={`relative flex flex-container flex-row z-10`}>
               <div
