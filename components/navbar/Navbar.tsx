@@ -85,7 +85,6 @@ export default function Navbar(): JSX.Element {
         <div className="flex flex-row items-center space-x-4">
           <div className="hidden md:flex flex-row space-x-4">
             <BuyVCXButton />
-            <StakeVCXButton />
           </div>
           {account ? (
             <div className={`relative flex flex-container flex-row z-10`}>
@@ -170,7 +169,6 @@ export default function Navbar(): JSX.Element {
                       <NavbarLinks />
                       <div className="md:hidden space-y-4">
                         <BuyVCXButton />
-                        <StakeVCXButton />
                       </div>
                     </div>
                     <div className="pt-12 md:pt-0">
@@ -255,47 +253,6 @@ function BuyVCXButton(): JSX.Element {
           className="w-5 h-5 rounded-full border border-customGray500"
         />
         <p className="ml-2 mb-1">Buy VCX</p>
-      </button>
-    </>
-  );
-}
-
-function StakeVCXButton(): JSX.Element {
-  return (
-    <>
-      <button
-        className={`w-48 px-4 py-2 rounded bg-primaryGreen border border-primaryGreen font-semibold text-base text-black
-                  transition-all ease-in-out duration-500 hover:bg-white hover:border-white
-                  disabled:bg-customGray100 disabled:border-customGray100 disabled:text-white disabled:cursor-not-allowed
-                  disabled:hover:border-customGray100 disabled:hover:bg-customGray100 disabled:hover:text-white
-                  hidden md:flex flex-row items-center justify-center`}
-        type="button"
-        onClick={() =>
-          window.open("https://app.vaultcraft.io/migrate", "_blank")
-        }
-      >
-        <img
-          src="/images/tokens/vcx.svg"
-          className="w-5 h-5 rounded-full border border-black"
-        />
-        <p className="ml-2 mt-1">Migrate VCX</p>
-      </button>
-      <button
-        className={`w-48 px-4 py-2 rounded bg-black border border-black font-semibold text-base text-primaryGreen
-        transition-all ease-in-out duration-500 hover:bg-white hover:border-white hover:text-black
-        disabled:bg-customGray100 disabled:border-customGray100 disabled:text-white disabled:cursor-not-allowed
-        disabled:hover:border-customGray100 disabled:hover:bg-customGray100 disabled:hover:text-white
-        md:hidden flex flex-row items-center justify-center`}
-        type="button"
-        onClick={() =>
-          window.open("https://app.vaultcraft.io/staking", "_blank")
-        }
-      >
-        <img
-          src="/images/tokens/vcx.svg"
-          className="w-5 h-5 rounded-full border border-customGray500"
-        />
-        <p className="ml-2 mb-1">Stake VCX</p>
       </button>
     </>
   );
