@@ -225,7 +225,7 @@ export const VaultOracleByChain: AddressByChain = {
   [fraxtal.id]: zeroAddress,
   [avalanche.id]: "0x0AcFFe851833f934b3ba4d49F279563513F7e110",
   [polygon.id]: zeroAddress,
-  [bsc.id]: "zeroAddress",
+  [bsc.id]: "0x8D225f07947E6C2158835509A3E309a8efDAfefb",
 }
 
 export const VaultOracleOwnerByChain: AddressByChain = {
@@ -237,7 +237,7 @@ export const VaultOracleOwnerByChain: AddressByChain = {
   [fraxtal.id]: zeroAddress,
   [avalanche.id]: "0x6Ee09de47C67a858ae84ab0848a50ca2278bC959",
   [polygon.id]: zeroAddress,
-  [bsc.id]: zeroAddress,
+  [bsc.id]: "0x323053A0902E67791c06F65A5D2097ee79dD740F",
 }
 
 export const VaultOracleV2ByChain: AddressByChain = {
