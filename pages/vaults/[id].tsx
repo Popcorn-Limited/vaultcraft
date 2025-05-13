@@ -80,7 +80,7 @@ export default function Index() {
               asset={asset}
               vault={vault}
               gauge={gauge}
-              showClaim
+              showClaim={false}
             />
 
             <section className="w-full md:flex md:flex-row md:justify-between md:space-x-8 py-10 px-4 md:px-0">
