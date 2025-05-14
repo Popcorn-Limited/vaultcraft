@@ -13,12 +13,16 @@ export async function getRewardData(gauge: Address, chainId: number) {
     transport: http(RPC_URLS[chainId]),
   });
 
+  const latestBl = await client.getBlockNumber();
+  const deployBlock = ORACLES_DEPLOY_BLOCK[chainId];
+  const fromBlock = deployBlock === 0 ? "earliest" : BigInt(deployBlock) <= latestBl - BigInt(10000) ? latestBl - BigInt(9999) : BigInt(deployBlock)
+
   const rewardLogs = await client.getContractEvents({
     address: gauge,
     abi: chainId === chains.mainnet.id ? GaugeAbi : ChildGaugeAbi,
     eventName: chainId === chains.mainnet.id ? "RewardDistributorUpdated" : "AddReward",
-    fromBlock: ORACLES_DEPLOY_BLOCK[chainId] === 0 ? "earliest" : BigInt(ORACLES_DEPLOY_BLOCK[chainId]),
-    toBlock: "latest",
+    fromBlock,
+    toBlock: latestBl,
   }) as any[];
 
   let rewardData = []
@@ -65,12 +69,16 @@ export async function getClaimableRewards({ gauge, account, tokens, chainId }: {
     transport: http(RPC_URLS[chainId]),
   })
 
+  const latestBl = await client.getBlockNumber();
+  const deployBlock = ORACLES_DEPLOY_BLOCK[chainId];
+  const fromBlock = deployBlock === 0 ? "earliest" : BigInt(deployBlock) <= latestBl - BigInt(10000) ? latestBl - BigInt(9999) : BigInt(deployBlock)
+
   const rewardLogs = await client.getContractEvents({
     address: gauge,
     abi: chainId === chains.mainnet.id ? GaugeAbi : ChildGaugeAbi,
     eventName: chainId === chains.mainnet.id ? "RewardDistributorUpdated" : "AddReward",
-    fromBlock: ORACLES_DEPLOY_BLOCK[chainId] === 0 ? "earliest" : BigInt(ORACLES_DEPLOY_BLOCK[chainId]),
-    toBlock: "latest",
+    fromBlock,
+    toBlock: latestBl,
   }) as any[];
 
   if (rewardLogs.length > 0) {

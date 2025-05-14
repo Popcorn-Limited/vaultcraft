@@ -23,26 +23,30 @@ export default async function fetchWithdrawalRequests(vault: VaultData): Promise
     transport: http(RPC_URLS[vault.chainId]),
   })
 
+  const latestBl = await client.getBlockNumber();
+  const deployBlock = ORACLES_DEPLOY_BLOCK[vault.chainId];
+  const fromBlock = deployBlock === 0 ? "earliest" : BigInt(deployBlock) <= latestBl - BigInt(10000) ? latestBl - BigInt(9999) : BigInt(deployBlock)
+
   const requestLogs = await client.getContractEvents({
     address: vault.address,
     abi: OracleVaultAbi,
     eventName: "RedeemRequested",
-    fromBlock: ORACLES_DEPLOY_BLOCK[vault.chainId] === 0 ? "earliest" : BigInt(ORACLES_DEPLOY_BLOCK[vault.chainId]),
-    toBlock: "latest",
+    fromBlock,
+    toBlock: latestBl,
   });
   const cancelLogs = await client.getContractEvents({
     address: vault.address,
     abi: OracleVaultAbi,
     eventName: "RedeemRequestCanceled",
-    fromBlock: ORACLES_DEPLOY_BLOCK[vault.chainId] === 0 ? "earliest" : BigInt(ORACLES_DEPLOY_BLOCK[vault.chainId]),
-    toBlock: "latest",
+    fromBlock,
+    toBlock: latestBl,
   });
   const fulfillLogs = await client.getContractEvents({
     address: vault.address,
     abi: OracleVaultAbi,
     eventName: "RedeemRequestFulfilled",
-    fromBlock: ORACLES_DEPLOY_BLOCK[vault.chainId] === 0 ? "earliest" : BigInt(ORACLES_DEPLOY_BLOCK[vault.chainId]),
-    toBlock: "latest",
+    fromBlock,
+    toBlock: latestBl,
   });
 
   // Sort and sum requests by controller

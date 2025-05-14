@@ -21,19 +21,23 @@ import { showErrorToast } from "@/lib/toasts";
 async function getReserveLogs(address: Address, account: Address, client: PublicClient) {
   const chainId = client.chain?.id || 1
 
+  const latestBl = await client.getBlockNumber();
+  const deployBlock = ORACLES_DEPLOY_BLOCK[chainId];
+  const fromBlock = deployBlock === 0 ? "earliest" : BigInt(deployBlock) <= latestBl - BigInt(10000) ? latestBl - BigInt(9999) : BigInt(deployBlock)
+
   let addedLogs = await client.getContractEvents({
     address: address,
     abi: AnyToAnyDepositorAbi,
     eventName: "ReserveAdded",
-    fromBlock: ORACLES_DEPLOY_BLOCK[chainId] === 0 ? "earliest" : BigInt(ORACLES_DEPLOY_BLOCK[chainId]),
-    toBlock: "latest",
+    fromBlock,
+    toBlock: latestBl,
   });
   const removeLogs = await client.getContractEvents({
     address: address,
     abi: AnyToAnyDepositorAbi,
     eventName: "ReserveClaimed",
-    fromBlock: ORACLES_DEPLOY_BLOCK[chainId] === 0 ? "earliest" : BigInt(ORACLES_DEPLOY_BLOCK[chainId]),
-    toBlock: "latest",
+    fromBlock,
+    toBlock: latestBl,
   });
   // Filter out claimed reserves
   const removedBlocks = removeLogs.map(log => log.args.blockNumber)

@@ -318,13 +318,17 @@ async function getRewardsApy({
 }): Promise<RewardApy> {
   const client = clientByChainId[chainId];
 
+  const latestBl = await client.getBlockNumber();
+  const deployBlock = ORACLES_DEPLOY_BLOCK[chainId];
+  const fromBlock = deployBlock === 0 ? "earliest" : BigInt(deployBlock) <= latestBl - BigInt(10000) ? latestBl - BigInt(9999) : BigInt(deployBlock)
+
   // get all reward token via events
   const rewardLogs = await client.getContractEvents({
     address: gauge,
     abi: chainId === mainnet.id ? GaugeAbi : ChildGaugeAbi,
     eventName: chainId === mainnet.id ? "RewardDistributorUpdated" : "AddReward",
-    fromBlock: ORACLES_DEPLOY_BLOCK[chainId] === 0 ? "earliest" : BigInt(ORACLES_DEPLOY_BLOCK[chainId]),
-    toBlock: "latest",
+    fromBlock,
+    toBlock: latestBl,
   }) as any[];
   const rewardTokens: Address[] = []
   const filteredRewardLogs: any[] = []

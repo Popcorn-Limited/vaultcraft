@@ -235,7 +235,9 @@ async function getSafeVaultApy(vault: VaultData): Promise<LlamaApy[]> {
     chain: ChainById[vault.chainId],
     transport: http(RPC_URLS[vault.chainId]),
   });
-
+  const latestBl = await client.getBlockNumber();
+  const deployBlock = ORACLES_DEPLOY_BLOCK[vault.chainId];
+  const fromBlock = deployBlock === 0 ? "earliest" : BigInt(deployBlock) <= latestBl - BigInt(10000) ? latestBl - BigInt(9999) : BigInt(deployBlock)
   const logs = await client.getContractEvents({
     address:
       vault.metadata.type === "safe-vault-v1.5"
@@ -243,11 +245,8 @@ async function getSafeVaultApy(vault: VaultData): Promise<LlamaApy[]> {
         : VaultOracleByChain[vault.chainId],
     abi: AssetPushOracleAbi,
     eventName: "PriceUpdated",
-    fromBlock:
-      ORACLES_DEPLOY_BLOCK[vault.chainId] === 0
-        ? "earliest"
-        : BigInt(ORACLES_DEPLOY_BLOCK[vault.chainId]),
-    toBlock: "latest",
+    fromBlock,
+    toBlock: latestBl
   });
 
   if (logs.length === 0) return [];

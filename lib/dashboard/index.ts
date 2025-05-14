@@ -94,11 +94,17 @@ async function loadVCXDataByChain(chainId: number, mainnetClient: PublicClient, 
     oVCXInCirculation = tokens[chainId][OptionTokenByChain[chainId]].totalSupply - balanceRes[0]
     exercisableVCX = balanceRes[1]
 
+
+
+    const latestBl = await client.getBlockNumber();
+    const deployBlock = ORACLES_DEPLOY_BLOCK[chainId];
+    const fromBlock = deployBlock === 0 ? "earliest" : BigInt(deployBlock) <= latestBl - BigInt(10000) ? latestBl - BigInt(9999) : BigInt(deployBlock)
+  
     const updateLogs = await client.getLogs({
       address: ExerciseOracleByChain[chainId],
       event: parseAbiItem("event PriceUpdate(uint oldPrice, uint newPrice)"),
-      fromBlock: ORACLES_DEPLOY_BLOCK[chainId] === 0 ? "earliest" : BigInt(ORACLES_DEPLOY_BLOCK[chainId]),
-      toBlock: "latest",
+      fromBlock,
+      toBlock: latestBl,
     });
     const block = await client.getBlock({ blockNumber: updateLogs[updateLogs.length - 1].blockNumber })
     lastUpdate = block.timestamp
@@ -108,8 +114,8 @@ async function loadVCXDataByChain(chainId: number, mainnetClient: PublicClient, 
       bridgeLogs = await mainnetClient.getLogs({
         address: "0x99C9fc46f92E8a1c0deC1b1747d010903E884bE1",
         event: parseAbiItem("event ERC20BridgeInitiated(address indexed localToken, address indexed remoteToken, address indexed from, address to, uint256 amount, bytes extraData)"),
-        fromBlock: ORACLES_DEPLOY_BLOCK[chainId] === 0 ? "earliest" : BigInt(ORACLES_DEPLOY_BLOCK[chainId]),
-        toBlock: "latest",
+        fromBlock,
+        toBlock: latestBl,
         args: {
           localToken: OptionTokenByChain[1]
         }
@@ -118,8 +124,8 @@ async function loadVCXDataByChain(chainId: number, mainnetClient: PublicClient, 
       bridgeLogs = await mainnetClient.getLogs({
         address: "0x72Ce9c846789fdB6fC1f34aC4AD25Dd9ef7031ef",
         event: parseAbiItem("event TransferRouted(address indexed token, address indexed _userFrom, address indexed _userTo, address gateway)"),
-        fromBlock: ORACLES_DEPLOY_BLOCK[chainId] === 0 ? "earliest" : BigInt(ORACLES_DEPLOY_BLOCK[chainId]),
-        toBlock: "latest",
+        fromBlock,
+        toBlock: latestBl,
         args: {
           token: OptionTokenByChain[1]
         }
@@ -147,11 +153,15 @@ async function loadAssetOracleData() {
 async function loadAssetOracleDataByChain(chainId: number) {
   const client = createPublicClient({ chain: ChainById[chainId], transport: http(RPC_URLS[chainId]) })
 
+  const latestBl = await client.getBlockNumber();
+  const deployBlock = ORACLES_DEPLOY_BLOCK[chainId];
+  const fromBlock = deployBlock === 0 ? "earliest" : BigInt(deployBlock) <= latestBl - BigInt(10000) ? latestBl - BigInt(9999) : BigInt(deployBlock)
+ 
   const logs = await client.getLogs({
     address: AssetPushOracleByChain[chainId],
     event: AssetPushOracleAbi[6],
-    fromBlock: ORACLES_DEPLOY_BLOCK[chainId] === 0 ? "earliest" : BigInt(ORACLES_DEPLOY_BLOCK[chainId]),
-    toBlock: "latest"
+    fromBlock,
+    toBlock: latestBl
   });
 
   // Get unique base-quote pairs
