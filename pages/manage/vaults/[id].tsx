@@ -29,28 +29,29 @@ async function getLogs(vault: VaultData, asset: Token) {
     transport: http(RPC_URLS[vault.chainId]),
   });
 
+  const latestBlock = await client.getBlockNumber();
+  const deployBlock = ORACLES_DEPLOY_BLOCK[vault.chainId];
+  const fromBlock = deployBlock === 0 ? "earliest" : BigInt(deployBlock) < latestBlock - BigInt(10000) ? latestBlock - BigInt(9999) : BigInt(deployBlock)
   const depositLogs = await client.getContractEvents({
     address: vault.address,
     abi: VaultAbi,
     eventName: "Deposit",
-    fromBlock: ORACLES_DEPLOY_BLOCK[vault.chainId] === 0 ? "earliest" : BigInt(ORACLES_DEPLOY_BLOCK[vault.chainId]),
-    toBlock: "latest",
+    fromBlock: fromBlock,
+    toBlock: latestBlock,
   });
   if (depositLogs.length === 0) return []
   const withdrawLogs = await client.getContractEvents({
     address: vault.address,
     abi: VaultAbi,
     eventName: "Withdraw",
-    fromBlock: ORACLES_DEPLOY_BLOCK[vault.chainId] === 0 ? "earliest" : BigInt(ORACLES_DEPLOY_BLOCK[vault.chainId]),
-    toBlock: "latest",
+    fromBlock,
+    toBlock: latestBlock,
   });
-
-  const latestBlock = await client.getBlock({ blockTag: "latest" });
 
   let result = [];
   let startBlock = depositLogs[0].blockNumber;
   let day = 0;
-  while (startBlock < latestBlock.number) {
+  while (startBlock < latestBlock) {
     const newBlock = startBlock + BigInt(7200);
 
     const deposits = depositLogs.filter(

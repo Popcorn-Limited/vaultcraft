@@ -26,12 +26,16 @@ async function getLogs(vault: Address, asset: Token, chainId: number) {
     transport: http(RPC_URLS[chainId]),
   });
 
+  const latestBlock = await client.getBlockNumber();
+  const deployBlock = ORACLES_DEPLOY_BLOCK[chainId];
+  const fromBlock = deployBlock === 0 ? "earliest" : BigInt(deployBlock) < latestBlock - BigInt(10000) ? latestBlock - BigInt(9999) : BigInt(deployBlock)
+
   const initLog = await client.getContractEvents({
     address: vault,
     abi: VaultAbi,
     eventName: "Deposit",
-    fromBlock: ORACLES_DEPLOY_BLOCK[chainId] === 0 ? "earliest" : BigInt(ORACLES_DEPLOY_BLOCK[chainId]),
-    toBlock: "latest",
+    fromBlock,
+    toBlock: latestBlock,
   });
   const creationBlockNumber = initLog[0]?.blockNumber || BigInt(0);
   const creationBlock = creationBlockNumber === BigInt(0)
@@ -53,18 +57,16 @@ async function getLogs(vault: Address, asset: Token, chainId: number) {
     address: vault,
     abi: VaultAbi,
     eventName: "Deposit",
-    fromBlock: creationBlockNumber,
-    toBlock: "latest",
+    fromBlock,
+    toBlock: latestBlock,
   });
   const withdrawLogs = await client.getContractEvents({
     address: vault,
     abi: VaultAbi,
     eventName: "Withdraw",
-    fromBlock: creationBlockNumber,
-    toBlock: "latest",
+    fromBlock,
+    toBlock: latestBlock,
   });
-
-  const latestBlock = await client.getBlock({ blockTag: "latest" });
 
   let result = [];
   let startBlock =
@@ -73,7 +75,7 @@ async function getLogs(vault: Address, asset: Token, chainId: number) {
       Math.floor((Number(creationBlock.timestamp) - creationDate / 1000) / 13)
     );
   let day = 0;
-  while (startBlock < latestBlock.number) {
+  while (startBlock < latestBlock) {
     const newBlock = startBlock + BigInt(7200);
 
     const deposits = depositLogs.filter(
