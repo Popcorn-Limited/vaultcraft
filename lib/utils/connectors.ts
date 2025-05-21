@@ -55,7 +55,7 @@ export const networkLogos: { [key: number]: string } = {
   [ChainId.Fraxtal]: "/images/networks/fraxtal.svg",
   [ChainId.Avalanche]: "/images/networks/avalanche.svg",
   [ChainId.Hemi]: "/images/networks/hemi.png",
-  [ChainId.Morph]: "/images/networks/morph.png",
+  [ChainId.Morph]: "/images/networks/Morph.png",
 };
 
 export const RPC_URLS: { [key: number]: string } = {
