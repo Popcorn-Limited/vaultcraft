@@ -1,6 +1,6 @@
 import { Address, zeroAddress } from "viem";
 import { AddressByChain } from "@/lib/types";
-import { mainnet, arbitrum, aurora, avalanche, bsc, fantom, optimism, polygon, xLayer, fraxtal, base, hemi } from "viem/chains";
+import { mainnet, arbitrum, aurora, avalanche, bsc, fantom, optimism, polygon, xLayer, fraxtal, base, hemi, morph } from "viem/chains";
 
 export const VCX: Address = "0xcE246eEa10988C495B4A90a905Ee9237a0f91543";
 export const VCX_LP: Address = "0x577A7f7EE659Aa14Dc16FD384B3F8078E23F1920";
@@ -251,6 +251,7 @@ export const VaultOracleV2ByChain: AddressByChain = {
   [polygon.id]: zeroAddress,
   [bsc.id]: "0x8D225f07947E6C2158835509A3E309a8efDAfefb",
   [hemi.id]: "0xc67Ef06A3213c2212bC05e4cE34a8eEbA29278E2",
+  [morph.id]: "0x484E23b0109e7A2eeCE9e7AE91BA34648a6552B7",
 }
 
 export const VaultOracleOwnerV2ByChain: AddressByChain = {
@@ -264,6 +265,7 @@ export const VaultOracleOwnerV2ByChain: AddressByChain = {
   [polygon.id]: zeroAddress,
   [bsc.id]: "0x323053A0902E67791c06F65A5D2097ee79dD740F",
   [hemi.id]: "0x0ae9515aC7900C6054F684795d554a9Dc202eb51",
+  [morph.id]: "0x4B11A40B93207ef9bD9Cd8d5871CA30a0aA25268",
 }
 
 export const ManagementMultisigByChain: AddressByChain = {
@@ -378,7 +380,8 @@ export const ZapAssetAddressesByChain: { [key: number]: Address[] } = {
   [base.id]: [],
   [fraxtal.id]: [],
   [avalanche.id]: [],
-  [hemi.id]: []
+  [hemi.id]: [],
+  [morph.id]: []
 }
 
 
