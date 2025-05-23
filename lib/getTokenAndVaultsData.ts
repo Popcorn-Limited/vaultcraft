@@ -12,7 +12,7 @@ import { prepareAssets, prepareVaults, addBalances, prepareGauges } from "@/lib/
 import { mainnet } from "viem/chains";
 import prepareStrategies from "@/lib/prepareStrategies";
 import { addApyHist, addDynamicVaultsData, addGaugeData, addSafeStrategyData, addStrategyData, getInitialVaultsData } from "@/lib/vault/prepareVaultData";
-import { formatBalance } from "./utils/helpers";
+import { formatBalance, getLogsFromBlock } from "./utils/helpers";
 
 interface GetVaultsByChainProps {
   chain: Chain;
@@ -88,16 +88,17 @@ export default async function getTokenAndVaultsDataByChain({
     // @ts-ignore
     for (let [i, vault] of Object.values(vaultsData).entries()) {
       if (vault.gauge !== zeroAddress) {
-        const latestBl = await client.getBlockNumber();
-        const deployBlock = ORACLES_DEPLOY_BLOCK[chainId];
-        const fromBlock = deployBlock === 0 ? "earliest" : BigInt(deployBlock) <= latestBl - BigInt(10000) ? latestBl - BigInt(9999) : BigInt(deployBlock)
+
+        const latestBlock = await client.getBlockNumber();
+        const initialBlock = await getLogsFromBlock(latestBlock, ORACLES_DEPLOY_BLOCK[chainId], chainId);
+        const fromBlock = initialBlock === BigInt(0) ? "earliest" : initialBlock;
 
         const rewardLog = await client.getContractEvents({
           address: vault.gauge,
           abi: chainId === mainnet.id ? GaugeAbi : ChildGaugeAbi,
           eventName: chainId === mainnet.id ? "RewardDistributorUpdated" : "AddReward",
           fromBlock,
-          toBlock: latestBl,
+          toBlock: latestBlock,
         }) as any[]
 
         rewardLog.forEach((log) => {

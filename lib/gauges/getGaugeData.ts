@@ -2,6 +2,7 @@ import { Address, PublicClient, createPublicClient, erc20Abi, http, zeroAddress 
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 import { ChildGaugeAbi, GaugeAbi, ORACLES_DEPLOY_BLOCK, VCX, } from "@/lib/constants";
 import { vcx as getVcxPrice } from "@/lib/resolver/price/resolver";
+import { getLogsFromBlock } from "@/lib/utils/helpers";
 import { GaugeData, RewardApy, Token, TokenByAddress, VaultDataByAddress } from "@/lib/types";
 import { thisPeriodTimestamp } from "./utils";
 import { mainnet } from "viem/chains";
@@ -318,9 +319,9 @@ async function getRewardsApy({
 }): Promise<RewardApy> {
   const client = clientByChainId[chainId];
 
-  const latestBl = await client.getBlockNumber();
-  const deployBlock = ORACLES_DEPLOY_BLOCK[chainId];
-  const fromBlock = deployBlock === 0 ? "earliest" : BigInt(deployBlock) <= latestBl - BigInt(10000) ? latestBl - BigInt(9999) : BigInt(deployBlock)
+  const latestBlock = await client.getBlockNumber();
+  const initialBlock = await getLogsFromBlock(latestBlock, ORACLES_DEPLOY_BLOCK[chainId], chainId);
+  const fromBlock = initialBlock === BigInt(0) ? "earliest" : initialBlock;
 
   // get all reward token via events
   const rewardLogs = await client.getContractEvents({
@@ -328,7 +329,7 @@ async function getRewardsApy({
     abi: chainId === mainnet.id ? GaugeAbi : ChildGaugeAbi,
     eventName: chainId === mainnet.id ? "RewardDistributorUpdated" : "AddReward",
     fromBlock,
-    toBlock: latestBl,
+    toBlock: latestBlock,
   }) as any[];
   const rewardTokens: Address[] = []
   const filteredRewardLogs: any[] = []

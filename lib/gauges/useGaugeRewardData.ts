@@ -4,6 +4,7 @@ import { ChildGaugeAbi, GaugeAbi, ORACLES_DEPLOY_BLOCK } from "@/lib/constants";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
 import { ClaimableReward, TokenByAddress } from "@/lib/types";
 import { avalanche } from "viem/chains";
+import { getLogsFromBlock } from "../utils/helpers";
 
 export async function getRewardData(gauge: Address, chainId: number) {
   if (gauge === zeroAddress || chainId === avalanche.id) return []
@@ -13,16 +14,16 @@ export async function getRewardData(gauge: Address, chainId: number) {
     transport: http(RPC_URLS[chainId]),
   });
 
-  const latestBl = await client.getBlockNumber();
-  const deployBlock = ORACLES_DEPLOY_BLOCK[chainId];
-  const fromBlock = deployBlock === 0 ? "earliest" : BigInt(deployBlock) <= latestBl - BigInt(10000) ? latestBl - BigInt(9999) : BigInt(deployBlock)
+  const latestBlock = await client.getBlockNumber();
+  const initialBlock = await getLogsFromBlock(latestBlock, ORACLES_DEPLOY_BLOCK[chainId], chainId);
+  const fromBlock = initialBlock === BigInt(0) ? "earliest" : initialBlock;
 
   const rewardLogs = await client.getContractEvents({
     address: gauge,
     abi: chainId === chains.mainnet.id ? GaugeAbi : ChildGaugeAbi,
     eventName: chainId === chains.mainnet.id ? "RewardDistributorUpdated" : "AddReward",
     fromBlock,
-    toBlock: latestBl,
+    toBlock: latestBlock,
   }) as any[];
 
   let rewardData = []
@@ -69,16 +70,16 @@ export async function getClaimableRewards({ gauge, account, tokens, chainId }: {
     transport: http(RPC_URLS[chainId]),
   })
 
-  const latestBl = await client.getBlockNumber();
-  const deployBlock = ORACLES_DEPLOY_BLOCK[chainId];
-  const fromBlock = deployBlock === 0 ? "earliest" : BigInt(deployBlock) <= latestBl - BigInt(10000) ? latestBl - BigInt(9999) : BigInt(deployBlock)
+  const latestBlock = await client.getBlockNumber();
+  const initialBlock = await getLogsFromBlock(latestBlock, ORACLES_DEPLOY_BLOCK[chainId], chainId);
+  const fromBlock = initialBlock === BigInt(0) ? "earliest" : initialBlock;
 
   const rewardLogs = await client.getContractEvents({
     address: gauge,
     abi: chainId === chains.mainnet.id ? GaugeAbi : ChildGaugeAbi,
     eventName: chainId === chains.mainnet.id ? "RewardDistributorUpdated" : "AddReward",
     fromBlock,
-    toBlock: latestBl,
+    toBlock: latestBlock,
   }) as any[];
 
   if (rewardLogs.length > 0) {

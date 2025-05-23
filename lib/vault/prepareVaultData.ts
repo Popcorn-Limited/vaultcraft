@@ -36,7 +36,7 @@ import {
 import getGaugesData from "@/lib/gauges/getGaugeData";
 import { EMPTY_LLAMA_APY_ENTRY, getApy } from "@/lib/resolver/apy";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
-import { daysDifferenceUTC, returnBigIntResult } from "@/lib/utils/helpers";
+import { daysDifferenceUTC, getLogsFromBlock, returnBigIntResult } from "@/lib/utils/helpers";
 
 export async function getInitialVaultsData(
   chainId: number,
@@ -235,9 +235,11 @@ async function getSafeVaultApy(vault: VaultData): Promise<LlamaApy[]> {
     chain: ChainById[vault.chainId],
     transport: http(RPC_URLS[vault.chainId]),
   });
-  const latestBl = await client.getBlockNumber();
-  const deployBlock = ORACLES_DEPLOY_BLOCK[vault.chainId];
-  const fromBlock = deployBlock === 0 ? "earliest" : BigInt(deployBlock) <= latestBl - BigInt(10000) ? latestBl - BigInt(9999) : BigInt(deployBlock)
+
+  const latestBlock = await client.getBlockNumber();
+  const initialBlock = await getLogsFromBlock(latestBlock, ORACLES_DEPLOY_BLOCK[vault.chainId], vault.chainId);
+  const fromBlock = initialBlock === BigInt(0) ? "earliest" : initialBlock;
+
   const logs = await client.getContractEvents({
     address:
       vault.metadata.type === "safe-vault-v1.5"
@@ -246,7 +248,7 @@ async function getSafeVaultApy(vault: VaultData): Promise<LlamaApy[]> {
     abi: AssetPushOracleAbi,
     eventName: "PriceUpdated",
     fromBlock,
-    toBlock: latestBl
+    toBlock: latestBlock
   });
 
   if (logs.length === 0) return [];

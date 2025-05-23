@@ -20,6 +20,7 @@ import Link from "next/link";
 import CopyAddress from "@/components/common/CopyAddress";
 import SpinningLogo from "@/components/common/SpinningLogo";
 import { avalanche } from "viem/chains";
+import { getLogsFromBlock } from "@/lib/utils/helpers";
 
 async function getLogs(vault: VaultData, asset: Token) {
   // if (vault.chainId === avalanche.id) return []
@@ -29,9 +30,11 @@ async function getLogs(vault: VaultData, asset: Token) {
     transport: http(RPC_URLS[vault.chainId]),
   });
 
+
   const latestBlock = await client.getBlockNumber();
-  const deployBlock = ORACLES_DEPLOY_BLOCK[vault.chainId];
-  const fromBlock = deployBlock === 0 ? "earliest" : BigInt(deployBlock) < latestBlock - BigInt(10000) ? latestBlock - BigInt(9999) : BigInt(deployBlock)
+  const initialBlock = await getLogsFromBlock(latestBlock, ORACLES_DEPLOY_BLOCK[vault.chainId], vault.chainId);
+  const fromBlock = initialBlock === BigInt(0) ? "earliest" : initialBlock;
+
   const depositLogs = await client.getContractEvents({
     address: vault.address,
     abi: VaultAbi,

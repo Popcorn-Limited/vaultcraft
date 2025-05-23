@@ -4,7 +4,7 @@ import {
   showSuccessToast,
 } from "@/lib/toasts";
 import { Balance, Clients, SimulationResponse, Token } from "@/lib/types";
-import { Abi, Address, PublicClient, isAddress } from "viem";
+import { Abi, Address, BlockTag, PublicClient, isAddress } from "viem";
 import { sendMessageToDiscord } from "@/lib/discord/discordBot";
 import clsx, { type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -230,4 +230,32 @@ export function daysDifferenceUTC(date1: Date, date2: Date): number {
   const utc1 = Date.UTC(date1.getFullYear(), date1.getMonth(), date1.getDate());
   const utc2 = Date.UTC(date2.getFullYear(), date2.getMonth(), date2.getDate());
   return Math.floor((utc2 - utc1) / (1000 * 60 * 60 * 24));
+}
+
+export async function getLogsFromBlock(
+  lastBlock: bigint,
+  deployBlock: number,
+  chainId: number
+): Promise<bigint> {
+  let fromBlock;
+
+  if (deployBlock === 0) {
+    fromBlock = BigInt(0);
+  } else {
+    switch (chainId) {
+      case 2818: // morph rpc allows to read 5k blocks
+        fromBlock =
+          BigInt(deployBlock) < lastBlock - BigInt(5000)
+            ? lastBlock - BigInt(4999)
+            : BigInt(deployBlock);
+        break;
+      default: // most rpcs allow to read 10k blocks
+        fromBlock =
+          BigInt(deployBlock) < lastBlock - BigInt(10000)
+            ? lastBlock - BigInt(9999)
+            : BigInt(deployBlock);
+        break;
+    }
+  }
+  return fromBlock;
 }
