@@ -3,6 +3,7 @@ import { VaultData } from "@/lib/types";
 import { ChainById } from "@/lib/utils/connectors";
 import { createPublicClient, http, Address, erc20Abi } from "viem";
 import { OracleVaultAbi, ORACLES_DEPLOY_BLOCK } from "@/lib/constants";
+import { getLogsFromBlock } from "@/lib/utils/helpers";
 
 export type WithdrawalRequest = {
   user: Address,
@@ -23,30 +24,30 @@ export default async function fetchWithdrawalRequests(vault: VaultData): Promise
     transport: http(RPC_URLS[vault.chainId]),
   })
 
-  const latestBl = await client.getBlockNumber();
-  const deployBlock = ORACLES_DEPLOY_BLOCK[vault.chainId];
-  const fromBlock = deployBlock === 0 ? "earliest" : BigInt(deployBlock) <= latestBl - BigInt(10000) ? latestBl - BigInt(9999) : BigInt(deployBlock)
+  const latestBlock = await client.getBlockNumber();
+  const initialBlock = await getLogsFromBlock(latestBlock, ORACLES_DEPLOY_BLOCK[vault.chainId], vault.chainId);
+  const fromBlock = initialBlock === BigInt(0) ? "earliest" : initialBlock;
 
   const requestLogs = await client.getContractEvents({
     address: vault.address,
     abi: OracleVaultAbi,
     eventName: "RedeemRequested",
     fromBlock,
-    toBlock: latestBl,
+    toBlock: latestBlock,
   });
   const cancelLogs = await client.getContractEvents({
     address: vault.address,
     abi: OracleVaultAbi,
     eventName: "RedeemRequestCanceled",
     fromBlock,
-    toBlock: latestBl,
+    toBlock: latestBlock,
   });
   const fulfillLogs = await client.getContractEvents({
     address: vault.address,
     abi: OracleVaultAbi,
     eventName: "RedeemRequestFulfilled",
     fromBlock,
-    toBlock: latestBl,
+    toBlock: latestBlock,
   });
 
   // Sort and sum requests by controller

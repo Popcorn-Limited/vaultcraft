@@ -9,7 +9,8 @@ import {
   optimism,
   polygon,
   xLayer,
-  hemi
+  hemi,
+  morph
 } from "viem/chains";
 
 export enum ChainId {
@@ -23,7 +24,8 @@ export enum ChainId {
   Base = 8453,
   Fraxtal = 252,
   Avalanche = 43114,
-  Hemi = 43111
+  Hemi = 43111,
+  Morph = 2818
 }
 
 export const networkMap: { [key: number]: string } = {
@@ -37,7 +39,8 @@ export const networkMap: { [key: number]: string } = {
   [ChainId.Base]: "Base",
   [ChainId.Fraxtal]: "Fraxtal",
   [ChainId.Avalanche]: "Avax",
-  [ChainId.Hemi]: "Hemi"
+  [ChainId.Hemi]: "Hemi",
+  [ChainId.Morph]: "Morph",
 };
 
 export const networkLogos: { [key: number]: string } = {
@@ -51,7 +54,8 @@ export const networkLogos: { [key: number]: string } = {
   [ChainId.Base]: "/images/networks/base.svg",
   [ChainId.Fraxtal]: "/images/networks/fraxtal.svg",
   [ChainId.Avalanche]: "/images/networks/avalanche.svg",
-  [ChainId.Hemi]: "/images/networks/hemi.png"
+  [ChainId.Hemi]: "/images/networks/hemi.png",
+  [ChainId.Morph]: "/images/networks/Morph.png",
 };
 
 export const RPC_URLS: { [key: number]: string } = {
@@ -64,7 +68,8 @@ export const RPC_URLS: { [key: number]: string } = {
   [ChainId.Base]: `https://base-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`,
   [ChainId.Fraxtal]: `https://rpc.frax.com`,
   [ChainId.Avalanche]: `https://avax-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`,
-  [ChainId.Hemi]: `https://rpc.hemi.network/rpc`
+  [ChainId.Hemi]: `https://rpc.hemi.network/rpc`,
+  [ChainId.Morph]: `https://rpc.morphl2.io`
 };
 
 export const SUPPORTED_NETWORKS: Chain[] = [
@@ -93,7 +98,16 @@ export const SUPPORTED_NETWORKS: Chain[] = [
         blockCreated: 1384621
       }
     }
-  }
+  },
+  {
+    ...morph,
+    contracts: {
+      multicall3: {
+        address: "0xcA11bde05977b3631167028862bE2a173976CA11",
+        blockCreated: 3654914        
+      }
+    }
+  },
 ]
 
 export const GAUGE_NETWORKS = [1, 10, 42161];
@@ -108,5 +122,6 @@ export const ChainById: { [key: number]: Chain } = {
   8453: base,
   252: fraxtal,
   43114: avalanche,
-  43111: SUPPORTED_NETWORKS[9], // hemi with multicall3 override
+  43111: SUPPORTED_NETWORKS[9], // hemi with multicall3 override,
+  2818: SUPPORTED_NETWORKS[10], // morph with multicall3 override
 }

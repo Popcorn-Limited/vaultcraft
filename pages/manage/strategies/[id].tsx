@@ -19,6 +19,7 @@ import NetworkSticker from "@/components/network/NetworkSticker";
 import TokenIcon from "@/components/common/TokenIcon";
 import AnyToAnyV1DepositorSettings from "@/components/manage/strategy/AnyToAnyV1DepositorSettings";
 import SpinningLogo from "@/components/common/SpinningLogo";
+import { getLogsFromBlock } from "@/lib/utils/helpers";
 
 async function getLogs(vault: Address, asset: Token, chainId: number) {
   const client = createPublicClient({
@@ -27,8 +28,8 @@ async function getLogs(vault: Address, asset: Token, chainId: number) {
   });
 
   const latestBlock = await client.getBlockNumber();
-  const deployBlock = ORACLES_DEPLOY_BLOCK[chainId];
-  const fromBlock = deployBlock === 0 ? "earliest" : BigInt(deployBlock) < latestBlock - BigInt(10000) ? latestBlock - BigInt(9999) : BigInt(deployBlock)
+  const initialBlock = await getLogsFromBlock(latestBlock, ORACLES_DEPLOY_BLOCK[chainId], chainId);
+  const fromBlock = initialBlock === BigInt(0) ? "earliest" : initialBlock;
 
   const initLog = await client.getContractEvents({
     address: vault,

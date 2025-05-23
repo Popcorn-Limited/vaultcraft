@@ -51,6 +51,7 @@ export const IconByProtocol: { [key: string]: string } = {
   Kodiak: "/images/icons/kodiak-logo.svg",
   Goldilocks: "/images/icons/logo-goldilocks.png",
   Matrixport: "/images/icons/matrixport.png",
+  Morph: "/images/networks/Morph.png",
   UltraYield: "/images/icons/ultrayield.svg",
   Keyrock: "/images/icons/keyrock.png",
   Kernel: "/images/icons/kernel.png",

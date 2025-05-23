@@ -10,7 +10,7 @@ import InputTokenWithError from "@/components/input/InputTokenWithError";
 import SecondaryActionButton from "@/components/button/SecondaryActionButton";
 import MainActionButton from "@/components/button/MainActionButton";
 import { handleAllowance } from "@/lib/approve";
-import { NumberFormatter, validateInput } from "@/lib/utils/helpers";
+import { getLogsFromBlock, NumberFormatter, validateInput } from "@/lib/utils/helpers";
 import { useAccount, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
 import { claimReserve, pullFunds, pushFunds } from "@/lib/vault/management/strategyInteractions";
 import { PassThroughProps } from "@/components/manage/strategy/AnyToAnyV1DepositorSettings";
@@ -21,23 +21,23 @@ import { showErrorToast } from "@/lib/toasts";
 async function getReserveLogs(address: Address, account: Address, client: PublicClient) {
   const chainId = client.chain?.id || 1
 
-  const latestBl = await client.getBlockNumber();
-  const deployBlock = ORACLES_DEPLOY_BLOCK[chainId];
-  const fromBlock = deployBlock === 0 ? "earliest" : BigInt(deployBlock) <= latestBl - BigInt(10000) ? latestBl - BigInt(9999) : BigInt(deployBlock)
+  const latestBlock = await client.getBlockNumber();
+  const initialBlock = await getLogsFromBlock(latestBlock, ORACLES_DEPLOY_BLOCK[chainId], chainId);
+  const fromBlock = initialBlock === BigInt(0) ? "earliest" : initialBlock;
 
   let addedLogs = await client.getContractEvents({
     address: address,
     abi: AnyToAnyDepositorAbi,
     eventName: "ReserveAdded",
     fromBlock,
-    toBlock: latestBl,
+    toBlock: latestBlock,
   });
   const removeLogs = await client.getContractEvents({
     address: address,
     abi: AnyToAnyDepositorAbi,
     eventName: "ReserveClaimed",
     fromBlock,
-    toBlock: latestBl,
+    toBlock: latestBlock,
   });
   // Filter out claimed reserves
   const removedBlocks = removeLogs.map(log => log.args.blockNumber)
