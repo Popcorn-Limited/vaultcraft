@@ -88,7 +88,7 @@ export const SUPPORTED_NETWORKS: Chain[] = [
     }
   },
   base,
-  fraxtal,
+  // fraxtal,
   avalanche,
   {
     ...hemi,
