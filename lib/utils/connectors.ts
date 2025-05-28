@@ -72,43 +72,49 @@ export const RPC_URLS: { [key: number]: string } = {
   [ChainId.Morph]: `https://rpc.morphl2.io`
 };
 
+const customXLayer = {
+  ...xLayer,
+  contracts: {
+    multicall3: {
+      address: "0xca11bde05977b3631167028862be2a173976ca11",
+      blockCreated: 47416
+    }
+  }
+}
+const customHemi = {
+  ...hemi,
+  contracts: {
+    multicall3: {
+      address: "0xcA11bde05977b3631167028862bE2a173976CA11",
+      blockCreated: 1384621
+    }
+  }
+}
+const customMorph = {
+  ...morph,
+  contracts: {
+    multicall3: {
+      address: "0xcA11bde05977b3631167028862bE2a173976CA11",
+      blockCreated: 3654914        
+    }
+  }
+}
+
 export const SUPPORTED_NETWORKS: Chain[] = [
   mainnet,
   optimism,
   arbitrum,
   polygon,
   bsc,
-  {
-    ...xLayer,
-    contracts: {
-      multicall3: {
-        address: "0xca11bde05977b3631167028862be2a173976ca11",
-        blockCreated: 47416
-      }
-    }
-  },
+  customXLayer,
   base,
   // fraxtal,
   avalanche,
-  {
-    ...hemi,
-    contracts: {
-      multicall3: {
-        address: "0xcA11bde05977b3631167028862bE2a173976CA11",
-        blockCreated: 1384621
-      }
-    }
-  },
-  {
-    ...morph,
-    contracts: {
-      multicall3: {
-        address: "0xcA11bde05977b3631167028862bE2a173976CA11",
-        blockCreated: 3654914        
-      }
-    }
-  },
+  customHemi,
+  customMorph
 ]
+
+
 
 export const GAUGE_NETWORKS = [1, 10, 42161];
 
@@ -118,10 +124,10 @@ export const ChainById: { [key: number]: Chain } = {
   42161: arbitrum,
   137: polygon,
   56: bsc,
-  196: SUPPORTED_NETWORKS[5], // xLayer with multicall3 override
+  196: customXLayer, // xLayer with multicall3 override
   8453: base,
   252: fraxtal,
   43114: avalanche,
-  43111: SUPPORTED_NETWORKS[9], // hemi with multicall3 override,
-  2818: SUPPORTED_NETWORKS[10], // morph with multicall3 override
+  43111: customHemi, // hemi with multicall3 override,
+  2818: customMorph, // morph with multicall3 override
 }

@@ -49,6 +49,8 @@ export const AsyncRouterByChain: AddressByChain = {
   [avalanche.id]: "0x7902c757a4A4B44C3B271Ce2f0c2A575C6D5f57A",
   [polygon.id]: zeroAddress,
   [bsc.id]: zeroAddress,
+  [hemi.id]: zeroAddress,
+  [morph.id]: "0x06C0c876419a76E89AD55D1225bB335939C25150",
 }
 
 export const VeRecipientByChain: AddressByChain = {

@@ -4,7 +4,7 @@ import { Token, TokenByAddress, TokenType } from "@/lib/types";
 import { networkMap } from "@/lib/utils/connectors";
 import { vcx as getVcxPrice, vcxLp as getVcxLpPrice } from "@/lib/resolver/price/resolver";
 import { ALT_NATIVE_ADDRESS, OptionTokenByChain, ST_VCX, VCX, VCX_LP, WrappedOptionTokenByChain } from "@/lib/constants";
-import { hemi, mainnet } from "viem/chains";
+import { hemi, mainnet, morph } from "viem/chains";
 import { EMPTY_BALANCE } from "@/lib/utils/helpers";
 
 export async function prepareAssets(addresses: Address[], chainId: number, client: PublicClient): Promise<TokenByAddress> {
@@ -12,7 +12,7 @@ export async function prepareAssets(addresses: Address[], chainId: number, clien
     `https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/assets/tokens/${chainId}.json`
   );
 
-  if (chainId === hemi.id) {
+  if (chainId === hemi.id || chainId === morph.id) {
     return handleChainException(addresses, assets, chainId, client)
   }
 
@@ -94,13 +94,13 @@ async function handleChainException(addresses: Address[], assets: any, chainId: 
     allowFailure: true,
   });
 
-  const { data: nbtcPriceData } = await axios.get(
+  const { data: btcPriceData } = await axios.get(
     `https://pro-api.llama.fi/${process.env.DEFILLAMA_API_KEY}/coins/prices/current/ethereum:0x8BB97A618211695f5a6a889faC3546D1a573ea77`
   );
 
   let result: TokenByAddress = {}
   addresses.forEach((address, i) => {
-    let tokenPrice = address === "0xC93B7aae2802f57eb9D98E2B6a68217d75a0658c" ? Number(nbtcPriceData.coins["ethereum:0x8BB97A618211695f5a6a889faC3546D1a573ea77"]?.price) || 0 : 0
+    let tokenPrice = Number(btcPriceData.coins["ethereum:0x8BB97A618211695f5a6a889faC3546D1a573ea77"]?.price)
 
     result[getAddress(address)] = {
       ...assets[getAddress(address)],
