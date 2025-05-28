@@ -1,5 +1,31 @@
+
+async function doStuff() {
+  console.log("doing stuff")
+  const response = await fetch("http://164.92.165.106:8000/subgraphs/id/QmR5K6YutZESdLk3czVrEvWUuJhjfQ4jAeAWnRtepPmMuZ", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/graphql-response+json",
+    },
+    body: JSON.stringify({
+      query: `
+      query MyQuery {
+  collateralAddresses_collection(first: 10) {
+    id
+  }
+}
+      `
+    })
+  })
+
+  const data = await response.json()
+  console.log(data)
+}
+
 export default function Test() {
+
+
   return (
-    <div className="text-white"><p>This is <span className='font-bold'>DrPepe.ai’s</span> first de-risked IP market funding the cure to HPV via repurposed Chloroquine (topical, injection).</p><ul className='list-disc list-inside'><li>Chloroquine is an old anti-malaria drug that gained memetic popularity during Covid-19 via Elon Musk, Trump, RFK, etc.</li><li>HPV accounts for .8% of deaths and 5% of cancers worldwide + is #1 STI</li><li>100x Monetization Strategy</li><li className='ml-6'>D2C telehealth for external HPV skin lesions (crushed up pills applied topically, 90%+ cure)</li><li className='ml-6'>Rare disease clinical trial for internal oral HPV lesions (submit for FDA approval after just one 30 person trial, chloroquine injected directly into HPV lesion, 90%+ cure expected)</li></ul><div><p className='font-bold mt-4'>What is DrPepe.ai?</p><p>DrPepe.ai (www.drpepe.ai) is the first AI-driven longevity framework designed to integrate seamlessly into the AI agent economy. Think of it as your personal Jarvis for longevity—an intelligent agent that not only tracks and optimizes your health but also ensures you always have the right supplements, protocols, and interventions at your fingertips.</p></div></div>
+    <div><button onClick={doStuff} className="text-white">Do Stuff</button></div>
   );
 }
