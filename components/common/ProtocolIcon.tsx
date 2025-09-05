@@ -58,6 +58,7 @@ export const IconByProtocol: { [key: string]: string } = {
   Kernel: "/images/icons/kernel.png",
   Dinero: "/images/icons/dinero.png",
   Multistrategy: "/images/tokens/vcx.svg",
+  Bitget: "/images/icons/bitget.png",
   VaultCraft: "/images/tokens/vcx.svg",
   None: "/images/tokens/vcx.svg"
 };
