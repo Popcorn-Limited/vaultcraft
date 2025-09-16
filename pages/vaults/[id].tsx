@@ -16,6 +16,8 @@ import UserBoostSection from "@/components/vault/UserBoostSection";
 import SpinningLogo from "@/components/common/SpinningLogo";
 import SafeVaultInteraction from "@/components/vault/safe/SafeVaultInteraction";
 import VaultInformation from "@/components/vault/VaultInformation";
+import { addDynamicVaultData } from "@/lib/vault/prepareVaultData";
+import { ChainById } from "@/lib/utils/connectors";
 
 export default function Index() {
   const router = useRouter();
@@ -29,30 +31,52 @@ export default function Index() {
   const [asset, setAsset] = useState<Token>();
   const [vault, setVault] = useState<Token>();
   const [gauge, setGauge] = useState<Token>();
-
+  const [foundVault, setFoundVault] = useState<VaultData>();
 
   useEffect(() => {
+    async function updateVaultData(foundVault: VaultData, chainId: number) {
+      console.log("UPDATING VAULT DATA", foundVault.address);
+      const getDataStart = Number(new Date());
+
+      const updatedVault = await addDynamicVaultData(foundVault, ChainById[chainId]);
+      
+      const newTokenOptions = [
+        tokens[chainId][updatedVault.asset],
+        tokens[chainId][updatedVault.vault],
+        ...ZapAssetAddressesByChain[chainId].filter(addr => updatedVault.asset !== addr).map(addr => tokens[chainId][addr])
+      ]
+
+      setAsset(tokens[chainId][foundVault.asset])
+      setVault(tokens[chainId][foundVault.vault])
+
+      if (foundVault.gauge && foundVault.gauge !== zeroAddress) {
+        setGauge(tokens[chainId][foundVault.gauge])
+        newTokenOptions.push(tokens[chainId][foundVault.gauge])
+      }
+      setTokenOptions(newTokenOptions)
+      setVaultData(foundVault)
+      
+      console.log(`Took ${Number(new Date()) - getDataStart}ms to update vault data`);
+    }
+
+    const chainIdQuery = query?.chainId! as string
+    const chainId = Number(chainIdQuery.replace("?", "").replace("&", ""))
+
+    if(foundVault)
+      updateVaultData(foundVault, chainId)
+
+  }, [foundVault])
+  
+  useEffect(() => {
+    
+
     if (Object.keys(query).length > 0 && Object.keys(vaults).length > 0) {
       const chainIdQuery = query?.chainId! as string
       const chainId = Number(chainIdQuery.replace("?", "").replace("&", ""))
       const foundVault = vaults[chainId].find(vault => vault.address === query?.id)
-      if (foundVault) {
-        const newTokenOptions = [
-          tokens[chainId][foundVault.asset],
-          tokens[chainId][foundVault.vault],
-          ...ZapAssetAddressesByChain[chainId].filter(addr => foundVault.asset !== addr).map(addr => tokens[chainId][addr])
-        ]
-
-        setAsset(tokens[chainId][foundVault.asset])
-        setVault(tokens[chainId][foundVault.vault])
-
-        if (foundVault.gauge && foundVault.gauge !== zeroAddress) {
-          setGauge(tokens[chainId][foundVault.gauge])
-          newTokenOptions.push(tokens[chainId][foundVault.gauge])
-        }
-        setTokenOptions(newTokenOptions)
-        setVaultData(foundVault)
-      }
+      
+      if (foundVault)
+        setFoundVault(foundVault);
     }
   }, [vaults, query, vaultData, tokens]);
 
