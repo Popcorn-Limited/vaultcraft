@@ -173,12 +173,13 @@ export default function Page({
   const publicClient = usePublicClient();
 
   const [progress, setLoadingProgress] = useAtom(loadingProgressAtom);
-  const [, setVaults] = useAtom(vaultsAtom);
-  const [, setTokens] = useAtom(tokensAtom);
+  const [vaults, setVaults] = useAtom(vaultsAtom);
+  const [tokens, setTokens] = useAtom(tokensAtom);
   const [, setStrategies] = useAtom(strategiesAtom);
   const [, setGaugeRewards] = useAtom(gaugeRewardsAtom);
   const [, setTVL] = useAtom(tvlAtom);
   const [, setNetworth] = useAtom(networthAtom);
+  const [startLoad, setStartLoad] = useState<number>(0);
 
   function editDate(vaultsData: VaultData[], strategies: StrategiesByChain) {
     const vaults = vaultsData.map((vault) => ({
@@ -216,38 +217,12 @@ export default function Page({
   }
 
   useEffect(() => {
-    async function getCache() {
-      setLoadingProgress(0);
-
-      const getDataStart = Number(new Date());
-
-      setLoadingProgress(10);
-
-      // get cached vaultsData and tokens
-      const newVaultsData: { [key: number]: VaultData[] } = {};
-      const newTokens: { [key: number]: TokenByAddress } = {};
-      const newStrategies: StrategiesByChain = {};
-
-      const response = await fetch(`${process.env.VAULTS_CACHE}`);
-
-      const {
-        vaultsData,
-        tokens,
-        strategies,
-        vaultTVL,
-        lockVaultTVL,
-        stakingTVL,
-      } = await response.json();
-
-      SUPPORTED_NETWORKS.map((chain) => {
-        const { v, s } = editDate(vaultsData[chain.id], strategies[chain.id]);
-        newVaultsData[chain.id] = v;
-        newTokens[chain.id] = tokens[chain.id];
-        newStrategies[chain.id] = s[chain.id];
-      });
-
+    async function getAccountData(
+      newTokens: { [key: number]: TokenByAddress },
+      newVaultsData: { [key: number]: VaultData[] }
+    ) {
       if (account && account !== zeroAddress) {
-        console.log(`Fetching Networth (${new Date()})`);
+        console.log(`Fetching Account Data (${new Date()})`);
         let start = Number(new Date());
 
         await Promise.all(
@@ -297,10 +272,10 @@ export default function Page({
           ) + Number(newTokens[1][ST_VCX].balance.formattedUSD);
         const lockVaultNetworth = 0; // @dev hardcoded since we removed lock vaults
 
-        console.log(`Completed fetching Networth (${new Date()})`);
-        console.log(`Took ${Number(new Date()) - start}ms to load`);
+        // console.log(`Completed fetching Networth (${new Date()})`);
+        // console.log(`Took ${Number(new Date()) - start}ms to load`);
 
-        console.log(`Fetching GaugeRewards (${new Date()})`);
+        // console.log(`Fetching GaugeRewards (${new Date()})`);
         start = Number(new Date());
 
         const newRewards: { [key: number]: GaugeRewards } = {};
@@ -318,8 +293,8 @@ export default function Page({
           )
         );
 
-        console.log(`Completed fetching GaugeRewards (${new Date()})`);
-        console.log(`Took ${Number(new Date()) - start}ms to load`);
+        // console.log(`Completed fetching GaugeRewards (${new Date()})`);
+        // console.log(`Took ${Number(new Date()) - start}ms to load`);
 
         setNetworth((prev) => ({
           vault: vaultNetworth,
@@ -331,9 +306,136 @@ export default function Page({
         }));
         setGaugeRewards((pre) => ({ ...newRewards }));
 
-        console.log(`Completed fetching Vaultron (${new Date()})`);
-        console.log(`Took ${Number(new Date()) - start}ms to load`);
+        // console.log(`Completed fetching Vaultron (${new Date()})`);
+        console.log(
+          `Took ${Number(new Date()) - start}ms to load account data`
+        );
+        console.log(
+          `Took ${Number(new Date()) - startLoad}ms to load entire data`
+        );
       }
+    }
+
+    if (Object.keys(tokens).length > 0 && Object.keys(vaults).length > 0)
+      getAccountData(tokens, vaults);
+  }, [account, vaults]);
+
+  useEffect(() => {
+    async function getData() {
+      console.log(`FETCHING APP DATA (${new Date()})`);
+      setLoadingProgress(0);
+      setStartLoad(Number(new Date()));
+      const getDataStart = Number(new Date());
+
+      // get vaultsData and tokens
+      const newVaultsData: { [key: number]: VaultData[] } = {};
+      const newTokens: { [key: number]: TokenByAddress } = {};
+      const newStrategies: StrategiesByChain = {};
+
+      console.log(`Fetching Token and Vaults Data (${new Date()})`);
+      let start = Number(new Date());
+
+      setLoadingProgress(10);
+      await Promise.all(
+        SUPPORTED_NETWORKS.map(async (chain) => {
+          // console.log(`Fetching Data for chain ${chain.id} (${new Date()})`)
+          let chainStart = Number(new Date());
+
+          const { vaultsData, tokens, strategies } =
+            await getTokenAndVaultsDataByChain({
+              chain,
+              account: account || zeroAddress,
+            });
+
+          console.log(
+            `Completed fetching Data for chain ${chain.id} (${new Date()})`
+          );
+          console.log(`Took ${Number(new Date()) - chainStart}ms to load`);
+
+          newVaultsData[chain.id] = vaultsData;
+          newTokens[chain.id] = tokens;
+          newStrategies[chain.id] = strategies;
+
+          setLoadingProgress((prev) => prev + 70 / SUPPORTED_NETWORKS.length);
+        })
+      );
+
+      // console.log(`Completed fetching Token and Vaults Data (${new Date()})`)
+      // console.log(`Took ${Number(new Date()) - start}ms to load`)
+
+      // console.log(`Fetching TVL (${new Date()})`)
+      start = Number(new Date());
+
+      console.log(newVaultsData);
+      const vaultTVL = SUPPORTED_NETWORKS.map(
+        (chain) => newVaultsData[chain.id]
+      )
+        .flat()
+        .reduce((a, b) => a + (b?.tvl || 0), 0);
+      const lockVaultTVL = 520000; // @dev hardcoded since we removed lock vaults
+      let stakingTVL = 0;
+      try {
+        stakingTVL = await axios
+          .get(
+            `https://pro-api.llama.fi/${process.env.DEFILLAMA_API_KEY}/api/protocol/vaultcraft`
+          )
+          .then((res) => res.data.currentChainTvls["staking"]);
+      } catch (e) {
+        stakingTVL = 2590000;
+      }
+
+      // console.log(`Completed fetching TVL (${new Date()})`)
+      // console.log(`Took ${Number(new Date()) - start}ms to load`)
+
+      setTVL((prev) => ({
+        vault: vaultTVL,
+        lockVault: lockVaultTVL,
+        stake: stakingTVL,
+        total: vaultTVL + lockVaultTVL + stakingTVL,
+      }));
+      setVaults((prev) => ({ ...newVaultsData }));
+      setTokens((prev) => ({ ...newTokens }));
+      setStrategies((prev) => ({ ...newStrategies }));
+
+      console.log(`COMPLETED FETCHING APP DATA (${new Date()})`);
+      console.log(`Took ${Number(new Date()) - getDataStart}ms to load`);
+
+      setLoadingProgress((prev) => 100);
+    }
+
+    async function getCache() {
+      console.log("CACHE");
+      console.log(`FETCHING APP DATA (${new Date()})`);
+
+      setLoadingProgress(0);
+      setStartLoad(Number(new Date()));
+
+      const getDataStart = Number(new Date());
+
+      setLoadingProgress(10);
+
+      // get cached vaultsData and tokens
+      const newVaultsData: { [key: number]: VaultData[] } = {};
+      const newTokens: { [key: number]: TokenByAddress } = {};
+      const newStrategies: StrategiesByChain = {};
+
+      const response = await fetch(`${process.env.VAULTS_CACHE}`);
+
+      const {
+        vaultsData,
+        tokens,
+        strategies,
+        vaultTVL,
+        lockVaultTVL,
+        stakingTVL,
+      } = await response.json();
+
+      SUPPORTED_NETWORKS.map((chain) => {
+        const { v, s } = editDate(vaultsData[chain.id], strategies[chain.id]);
+        newVaultsData[chain.id] = v;
+        newTokens[chain.id] = tokens[chain.id];
+        newStrategies[chain.id] = s[chain.id];
+      });
 
       setTVL((prev) => ({
         vault: vaultTVL,
@@ -350,8 +452,16 @@ export default function Page({
       console.log(`Took ${Number(new Date()) - getDataStart}ms to load`);
       setLoadingProgress((prev) => 100);
     }
-    getCache();
-  }, [account]);
+
+    (async () => {
+      try {
+        if (process.env.VAULTS_CACHE) await getCache();
+        else await getData();
+      } catch (e) {
+        await getData();
+      }
+    })();
+  }, []);
 
   const [showTermsModal, setShowTermsModal] = useState<boolean>(false);
   const [termsSigned, setTermsSigned] = useState<boolean>(false);
