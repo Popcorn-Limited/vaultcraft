@@ -1,0 +1,40 @@
+name: Update Vault Data
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # every hour
+  workflow_dispatch:
+
+jobs:
+  run-update-script:
+    name: Run stats-script
+    runs-on: ubuntu-latest
+
+    env:
+      DEFILLAMA_API_KEY: ${{ secrets.DEFILLAMA_API_KEY }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.15.0
+
+      - name: Install Yarn 1.22
+        run: npm install -g yarn@1.22.21
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Run cache script
+        run: yarn run cache
+
+      - name: Commit & push changes 
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Update vaults data cache"
+          git push origin main

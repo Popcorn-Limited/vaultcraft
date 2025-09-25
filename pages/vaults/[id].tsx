@@ -32,6 +32,7 @@ export default function Index() {
   const [vault, setVault] = useState<Token>();
   const [gauge, setGauge] = useState<Token>();
   const [foundVault, setFoundVault] = useState<VaultData>();
+  const [chainId, setChainId] = useState<number>();
 
   useEffect(() => {
     async function updateVaultData(foundVault: VaultData, chainId: number) {
@@ -59,24 +60,21 @@ export default function Index() {
       console.log(`Took ${Number(new Date()) - getDataStart}ms to update vault data`);
     }
 
-    const chainIdQuery = query?.chainId! as string
-    const chainId = Number(chainIdQuery.replace("?", "").replace("&", ""))
-
-    if(foundVault)
+    if(foundVault !== undefined && chainId !== undefined)
       updateVaultData(foundVault, chainId)
 
   }, [foundVault])
   
   useEffect(() => {
-    
-
     if (Object.keys(query).length > 0 && Object.keys(vaults).length > 0) {
       const chainIdQuery = query?.chainId! as string
       const chainId = Number(chainIdQuery.replace("?", "").replace("&", ""))
       const foundVault = vaults[chainId].find(vault => vault.address === query?.id)
       
-      if (foundVault)
+      if (foundVault) {
         setFoundVault(foundVault);
+        setChainId(chainId);
+      }
     }
   }, [vaults, query, vaultData, tokens]);
 

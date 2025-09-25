@@ -177,6 +177,7 @@ export default function Page({
   const [, setTVL] = useAtom(tvlAtom);
   const [, setNetworth] = useAtom(networthAtom);
   const [startLoad, setStartLoad] = useState<number>(0);
+  const [hasCached, setHasCached] = useState<boolean>(false);
 
   function editDate(vaultsData: VaultData[], strategies: StrategiesByChain) {
     const vaults = vaultsData.map((vault) => ({
@@ -217,8 +218,11 @@ export default function Page({
   const TOKENS = "tokensData";
   const GAUGE = "gaugeData";
   const UPDATE_TIME  = "updateTime";
-  const REFRESH_MSECONDS = 60000; // after this amount of ms the account balances are fetched again
+  const REFRESH_MSECONDS = 10000; // after this amount of ms the account balances are fetched again
+  const ACCOUNT = "accountAddr";
 
+  // get accounts data like balances
+  // uses local storage that refreshes every REFRESH_MSECONDS
   useEffect(() => {
     async function getAccountData(
       newTokens: { [key: number]: TokenByAddress },
@@ -227,7 +231,6 @@ export default function Page({
       if (account && account !== zeroAddress) {
         console.log(`FETCHING ACCOUNT DATA (${new Date()})`);
         let start = Number(new Date());
-
         // TOKEN BALANCES
         const t = localStorage.getItem(TOKENS);
         if (t) {
@@ -265,7 +268,7 @@ export default function Page({
         // check for account networth in local storage
         const nStored = localStorage.getItem(ACCOUNT_NETWORTH);
         if (nStored) {
-          console.log("USING STORED DATA FOR NETWORTH");
+          // console.log("USING STORED DATA FOR NETWORTH");
           const networth = JSON.parse(nStored);
 
           setNetworth((prev) => ({
@@ -277,7 +280,7 @@ export default function Page({
               networth.vault + networth.lockVault + networth.wallet + networth.stake,
           }));
         } else {
-          console.log("FETCHING NETWORTH");
+          // console.log("FETCHING NETWORTH");
 
           const vaultNetworth = SUPPORTED_NETWORKS.map((chain) =>
             Object.values(newTokens[chain.id])
@@ -334,13 +337,13 @@ export default function Page({
         const g = localStorage.getItem(GAUGE);
         if (g) {
           const newRewards: { [key: number]: GaugeRewards } = JSON.parse(g);
-          console.log("USING STORED DATA FOR GAUGES");
+          // console.log("USING STORED DATA FOR GAUGES");
           
           // update tokens with account balance
           setGaugeRewards((pre) => ({ ...newRewards }));
         } else {
           const newRewards: { [key: number]: GaugeRewards } = {};
-          console.log("FETCHING GAUGE REWARDS");
+          // console.log("FETCHING GAUGE REWARDS");
           
           await Promise.all(
             GAUGE_NETWORKS.map(
@@ -364,22 +367,33 @@ export default function Page({
         }
 
         // console.log(`Completed fetching Vaultron (${new Date()})`);
-        console.log(
-          `Took ${Number(new Date()) - start}ms to load account data`
-        );
-        console.log(
-          `Took ${Number(new Date()) - startLoad}ms to load entire data`
-        );
+        if(hasCached) {
+          console.log(
+            `Took ${Number(new Date()) - start}ms to load entire data`
+          );
+        } else {
+          console.log(
+            `Took ${Number(new Date()) - start}ms to load account data`
+          );
+          console.log(
+            `Took ${Number(new Date()) - startLoad}ms to load entire data`
+          );
+        }
+
       }
     }
 
     function getStorageOrClean() {
       const time = localStorage.getItem(UPDATE_TIME);
-      if (time && Number(time) + REFRESH_MSECONDS < Number(new Date())) {
-        console.log("CLEARING LOCAL STORAGE");
-        localStorage.removeItem(ACCOUNT_NETWORTH);
-        localStorage.removeItem(TOKENS);
-        localStorage.removeItem(GAUGE);
+      const acc = localStorage.getItem(ACCOUNT);
+      if (account && account !== zeroAddress) {
+        if (time && Number(time) + REFRESH_MSECONDS < Number(new Date()) || account !== acc) {
+          console.log("CLEARING LOCAL STORAGE");
+          localStorage.removeItem(ACCOUNT_NETWORTH);
+          localStorage.removeItem(TOKENS);
+          localStorage.removeItem(GAUGE);
+          localStorage.setItem(ACCOUNT, account);
+        }
       }
     }
 
@@ -390,6 +404,9 @@ export default function Page({
     }
   }, [account, vaults]);
 
+  // gets vaults data
+  // uses json cache file if present in env
+  // TODO add time based
   useEffect(() => {
     async function getData() {
       console.log(`FETCHING APP DATA (${new Date()})`);
@@ -527,8 +544,10 @@ export default function Page({
       try {
         if (process.env.VAULTS_CACHE) await getCache();
         else await getData();
+        setHasCached(true);
       } catch (e) {
         await getData();
+        setHasCached(true);
       }
     })();
   }, []);
