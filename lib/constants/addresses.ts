@@ -309,7 +309,7 @@ export const TokenMigrationByChain: AddressByChain = {
 }
 
 // EXTERNAL
-export const ENSO_ROUTER: Address = "0x80EbA3855878739F4710233A8a19d89Bdd2ffB8E"
+export const ENSO_ROUTER: Address = "0xf75584ef6673ad213a685a1b58cc0330b8ea22cf"
 export const BALANCER_VAULT: Address = "0xBA12222222228d8Ba445958a75a0704d566BF2C8";
 export const BALANCER_QUERIES: Address = "0xE39B5e3B6D74016b2F6A9673D7d7493B6DF549d5";
 export const WETH: Address = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2";

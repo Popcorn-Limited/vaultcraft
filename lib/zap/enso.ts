@@ -8,10 +8,10 @@ import { ZapQuote } from "./zapQuote"
 
 
 const EnsoRouterByChain: AddressByChain = {
-  [mainnet.id]: "0x80EbA3855878739F4710233A8a19d89Bdd2ffB8E",
-  [polygon.id]: "0x80EbA3855878739F4710233A8a19d89Bdd2ffB8E",
-  [optimism.id]: "0x80EbA3855878739F4710233A8a19d89Bdd2ffB8E",
-  [arbitrum.id]: "0x80EbA3855878739F4710233A8a19d89Bdd2ffB8E",
+  [mainnet.id]: "0xf75584ef6673ad213a685a1b58cc0330b8ea22cf",
+  [polygon.id]: "0xf75584ef6673ad213a685a1b58cc0330b8ea22cf",
+  [optimism.id]: "0xf75584ef6673ad213a685a1b58cc0330b8ea22cf",
+  [arbitrum.id]: "0xf75584ef6673ad213a685a1b58cc0330b8ea22cf",
   [xLayer.id]: zeroAddress
 }
 
