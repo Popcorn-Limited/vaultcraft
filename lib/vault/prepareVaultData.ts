@@ -1,5 +1,6 @@
 import {
   Address,
+  Chain,
   PublicClient,
   createPublicClient,
   erc20Abi,
@@ -36,7 +37,11 @@ import {
 import getGaugesData from "@/lib/gauges/getGaugeData";
 import { EMPTY_LLAMA_APY_ENTRY, getApy } from "@/lib/resolver/apy";
 import { ChainById, RPC_URLS } from "@/lib/utils/connectors";
-import { daysDifferenceUTC, getLogsFromBlock, returnBigIntResult } from "@/lib/utils/helpers";
+import {
+  daysDifferenceUTC,
+  getLogsFromBlock,
+  returnBigIntResult,
+} from "@/lib/utils/helpers";
 
 export async function getInitialVaultsData(
   chainId: number,
@@ -195,10 +200,16 @@ export async function addDynamicVaultsData(
 
   Object.values(vaults).forEach((vault: any, i: number) => {
     if (i > 0) i = i * 4;
-    const totalSupply = vault.address === "0x77e88cA17A6D384DCBB13747F6767F30e3753e63" ? BigInt(0) : returnBigIntResult(dynamicValues[i + 1]);
+    const totalSupply =
+      vault.address === "0x77e88cA17A6D384DCBB13747F6767F30e3753e63"
+        ? BigInt(0)
+        : returnBigIntResult(dynamicValues[i + 1]);
 
-    let totalAssets = vault.address === "0x77e88cA17A6D384DCBB13747F6767F30e3753e63" ? BigInt(0) : returnBigIntResult(dynamicValues[i]);
-  
+    let totalAssets =
+      vault.address === "0x77e88cA17A6D384DCBB13747F6767F30e3753e63"
+        ? BigInt(0)
+        : returnBigIntResult(dynamicValues[i]);
+
     vaults[vault.address].totalAssets = totalAssets;
     vaults[vault.address].totalSupply = totalSupply;
     vaults[vault.address].withdrawalLimit = totalSupply;
@@ -230,6 +241,105 @@ export async function addDynamicVaultsData(
   return vaults;
 }
 
+export async function addDynamicVaultData(
+  vault: VaultData,
+  chain: Chain
+): Promise<VaultData> {
+  const client = createPublicClient({
+    chain,
+    transport: http(RPC_URLS[chain.id]),
+  });
+
+  // @ts-ignore
+  const dynamicValues = await client.multicall({
+    contracts: vault.metadata.type.includes("safe-vault")
+      ? [
+          {
+            address: vault.address,
+            abi: VaultAbi,
+            functionName: "totalAssets",
+          },
+          {
+            address: vault.address,
+            abi: VaultAbi,
+            functionName: "totalSupply",
+          },
+          {
+            address: vault.address,
+            abi: OracleVaultAbi,
+            functionName: "limits",
+          },
+          {
+            address: vault.address,
+            abi: erc20Abi,
+            functionName: "balanceOf",
+            args: [vault.safes![0]],
+          },
+        ]
+      : [
+          {
+            address: vault.address,
+            abi: VaultAbi,
+            functionName: "totalAssets",
+          },
+          {
+            address: vault.address,
+            abi: VaultAbi,
+            functionName: "totalSupply",
+          },
+          {
+            address: vault.address,
+            abi: VaultAbi,
+            functionName: "depositLimit",
+          },
+          {
+            address: vault.address,
+            abi: erc20Abi,
+            functionName: "balanceOf",
+            args: [vault.address],
+          },
+        ],
+    allowFailure: true,
+  });
+
+  const totalSupply =
+    vault.address === "0x77e88cA17A6D384DCBB13747F6767F30e3753e63"
+      ? BigInt(0)
+      : returnBigIntResult(dynamicValues[1]);
+
+  let totalAssets =
+    vault.address === "0x77e88cA17A6D384DCBB13747F6767F30e3753e63"
+      ? BigInt(0)
+      : returnBigIntResult(dynamicValues[0]);
+
+  vault.totalAssets = totalAssets;
+  vault.totalSupply = totalSupply;
+  vault.withdrawalLimit = totalSupply;
+  vault.assetsPerShare =
+    totalSupply > 0 ? Number(totalAssets) / Number(totalSupply) : 1;
+  vault.idle = returnBigIntResult(dynamicValues[3]);
+
+  if (vault.metadata.type.includes("safe-vault")) {
+    // @ts-ignore
+    vault.depositLimit =
+      dynamicValues[2].status === "success"
+        ? // @ts-ignore
+          (dynamicValues[2].result[0] as unknown as bigint)
+        : BigInt(0);
+    // @ts-ignore
+    vault.minLimit =
+      dynamicValues[2].status === "success"
+        ? // @ts-ignore
+          (dynamicValues[2].result[1] as unknown as bigint)
+        : BigInt(0);
+    vault.liquid = returnBigIntResult(dynamicValues[3]);
+  } else {
+    vault.depositLimit = returnBigIntResult(dynamicValues[2]);
+  }
+
+  return vault;
+}
+
 async function getSafeVaultApy(vault: VaultData): Promise<LlamaApy[]> {
   const client = createPublicClient({
     chain: ChainById[vault.chainId],
@@ -237,7 +347,11 @@ async function getSafeVaultApy(vault: VaultData): Promise<LlamaApy[]> {
   });
 
   const latestBlock = await client.getBlockNumber();
-  const initialBlock = await getLogsFromBlock(latestBlock, ORACLES_DEPLOY_BLOCK[vault.chainId], vault.chainId);
+  const initialBlock = await getLogsFromBlock(
+    latestBlock,
+    ORACLES_DEPLOY_BLOCK[vault.chainId],
+    vault.chainId
+  );
   const fromBlock = initialBlock === BigInt(0) ? "earliest" : initialBlock;
 
   const logs = await client.getContractEvents({
@@ -248,7 +362,7 @@ async function getSafeVaultApy(vault: VaultData): Promise<LlamaApy[]> {
     abi: AssetPushOracleAbi,
     eventName: "PriceUpdated",
     fromBlock,
-    toBlock: latestBlock
+    toBlock: latestBlock,
   });
 
   if (logs.length === 0) return [];

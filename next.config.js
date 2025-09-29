@@ -14,6 +14,7 @@ const nextConfig = {
     DUNE_API_KEY: process.env.DUNE_API_KEY,
     ENSO_API_KEY: process.env.ENSO_API_KEY,
     DEFILLAMA_API_KEY: process.env.DEFILLAMA_API_KEY,
+    VAULTS_CACHE: process.env.VAULTS_CACHE,
     DISCORD_WEBHOOK: process.env.DISCORD_WEBHOOK,
     FLASHBOTS_RPC_URL: process.env.FLASHBOTS_RPC_URL,
     MAINNET_RPC_URL: process.env.MAINNET_RPC_URL,

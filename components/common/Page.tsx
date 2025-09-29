@@ -1,6 +1,10 @@
 import Navbar from "@/components/navbar/Navbar";
 import { vaultsAtom } from "@/lib/atoms/vaults";
-import { GAUGE_NETWORKS, RPC_URLS, SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
+import {
+  GAUGE_NETWORKS,
+  RPC_URLS,
+  SUPPORTED_NETWORKS,
+} from "@/lib/utils/connectors";
 import { useAtom } from "jotai";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useAccount, usePublicClient } from "wagmi";
@@ -8,8 +12,23 @@ import Footer from "@/components/common/Footer";
 import { Address, createPublicClient, http, zeroAddress } from "viem";
 import Modal from "@/components/modal/Modal";
 import MainActionButton from "../button/MainActionButton";
-import { gaugeRewardsAtom, loadingProgressAtom, networthAtom, strategiesAtom, tokensAtom, tvlAtom} from "@/lib/atoms";
-import { StrategiesByChain, TokenByAddress, TokenType, VaultData } from "@/lib/types";
+import {
+  gaugeRewardsAtom,
+  loadingProgressAtom,
+  networthAtom,
+  strategiesAtom,
+  tokensAtom,
+  tvlAtom,
+} from "@/lib/atoms";
+import {
+  StrategiesByChain,
+  TokenByAddress,
+  TokenType,
+  VaultData,
+} from "@/lib/types";
+import {
+  addBalances,
+} from "@/lib/tokens";
 import getTokenAndVaultsDataByChain from "@/lib/getTokenAndVaultsData";
 import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
 import axios from "axios";
@@ -21,9 +40,9 @@ import ProgressBar from "@/components/common/ProgressBar";
 import localFont from "next/font/local";
 
 const khTeka = localFont({
-  src: '../../public/KH_Teka/KHTeka-Regular.woff',
-  variable: '--font-kh-teka'
-})
+  src: "../../public/KH_Teka/KHTeka-Regular.woff",
+  variable: "--font-kh-teka",
+});
 
 interface TermsModalProps {
   showModal: boolean;
@@ -151,145 +170,387 @@ export default function Page({
   const publicClient = usePublicClient();
 
   const [progress, setLoadingProgress] = useAtom(loadingProgressAtom);
-  const [, setVaults] = useAtom(vaultsAtom);
-  const [, setTokens] = useAtom(tokensAtom);
+  const [vaults, setVaults] = useAtom(vaultsAtom);
+  const [tokens, setTokens] = useAtom(tokensAtom);
   const [, setStrategies] = useAtom(strategiesAtom);
   const [, setGaugeRewards] = useAtom(gaugeRewardsAtom);
   const [, setTVL] = useAtom(tvlAtom);
   const [, setNetworth] = useAtom(networthAtom);
+  const [startLoad, setStartLoad] = useState<number>(0);
+  const [hasCached, setHasCached] = useState<boolean>(false);
 
+  function editDate(vaultsData: VaultData[], strategies: StrategiesByChain) {
+    const vaults = vaultsData.map((vault) => ({
+      ...vault,
+      apyData: {
+        ...vault.apyData,
+        apyHist: vault.apyData.apyHist.map((entry) => ({
+          ...entry,
+          date: new Date(entry.date),
+        })),
+      },
+    }));
+
+    const fixedStrategies: StrategiesByChain = {};
+
+    for (const [chainId, stratByAddr] of Object.entries(strategies)) {
+      fixedStrategies[Number(chainId)] = Object.fromEntries(
+        Object.entries(stratByAddr).map(([address, strat]) => [
+          address,
+          {
+            ...strat,
+            apyData: {
+              ...strat.apyData,
+              apyHist: strat.apyData?.apyHist.map((entry) => ({
+                ...entry,
+                date: new Date(entry.date),
+              })),
+            },
+          },
+        ])
+      );
+    }
+
+    return { v: vaults, s: fixedStrategies };
+  }
+
+  const ACCOUNT_NETWORTH = "accountData";
+  const TOKENS = "tokensData";
+  const GAUGE = "gaugeData";
+  const UPDATE_TIME  = "updateTime";
+  const REFRESH_MSECONDS = 10000; // after this amount of ms the account balances are fetched again
+  const ACCOUNT = "accountAddr";
+
+  // get accounts data like balances
+  // uses local storage that refreshes every REFRESH_MSECONDS
+  useEffect(() => {
+    async function getAccountData(
+      newTokens: { [key: number]: TokenByAddress },
+      newVaultsData: { [key: number]: VaultData[] }
+    ) {
+      if (account && account !== zeroAddress) {
+        console.log(`FETCHING ACCOUNT DATA (${new Date()})`);
+        let start = Number(new Date());
+        // TOKEN BALANCES
+        const t = localStorage.getItem(TOKENS);
+        if (t) {
+          const storedTokens: { [key: number]: TokenByAddress } = JSON.parse(t);
+          console.log("USING STORED DATA FOR BALANCES");
+          
+          // update tokens with account balance
+          setTokens((prev) => ({ ...storedTokens }));
+        } else {
+          console.log("FETCHING ACCOUNT BALANCES");
+          await Promise.all(
+            SUPPORTED_NETWORKS.map(async (chain) => {
+              const client = createPublicClient({
+                chain,
+                transport: http(RPC_URLS[chain.id]),
+              });
+              newTokens[chain.id] = await addBalances(
+                newTokens[chain.id],
+                account,
+                client
+              );
+  
+              setLoadingProgress((prev) => prev + 70 / SUPPORTED_NETWORKS.length);
+            })
+          );
+
+          setTokens((prev) => ({ ...newTokens }));
+
+          localStorage.setItem(TOKENS, JSON.stringify(newTokens, (_, v) =>
+            typeof v === "bigint" ? v.toString() : v
+          ));
+        }
+
+
+        // check for account networth in local storage
+        const nStored = localStorage.getItem(ACCOUNT_NETWORTH);
+        if (nStored) {
+          // console.log("USING STORED DATA FOR NETWORTH");
+          const networth = JSON.parse(nStored);
+
+          setNetworth((prev) => ({
+            vault: networth.vault,
+            lockVault: networth.lockVault,
+            wallet: networth.wallet,
+            stake: networth.stake,
+            total:
+              networth.vault + networth.lockVault + networth.wallet + networth.stake,
+          }));
+        } else {
+          // console.log("FETCHING NETWORTH");
+
+          const vaultNetworth = SUPPORTED_NETWORKS.map((chain) =>
+            Object.values(newTokens[chain.id])
+          )
+            .flat()
+            .filter(
+              (t) => t.type === TokenType.Vault || t.type === TokenType.Gauge
+            )
+            .reduce((a, b) => a + Number(b.balance.formattedUSD), 0);
+          const assetNetworth = SUPPORTED_NETWORKS.map((chain) =>
+            Object.values(newTokens[chain.id])
+          )
+            .flat()
+            .filter((t) => t.type === TokenType.Asset)
+            .reduce((a, b) => a + Number(b.balance.formattedUSD), 0);
+  
+          const stake = await createPublicClient({
+            chain: mainnet,
+            transport: http(RPC_URLS[1]),
+          }).readContract({
+            address: VE_VCX,
+            abi: VotingEscrowAbi,
+            functionName: "locked",
+            args: [account],
+          });
+  
+          const stakeNetworth =
+            Number(
+              formatBalanceUSD(stake.amount, 18, newTokens[1][VCX_LP].price)
+            ) + Number(newTokens[1][ST_VCX].balance.formattedUSD);
+          const lockVaultNetworth = 0; // @dev hardcoded since we removed lock vaults
+
+          localStorage.setItem(ACCOUNT_NETWORTH, JSON.stringify({
+            vault: vaultNetworth,
+            lockVault: lockVaultNetworth,
+            wallet: assetNetworth,
+            stake: stakeNetworth,
+            total:
+              vaultNetworth + assetNetworth + stakeNetworth + lockVaultNetworth,
+          }));
+  
+          localStorage.setItem(UPDATE_TIME, `${Number(new Date())}`);
+  
+          setNetworth((prev) => ({
+            vault: vaultNetworth,
+            lockVault: lockVaultNetworth,
+            wallet: assetNetworth,
+            stake: stakeNetworth,
+            total:
+              vaultNetworth + assetNetworth + stakeNetworth + lockVaultNetworth,
+          }));
+        }
+
+        const g = localStorage.getItem(GAUGE);
+        if (g) {
+          const newRewards: { [key: number]: GaugeRewards } = JSON.parse(g);
+          // console.log("USING STORED DATA FOR GAUGES");
+          
+          // update tokens with account balance
+          setGaugeRewards((pre) => ({ ...newRewards }));
+        } else {
+          const newRewards: { [key: number]: GaugeRewards } = {};
+          // console.log("FETCHING GAUGE REWARDS");
+          
+          await Promise.all(
+            GAUGE_NETWORKS.map(
+              async (chain) =>
+                (newRewards[chain] = await getGaugeRewards({
+                  gauges: newVaultsData[chain]
+                    .filter((vault) => vault.gauge && vault.gauge !== zeroAddress)
+                    .map((vault) => vault.gauge) as Address[],
+                  account: account as Address,
+                  chainId: chain,
+                  publicClient: publicClient!,
+                }))
+            )
+          );
+  
+          localStorage.setItem(GAUGE, JSON.stringify(newRewards, (_, v) =>
+            typeof v === "bigint" ? v.toString() : v
+          ));
+
+          setGaugeRewards((pre) => ({ ...newRewards }));
+        }
+
+        // console.log(`Completed fetching Vaultron (${new Date()})`);
+        if(hasCached) {
+          console.log(
+            `Took ${Number(new Date()) - start}ms to load entire data`
+          );
+        } else {
+          console.log(
+            `Took ${Number(new Date()) - start}ms to load account data`
+          );
+          console.log(
+            `Took ${Number(new Date()) - startLoad}ms to load entire data`
+          );
+        }
+
+      }
+    }
+
+    function getStorageOrClean() {
+      const time = localStorage.getItem(UPDATE_TIME);
+      const acc = localStorage.getItem(ACCOUNT);
+      if (account && account !== zeroAddress) {
+        if (time && Number(time) + REFRESH_MSECONDS < Number(new Date()) || account !== acc) {
+          console.log("CLEARING LOCAL STORAGE");
+          localStorage.removeItem(ACCOUNT_NETWORTH);
+          localStorage.removeItem(TOKENS);
+          localStorage.removeItem(GAUGE);
+          localStorage.setItem(ACCOUNT, account);
+        }
+      }
+    }
+
+    if (Object.keys(tokens).length > 0 && Object.keys(vaults).length > 0) {
+      getStorageOrClean();
+      getAccountData(tokens, vaults);
+
+    }
+  }, [account, vaults]);
+
+  // gets vaults data
+  // uses json cache file if present in env
+  // TODO add time based
   useEffect(() => {
     async function getData() {
-      console.log(`FETCHING APP DATA (${new Date()})`)
+      console.log(`FETCHING APP DATA (${new Date()})`);
       setLoadingProgress(0);
-      const getDataStart = Number(new Date())
+      setStartLoad(Number(new Date()));
+      const getDataStart = Number(new Date());
 
       // get vaultsData and tokens
-      const newVaultsData: { [key: number]: VaultData[] } = {}
-      const newTokens: { [key: number]: TokenByAddress } = {}
-      const newStrategies: StrategiesByChain = {}
+      const newVaultsData: { [key: number]: VaultData[] } = {};
+      const newTokens: { [key: number]: TokenByAddress } = {};
+      const newStrategies: StrategiesByChain = {};
 
-      console.log(`Fetching Token and Vaults Data (${new Date()})`)
-      let start = Number(new Date())
+      console.log(`Fetching Token and Vaults Data (${new Date()})`);
+      let start = Number(new Date());
 
       setLoadingProgress(10);
       await Promise.all(
         SUPPORTED_NETWORKS.map(async (chain) => {
-          console.log(`Fetching Data for chain ${chain.id} (${new Date()})`)
-          let chainStart = Number(new Date())
+          // console.log(`Fetching Data for chain ${chain.id} (${new Date()})`)
+          let chainStart = Number(new Date());
 
-          const { vaultsData, tokens, strategies } = await getTokenAndVaultsDataByChain({
-            chain,
-            account: account || zeroAddress
-          })
+          const { vaultsData, tokens, strategies } =
+            await getTokenAndVaultsDataByChain({
+              chain,
+              account: account || zeroAddress,
+            });
 
-          console.log(`Completed fetching Data for chain ${chain.id} (${new Date()})`)
-          console.log(`Took ${Number(new Date()) - chainStart}ms to load`)
+          console.log(
+            `Completed fetching Data for chain ${chain.id} (${new Date()})`
+          );
+          console.log(`Took ${Number(new Date()) - chainStart}ms to load`);
 
-          newVaultsData[chain.id] = vaultsData
+          newVaultsData[chain.id] = vaultsData;
           newTokens[chain.id] = tokens;
-          newStrategies[chain.id] = strategies
+          newStrategies[chain.id] = strategies;
 
-          setLoadingProgress(prev => prev + (70 / SUPPORTED_NETWORKS.length))
+          setLoadingProgress((prev) => prev + 70 / SUPPORTED_NETWORKS.length);
         })
       );
 
-      console.log(`Completed fetching Token and Vaults Data (${new Date()})`)
-      console.log(`Took ${Number(new Date()) - start}ms to load`)
+      // console.log(`Completed fetching Token and Vaults Data (${new Date()})`)
+      // console.log(`Took ${Number(new Date()) - start}ms to load`)
 
-      console.log(`Fetching TVL (${new Date()})`)
-      start = Number(new Date())
+      // console.log(`Fetching TVL (${new Date()})`)
+      start = Number(new Date());
 
-      console.log(newVaultsData)
-      const vaultTVL = SUPPORTED_NETWORKS.map(chain => newVaultsData[chain.id]).flat().reduce((a, b) => a + (b?.tvl || 0), 0)
-      const lockVaultTVL = 520000 // @dev hardcoded since we removed lock vaults
-      let stakingTVL = 0
+      console.log(newVaultsData);
+      const vaultTVL = SUPPORTED_NETWORKS.map(
+        (chain) => newVaultsData[chain.id]
+      )
+        .flat()
+        .reduce((a, b) => a + (b?.tvl || 0), 0);
+      const lockVaultTVL = 520000; // @dev hardcoded since we removed lock vaults
+      let stakingTVL = 0;
       try {
-        stakingTVL = await axios.get(`https://pro-api.llama.fi/${process.env.DEFILLAMA_API_KEY}/api/protocol/vaultcraft`).then(res => res.data.currentChainTvls["staking"])
+        stakingTVL = await axios
+          .get(
+            `https://pro-api.llama.fi/${process.env.DEFILLAMA_API_KEY}/api/protocol/vaultcraft`
+          )
+          .then((res) => res.data.currentChainTvls["staking"]);
       } catch (e) {
         stakingTVL = 2590000;
       }
 
-      console.log(`Completed fetching TVL (${new Date()})`)
-      console.log(`Took ${Number(new Date()) - start}ms to load`)
+      // console.log(`Completed fetching TVL (${new Date()})`)
+      // console.log(`Took ${Number(new Date()) - start}ms to load`)
 
-
-      setTVL(prev => ({
+      setTVL((prev) => ({
         vault: vaultTVL,
         lockVault: lockVaultTVL,
         stake: stakingTVL,
         total: vaultTVL + lockVaultTVL + stakingTVL,
       }));
-      setVaults(prev => ({ ...newVaultsData }));
-      setTokens(prev => ({ ...newTokens }));
-      setStrategies(prev => ({ ...newStrategies }));
-      setLoadingProgress(prev => 90)
+      setVaults((prev) => ({ ...newVaultsData }));
+      setTokens((prev) => ({ ...newTokens }));
+      setStrategies((prev) => ({ ...newStrategies }));
 
-      if (account) {
-        console.log(`Fetching Networth (${new Date()})`)
-        start = Number(new Date())
+      console.log(`COMPLETED FETCHING APP DATA (${new Date()})`);
+      console.log(`Took ${Number(new Date()) - getDataStart}ms to load`);
 
-        const vaultNetworth = SUPPORTED_NETWORKS.map(chain =>
-          Object.values(newTokens[chain.id])).flat().filter(t => t.type === TokenType.Vault || t.type === TokenType.Gauge)
-          .reduce((a, b) => a + Number(b.balance.formattedUSD), 0)
-        const assetNetworth = SUPPORTED_NETWORKS.map(chain =>
-          Object.values(newTokens[chain.id])).flat().filter(t => t.type === TokenType.Asset)
-          .reduce((a, b) => a + Number(b.balance.formattedUSD), 0)
-
-        const stake = await createPublicClient({
-          chain: mainnet,
-          transport: http(RPC_URLS[1]),
-        }).readContract({
-          address: VE_VCX,
-          abi: VotingEscrowAbi,
-          functionName: "locked",
-          args: [account],
-        });
-
-        const stakeNetworth = Number(formatBalanceUSD(stake.amount, 18, newTokens[1][VCX_LP].price)) + Number(newTokens[1][ST_VCX].balance.formattedUSD);
-        const lockVaultNetworth = 0; // @dev hardcoded since we removed lock vaults
-
-        console.log(`Completed fetching Networth (${new Date()})`)
-        console.log(`Took ${Number(new Date()) - start}ms to load`)
-
-
-        console.log(`Fetching GaugeRewards (${new Date()})`)
-        start = Number(new Date())
-
-
-        const newRewards: { [key: number]: GaugeRewards } = {}
-        await Promise.all(GAUGE_NETWORKS.map(async (chain) =>
-          newRewards[chain] = await getGaugeRewards({
-            gauges: newVaultsData[chain].filter(vault => vault.gauge && vault.gauge !== zeroAddress).map(vault => vault.gauge) as Address[],
-            account: account as Address,
-            chainId: chain,
-            publicClient: publicClient!
-          })
-        ))
-
-        console.log(`Completed fetching GaugeRewards (${new Date()})`)
-        console.log(`Took ${Number(new Date()) - start}ms to load`)
-
-
-        setNetworth(prev => ({
-          vault: vaultNetworth,
-          lockVault: lockVaultNetworth,
-          wallet: assetNetworth,
-          stake: stakeNetworth,
-          total:
-            vaultNetworth + assetNetworth + stakeNetworth + lockVaultNetworth,
-        }));
-        setGaugeRewards(pre => ({ ...newRewards }));
-
-        console.log(`Completed fetching Vaultron (${new Date()})`)
-        console.log(`Took ${Number(new Date()) - start}ms to load`)
-      }
-      console.log(`COMPLETED FETCHING APP DATA (${new Date()})`)
-      console.log(`Took ${Number(new Date()) - getDataStart}ms to load`)
-      setLoadingProgress(prev => 100)
+      setLoadingProgress((prev) => 100);
     }
-    getData();
-  }, [account]);
+
+    async function getCache() {
+      console.log("CACHE");
+      console.log(`FETCHING APP DATA (${new Date()})`);
+
+      setLoadingProgress(0);
+      setStartLoad(Number(new Date()));
+
+      const getDataStart = Number(new Date());
+
+      setLoadingProgress(10);
+
+      // get cached vaultsData and tokens
+      const newVaultsData: { [key: number]: VaultData[] } = {};
+      const newTokens: { [key: number]: TokenByAddress } = {};
+      const newStrategies: StrategiesByChain = {};
+
+      const response = await fetch(`${process.env.VAULTS_CACHE}`);
+
+      const {
+        vaultsData,
+        tokens,
+        strategies,
+        vaultTVL,
+        lockVaultTVL,
+        stakingTVL,
+      } = await response.json();
+
+      SUPPORTED_NETWORKS.map((chain) => {
+        const { v, s } = editDate(vaultsData[chain.id], strategies[chain.id]);
+        newVaultsData[chain.id] = v;
+        newTokens[chain.id] = tokens[chain.id];
+        newStrategies[chain.id] = s[chain.id];
+      });
+
+      setTVL((prev) => ({
+        vault: vaultTVL,
+        lockVault: lockVaultTVL,
+        stake: stakingTVL,
+        total: vaultTVL + lockVaultTVL + stakingTVL,
+      }));
+      setVaults((prev) => ({ ...newVaultsData }));
+      setTokens((prev) => ({ ...newTokens }));
+      setStrategies((prev) => ({ ...newStrategies }));
+      setLoadingProgress((prev) => 90);
+
+      console.log(`COMPLETED FETCHING VAULTS DATA (${new Date()})`);
+      console.log(`Took ${Number(new Date()) - getDataStart}ms to load`);
+      setLoadingProgress((prev) => 100);
+    }
+
+    (async () => {
+      try {
+        if (process.env.VAULTS_CACHE) await getCache();
+        else await getData();
+        setHasCached(true);
+      } catch (e) {
+        await getData();
+        setHasCached(true);
+      }
+    })();
+  }, []);
 
   const [showTermsModal, setShowTermsModal] = useState<boolean>(false);
   const [termsSigned, setTermsSigned] = useState<boolean>(false);
@@ -310,11 +571,11 @@ export default function Page({
       <div className="bg-customNeutral300 w-full min-h-screen h-full mx-auto flex flex-col font-khTeka">
         <Navbar />
         <div className="flex-1 container p-0">
-          {progress < 100 &&
+          {progress < 100 && (
             <div className="">
               <ProgressBar progress={progress} />
             </div>
-          }
+          )}
           <TermsModal
             showModal={showTermsModal}
             setShowModal={setShowTermsModal}
@@ -324,7 +585,7 @@ export default function Page({
         </div>
         <div className="py-10"></div>
         <Footer />
-      </div >
+      </div>
     </div>
   );
 }

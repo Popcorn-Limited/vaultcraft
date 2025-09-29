@@ -13,7 +13,7 @@ export async function vcx({
 
     return Number(data.pair.priceUsd)
   } catch (e) {
-    console.log("DEXSCREENER: error fetching vcx price : ", e)
+    // console.log("DEXSCREENER: error fetching vcx price : ", e)
     try {
       const { data } = await axios.get(`https://pro-api.llama.fi/${process.env.DEFILLAMA_API_KEY}/coins/prices/current/ethereum:0xce246eea10988c495b4a90a905ee9237a0f91543?searchWidth=4h`);
 
@@ -22,7 +22,7 @@ export async function vcx({
         ? FALLBACK_PRICE
         : data.coins["ethereum:0xce246eea10988c495b4a90a905ee9237a0f91543"].price;
     } catch (e) {
-      console.log("DEFILLAMA: error fetching vcx price : ", e)
+      // console.log("DEFILLAMA: error fetching vcx price : ", e)
       return FALLBACK_PRICE
     }
   }
