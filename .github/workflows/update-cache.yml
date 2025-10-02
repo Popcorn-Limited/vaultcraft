@@ -20,7 +20,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18.17.0
+          node-version: 22.0.0
 
       - name: Install Yarn 1.22
         run: npm install -g yarn@1.22.21
