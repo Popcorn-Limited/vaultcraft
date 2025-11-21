@@ -30,7 +30,7 @@ export const DEBANK_CHAIN_IDS: { [key: number]: string } = {
 export const ORACLES_DEPLOY_BLOCK: { [key: number]: number } = {
   [1]: 0,
   [10]: 0,
-  [42161]: 0,
+  [42161]: 203649916,
   [137]: 0,
   [56]: 48150138,
   [196]: 0,
