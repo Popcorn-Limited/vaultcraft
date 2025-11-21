@@ -2,7 +2,7 @@ name: Update Vault Data
 
 on:
   schedule:
-    - cron: '0 * * * *'  # every hour
+    - cron: '0 */4 * * *'  # every 4 hours
   workflow_dispatch:
 
 jobs:
