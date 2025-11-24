@@ -243,7 +243,7 @@ function SafeVaultInputs({
 
       if (float >= expectedAssets) {
         if (vaultWithdraw) {
-          if(vaultData.address === "0xdB06a9D79f5Ff660f611234c963c255E03Cb5554") {
+          if(vaultData.address === "0xdB06a9D79f5Ff660f611234c963c255E03Cb5554" && vaultData.chainId === 1) {
              // request withdraw vault input 
              setAction(VaultActionType.RequestWithdrawal)
              setSteps(selectActions(VaultActionType.RequestWithdrawal));
