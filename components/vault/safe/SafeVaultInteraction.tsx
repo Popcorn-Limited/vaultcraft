@@ -243,9 +243,15 @@ function SafeVaultInputs({
 
       if (float >= expectedAssets) {
         if (vaultWithdraw) {
-          // instant withdrawing vault input 
-          setAction(VaultActionType.RequestFulfillAndWithdraw)
-          setSteps(selectActions(VaultActionType.RequestFulfillAndWithdraw));
+          if(vaultData.address === "0xdB06a9D79f5Ff660f611234c963c255E03Cb5554") {
+             // request withdraw vault input 
+             setAction(VaultActionType.RequestWithdrawal)
+             setSteps(selectActions(VaultActionType.RequestWithdrawal));
+          } else {
+            // instant withdrawing vault input 
+            setAction(VaultActionType.RequestFulfillAndWithdraw)
+            setSteps(selectActions(VaultActionType.RequestFulfillAndWithdraw));
+          }
         } else {
           // instant withdrawing gauge input
           setAction(VaultActionType.UnstakeAndRequestFulfillWithdraw);
