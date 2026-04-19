@@ -18,6 +18,7 @@ const nextConfig = {
     ENSO_API_KEY: process.env.ENSO_API_KEY,
     DEFILLAMA_API_KEY: process.env.DEFILLAMA_API_KEY,
     DEBANK_API_KEY: process.env.DEBANK_API_KEY,
+    VAULTS_CACHE: process.env.VAULTS_CACHE,
   },
   async headers() {
     return [{
