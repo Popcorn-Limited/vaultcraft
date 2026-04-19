@@ -6,26 +6,18 @@ const nextConfig = {
   images: {
     domains: ["cdn.furucombo.app", "cryptologos.cc", "forum.vaultcraft.io"],
   },
+  // Next.js inlines vars listed here into the CLIENT-side JS bundle at build
+  // time. Only keep values that client code legitimately needs. Server-only
+  // code (API routes, server components) reads process.env directly at
+  // runtime and does NOT need an entry here.
   env: {
     NEXT_PUBLIC_ALCHEMY_API_KEY: process.env.ALCHEMY_API_KEY,
     PINATA_API_SECRET: process.env.PINATA_API_SECRET,
     PINATA_API_KEY: process.env.PINATA_API_KEY,
     IPFS_URL: process.env.IPFS_URL,
-    DUNE_API_KEY: process.env.DUNE_API_KEY,
     ENSO_API_KEY: process.env.ENSO_API_KEY,
     DEFILLAMA_API_KEY: process.env.DEFILLAMA_API_KEY,
-    VAULTS_CACHE: process.env.VAULTS_CACHE,
-    DISCORD_WEBHOOK: process.env.DISCORD_WEBHOOK,
-    FLASHBOTS_RPC_URL: process.env.FLASHBOTS_RPC_URL,
-    MAINNET_RPC_URL: process.env.MAINNET_RPC_URL,
-    VCX_RECIPIENT: process.env.VCX_RECIPIENT,
-    BOT_PRIVATE_KEY: process.env.BOT_PRIVATE_KEY,
-    MIN_AMOUNT: process.env.MIN_AMOUNT,
-    WATCH_LIST: process.env.WATCH_LIST,
-    ZK_FETCH_APP_ID: process.env.ZK_FETCH_APP_ID,
-    ZK_FETCH_SECRET: process.env.ZK_FETCH_SECRET,
     DEBANK_API_KEY: process.env.DEBANK_API_KEY,
-    TEST_BOT_PRIVATE_KEY: process.env.TEST_BOT_PRIVATE_KEY,
   },
   async headers() {
     return [{
