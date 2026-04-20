@@ -371,6 +371,8 @@ async function getSafeVaultApy(vault: VaultData): Promise<LlamaApy[]> {
     (log) => log.args.base === vault.address && log.args.quote === vault.asset
   );
 
+  if (filteredLogs.length === 0) return [];
+
   let firstTimestamp = Number(
     (
       await client.getBlock({

@@ -32,10 +32,82 @@ jobs:
       - name: Run cache script
         run: yarn run cache
 
-      - name: Commit & push changes 
+      - name: Validate cache output
+        run: |
+          FILE=cache/vaultsData.json
+          if [ ! -f "$FILE" ]; then
+            echo "::error::$FILE not written by cache script"
+            exit 1
+          fi
+          # Must be valid JSON
+          jq empty "$FILE" || { echo "::error::$FILE is not valid JSON"; exit 1; }
+          # Must have generatedAt within last 30 minutes
+          GEN=$(jq -r '.generatedAt // empty' "$FILE")
+          if [ -z "$GEN" ]; then
+            echo "::error::generatedAt missing from $FILE"
+            exit 1
+          fi
+          GEN_EPOCH=$(date -d "$GEN" +%s)
+          NOW_EPOCH=$(date +%s)
+          AGE=$(( NOW_EPOCH - GEN_EPOCH ))
+          if [ "$AGE" -gt 1800 ] || [ "$AGE" -lt -60 ]; then
+            echo "::error::generatedAt=$GEN is ${AGE}s from now (outside -60..1800 window)"
+            exit 1
+          fi
+          # Must have mainnet (chain 1) data
+          CHAINS=$(jq -r '.chains[]?' "$FILE" | tr '\n' ' ')
+          echo "chains present: $CHAINS"
+          if ! echo "$CHAINS" | grep -qE '(^| )1( |$)'; then
+            echo "::error::mainnet (chain 1) missing from output"
+            exit 1
+          fi
+          # Require at least 6 of the 9 supported chains
+          CHAIN_COUNT=$(jq -r '.chains | length' "$FILE")
+          if [ "$CHAIN_COUNT" -lt 6 ]; then
+            echo "::error::only $CHAIN_COUNT chains succeeded (need >=6)"
+            exit 1
+          fi
+          # vaultTVL must be a non-negative number
+          TVL=$(jq -r '.vaultTVL' "$FILE")
+          case "$TVL" in
+            ''|*[!0-9.]*) echo "::error::vaultTVL=$TVL is not numeric"; exit 1 ;;
+          esac
+          # Every vault.address must match 0x + 40 hex
+          BAD=$(jq -r '[.vaultsData[][] | .address] | map(select(test("^0x[a-fA-F0-9]{40}$") | not)) | length' "$FILE")
+          if [ "$BAD" -gt 0 ]; then
+            echo "::error::$BAD vault addresses failed hex validation"
+            exit 1
+          fi
+          # Every vault.asset must match 0x + 40 hex
+          BAD=$(jq -r '[.vaultsData[][] | .asset] | map(select(test("^0x[a-fA-F0-9]{40}$") | not)) | length' "$FILE")
+          if [ "$BAD" -gt 0 ]; then
+            echo "::error::$BAD vault assets failed hex validation"
+            exit 1
+          fi
+          echo "::notice::cache validated: $CHAIN_COUNT chains, vaultTVL=$TVL, generated $GEN"
+
+      - name: Commit & push changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
           git commit -m "Update vaults data cache"
-          git push origin main
+          git push origin HEAD:${{ github.ref_name }}
+
+      - name: Alert on failure
+        if: failure()
+        env:
+          WEBHOOK: ${{ secrets.CACHE_ALERT_WEBHOOK }}
+        run: |
+          if [ -z "$WEBHOOK" ]; then
+            echo "CACHE_ALERT_WEBHOOK secret not set — skipping alert"
+            exit 0
+          fi
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          curl -sS -X POST -H 'Content-Type: application/json' \
+            -d "{\"text\":\"vaultcraft cache update failed: $RUN_URL\"}" \
+            "$WEBHOOK" || true
